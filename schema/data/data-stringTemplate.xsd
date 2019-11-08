@@ -3,7 +3,7 @@
   <xs:annotation>
     <xs:documentation>
 
-      Copyright (C) 2002-2018  The FreeCol Team
+      Copyright (C) 2002-2019  The FreeCol Team
 
       This file is part of FreeCol.
 
@@ -34,12 +34,22 @@
 
   <xs:complexType name="StringTemplateType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="pair">
+        <xs:complexType>
+          <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element ref="stringTemplate" />
+          </xs:choice>
+          <xs:attribute name="value" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <!-- @compat 0.11.x -->
       <xs:element name="key">
         <xs:complexType>
           <xs:attribute name="value" type="xs:string" use="required" />
         </xs:complexType>
       </xs:element>
       <xs:element ref="stringTemplate" />
+      <!-- end @compat 0.11.x -->
     </xs:choice>
 
     <xs:attribute name="id" type="xs:string" use="required" />

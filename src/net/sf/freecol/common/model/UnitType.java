@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -31,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.UnitTypeChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -188,7 +190,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The offence value.
      */
     public double getOffence() {
-        return applyModifiers(this.baseOffence, null, Modifier.OFFENCE);
+        return apply(this.baseOffence, null, Modifier.OFFENCE);
     }
 
     /**
@@ -215,7 +217,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The defence value.
      */
     public double getDefence() {
-        return applyModifiers(this.baseDefence, null, Modifier.DEFENCE);
+        return apply(this.baseDefence, null, Modifier.DEFENCE);
     }
 
     /**
@@ -501,6 +503,15 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
+     * Is this unit type able to build a colony?
+     *
+     * @return True if this unit type can build colonies.
+     */
+    public boolean canBuildColony() {
+        return hasAbility(Ability.FOUND_COLONY);
+    }
+
+    /**
      * Can this unit type move to the High Seas?
      *
      * ATM this is synonymous with being a naval unit, but we should use
@@ -624,9 +635,7 @@ public final class UnitType extends BuildableType implements Consumer {
     // Interface Consumer
 
     /**
-     * Gets a list of goods this Consumer consumes.
-     *
-     * @return The goods consumed by this unit type.
+     * {@inheritDoc}
      */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
@@ -637,11 +646,7 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Gets the priority of this Consumer.  The higher the priority,
-     * the earlier will the Consumer be allowed to consume the goods
-     * it requires.
-     *
-     * @return The priority of this unit type.
+     * {@inheritDoc}
      */
     @Override
     public int getPriority() {
@@ -649,12 +654,11 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Is this unit type able to build a colony?
-     *
-     * @return True if this unit type can build colonies.
+     * {@inheritDoc}
      */
-    public boolean canBuildColony() {
-        return hasAbility(Ability.FOUND_COLONY);
+    @Override
+    public Stream<Modifier> getConsumptionModifiers(String id) {
+        return getModifiers(id);
     }
 
 

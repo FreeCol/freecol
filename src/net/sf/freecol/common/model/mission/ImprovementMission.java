@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -60,10 +60,8 @@ public class ImprovementMission extends AbstractMission {
      *
      * @param game a {@code Game} value
      * @param xr a {@code FreeColXMLReader} value
-     * @exception XMLStreamException if an error occurs
      */
-    public ImprovementMission(Game game,
-                              FreeColXMLReader xr) throws XMLStreamException {
+    public ImprovementMission(Game game, FreeColXMLReader xr) {
         super(game, xr);
     }
 
@@ -119,9 +117,8 @@ public class ImprovementMission extends AbstractMission {
      */
     @Override
     public boolean isValid() {
-        return super.isValid()
-            && improvement != null
-            && improvement.isWorkerAllowed(getUnit());
+        return improvement != null && improvement.isWorkerAllowed(getUnit())
+            && super.isValid();
     }
 
     /**

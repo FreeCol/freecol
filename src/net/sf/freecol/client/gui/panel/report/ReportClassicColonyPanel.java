@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,8 +54,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This panel displays the classic version of the colony report.
  */
-public final class ReportClassicColonyPanel extends ReportPanel
-    implements ActionListener {
+public final class ReportClassicColonyPanel extends ReportPanel {
 
     /**
      * Compare buildings by their underlying type index (which reduces
@@ -90,7 +89,6 @@ public final class ReportClassicColonyPanel extends ReportPanel
         final ImageLibrary lib = getImageLibrary();
         
         reportPanel.removeAll();
-        
         reportPanel.setLayout(new MigLayout("fill")); // Set the layout
         
         for (Colony colony : this.colonies) {

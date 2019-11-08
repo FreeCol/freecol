@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,12 +22,11 @@ package net.sf.freecol.tools;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.zip.GZIPInputStream;
 
 import net.sf.freecol.FreeCol;
@@ -46,8 +45,9 @@ public class FSGConverter {
      * @see #getFSGConverter()
      */
     private static FSGConverter singleton;
-    
-    
+    private static Object singletonLock = new Object();
+
+
     /**
      * Creates an instance of {@code FSGConverter}
      */
@@ -62,18 +62,18 @@ public class FSGConverter {
      */
     public static FSGConverter getFSGConverter() {
         // Using lazy initialization:       
-        if (singleton == null) {
-            singleton = new FSGConverter();
+        synchronized (singletonLock) {
+            if (singleton == null) {
+                singleton = new FSGConverter();
+            }
+            return singleton;
         }
-        return singleton;
     }
 
     
     /**
      * Converts the given input file to an uncompressed and
      * indented XML-file.
-     * 
-     * <br><br>
      * 
      * Savegame compression is automatically detected, so using
      * this method on an uncompressed savegame creates an
@@ -82,14 +82,11 @@ public class FSGConverter {
      * @param in The input file.
      * @param out The output file. This file will be overwritten
      *      if it already exists.
-     * @throws FileNotFoundException if the given input file could not be found.
      * @throws IOException if thrown while reading or writing the files. 
      */
-    public void convertToXML(File in, File out) throws FileNotFoundException, IOException {
-        try (
-            FileInputStream fis = new FileInputStream(in);
-            FileOutputStream fos = new FileOutputStream(out);
-        ) {
+    private void convertToXML(File in, File out) throws IOException {
+        try (InputStream fis = Files.newInputStream(in.toPath());
+            OutputStream fos = Files.newOutputStream(out.toPath())) {
             convertToXML(fis, fos);
         }
     }
@@ -105,23 +102,24 @@ public class FSGConverter {
      * this method on an uncompressed savegame creates an
      * indented version of that savegame.
      * 
-     * @param in The input stream.
-     * @param out The output stream.
-     * 
-     * @throws IOException if thrown while reading or writing the streams. 
+     * @param ins The input stream.
+     * @param outs The output stream.
+     * @exception IOException if thrown while reading or writing the streams. 
      */
-    public void convertToXML(InputStream in, OutputStream out) throws IOException {
-        try {
-            in = new BufferedInputStream(in);
-            out = new BufferedOutputStream(out);
-            
+    private void convertToXML(InputStream ins, OutputStream outs)
+        throws IOException {
+        BufferedInputStream in = new BufferedInputStream(ins);
+        try (BufferedOutputStream out = new BufferedOutputStream(outs)) {
             // Automatically detect savegame compression:
             in.mark(10);
             byte[] buf = new byte[5];
-            in.read(buf, 0, 5);
+            if (in.read(buf, 0, buf.length) < buf.length) {
+                System.err.println("Unable to read header");
+                return;
+            }
             in.reset();
-            if (!"<?xml".equals(new String(buf, "UTF-8"))) {
-                in =  new BufferedInputStream(new GZIPInputStream(in));
+            if (!"<?xml".equals(new String(buf, StandardCharsets.UTF_8))) {
+                in = new BufferedInputStream(new GZIPInputStream(ins));
             }
 
             // Support for XML comments has not been added:
@@ -161,11 +159,8 @@ public class FSGConverter {
                     out.write(c);
                 }           
             }
-
-        } finally {
-            in.close();
-            out.close();
         }
+        in.close();
     }
     
     
@@ -198,20 +193,16 @@ public class FSGConverter {
             if (args.length >= 3) {
                 out = new File(args[2]);
             } else {
-                String filename = in.getName()
-                    .replaceAll("." + FreeCol.FREECOL_SAVE_EXTENSION, ".xml");
-                if (filename.equals(in.getName())) {
-                    filename += ".xml";
-                }
+                String name = in.getName();
+                String filename = name.replaceAll("." + FreeCol.FREECOL_SAVE_EXTENSION, ".xml");
+                if (filename.equals(name)) filename += ".xml";
                 out = new File(filename);
             }
             try {
                 FSGConverter fsgc = FSGConverter.getFSGConverter();
                 fsgc.convertToXML(in, out);
             } catch (IOException e) {
-                System.out.println("An error occured while converting the file.");
-                e.printStackTrace();
-                System.exit(1);
+                FreeCol.fatal(null, "An error occured while converting the file.");
             }
         } else {
             printUsage();

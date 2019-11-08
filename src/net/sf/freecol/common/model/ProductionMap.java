@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -48,7 +48,7 @@ public class ProductionMap {
 
         public ProductionTree(AbstractGoods root, AbstractGoods... leafs) {
             if (leafs.length > 0) {
-                this.leafs = new ArrayList<>();
+                this.leafs = new ArrayList<>(leafs.length);
                 int amount = root.getAmount();
                 for (AbstractGoods leaf : leafs) {
                     this.leafs.add(new AbstractGoods(leaf));
@@ -133,7 +133,7 @@ public class ProductionMap {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(root.getSuffix()).append(':');
             for (AbstractGoods ag : leafs) {
-                sb.append(' ').append(ag.toString());
+                sb.append(' ').append(ag);
             }
             sb.append(" ]");
             return sb.toString();
@@ -219,7 +219,7 @@ public class ProductionMap {
         sb.append('[');
         forEachMapEntry(cache, e ->
             sb.append(' ').append(e.getKey().getSuffix())
-              .append(':').append(e.getValue().toString()));
+              .append(':').append(e.getValue()));
         sb.append(" ]");
         return sb.toString();
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -125,12 +125,9 @@ public class RiverSection {
      * @param direction The {@code Direction} of the branch.
      * @return The branch size.
      */
-    public final int getBranch(Direction direction) {
-        if (branches.containsKey(direction)) {
-            return branches.get(direction);
-        } else {
-            return TileImprovement.NO_RIVER;
-        }
+    private final int getBranch(Direction direction) {
+        Integer val = branches.get(direction);
+        return (val == null) ? TileImprovement.NO_RIVER : val;
     }
 
     /**

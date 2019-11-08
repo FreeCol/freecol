@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,14 +21,14 @@ package net.sf.freecol;
 
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
@@ -53,6 +55,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -60,6 +63,8 @@ import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.OSUtils;
+import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.Controller;
 
@@ -70,6 +75,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.DefaultParser;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -100,14 +107,14 @@ public final class FreeCol {
     /** The extension for FreeCol maps. */
     public static final String  FREECOL_MAP_EXTENSION = "fsm";
 
-    /** The Java version. */
+        /** The Java version. */
     private static final String JAVA_VERSION
         = System.getProperty("java.version");
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
     private static final long MEGA = 1000000; // Metric
-    
+
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";
     public static final String  METASERVER_THREAD = "FreeColMetaServer:";
@@ -141,6 +148,7 @@ public final class FreeCol {
     public static final long    TIMEOUT_DEFAULT = 60L; // 1 minute
     public static final long    TIMEOUT_MIN = 10L; // 10s
     public static final long    TIMEOUT_MAX = 3600000L; // 1000hours:-)
+    private static final Dimension WINDOWSIZE_FALLBACK = new Dimension(-1, -1);
 
 
     // Cli values.  Often set to null so the default can be applied in
@@ -219,7 +227,7 @@ public final class FreeCol {
      * The size of window to create, defaults to impossible dimensions
      * to require windowed mode with best determined screen size.
      */
-    private static Dimension windowSize = new Dimension(-1, -1);
+    private static Dimension windowSize = WINDOWSIZE_FALLBACK;
 
     /** How much gui elements get scaled. */
     private static float guiScale = GUI_SCALE_DEFAULT;
@@ -302,12 +310,6 @@ public final class FreeCol {
         StringTemplate key = FreeColDirectories.setUserDirectories();
         if (key != null) fatal(key);
 
-        // We used to display the result of setUserDirectories when we
-        // were doing a dodgy migration in 0.9 -> 0.10.  So userMsg is
-        // no longer really needed, but keep it around in case something
-        // similar comes up.
-        String userMsg = null;
-
         // Now we have the log file path, start logging.
         final Logger baseLogger = Logger.getLogger("");
         for (Handler handler : baseLogger.getHandlers()) {
@@ -318,9 +320,7 @@ public final class FreeCol {
             baseLogger.addHandler(new DefaultHandler(consoleLogging, writer));
             for (LogLevel ll : logLevels) ll.buildLogger();
         } catch (FreeColException e) {
-            System.err.println("Logging initialization failure: "
-                + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Logging initialization failure: " + e);
         }
         Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
                 baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
@@ -345,8 +345,9 @@ public final class FreeCol {
             && (cLang = specialOptions.get(ClientOptions.LANGUAGE)) != null
             && !Messages.AUTOMATIC.equalsIgnoreCase(cLang)
             && setLocale(cLang)) {
-            Messages.loadMessageBundle(getLocale());
-            logger.info("Loaded messages for " + getLocale());
+            Locale loc = getLocale();
+            Messages.loadMessageBundle(loc);
+            logger.info("Loaded messages for " + loc);
         }
 
         // Now we have the user mods directory and the locale is now
@@ -355,18 +356,27 @@ public final class FreeCol {
         FreeColModFile.loadMods();
         Messages.loadModMessageBundle(getLocale());
 
-        // Handle other special options
+        // Sort out the special graphics options before touching the GUI
+        // (which is initialized by FreeColClient).  These options control
+        // graphics pipeline initialization, and are ineffective if twiddled
+        // after the first Java2D call is made.
+        headless |= Utils.isHeadless();
         processSpecialOptions();
 
         // Report on where we are.
-        if (userMsg != null) logger.info(Messages.message(userMsg));
         logger.info(getConfiguration().toString());
 
         // Ready to specialize into client or server.
         if (standAloneServer) {
             startServer();
         } else {
-            startClient(userMsg);
+            if (headless) {
+                if (!FreeColDebugger.isInDebugMode()
+                    || FreeColDebugger.getDebugRunTurns() <= 0) {
+                    fatal(logger, Messages.message("client.headlessDebug"));
+                }
+            }
+            startClient();
         }
     }
 
@@ -445,7 +455,7 @@ public final class FreeCol {
      * @exception IOException if the connection fails to open.
      */
     private static JarURLConnection getJarURLConnection(Class c)
-        throws IOException, ClassCastException {
+        throws IOException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
         return (JarURLConnection)url.openConnection();
@@ -480,13 +490,34 @@ public final class FreeCol {
         ZipEntry ze = jf.getEntry(SPLASH_DEFAULT);
         return jf.getInputStream(ze);
     }
-            
+
+    /**
+     * Quit FreeCol.  Route all exits through here.
+     *
+     * @param status Exit status.
+     */
+    @SuppressFBWarnings(value="DM_EXIT", justification="Deliberate")
+    public static void quit(int status) {
+        System.exit(status);
+    }
+
+    /**
+     * Quit and exit with an error.
+     *
+     * @param logger An optional {@code Logger} to log to.
+     * @param err The error message.
+     */
+    public static void fatal(Logger logger, String err) {
+        if (logger != null) logger.log(Level.SEVERE, err);
+        FreeCol.fatal(err);
+    }
+
     /**
      * Exit printing fatal error message.
      *
      * @param template A {@code StringTemplate} to print.
      */
-    public static void fatal(StringTemplate template) {
+    private static void fatal(StringTemplate template) {
         fatal(Messages.message(template));
     }
 
@@ -495,13 +526,13 @@ public final class FreeCol {
      *
      * @param err The error message to print.
      */
-    public static void fatal(String err) {
+    private static void fatal(String err) {
         if (err == null || err.isEmpty()) {
             err = "Bogus null fatal error message";
             Thread.dumpStack();
         }
         System.err.println(err);
-        System.exit(1);
+        quit(1);
     }
 
     /**
@@ -509,7 +540,7 @@ public final class FreeCol {
      *
      * @param template A {@code StringTemplate} to print.
      */
-    public static void gripe(StringTemplate template) {
+    private static void gripe(StringTemplate template) {
         System.err.println(Messages.message(template));
     }
 
@@ -518,7 +549,7 @@ public final class FreeCol {
      *
      * @param key A message key.
      */
-    public static void gripe(String key) {
+    private static void gripe(String key) {
         System.err.println(Messages.message(key));
     }
 
@@ -634,12 +665,8 @@ public final class FreeCol {
                 printUsage(options, 0);
             }
 
-            if (line.hasOption("default-locale")) {
-                ; // Do nothing, already handled in main().
-            }
-            if (line.hasOption("freecol-data")) {
-                ; // Do nothing, already handled in main().
-            }
+            // Ignore "default-locale", "freecol-data", which are
+            // already handled in main()
 
             if (line.hasOption("advantages")) {
                 String arg = line.getOptionValue("advantages");
@@ -757,8 +784,8 @@ public final class FreeCol {
                 for (String value : line.getOptionValues("log-level")) {
                     String[] s = value.split(":");
                     logLevels.add((s.length == 1)
-                        ? new LogLevel("", Level.parse(s[0].toUpperCase()))
-                        : new LogLevel(s[0], Level.parse(s[1].toUpperCase())));
+                        ? new LogLevel("", Level.parse(upCase(s[0])))
+                        : new LogLevel(s[0], Level.parse(upCase(s[1]))));
                 }
             }
 
@@ -815,9 +842,9 @@ public final class FreeCol {
             if (line.hasOption("splash")) {
                 String splash = line.getOptionValue("splash");
                 try {
-                    FileInputStream fis = new FileInputStream(splash);
+                    InputStream fis = Files.newInputStream(Paths.get(splash));
                     splashStream = fis;
-                } catch (FileNotFoundException fnfe) {
+                } catch (IOException ioe) {
                     gripe(StringTemplate.template("cli.error.splash")
                         .addName("%name%", splash));
                 }
@@ -829,7 +856,9 @@ public final class FreeCol {
 
             if (line.hasOption("timeout")) {
                 String arg = line.getOptionValue("timeout");
-                if (!setTimeout(arg)) { // Not fatal
+                try {
+                    setTimeout(arg); // Not fatal
+                } catch (NumberFormatException nfe) {
                     gripe(StringTemplate.template("cli.error.timeout")
                         .addName("%string%", arg)
                         .addName("%minimum%", Long.toString(TIMEOUT_MIN)));
@@ -865,7 +894,7 @@ public final class FreeCol {
 
             if (line.hasOption("version")) {
                 System.out.println("FreeCol " + getVersion());
-                System.exit(0);
+                quit(0);
             }
 
             if (line.hasOption("windowed")) {
@@ -890,7 +919,7 @@ public final class FreeCol {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("java -Xmx1G -jar freecol.jar [OPTIONS]",
                             options);
-        System.exit(status);
+        quit(status);
     }
 
     /**
@@ -907,9 +936,9 @@ public final class FreeCol {
         Specification spec = null;
         try {
             if (tcf != null) spec = tcf.getSpecification();
-        } catch (IOException ioe) {
+        } catch (IOException|XMLStreamException ex) {
             System.err.println("Spec read failed in " + tcf.getId()
-                + ": " + ioe.getMessage() + "\n");
+                + ": " + ex.getMessage() + "\n");
         }
         if (spec != null) spec.prepare(advantages, difficulty);
         return spec;
@@ -931,6 +960,27 @@ public final class FreeCol {
     }
 
     // Accessors, mutators and support for the cli variables.
+
+    /**
+     * Are we in headless mode, either externally true or explicitly
+     * from the command line.
+     *
+     * @return True if in headless mode.
+     */
+    public static boolean getHeadless() {
+        return headless;
+    }
+
+    /**
+     * Set the headless state.
+     *
+     * Used by the test suite.
+     *
+     * @param newHeadless The new headless state.
+     */
+    public static void setHeadless(boolean newHeadless) {
+        headless = newHeadless;
+    }
 
     /**
      * Gets the default advantages type.
@@ -1011,7 +1061,7 @@ public final class FreeCol {
      * @param arg The supplied difficulty argument.
      * @return The name of the selected difficulty, or null if none.
      */
-    public static String selectDifficulty(String arg) {
+    private static String selectDifficulty(String arg) {
         String difficulty
             = find(map(DIFFICULTIES, d -> "model.difficulty." + d),
                    Messages.matchesName(arg));
@@ -1073,7 +1123,7 @@ public final class FreeCol {
      * @param arg The optional command line argument to be parsed.
      * @return If the argument was correctly formatted.
      */
-    public static boolean setGUIScale(String arg) {
+    private static boolean setGUIScale(String arg) {
         boolean valid = true;
         if(arg == null) {
             guiScale = GUI_SCALE_MAX;
@@ -1127,7 +1177,7 @@ public final class FreeCol {
      * @param arg The supplied count argument.
      * @return A valid nation number, or negative on error.
      */
-    public static int selectEuropeanCount(String arg) {
+    private static int selectEuropeanCount(String arg) {
         try {
             int n = Integer.parseInt(arg);
             if (n >= EUROPEANS_MIN) {
@@ -1160,6 +1210,7 @@ public final class FreeCol {
      * Set the meta-server location.
      *
      * @param arg The new meta-server location in HOST:PORT format.
+     * @return True if the location was set.
      */
     private static boolean setMetaServer(String arg) {
         String[] s = arg.split(":");
@@ -1208,10 +1259,14 @@ public final class FreeCol {
     /**
      * Set the locale.
      *
+     * Public for the test suite.
+     *
      * @param localeArg The locale specification, null implies the
      *     default locale.
      * @return True if the {@code Locale} changed.
      */
+    @SuppressFBWarnings(value="MDM_SETDEFAULTLOCALE",
+                        justification="Locale can be reset by user")
     public static boolean setLocale(String localeArg) {
         Locale newLocale = null;
         if (localeArg == null) {
@@ -1223,6 +1278,7 @@ public final class FreeCol {
         }
         if (newLocale != FreeCol.locale) {
             FreeCol.locale = newLocale;
+            Locale.setDefault(newLocale);
             return true;
         }
         return false;
@@ -1261,7 +1317,7 @@ public final class FreeCol {
      * @param arg The server port number.
      * @return True if the port was set.
      */
-    public static boolean setServerPort(String arg) {
+    private static boolean setServerPort(String arg) {
         if (arg == null) return false;
         try {
             serverPort = Integer.parseInt(arg);
@@ -1320,17 +1376,12 @@ public final class FreeCol {
      * Sets the timeout.
      *
      * @param timeout A string containing the new timeout.
-     * @return True if the timeout was set.
      */
-    public static boolean setTimeout(String timeout) {
-        try {
-            long result = Long.parseLong(timeout);
-            if (TIMEOUT_MIN <= result && result <= TIMEOUT_MAX) {
-                FreeCol.timeout = result;
-                return true;
-            }
-        } catch (NumberFormatException nfe) {}
-        return false;
+    public static void setTimeout(String timeout) {
+        long result = Long.parseLong(timeout);
+        if (TIMEOUT_MIN <= result && result <= TIMEOUT_MAX) {
+            FreeCol.timeout = result;
+        }
     }
 
     /**
@@ -1361,16 +1412,16 @@ public final class FreeCol {
      * @param arg The window size specification.
      */
     private static void setWindowSize(String arg) {
-        String[] xy;
-        if (arg != null
-            && (xy = arg.split("[^0-9]")) != null
-            && xy.length == 2) {
-            try {
-                windowSize = new Dimension(Integer.parseInt(xy[0]),
-                                           Integer.parseInt(xy[1]));
-            } catch (NumberFormatException nfe) {}
+        windowSize = WINDOWSIZE_FALLBACK; // Set fallback up front
+        if (arg != null) {
+            String[] xy =arg.split("[^0-9]");
+            if (xy.length == 2) {
+                try {
+                    windowSize = new Dimension(Integer.parseInt(xy[0]),
+                                               Integer.parseInt(xy[1]));
+                } catch (NumberFormatException nfe) {}
+            }
         }
-        if (windowSize == null) windowSize = new Dimension(-1, -1);
     }
 
 
@@ -1466,10 +1517,8 @@ public final class FreeCol {
 
     /**
      * Start a client.
-     *
-     * @param userMsg An optional user message key.
      */
-    private static void startClient(String userMsg) {
+    private static void startClient() {
         Specification spec = null;
         File savegame = FreeColDirectories.getSavegameFile();
         if (debugStart) {
@@ -1486,16 +1535,44 @@ public final class FreeCol {
             // savegame was specified on command line
         }
 
-        // Sort out the special graphics options before touching the GUI
-        // (which is initialized by FreeColClient).  These options control
-        // graphics pipeline initialization, and are ineffective if twiddled
-        // after the first Java2D call is made.
-        
-
         final FreeColClient freeColClient
-            = new FreeColClient(splashStream, fontName, guiScale, headless);
-        freeColClient.startClient(windowSize, userMsg, sound, introVideo,
+            = new FreeColClient(splashStream, fontName, guiScale);
+        freeColClient.startClient(windowSize, null, sound, introVideo,
                                   savegame, spec);
+    }
+
+    /**
+     * Check the integrity of a FreeCol server.
+     *
+     * @param freeColServer The server to check.
+     */
+    private static void checkServerIntegrity(FreeColServer freeColServer) {
+        String key;
+        int ret;
+        IntegrityType integ = IntegrityType.INTEGRITY_GOOD;
+        if (freeColServer == null) {
+            logger.warning("Integrity test blocked");
+            integ = integ.fail();
+        } else {
+            integ = freeColServer.getIntegrity();
+        }
+        switch (integ) {
+        case INTEGRITY_GOOD:
+            key = "cli.check-savegame.success";
+            ret = 0;
+            break;
+        case INTEGRITY_FIXED:
+            key = "cli.check-savegame.fixed";
+            ret = 2;
+            break;
+        default:
+            key = "cli.check-savegame.failed";
+            ret = 3;
+            break;
+        }
+        gripe(StringTemplate.template(key)
+            .add("%log%", FreeColDirectories.getLogFilePath()));
+        quit(ret);
     }
 
     /**
@@ -1517,33 +1594,7 @@ public final class FreeCol {
                     + ": " + e);
                 freeColServer = null;
             }
-            
-            if (checkIntegrity) {
-                String k;
-                int ret, check = (freeColServer == null) ? -1
-                    : freeColServer.getIntegrity();
-                switch (check) {
-                case 1:
-                    k = "cli.check-savegame.success";
-                    ret = 0;
-                    break;
-                case 0:
-                    k = "cli.check-savegame.fixed";
-                    ret = 2;
-                    break;
-                case -1: default:
-                    k = "cli.check-savegame.failed";
-                    ret = 3;
-                    break;
-                }
-                if (freeColServer == null) {
-                    logger.warning("Integrity test blocked");
-                }
-                gripe(StringTemplate.template(k)
-                    .add("%log%", FreeColDirectories.getLogFilePath()));
-                System.exit(ret);
-            }
-
+            if (checkIntegrity) checkServerIntegrity(freeColServer);
             if (freeColServer == null) return;
         } else {
             Specification spec = FreeCol.getTCSpecification();
@@ -1555,8 +1606,7 @@ public final class FreeCol {
                     + ": " + e.getMessage());
                 return;
             }
-            if (publicServer && freeColServer != null
-                && !freeColServer.getPublicServer()) {
+            if (publicServer && !freeColServer.getPublicServer()) {
                 gripe(Messages.message("server.noRouteToServer"));
             }
         }

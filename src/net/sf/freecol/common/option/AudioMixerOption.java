@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,6 +32,8 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -104,7 +106,10 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
          */
         @Override
         public String toString() {
-            return name;
+            StringBuilder sb = new StringBuilder(32);
+            sb.append(this.name).append('/')
+                .append((this.mixerInfo == null) ? "null" : this.mixerInfo.toString());
+            return sb.toString();
         }
     }
 
@@ -179,7 +184,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * {@inheritDoc}
      */
     @Override
-    public AudioMixerOption clone() {
+    public AudioMixerOption cloneOption() {
         AudioMixerOption result = new AudioMixerOption(getSpecification());
         result.setValues(this);
         return result;
@@ -213,6 +218,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE")
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         MixerWrapper mw = null;

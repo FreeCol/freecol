@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -98,7 +98,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     /**
      * Clean up this building panel.
      */
-    public void cleanup() {
+    protected void cleanup() {
         unitLabels.clear();
         removePropertyChangeListeners();
         removeAll();
@@ -125,7 +125,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     /**
      * Update up this building panel.
      */
-    public void update() {
+    protected void update() {
         removeAll();
         unitLabels.clear();
 

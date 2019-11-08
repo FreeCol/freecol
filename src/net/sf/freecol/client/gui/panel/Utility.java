@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -225,7 +225,7 @@ public final class Utility {
      * @param text The text to display in the text area.
      * @return A suitable text area.
      */
-    public static JTextArea createTextArea(String text) {
+    private static JTextArea createTextArea(String text) {
         JTextArea textArea = new JTextArea(text);
         textArea.setOpaque(false);
         textArea.setLineWrap(true);
@@ -631,11 +631,9 @@ public final class Utility {
      *
      * @param comp The {@code JComponent} to localize.
      * @param key The key to use.
-     * @return The original {@code JComponent}.
      */
-    public static JComponent localizeToolTip(JComponent comp, String key) {
+    public static void localizeToolTip(JComponent comp, String key) {
         comp.setToolTipText(Messages.message(key));
-        return comp;
     }
 
     /**
@@ -643,12 +641,10 @@ public final class Utility {
      *
      * @param comp The {@code JComponent} to localize.
      * @param template The {@code StringTemplate} to use.
-     * @return The original {@code JComponent}.
      */
-    public static JComponent localizeToolTip(JComponent comp,
-                                             StringTemplate template) {
+    public static void localizeToolTip(JComponent comp,
+                                       StringTemplate template) {
         comp.setToolTipText(Messages.message(template));
-        return comp;
     }
 
 }

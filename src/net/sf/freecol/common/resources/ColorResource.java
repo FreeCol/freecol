@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -63,6 +63,11 @@ public class ColorResource extends Resource {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
+    /**
      * Gets the {@code Color} represented by this resource.
      *
      * @return The {@code Color} in it's original size.
@@ -91,7 +96,7 @@ public class ColorResource extends Resource {
      * @param colorName a {@code String} value
      * @return a {@code Color} value
      */
-    public static Color createColor(String colorName) {
+    private static Color createColor(String colorName) {
         if (isHexString(colorName)) {
             try {
                 int col = Integer.decode(colorName);

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,12 +23,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -73,9 +72,6 @@ public abstract class FreeColObject
             };
 
 
-    public static final int INFINITY = Integer.MAX_VALUE;
-    public static final int UNDEFINED = Integer.MIN_VALUE;
-
     /** Fallback class index. */
     protected static final int DEFAULT_CLASS_INDEX = 1000;
 
@@ -95,11 +91,12 @@ public abstract class FreeColObject
     /**
      * Get the FreeColObject class corresponding to a class name.
      *
+     * @param <T> A FreeColObject subclass.
      * @param name The class name.
      * @return The class, or null if none found.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends FreeColObject> Class<T> getFreeColObjectClass(String name) {
+    public static <T extends FreeColObject> Class<T> getFreeColObjectClassByName(String name) {
         final String type = "net.sf.freecol.common.model."
             + capitalize(name);
         final Class<T> c = (Class<T>)Introspector.getClassByName(type);
@@ -111,6 +108,7 @@ public abstract class FreeColObject
     /**
      * Get the FreeColObject class for this object.
      *
+     * @param <T> A FreeColObject subclass.
      * @return The class, or null on error.
      */
     @SuppressWarnings("unchecked")
@@ -181,7 +179,7 @@ public abstract class FreeColObject
      * @param id The identifier to examine.
      * @return The type part of the identifier, or null on error.
      */
-    public static String getIdType(String id) {
+    public static String getIdTypeByName(String id) {
         if (id != null) {
             int col = id.lastIndexOf(':');
             return (col >= 0) ? id.substring(0, col) : id;
@@ -195,7 +193,7 @@ public abstract class FreeColObject
      * @return The type part of the identifier, or null on error.
      */
     public String getIdType() {
-        return getIdType(getId());
+        return getIdTypeByName(getId());
     }
 
     /**
@@ -256,6 +254,17 @@ public abstract class FreeColObject
         return DEFAULT_CLASS_INDEX;
     }
 
+    /**
+     * Get the class index, handling null and non-FCO objects.
+     *
+     * @param o The object to examine.
+     * @return The class index.
+     */
+    public static int getObjectClassIndex(Object o) {
+        return (o instanceof FreeColObject) ? ((FreeColObject)o).getClassIndex()
+            : DEFAULT_CLASS_INDEX;
+    }
+    
 
     // Specification handling.
     //
@@ -278,7 +287,8 @@ public abstract class FreeColObject
      *
      * @param specification The {@code Specification} to use.
      */
-    protected void setSpecification(@SuppressWarnings("unused") Specification specification) {}
+    protected void setSpecification(@SuppressWarnings("unused")
+                                    Specification specification) {}
 
 
     // Game handling.
@@ -435,7 +445,7 @@ public abstract class FreeColObject
      */
     public final boolean hasAbility(String id, FreeColSpecObjectType fcgot,
                                     Turn turn) {
-        return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
+        return FeatureContainer.allAbilities(getAbilities(id, fcgot, turn));
     }
 
     /**
@@ -657,8 +667,8 @@ public abstract class FreeColObject
      * @param id The object identifier.
      * @return The modified number.
      */
-    public final float applyModifiers(float number, Turn turn, String id) {
-        return applyModifiers(number, turn, id, null);
+    public final float apply(float number, Turn turn, String id) {
+        return apply(number, turn, id, null);
     }
 
     /**
@@ -672,22 +682,9 @@ public abstract class FreeColObject
      *     modifier applies to.
      * @return The modified number.
      */
-    public final float applyModifiers(float number, Turn turn,
-                                      String id, FreeColSpecObjectType fcgot) {
+    public final float apply(float number, Turn turn, String id,
+                             FreeColSpecObjectType fcgot) {
         return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
-    }
-
-    /**
-     * Applies a collection of modifiers to the given number.
-     *
-     * @param number The number to modify.
-     * @param turn An optional applicable {@code Turn}.
-     * @param mods The {@code Modifier}s to apply.
-     * @return The modified number.
-     */
-    public static final float applyModifiers(float number, Turn turn,
-                                             Collection<Modifier> mods) {
-        return FeatureContainer.applyModifiers(number, turn, mods);
     }
 
     /**
@@ -700,6 +697,19 @@ public abstract class FreeColObject
      */
     public static final float applyModifiers(float number, Turn turn,
                                              Stream<Modifier> mods) {
+        return FeatureContainer.applyModifiers(number, turn, mods);
+    }
+
+    /**
+     * Applies a collection of modifiers to the given number.
+     *
+     * @param number The number to modify.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
+     * @return The modified number.
+     */
+    public static final float applyModifiers(float number, Turn turn,
+                                             Collection<Modifier> mods) {
         return FeatureContainer.applyModifiers(number, turn, mods);
     }
 
@@ -885,14 +895,10 @@ public abstract class FreeColObject
      * @return True if the save proceeded without error.
      */
     public boolean save(File file, WriteScope scope, boolean pretty) {
-        try (
-            FileOutputStream fos = new FileOutputStream(file);
-        ) {
+        try (OutputStream fos = Files.newOutputStream(file.toPath())) {
             return save(fos, scope, pretty);
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "No file: " + file.getPath(), fnfe);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FileOutputStream", ioe);
+            logger.log(Level.WARNING, "Error creating output stream", ioe);
         }
         return false;
     }
@@ -1040,12 +1046,12 @@ public abstract class FreeColObject
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
         T ret = null;
-        try (
-             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
-             ) {
+        try (FreeColXMLReader xr
+            = new FreeColXMLReader(new StringReader(this.serialize()))) {
             ret = xr.copy(game, returnClass);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Copy of " + getId()
+                + " to " + returnClass.getName() + "failed", xse);
         }
         return ret;
     }
@@ -1062,12 +1068,13 @@ public abstract class FreeColObject
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass,
         Player player) {
         T ret = null;
-        try (
-             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize(player)));
-             ) {
+        try (FreeColXMLReader xr
+            = new FreeColXMLReader(new StringReader(this.serialize(player)))) {
             ret = xr.copy(game, returnClass);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Copy of " + getId()
+                + " to " + returnClass.getName()
+                + " for " + player.getId() + "failed", xse);
         }
         return ret;
     }
@@ -1075,6 +1082,7 @@ public abstract class FreeColObject
     /**
      * Copy another FreeColObject into this one if it is compatible.
      *
+     * @param <T> The {@code FreeColObject} subclass of the object to copy in.
      * @param other The other object.
      * @return True if the copy in is succesful.
      */
@@ -1091,9 +1099,9 @@ public abstract class FreeColObject
     /**
      * If another object can be copied into this one, 
      *
-     * @param T The {@code FreeColObject} subclass of the object to copy in.
+     * @param <T> The {@code FreeColObject} subclass of the object to copy in.
      * @param other The {@code FreeColObject} to copy in.
-     * @param R The {@code FreeColObject} subclass to copy in to.
+     * @param <R> The {@code FreeColObject} subclass to copy in to.
      * @param returnClass The return class.
      * @return The other object cast to the return class, or null
      *     if incompatible in any way.
@@ -1201,24 +1209,23 @@ public abstract class FreeColObject
                                    String[] fields) throws XMLStreamException {
         final Class theClass = getClass();
 
-        try {
-            xw.writeStartElement(getXMLTagName());
+        xw.writeStartElement(getXMLTagName());
 
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
-            xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
+        xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
 
-            for (String field : fields) {
-                Introspector intro = new Introspector(theClass, field);
-                xw.writeAttribute(field, intro.getter(this));
+        for (String field : fields) {
+            Introspector intro = new Introspector(theClass, field);
+            try {
+                String value = intro.getter(this);
+                xw.writeAttribute(field, value);
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Failed to write field: " + field, ie);
             }
-
-            xw.writeEndElement();
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Partial write failed for "
-                       + theClass.getName(), e);
         }
+
+        xw.writeEndElement();
     }
 
     /**
@@ -1294,7 +1301,7 @@ public abstract class FreeColObject
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         String tag = xr.getLocalName();
         if (tag == null) {
-            throw new XMLStreamException("Parse error, null opening tag.");
+            throw new XMLStreamException("Parse error, null opening tag: " + this);
         }
         try {
             while (xr.moreTags()) {
@@ -1384,8 +1391,8 @@ public abstract class FreeColObject
     @Override
     public boolean equals(Object o) {
         if (o instanceof FreeColObject) {
-            FreeColObject fco = (FreeColObject)o;
-            return Utils.equals(this.id, fco.id);
+            FreeColObject other = (FreeColObject)o;
+            return Utils.equals(this.id, other.id);
         }
         return false;
     }

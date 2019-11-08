@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -100,9 +100,10 @@ public class ForestMaker {
         @Override
         public boolean equals(Object other) {
             if (other instanceof ImageLocation) {
-                return this.compareTo((ImageLocation)other) == 0;
+                return this.compareTo((ImageLocation)other) == 0
+                    && super.equals(other);
             }
-            return super.equals(other);
+            return false;
         }
 
         /**
@@ -150,17 +151,18 @@ public class ForestMaker {
             String baseName = sourceDirectory.getName();
             File destinationDirectory = new File(DESTDIR, baseName);
             if (!destinationDirectory.exists()) {
-                System.out.println("Destination directory " + destinationDirectory.getPath()
-                                           + " does not exist.");
+                System.out.println("Destination directory "
+                    + destinationDirectory.getPath() + " does not exist.");
                 continue;
             }
             File[] imageFiles = sourceDirectory.listFiles();
             if (imageFiles == null) {
-                System.out.println("No images found in source directory " + arg + ".");
+                System.out.println("No images found in source directory "
+                    + arg + ".");
                 continue;
             } else {
-                System.out.println(imageFiles.length + " images found in source directory "
-                                           + arg + ".");
+                System.out.println(imageFiles.length
+                    + " images found in source directory " + arg + ".");
             }
             List<BufferedImage> images = new ArrayList<>(imageFiles.length);
             int maximumHeight = 0;
@@ -169,12 +171,10 @@ public class ForestMaker {
                     try {
                         BufferedImage image = ImageIO.read(imageFile);
                         images.add(image);
-                        if (image.getHeight() > maximumHeight) {
-                            maximumHeight = image.getHeight();
-                        }
+                        maximumHeight = Math.min(image.getHeight(), maximumHeight);
                     } catch(IOException e) {
-                        System.out.println("Unable to load image " + imageFile.getName() + ":\n");
-                        e.printStackTrace();
+                        System.err.println("Unable to load image "
+                            + imageFile.getName() + ":\n" + e);
                     }
                 }
             }
@@ -201,17 +201,19 @@ public class ForestMaker {
                 g.translate(HALF_WIDTH, BASE_HEIGHT + MARGIN);
 
                 g.setPaint(texture);
-                String counter = "";
                 boolean[] branches = new boolean[4];
+                String counter = "";
                 if (index > 0) {
+                    StringBuilder sb = new StringBuilder(POWERS_OF_TWO.length);
                     for (int i = 0; i < POWERS_OF_TWO.length; i++) {
                         if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
                             branches[i] = true;
-                            counter += "1";
+                            sb.append('1');
                         } else {
-                            counter += "0";
+                            sb.append('0');
                         }
                     }
+                    counter = sb.toString();
                 }
 
                 // the two vectors that describe the diamond
@@ -316,14 +318,15 @@ public class ForestMaker {
         }
     }
 
+    /* Currently unused
     private static int getY(int x, int y, double slope, int newX) {
         return (int) (y + slope * (newX - x));
-    }
+    }*/
 
+    /* Currently unused
     private static int getRandomY(Random random, int x) {
         int height = HALF_HEIGHT - Math.abs(x) / 2;
         return (height == 0) ? 0 : random.nextInt(2 * height) - height;
-    }
-
+    }*/
 }
 

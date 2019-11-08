@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -92,7 +92,7 @@ public class Relation {
         if ("n".equals(token)) {
             token = input.remove(0);
         } else {
-            throw new IllegalArgumentException("Relation must start with 'n'.");
+            throw new RuntimeException("Relation must start with 'n': " + token);
         }
         if ("mod".equals(token)) {
             mod = Integer.parseInt(input.remove(0));
@@ -120,6 +120,36 @@ public class Relation {
 
 
     // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Relation) {
+            Relation other = (Relation)o;
+            return this.low == other.low && this.high == other.high
+                && this.mod == other.mod
+                && this.negated == other.negated
+                && this.integer == other.integer;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + this.low;
+        hash = 31 * hash + this.high;
+        hash = 31 * hash + this.mod;
+        hash = 31 * hash + ((this.negated) ? 1 : 0)
+            + ((this.integer) ? 2 : 0);
+        return hash;
+    }
 
     /**
      * {@inheritDoc}

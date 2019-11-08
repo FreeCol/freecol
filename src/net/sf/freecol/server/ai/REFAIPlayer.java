@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,11 +22,13 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -60,7 +62,6 @@ import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.PrivateerMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -68,12 +69,65 @@ import net.sf.freecol.server.model.ServerPlayer;
  *
  * For now, mostly just the EuropeanAIPlayer, with a few tweaks.
  */
-public class REFAIPlayer extends EuropeanAIPlayer {
+public final class REFAIPlayer extends EuropeanAIPlayer {
 
     private static final Logger logger = Logger.getLogger(REFAIPlayer.class.getName());
 
     /** Limit on the number of REF units chasing a single hostile unit. */
     private static final int UNIT_USAD_THRESHOLD = 5;
+
+    /** Goal decider class for the REF Navy */
+    private static class REFNavyGoalDecider implements GoalDecider {
+
+        /** The rebel player to attack. */
+        private Player rebel;
+
+        /** A container to fill with target units. */
+        private Set<Unit> rebelNavy;
+
+
+        /**
+         * Build a new goal decider for the REF to find rebel naval units.
+         *
+         * @param rebel The {@code Player} to attack.
+         * @param rebelNavy A container to fill with the naval units found.
+         */
+        public REFNavyGoalDecider(Player rebel, Set<Unit> rebelNavy) {
+            this.rebel = rebel;
+            this.rebelNavy = rebelNavy;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public PathNode getGoal() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasSubGoals() {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean check(Unit unit, PathNode pathNode) {
+            final Predicate<Unit> pred
+                = (u -> u.isOffensiveUnit() && u.isNaval()
+                    && !this.rebelNavy.contains(u));
+            Tile tile = pathNode.getTile();
+            if (tile != null && !tile.isEmpty()
+                && !tile.isLand()
+                && this.rebel.owns(tile.getFirstUnit())) {
+                this.rebelNavy.addAll(transform(tile.getUnits(), pred));
+                return true;
+            }
+            return false;
+        }
+    };
 
     /** Container class for REF target colony information. */
     private static class TargetTuple implements Comparable<TargetTuple> {
@@ -116,11 +170,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object other) {
-            if (other instanceof TargetTuple) {
-                return this.compareTo((TargetTuple)other) == 0;
+        public boolean equals(Object o) {
+            if (o instanceof TargetTuple) {
+                TargetTuple other = (TargetTuple)o;
+                return this.compareTo(other) == 0
+                    && super.equals(other);
             }
-            return super.equals(other);
+            return false;
         }
 
         /**
@@ -150,10 +206,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * @param player The player that should be associated with this
      *            {@code REFAIPlayer}.
      */
-    public REFAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public REFAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
     /**
@@ -163,11 +219,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public REFAIPlayer(AIMain aiMain,
-                       FreeColXMLReader xr) throws XMLStreamException {
+    public REFAIPlayer(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
 
@@ -186,7 +242,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Unit carrier = aiCarrier.getUnit();
         final CachingFunction<Colony, PathNode> pathMapper
             = new CachingFunction<Colony, PathNode>(c ->
-                unit.findPath(carrier, c, carrier, null));
+                unit.findPath(carrier, c, carrier));
         final Predicate<Colony> pathPred = c ->
             pathMapper.apply(c) != null;
         final Function<Colony, TargetTuple> newTupleMapper = c -> {
@@ -311,8 +367,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // appear at this location, otherwise at the best entry
         // location for it.
         int fail = 0;
-        for (int i = 0; i < n; i++) {
-            final TargetTuple t = targets.get(i);
+        for (TargetTuple t : targets) {
             final GoalDecider gd = GoalDeciders
                 .getDisembarkGoalDecider(t.colony.getTile());
             PathNode path = unit.search(t.entry, gd, null, 10, carrier);
@@ -342,8 +397,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 }
                 lb.add(")");
             } else { // They were all bad, just use the existing simple path
-                for (int i = 0; i < n; i++) {
-                    final TargetTuple t = targets.get(i);
+                for (TargetTuple t : targets) {
                     t.disembarkTile = t.path.getTransportDropNode()
                         .previous.getTile();
                 }
@@ -424,25 +478,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Try to find some rebel naval units near the entry locations
         // for the targets.
-        final List<Unit> rebelNavy = new ArrayList<>();
-        final GoalDecider navyGD = new GoalDecider() {
-                @Override
-                public PathNode getGoal() { return null; }
-                @Override
-                public boolean hasSubGoals() { return true; }
-                @Override
-                public boolean check(Unit unit, PathNode pathNode) {
-                    Tile tile = pathNode.getTile();
-                    if (tile != null && !tile.isEmpty()
-                        && !tile.isLand()
-                        && rebel.owns(tile.getFirstUnit())) {
-                        rebelNavy.addAll(transform(tile.getUnits(), u ->
-                                (u.isOffensiveUnit() && u.isNaval()
-                                    && !rebelNavy.contains(u))));
-                    }
-                    return false;
-                }
-            };
+        final Set<Unit> rebelNavy = new HashSet<>();
+        final GoalDecider navyGD = new REFNavyGoalDecider(rebel, rebelNavy);
         for (int i = 0; i < n; i++) {
             carrier.search(targets.get(i).entry, navyGD, null,
                            carrier.getInitialMovesLeft() * 2, null);
@@ -451,8 +488,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // Attack naval targets.
         final Comparator<Unit> militaryStrengthComparator
             = getGame().getCombatModel().getMilitaryStrengthComparator();
-        rebelNavy.sort(militaryStrengthComparator);
-        Iterator<Unit> ui = rebelNavy.iterator();
+        List<Unit> rebelTargets = new ArrayList<>(rebelNavy);
+        rebelTargets.sort(militaryStrengthComparator);
+        Iterator<Unit> ui = rebelTargets.iterator();
         List<Tile> entries = new ArrayList<>();
         entries.add(rebel.getEntryTile());
         while (!navy.isEmpty()) {
@@ -634,11 +672,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // - defend the closest port
         // - go idle in a port
         for (AIUnit aiu : land) {
-            Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
+            Location target = UnitSeekAndDestroyMission.findMissionTarget(aiu, 
                 seekAndDestroyRange, false);
             if (target != null) {
-                int count = (targetMap.containsKey(target))
-                    ? targetMap.get(target) : 0;
+                Integer count = targetMap.get(target);
+                if (count == null) count = 0;
                 if (target instanceof Unit
                     && count < UNIT_USAD_THRESHOLD
                     && (m = getSeekAndDestroyMission(aiu, target)) != null) {

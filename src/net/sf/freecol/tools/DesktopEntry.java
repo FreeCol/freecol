@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -51,7 +51,7 @@ public class DesktopEntry {
      * @exception IOException when various IO fails.
      */
     public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+        throws IOException {
 
         try (Writer result = Utils.getFileUTF8Writer(new File(args[0]))) {
             result.append("[Desktop Entry]\n");
@@ -69,7 +69,12 @@ public class DesktopEntry {
                             && name.endsWith(".properties");
                 }
             });
-            
+            if (sourceFiles == null) {
+                System.err.println("No messages files found in "
+                    + SOURCE_DIRECTORY);
+                System.exit(1);
+            }
+
             for (String name : sourceFiles) {
                 
                 System.out.println("Processing source file: " + name);
@@ -91,18 +96,18 @@ public class DesktopEntry {
                     int index = line.indexOf('=');
                     if (index >= 0) {
                         String key = line.substring(0, index).trim();
-                        if (null != key) switch (key) {
-                            case GENERIC_NAME:
-                                result.append("GenericName");
-                                foundGenericName = true;
-                                break;
-                            case COMMENT:
-                                result.append("Comment");
-                                foundComment = true;
-                                break;
-                            default:
-                                line = bufferedReader.readLine();
-                                continue;
+                        switch (key) {
+                        case GENERIC_NAME:
+                            result.append("GenericName");
+                            foundGenericName = true;
+                            break;
+                        case COMMENT:
+                            result.append("Comment");
+                            foundComment = true;
+                            break;
+                        default:
+                            line = bufferedReader.readLine();
+                            continue;
                         }
                         if (languageCode != null) {
                             result.append('[' + languageCode + "]");

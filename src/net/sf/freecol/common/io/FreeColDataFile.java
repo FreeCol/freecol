@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -92,10 +92,9 @@ public class FreeColDataFile {
      * has been renamed.
      *
      * @param file The zip-file.
-     * @return The name of the base directory in the zip-file.
+     * @return The name of the base directory in the zip-file or null on error.
      */
     private static String findJarDirectory(File file) {
-        String expected = file.getName().substring(0, file.getName().lastIndexOf('.'));
         try (
             JarFile jf = new JarFile(file);
         ) {
@@ -107,10 +106,10 @@ public class FreeColDataFile {
                 name = en.substring(0, index + 1);
             }
             return name;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while reading data file.", e);
-            return expected;
+        } catch (IOException ioe) {
+            logger.warning("Failed to create jar file: " + file.getName());
         }
+        return null;
     }
 
     /**

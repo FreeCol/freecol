@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -71,6 +71,8 @@ public final class PreGameController extends FreeColClientHolder {
 
     /**
      * Handle an addPlayer message.
+     *
+     * @param players The {@code Player}s to add.
      */
     public void addPlayerHandler(List<Player> players) {
         getGame().addPlayers(players);
@@ -102,6 +104,9 @@ public final class PreGameController extends FreeColClientHolder {
 
     /**
      * Handle an error.
+     *
+     * @param template A {@code StringTemplate} describing the error.
+     * @param message A backup string describing the error.
      */
     public void errorHandler(StringTemplate template, String message) {
         getGUI().showErrorMessage(template, message);
@@ -328,7 +333,6 @@ public final class PreGameController extends FreeColClientHolder {
         final Game game = getGame();
         
         for (FreeColObject fco : objects) {
-            FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
             if (fco instanceof Game) {
                 if (game.preGameUpdate((Game)fco)) {
                     final FreeColClient fcc = getFreeColClient();

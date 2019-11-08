@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -39,6 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
@@ -56,6 +59,7 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -95,15 +99,48 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * A container for a destination location, with associated
      * distance and extra characteristics.
      */
-    private class Destination {
+    private static class Destination {
 
+        /** Basic destination comparator, that just uses the name field. */
+        private static Comparator<Destination> nameComparator
+            = new Comparator<Destination>() {
+                    public int compare(Destination d1, Destination d2) {
+                        if (!(d1.location instanceof Settlement)) return -1;
+                        if (!(d2.location instanceof Settlement)) return 1;
+                        return d1.name.compareTo(d2.name);
+                    }
+                };
+
+        /** Distance comparator, uses turns field then falls back to names. */
+        private static Comparator<Destination> distanceComparator
+            = Comparator.comparingInt(Destination::getTurns)
+                .thenComparing(Destination.nameComparator);
+
+        /** Owner comparator, uses the owner field then falls back to names. */
+        private static Comparator<Destination> ownerComparator
+            = Comparator.comparingInt(Destination::getScore)
+                .thenComparing(Destination.nameComparator);
+
+        /** The unit that is travelling. */
         public final Unit unit;
+
+        /** The location to travel to. */
         public final Location location;
+
+        /** The displayed name of the location (needed in text and comparator)*/
+        public final String name;
+
+        /** The number of turns to reach the destination. */
         public final int turns;
+
+        /** Extra special information about the destination */
         public final String extras;
-        public final String text;
+
+        /** A magic score for the destination for the comparator/s. */
         public final int score;
-        public ImageIcon icon;
+
+        /** The full text to display. */
+        public final String text;
 
 
         /**
@@ -118,21 +155,15 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                            List<GoodsType> goodsTypes) {
             this.unit = unit;
             this.location = location;
+            this.name = Messages.message(location.getLocationLabelFor(unit.getOwner()));
             this.turns = turns;
             this.extras = getExtras(location, unit, goodsTypes);
             this.score = calculateScore();
-            this.icon = null;
-
-            final Player player = getMyPlayer();
-            final ImageLibrary lib = getImageLibrary();
-            final String name = location.getNameForLabel(player);
-            this.icon = location.getLocationImage(CELL_HEIGHT, lib);
-            StringTemplate template = StringTemplate
+            this.text = Messages.message(StringTemplate
                 .template("selectDestinationDialog.destinationTurns")
-                .addName("%location%", name)
+                .addName("%location%", this.name)
                 .addAmount("%turns%", this.turns)
-                .addName("%extras%", this.extras);
-            this.text = Messages.message(template);
+                .addName("%extras%", this.extras));
         }
 
         /**
@@ -147,7 +178,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
          */
         private String getExtras(Location loc, Unit unit,
                                  List<GoodsType> goodsTypes) {
-            final Specification spec = unit.getSpecification();
             final String sep = ", ";
             final Player owner = unit.getOwner();
             LogBuilder lb = new LogBuilder(32);
@@ -226,84 +256,50 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 ? 40
                 : 100;
         }
-    }
 
-    private static class DestinationComparator implements Comparator<Destination> {
-
-        protected final Player owner;
-
-        public DestinationComparator(Player player) {
-            this.owner = player;
+        public int getTurns() {
+            return this.turns;
         }
 
-        @Override
-        public int compare(Destination choice1, Destination choice2) {
-            int score1 = choice1.score;
-            int score2 = choice2.score;
-            return (score1 != score2) ? score1 - score2
-                : compareNames(choice1.location, choice2.location);
+        public int getScore() {
+            return this.score;
         }
 
-        /**
-         * Compare the names of two locations.
-         *
-         * @param loc1 The first {@code Location}.
-         * @param loc2 The second {@code Location}.
-         * @return The comparison result.
-         */
-        protected int compareNames(Location loc1, Location loc2) {
-            if (!(loc1 instanceof Settlement)) return -1;
-            if (!(loc2 instanceof Settlement)) return 1;
-            Settlement s1 = (Settlement)loc1;
-            String name1 = Messages.message(s1.getLocationLabelFor(owner));
-            Settlement s2 = (Settlement)loc2;
-            String name2 = Messages.message(s2.getLocationLabelFor(owner));
-            return name1.compareTo(name2);
-        }
-    }
 
-    private class NameComparator extends DestinationComparator {
-
-        public NameComparator(Player player) {
-            super(player);
+        public static int getDestinationComparatorIndex(Comparator<Destination> dc) {
+            return (dc == nameComparator) ? 1
+                : (dc == distanceComparator) ? 2
+                : 0;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int compare(Destination choice1, Destination choice2) {
-            return compareNames(choice1.location, choice2.location);
-        }
-    }
-
-    private class DistanceComparator extends DestinationComparator {
-
-        public DistanceComparator(Player player) {
-            super(player);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int compare(Destination choice1, Destination choice2) {
-            int result = choice1.turns - choice2.turns;
-            return (result != 0) ? result
-                : compareNames(choice1.location, choice2.location);
+        public static Comparator<Destination> getDestinationComparator(int index) {
+            return (index == 1) ? nameComparator
+                : (index == 2) ? distanceComparator
+                : ownerComparator;
         }
     }
 
     private static class LocationRenderer
         extends FreeColComboBoxRenderer<Destination> {
 
+        private final ImageLibrary lib;
+        
+        /**
+         * Create a new location renderer.
+         *
+         * @param lib The {@code ImageLibrary} to use to make icons.
+         */
+        public LocationRenderer(ImageLibrary lib) {
+            this.lib = lib;
+        }
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void setLabelValues(JLabel label, Destination value) {
-            if (value.icon != null) label.setIcon(value.icon);
             label.setText(value.text);
+            label.setIcon(value.location.getLocationImage(CELL_HEIGHT, this.lib));
         }
     }
 
@@ -311,11 +307,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private static final int CELL_HEIGHT = 48;
 
     /** Show only the player colonies.  FIXME: make a client option. */
-    private static boolean showOnlyMyColonies = true;
+    private static AtomicBoolean showOnlyMyColonies = new AtomicBoolean(true);
 
     /** How to order the destinations. */
-    private static Comparator<Destination> destinationComparator = null;
-
+    private static AtomicReference<Comparator<Destination>>
+        destinationComparator = new AtomicReference<>(null);
+    
     /** The available destinations. */
     private final List<Destination> destinations = new ArrayList<>();
 
@@ -340,17 +337,17 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                                    Unit unit) {
         super(freeColClient, frame);
 
+        final ImageLibrary lib = getImageLibrary();
         // Collect the goods the unit is carrying and set this.destinations.
-        final List<GoodsType> goodsTypes = new ArrayList<>();
-        for (Goods goods : unit.getCompactGoodsList()) {
-            goodsTypes.add(goods.getType());
-        }
+        final List<GoodsType> goodsTypes
+            = transform(unit.getCompactGoodsList(), alwaysTrue(),
+                        Goods::getType);
         loadDestinations(unit, goodsTypes);
 
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
         this.destinationList = new JList<>(model);
-        this.destinationList.setCellRenderer(new LocationRenderer());
+        this.destinationList.setCellRenderer(new LocationRenderer(lib));
         this.destinationList.setFixedCellHeight(CELL_HEIGHT);
         this.destinationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.destinationList.addListSelectionListener(this);
@@ -368,9 +365,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         listScroller.setPreferredSize(new Dimension(300, 300));
 
         String omcb = Messages.message("selectDestinationDialog.onlyMyColonies");
-        this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies);
+        this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies.get());
         this.onlyMyColoniesBox.addChangeListener((ChangeEvent event) -> {
-                showOnlyMyColonies = onlyMyColoniesBox.isSelected();
+                showOnlyMyColonies.set(onlyMyColoniesBox.isSelected());
                 updateDestinationList();
             });
 
@@ -381,16 +378,16 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             });
         this.comparatorBox.addItemListener((ItemEvent event) -> {
                 updateDestinationComparator();
-                SelectDestinationDialog.this.destinations.sort(SelectDestinationDialog.this.destinationComparator);
+                Comparator<Destination> dc = getDestinationComparator();
+                SelectDestinationDialog.this.destinations.sort(dc);
                 updateDestinationList();
             });
-        this.comparatorBox.setSelectedIndex(
-            (this.destinationComparator instanceof NameComparator) ? 1
-            : (this.destinationComparator instanceof DistanceComparator) ? 2
-            : 0);
+        Comparator<Destination> dc = getDestinationComparator();
+        this.comparatorBox.setSelectedIndex(Destination
+            .getDestinationComparatorIndex(dc));
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
-                                                    "[align center]", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
+                                                  "[align center]", ""));
         panel.add(Utility.localizedHeader("selectDestinationDialog.text", true));
 
         panel.add(listScroller, "newline 30, growx, growy");
@@ -403,11 +400,34 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 (Location)null).okOption());
         c.add(new ChoiceItem<>(Messages.message("selectDestinationDialog.cancel"),
                 (Location)null).cancelOption().defaultOption());
-        initializeDialog(frame, DialogType.QUESTION, true, panel, new ImageIcon(
-            getImageLibrary().getSmallUnitImage(unit)), c);
+        initializeDialog(frame, DialogType.QUESTION, true, panel,
+                         new ImageIcon(lib.getSmallUnitImage(unit)), c);
     }
 
 
+    /**
+     * Get the current destination comparator.
+     *
+     * @return The destination comparator.
+     */
+    private Comparator<Destination> getDestinationComparator() {
+        Comparator<Destination> ret = destinationComparator.get();
+        if (ret == null) {
+            ret = Destination.getDestinationComparator(0);
+            destinationComparator.set(ret);
+        }
+        return ret;
+    }
+
+    /**
+     * Set the current destination comparator.
+     *
+     * @param dc The new destination comparator.
+     */
+    private void setDestinationComparator(Comparator<Destination> dc) {
+        destinationComparator.set(dc);
+    }
+    
     /**
      * Load destinations for a given unit and carried goods types.
      *
@@ -431,13 +451,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Predicate<Settlement> canReach = s ->
             (unit.isNaval()) ? s.isConnectedPort()
                 : Map.isSameContiguity(unit.getLocation(), s.getTile());
-       
-        if (this.destinationComparator == null) {
-            this.destinationComparator = new DestinationComparator(player);
-        }
-        List<Destination> td = new ArrayList<>();
-        
         // Add Europe or "New World" (the map) depending where the unit is
+        List<Destination> td = new ArrayList<>();
         if (unit.isInEurope()) {
             td.add(new Destination(map, unit.getSailTurns(), unit, goodsTypes));
         } else if (europe != null
@@ -469,7 +484,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                                              tradePred, settlementTileMapper));
         MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
-                    FreeColObject.INFINITY, null);
+                    INFINITY, null);
         final Function<Entry<Location, PathNode>, Destination> dmapper = e -> {
             Settlement s = e.getKey().getTile().getSettlement();
             PathNode p = e.getValue();
@@ -488,8 +503,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         // Drop inaccessible destinations and sort as specified.
         this.destinations.addAll(transform(td, d -> d.turns < Unit.MANY_TURNS,
-                                           Function.identity(),
-                                           this.destinationComparator));
+                                           Function.<Destination>identity(),
+                                           getDestinationComparator()));
     }
 
     /**
@@ -501,7 +516,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
         for (Destination d : this.destinations) {
-            if (showOnlyMyColonies) {
+            if (showOnlyMyColonies.get()) {
                 if (d.location instanceof Europe
                     || d.location instanceof Map
                     || (d.location instanceof Colony
@@ -536,18 +551,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * Set the selected destination comparator.
      */
     private void updateDestinationComparator() {
-        final Player player = getMyPlayer();
-        switch (this.comparatorBox.getSelectedIndex()) {
-        case 1:
-            this.destinationComparator = new NameComparator(player);
-            break;
-        case 2:
-            this.destinationComparator = new DistanceComparator(player);
-            break;
-        case 0: default:
-            this.destinationComparator = new DestinationComparator(player);
-            break;
-        }
+        setDestinationComparator(Destination
+            .getDestinationComparator(this.comparatorBox.getSelectedIndex()));
     }
 
 

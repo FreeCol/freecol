@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,10 +27,13 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -117,6 +120,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Get a stop in the trade route by index.
      *
+     * @param index The index to look up.
      * @return The {@code TradeRouteStop} found, or null if the index
      *     is invalid.
      */
@@ -293,7 +297,7 @@ public class TradeRoute extends FreeColGameObject
         Set<GoodsType> always = new HashSet<>(getStop(0).getCargo());
         boolean empty = true;
         int n = getStopCount();
-        for (int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
             TradeRouteStop stop = getStop(i);
             if (!TradeRoute.isStopValid(owner, stop)) {
                 return stop.invalidStopLabel(owner);
@@ -350,6 +354,23 @@ public class TradeRoute extends FreeColGameObject
     }
 
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
+        StringTemplate ver = verify();
+        if (ver != null) {
+            lb.add("\n  In ", getId(), " ", Messages.message(ver));
+            result = result.fail();
+        }
+        return result;
+    }
+
+
     // Override FreeColObject
 
     /**
@@ -359,7 +380,6 @@ public class TradeRoute extends FreeColGameObject
     public <T extends FreeColObject> boolean copyIn(T other) {
         TradeRoute o = copyInCast(other, TradeRoute.class);
         if (o == null || !super.copyIn(o)) return false;
-        final Game game = getGame();
         this.name = o.getName();
         this.owner = o.getOwner();
         clearStops();
@@ -434,8 +454,7 @@ public class TradeRoute extends FreeColGameObject
         final String tag = xr.getLocalName();
 
         if (TradeRouteStop.TAG.equals(tag)) {
-            TradeRouteStop trs = new TradeRouteStop(getGame(), xr);
-            if (trs != null) addStop(trs);
+            addStop(new TradeRouteStop(getGame(), xr));
             
         } else {
             super.readChild(xr);

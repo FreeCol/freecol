@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -43,7 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -170,7 +170,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      *     the new game.
      */
     public NewPanel(FreeColClient freeColClient, Specification specification) {
-        super(freeColClient, new MigLayout("wrap 6", "[15]", ""));
+        super(freeColClient, null, new MigLayout("wrap 6", "[15]", ""));
 
         this.fixedSpecification = specification;
 
@@ -282,7 +282,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         JButton cancel = Utility.localizedButton("cancel");
         cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
         cancel.addActionListener(ae -> {
-                final SwingGUI gui = getGUI();
+                final GUI gui = getGUI();
                 gui.removeComponent(this);
                 if (getFreeColClient().isMapEditor()) {
                     gui.startMapEditorGUI();
@@ -333,7 +333,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
 
         this.specification = getSpecification();
         if (this.specification == null) {
-            throw new RuntimeException("No specification found");
+            throw new RuntimeException("No specification found for: " + this);
         }
         this.difficulty = this.specification
             .getDifficultyOptionGroup(FreeCol.getDifficulty());
@@ -344,7 +344,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             this.difficulty = getSelectedDifficulty();
         }
         if (this.difficulty == null) {
-            throw new RuntimeException("No difficulty found");
+            throw new RuntimeException("No difficulty found for: " + this);
         }
         logger.info("NewPanel initialized with " + this.specification.getId()
             + "/" + this.difficulty.getId());
@@ -545,7 +545,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         final ConnectController cc = getFreeColClient().getConnectController();
-        final SwingGUI gui = getGUI();
+        final GUI gui = getGUI();
         final String command = ae.getActionCommand();
 
         switch (Enum.valueOf(NewPanelAction.class, command)) {

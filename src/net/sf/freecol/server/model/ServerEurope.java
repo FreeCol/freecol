@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -95,18 +96,19 @@ public class ServerEurope extends Europe implements TurnTaker {
         }
 
         // Sell any excess
-        final ServerPlayer owner = (ServerPlayer)getOwner();
+        final Player owner = getOwner();
         for (AbstractGoods ag : transform(req, g -> g.getAmount() < 0)) {
-            int rm = owner.sellInEurope(null, null, ag.getType(), -ag.getAmount());
+            int rm = ((ServerPlayer)owner).sellInEurope(null, null, ag.getType(), -ag.getAmount());
             if (rm > 0) {
-                owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
+                ((ServerPlayer)owner).addExtraTrade(new AbstractGoods(ag.getType(), rm));
             }
         }
         // Buy what is needed
         for (AbstractGoods ag : transform(req, AbstractGoods::isPositive)) {
-            int m = owner.buyInEurope(null, null, ag.getType(), ag.getAmount());
+            int m = ((ServerPlayer)owner).buyInEurope(null, null,
+                ag.getType(), ag.getAmount());
             if (m > 0) {
-                owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
+                ((ServerPlayer)owner).addExtraTrade(new AbstractGoods(ag.getType(), -m));
             }
         }
 
@@ -133,7 +135,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @param random A pseudo-random number source.
      */
-    public void fillRecruitables(Random random) {
+    private void fillRecruitables(Random random) {
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
         UnitType unitType;
         do {
@@ -165,7 +167,6 @@ public class ServerEurope extends Europe implements TurnTaker {
     public AbstractUnit extractRecruitable(int slot, Random random) {
         // An invalid slot is normal when the player has no control over
         // recruit type.
-        final Specification spec = getSpecification();
         final int count = MigrationType.getMigrantCount();
         int index = (MigrationType.specificMigrantSlot(slot))
             ? MigrationType.migrantSlotToIndex(slot)
@@ -178,7 +179,7 @@ public class ServerEurope extends Europe implements TurnTaker {
         for (AbstractUnit au : expanded) {
             if (au.getId().equals(top.getId())
                 && au.getRoleId().equals(top.getRoleId())) {
-                top.setNumber(top.getNumber() + au.getNumber());
+                top.addToNumber(au.getNumber());
             } else {
                 this.recruitables.add(au);
                 top = au;
@@ -193,7 +194,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @return A weighted list of recruitable unit types.
      */
-    public List<RandomChoice<UnitType>> generateRecruitablesList() {
+    private List<RandomChoice<UnitType>> generateRecruitablesList() {
         final Player owner = getOwner();
         return transform(getSpecification().getUnitTypeList(),
                          ut -> ut.isRecruitable()
@@ -222,16 +223,19 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @param n The number of new units.
      * @param random A pseudo-random number source.
+     * @return The generated units.
      */
-    public void generateFountainRecruits(int n, Random random) {
+    public List<Unit> generateFountainRecruits(int n, Random random) {
         final Game game = getGame();
         final Player owner = getOwner();
+        List<Unit> ret = new ArrayList<>(n);
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
         for (int k = 0; k < n; k++) {
             UnitType ut = RandomChoice.getWeightedRandom(logger, "Choose FoY",
                                                          recruits, random);
-            new ServerUnit(game, this, owner, ut);//-vis: safe, Europe
+            ret.add(new ServerUnit(game, this, owner, ut));//-vis: safe, Europe
         }
+        return ret;
     }
 
     /**
@@ -268,12 +272,12 @@ public class ServerEurope extends Europe implements TurnTaker {
         boolean ret = equipForRole(unit, role, roleCount);
 
         if (ret) {
-            ServerPlayer serverPlayer = (ServerPlayer)getOwner();
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                "gold", String.valueOf(serverPlayer.getGold()));
-            cs.add(See.only(serverPlayer), unit);
-            serverPlayer.flushExtraTrades(random);
-            serverPlayer.csFlushMarket(cs);
+            Player owner = getOwner();
+            cs.addPartial(See.only(owner), owner,
+                "gold", String.valueOf(owner.getGold()));
+            cs.add(See.only(owner), unit);
+            ((ServerPlayer)owner).flushExtraTrades(random);
+            ((ServerPlayer)owner).csFlushMarket(cs);
         }
         return ret;
     }
@@ -292,7 +296,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        logger.finest("ServerEurope.csNewTurn, for " + this);
+        lb.add(this);
 
         for (Unit unit : transform(getUnits(),
                                    u -> u.isNaval() && u.isDamaged())) {

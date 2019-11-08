@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -120,6 +120,6 @@ public class ReadyMessage extends AttributeMessage {
      * @return True if the player is ready.
      */
     public boolean getValue() {
-        return getBooleanAttribute(VALUE_TAG, false);
+        return getBooleanAttribute(VALUE_TAG, Boolean.FALSE);
     }
 }

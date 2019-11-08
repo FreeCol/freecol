@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -35,7 +35,7 @@ public interface TradeLocation {
      * @param goodsType The {@code GoodsType} to check.
      * @return The amount of goods present.
      */
-    public int getGoodsCount(GoodsType goodsType);
+    public int getAvailableGoodsCount(GoodsType goodsType);
 
     /**
      * Gets the amount of a given goods type that can be exported from
@@ -66,20 +66,22 @@ public interface TradeLocation {
     public String getLocationName(TradeLocation tradeLocation);
 
     /**
-     * Return the name of this instance as a JLabel
+     * Get the name of this instance as a JLabel.
      *
-     * @return The JLabel with the result of {@link #getLocationName(TradeLocation)}
+     * @return The {@code JLabel} with the result of
+     *     {@link #getLocationName(TradeLocation)}
      */
     public default JLabel getNameAsJlabel() {
         return new JLabel(getLocationName(this));
     }
 
     /**
-     * Returns whether a TradeLocation be set as the input location on a TradeRouteInputPanel
+     * Can a TradeLocation be set as the input location on a
+     * TradeRouteInputPanel
      *
-     * @return true, if possible, false by default
+     * @return True if possible, false by default.
      */
-    public default Boolean canBeInput() {
+    public default boolean canBeInput() {
         return false;
     }
 }

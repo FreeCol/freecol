@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -41,6 +41,8 @@ public class CloseMessage extends AttributeMessage {
 
     /**
      * Create a new {@code CloseMessage}.
+     *
+     * @param panel The panel name.
      */
     public CloseMessage(String panel) {
         super(TAG, PANEL_TAG, panel);
@@ -52,10 +54,9 @@ public class CloseMessage extends AttributeMessage {
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
-     * @exception FreeColException if the internal message can not be read.
      */
     public CloseMessage(Game game, FreeColXMLReader xr)
-        throws FreeColException, XMLStreamException {
+        throws XMLStreamException {
         super(TAG, xr, PANEL_TAG);
     }
     

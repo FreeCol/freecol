@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -43,7 +43,6 @@ import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
-import net.sf.freecol.server.model.ServerPlayer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -91,10 +90,9 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * Creates a new AI player.
      *
      * @param aiMain The {@code AIMain} the player exists within.
-     * @param player The {@code ServerPlayer} to associate this
-     *            AI player with.
+     * @param player The {@code Player} to associate this AI player with.
      */
-    public MissionAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public MissionAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
     }
 
@@ -107,8 +105,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public MissionAIPlayer(AIMain aiMain,
-                    FreeColXMLReader xr) throws XMLStreamException {
+    public MissionAIPlayer(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(aiMain, xr);
     }
 
@@ -268,7 +266,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new misison, or null if impossible or not worthwhile.
      */
     public Mission getDefendCurrentSettlementMission(AIUnit aiUnit) {
-        if (DefendSettlementMission.invalidReason(aiUnit) != null) return null;
+        if (DefendSettlementMission.invalidMissionReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location loc = unit.getLocation();
         final Settlement settlement = (loc == null) ? null
@@ -287,7 +285,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      */
     public Mission getDefendSettlementMission(AIUnit aiUnit,
                                               Settlement target) {
-        return (DefendSettlementMission.invalidReason(aiUnit) != null) ? null
+        return (DefendSettlementMission.invalidMissionReason(aiUnit) != null) ? null
             : new DefendSettlementMission(getAIMain(), aiUnit, target);
     }
 
@@ -298,7 +296,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getIdleAtSettlementMission(AIUnit aiUnit) {
-        return (IdleAtSettlementMission.invalidReason(aiUnit) != null) ? null
+        return (IdleAtSettlementMission.invalidMissionReason(aiUnit) != null) ? null
             : new IdleAtSettlementMission(getAIMain(), aiUnit);
     }
        
@@ -311,8 +309,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, int range) {
         Location loc = null;
-        if (UnitSeekAndDestroyMission.invalidReason(aiUnit) == null) {
-            loc = UnitSeekAndDestroyMission.findTarget(aiUnit, range, false);
+        if (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit) == null) {
+            loc = UnitSeekAndDestroyMission.findMissionTarget(aiUnit, range, false);
         }
         return (loc == null) ? null
             : getSeekAndDestroyMission(aiUnit, loc);
@@ -326,7 +324,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, Location loc) {
-        return (UnitSeekAndDestroyMission.invalidReason(aiUnit) != null
+        return (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit) != null
             || loc == null) ? null
             : new UnitSeekAndDestroyMission(getAIMain(), aiUnit, loc);
     }
@@ -338,7 +336,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getWanderHostileMission(AIUnit aiUnit) {
-        return (UnitWanderHostileMission.invalidReason(aiUnit) != null) ? null
+        return (UnitWanderHostileMission.invalidMissionReason(aiUnit) != null) ? null
             : new UnitWanderHostileMission(getAIMain(), aiUnit);
     }
 

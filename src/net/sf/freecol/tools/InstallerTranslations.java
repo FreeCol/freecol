@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,6 +22,7 @@ package net.sf.freecol.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
@@ -109,16 +110,26 @@ public class InstallerTranslations {
         */
 
         if (!MAIN_FILE.exists()) {
-            System.out.println("Main input file not found.");
+            System.err.println("Main input file not found.");
             System.exit(1);
         }
 
         if (!DESTINATION_DIRECTORY.exists()) {
-            DESTINATION_DIRECTORY.mkdirs();
+            try {
+                if (!DESTINATION_DIRECTORY.mkdirs()) {
+                    System.err.println("Could not create "
+                        + DESTINATION_DIRECTORY);
+                    System.exit(1);
+                }
+            } catch (SecurityException se) {
+                System.err.println("Could not create " + DESTINATION_DIRECTORY
+                    + ": " + se);
+                System.exit(1);
+            }
         }
 
         //Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);
-        Map<String, String> languageMappings = new HashMap<>();
+        Map<String, String> languageMappings = new HashMap<>(IZPACK_CODES.length);
         for (String[] mapping : IZPACK_CODES) {
             languageMappings.put(mapping[0], mapping[1]);
         }
@@ -131,6 +142,10 @@ public class InstallerTranslations {
                     return name.matches("FreeColMessages_.*\\.properties");
                 }
             });
+        if (sourceFiles == null) {
+            System.err.println("No messages files found in " + SOURCE_DIRECTORY);
+            System.exit(1);
+        }
 
         for (String name : sourceFiles) {
 
@@ -202,8 +217,9 @@ public class InstallerTranslations {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch (Exception e) {
-            // forget it
+        } catch (IOException ioe) {
+            System.err.println("Error reading file: " + file.getName()
+                + ": " + ioe);
         }
         return result;
     }

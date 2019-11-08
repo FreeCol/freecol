@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -278,10 +278,11 @@ public class HistoryEvent extends StringTemplate {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof HistoryEvent) {
-            HistoryEvent h = (HistoryEvent)o;
-            return turn == h.turn && eventType == h.eventType
-                && Utils.equals(playerId, h.playerId)
-                && score == h.score;
+            HistoryEvent other = (HistoryEvent)o;
+            return turn == other.turn && eventType == other.eventType
+                && score == other.score
+                && Utils.equals(playerId, other.playerId)
+                && super.equals(other);
         }
         return false;
     }

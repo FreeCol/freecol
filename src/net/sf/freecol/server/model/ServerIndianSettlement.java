@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -151,17 +151,17 @@ public class ServerIndianSettlement extends IndianSettlement
     public void csStartTurn(Random random, ChangeSet cs) {
         final Unit missionary = getMissionary();
         if (missionary == null) return;
-        final ServerPlayer other = (ServerPlayer)missionary.getOwner();
+        final Player other = missionary.getOwner();
         final Tile tile = getTile();
         final Turn turn = getGame().getTurn();
 
         // Check for braves converted by missionaries
         float convert = getConvertProgress();
-        float cMiss = missionary.applyModifiers(missionary.getType().getSkill(),
-                                                turn, Modifier.CONVERSION_SKILL);
+        float cMiss = missionary.apply(missionary.getType().getSkill(),
+                                       turn, Modifier.CONVERSION_SKILL);
         // The convert rate increases by a percentage of the current alarm.
         int alarm = Math.min(getAlarm(other).getValue(), Tension.TENSION_MAX);
-        float cAlarm = missionary.applyModifiers(alarm, turn,
+        float cAlarm = missionary.apply(alarm, turn,
             Modifier.CONVERSION_ALARM_RATE);
         convert += cMiss + (cAlarm - alarm);
         logger.finest("Conversion at " + getName() + " alarm=" + alarm
@@ -273,7 +273,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * @return True if the most hated nation changed.
      */
-    public boolean updateMostHated() {
+    private boolean updateMostHated() {
         final Player old = this.mostHated;
         final Predicate<Player> hatedPred = p -> {
             Tension alarm = getAlarm(p);
@@ -376,12 +376,12 @@ public class ServerIndianSettlement extends IndianSettlement
         if (missionary == old) return;
 
         final Tile tile = getTile();
-        final ServerPlayer newOwner = (missionary == null) ? null
-            : (ServerPlayer)missionary.getOwner();
+        final Player newOwner = (missionary == null) ? null
+            : missionary.getOwner();
         tile.cacheUnseen(newOwner);//+til
 
         if (old != null) {
-            final ServerPlayer oldOwner = (ServerPlayer)old.getOwner(); 
+            final Player oldOwner = old.getOwner(); 
             setMissionary(null);//-vis(oldOwner),-til
             tile.updateIndianSettlement(oldOwner);
             ((ServerUnit)old).csRemove(See.only(oldOwner),
@@ -404,7 +404,7 @@ public class ServerIndianSettlement extends IndianSettlement
             tile.updateIndianSettlement(newOwner);
 
             cs.add(See.only(newOwner),
-                   newOwner.collectNewTiles(getMissionaryVisibleTiles()));
+                ((ServerPlayer)newOwner).collectNewTiles(getMissionaryVisibleTiles()));
             cs.add(See.perhaps().always(newOwner), tile);
             newOwner.invalidateCanSeeTiles();//+vis(newOwner)
         }
@@ -423,7 +423,7 @@ public class ServerIndianSettlement extends IndianSettlement
         csChangeMissionary(null, cs);
         
         // Inform the enemy of loss of mission
-        ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
+        Player missionaryOwner = missionary.getOwner();
         if (destroy != null) {
             if (destroy) {
                 cs.addMessage(missionaryOwner,
@@ -458,7 +458,7 @@ public class ServerIndianSettlement extends IndianSettlement
         boolean ret = equipForRole(unit, role, roleCount);
 
         if (ret) {
-            cs.add(See.only((ServerPlayer)getOwner()), getTile());
+            cs.add(See.only(getOwner()), getTile());
         }
         return ret;
     }
@@ -479,11 +479,11 @@ public class ServerIndianSettlement extends IndianSettlement
             || !hasContacted(enemy) || !enemy.hasExplored(getTile())) return;
 
         // Tension has changed, update the enemy
-        cs.add(See.only(null).perhaps((ServerPlayer)enemy), this);
+        cs.add(See.only(null).perhapsOnly(enemy), this);
 
         // No messages about improving tension
-        if (newLevel == null || (oldLevel != null
-                && oldLevel.getLimit() > newLevel.getLimit())) return;
+        if (newLevel == null
+            || oldLevel.getLimit() > newLevel.getLimit()) return;
 
         // Send a message to the enemy that tension has increased.
         String key = "model.player.alarmIncrease." + getAlarm(enemy).getKey();
@@ -507,9 +507,9 @@ public class ServerIndianSettlement extends IndianSettlement
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        final Specification spec = getSpecification();
+        final Player owner = getOwner();
         lb.add(this);
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        Specification spec = getSpecification();
 
         // Produce goods.
         List<GoodsType> goodsList = spec.getGoodsTypeList();
@@ -534,7 +534,7 @@ public class ServerIndianSettlement extends IndianSettlement
         if (getUnitCount() <= 0) {
             if (tile.isEmpty()) {
                 lb.add(" COLLAPSED, ");
-                owner.csDisposeSettlement(this, cs);//+vis(owner)
+                ((ServerPlayer)owner).csDisposeSettlement(this, cs);//+vis(owner)
                 return;
             }
             tile.getFirstUnit().setLocation(this);//-vis,til: safe in settlement
@@ -574,8 +574,8 @@ public class ServerIndianSettlement extends IndianSettlement
         // FIXME: remove this
         GoodsType grainType = spec.getGoodsType("model.goods.grain");
         int foodProdAvail = getTotalProductionOf(grainType) - getFoodConsumption();
-        if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
-            && foodProdAvail > 0) {
+        if (foodProdAvail > 0
+            && getGoodsCount(horsesType) >= horsesType.getBreedingNumber()) {
             int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);
             addGoods(horsesType, nHorses);
             lb.add(" bred ", nHorses, " horses");

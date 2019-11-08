@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -41,11 +41,7 @@ public class UtilsTest extends FreeColTestCase {
         l.add(2);
         l.add(3);
         List<List<Integer>> p = new ArrayList<>();
-        try {
-            for (List<Integer> li : CollectionUtils.getPermutations(l)) p.add(li);
-        } catch (Exception e) {
-            fail();
-        }
+        for (List<Integer> li : CollectionUtils.getPermutations(l)) p.add(li);
         assertEquals(p.size(), 6);
         assertEquals(p.get(0), makeList(1,2,3));
         assertEquals(p.get(1), makeList(1,3,2));

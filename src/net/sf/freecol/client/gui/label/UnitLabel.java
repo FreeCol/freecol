@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -223,7 +223,7 @@ public final class UnitLabel extends FreeColLabel
         } else {
             Icon imageIcon = new ImageIcon(lib.getScaledUnitImage(unit));
             if (unit.getLocation() instanceof ColonyTile) {
-                Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+                Dimension tileSize = lib.scale(ImageLibrary.TILE_SIZE);
                 tileSize.width /= 2;
                 tileSize.height = imageIcon.getIconHeight();
                 setSize(tileSize);
@@ -278,7 +278,7 @@ public final class UnitLabel extends FreeColLabel
      * {@inheritDoc}
      */
     @Override
-    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
+    public boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
         Unit unit = ((UnitLabel)comp).getUnit();
         if (carrier.canAdd(unit)) {
             Container oldParent = comp.getParent();
@@ -286,10 +286,10 @@ public final class UnitLabel extends FreeColLabel
                 ((UnitLabel) comp).setSmall(false);
                 if (oldParent != null) oldParent.remove(comp);
                 cargoPanel.update();
-                return comp;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     /**
@@ -427,15 +427,16 @@ public final class UnitLabel extends FreeColLabel
             }
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
                 getParent() instanceof InPortPanel ||
-                getParent() instanceof EuropePanel.DocksPanel ||
+                getParent() instanceof EuropePanel.EuropeanDocksPanel ||
                 getParent().getParent() instanceof ReportPanel) {
             String text = Messages.message(unit.getOccupationLabel(player, false));
             g.drawImage(lib.getOccupationIndicatorChip((Graphics2D)g, unit, text), 0, 0, null);
 
             if (unit.isDamaged()) {
                 String underRepair = Messages.message(unit.getRepairLabel());
-                String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
-                String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
+                int idx = underRepair.indexOf('(');
+                String underRepair1 = underRepair.substring(0, idx).trim();
+                String underRepair2 = underRepair.substring(idx).trim();
                 Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                                                    FontLibrary.FontSize.TINY, lib.getScaleFactor());
                 Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);

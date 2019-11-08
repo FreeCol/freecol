@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -462,7 +462,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public void update(GoodsType goodsType) {
         MarketData data = requireMarketData(goodsType);
-        if (data != null) data.update();
+        data.update();
     }
 
     /**

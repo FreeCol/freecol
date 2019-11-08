@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -62,8 +62,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create players, settlement and unit
-        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = getServerPlayer(game, "model.nation.inca");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         dutch.exploreMap(true);
 
         Tile settlementTile = map.getTile(2, 1);
@@ -86,11 +86,11 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertTrue("Scout should be able to speak to chief",
                    scout.hasAbility(Ability.SPEAK_WITH_CHIEF));
         assertEquals("The Inca settlement should be a scouting target", null,
-                     ScoutingMission.invalidReason(aiUnit, is));
+                     ScoutingMission.invalidMissionReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
-                     is, ScoutingMission.findTarget(aiUnit, 10, false));
+                     is, ScoutingMission.findMissionTarget(aiUnit, 10, false));
         assertEquals("Scouting mission should be assignable to scout", null,
-                     ScoutingMission.invalidReason(aiUnit));
+                     ScoutingMission.invalidMissionReason(aiUnit));
 
         ScoutingMission mission
             = new ScoutingMission(aiMain, aiUnit, is);
@@ -109,7 +109,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertNotNull("Scouting mission should be invalid",
                       aiUnit.getMission().invalidReason());
         assertNotNull("Scouting mission should be impossible for this unit",
-                      ScoutingMission.invalidReason(aiUnit));
+                      ScoutingMission.invalidMissionReason(aiUnit));
         
         // Restore the horses.
         scout.changeRole(scoutRole, 1);
@@ -125,8 +125,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
         Tile lcrTile = map.getTile(2, 3);
         lcrTile.addLostCityRumour(new LostCityRumour(game, lcrTile));
         assertEquals("Scouting mission should be possible for this unit", null,
-            ScoutingMission.invalidReason(aiUnit));
+            ScoutingMission.invalidMissionReason(aiUnit));
         assertEquals("The LCR tile should be a scouting target",
-            lcrTile, ScoutingMission.findTarget(aiUnit, 10, false));
+            lcrTile, ScoutingMission.findMissionTarget(aiUnit, 10, false));
     }
 }

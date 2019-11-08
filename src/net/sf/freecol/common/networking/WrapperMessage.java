@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -87,7 +87,7 @@ public abstract class WrapperMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     public boolean isEmpty() {
-        return super.isEmpty() && this.message == null;
+        return this.message == null && super.isEmpty();
     }
 
     /**

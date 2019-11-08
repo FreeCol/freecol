@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -511,6 +512,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param x The new mouse x position.
      * @param y The new mouse y position.
+     * @return True if the mouse has been dragged.
      */
     public boolean isDrag(int x, int y) {
         final Point drag = getDragPoint();
@@ -598,8 +600,9 @@ public final class Canvas extends JDesktopPane {
 
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
             : new JInternalFrame();
-        if (f.getContentPane() instanceof JComponent) {
-            JComponent c = (JComponent) f.getContentPane();
+        Container con = f.getContentPane();
+        if (con instanceof JComponent) {
+            JComponent c = (JComponent)con;
             c.setOpaque(false);
             c.setBorder(null);
         }
@@ -779,7 +782,7 @@ public final class Canvas extends JDesktopPane {
         List<Component> allComponents
             = transform(this.getComponents(),
                         c -> !(c instanceof GrayLayer) && c.isValid());
-        for (FreeColDialog<?> fcd : dialogs) allComponents.add(fcd);
+        allComponents.addAll(dialogs);
 
         // Find the position with the least overlap
         int bestScore = Integer.MAX_VALUE;
@@ -796,8 +799,9 @@ public final class Canvas extends JDesktopPane {
             int foundScore = 0;
             Component found = null;
             for (Component c : allComponents) {
-                if (c.getBounds().intersects(r)) {
-                    Rectangle rr = c.getBounds().intersection(r);
+                Rectangle rb = c.getBounds();
+                if (rb.intersects(r)) {
+                    Rectangle rr = rb.intersection(r);
                     int score = (int)Math.round(rr.getWidth() * rr.getHeight());
                     if (foundScore < score) {
                         foundScore = score;
@@ -1159,7 +1163,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else if (panel.endsWith("Dialog")) {
-            for (FreeColDialog<?> fcd : dialogs) {
+            for (FreeColDialog<?> fcd : new ArrayList<>(dialogs)) {
                 if (panel.equals(fcd.getClass().getName())) {
                     dialogs.remove(fcd);
                     fcd.dispose();
@@ -1203,7 +1207,9 @@ public final class Canvas extends JDesktopPane {
     /**
      * Tells that a chat message was received.
      *
+     * @param senderName The sender.
      * @param message The chat message.
+     * @param privateChat True if this is a private message.
      */
     public void displayStartChat(String senderName, String message,
                                  boolean privateChat) {
@@ -1312,7 +1318,7 @@ public final class Canvas extends JDesktopPane {
      * @return {@code true} if the {@code Canvas} is displaying an
      *         internal frame.
      */
-    public boolean isShowingSubPanel() {
+    private boolean isShowingSubPanel() {
         return getShowingSubPanel() != null;
     }
 
@@ -1572,12 +1578,13 @@ public final class Canvas extends JDesktopPane {
      * @return The corresponding member of the values array to the selected
      *     option, or null if no choices available.
      */
-    public <T> T showChoiceDialog(Tile tile, Object obj, ImageIcon icon,
-                                  String cancelKey, List<ChoiceItem<T>> choices) {
+    public <T> T showChoiceDialog(Tile tile, StringTemplate tmpl,
+                                  ImageIcon icon, String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
         if (choices.isEmpty()) return null;
         FreeColChoiceDialog<T> fcd
-            = new FreeColChoiceDialog<>(freeColClient, frame, true, obj, icon,
-                                         cancelKey, choices);
+            = new FreeColChoiceDialog<>(freeColClient, frame, true, tmpl, icon,
+                                        cancelKey, choices);
         return showFreeColDialog(fcd, tile);
     }
 
@@ -1586,17 +1593,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @param tile An optional {@code Tile} to make visible (not
      *     under the dialog!)
-     * @param obj An object that explains the choice for the user.
+     * @param template A {@code StringTemplate} to explain the choice.
      * @param icon An optional icon to display.
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      * @return True if the user clicked the "ok"-button.
      */
-    public boolean showConfirmDialog(Tile tile, Object obj, ImageIcon icon,
+    public boolean showConfirmDialog(Tile tile, StringTemplate template,
+                                     ImageIcon icon,
                                      String okKey, String cancelKey) {
         FreeColConfirmDialog fcd
-            = new FreeColConfirmDialog(freeColClient, frame, true, obj, icon,
-                                       okKey, cancelKey);
+            = new FreeColConfirmDialog(freeColClient, frame, true, template,
+                                       icon, okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
 
@@ -1616,8 +1624,8 @@ public final class Canvas extends JDesktopPane {
                                   String okKey, String cancelKey) {
         FreeColStringInputDialog fcd
             = new FreeColStringInputDialog(freeColClient, frame, true,
-                                           Messages.message(template),
-                                           defaultValue, okKey, cancelKey);
+                                           template, defaultValue,
+                                           okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
 
@@ -1762,12 +1770,9 @@ public final class Canvas extends JDesktopPane {
             try {
                 panel = new ColonyPanel(freeColClient, colony);
             } catch (Exception e) {
-                try {
-                    logger.log(Level.WARNING, "Exception in ColonyPanel for "
-                        + colony.getId(), e);
-                } finally {
-                    return null;
-                }
+                logger.log(Level.WARNING, "Exception in ColonyPanel for "
+                    + colony.getId(), e);
+                return null;
             }
             showFreeColPanel(panel, colony.getTile(), true);
         } else {
@@ -2150,7 +2155,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the map editor transform panel.
      */
-    public void showMapEditorTransformPanel() {
+    private void showMapEditorTransformPanel() {
         JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient),
             true, PopupPosition.CENTERED, false);
         f.setLocation(f.getX(), 50);
@@ -2238,8 +2243,8 @@ public final class Canvas extends JDesktopPane {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new FreeColStringInputDialog(freeColClient, frame, false,
-                                             Messages.message(template),
-                                             defaultName, "ok", null),
+                                             template, defaultName,
+                                             "ok", null),
                 unit.getTile(), handler));
     }
 
@@ -2327,7 +2332,9 @@ public final class Canvas extends JDesktopPane {
     public void showPurchasePanel() {
         PurchasePanel panel = getExistingFreeColPanel(PurchasePanel.class);
         if (panel == null) {
-            showFreeColPanel(new PurchasePanel(freeColClient), null, false);
+            PurchasePanel pp = new PurchasePanel(freeColClient);
+            pp.update();
+            showFreeColPanel(pp, null, false);
         }
     }
 
@@ -2537,8 +2544,6 @@ public final class Canvas extends JDesktopPane {
      * Display the trade route input panel for a given trade route.
      *
      * @param newRoute The {@code TradeRoute} to display.
-     * @param callBack The {@code Runnable} that is run when the
-     *     panel closes.
      * @return The {@code TradeRouteInputPanel}.
      */
     public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
@@ -2564,7 +2569,9 @@ public final class Canvas extends JDesktopPane {
     public void showTrainPanel() {
         TrainPanel panel = getExistingFreeColPanel(TrainPanel.class);
         if (panel == null) {
-            showFreeColPanel(new TrainPanel(freeColClient), null, false);
+            TrainPanel tp = new TrainPanel(freeColClient);
+            tp.update();
+            showFreeColPanel(tp, null, false);
         }
     }
 

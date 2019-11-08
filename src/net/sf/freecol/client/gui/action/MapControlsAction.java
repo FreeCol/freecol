@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,6 +42,8 @@ public class MapControlsAction extends SelectableAction {
      */
     public MapControlsAction(FreeColClient freeColClient) {
         super(freeColClient, id, ClientOptions.DISPLAY_MAP_CONTROLS);
+
+        setSelected(shouldBeSelected());
     }
 
 

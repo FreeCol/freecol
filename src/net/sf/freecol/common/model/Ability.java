@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -180,13 +180,6 @@ public final class Ability extends Feature {
     /** Restrict some buildings to only be buildable on the coast. */
     public static final String COASTAL_ONLY
         = "model.ability.coastalOnly";
-
-    /**
-     * The ability of certain consumers (e.g. BuildQueues) to consume
-     * a large amount of goods at once instead of turn by turn.
-     */
-    public static final String CONSUME_ALL_OR_NOTHING
-        = "model.ability.consumeAllOrNothing";
 
     /** The ability of customs houses to trade with other players. */
     public static final String CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES
@@ -558,8 +551,9 @@ public final class Ability extends Feature {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof Ability) {
-            return this.value == ((Ability)o).value
-                && super.equals(o);
+            Ability other = (Ability)o;
+            return this.value == other.value
+                && super.equals(other);
         }
         return false;
     }

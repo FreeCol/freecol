@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -33,8 +33,10 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -55,20 +57,10 @@ public class ResourceManager {
     public static final String REPLACEMENT_STRING = "X";
 
     /**
-     * The following fields are mappings from resource IDs to
-     * resources.  A mapping is defined within a specific context.
-     * See the comment on each field's setter for more information:
+     * All the mappings are merged in order into this single ResourceMapping.
      */
-    private static ResourceMapping baseMapping;
-    private static ResourceMapping tcMapping;
-    private static ResourceMapping scenarioMapping;
-    private static ResourceMapping modMapping;
-
-    /**
-     * All the mappings above merged into this single ResourceMapping
-     * according to precendence.
-     */
-    private static ResourceMapping mergedContainer;
+    private static final ResourceMapping mergedContainer
+        = new ResourceMapping();
 
     /** The thread that handles preloading of resources. */
     private static volatile Thread preloadThread = null;
@@ -81,83 +73,26 @@ public class ResourceManager {
      * Sets the mappings specified in the date/base-directory.
      * Do not access the mapping after the call.
      *
+     * @param name The name of the mapping, for logging purposes.
      * @param mapping The mapping between IDs and files.
      */
-    public static synchronized void setBaseMapping(final ResourceMapping mapping) {
-        baseMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Sets the mappings specified for a Total Conversion (TC).
-     * Do not access the mapping after the call.
-     *
-     * @param mapping The mapping between IDs and files.
-     */
-    public static synchronized void setTcMapping(final ResourceMapping mapping) {
-        tcMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Sets the mappings specified by mods.
-     * Do not access the mapping after the call.
-     *
-     * @param mapping A list of the mappings between IDs and files.
-     */
-    public static synchronized void setModMapping(final ResourceMapping mapping) {
-        modMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Sets the mappings specified in a scenario.
-     * Do not access the mapping after the call.
-     *
-     * @param mapping The mapping between IDs and files.
-     */
-    public static synchronized void setScenarioMapping(final ResourceMapping mapping) {
-        scenarioMapping = mapping;
-        // As this is called when loading a new savegame,
-        // use it as a hint for cleaning up
-        clean();
-        update(mapping != null);
+    public static synchronized void addMapping(String name,
+                                               final ResourceMapping mapping) {
+        logger.info("Resource manager adding mapping " + name);
+        mergedContainer.addAll(mapping);
+        preloadThread = null;
+        // TODO: This should wait for the thread to exit, if one
+        // was running.
+        startBackgroundPreloading();
     }
 
     /**
      * Clean up easily replaced modified copies in caches.
      */
-    public static synchronized void clean() {
-        imageCache.clear();
-        System.gc();
-    }
-
-    /**
-     * Updates the resource mappings after making changes.
-     * 
-     * @param newItems If new items have been added.
-     */
-    private static void update(boolean newItems) {
-        logger.finest("update(" + newItems + ")");
-        if (newItems) preloadThread = null;
-        createMergedContainer();
-        if (newItems) {
-            // TODO: This should wait for the thread to exit, if one
-            // was running.
-            startBackgroundPreloading();
+    public static void clearImageCache() {
+        synchronized (imageCache) {
+            imageCache.clear();
         }
-    }
-
-    /**
-     * Creates a merged container containing all the resources.
-     */
-    private static synchronized void createMergedContainer() {
-        ResourceMapping mc = new ResourceMapping();
-        mc.addAll(baseMapping);
-        mc.addAll(tcMapping);
-        mc.addAll(scenarioMapping);
-        mc.addAll(modMapping);
-        mergedContainer = mc;
     }
 
     /**
@@ -173,9 +108,7 @@ public class ResourceManager {
      * Create and start a new background preload thread.
      */
     private static void startBackgroundPreloading() {
-        if ("true".equals(System.getProperty("java.awt.headless", "false"))) {
-            return; // Do not preload in headless mode
-        }
+        if (FreeCol.getHeadless()) return; // Do not preload in headless mode
 
         preloadThread = new Thread(FreeCol.CLIENT_THREAD + "-Resource loader") {
                 @Override
@@ -192,16 +125,13 @@ public class ResourceManager {
                             return;
                         }
                         // TODO: Filter list before running thread?
-                        if (r instanceof Resource.Preloadable) {
-                            ((Resource.Preloadable)r).preload();
-                            n++;
-                        }
+                        r.preload();
+                        n++;
                     }
                     logger.info("Preload background thread preloaded " + n
                         + " resources.");
                 }
             };
-        preloadThread.setPriority(2);
         preloadThread.start();
     }
 
@@ -260,7 +190,7 @@ public class ResourceManager {
             logger.warning("getImageResource(" + key + ") failed");
             r = mergedContainer.getImageResource(REPLACEMENT_IMAGE);
             if (r == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
+                FreeCol.fatal(logger, "Failed getting replacement image.");
             }
         }
         return r;
@@ -333,7 +263,7 @@ public class ResourceManager {
                 + ") failed");
             if ((image = getImageResource(REPLACEMENT_IMAGE)
                     .getImage(size, grayscale)) == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
+                FreeCol.fatal(logger, "Failed getting replacement image.");
             }
         } else {
             imageCache.put(hashKey, image);
@@ -387,6 +317,7 @@ public class ResourceManager {
      * Gets a color resource with the given name.
      *
      * @param key The name of the resource to query.
+     * @param replacement A fallback color.
      * @return The {@code Color} found, or if not found, the replacement color,
      *     or finally the generic replacement color.
      */
@@ -572,5 +503,27 @@ public class ResourceManager {
     public static Video getVideo(final String key) {
         final VideoResource r = getVideoResource(key);
         return (r != null) ? r.getVideo() : null;
+    }
+
+    /**
+     * Summarize the image resources and image cache contents.
+     *
+     * @param sb A {@code StringBuilder} to summarize to.
+     */
+    public static void summarizeImageResources(StringBuilder sb) {
+        Set<String> keys = mergedContainer.getImageKeySet();
+        sb.append("All keys\n").append(join(" ", keys)).append('\n');
+        Map<Integer,String> decode = new HashMap<>();
+        for (String k : keys) decode.put(k.hashCode(), k);
+        sb.append("Cache\n");
+        synchronized (imageCache) {
+            forEachMapEntry(imageCache, e -> {
+                    Long key = e.getKey();
+                    String rep = ResourceManager.imageUnhash(key);
+                    int i = Integer.parseInt(firstPart(rep, "."));
+                    sb.append(decode.get(i)).append('.')
+                        .append(lastPart(rep, ".")).append('\n');
+                });
+        }
     }
 }

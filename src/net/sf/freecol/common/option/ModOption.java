@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -71,7 +71,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    public ModOption clone() {
+    public ModOption cloneOption() {
         ModOption result = new ModOption(getSpecification());
         result.setId(this.getId());
         result.value = this.value;
@@ -159,9 +159,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof ModOption) {
-            ModOption mod = (ModOption)o;
-            return this.value == mod.value
-                && super.equals(o);
+            ModOption other = (ModOption)o;
+            return this.value == other.value
+                && super.equals(other);
         }
         return false;
     }

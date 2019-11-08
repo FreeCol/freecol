@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,10 +30,8 @@ import javax.swing.JPanel;
  */
 public class MigPanel extends JPanel {
 
-    private String uiClassId = null;
+    private String uiClassId;
 
-
-    public MigPanel() {}
 
     public MigPanel(String uiClassId) {
         this.uiClassId = uiClassId;
@@ -41,6 +39,14 @@ public class MigPanel extends JPanel {
 
     public MigPanel(LayoutManager layout) {
         super(layout);
+
+        this.uiClassId = null;
+    }
+
+    protected MigPanel(String uiClassId, LayoutManager layout) {
+        super(layout);
+        
+        this.uiClassId = uiClassId;
     }
 
 

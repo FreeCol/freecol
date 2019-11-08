@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -180,6 +180,7 @@ public final class Server extends Thread {
     public void sendToAll(Message message, Connection exceptConnection) {
         for (Connection conn : transform(connections.values(),
                                          c -> c != exceptConnection)) {
+
             if (conn.isAlive()) {
                 try {
                     conn.sendMessage(message);
@@ -190,6 +191,17 @@ public final class Server extends Thread {
                 logger.log(Level.INFO, "Reap dead connection: " + conn);
                 removeConnection(conn);
             }
+        }
+    }
+
+    /**
+     * Set the logging state for all connections.
+     *
+     * @param log If true, enable logging.
+     */
+    public void setLogging(boolean log) {
+        for (Connection conn : connections.values()) {
+            conn.setLogging(log);
         }
     }
 
@@ -232,12 +244,12 @@ public final class Server extends Thread {
                         // Undocumented null return has been seen
                         this.freeColServer.addNewUserConnection(sock);
                     }
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     // Catch all exceptions.  There have been
                     // sightings of spurious NPEs and other fail in
                     // the Java libraries.
                     if (this.running) {
-                        logger.log(Level.WARNING, "Connection failed: ", e);
+                        logger.log(Level.WARNING, "Connection failed: ", ex);
                     }
                 }
             }

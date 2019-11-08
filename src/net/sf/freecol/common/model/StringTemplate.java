@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -49,6 +51,10 @@ public class StringTemplate extends FreeColObject {
 
     public static final String TAG = "stringTemplate";
 
+    /** Fixed trivial return value for entryList(). */
+    private static final List<SimpleEntry<String,StringTemplate>> emptyList
+        = Collections.<SimpleEntry<String,StringTemplate>>emptyList();
+
     /**
      * The type of this StringTemplate, either NAME, a proper name
      * that must not be localized (e.g. "George Washington"), or KEY,
@@ -68,11 +74,8 @@ public class StringTemplate extends FreeColObject {
      */
     private String defaultId = null;
 
-    /** The keys to replace within the string template. */
-    private List<String> keys = null;
-
-    /** The values with which to replace the keys in the string template. */
-    private List<StringTemplate> replacements = null;
+    /** The key,value paris to apply within the string template. */
+    private List<SimpleEntry<String,StringTemplate>> kv = null;
 
 
     /**
@@ -90,8 +93,7 @@ public class StringTemplate extends FreeColObject {
         setId(id);
         this.templateType = template.templateType;
         this.defaultId = template.defaultId;
-        this.keys = template.keys;
-        this.replacements = template.replacements;
+        this.kv = template.kv;
     }
 
     /**
@@ -106,8 +108,7 @@ public class StringTemplate extends FreeColObject {
         setId(id);
         this.defaultId = defaultId;
         this.templateType = templateType;
-        this.keys = null;
-        this.replacements = null;
+        this.kv = null;
     }
 
     /**
@@ -128,9 +129,6 @@ public class StringTemplate extends FreeColObject {
     }
 
     public static StringTemplate name(String value) {
-        if (value == null) {
-            net.sf.freecol.FreeCol.trace(logger, "Null name template");
-        }
         return new StringTemplate(value, null, TemplateType.NAME);
     }
 
@@ -197,41 +195,10 @@ public class StringTemplate extends FreeColObject {
         try {
             return returnClass.cast(this);
         } catch (ClassCastException cce) {
-            logger.log(Level.WARNING, "Invalid class " + this.getClass() + " referenced.", cce);
+            logger.log(Level.WARNING, "Invalid class "
+                + this.getClass() + " referenced.", cce);
         }
         return null;            
-    }
-
-
-    /**
-     * Get the keys.
-     *
-     * @return A list of keys.
-     */
-    public final List<String> getKeys() {
-        return (this.keys == null) ? Collections.<String>emptyList()
-            : this.keys;
-    }
-
-    /**
-     * Add a key.
-     * 
-     * @param key The key to add.
-     */
-    private void addKey(String key) {
-        if (this.keys == null) this.keys = new ArrayList<>();
-        this.keys.add(key);
-    }
-
-    /**
-     * Get the replacements.
-     *
-     * @return A list of replacements.
-     */
-    public final List<StringTemplate> getReplacements() {
-        return (this.replacements == null)
-            ? Collections.<StringTemplate>emptyList()
-            : this.replacements;
     }
 
     /**
@@ -240,36 +207,71 @@ public class StringTemplate extends FreeColObject {
      * @return True if the template is empty.
      */
     public boolean isEmpty() {
-        return this.replacements == null || this.replacements.isEmpty();
+        return this.kv == null || this.kv.isEmpty();
     }
-    
+
+    /**
+     * Get the list of key, value pairs.
+     *
+     * @return The pairs.
+     */
+    public List<SimpleEntry<String,StringTemplate>> entryList() {
+        return (this.kv != null) ? this.kv : emptyList;
+    }
+
+    /**
+     * Try to find the replacement for a given key.
+     *
+     * @param key The key to look for.
+     * @return The value found, otherwise null.
+     */
+    public StringTemplate getReplacement(String key) {
+        if (this.kv == null) return null;
+        SimpleEntry<String,StringTemplate> val
+            = find(this.kv, matchKeyEquals(key, SimpleEntry::getKey));
+        return (val == null) ? null : val.getValue();
+    }
+
+    /**
+     * Add a key, value pair.
+     *
+     * @param key The {@code String} key.
+     * @param value The {@code StringTemplate} value.
+     */
+    private void addPair(String key, StringTemplate value) {
+        if (key == null && value == null) {
+            throw new RuntimeException("Null key and pair: " + this);
+        }
+        if (this.kv == null) this.kv = new ArrayList<>();
+        this.kv.add(new SimpleEntry<>(key, value));
+    }
+
+    // @compat 0.11.x
+    /**
+     * Add a key.
+     * 
+     * @param key The key to add.
+     */
+    private void addKey(String key) {
+        addPair(key, null);
+    }
+
     /**
      * Add a replacement.
      *
      * @param replacement The {@code StringTemplate} replacement to add.
      */
     private void addReplacement(StringTemplate replacement) {
-        if (this.replacements == null) this.replacements = new ArrayList<>();
-        this.replacements.add(replacement);
-    }
-
-    /**
-     * Get the replacement value for a given key.
-     *
-     * @param key The key to find a replacement for.
-     * @return The replacement found, or null if none found.
-     */
-    public final StringTemplate getReplacement(String key) {
-        if (this.keys != null && this.replacements != null) {
-            for (int index = 0; index < this.keys.size(); index++) {
-                if (key.equals(this.keys.get(index))) {
-                    return (this.replacements.size() <= index) ? null
-                        : this.replacements.get(index);
-                }
+        if (this.kv == null) this.kv = new ArrayList<>();
+        for (SimpleEntry<String,StringTemplate> e : this.kv) {
+            if (e.getValue() == null) {
+                e.setValue(replacement);
+                return;
             }
         }
-        return null;
+        addPair(null, replacement);
     }
+    // end @compat 0.11.x
 
     /**
      * Add an optional key and replacement.  Helper function for the add*()
@@ -283,8 +285,7 @@ public class StringTemplate extends FreeColObject {
     @SuppressWarnings("unchecked")
     private final <T extends StringTemplate> T complete(String key,
                                                         StringTemplate value) {
-        if (key != null) addKey(key);
-        addReplacement(value);
+        addPair(key, value);
         return (T)this;
     }
 
@@ -300,10 +301,10 @@ public class StringTemplate extends FreeColObject {
      */
     public <T extends StringTemplate> T add(String key, String value) {
         if (this.templateType != TemplateType.TEMPLATE) {
-            throw new IllegalArgumentException("Cannot add key-value pair"
+            throw new RuntimeException("Cannot add key-value pair"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(key, this.key(value));
+        return complete(key, StringTemplate.key(value));
     }
 
     /**
@@ -317,10 +318,10 @@ public class StringTemplate extends FreeColObject {
      */
     public <T extends StringTemplate> T add(String value) {
         if (this.templateType != TemplateType.LABEL) {
-            throw new IllegalArgumentException("Cannot add a single string"
+            throw new RuntimeException("Cannot add a single string"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(null, this.key(value));
+        return complete(null, StringTemplate.key(value));
     }
 
     /**
@@ -335,10 +336,10 @@ public class StringTemplate extends FreeColObject {
      */
     public <T extends StringTemplate> T addName(String key, String value) {
         if (this.templateType != TemplateType.TEMPLATE) {
-            throw new IllegalArgumentException("Cannot add key-name pair"
+            throw new RuntimeException("Cannot add key-name pair"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(key, this.name(value));
+        return complete(key, StringTemplate.name(value));
     }
 
     /**
@@ -353,10 +354,10 @@ public class StringTemplate extends FreeColObject {
      */
     public <T extends StringTemplate> T addName(String key, FreeColObject object) {
         if (this.templateType != TemplateType.TEMPLATE) {
-            throw new IllegalArgumentException("Cannot add key-object pair"
+            throw new RuntimeException("Cannot add key-object pair"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(key, this.key(Messages.nameKey(object.getId())));
+        return complete(key, StringTemplate.key(Messages.nameKey(object.getId())));
     }
 
     /**
@@ -370,10 +371,10 @@ public class StringTemplate extends FreeColObject {
      */
     public <T extends StringTemplate> T addName(String value) {
         if (this.templateType != TemplateType.LABEL) {
-            throw new IllegalArgumentException("Cannot add a single string"
+            throw new RuntimeException("Cannot add a single string"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(null, this.name(value));
+        return complete(null, StringTemplate.name(value));
     }
 
     /**
@@ -422,9 +423,9 @@ public class StringTemplate extends FreeColObject {
      * @return This.
      */
     public <T extends StringTemplate> T addStringTemplate(String key,
-        StringTemplate template) {
+                                                          StringTemplate template) {
         if (this.templateType != TemplateType.TEMPLATE) {
-            throw new IllegalArgumentException("Cannot add key-template pair"
+            throw new RuntimeException("Cannot add key-template pair"
                 + " to StringTemplate." + this.templateType);
         }
         return complete(key, template);
@@ -441,7 +442,7 @@ public class StringTemplate extends FreeColObject {
      */
     public <T extends StringTemplate> T addStringTemplate(StringTemplate template) {
         if (this.templateType != TemplateType.LABEL) {
-            throw new IllegalArgumentException("Cannot add a template"
+            throw new RuntimeException("Cannot add a template"
                 + " to StringTemplate." + this.templateType);
         }
         return complete(null, template);
@@ -474,8 +475,7 @@ public class StringTemplate extends FreeColObject {
         if (o == null || !super.copyIn(o)) return false;
         this.templateType = o.getTemplateType();
         this.defaultId = o.getDefaultId();
-        this.keys = o.getKeys();
-        this.replacements = o.getReplacements();
+        this.kv = o.kv;
         return true;
     }
 
@@ -483,8 +483,11 @@ public class StringTemplate extends FreeColObject {
     // Serialization
 
     private static final String DEFAULT_ID_TAG = "defaultId";
-    private static final String KEY_TAG = "key";
+    private static final String PAIR_TAG = "pair";
     private static final String TEMPLATE_TYPE_TAG = "templateType";
+    // @compat 0.11.x
+    private static final String OLD_KEY_TAG = "key";
+    // end @compat 0.11.x
 
 
     /**
@@ -508,19 +511,16 @@ public class StringTemplate extends FreeColObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (keys != null) {
-            for (String key : keys) {
-                xw.writeStartElement(KEY_TAG);
+        if (this.kv != null) {
+            for (SimpleEntry<String,StringTemplate> e : this.kv) {
+                xw.writeStartElement(PAIR_TAG);
+                
+                String key = e.getKey(); // OK if null
+                if (key != null) xw.writeAttribute(VALUE_TAG, key);
 
-                xw.writeAttribute(VALUE_TAG, key);
+                e.getValue().toXML(xw); // value is always present
 
                 xw.writeEndElement();
-            }
-        }
-
-        if (replacements != null) {
-            for (StringTemplate replacement : replacements) {
-                replacement.toXML(xw);
             }
         }
     }
@@ -531,7 +531,7 @@ public class StringTemplate extends FreeColObject {
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
-
+        
         templateType = xr.getAttribute(TEMPLATE_TYPE_TAG,
             TemplateType.class, TemplateType.TEMPLATE);
 
@@ -544,8 +544,7 @@ public class StringTemplate extends FreeColObject {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        if (keys != null) keys.clear();
-        if (replacements != null) replacements.clear();
+        if (kv != null) kv.clear();
 
         super.readChildren(xr);
     }
@@ -557,13 +556,34 @@ public class StringTemplate extends FreeColObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (KEY_TAG.equals(tag)) {
+        if (PAIR_TAG.equals(tag)) {
+            // key == null is allowed
+            String key = xr.getAttribute(VALUE_TAG, (String)null);
+            StringTemplate val = null;
+            while (xr.moreTags()) {
+                final String inner = xr.getLocalName();
+                if (StringTemplate.TAG.equals(inner)) {
+                    if (val == null) {
+                        val = new StringTemplate(xr);
+                    } else {
+                        xr.expectTag(PAIR_TAG);
+                    }
+                } else {
+                    xr.expectTag(StringTemplate.TAG);
+                }
+            }
+            addPair(key, val);
+
+        // @compat 0.11.x
+        // old format where key and value were separated
+        } else if (OLD_KEY_TAG.equals(tag)) {
             addKey(xr.getAttribute(VALUE_TAG, (String)null));
-            xr.closeTag(KEY_TAG);
+            xr.closeTag(OLD_KEY_TAG);
 
         } else if (StringTemplate.TAG.equals(tag)) {
             addReplacement(new StringTemplate(xr));
-        
+        // end @compat 0.11.x
+
         } else {
             super.readChild(xr);
         }
@@ -584,40 +604,24 @@ public class StringTemplate extends FreeColObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof StringTemplate) {
-            StringTemplate t = (StringTemplate)o;
-            if (!super.equals(o)
-                || this.templateType != t.templateType
-                || !Utils.equals(this.defaultId, t.defaultId)) return false;
-            switch (this.templateType) {
-            case TEMPLATE:
-                if ((this.keys == null) != (t.keys == null))
-                    return false;
-                if (this.keys != null) {
-                    if (this.keys.size() != t.keys.size()
-                        || this.keys.size() != this.replacements.size())
+            StringTemplate other = (StringTemplate)o;
+            int i;
+            if (this.templateType != other.templateType
+                || !Utils.equals(this.defaultId, other.defaultId))
+                return false;
+            if ((this.kv == null) != (other.kv == null)) return false;
+            if (this.kv != null) {
+                if (this.kv.size() != other.kv.size()) return false;
+                i = 0;
+                for (SimpleEntry<String,StringTemplate> e : this.kv) {
+                    if (!e.getKey().equals(other.kv.get(i).getKey()))
                         return false;
-                    for (int i = 0; i < this.keys.size(); i++) {
-                        if (!this.keys.get(i)
-                            .equals(t.keys.get(i))) return false;
-                    }
-                }
-                // Fall through
-            case LABEL:
-                if ((this.replacements == null) != (t.replacements == null))
-                    return false;
-                if (this.replacements != null) {
-                    if (this.replacements.size() != t.replacements.size())
+                    if (!e.getValue().equals(other.kv.get(i).getValue()))
                         return false;
-                    for (int i = 0; i < this.replacements.size(); i++) {
-                        if (!this.replacements.get(i)
-                            .equals(t.replacements.get(i))) return false;
-                    }
+                    i++;
                 }
-                break;
-            default:
-                break;
             }
-            return true;
+            return super.equals(other);
         }
         return false;
     }
@@ -630,19 +634,11 @@ public class StringTemplate extends FreeColObject {
         int hash = super.hashCode();
         hash = 31 * hash + this.templateType.ordinal();
         hash = 31 * hash + Utils.hashCode(this.defaultId);
-        switch (this.templateType) {
-        case TEMPLATE:
-            for (String key : getKeys()) {
-                hash = 31 * hash + Utils.hashCode(key);
+        if (this.kv != null) {
+            for (SimpleEntry<String,StringTemplate> e : this.kv) {
+                hash = 31 * hash + Utils.hashCode(e.getKey());
+                hash = 31 * hash + Utils.hashCode(e.getValue());
             }
-            // Fall through
-        case LABEL:
-            for (StringTemplate replacement : getReplacements()) {
-                hash = 31 * hash + Utils.hashCode(replacement);
-            }
-            break;
-        default:
-            break;
         }
         return hash;
     }
@@ -653,40 +649,37 @@ public class StringTemplate extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append(templateType).append(": ");
+        sb.append(templateType).append(':').append(getId());
+        if (this.defaultId != null) {
+            sb.append('(').append(this.defaultId).append(')');
+        }
+        String start;
         switch (templateType) {
         case LABEL:
-            if (this.replacements == null) {
-                sb.append(getId());
-            } else {
-                for (StringTemplate object : this.replacements) {
-                    sb.append(object).append(getId());
+            if (this.kv != null) {
+                int index = 0;
+                start = "[";
+                for (SimpleEntry<String,StringTemplate> e : this.kv) {
+                    sb.append(start).append(index++)
+                        .append(':').append(e.getValue());
+                    start = " ";
                 }
+                sb.append(']');
             }
             break;
         case TEMPLATE:
-            sb.append(getId());
-            if (this.defaultId != null) {
-                sb.append(" (").append(this.defaultId).append(')');
-            }
-            sb.append(" [");
-            if (this.keys != null) {
-                for (int index = 0; index < this.keys.size(); index++) {
-                    sb.append('[').append(this.keys.get(index)).append(": ")
-                        .append(this.replacements.get(index)).append(']');
+            sb.append('[');
+            if (this.kv != null) {
+                start = "";
+                for (SimpleEntry<String,StringTemplate> e : this.kv) {
+                    sb.append(start).append(e.getKey())
+                        .append('=').append(e.getValue());
+                    start = "";
                 }
             }
             sb.append(']');
             break;
-        case KEY:
-            sb.append(getId());
-            if (this.defaultId != null) {
-                sb.append(" (").append(this.defaultId).append(')');
-            }
-            break;
-        case NAME:
-        default:
-            sb.append(getId());
+        case KEY: case NAME: default:
             break;
         }
         return sb.toString();

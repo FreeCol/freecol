@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,8 +69,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         final Player player = getMyPlayer();
         final FoundingFather currentFather = player.getCurrentFather();
 
-        JPanel recruitingPanel = new MigPanel();
-        recruitingPanel.setLayout(new MigLayout("center, wrap 1", "center"));
+        JPanel recruitingPanel = new MigPanel(new MigLayout("center, wrap 1", "center"));
         if (currentFather == null) {
             recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
@@ -99,19 +98,17 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         Map<FoundingFatherType, JPanel> panels
             = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFatherType type : FoundingFatherType.values()) {
-            JPanel panel = new MigPanel();
-            panel.setLayout(new MigLayout("flowy", "[center]"));
+            JPanel panel = new MigPanel(new MigLayout("flowy", "[center]"));
             panels.put(type, panel);
             JScrollPane imageScrollPane = new JScrollPane(panel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
+            tabs.addTab(Messages.message(type.getTypeKey()), null,
                         imageScrollPane, null);
         }
         final int age = getGame().getAge();
         Map<String, Turn> electionTurns = getMyPlayer().getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
-            String name = Messages.getName(father);
             JPanel panel = panels.get(father.getType());
             Image image;
             Turn turn = null;

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -75,11 +75,9 @@ public abstract class ObjectMessage extends AttributeMessage {
      * @param type The message type.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @param attributes The attributes to read.
-     * @exception XMLStreamException if the stream is corrupt.
      */
     protected ObjectMessage(String type, FreeColXMLReader xr,
-                            String... attributes)
-        throws XMLStreamException {
+                            String... attributes) {
         super(type, xr.getAttributeMap(attributes));
 
         this.objects.clear();

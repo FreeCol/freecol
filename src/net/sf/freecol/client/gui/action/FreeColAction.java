@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,6 +21,8 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -58,6 +60,12 @@ public abstract class FreeColAction extends AbstractAction
 
     public static final String TAG = "action";
 
+    /**
+     * There are four versions of the order buttons: normal, rollover,
+     * pressed, disabled.
+     */
+    private static final int ORDER_BUTTON_COUNT = 4;
+    
     /**
      * A class used by Actions which have a mnemonic. Those Actions should
      * assign this listener to the JMenuItem they are a part of. This captures
@@ -202,8 +210,8 @@ public abstract class FreeColAction extends AbstractAction
      * Don't use this method.
      */
     @Override
-    public FreeColAction clone() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException("FreeColAction can not be cloned.");
+    public FreeColAction cloneOption() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("FreeColAction can not be cloned:" + this);
     }
 
     /**
@@ -225,7 +233,7 @@ public abstract class FreeColAction extends AbstractAction
      * @return True if all the order button images are present.
      */
     public boolean hasOrderButtons() {
-        return orderButtonImageCount == 4;
+        return orderButtonImageCount == ORDER_BUTTON_COUNT;
     }
 
     /**
@@ -234,28 +242,16 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
-        orderButtonImageCount = 0;
-        Image[] images = ImageLibrary.getButtonImages(key);
-        if (images[0] != null) {
-            putValue(BUTTON_IMAGE, new ImageIcon(images[0]));
-            orderButtonImageCount++;
-        }
-        if (images[1] != null) {
-            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images[1]));
-            orderButtonImageCount++;
-        }
-        if (images[2] != null) {
-            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images[2]));
-            orderButtonImageCount++;
-        }
-        if (images[3] != null) {
-            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images[3]));
-            orderButtonImageCount++;
-        }
-
-        if (!hasOrderButtons()) {
-            logger.warning("Missing " + (4-orderButtonImageCount)
-                + " order button images for " + getId());
+        List<BufferedImage> images = ImageLibrary.getButtonImages(key);
+        orderButtonImageCount = images.size();
+        if (hasOrderButtons()) {
+            putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
+        } else {
+            logger.warning("Found only " + orderButtonImageCount
+                + " order button images for " + getId() + "/" + key);
         }
     }
 
@@ -318,7 +314,7 @@ public abstract class FreeColAction extends AbstractAction
      *         given {@code KeyStroke} if passed as a parameter to
      *         {@code getAWTKeyStroke(String)}.
      */
-    public static String getKeyStrokeText(KeyStroke keyStroke) {
+    private static String getKeyStrokeText(KeyStroke keyStroke) {
         return (keyStroke == null) ? "" : keyStroke.toString();
     }
 

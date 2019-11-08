@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -49,12 +50,19 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Create a unit panel.
      *
+     * @param uiClassId An optional L+F class to render this component.
+     * @param layout The {@code LayoutManager} to use.
      * @param portPanel A {@code PortPanel} to supply units.
      * @param name An optional name for the panel.
      * @param editable True if the panel can be edited.
      */
-    protected UnitPanel(PortPanel portPanel, String name, boolean editable) {
-        if (portPanel == null) throw new RuntimeException("Null port panel.");
+    protected UnitPanel(String uiClassId, LayoutManager layout,
+                        PortPanel portPanel, String name, boolean editable) {
+        super(uiClassId, layout);
+
+        if (portPanel == null) {
+            throw new RuntimeException("Null port panel for: " + this);
+        }
         this.portPanel = portPanel;
         this.editable = editable;
         setName(name);
@@ -64,7 +72,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Initialize this unit panel.
      */
-    public void initialize() {
+    protected void initialize() {
         cleanup();
         addPropertyChangeListeners();
         update();
@@ -75,28 +83,24 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Clean up this unit panel.
      */
-    public void cleanup() {
+    protected void cleanup() {
         removePropertyChangeListeners();
     }
 
     /**
      * Add any property change listeners.
      */
-    protected void addPropertyChangeListeners() {
-        // do nothing
-    }
+    protected void addPropertyChangeListeners() {}
 
     /**
      * Remove any property change listeners.
      */
-    protected void removePropertyChangeListeners() {
-        // do nothing
-    }
+    protected void removePropertyChangeListeners() {}
 
     /**
      * Update this unit panel.
      */
-    public void update() {
+    protected void update() {
         removeAll();
 
         if (portPanel != null) {
@@ -153,9 +157,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Select a UnitLabel based on some criterion.
      */
-    public void selectLabel() {
-        // Default to doing nothing
-    }
+    public abstract void selectLabel();
 
     /**
      * Select a given unit.
@@ -163,7 +165,7 @@ public abstract class UnitPanel extends MigPanel
      * @param unit The {@code Unit} to select.
      * @return True if the selection succeeds.
      */
-    public boolean setSelectedUnit(Unit unit) {
+    protected boolean setSelectedUnit(Unit unit) {
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;

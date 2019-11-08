@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -67,7 +67,7 @@ public final class TilePopup extends JPopupMenu {
     public static final int UNIT_LINES_IN_OTHER_MENUS = 19;
 
     private final FreeColClient freeColClient;
-    private final SwingGUI gui;
+    private final GUI gui;
     private final Canvas canvas;
     private boolean hasAnItem = false;
 
@@ -85,7 +85,7 @@ public final class TilePopup extends JPopupMenu {
         super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
-        this.gui = (SwingGUI)freeColClient.getGUI();
+        this.gui = freeColClient.getGUI();
         this.canvas = canvas;
 
         final InGameController igc = freeColClient.getInGameController();
@@ -235,8 +235,8 @@ public final class TilePopup extends JPopupMenu {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param tile The {@code Tile} to build menu items for.
      */
-    public void addDebugItems(final FreeColClient freeColClient, 
-                              final Tile tile) {
+    private void addDebugItems(final FreeColClient freeColClient, 
+                               final Tile tile) {
         addSeparator();
 
         JMenu changeOwnership = new JMenu("Change ownership");
@@ -340,9 +340,8 @@ public final class TilePopup extends JPopupMenu {
                     if (currTile == tile) return;
                     final Map map = activeUnit.getGame().getMap();
                     LogBuilder lb = new LogBuilder(512);
-                    PathNode path = map.findPath(activeUnit,
-                        activeUnit.getTile(), tile, activeUnit.getCarrier(),
-                        null, lb);
+                    PathNode path = activeUnit.findPath(activeUnit.getTile(),
+                        tile, activeUnit.getCarrier(), null, lb);
                     gui.showInformationMessage(lb.toString());
                     gui.setUnitPath(path);
                     gui.refresh();                        

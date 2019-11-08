@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,9 +22,7 @@ package net.sf.freecol.common.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -36,9 +34,11 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-
+import java.nio.file.Files;
+import static java.nio.file.StandardOpenOption.*;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +46,8 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -102,15 +104,14 @@ public class Utils {
      *
      * @param random A pseudo-random number source.
      * @return A {@code String} encapsulating the object state.
+     * @exception IOException is the byte stream output breaks.
      */
-    public static synchronized String getRandomState(Random random) {
+    public static synchronized String getRandomState(Random random)
+        throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
+        try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(random);
             oos.flush();
-        } catch (IOException e) {
-            throw new IllegalStateException("IO exception in memory!?", e);
         }
         byte[] bytes = bos.toByteArray();
         StringBuilder sb = new StringBuilder(bytes.length * 2);
@@ -153,15 +154,14 @@ public class Utils {
      * @return A {@code Reader} for this file.
      */
     public static Reader getFileUTF8Reader(File file) {
-        FileInputStream fis;
         try {
-            fis = new FileInputStream(file);
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "No FileInputStream for "
-                + file.getPath(), fnfe);
-            return null;
+            InputStream fis = Files.newInputStream(file.toPath());
+            return new InputStreamReader(fis, StandardCharsets.UTF_8);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "No input stream for " + file.getPath(),
+                       ioe);
         }
-        return new InputStreamReader(fis, StandardCharsets.UTF_8);
+        return null;
     }
 
     /**
@@ -195,6 +195,36 @@ public class Utils {
     /**
      * Create a new file writer that uses UTF-8.
      *
+     * @param os An {@code OutputStream} to write to.
+     * @return A {@code Writer} for this file.
+     */
+    public static Writer getUTF8Writer(OutputStream os) {
+        return new OutputStreamWriter(os, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
+     * @param file A {@code File} to write to.
+     * @param append If true, append to the file.
+     * @return A {@code Writer} for this file.
+     */
+    private static Writer getF8W(File file, boolean append) {
+        try {
+            OutputStream fos = (append)
+                ? Files.newOutputStream(file.toPath(), CREATE, APPEND)
+                : Files.newOutputStream(file.toPath());
+            return getUTF8Writer(fos);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "No output stream for " + file.getName(),
+                       ioe);
+        }
+        return null;
+    }
+
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
      * @param file A {@code File} to write to.
      * @return A {@code Writer} for this file.
      */
@@ -213,43 +243,6 @@ public class Utils {
     }
     
     /**
-     * Create a new file writer that uses UTF-8.
-     *
-     * @param file A {@code File} to write to.
-     * @param append If true, append to the file.
-     * @return A {@code Writer} for this file.
-     */
-    private static Writer getF8W(File file, boolean append) {
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream(file, append);
-        } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "No FileOutputStream for "
-                + file.getName(), e);
-            return null;
-        }
-        Writer wr = getUTF8Writer(fos);
-        if (wr == null) {
-            try {
-                fos.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to close", ioe);
-            }
-        }
-        return wr;            
-    }
-
-    /**
-     * Create a new file writer that uses UTF-8.
-     *
-     * @param os An {@code OutputStream} to write to.
-     * @return A {@code Writer} for this file.
-     */
-    public static Writer getUTF8Writer(OutputStream os) {
-        return new OutputStreamWriter(os, StandardCharsets.UTF_8);
-    }
-
-    /**
      * Helper to make an XML Transformer.
      *
      * @param declaration If true, include the XML declaration.
@@ -261,7 +254,7 @@ public class Utils {
         Transformer tf = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
-            factory.setAttribute("indent-number", new Integer(2));
+            factory.setAttribute("indent-number", Integer.valueOf(2));
             tf = factory.newTransformer();
             tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             tf.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -279,21 +272,28 @@ public class Utils {
     }
 
     /**
+     * Delete a file.
+     *
+     * @param file The {@code File} to delete.
+     */
+    public static void deleteFile(File file) {
+        try {
+            if (!file.delete()) {
+                logger.warning("Failed to delete: " + file.getPath());
+            }
+        } catch (SecurityException ex) {
+            logger.log(Level.WARNING, "Exception deleting: "
+                + file.getPath(), ex);
+        }
+    }
+        
+    /**
      * Delete a list of files.
      *
      * @param files The list of {@code File}s to delete.
      */
     public static void deleteFiles(List<File> files) {
-        for (File f : files) {
-            try {
-                if (!f.delete()) {
-                    logger.warning("Failed to delete: " + f.getPath());
-                }
-            } catch (SecurityException ex) {
-                logger.log(Level.WARNING, "Exception deleting: "
-                    + f.getPath(), ex);
-            }
-        }
+        for (File f : files) deleteFile(f);
     }
 
     /**
@@ -334,7 +334,7 @@ public class Utils {
      */
     public static void delay(long ms, String warning) {
         try {
-            Thread.sleep(ms);
+            TimeUnit.MILLISECONDS.sleep(ms);
         } catch (InterruptedException ie) {
             if (warning == null) {
                 Thread.currentThread().interrupt();
@@ -351,5 +351,25 @@ public class Utils {
      */
     public static long now() {
         return System.currentTimeMillis();
+    }
+
+
+    /**
+     * Run the garbage collector.
+     *
+     * Route all gc calls here, so we can disable the findbugs warning.
+     */
+    @SuppressFBWarnings(value="DM_GC", justification="Deliberate")
+    public static void garbageCollect() {
+        System.gc();
+    }
+
+    /**
+     * Are we in headless mode?
+     *
+     * @return True if in headless mode.
+     */
+    public static boolean isHeadless() {
+        return "true".equals(System.getProperty("java.awt.headless", "false"));
     }
 }

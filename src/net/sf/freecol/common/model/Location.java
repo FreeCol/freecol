@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,10 +22,11 @@ package net.sf.freecol.common.model;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.swing.ImageIcon;
+
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.ObjectWithId;
 
-import javax.swing.ImageIcon;
 
 /**
  * A place where a {@code Locatable} can be put.
@@ -203,25 +204,15 @@ public interface Location extends ObjectWithId {
      * @param loc A {@code Location} to check.
      * @return The integer rank of the given location.
      */
-    public static int getRank(Location loc) {
+    public static int rankOf(Location loc) {
         return (loc == null) ? Location.LOCATION_RANK_NOWHERE : loc.getRank();
-    }
-
-    /**
-     * Return the name of a Location, used with {@code StringTemplate}
-     *
-     * @param player The active player
-     * @return The string with the Location's name.
-     */
-    public default String getNameForLabel(Player player) {
-        return "";
     }
 
     /**
      * Return an ImageIcon for a Location
      *
      * @param cellHeight The size of a destination cell, used by Europe
-     * @param library The SwingGUI image library
+     * @param library The image library
      * @return The ImageIcon, null by default.
      */
     public default ImageIcon getLocationImage(final int cellHeight,

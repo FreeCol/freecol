@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
@@ -55,8 +56,6 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
     public EmigrationDialog(FreeColClient freeColClient, JFrame frame,
             Europe europe, boolean foy) {
         super(freeColClient, frame);
-
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final List<AbstractUnit> recruitables
             = new ArrayList<>(europe.getExpandedRecruitables(false));
 
@@ -67,7 +66,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
                           + "\n\n", 0);
         }
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[fill]", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[fill]", ""));
         panel.add(header, "wrap 20");
         panel.setSize(panel.getPreferredSize());
 

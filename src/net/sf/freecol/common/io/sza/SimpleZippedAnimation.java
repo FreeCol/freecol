@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -203,8 +203,6 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      */
     private static List<AnimationEvent> loadEvents(ZipInputStream zipStream)
         throws IOException {
-        List<AnimationEvent> events = new ArrayList<>();
-
         // Preload all files from the archive since we cannot use a
         // ZipFile for reading (as we should support an arbitrary stream).
         final Map<String, BufferedImage> loadingImages = new HashMap<>();
@@ -231,15 +229,16 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         
         if (loadingDescriptor.isEmpty()) {
             throw new IOException(ANIMATION_DESCRIPTOR_FILE
-                + " is missing from the SZA.");
+                + " is missing from the SZA: " + zipStream);
         }
         
+        List<AnimationEvent> events = new ArrayList<>(loadingDescriptor.size());
         for (String line : loadingDescriptor) {
             final int idx = line.indexOf('(');
             final int idx2 = line.indexOf("ms)");
             if (idx < 0 || idx2 <= idx) {
                 throw new IOException(ANIMATION_DESCRIPTOR_FILE
-                    + " should use the format: FILNAME (TIMEms)");
+                    + " should use the format: FILNAME (TIMEms) in: " + line);
             }
             final String imageName = line.substring(0, idx).trim();
             final int ms = Integer.parseInt(line.substring(idx+1, idx2));

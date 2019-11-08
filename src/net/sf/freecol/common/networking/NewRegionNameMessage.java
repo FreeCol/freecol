@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -143,7 +143,7 @@ public class NewRegionNameMessage extends AttributeMessage {
             return serverPlayer.clientError("Region mismatch, "
                 + region.getId() + " != " + regionId);
         }
-        
+
         // Do the discovery
         return igc(freeColServer)
             .setNewRegionName(serverPlayer, unit, region, getNewRegionName());

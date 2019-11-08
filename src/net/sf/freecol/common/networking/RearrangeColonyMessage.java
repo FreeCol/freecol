@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -48,7 +48,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
     private static final String COLONY_TAG = "colony";
 
     /** Container for the unit change information. */
-    public static class Arrangement implements Comparable<Arrangement> {
+    public static class Arrangement {
 
         public Unit unit;
         public Location loc;
@@ -120,7 +120,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
         public static List<Arrangement> getArrangements(Colony colony,
                                                         List<Unit> workers,
                                                         Colony scratch) {
-            List<Arrangement> ret = new ArrayList<>();
+            List<Arrangement> ret = new ArrayList<>(workers.size());
             for (Unit u : workers) {
                 Unit su = scratch.getCorresponding(u);
                 if (u.getLocation().getId().equals(su.getLocation().getId())
@@ -134,13 +134,13 @@ public class RearrangeColonyMessage extends AttributeMessage {
             return ret;
         }
 
-            
-        // Interface Comparable<Arrangement>
-
         /**
-         * {@inheritDoc}
+         * Role comparison for use in rearrangeColony.
+         *
+         * @param other The {@code Arrangement} to compare to.
+         * @return A comparison value.
          */
-        public int compareTo(Arrangement other) {
+        public int roleComparison(Arrangement other) {
             int cmp = this.role.compareTo(other.role);
             if (cmp == 0) cmp = this.roleCount - other.roleCount;
             return cmp;
@@ -180,10 +180,8 @@ public class RearrangeColonyMessage extends AttributeMessage {
      *
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if the stream is corrupt.
      */
-    public RearrangeColonyMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public RearrangeColonyMessage(Game game, FreeColXMLReader xr) {
         super(TAG, getAttributeMap(xr));
     }
 
@@ -194,9 +192,9 @@ public class RearrangeColonyMessage extends AttributeMessage {
      * @return An attribute map.
      */
     private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
-        Map<String, String> ret = new HashMap<>();
-        ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));
         int n = xr.getAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
+        Map<String, String> ret = new HashMap<>(5 * n + 1);
+        ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));
         for (int i = 0; i < n; i++) {
             ret.put(Arrangement.unitKey(i),
                 xr.getAttribute(Arrangement.unitKey(i), (String)null));
@@ -220,13 +218,14 @@ public class RearrangeColonyMessage extends AttributeMessage {
     private void setArrangementAttributes(List<Arrangement> arrangements) {
         int i = 0;
         for (Arrangement a : arrangements) {
-            setStringAttribute(a.unitKey(i), a.unit.getId());
-            setStringAttribute(a.locKey(i), a.loc.getId());
+            setStringAttribute(Arrangement.unitKey(i), a.unit.getId());
+            setStringAttribute(Arrangement.locKey(i), a.loc.getId());
             if (a.work != null) {
-                setStringAttribute(a.workKey(i), a.work.getId());
+                setStringAttribute(Arrangement.workKey(i), a.work.getId());
             }
-            setStringAttribute(a.roleKey(i), a.role.toString());
-            setStringAttribute(a.roleCountKey(i), String.valueOf(a.roleCount));
+            setStringAttribute(Arrangement.roleKey(i), a.role.toString());
+            setStringAttribute(Arrangement.roleCountKey(i),
+                               String.valueOf(a.roleCount));
             i++;
         }
         setIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, i);
@@ -308,8 +307,8 @@ public class RearrangeColonyMessage extends AttributeMessage {
      * @return A list of {@code Arrangement}s.
      */
     public List<Arrangement> getArrangements(Game game) {
-        List<Arrangement> ret = new ArrayList<>();
         int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
+        List<Arrangement> ret = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             ret.add(new Arrangement(game,
                                     getStringAttribute(Arrangement.unitKey(i)),

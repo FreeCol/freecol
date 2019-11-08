@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -60,15 +60,12 @@ public class ImprovementAction extends UnitAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        if (super.shouldBeEnabled()) {
-            Unit selectedUnit = getGUI().getActiveUnit();
-            Tile tile = selectedUnit.getTile();
-            return selectedUnit.checkSetState(Unit.UnitState.IMPROVING)
-                && tile != null
-                && tile.isImprovementTypeAllowed(improvement)
-                && improvement.isWorkerAllowed(selectedUnit);
-        }
-        return false;
+        if (!super.shouldBeEnabled()) return false;
+        Unit selectedUnit = getGUI().getActiveUnit();
+        Tile tile = selectedUnit.getTile();
+        return tile != null && tile.isImprovementTypeAllowed(improvement)
+            && improvement.isWorkerAllowed(selectedUnit)
+            && selectedUnit.checkSetState(Unit.UnitState.IMPROVING);
     }
 
 

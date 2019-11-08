@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -49,7 +49,7 @@ public class OptionTest extends FreeColTestCase {
     public void testCloneIntegerOption() {
         IntegerOption money = spec().getOption(GameOptions.STARTING_MONEY,
                                                IntegerOption.class);
-        IntegerOption money2 = money.clone();
+        IntegerOption money2 = money.cloneOption();
 
         assertFalse(money == money2);
         assertEquals(money.getId(), money2.getId());

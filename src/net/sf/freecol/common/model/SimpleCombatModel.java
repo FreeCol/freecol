@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -143,7 +143,7 @@ public class SimpleCombatModel extends CombatModel {
                                    LogBuilder lb) {
         double result = 0.0;
         if (attacker == null) {
-            throw new IllegalStateException("Null attacker");
+            throw new RuntimeException("Null attacker: " + this);
 
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
@@ -167,7 +167,8 @@ public class SimpleCombatModel extends CombatModel {
             if (lb != null) lb.add(" bombard=", result);
 
         } else {
-            throw new IllegalArgumentException("Bogus combat");
+            throw new RuntimeException("Bogus combat: " + attacker
+                + " v " + defender);
         }
         return result;
     }
@@ -227,7 +228,7 @@ public class SimpleCombatModel extends CombatModel {
                                                FreeColGameObject defender) {
         Set<Modifier> result = new HashSet<>();
         if (attacker == null) {
-            throw new IllegalStateException("Null attacker");
+            throw new RuntimeException("Null attacker: " + this);
         } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
@@ -268,7 +269,8 @@ public class SimpleCombatModel extends CombatModel {
             ; // Bombard strength handled by getOffensePower
 
         } else {
-            throw new IllegalArgumentException("Bogus combat");
+            throw new RuntimeException("Bogus combat: " + attacker
+                + " v " + defender);
         }
 
         // @compat 0.11.0
@@ -300,7 +302,7 @@ public class SimpleCombatModel extends CombatModel {
         if (goodsCount > 0) {
             result.addAll(transform(spec.getModifiers(Modifier.CARGO_PENALTY),
                     alwaysTrue(),
-                    m -> new Modifier(m).setValue(m.getValue() * goodsCount)));
+                    m -> Modifier.makeModifier(m).setValue(m.getValue() * goodsCount)));
         }
     }
 
@@ -386,7 +388,8 @@ public class SimpleCombatModel extends CombatModel {
                     // bonus, if defender is REF, or attacker is indian.
                     if (isAmbush(attacker, defender)) {
                         for (Modifier m : tile.getDefenceModifiers()) {
-                            Modifier mod = new Modifier(Modifier.OFFENCE, m);
+                            Modifier mod = Modifier.makeModifier(m);
+                            mod.setId(Modifier.OFFENCE);
                             mod.setSource(Specification.AMBUSH_BONUS_SOURCE);
                             result.add(mod);
                         }
@@ -397,14 +400,15 @@ public class SimpleCombatModel extends CombatModel {
             // Artillery in the open penalty, attacker must be on a
             // tile and neither unit can be in a settlement.
             if (attacker.hasAbility(Ability.BOMBARD)
-                && attacker.getLocation() instanceof Tile
+                && attacker.isOnTile()
                 && attacker.getSettlement() == null
                 && attacker.getState() != Unit.UnitState.FORTIFIED
                 && defenderUnit.getSettlement() == null) {
                 result.addAll(toList(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN)));
             }
         } else {
-            throw new IllegalStateException("Bogus combat");
+            throw new RuntimeException("Bogus combat: " + attacker
+                + " v " + defender);
         }
     }
 
@@ -461,7 +465,8 @@ public class SimpleCombatModel extends CombatModel {
             result.add(UNKNOWN_DEFENCE_MODIFIER);
 
         } else {
-            throw new IllegalArgumentException("Bogus combat");
+            throw new RuntimeException("Bogus combat: " + attacker
+                + " v " + defender);
         }
 
         // @compat 0.11.0
@@ -491,7 +496,7 @@ public class SimpleCombatModel extends CombatModel {
         if (goodsCount > 0) {
             result.addAll(transform(spec.getModifiers(Modifier.CARGO_PENALTY),
                     alwaysTrue(),
-                    m -> new Modifier(m).setValue(m.getValue() * goodsCount)));
+                    m -> Modifier.makeModifier(m).setValue(m.getValue() * goodsCount)));
         }
     }
 
@@ -544,9 +549,8 @@ public class SimpleCombatModel extends CombatModel {
                 result.addAll(settlement.getDefenceModifiers());
 
                 // Artillery defence bonus against an Indian raid
-                if (defender.hasAbility(Ability.BOMBARD)
-                    && attacker != null
-                    && ((Unit)attacker).getOwner().isIndian()) {
+                if (attacker != null && ((Unit)attacker).getOwner().isIndian()
+                    && defender.hasAbility(Ability.BOMBARD)) {
                     result.addAll(toList(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID)));
                 }
 
@@ -565,8 +569,8 @@ public class SimpleCombatModel extends CombatModel {
             }
 
             // Fortify bonus
-            if (defender.getState() == Unit.UnitState.FORTIFIED
-                && !disableFortified) {
+            if (!disableFortified
+                && defender.getState() == Unit.UnitState.FORTIFIED) {
                 result.addAll(toList(spec.getModifiers(Modifier.FORTIFIED)));
             }
         }
@@ -637,7 +641,8 @@ public class SimpleCombatModel extends CombatModel {
             if (!defenderUnit.isNaval()) {
                 // One day we might want:
                 //   crs.add(CombatResult.SLAUGHTER_UNIT_BOMBARD);
-                throw new IllegalStateException("Bombard of non-naval");
+                throw new RuntimeException("Bombard of non-naval: " + attacker
+                    + " v " + defender);
             }
             action = "Bombard";
 
@@ -669,7 +674,8 @@ public class SimpleCombatModel extends CombatModel {
             }
 
         } else {
-            throw new IllegalStateException("Bogus combat");
+            throw new RuntimeException("Bogus combat: " + attacker
+                + " v " + defender);
         }
 
         // Log the results so that we have a solid record of combat
@@ -693,7 +699,6 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void resolveAttack(Unit winner, Unit loser, boolean great,
                                double r, List<CombatResult> crs) {
-        final Specification spec = winner.getSpecification();
         Player loserPlayer = loser.getOwner();
         Tile tile = loser.getTile();
         Player winnerPlayer = winner.getOwner();
@@ -733,7 +738,7 @@ public class SimpleCombatModel extends CombatModel {
                 // until the colony falls for lack of survivors.
                 // Ships in a falling colony will be damaged or sunk
                 // if they have no repair location.
-                if (!loser.isDefensiveUnit() && autoRole == null) {
+                if (autoRole == null && !loser.isDefensiveUnit()) {
                     List<Unit> ships = colony.getTile().getNavalUnits();
                     final CombatResult shipResult = (ships.isEmpty()) ? null
                         : (ships.get(0).getRepairLocation() == null)
@@ -833,8 +838,7 @@ public class SimpleCombatModel extends CombatModel {
                     crs.add((winner.canCaptureEquipment(loserRole) != null)
                         ? CombatResult.CAPTURE_EQUIP
                         : CombatResult.LOSE_EQUIP);
-                    if (loserMustDie
-                        || loser.losingEquipmentKillsUnit()) {
+                    if (loser.losingEquipmentKillsUnit()) {
                         crs.add(CombatResult.SLAUGHTER_UNIT);
                     } else if (loser.losingEquipmentDemotesUnit()) {
                         crs.add(CombatResult.DEMOTE_UNIT);
@@ -877,19 +881,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     private boolean isAmbush(FreeColGameObject attacker,
                              FreeColGameObject defender) {
-        if (attacker instanceof Unit && defender instanceof Unit) {
-            Unit attackerUnit = (Unit)attacker;
-            Unit defenderUnit = (Unit)defender;
-            return attackerUnit.getSettlement() == null
-                && attackerUnit.hasTile()
-                && defenderUnit.getSettlement() == null
-                && defenderUnit.getState() != Unit.UnitState.FORTIFIED
-                && defenderUnit.hasTile()
-                && (attackerUnit.hasAbility(Ability.AMBUSH_BONUS)
-                    || defenderUnit.hasAbility(Ability.AMBUSH_PENALTY))
-                && (attackerUnit.getTile().hasAbility(Ability.AMBUSH_TERRAIN)
-                    || defenderUnit.getTile().hasAbility(Ability.AMBUSH_TERRAIN));
-        }
-        return false;
+        return attacker instanceof Unit && defender instanceof Unit
+            && ((Unit)attacker).canAmbush((Unit)defender);
     }
 }

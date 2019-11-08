@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -51,7 +51,10 @@ public class AnimateMoveMessage extends ObjectMessage {
      * direction.
      *
      * @param unit The {@code Unit} to move.
-     * @param direction The {@code Direction} to move in.
+     * @param oldTile The {@code Tile} to move from.
+     * @param newTile The {@code Tile} to move to.
+     * @param appears If true, the unit is newly appearing, and either it
+     *     or its carrier must be present in this message.
      */
     public AnimateMoveMessage(Unit unit, Tile oldTile, Tile newTile,
                               boolean appears) {
@@ -102,6 +105,7 @@ public class AnimateMoveMessage extends ObjectMessage {
     /**
      * Get the unit that is moving.
      *
+     * @param game The {@code Game} to look up the unit in.
      * @return The {@code Unit} that moves.
      */
     private Unit getUnit(Game game) {
@@ -127,6 +131,7 @@ public class AnimateMoveMessage extends ObjectMessage {
     /**
      * Get the tile to move to.
      *
+     * @param game The {@code Game} to look up the tile in.
      * @return The new {@code Tile}.
      */
     private Tile getNewTile(Game game) {
@@ -137,6 +142,7 @@ public class AnimateMoveMessage extends ObjectMessage {
     /**
      * Get the tile to move from.
      *
+     * @param game The {@code Game} to look up the tile in.
      * @return The old {@code Tile}.
      */
     private Tile getOldTile(Game game) {

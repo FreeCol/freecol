@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
@@ -135,7 +136,7 @@ public final class EuropePanel extends PortPanel {
             }
 
             // "ship" is a tag, not a key
-            Utility.localizeBorder(this, Unit.getDestinationLabel("ship",
+            Utility.localizeBorder(this, Unit.getUnitDestinationLabel("ship",
                     destination, getMyPlayer()));
             revalidate();
         }
@@ -186,7 +187,7 @@ public final class EuropePanel extends PortPanel {
                 if (!co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
                     && unit.isInEurope()
                     && !(destination instanceof Europe)
-                    && docksPanel.getComponentCount() > 0
+                    && europeanDocksPanel.getComponentCount() > 0
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
                         .getLocationLabelFor(unit.getOwner());
@@ -203,9 +204,10 @@ public final class EuropePanel extends PortPanel {
                     // Fail if still in Europe if told to leave
                     if (unit.isInEurope()) return null;
                 }
-                if (comp.getParent() != null) comp.getParent().remove(comp);
+                Container parent = comp.getParent();
+                if (parent != null) parent.remove(comp);
                 inPortPanel.update();
-                docksPanel.update();
+                europeanDocksPanel.update();
                 cargoPanel.update();
                 if (unit == cargoPanel.getCarrier()) {
                     cargoPanel.setCarrier(null);
@@ -229,35 +231,46 @@ public final class EuropePanel extends PortPanel {
      * A panel that holds UnitLabels that represent Units that are
      * waiting on the docks in Europe.
      */
-    public final class DocksPanel extends UnitPanel implements DropTarget {
+    public final class EuropeanDocksPanel extends UnitPanel
+        implements DropTarget {
 
-        public DocksPanel() {
-            super(EuropePanel.this, "Europe - docks", true);
-
-            setLayout(new MigLayout("wrap 6"));
+        public EuropeanDocksPanel() {
+            super(null, new MigLayout("wrap 6"), EuropePanel.this,
+                  "Europe - docks", true);
         }
 
-
-        @Override
-        public void addPropertyChangeListeners() {
-            europe.addPropertyChangeListener(this);
-        }
-
-        @Override
-        public void removePropertyChangeListeners() {
-            europe.removePropertyChangeListener(this);
-        }
-
-
-        // Interface DropTarget
 
         /**
          * {@inheritDoc}
          */
         @Override
+        public void addPropertyChangeListeners() {
+            europe.addPropertyChangeListener(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void removePropertyChangeListeners() {
+            europe.removePropertyChangeListener(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void selectLabel() {
+            // do nothing
+        }
+
+        // Interface DropTarget
 
         /**
          * {@inheritDoc}
@@ -321,7 +334,7 @@ public final class EuropePanel extends PortPanel {
     private final class EuropeInPortPanel extends InPortPanel {
 
         public EuropeInPortPanel() {
-            super(EuropePanel.this, "Europe - port", true);
+            super(new MigLayout(), EuropePanel.this, "Europe - port", true);
         }
 
 
@@ -574,7 +587,7 @@ public final class EuropePanel extends PortPanel {
 
     private DestinationPanel toEuropePanel;
 
-    private DocksPanel docksPanel;
+    private EuropeanDocksPanel europeanDocksPanel;
 
     private MarketPanel marketPanel;
 
@@ -619,7 +632,7 @@ public final class EuropePanel extends PortPanel {
         toEuropePanel = new DestinationPanel();
         inPortPanel = new EuropeInPortPanel();
         cargoPanel = new CargoPanel(freeColClient, true);
-        docksPanel = new DocksPanel();
+        europeanDocksPanel = new EuropeanDocksPanel();
         marketPanel = new MarketPanel(this);
         log = new TransactionLog();
         europe = freeColClient.getMyPlayer().getEurope();
@@ -636,7 +649,7 @@ public final class EuropePanel extends PortPanel {
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
         cargoPanel.setTransferHandler(defaultTransferHandler);
-        docksPanel.setTransferHandler(defaultTransferHandler);
+        europeanDocksPanel.setTransferHandler(defaultTransferHandler);
         marketPanel.setTransferHandler(defaultTransferHandler);
 
         pressListener = new DragListener(freeColClient, this);
@@ -645,14 +658,14 @@ public final class EuropePanel extends PortPanel {
         toEuropePanel.addMouseListener(releaseListener);
         inPortPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
-        docksPanel.addMouseListener(releaseListener);
+        europeanDocksPanel.addMouseListener(releaseListener);
         marketPanel.addMouseListener(releaseListener);
 
         toAmericaPanel.setLayout(new GridLayout(1, 0));
         toEuropePanel.setLayout(new GridLayout(1, 0));
         inPortPanel.setLayout(new GridLayout(1, 0));
         cargoPanel.setLayout(new GridLayout(1, 0));
-        docksPanel.setLayout(new GridLayout(0, 5));
+        europeanDocksPanel.setLayout(new GridLayout(0, 5));
 
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -670,7 +683,7 @@ public final class EuropePanel extends PortPanel {
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         cargoScroll.getVerticalScrollBar().setUnitIncrement(16);
-        JScrollPane docksScroll = new JScrollPane(docksPanel,
+        JScrollPane docksScroll = new JScrollPane(europeanDocksPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         docksScroll.getVerticalScrollBar().setUnitIncrement(16);
@@ -684,7 +697,7 @@ public final class EuropePanel extends PortPanel {
 
         toAmericaPanel.setBorder(Utility.localizedBorder("sailingToAmerica"));
         toEuropePanel.setBorder(Utility.localizedBorder("sailingToEurope"));
-        docksPanel.setBorder(Utility.localizedBorder("docks"));
+        europeanDocksPanel.setBorder(Utility.localizedBorder("docks"));
         inPortPanel.setBorder(Utility.localizedBorder("inPort"));
         marketPanel.setBorder(Utility.blankBorder(10, 10, 10, 10));
         log.setBorder(Utility.localizedBorder("sales"));
@@ -698,7 +711,7 @@ public final class EuropePanel extends PortPanel {
         cargoScroll.getViewport().setOpaque(false);
         cargoPanel.setOpaque(false);
         docksScroll.getViewport().setOpaque(false);
-        docksPanel.setOpaque(false);
+        europeanDocksPanel.setOpaque(false);
         marketScroll.getViewport().setOpaque(false);
         marketPanel.setOpaque(false);
         logScroll.getViewport().setOpaque(false);
@@ -747,16 +760,16 @@ public final class EuropePanel extends PortPanel {
         cargoPanel.initialize();
         inPortPanel.initialize();
         marketPanel.initialize();
-        docksPanel.initialize();
+        europeanDocksPanel.initialize();
         log.initialize();
     }
 
     /**
      * Cleans up this EuropePanel.
      */
-    public void cleanup() {
+    private void cleanup() {
         log.cleanup();
-        docksPanel.cleanup();
+        europeanDocksPanel.cleanup();
         marketPanel.cleanup();
         inPortPanel.cleanup();
         cargoPanel.cleanup();
@@ -830,7 +843,7 @@ public final class EuropePanel extends PortPanel {
                 igc().leaveShip(u);
             }
             cargoPanel.update();
-            docksPanel.update();
+            europeanDocksPanel.update();
         }
         requestFocus();
     }
@@ -872,7 +885,7 @@ public final class EuropePanel extends PortPanel {
         removeAll();
         toAmericaPanel = null;
         toEuropePanel = null;
-        docksPanel = null;
+        europeanDocksPanel = null;
         marketPanel = null;
         log = null;
         exitButton = trainButton = purchaseButton = recruitButton

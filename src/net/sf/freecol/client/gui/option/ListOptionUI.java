@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,6 +38,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
@@ -78,15 +79,15 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         boolean editable) {
         super(option, editable);
 
-        this.panel = new JPanel();
+        this.panel = new MigPanel(new MigLayout("wrap 2, fill",
+                                                "[fill, grow]20[fill]"));
         this.panel.setBorder(Utility.localizedBorder(super.getJLabel().getText(),
                                                  Utility.BORDER_COLOR));
-        this.panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         this.model = new DefaultListModel<>();
         for (AbstractOption<T> o : option.getValue()) {
             try {
-                AbstractOption<T> c = o.clone();
+                AbstractOption<T> c = o.cloneOption();
                 this.model.addElement(c);
             } catch (CloneNotSupportedException e) {
                 logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
@@ -114,7 +115,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         
         addButton.addActionListener((ActionEvent ae) -> {
                 try {
-                    AbstractOption<T> ao = option.getTemplate().clone();
+                    AbstractOption<T> ao = option.getTemplate().cloneOption();
                     if (gui.showEditOptionDialog(ao) && option.canAdd(ao)) {
                         this.model.addElement(ao);
                         this.list.setSelectedValue(ao, true);

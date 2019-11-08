@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -135,8 +135,8 @@ public final class StatisticsPanel extends FreeColPanel {
          */
         @Override
         public Object getValueAt(int row, int column) {
-            if ((row < getRowCount()) && (column < getColumnCount())
-                && (row >= 0) && (column >= 0)) {
+            if (0 <= row && 0 <= column
+                && row < getRowCount() && column < getColumnCount()) {
                 switch (column) {
                 case StatisticsModel.NAME_COLUMN:
                     return data[NAME_COLUMN][row];
@@ -159,7 +159,7 @@ public final class StatisticsPanel extends FreeColPanel {
     public StatisticsPanel(FreeColClient freeColClient,
                            Map<String, String> serverStatistics,
                            Map<String, String> clientStatistics) {
-        super(freeColClient, new BorderLayout());
+        super(freeColClient, null, new BorderLayout());
 
         // Title
         JPanel header = new JPanel();
@@ -191,7 +191,7 @@ public final class StatisticsPanel extends FreeColPanel {
         panel.setBorder(Utility.localizedBorder(title));
         Box b = new Box(BoxLayout.PAGE_AXIS);
         panel.add(b);
-        Map<String, String> memory = new HashMap<>();
+        Map<String, String> memory = new HashMap<>(memoryKeys.length);
         Map<String, String> ai = new HashMap<>();
         for (String k : memoryKeys) {
             memory.put(Messages.message("memoryManager." + k),

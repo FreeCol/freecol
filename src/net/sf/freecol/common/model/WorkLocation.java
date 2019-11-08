@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -306,9 +306,9 @@ public abstract class WorkLocation extends UnitLocation
     private Suggestion getSuggestion(Unit unit, ProductionType productionType,
                                      GoodsType goodsType) {
         // Check first if there is space.
-        if (((unit == null || !contains(unit)) && isFull())
-            || productionType == null
-            || goodsType == null) return null;
+        if (productionType == null
+            || goodsType == null
+            || ((unit == null || !contains(unit)) && isFull())) return null;
 
         final Specification spec = getSpecification();
         final Player owner = getOwner();
@@ -352,7 +352,7 @@ public abstract class WorkLocation extends UnitLocation
      *
      * @return True or false, depending on whether the suggestion is valid.
      */
-    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
+    protected boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
         return goodSuggestionCheck(unitType, unit, goodsType, this);
     }
 
@@ -367,7 +367,7 @@ public abstract class WorkLocation extends UnitLocation
      *     the WorkLocation instance currently in in reference.
      * @return True or false, depending on whether the suggestion is valid.
      */
-    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit,
+    protected boolean goodSuggestionCheck(UnitType unitType, Unit unit,
                                           GoodsType goodsType,
                                           WorkLocation workLocation) {
         return false;
@@ -396,8 +396,8 @@ public abstract class WorkLocation extends UnitLocation
             }
         }
         // Check for a suggestion for an extra worker if there is space.
-        if (!isFull() && occ != null
-            && (work = occ.workType) != null
+        if (occ != null && (work = occ.workType) != null
+            && !isFull()
             && (sug = getSuggestion(null, occ.productionType, work)) != null) {
             result.put(null, sug);
         }
@@ -502,7 +502,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public int getTotalProductionOf(GoodsType goodsType) {
         if (goodsType == null) {
-            throw new IllegalArgumentException("Null GoodsType.");
+            throw new RuntimeException("Null GoodsType: " + this);
         }
         return AbstractGoods.getCount(goodsType, getProduction());
     }
@@ -568,10 +568,9 @@ public abstract class WorkLocation extends UnitLocation
         final UnitType unitType = unit.getType();
         final Turn turn = getGame().getTurn();
         return Math.max(0,
-            (int)applyModifiers(getBaseProduction(getProductionType(),
-                                                  goodsType, unitType),
-                                turn,
-                                getProductionModifiers(goodsType, unitType)));
+                        (int)applyModifiers(getBaseProduction(getProductionType(), goodsType, unitType),
+                                            turn,
+                                            getProductionModifiers(goodsType, unitType)));
     }
 
     /**
@@ -582,7 +581,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return The production of the given type of goods.
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
-        if (unit == null) throw new IllegalArgumentException("Null unit.");
+        if (unit == null) throw new RuntimeException("Null unit: " + this);
         return (!produces(goodsType)) ? 0
             : Math.max(0, getPotentialProduction(goodsType, unit.getType()));
     }
@@ -634,7 +633,7 @@ public abstract class WorkLocation extends UnitLocation
 
         int amount = getBaseProduction(null, goodsType, unitType);
         amount = (int)applyModifiers(amount, getGame().getTurn(),
-            getProductionModifiers(goodsType, unitType));
+                                     getProductionModifiers(goodsType, unitType));
         return (amount < 0) ? 0 : amount;
     }
 
@@ -749,7 +748,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public final int getRank() {
-        return Location.getRank(getTile());
+        return Location.rankOf(getTile());
     }
 
     

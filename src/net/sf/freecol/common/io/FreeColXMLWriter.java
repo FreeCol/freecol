@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -84,9 +84,6 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
         }
         
         public static WriteScope toClient(Player player) {
-            if (player == null) {
-                throw new IllegalArgumentException("Null player.");
-            }
             return new WriteScope(WriteScopeType.CLIENT, player);
         }            
 
@@ -255,6 +252,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * Internal flush, returning what was written.
      *
      * @return The internal buffer containing the flushed data.
+     * @exception XMLStreamException on stream error.
      */
     public StringBuffer flushBuffer() throws XMLStreamException {
         this.xmlStreamWriter.flush();

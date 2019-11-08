@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -46,7 +46,7 @@ import net.sf.freecol.server.ai.MissionAIPlayer;
 /**
  * Mission for defending a {@code Settlement}.
  */
-public class DefendSettlementMission extends Mission {
+public final class DefendSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
@@ -73,7 +73,9 @@ public class DefendSettlementMission extends Mission {
      */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
                                    Settlement settlement) {
-        super(aiMain, aiUnit, settlement);
+        super(aiMain, aiUnit);
+
+        setTarget(settlement);
     }
 
     /**
@@ -106,7 +108,7 @@ public class DefendSettlementMission extends Mission {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         Settlement settlement = loc.getSettlement();
-        return (invalidReason(aiUnit, settlement) == null) ? settlement
+        return (invalidSettlementReason(aiUnit, settlement) == null) ? settlement
             : null;
     }
 
@@ -164,8 +166,8 @@ public class DefendSettlementMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+        @SuppressWarnings("unused") boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
@@ -183,8 +185,8 @@ public class DefendSettlementMission extends Mission {
      * @param deferOK Enables deferral (not implemented in this mission).
      * @return A suitable target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    private static Location findMissionTarget(AIUnit aiUnit, int range,
+                                              boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path) : null;
     }
@@ -196,7 +198,7 @@ public class DefendSettlementMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
@@ -223,8 +225,8 @@ public class DefendSettlementMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        String reason = invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidUnitReason(aiUnit);
         return (reason != null)
             ? reason
             : (!aiUnit.getUnit().getOwner().hasSettlements())
@@ -239,7 +241,7 @@ public class DefendSettlementMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -284,7 +286,7 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 4, true);
+        return findMissionTarget(getAIUnit(), 4, true);
     }
 
     /**
@@ -292,7 +294,7 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**

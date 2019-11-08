@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -142,21 +142,23 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
-     * Get a label for these goods.
-     *
-     * @return The label for these goods.
-     */
-    public StringTemplate getLabel() {
-        return getLabel(getType(), getAmount());
-    }
-
-    /**
      * Are these goods storable.
      *
      * @return True if the goods are storable.
      */
     public boolean isStorable() {
         return getType().isStorable();
+    }
+
+    /**
+     * Get a label for these goods.
+     *
+     * @return The label for these goods.
+     */
+    public StringTemplate getLabel() {
+        return StringTemplate.template("model.abstractGoods.label")
+            .addNamed("%goods%", getType())
+            .addAmount("%amount%", getAmount());
     }
 
     /**
@@ -173,26 +175,15 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
-     * Get a label given a goods type and amount.
-     *
-     * @param type The {@code GoodsType} to display.
-     * @param amount The amount of goods.
-     * @return The goods label.
-     */
-    public static StringTemplate getLabel(GoodsType type, int amount) {
-        return StringTemplate.template("model.abstractGoods.label")
-            .addNamed("%goods%", type)
-            .addAmount("%amount%", amount);
-    }
-
-    /**
      * Get a label given a key and amount.
+     *
+     * Used for arbitrary objects, such as the missionary's bible.
      *
      * @param key A key for the goods to display.
      * @param amount The amount of goods.
      * @return The goods label.
      */
-    public static StringTemplate getLabel(String key, int amount) {
+    public static StringTemplate getAbstractLabel(String key, int amount) {
         return StringTemplate.template("model.abstractGoods.label")
             .add("%goods%", key)
             .addAmount("%amount%", amount);
@@ -277,8 +268,9 @@ public class AbstractGoods extends FreeColObject implements Named {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof AbstractGoods) {
-            AbstractGoods ag = (AbstractGoods)o;
-            return type == ag.type && amount == ag.amount;
+            AbstractGoods other = (AbstractGoods)o;
+            return this.type == other.type && this.amount == other.amount
+                && super.equals(other);
         }
         return false;
     }
@@ -299,17 +291,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     @Override
     public String toString() {
-        return AbstractGoods.toString(this);
-    }
-
-    /**
-     * Simple string version of some goods.
-     *
-     * @param ag The {@code AbstractGoods} to make a string from.
-     * @return A string version of the goods.
-     */     
-    public static String toString(AbstractGoods ag) {
-        return toString(ag.getType(), ag.getAmount());
+        return AbstractGoods.toFullString(getType(), getAmount());
     }
 
     /**
@@ -319,7 +301,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @param amount The amount of goods.
      * @return A string version of the goods.
      */     
-    public static String toString(GoodsType goodsType, int amount) {
+    public static String toFullString(GoodsType goodsType, int amount) {
         return amount + " "
             + ((goodsType == null) ? "(null)" : goodsType.getSuffix());
     }

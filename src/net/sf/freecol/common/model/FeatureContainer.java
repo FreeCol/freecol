@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -123,7 +123,7 @@ public final class FeatureContainer {
      * @param abilities A stream of {@code Ability}s to check.
      * @return True if the abilities are `satisfied'.
      */
-    public static boolean hasAbility(Stream<Ability> abilities) {
+    public static boolean allAbilities(Stream<Ability> abilities) {
         boolean ret = false;
         for (Ability ability : iterable(abilities)) {
             if (!ability.getValue()) return false;
@@ -144,7 +144,7 @@ public final class FeatureContainer {
      */
     public boolean hasAbility(String id, FreeColSpecObjectType fcgot,
                               Turn turn) {
-        return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
+        return FeatureContainer.allAbilities(getAbilities(id, fcgot, turn));
     }
 
     /**
@@ -265,22 +265,6 @@ public final class FeatureContainer {
     }
 
     /**
-     * Applies this objects modifiers with the given identifier to the
-     * given number.
-     *
-     * @param number The number to modify.
-     * @param turn An optional applicable {@code Turn}.
-     * @param id The object identifier.
-     * @param fcgot An optional {@code FreeColSpecObjectType} the
-     *     modifier applies to.
-     * @return The modified number.
-     */
-    public final float applyModifiers(float number, Turn turn,
-                                      String id, FreeColSpecObjectType fcgot) {
-        return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
-    }
-
-    /**
      * Applies a collection of modifiers to the given float value.
      *
      * @param number The number to modify.
@@ -291,7 +275,7 @@ public final class FeatureContainer {
     public static float applyModifiers(float number, Turn turn,
                                        Collection<Modifier> mods) {
         return (mods == null || mods.isEmpty()) ? number
-            : applyModifiers_internal(number, turn,
+            : applyModifiersInternal(number, turn,
                 sort(mods, Modifier.ascendingModifierIndexComparator));
     }
 
@@ -306,7 +290,7 @@ public final class FeatureContainer {
     public static float applyModifiers(float number, Turn turn,
                                        Stream<Modifier> mods) {
         return (mods == null) ? number
-            : applyModifiers_internal(number, turn,
+            : applyModifiersInternal(number, turn,
                 sort(mods, Modifier.ascendingModifierIndexComparator));
     }
 
@@ -318,8 +302,8 @@ public final class FeatureContainer {
      * @param mods The {@code Modifier}s to apply.
      * @return The modified number.
      */
-    private static float applyModifiers_internal(float number, Turn turn,
-                                                 Collection<Modifier> mods) {
+    private static float applyModifiersInternal(float number, Turn turn,
+                                                Collection<Modifier> mods) {
         float result = number;
         for (Modifier m : mods) {
             float value = m.getValue(turn);
@@ -472,6 +456,8 @@ public final class FeatureContainer {
 
     /**
      * Copy anther feature container.
+     *
+     * @param other The other {@code FeatureContainer}.
      */
     public void copy(FeatureContainer other) {
         clear();
@@ -517,9 +503,9 @@ public final class FeatureContainer {
         for (Modifier modifier : transform(getModifiers(null, null, null),
                 m -> oldSource == null || m.getSource() == oldSource)) {
             removeModifier(modifier);
-            Modifier newModifier = new Modifier(modifier);
-            newModifier.setSource(newSource);
-            addModifier(newModifier);
+            Modifier mod = Modifier.makeModifier(modifier);
+            mod.setSource(newSource);
+            addModifier(mod);
         }
     }
 

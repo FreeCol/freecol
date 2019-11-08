@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -156,7 +156,7 @@ public class RebelToolTip extends JToolTip {
         } else if (grow >= 0) {
             add(Utility.localizedLabel("rebelToolTip.changeMore"));
             add(new JLabel(String.valueOf(grow)), "skip");
-        } else if (grow < 0) {
+        } else { // grow < 0
             add(Utility.localizedLabel("rebelToolTip.changeLess"));
             add(new JLabel(String.valueOf(-grow)), "skip");
         }

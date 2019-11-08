@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,7 +69,7 @@ public class UnitIterator implements Iterator<Unit> {
     private final void update() {
         this.units.clear();
         this.units.addAll(transform(owner.getUnits(), u -> predicate.test(u),
-                          Function.identity(), Unit.locComparator));
+                          Function.<Unit>identity(), Unit.locComparator));
     }
 
     /**

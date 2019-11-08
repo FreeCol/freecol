@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -49,7 +49,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * FIXME: acquire protection
  * FIXME: Better avoidance of enemy units
  */
-public class CashInTreasureTrainMission extends Mission {
+public final class CashInTreasureTrainMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
@@ -74,7 +74,9 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
                                       Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**
@@ -144,9 +146,9 @@ public class CashInTreasureTrainMission extends Mission {
         final Location loc = path.getLastNode().getLocation();
         Colony colony = loc.getColony();
         return (loc instanceof Europe
-            && invalidReason(aiUnit, loc) == null) ? loc
+            && invalidMissionReason(aiUnit, loc) == null) ? loc
             : (colony != null
-                && invalidReason(aiUnit, colony) == null) ? colony
+                && invalidMissionReason(aiUnit, colony) == null) ? colony
             : null;
     }
 
@@ -235,7 +237,7 @@ public class CashInTreasureTrainMission extends Mission {
             // doomed.
             return (europe == null) ? null
                 : unit.findPath(unit.getLocation(), europe, carrier,
-                                standardCd);
+                                standardCd, null);
         }
 
         // Can the unit get to a cash in site?
@@ -251,8 +253,8 @@ public class CashInTreasureTrainMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A {@code PathNode} to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range, 
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range, 
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : Location.upLoc(findCircleTarget(aiUnit,
@@ -266,7 +268,7 @@ public class CashInTreasureTrainMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
@@ -318,13 +320,23 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The {@code AIUnit} to test.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
+    }
+
+    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The {@code AIUnit} to check.
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -333,16 +345,6 @@ public class CashInTreasureTrainMission extends Mission {
             : (loc instanceof Europe)
             ? invalidEuropeReason(aiUnit, (Europe)loc)
             : Mission.TARGETINVALID;
-    }
-
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The {@code AIUnit} to test.
-     * @return A reason for invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
     }
 
 
@@ -381,7 +383,7 @@ public class CashInTreasureTrainMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
+        return findMissionTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -389,7 +391,7 @@ public class CashInTreasureTrainMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidMissionReason(getAIUnit(), target);
     }
 
     /**
@@ -438,8 +440,7 @@ public class CashInTreasureTrainMission extends Mission {
             final Europe europe = getUnit().getOwner().getEurope();
             if (unit.canCashInTreasureTrain()) {
                 AIUnit aiCarrier = null;
-                boolean cashin = unit.isInEurope()
-                    || europe == null
+                boolean cashin = europe == null || unit.isInEurope()
                     || unit.getTransportFee() == 0;
                 if (!cashin && aiUnit.getTransport() == null) {
                     cashin = assignCarrier(lb) == null;

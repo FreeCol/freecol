@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -350,8 +351,7 @@ public final class BuildingType extends BuildableType
                                       UnitType unitType) {
         if (goodsType == null) return 0;
         int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)applyModifiers(amount, null, goodsType.getId(),
-                unitType);
+        amount = (int)apply(amount, null, goodsType.getId(), unitType);
         return (amount < 0) ? 0 : amount;
     }
 
@@ -651,9 +651,10 @@ public final class BuildingType extends BuildableType
         }
 
         // @compat 0.11.6
-        if (hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
-                && this.expertConnectionProduction == 0)
+        if (this.expertConnectionProduction == 0
+            && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)) {
             this.expertConnectionProduction = 4;
+        }
         // end @compat 0.11.6
     }
 

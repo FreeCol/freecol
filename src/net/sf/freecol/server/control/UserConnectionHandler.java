@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.Connection;
@@ -33,7 +34,6 @@ import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -71,12 +71,12 @@ public final class UserConnectionHandler extends FreeColServerHolder
             cs = ((LoginMessage)message).loginHandler(freeColServer, connection);
             break;
         default:
-            cs = ChangeSet.clientError((ServerPlayer)null,
+            cs = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.couldNotLogin"));
             break;
         }
-        ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
-        return (cs == null) ? null : cs.build(serverPlayer);
+        return (cs == null) ? null
+            : cs.build(freeColServer.getPlayer(connection));
     }
 
     /**

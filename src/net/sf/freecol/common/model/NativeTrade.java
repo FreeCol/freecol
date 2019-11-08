@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -182,7 +182,7 @@ public class NativeTrade extends FreeColGameObject {
      * @return A suitable key.
      */
     public String getKey() {
-        return getKey(this.unit, this.is);
+        return getNativeTradeKey(this.unit, this.is);
     }
 
     /**
@@ -192,7 +192,7 @@ public class NativeTrade extends FreeColGameObject {
      * @param is The {@code IndianSettlement} that is trading.
      * @return A suitable key.
      */
-    public static String getKey(Unit unit, IndianSettlement is) {
+    public static String getNativeTradeKey(Unit unit, IndianSettlement is) {
         return unit.getId() + "-" + is.getId();
     }
 
@@ -403,7 +403,8 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * Is another native trade compatible with this one?
      *
-     * @return nt The other {@code NativeTrade}.
+     * @param nt The other {@code NativeTrade}.
+     * @return True if the other trade is compatible.
      */
     public boolean isCompatible(final NativeTrade nt) {
         return this.getKey().equals(nt.getKey());
@@ -451,7 +452,8 @@ public class NativeTrade extends FreeColGameObject {
      */
     public void limitSettlementToUnit(int n) {
         List<NativeTradeItem> best = transform(this.settlementToUnit,
-            NativeTradeItem::priceIsValid, Function.identity(),
+            NativeTradeItem::priceIsValid,
+            Function.<NativeTradeItem>identity(),
             NativeTradeItem.descendingPriceComparator);
         if (best.size() <= n) return;
         for (NativeTradeItem nti : best.subList(n, best.size())) {
@@ -615,8 +617,7 @@ public class NativeTrade extends FreeColGameObject {
             while (xr.moreTags()) {
                 tag = xr.getLocalName();
                 if (NativeTradeItem.TAG.equals(tag)) {
-                    NativeTradeItem nti = new NativeTradeItem(game, xr);
-                    if (nti != null) this.settlementToUnit.add(nti);
+                    this.settlementToUnit.add(new NativeTradeItem(game, xr));
                 } else {
                     logger.warning("SettlementToUnit-item expected, not: " + tag);
                 }
@@ -626,8 +627,7 @@ public class NativeTrade extends FreeColGameObject {
             while (xr.moreTags()) {
                 tag = xr.getLocalName();
                 if (NativeTradeItem.TAG.equals(tag)) {
-                    NativeTradeItem nti = new NativeTradeItem(game, xr);
-                    if (nti != null) this.unitToSettlement.add(nti);
+                    this.unitToSettlement.add(new NativeTradeItem(game, xr));
                 } else {
                     logger.warning("UnitToSettlement-item expected, not: " + tag);
                 }
@@ -666,11 +666,11 @@ public class NativeTrade extends FreeColGameObject {
             .append(" item=").append((item == null) ? "null" : item.toString())
             .append(" unitToSettlement[");
         for (NativeTradeItem nti : this.unitToSettlement) {
-            sb.append(' ').append(nti.toString());
+            sb.append(' ').append(nti);
         }
         sb.append("] settlementToUnit[");
         for (NativeTradeItem nti : this.settlementToUnit) {
-            sb.append(' ').append(nti.toString());
+            sb.append(' ').append(nti);
         }
         return sb.append(" ]]").toString();
     }

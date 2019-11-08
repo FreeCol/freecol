@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -55,10 +55,8 @@ public class LoadAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         final Unit carrier = getGUI().getActiveUnit();
-        return super.shouldBeEnabled()
-            && carrier != null
-            && carrier.isCarrier()
-            && carrier.hasSpaceLeft();
+        return carrier != null && carrier.isCarrier()
+            && carrier.hasSpaceLeft() && super.shouldBeEnabled();
     }    
 
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -50,7 +50,8 @@ public abstract class TradeItem extends FreeColGameObject {
      * @param source The source {@code Player}.
      * @param destination The destination {@code Player}.
      */
-    public TradeItem(Game game, String id, Player source, Player destination) {
+    protected TradeItem(Game game, String id, Player source,
+                        Player destination) {
         super(game, id);
 
         this.source = source;
@@ -64,7 +65,8 @@ public abstract class TradeItem extends FreeColGameObject {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public TradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    protected TradeItem(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(game, "");
 
         readFromXML(xr);
@@ -291,13 +293,12 @@ public abstract class TradeItem extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof TradeItem) {
-            return Utils.equals(this.source, ((TradeItem)other).source)
-                && Utils.equals(this.destination, ((TradeItem)other).destination)
-                && super.equals(other);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof TradeItem)) return false;
+        TradeItem other = (TradeItem)o;
+        return Utils.equals(this.source, other.source)
+            && Utils.equals(this.destination, other.destination)
+            && super.equals(other);
     }
 
     /**

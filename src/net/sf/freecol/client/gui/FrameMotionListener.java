@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,49 +32,66 @@ import javax.swing.SwingUtilities;
 /**
  * The mouse adapter to handle frame movement.
  */
-public class FrameMotionListener extends MouseAdapter implements MouseMotionListener {
+public class FrameMotionListener extends MouseAdapter {
 
     private final JInternalFrame f;
 
     private Point loc = null;
 
 
+    /**
+     * Build a new frame motion listener.
+     *
+     * @param f The base internal frame.
+     */
     FrameMotionListener(JInternalFrame f) {
         this.f = f;
     }
 
+    // Override MouseAdapter
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
+        if (loc == null || f.getDesktopPane() == null
+            || f.getDesktopPane().getDesktopManager() == null) {
             return;
         }
 
-        Point p = SwingUtilities.convertPoint((Component) e.getSource(), e.getX(), e.getY(), null);
+        Point p = SwingUtilities.convertPoint((Component)e.getSource(),
+                                              e.getX(), e.getY(), null);
         int moveX = loc.x - p.x;
         int moveY = loc.y - p.y;
-        f.getDesktopPane().getDesktopManager().dragFrame(f, f.getX() - moveX, f.getY() - moveY);
+        f.getDesktopPane().getDesktopManager()
+            .dragFrame(f, f.getX() - moveX, f.getY() - moveY);
         loc = p;
     }
 
-    //@Override
-    //public void mouseMoved(MouseEvent arg0) {
-    //}
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
+        if (f.getDesktopPane() == null
+            || f.getDesktopPane().getDesktopManager() == null) {
             return;
         }
-        loc = SwingUtilities.convertPoint((Component) e.getSource(), e.getX(), e.getY(), null);
+        loc = SwingUtilities.convertPoint((Component)e.getSource(),
+                                          e.getX(), e.getY(), null);
         f.getDesktopPane().getDesktopManager().beginDraggingFrame(f);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
+        if (loc == null || f.getDesktopPane() == null
+            || f.getDesktopPane().getDesktopManager() == null) {
             return;
         }
         f.getDesktopPane().getDesktopManager().endDraggingFrame(f);
     }
-
 }

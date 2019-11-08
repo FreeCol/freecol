@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -209,8 +209,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the load succeeded.
      */
     protected boolean load(File file) {
-        OptionGroup og = OptionGroup.load(file, getOptionGroupId(),
-                                          getSpecification());
+        OptionGroup og = OptionGroup.loadOptionGroup(file, getOptionGroupId(),
+                                                     getSpecification());
         if (og == null) return false;
         set(og);
         return true;

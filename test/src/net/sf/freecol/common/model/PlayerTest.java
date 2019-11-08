@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -59,7 +59,7 @@ public class PlayerTest extends FreeColTestCase {
         Unit unit4 = new ServerUnit(game, map.getTile(5, 8), dutch,
                                     freeColonist);
 
-        int count = count(dutch.getUnitList());
+        int count = count(dutch.getUnitSet());
         assertTrue(count == 4);
 
         unit1.dispose();
@@ -239,12 +239,10 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals(russianREF, russian.getREFPlayer());
     }
 
-    public void testTension(){
-        String errMsg = "";
+    public void testTension() {
         Game game = getStandardGame();
-
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
 
         int initialTension = 500;
         int change = 250;
@@ -257,10 +255,10 @@ public class PlayerTest extends FreeColTestCase {
         int expectedDutchTension = initialTension + change;
         int expectedFrenchTension = initialTension;
 
-        errMsg = "Dutch tension value should have changed";
-        assertEquals(errMsg, expectedDutchTension, dutch.getTension(french).getValue());
-        errMsg = "French tension value should have remained the same";
-        assertEquals(errMsg, expectedFrenchTension ,french.getTension(dutch).getValue());
+        assertEquals("Dutch tension value should have changed",
+            expectedDutchTension, dutch.getTension(french).getValue());
+        assertEquals("French tension value should have remained the same",
+            expectedFrenchTension, french.getTension(dutch).getValue());
     }
 
     public void testAddAnotherPlayersUnit(){

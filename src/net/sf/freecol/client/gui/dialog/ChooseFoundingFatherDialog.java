@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -79,18 +79,17 @@ public final class ChooseFoundingFatherDialog
         FatherDetailPanel details = new FatherDetailPanel(freeColClient,
             new ColopediaPanel(freeColClient));
         for (FoundingFather father : possibleFoundingFathers) {
-            JPanel jp = new MigPanel();
+            JPanel jp = new MigPanel(new MigLayout());
             details.buildDetail(father, jp);
             jp.validate();
             tb.addTab(Messages.message(father.getTypeKey()), jp);
         }
         tb.setSelectedIndex(0);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
         panel.add(Utility.localizedHeader("chooseFoundingFatherDialog.title", false));
         panel.add(helpButton, "tag help");
         panel.add(tb, "width 100%");
-        panel.setPreferredSize(panel.getPreferredSize());
 
         List<ChoiceItem<FoundingFather>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), (FoundingFather)null)

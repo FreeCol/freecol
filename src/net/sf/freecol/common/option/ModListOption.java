@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -59,7 +59,7 @@ public class ModListOption extends ListOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    public ModListOption clone() {
+    public ModListOption cloneOption() {
         ModListOption ret = new ModListOption(getId(), getSpecification());
         ret.setValues(this);
         ret.setListValues(this);

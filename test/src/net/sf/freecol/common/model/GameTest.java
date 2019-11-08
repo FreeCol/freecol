@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -73,33 +73,33 @@ public class GameTest extends FreeColTestCase {
         assertEquals(1600, Turn.getSeasonYear());
         assertEquals(2, Turn.getSeasonNumber());
 
-        assertEquals(1492, Turn.getYear(1));
+        assertEquals(1492, Turn.getTurnYear(1));
         assertEquals(1, Turn.yearToTurn(1492));
-        assertEquals(-1, Turn.getSeason(1));
+        assertEquals(-1, Turn.getTurnSeason(1));
         assertEquals(0, spec().getAge(new Turn(1)));
 
-        assertEquals(1599, Turn.getYear(108));
+        assertEquals(1599, Turn.getTurnYear(108));
         assertEquals(108, Turn.yearToTurn(1599));
-        assertEquals(-1, Turn.getSeason(108));
+        assertEquals(-1, Turn.getTurnSeason(108));
         assertEquals(0, spec().getAge(new Turn(108)));
 
-        assertEquals(1600, Turn.getYear(109));
+        assertEquals(1600, Turn.getTurnYear(109));
         assertEquals(109, Turn.yearToTurn(1600, 0));
-        assertEquals(0, Turn.getSeason(109));
+        assertEquals(0, Turn.getTurnSeason(109));
         assertEquals(1, spec().getAge(new Turn(109)));
 
-        assertEquals(1600, Turn.getYear(110));
+        assertEquals(1600, Turn.getTurnYear(110));
         assertEquals(110, Turn.yearToTurn(1600, 1));
-        assertEquals(1, Turn.getSeason(110));
+        assertEquals(1, Turn.getTurnSeason(110));
         assertEquals(1, spec().getAge(new Turn(308)));
 
-        assertEquals(1700, Turn.getYear(309));
+        assertEquals(1700, Turn.getTurnYear(309));
         assertEquals(309, Turn.yearToTurn(1700, 0));
-        assertEquals(0, Turn.getSeason(309));
+        assertEquals(0, Turn.getTurnSeason(309));
         assertEquals(2, spec().getAge(new Turn(309)));
 
-        assertEquals(1700, Turn.getYear(310));
+        assertEquals(1700, Turn.getTurnYear(310));
         assertEquals(310, Turn.yearToTurn(1700, 1));
-        assertEquals(1, Turn.getSeason(310));
+        assertEquals(1, Turn.getTurnSeason(310));
     }
 }

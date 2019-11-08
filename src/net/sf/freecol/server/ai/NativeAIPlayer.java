@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -37,7 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.Constants;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -81,7 +81,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
-public class NativeAIPlayer extends MissionAIPlayer {
+public final class NativeAIPlayer extends MissionAIPlayer {
 
     private static final Logger logger = Logger.getLogger(NativeAIPlayer.class.getName());
 
@@ -107,10 +107,10 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param player The player that should be associated with this
      *            {@code AIPlayer}.
      */
-    public NativeAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public NativeAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
     /**
@@ -124,7 +124,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                           FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
 
@@ -163,15 +163,14 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param lb A {@code LogBuilder} to log to.
      */
     private void determineStances(LogBuilder lb) {
-        final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
+        final Player player = getPlayer();
         lb.mark();
 
-        for (Player p : getGame().getLivePlayerList(serverPlayer)) {
+        for (Player p : getGame().getLivePlayerList(player)) {
             Stance newStance = determineStance(p);
-            if (newStance != serverPlayer.getStance(p)) {
+            if (newStance != player.getStance(p)) {
                 getAIMain().getFreeColServer().getInGameController()
-                    .changeStance(serverPlayer, newStance, 
-                                  (ServerPlayer)p, true);
+                    .changeStance(player, newStance, p, true);
                 lb.add(" ", p.getDebugName(), "->", newStance, ", ");
             }
         }
@@ -209,6 +208,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
     /**
      * Greedily equips braves with horses and muskets.
+     *
      * Public for the test suite.
      *
      * @param is The {@code IndianSettlement} where the equipping occurs.
@@ -231,6 +231,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
     /**
      * Takes the necessary actions to secure an indian settlement
+     *
      * Public for the test suite.
      *
      * @param is The {@code IndianSettlement} to secure.
@@ -357,7 +358,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             final ToIntFunction<Unit> score = cacheInt(u ->
                 u.getTile().getDistanceTo(tile));
             final Predicate<Unit> validPred = u ->
-                UnitSeekAndDestroyMission.invalidReason(aiMain.getAIUnit(u),
+                UnitSeekAndDestroyMission.invalidMissionReason(aiMain.getAIUnit(u),
                     tile.getDefendingUnit(u)) == null
                 && score.applyAsInt(u) >= 0;
             final Comparator<Unit> scoreComp = Comparator.comparingInt(score);
@@ -381,7 +382,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         List<AIUnit> aiUnits = getAIUnits();
 
         lb.mark();
-        List<AIUnit> done = new ArrayList<>();
+        List<AIUnit> done = new ArrayList<>(aiUnits.size());
         reasons.clear();
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
@@ -506,8 +507,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
                         getAIRandom(), availableUnits.size()));
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
-                if (IndianBringGiftMission.invalidReason(aiUnit) == null
-                    && u.findPath(u.getTile(), home, null, cd) != null) {
+                if (IndianBringGiftMission.invalidMissionReason(aiUnit) == null
+                    && u.findPath(u.getTile(), home, null, cd, null) != null) {
                     unit = u;
                 }
             }
@@ -525,9 +526,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 PathNode path;
                 if (c == null
                     || !is.hasContacted(c.getOwner())
-                    || IndianBringGiftMission.invalidReason(aiUnit, c) != null
+                    || IndianBringGiftMission.invalidMissionReason(aiUnit, c) != null
                     || (path = unit.findPath(home, c.getTile(),
-                                             null, cd)) == null) continue;
+                                             null, cd, null)) == null) continue;
                 int alarm = Math.max(1, is.getAlarm(c.getOwner()).getValue());
                 nearbyColonies.add(new RandomChoice<>(c,
                         1000000 / alarm / (1 + path.getTotalTurns())));
@@ -542,7 +543,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             Colony target = RandomChoice.getWeightedRandom(logger,
                 "Choose gift colony", nearbyColonies, getAIRandom());
             if (target == null) {
-                throw new IllegalStateException("No gift target!?!");
+                throw new RuntimeException("No gift target: " + this);
             }
 
             // Send the unit.
@@ -602,8 +603,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
                         getAIRandom(), availableUnits.size()));
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
-                if (IndianDemandMission.invalidReason(aiUnit) == null
-                    && u.findPath(u.getTile(), home, null, cd) != null) {
+                if (IndianDemandMission.invalidMissionReason(aiUnit) == null
+                    && u.findPath(u.getTile(), home, null, cd, null) != null) {
                     unit = u;
                 }
             }
@@ -620,9 +621,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 PathNode path;
                 if (c == null
                     || !is.hasContacted(c.getOwner())
-                    || IndianDemandMission.invalidReason(aiUnit, c) != null
+                    || IndianDemandMission.invalidMissionReason(aiUnit, c) != null
                     || (path = unit.findPath(home, c.getTile(),
-                                             null, cd)) == null) continue;
+                                             null, cd, null)) == null) continue;
                 int alarm = is.getAlarm(c.getOwner()).getValue();
                 int defence = c.getUnitCount() + ((c.getStockade() == null) ? 1
                     : (c.getStockade().getLevel() * 10));
@@ -662,11 +663,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
         final Specification spec = getSpecification();
         final int penalty = ((sense) ? 1 : -1)
             * spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
-        final Function<Modifier, Modifier> mapper = m -> {
-            Modifier n = new Modifier(m);
-            n.setValue(penalty);
-            return n;
-        };
+        final Function<Modifier, Modifier> mapper
+            = m -> Modifier.makeModifier(m).setValue(penalty);
         return transform(spec.getModifiers(Modifier.SHIP_TRADE_PENALTY),
                          alwaysTrue(), mapper);
     }
@@ -693,30 +691,23 @@ public class NativeAIPlayer extends MissionAIPlayer {
     //   selectFoundingFather
 
     /**
-     * Decides whether to accept an Indian demand, or not.
-     *
-     * @param unit The {@code Unit} making demands.
-     * @param colony The {@code Colony} where demands are being made.
-     * @param type The {@code GoodsType} demanded.
-     * @param amount The amount of gold demanded.
-     * @param accept The acceptance state of the demand.
-     * @return True if this player accepts the demand, false if rejected,
-     *     null if no further action is required.
+     * {@inheritDoc}
      */
-    public Boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount, Boolean accept) {
+    public IndianDemandAction indianDemand(Unit unit, Colony colony,
+                                           GoodsType type, int amount,
+                                           IndianDemandAction accept) {
         final Player player = getPlayer();
         AIUnit aiu;
         IndianDemandMission mission;
         if (unit.getOwner() == player) { // Its one of ours
             if ((aiu = getAIUnit(unit)) != null // and its valid and demanding
                 && (mission = aiu.getMission(IndianDemandMission.class)) != null
-                && accept != null) {
-                mission.setSucceeded(accept);
+                && accept != IndianDemandAction.INDIAN_DEMAND_DONE) {
+                mission.setSucceeded(accept == IndianDemandAction.INDIAN_DEMAND_ACCEPT);
             }
         }
-            
-        return null;
+        // Once we get here, the demand is settled
+        return IndianDemandAction.INDIAN_DEMAND_DONE;
     }
 
     /**
@@ -798,7 +789,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param nt The {@code NativeTrade} to update.
      * @param anger A penalty to the native prices due to anger.
      */
-    public void updateTrade(NativeTrade nt, int anger) {
+    private void updateTrade(NativeTrade nt, int anger) {
         final Specification spec = getSpecification();
         final Turn turn = getGame().getTurn();
         final IndianSettlement is = nt.getIndianSettlement();
@@ -857,11 +848,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         if (nt == null || !this.getPlayer().owns(nt.getIndianSettlement())) {
             return NativeTradeAction.NAK_INVALID;
         }
-        final Specification spec = getSpecification();
         final IndianSettlement is = nt.getIndianSettlement();
         final Unit unit = nt.getUnit();
         final Player other = unit.getOwner();
-        final Turn turn = getGame().getTurn();
         NativeTradeItem ours;
         int anger, haggle;
         Tension tension = is.getAlarm(other);
@@ -962,6 +951,34 @@ public class NativeAIPlayer extends MissionAIPlayer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getNeededWagons(Tile tile) {
+        throw new RuntimeException("Can not happen: " + this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int pioneersNeeded() {
+        throw new RuntimeException("Can not happen: " + this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int scoutsNeeded() {
+        throw new RuntimeException("Can not happen: " + this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void completeWish(Wish w) {
+        throw new RuntimeException("Can not happen: " + this);
+    }
+    
 
     // Serialization
 

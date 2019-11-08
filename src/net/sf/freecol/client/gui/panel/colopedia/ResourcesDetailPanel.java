@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -95,7 +95,7 @@ public class ResourcesDetailPanel
             if (modifier.hasScope()) {
                 String scopes = transform(modifier.getScopes(),
                                           isNotNull(Scope::getType),
-                                          s -> Messages.getName(spec.findType(s.getType())),
+                                          s -> Messages.getName(spec.getType(s.getType())),
                                           Collectors.joining(", "));
                 if (!scopes.isEmpty()) text += " (" + scopes + ")";
             }

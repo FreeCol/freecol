@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,9 +44,11 @@ import javax.swing.ImageIcon;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -159,7 +162,7 @@ public class Map extends FreeColGameObject implements Location {
          * @return True if the given position is within the bounds of the map.
          */
         public boolean isValid(int width, int height) {
-            return Map.isValid(x, y, width, height);
+            return Map.inBox(x, y, width, height);
         }
 
         /**
@@ -175,7 +178,7 @@ public class Map extends FreeColGameObject implements Location {
          * @param by The y-coordinate of the second position.
          * @return The distance in tiles between the positions.
          */
-        public static int getDistance(int ax, int ay, int bx, int by) {
+        public static int getXYDistance(int ax, int ay, int bx, int by) {
             int r = (bx - ax) - (ay - by) / 2;
 
             if (by > ay && ay % 2 == 0 && by % 2 != 0) {
@@ -197,7 +200,7 @@ public class Map extends FreeColGameObject implements Location {
          * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
-            return getDistance(getX(), getY(),
+            return getXYDistance(getX(), getY(),
                                position.getX(), position.getY());
         }
 
@@ -221,8 +224,8 @@ public class Map extends FreeColGameObject implements Location {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o instanceof Position) {
-                Position p = (Position)o;
-                return x == p.x && y == p.y;
+                Position other = (Position)o;
+                return x == other.x && y == other.y;
             }
             return false;
         }
@@ -245,11 +248,22 @@ public class Map extends FreeColGameObject implements Location {
     }
 
 
-    /** The tiles that this map contains. */
-    private Tile[][] tiles;
-
     /** The width and height of the map. */
-    private int width, height;
+    private int width = -1, height = -1;
+
+    /**
+     * The tiles that this map contains, as a 2D array.  This starts
+     * out unassigned, but is initialized in setTiles().  Then the
+     * individual tiles are filled in with setTile(), however once a
+     * Tile is present further calls to setTile will copyIn to it.
+     */
+    private Tile[][] tileArray;
+
+    /**
+     * The tiles that this map contains, as a list.
+     * This is populated in setTile().
+     */
+    private List<Tile> tileList = new ArrayList<>();
 
     /** The highest map layer included. */
     private Layer layer;
@@ -279,18 +293,6 @@ public class Map extends FreeColGameObject implements Location {
     /** The search tracing status. */
     private boolean traceSearch = false;
 
-    /**
-     * A cache of all tiles as a set.  This is just a {@code Map}
-     * local cache, and is unrelated to the player-specific caching
-     * within {@code Tile} iteself.
-     */
-    private final Set<Tile> cachedTiles = new HashSet<>();
-    /**
-     * Validity flag for the cachedTiles set, invalidation occurs in
-     * {@link Map#setTile}, revalidation in {@link Map#resetCachedTiles}.
-     */
-    private volatile boolean cachedTilesValid = false;
-
 
     /**
      * Create a new {@code Map} from a collection of tiles.
@@ -305,6 +307,7 @@ public class Map extends FreeColGameObject implements Location {
         setTiles(width, height);
         setLayer(Layer.RESOURCES);
         calculateLatitudePerRow();
+        initializeTraceSearch();
     }
 
     /**
@@ -315,7 +318,8 @@ public class Map extends FreeColGameObject implements Location {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public Map(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        super(game, null);
+        this(game, xr.getAttribute(WIDTH_TAG, -1),
+                   xr.getAttribute(HEIGHT_TAG, -1));
 
         readFromXML(xr);
     }
@@ -330,9 +334,18 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Map(Game game, String id) {
         super(game, id);
+
+        initializeTraceSearch();
     }
 
 
+    /**
+     * Enable full path logging by default if in PATHS debug mode.
+     */
+    private void initializeTraceSearch() {
+        this.traceSearch = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.PATHS);
+    }
+        
     /**
      * Gets the width of this map.
      *
@@ -361,7 +374,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param height The height of the map.
      * @return True if the given position is within the bounds of the map.
      */
-    public static boolean isValid(int x, int y, int width, int height) {
+    public static boolean inBox(int x, int y, int width, int height) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
 
@@ -373,7 +386,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return True if the coordinates are valid.
      */
     public boolean isValid(int x, int y) {
-        return isValid(x, y, getWidth(), getHeight());
+        return Map.inBox(x, y, getWidth(), getHeight());
     }
 
     /**
@@ -387,18 +400,40 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Set the tiles to a new shape.
+     * Initialize the tile shape.  This must be called *once* per map.
      *
      * @param width The new map width.
      * @param height The new map height.
-     * @return The old tiles array.
+     * @return An error message if setting the tile array was invalid, null if valid.
      */
-    public synchronized Tile[][] setTiles(int width, int height) {
-        Tile[][] ret = this.tiles;
+    private String setTiles(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            return "Bad map tile array size: (" + width + "," + height + ")";
+        }
         this.width = width;
         this.height = height;
-        this.tiles = new Tile[width][height];
-        return ret;
+        this.tileArray = new Tile[width][height];
+        this.tileList.clear();
+        return null;
+    }
+
+    /**
+     * Update the tile shape, however it is an error to change the map
+     * size after the initial setting.
+     *
+     * @param width The new map width.
+     * @param height The new map height.
+     * @return An error message if setting the tile array was invalid, null if valid.
+     */
+    private String updateTiles(int width, int height) {
+        // Initial setting
+        if (this.width < 0 && this.height < 0) return setTiles(width, height);
+        // Next time, the size must *not* change.
+        if (this.width != width || this.height != height) {
+            return "Attempted map resize (" + this.width + "," + this.height
+                + " -> " + width + "," + height + ")";
+        }
+        return null;
     }
 
     /**
@@ -411,8 +446,9 @@ public class Map extends FreeColGameObject implements Location {
      * @return The {@code Tile} at (x, y), or null if the
      *     position is invalid.
      */
-    public synchronized Tile getTile(int x, int y) {
-        return (isValid(x, y)) ? this.tiles[x][y] : null;
+    public Tile getTile(int x, int y) {
+        if (!isValid(x, y)) return null;
+        return this.tileArray[x][y];
     }
 
     /**
@@ -426,28 +462,41 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Sets the tile at the given coordinates.
+     * Set the tile at the given coordinates.
+     *
+     * This can be done *once* per tile.  Currently that is enforced
+     * by calling setTile() only from populateTiles() where the map is
+     * being built or indirectly through updateTile() where the
+     * absence of the tile is checked.
      *
      * @param x The x-coordinate of the {@code Tile}.
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
+     * @return True if the {@code Tile} was updated.
      */
-    public synchronized void setTile(Tile tile, int x, int y) {
-        if (isValid(x, y)) {
-            this.tiles[x][y] = tile;
-            this.cachedTilesValid = false;
-        }
+    private boolean setTile(Tile tile, int x, int y) {
+        if (tile == null) return false;
+        this.tileArray[x][y] = tile;
+        this.tileList.add(tile);
+        return true;
     }
 
     /**
-     * Set a tile from its internal coordinates.
+     * Update a tile in this map from the given tile.
      *
-     * @param tile The {@code Tile} to set.
+     * @param tile The {@code Tile} to update from.
+     * @return True if the tile was updated.
      */
-    public void setTile(Tile tile) {
-        setTile(tile, tile.getX(), tile.getY());
+    private boolean updateTile(Tile tile) {
+        if (tile == null) return false;
+        final int x = tile.getX(), y = tile.getY();
+        if (!isValid(x, y)) return false;
+        Tile old = this.tileArray[x][y];
+        if (old == null) return setTile(tile, x, y);
+        old.copyIn(tile);
+        return true;
     }
-
+        
     /**
      * Get the layer.
      *
@@ -610,30 +659,6 @@ public class Map extends FreeColGameObject implements Location {
             : find(getRegions(), matchKeyEquals(name, Region::getName));
     }
 
-    /**
-     * Reset the tile cache.
-     */
-    private synchronized void resetCachedTiles() {
-        if (this.cachedTilesValid) return;
-        this.cachedTiles.clear();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                this.cachedTiles.add(this.tiles[x][y]);
-            }
-        }
-        this.cachedTilesValid = true;
-    }
-
-    /**
-     * Get all the tiles in the map as a set.
-     *
-     * @return A {@code Set} of all {@code Tile}s in this {@code Map}.
-     */
-    public Set<Tile> getAllTilesSet() {
-        if (!this.cachedTilesValid) resetCachedTiles();
-        return this.cachedTiles;
-    }
-
 
     // Useful location and direction utilities
     
@@ -744,8 +769,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return The distance between the tiles.
      */
     public int getDistance(Tile t1, Tile t2) {
-        return Position.getDistance(t1.getX(), t1.getY(),
-            t2.getX(), t2.getY());
+        return Position.getXYDistance(t1.getX(), t1.getY(),
+                                      t2.getX(), t2.getY());
     }
 
     /**
@@ -788,13 +813,31 @@ public class Map extends FreeColGameObject implements Location {
     // Support for various kinds of map iteration.
 
     /**
-     * Get a stream of all the tiles in the map using an underlying
-     * WholeMapIterator.
+     * Get a list of all the tiles that match a predicate.
      *
-     * @return A {@code Stream} of all {@code Tile}s in this {@code Map}.
+     * @param predicate The <code>Predicate</code> to check.
+     * @return A {@code List} of all matching {@code Tile}s.
      */
-    public Stream<Tile> getAllTiles() {
-        return toStream(getAllTilesSet());
+    public Set<Tile> getTileSet(Predicate<Tile> predicate) {
+        Set<Tile> ret = new HashSet<>();
+        for (Tile t : this.tileList) {
+            if (predicate.test(t)) ret.add(t);
+        }
+        return ret;
+    }
+
+    /**
+     * Get a list of all the tiles that match a predicate.
+     *
+     * @param predicate The <code>Predicate</code> to check.
+     * @return A {@code List} of all matching {@code Tile}s.
+     */
+    public List<Tile> getTileList(Predicate<Tile> predicate) {
+        List<Tile> ret = new ArrayList<>();
+        for (Tile t : this.tileList) {
+            if (predicate.test(t)) ret.add(t);
+        }
+        return ret;
     }
 
     /**
@@ -803,7 +846,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param consumer The {@code Consumer} action to perform.
      */
     public void forEachTile(Consumer<Tile> consumer) {
-        for (Tile t : getAllTilesSet()) consumer.accept(t);
+        for (Tile t : this.tileList) consumer.accept(t);
     }
 
     /**
@@ -814,9 +857,27 @@ public class Map extends FreeColGameObject implements Location {
      */
     public void forEachTile(Predicate<Tile> predicate,
                             Consumer<Tile> consumer) {
-        for (Tile t : getAllTilesSet()) {
+        for (Tile t : this.tileList) {
             if (predicate.test(t)) consumer.accept(t);
         }
+    }
+
+    /**
+     * Populate the map.
+     *
+     * To be called to build a new map.
+     *
+     * @param func A <code>Function</code> that makes a new
+     *    <code>Tile</code> for the supplied x,y coordinates.
+     * @return True if the map was populated.
+     */
+    public boolean populateTiles(BiFunction<Integer, Integer, Tile> func) {
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                if (!this.setTile(func.apply(x, y), x, y)) return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -869,6 +930,18 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Get a shuffled list of all the tiles.
+     *
+     * @param random A pseudo-random number source.
+     * @return A shuffled list of all the {@code Tile}s in this map.
+     */
+    public List<Tile> getShuffledTiles(Random random) {
+        List<Tile> ret = new ArrayList<>(this.tileList);
+        randomShuffle(logger, "All tile shuffle", ret, random);
+        return ret;
+    }
+        
+    /**
      * An iterator returning positions in a spiral starting at a given
      * center tile.  The center tile is never included in the returned
      * tiles, and all returned tiles are valid.
@@ -894,7 +967,7 @@ public class Map extends FreeColGameObject implements Location {
          */
         public CircleIterator(Tile center, boolean isFilled, int radius) {
             if (center == null) {
-                throw new IllegalArgumentException("center must not be null.");
+                throw new RuntimeException("center must not be null: " + this);
             }
             this.radius = radius;
             n = 0;
@@ -993,9 +1066,9 @@ public class Map extends FreeColGameObject implements Location {
          * {@inheritDoc}
          */
         @Override
-        public Tile next() throws NoSuchElementException {
+        public Tile next() {
             if (!hasNext()) {
-                throw new NoSuchElementException("CircleIterator exhausted");
+                throw new NoSuchElementException("CircleIterator exhausted: " + n);
             }
             Tile result = getTile(x, y);
             nextTile();
@@ -1068,83 +1141,17 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Unified argument tests for full path searches, which then finds
-     * the actual starting location for the path.  Deals with special
-     * cases like starting on a carrier and/or high seas.
-     *
-     * @param unit The {@code Unit} to find the path for.
-     * @param start The {@code Location} in which the path starts from.
-     * @param carrier An optional naval carrier {@code Unit} to use.
-     * @return The actual starting location.
-     * @throws IllegalArgumentException If there are any argument problems.
-     */
-    private Location findRealStart(final Unit unit, final Location start,
-                                   final Unit carrier) {
-        // Unit checks.
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (carrier != null && !carrier.canCarryUnits()) {
-            throw new IllegalArgumentException("Non-carrier carrier: "
-                + carrier);
-        } else if (carrier != null && !carrier.couldCarry(unit)) {
-            throw new IllegalArgumentException("Carrier could not carry unit: "
-                + carrier + "/" + unit);
-        }
-
-        Location entry;
-        if (start == null) {
-            throw new IllegalArgumentException("Null start: " + unit);
-        } else if (start instanceof Unit) {
-            Location unitLoc = ((Unit)start).getLocation();
-            if (unitLoc == null) {
-                throw new IllegalArgumentException("Null on-carrier start: "
-                    + unit + "/" + start);
-            } else if (unitLoc instanceof HighSeas) {
-                if (carrier == null) {
-                    throw new IllegalArgumentException("Null carrier when"
-                        + " starting on high seas: " + unit);
-                } else if (carrier != start) {
-                    throw new IllegalArgumentException("Wrong carrier when"
-                        + " starting on high seas: " + unit
-                        + "/" + carrier + " != " + start);
-                }
-                entry = carrier.resolveDestination();
-            } else {
-                entry = unitLoc;
-            }
-            
-        } else if (start instanceof HighSeas) {
-            if (unit.isOnCarrier()) {
-                entry = unit.getCarrier().resolveDestination();
-            } else if (unit.isNaval()) {
-                entry = unit.resolveDestination();
-            } else {
-                throw new IllegalArgumentException("No carrier when"
-                    + " starting on high seas: " + unit
-                    + "/" + unit.getLocation());
-            }
-        } else if (start instanceof Europe || start.getTile() != null) {
-            entry = start; // OK
-        } else {
-            throw new IllegalArgumentException("Invalid start: " + start);
-        }
-        // Valid result, reduce to tile if possible.
-        return (entry.getTile() != null) ? entry.getTile() : entry;
-    }
-
-    /**
      * Destination argument test for path searches.  Find the actual
      * destination of a path.
      *
      * @param unit An optional {@code Unit} to search for.
      * @param end  The candidate end {@code Location}.
      * @return The actual end location.
-     * @throws IllegalArgumentException If there are any argument problems.
      */
     private Location findRealEnd(Unit unit, Location end) {
         while (true) {
             if (end == null) {
-                throw new IllegalArgumentException("Null end.");
+                throw new RuntimeException("Null end for: " + unit);
             } else if (end instanceof Europe) {
                 return end;
             } else if (end instanceof Map) {
@@ -1154,7 +1161,7 @@ public class Map extends FreeColGameObject implements Location {
             } else if (unit != null) {
                 return unit.resolveDestination();
             } else {
-                throw new IllegalArgumentException("Invalid end: " + end);
+                throw new RuntimeException("Invalid end: " + end);
             }
         }
     }
@@ -1217,7 +1224,7 @@ public class Map extends FreeColGameObject implements Location {
             : null;
         final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
         final SearchHeuristic sh = getManhattenHeuristic(end);
-        Unit embarkTo;
+        Unit embarkTo, endUnit;
 
         PathNode path;
         if (start.getContiguity() == end.getContiguity()) {
@@ -1254,10 +1261,10 @@ public class Map extends FreeColGameObject implements Location {
             path = searchMap(unit, start, gd, costDecider, INFINITY,
                              carrier, sh, lb);
 
-        } else if (start.isLand() && !end.isLand()
-            && end.getFirstUnit() != null
+        } else if (start.isLand()
+            && !end.isLand() && (endUnit = end.getFirstUnit()) != null
+            && unit != null && unit.getOwner().owns(endUnit)
             && !end.getContiguityAdjacent(start.getContiguity()).isEmpty()
-            && unit != null && unit.getOwner().owns(end.getFirstUnit())
             && (embarkTo = end.getCarrierForUnit(unit)) != null) {
             // Special case where a land unit is trying to move from
             // land to an adjacent ship.
@@ -1311,8 +1318,6 @@ public class Map extends FreeColGameObject implements Location {
      * @param lb An optional {@code LogBuilder} to log to.
      * @return A path starting at the start location and ending at the
      *     end location, or null if none found.
-     * @throws IllegalArgumentException For many reasons, see
-     *     {@link #findRealStart}.
      */
     public PathNode findPath(final Unit unit,
                              final Location start, final Location end,
@@ -1321,7 +1326,6 @@ public class Map extends FreeColGameObject implements Location {
         if (traceSearch) lb = new LogBuilder(1024);
 
         // Validate the arguments, reducing to either Europe or a Tile.
-        final Location realStart = findRealStart(unit, start, carrier);
         final Location realEnd;
         try {
             realEnd = findRealEnd(unit, end);
@@ -1339,26 +1343,27 @@ public class Map extends FreeColGameObject implements Location {
             // as we do not have the terrain type and thus can not
             // calculate costs, but relent if the unexplored tile borders
             // an explored one on the same contiguity.
-            Tile closest = (realStart instanceof Tile)
-                ? getClosestTile((Tile)realStart,
+            Tile closest = (start instanceof Tile)
+                ? getClosestTile((Tile)start,
                     transform(((Tile)realEnd).getSurroundingTiles(1, 1),
                         t -> t.isExplored()
-                            && isSameContiguity(t, realStart)))
+                            && isSameContiguity(t, start)))
                 : null;
             path = (closest == null) ? null
-                : findPath(unit, realStart, closest, carrier, costDecider, lb);
+                : this.findPath(unit, start, closest, carrier,
+                                costDecider, lb);
             if (path != null) {
                 PathNode last = path.getLastNode();
                 last.next = new PathNode((Tile)realEnd, 0,
                     last.getTurns()+1, last.isOnCarrier(), last, null);
             }
 
-        } else if (realStart instanceof Europe && realEnd instanceof Europe) {
+        } else if (start instanceof Europe && realEnd instanceof Europe) {
             // 0: Europe->Europe: Create a trivial path.
-            path = new PathNode(realStart, unit.getMovesLeft(), 0,
+            path = new PathNode(start, unit.getMovesLeft(), 0,
                 false, null, null);
 
-        } else if (realStart instanceof Europe && realEnd instanceof Tile) {
+        } else if (start instanceof Europe && realEnd instanceof Tile) {
             // 1: Europe->Tile
             // Fail fast without an off map unit.
             if (offMapUnit == null
@@ -1395,17 +1400,17 @@ public class Map extends FreeColGameObject implements Location {
                 // the entry location.
             } else {
                 path.addTurns(offMapUnit.getSailTurns());
-                path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                path.previous = new PathNode(start, unit.getMovesLeft(),
                     0, carrier != null, null, path);
                 path = path.previous;
                 if (carrier != null && unit.getLocation() != carrier) {
-                    path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                    path.previous = new PathNode(start, unit.getMovesLeft(),
                         0, false, null, path);
                     path = path.previous;
                 }
             }
 
-        } else if (realStart instanceof Tile && realEnd instanceof Europe) {
+        } else if (start instanceof Tile && realEnd instanceof Europe) {
             // 2: Tile->Europe
             // Fail fast if Europe is unattainable.
             if (offMapUnit == null
@@ -1413,7 +1418,7 @@ public class Map extends FreeColGameObject implements Location {
                 path = null;
                 
                 // Search forwards to the high seas.
-            } else if ((p = searchMap(unit, (Tile)realStart,
+            } else if ((p = searchMap(unit, (Tile)start,
                         GoalDeciders.getHighSeasGoalDecider(),
                         costDecider, INFINITY, carrier, null, lb)) == null) {
                 path = null;
@@ -1426,27 +1431,27 @@ public class Map extends FreeColGameObject implements Location {
                 path = p;
             }
 
-        } else if (realStart instanceof Tile && realEnd instanceof Tile) {
+        } else if (start instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
             Direction d;
             Unit.MoveType mt;
             // Short circuit if adjacent and blocked
             if (unit != null
-                && (d = ((Tile)realStart).getDirection((Tile)realEnd)) != null
+                && (d = ((Tile)start).getDirection((Tile)realEnd)) != null
                 && (mt = unit.getMoveType(d)).isLegal()
                 && !mt.isProgress()) {
-                path = new PathNode(realStart, unit.getMovesLeft(), 0,
+                path = new PathNode(start, unit.getMovesLeft(), 0,
                                     carrier != null, null, null);
-                int cost = unit.getMoveCost((Tile)realStart, (Tile)realEnd,
+                int cost = unit.getMoveCost((Tile)start, (Tile)realEnd,
                                             unit.getMovesLeft());
                 path.next = new PathNode(realEnd, unit.getMovesLeft() - cost,
                                          0, false, path, null);
             } else {
-                path = findMapPath(unit, (Tile)realStart, (Tile)realEnd,
+                path = findMapPath(unit, (Tile)start, (Tile)realEnd,
                                    carrier, costDecider, lb);
             }
         } else {
-            throw new IllegalStateException("Can not happen: " + realStart
+            throw new IllegalStateException("Can not happen: " + start
                 + ", " + realEnd);
         }
 
@@ -1483,11 +1488,10 @@ public class Map extends FreeColGameObject implements Location {
                            LogBuilder lb) {
         if (traceSearch) lb = new LogBuilder(1024);
 
-        final Location realStart = findRealStart(unit, start, carrier);
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         
         PathNode p, path;
-        if (realStart instanceof Europe) {
+        if (start instanceof Europe) {
             // Fail fast if Europe is unattainable.
             if (offMapUnit == null
                 || !offMapUnit.getType().canMoveToHighSeas()) {
@@ -1505,12 +1509,12 @@ public class Map extends FreeColGameObject implements Location {
                 // will lose if the initial search fails due to a turn limit.
                 // FIXME: do something better.
             } else {
-                path = findPath(unit, realStart, p.getLastNode().getTile(),
-                                carrier, costDecider, lb);
+                path = this.findPath(unit, start, p.getLastNode().getTile(),
+                                     carrier, costDecider, lb);
             }
 
         } else {
-            path = searchMap(unit, realStart.getTile(), goalDecider,
+            path = searchMap(unit, start.getTile(), goalDecider,
                              costDecider, maxTurns, carrier, null, lb);
         }
 
@@ -1592,12 +1596,31 @@ public class Map extends FreeColGameObject implements Location {
             this.movesLeft = movesLeft;
             this.turns = turns;
             this.onCarrier = onCarrier;
-            this.cost = decider.getCost(unit, current.getLocation(),
-                                        dst, movesLeft);
-            assert this.cost != CostDecider.ILLEGAL_MOVE;
-            this.turns += decider.getNewTurns();
-            this.movesLeft = decider.getMovesLeft();
-            this.cost = PathNode.getCost(this.turns, this.movesLeft);
+            CostDecider cd = (decider != null) ? decider
+                : CostDeciders.defaultCostDeciderFor(unit);
+            this.cost = cd.getCost(unit, current.getLocation(), dst,
+                                   movesLeft);
+            if (this.cost == CostDecider.ILLEGAL_MOVE) {
+                // This can happen "validly" if we try to route
+                // through unexplored tiles.  We do *not* want to
+                // disallow this completely --- there was a bug report
+                // to the effect that surely you should be able to
+                // route through short stretches of unknown to
+                // explored areas on the other side.  However BR#3153
+                // shows that we need to cost the unexplored tiles
+                // conservatively, so for now, consume all moves left
+                // add two extra turns.
+                if (dst.getTile() != null && !dst.getTile().isExplored()) {
+                    this.turns += 2;
+                    this.movesLeft = 0;
+                } else {
+                    throw new RuntimeException("Invalid move candidate:"
+                        + " for " + unit + " to " + dst);
+                }
+            }
+            this.turns += cd.getNewTurns();
+            this.movesLeft = cd.getMovesLeft();
+            this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
         }
 
         /**
@@ -1618,7 +1641,7 @@ public class Map extends FreeColGameObject implements Location {
             this.unit = unit;
             this.movesLeft = unit.getInitialMovesLeft();
             this.turns++;
-            this.cost = PathNode.getCost(this.turns, this.movesLeft);
+            this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
         }
 
         /**
@@ -1656,7 +1679,7 @@ public class Map extends FreeColGameObject implements Location {
          *
          * @param openMap The list of available nodes.
          * @param openMapQueue The queue of available nodes.
-         * @param cost The provisional cost for the path.
+         * @param f The map of f-values.
          * @param sh A {@code SearchHeuristic} to apply.
          */
         public void add(HashMap<String, PathNode> openMap,
@@ -1743,10 +1766,10 @@ public class Map extends FreeColGameObject implements Location {
             ? trivialSearchHeuristic : searchHeuristic;
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
-            ? ((start.hasSettlement()
-                    && start.getSettlement().isConnectedPort()
-                    && unit != null
-                    && unit.getLocation() == carrier) ? carrier : unit)
+            ? ((unit != null && unit.getLocation() == carrier
+                    && start.hasSettlement()
+                    && start.getSettlement().isConnectedPort())
+                ? carrier : unit)
             : offMapUnit;
         if (lb != null) lb.add("Search trace(unit=", unit,
             ", from=", start,
@@ -1841,9 +1864,9 @@ ok:     while (!openMap.isEmpty()) {
                                                            moveTile);
                 boolean unitMove = umt.isProgress();
                 boolean carrierMove = carrier != null
-                    && carrier.isTileAccessible(moveTile);
-                if (lb != null) lb.add(" ", ((unitMove) ? "U" : ""),
-                    ((carrierMove) ? "C" : ""));
+                    && carrier.getSimpleMoveType(carrier.getTile(), moveTile).isProgress();
+                if (lb != null) lb.add(" ", ((unitMove) ? "U"
+                        : ((carrierMove) ? "C" : "")));
                 MoveCandidate move;
                 String stepLog;
                 
@@ -1853,13 +1876,10 @@ ok:     while (!openMap.isEmpty()) {
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, 0, INFINITY/2, false,
                                  currentNode, null));
-                if (isGoal && lb != null) lb.add(" *goal*", umt);
-
-                // Special processing for moves-to-goal.
                 if (isGoal) {
+                    if (lb != null) lb.add(" *goal*", umt);
                     if (unitMove) {
-                        if (moveTile.hasSettlement() && currentOnCarrier
-                            && carrierMove) {
+                        if (moveTile.hasSettlement() && currentOnCarrier && carrierMove) {
                             // If the goal has a settlement and the
                             // unit is travelling by carrier, dock the
                             // carrier.
@@ -1868,12 +1888,11 @@ ok:     while (!openMap.isEmpty()) {
                                 true, CostDeciders.tileCost());
                         } else {
                             // Otherwise let the unit complete the path.
-                            int left = currentMovesLeft;
-                            if (currentOnCarrier && unit != null) {
-                                left = (currentNode.embarkedThisTurn(currentTurns))
+                            int left = (currentOnCarrier)
+                                ? ((currentNode.embarkedThisTurn(currentTurns))
                                     ? 0
-                                    : unit.getInitialMovesLeft();
-                            }
+                                    : unit.getInitialMovesLeft())
+                                : currentMovesLeft;
                             move = new MoveCandidate(unit, currentNode,
                                 moveTile, left, currentTurns, false,
                                 CostDeciders.tileCost());
@@ -1903,11 +1922,6 @@ ok:     while (!openMap.isEmpty()) {
                                 true, CostDeciders.tileCost());
                             unitMove = true;
                             break;
-                        case MOVE_NO_ATTACK_MARINE:
-                            // Ampibious attack disallowed, disembark to
-                            // reach the goal.
-                            if (lb != null) lb.add(" !amphibious");
-                            continue;
                         case MOVE_NO_ATTACK_CIVILIAN:
                             // There is a settlement in the way, this
                             // path can never succeed.
@@ -1933,20 +1947,27 @@ ok:     while (!openMap.isEmpty()) {
                                 moveTile, currentMovesLeft, currentTurns,
                                 false, CostDeciders.tileCost());
                             break;
-                        case MOVE_NO_ACCESS_WATER:
-                            // The unit can not disembark directly to
-                            // the goal along this path, but the unit
-                            // could disembark onto land and then move
-                            // to the goal.
-                            if (lb != null) lb.add(" !disembark");
-                            continue;
                         default:
+                            // Several cases here, these are understood:
+                            // MOVE_NO_ATTACK_EMBARK:
+                            //   Land unit trying to use water, which
+                            //   can not work without a ship there
+                            // MOVE_NO_ACCESS_WATER:
+                            //   The unit can not disembark directly to
+                            //   the goal along this path
+                            // MOVE_NO_ATTACK_MARINE:
+                            //   Ampibious attack disallowed, disembark to
+                            //   reach the goal
+                            // There will be more.
+                            // We used to do---
+                            //   if (!goalDecider.hasSubGoals()) break ok;
+                            // --- here, like in the transient failure case
+                            // above but we should not truncate other
+                            // surrounding tiles.
                             if (lb != null) lb.add(" !FAIL-", umt);
-                            if (!goalDecider.hasSubGoals()) break ok;
                             continue;
                         }
                     }
-                    assert unitMove == true;
                     assert move != null;
                     stepLog = "@";
                 } else {
@@ -1981,28 +2002,22 @@ ok:     while (!openMap.isEmpty()) {
                     switch (step) {
                     case BYLAND:
                         move = new MoveCandidate(unit, currentNode, moveTile, 
-                            currentMovesLeft, currentTurns, false,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(unit)));
+                            currentMovesLeft, currentTurns, false, costDecider);
                         break;
                     case BYWATER:
                         move = new MoveCandidate(offMapUnit, currentNode, moveTile,
                             currentMovesLeft, currentTurns, currentOnCarrier,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(offMapUnit)));
+                            costDecider);
                         break;
                     case EMBARK:
-                        move = new MoveCandidate(unit, currentNode, moveTile,
+                        move = new MoveCandidate(offMapUnit, currentNode, moveTile,
                             currentMovesLeft, currentTurns, true,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(unit)));
+                            costDecider);
                         move.embarkUnit(carrier);
                         break;
                     case DISEMBARK:
                         move = new MoveCandidate(unit, currentNode, moveTile,
-                            0, currentTurns, false,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(unit)));
+                            0, currentTurns, false, costDecider);
                         break;
                     case FAIL: default: // Loop on failure.
                         if (lb != null) lb.add("!");
@@ -2010,8 +2025,7 @@ ok:     while (!openMap.isEmpty()) {
                     }
                     stepLog = " " + step + "_";
                 }
-
-                assert move != null && move.getCost() >= 0;
+                assert move.getCost() >= 0;
                 // Tighten the bounds on a previously seen case if possible
                 if (closed != null) {
                     if (move.canImprove(closed)) {
@@ -2100,8 +2114,8 @@ ok:     while (!openMap.isEmpty()) {
      * @return A boolean[][] of the same size as boolmap, where "true"
      *      means the fill succeeded at that location.
      */
-    public static boolean[][] floodFill(boolean[][] boolmap, int x, int y) {
-        return floodFill(boolmap, x, y, Integer.MAX_VALUE);
+    public static boolean[][] floodFillBool(boolean[][] boolmap, int x, int y) {
+        return floodFillBool(boolmap, x, y, Integer.MAX_VALUE);
     }
 
     /**
@@ -2115,24 +2129,25 @@ ok:     while (!openMap.isEmpty()) {
      * @return A boolean[][] of the same size as boolmap, where "true"
      *      means the fill succeeded at that location.
      */
-    public static boolean[][] floodFill(boolean[][] boolmap, int x, int y,
-        int limit) {
+    public static boolean[][] floodFillBool(boolean[][] boolmap, int x, int y,
+                                            int limit) {
         final int xmax = boolmap.length, ymax = boolmap[0].length;
         boolean[][] visited = new boolean[xmax][ymax];
         Queue<Position> q = new LinkedList<>();
 
         visited[x][y] = true;
-        for (Position p = new Position(x, y); p != null && --limit > 0;
-             p = q.poll()) {
+        Position p = new Position(x, y);
+        for (; p != null && --limit > 0; p = q.poll()) {
             for (Direction d : Direction.values()) {
                 final Position np = new Position(p, d);
-                if (np.isValid(xmax, ymax)
-                    && boolmap[np.getX()][np.getY()]
-                    && !visited[np.getX()][np.getY()]) {
-                    visited[np.getX()][np.getY()] = true;
+                if (!np.isValid(xmax, ymax)) continue;
+                int nx = np.getX(), ny = np.getY();
+                if (boolmap[nx][ny] && !visited[nx][ny]) {
+                    visited[nx][ny] = true;
                     q.add(np);
                 }
             }
+
         }
         return visited;
     }
@@ -2186,7 +2201,7 @@ ok:     while (!openMap.isEmpty()) {
                     Tile tile = getTile(x, y);
                     if (tile.getContiguity() >= 0) continue;
 
-                    boolean[][] found = floodFill(waterMap, x, y);
+                    boolean[][] found = floodFillBool(waterMap, x, y);
                     for (int yy = 0; yy < ymax; yy++) {
                         for (int xx = 0; xx < xmax; xx++) {
                             if (found[xx][yy]) {
@@ -2219,22 +2234,20 @@ ok:     while (!openMap.isEmpty()) {
         final TileType ocean = spec.getTileType("model.tile.ocean");
         final TileType highSeas = spec.getTileType("model.tile.highSeas");
         if (highSeas == null) {
-            throw new RuntimeException("HighSeas TileType must exist");
+            throw new RuntimeException("HighSeas TileType must exist: "+spec);
         }
         if (ocean == null) {
-            throw new RuntimeException("Ocean TileType must exist");
+            throw new RuntimeException("Ocean TileType must exist: " + spec);
         }
         if (distToLandFromHighSeas < 0) {
-            throw new RuntimeException("Land<->HighSeas distance can not be negative");
+            throw new RuntimeException("Land<->HighSeas distance can not be negative: " + distToLandFromHighSeas);
         }
         if (maxDistanceToEdge < 0) {
-            throw new RuntimeException("Distance to edge can not be negative");
+            throw new RuntimeException("Distance to edge can not be negative: " + maxDistanceToEdge);
         }
 
         // Reset all highSeas tiles to the default ocean type.
-        for (Tile t : getAllTilesSet()) {
-            if (t.getType() == highSeas) t.setType(ocean);
-        }
+        forEachTile(t -> t.getType() == highSeas, t -> t.setType(ocean));
 
         final int width = getWidth(), height = getHeight();
         Tile t, seaL = null, seaR = null;
@@ -2309,7 +2322,7 @@ ok:     while (!openMap.isEmpty()) {
         List<Tile> curr = new ArrayList<>();
         List<Tile> next = new ArrayList<>();
         int hsc = 0;
-        for (Tile t : getAllTilesSet()) {
+        for (Tile t : this.tileList) {
             t.setHighSeasCount(-1);
             if (!t.isLand()) {
                 if ((t.getX() == 0 || t.getX() == getWidth()-1)
@@ -2389,12 +2402,36 @@ ok:     while (!openMap.isEmpty()) {
             // Mountains and Rivers were setting their parent to the
             // discoverable land region they are created within.  Move them
             // up to being children of the geographic region.
-            if (r.getDiscoverable() && p != null && p.getDiscoverable()) {
+            if (p != null && p.getDiscoverable() && r.getDiscoverable()) {
                 p = p.getParent();
                 r.setParent(p);
             }
             if (p != null && !p.getChildren().contains(r)) p.addChild(r);
         }
+    }
+
+    /**
+     * Import a tile, possibly from another game.
+     *
+     * @param other The <code>Tile</code> to import.
+     * @param x The x-coordinate of the new tile.
+     * @param y The y-coordinate of the new tile.
+     * @param layer The maximum layer to import.
+     * @return The new imported <code>Tile</code>.
+     */
+    public Tile importTile(Tile other, int x, int y, Layer layer) {
+        final Game game = getGame();
+        Tile t = new Tile(game, other.getType(), x, y);
+        if (other.getMoveToEurope() != null) {
+            t.setMoveToEurope(other.getMoveToEurope());
+        }
+        if (other.getTileItemContainer() != null) {
+            TileItemContainer container = new TileItemContainer(game, t);
+            container.copyFrom(other.getTileItemContainer(), layer);
+            t.setTileItemContainer(container);
+        }
+        // FIXME: handle regions
+        return t;
     }
 
     /**
@@ -2410,38 +2447,28 @@ ok:     while (!openMap.isEmpty()) {
      *
      * @param width The width of the resulting map.
      * @param height The height of the resulting map.
+     * @return A scaled version of this map.
      */
-    public void scale(final int width, final int height) {
+    public Map scale(final int width, final int height) {
         // FIXME: the scaling above can omit or double tiles, which will
         // break the river and road connections.
         // FIXME: tile ownership is borked again
         // FIXME: settlements?!? what settlements?
         // Note: can not use Tile.copyIn as that sets x,y
         final Game game = getGame();
+        Map ret = new Map(game, width, height);
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        Tile oldTiles[][] = setTiles(width, height);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        ret.populateTiles((x, y) -> {
                 final int oldX = (x * oldWidth) / width;
                 final int oldY = (y * oldHeight) / height;
                 // FIXME: This tile should be based on the average as
                 // mentioned at the top of this method.
-                Tile importTile = oldTiles[oldX][oldY];
-                Tile t = getTile(x, y);
-                t.setType(importTile.getType());
-                if (importTile.getMoveToEurope() != null) {
-                    t.setMoveToEurope(importTile.getMoveToEurope());
-                }
-                if (t.getTileItemContainer() != null) {
-                    t.getTileItemContainer().copyFrom(importTile
-                        .getTileItemContainer(), Map.Layer.ALL);
-                }
-                // FIXME: t.setRegion(importTile.getRegion());
-            }
-        }
-        resetContiguity();
-        resetHighSeasCount();
+                return this.importTile(getTile(oldX, oldY), x, y, Layer.ALL);
+            });
+        ret.resetContiguity();
+        ret.resetHighSeasCount();
+        return ret;
     }
         
     
@@ -2483,7 +2510,7 @@ ok:     while (!openMap.isEmpty()) {
         // Used to add units to their entry location.  Dropped as this
         // is handled explicitly in the server.
         if (locatable instanceof Unit) {
-            throw new RuntimeException("Disabled Map.add(Unit)");
+            throw new RuntimeException("Disabled Map.add(Unit): " + locatable);
         }
         return false;
     }
@@ -2603,14 +2630,6 @@ ok:     while (!openMap.isEmpty()) {
      * {@inheritDoc}
      */
     @Override
-    public String getNameForLabel(Player player) {
-        return Messages.message(this.getLocationLabelFor(player));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
         return new ImageIcon(library.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
     }
@@ -2622,13 +2641,13 @@ ok:     while (!openMap.isEmpty()) {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
                 Tile t = getTile(x, y);
-                result = Math.min(result, t.checkIntegrity(fix, lb));
+                result = result.combine(t.checkIntegrity(fix, lb));
             }
         }
         return result;
@@ -2645,14 +2664,15 @@ ok:     while (!openMap.isEmpty()) {
         Map o = copyInCast(other, Map.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
+        String err = updateTiles(o.getWidth(), o.getHeight());
+        if (err != null) throw new RuntimeException("copyIn failure, " + err);
         // Allow creating new regions in first map update
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
-        this.setTiles(o.getWidth(), o.getHeight());
-        for (Tile ot : o.getAllTilesSet()) {
-            // Allow creating new tiles in first map update
-            this.setTile(game.update(ot, true), ot.getX(), ot.getY());
-        }
+        // Use updateTile rather than copyIn to allow new tiles to be
+        // populated in the first map update
+        o.forEachTile(t -> this.updateTile(game.update(t, true)));
+        
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
@@ -2712,15 +2732,8 @@ ok:     while (!openMap.isEmpty()) {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        int width = xr.getAttribute(WIDTH_TAG, -1);
-        if (width < 0) {
-            throw new XMLStreamException("Bogus width: " + width);
-        }
-        int height = xr.getAttribute(HEIGHT_TAG, -1);
-        if (height < 0) {
-            throw new XMLStreamException("Bogus height: " + height);
-        }
-        setTiles(width, height);
+        String err = updateTiles(xr.getAttribute(WIDTH_TAG, -1), xr.getAttribute(HEIGHT_TAG, -1));
+        if (err != null) throw new XMLStreamException("Map.readAttributes failure, " + err);
 
         setLayer(xr.getAttribute(LAYER_TAG, Layer.class, Layer.ALL));
 
@@ -2743,10 +2756,10 @@ ok:     while (!openMap.isEmpty()) {
 
         // Fix up settlement tile ownership in one hit here, avoiding
         // complications with Tile-internal cached tiles.
-        for (Tile t : getAllTilesSet()) {
-            Settlement s = t.getOwningSettlement();
-            if (s != null) s.addTile(t);
-        }
+        forEachTile(t -> {
+                Settlement s = t.getOwningSettlement();
+                if (s != null) s.addTile(t);
+            });
 
         // @compat 0.11.3
         // Maps with incorrect parent/child chains were occurring.
@@ -2767,7 +2780,9 @@ ok:     while (!openMap.isEmpty()) {
 
         } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColObject(game, Tile.class);
-            setTile(t);
+            if (!updateTile(t)) {
+                logger.warning("Tile update failure for: " + t);
+            }                    
 
         } else {
             super.readChild(xr);

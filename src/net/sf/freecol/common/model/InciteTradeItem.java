@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -173,12 +173,11 @@ public class InciteTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof InciteTradeItem) {
-            return Utils.equals(this.victim, ((InciteTradeItem)other).victim)
-                && super.equals(other);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof InciteTradeItem)) return false;
+        InciteTradeItem other = (InciteTradeItem)o;
+        return Utils.equals(this.victim, other.victim)
+            && super.equals(other);
     }
 
     /**

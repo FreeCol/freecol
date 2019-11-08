@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -333,17 +334,8 @@ public class Region extends FreeColGameObject implements Nameable {
      *
      * @return The unit identifier, or null if none yet.
      */
-    public synchronized String getDiscoverer() {
+    public final String getDiscoverer() {
         return this.discoverer;
-    }
-
-    /**
-     * Set the identifier for the unit the discovered the region.
-     *
-     * @param discoverer The unit identifier to set.
-     */
-    public synchronized void setDiscoverer(String discoverer) {
-        this.discoverer = discoverer;
     }
 
     /**
@@ -416,24 +408,45 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Check if this region is has been discovered.
+     *
+     * Use the discoverer field to provide mutual exclusion.
+     * Called in csMove when the unit moves into a discoverable region.
+     *
+     * @param unit The {@code Unit} that might have discovered the region.
+     * @return True if the region has been discovered.
+     */
+    public synchronized boolean checkDiscover(Unit unit) {
+        if (this.discoverer == null) {
+            this.discoverer = unit.getId();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Discover this region (and its children).
      *
      * @param player The discovering {@code Player}.
+     * @param unit The discovering {@code Unit}.
      * @param turn The {@code Turn} of discovery.
      * @return A list of discovered {@code Region}s.
      */
-    public List<Region> discover(Player player, Turn turn) {
-        List<Region> result = new ArrayList<>();
+    public List<Region> discover(Player player, Unit unit, Turn turn) {
         this.discoveredBy = player;
+        assert this.discoverer.equals(unit.getId()); // Require prediscover
         this.discoveredIn = turn;
         this.discoverable = false;
-        result.add(this);
-        for (Region r : transform(getChildren(), Region::getDiscoverable)) {
+        List<Region> discov = transform(getChildren(), Region::getDiscoverable);
+        for (Region r : discov) {
             r.discoveredBy = player;
+            r.discoverer = unit.getId();
             r.discoveredIn = turn;
             r.discoverable = false;
-            result.add(r);
         }
+        List<Region> result = new ArrayList<>(discov.size()+1);
+        result.add(this);
+        result.addAll(discov);
         return result;
     }
 

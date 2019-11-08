@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -75,17 +76,16 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
             checkBoxes.add(checkBox);
         }
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(Utility.localizedHeader("dumpCargo", true));
         for (JCheckBox c : checkBoxes) panel.add(c);
         panel.setSize(panel.getPreferredSize());
 
-        List<Goods> fake = null;
         List<ChoiceItem<List<Goods>>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), fake)
-            .okOption().defaultOption());
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                               (List<Goods>)null).okOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (List<Goods>)null).cancelOption());
         initializeDialog(frame, DialogType.QUESTION, false, panel,
             new ImageIcon(getImageLibrary().getScaledUnitImage(unit)), c);
     }

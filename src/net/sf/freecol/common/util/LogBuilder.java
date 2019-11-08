@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -71,7 +71,7 @@ public class LogBuilder {
      * @param sb The {@code StringBuilder} to add to.
      * @param objects The objects to add.
      */
-    private static void add(StringBuilder sb, Object... objects) {
+    private static void addInternal(StringBuilder sb, Object... objects) {
         for (Object o : objects) {
             if (o instanceof Object[]) {
                 for (Object o2 : (Object[])o) {
@@ -89,7 +89,7 @@ public class LogBuilder {
      * @param objects The objects to add.
      */
     public void add(Object... objects) {
-        if (sb != null) add(sb, objects);
+        if (sb != null) addInternal(sb, objects);
     }
 
     /**
@@ -101,7 +101,7 @@ public class LogBuilder {
      */
     public <T> void addCollection(String delim, Collection<T> c) {
         if (sb != null) {
-            for (T t : c) add(sb, t, delim);
+            for (T t : c) addInternal(sb, t, delim);
             if (!c.isEmpty()) shrink(delim);
         }
     }
@@ -144,7 +144,7 @@ public class LogBuilder {
         int p = this.points.remove(0);
         if (sb.length() <= p) return false;
         StringBuilder sb2 = new StringBuilder(64);
-        add(sb2, objects);
+        addInternal(sb2, objects);
         this.sb.insert(p, sb2.toString());
         return true;
     }
@@ -158,9 +158,10 @@ public class LogBuilder {
      */
     public void shrink(String delim) {
         if (sb != null && delim != null) {
-            int idx = sb.length() - delim.length();
+            int dlen = delim.length();
+            int idx = sb.length() - dlen;
             if (idx >= 0 && sb.substring(idx).equals(delim)) {
-                sb.setLength(sb.length() - delim.length());
+                sb.setLength(sb.length() - dlen);
             }
         }
     }
@@ -199,7 +200,7 @@ public class LogBuilder {
         boolean left = size > 0;
         if (!left) size = -size;
         StringBuilder s2 = new StringBuilder(size);
-        add(s2, objects);
+        addInternal(s2, objects);
         int delta = size - s2.length();
         if (left) {
             for (; delta > 0; delta--) s2.append(' ');

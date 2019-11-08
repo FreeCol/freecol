@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -118,7 +118,7 @@ public class FreeColComboBoxRenderer<T>
      * @param c The {@code JLabel} to assign.
      * @param value The object to derive a text value from.
      */
-    public void setLabelValues(JLabel c, T value) {
+    protected void setLabelValues(JLabel c, T value) {
         if (value == null) {
             c.setText(null);
         } else if (value instanceof Integer) {

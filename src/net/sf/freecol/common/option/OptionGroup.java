@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -103,7 +103,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public OptionGroup(FreeColXMLReader xr,
-                       Specification specification) throws XMLStreamException {
+        Specification specification) throws XMLStreamException {
         super(specification);
 
         readFromXML(xr);
@@ -345,10 +345,10 @@ public class OptionGroup extends AbstractOption<OptionGroup>
         if (file == null) return false;
         boolean ret = false;
         try (
-            FreeColXMLReader xr = new FreeColXMLReader(file);
-        ) {
+             FreeColXMLReader xr = new FreeColXMLReader(file);
+             ) {
             ret = load(xr);
-        } catch (FileNotFoundException|XMLStreamException xse) {
+        } catch (IOException|XMLStreamException xse) {
             logger.log(Level.WARNING, "Load OptionGroup(" + getId()
                 + ") from file " + file.getPath() + " crashed", xse);
             return false;
@@ -367,8 +367,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * @return The {@code OptionGroup} found, or null on error or
      *     not found.
      */
-    public static OptionGroup load(File file, String optionId,
-                                   Specification spec) {
+    public static OptionGroup loadOptionGroup(File file, String optionId,
+                                              Specification spec) {
         OptionGroup ret = new OptionGroup(spec);
         if (ret.load(file)) {
             if (!optionId.equals(ret.getId())) {
@@ -387,19 +387,21 @@ public class OptionGroup extends AbstractOption<OptionGroup>
     /**
      * {@inheritDoc}
      */    
-    public <R,T extends Option<R>> boolean hasOption(String id,
-                                                     Class<T> returnClass) {
-        return id != null && this.optionMap.containsKey(id)
-            && returnClass.isAssignableFrom(this.optionMap.get(id).getClass());
+    public <T extends Option> boolean hasOption(String id,
+                                                Class<T> returnClass) {
+        if (id == null) return false;
+        Option val = this.optionMap.get(id);
+        return (val == null) ? false
+            : returnClass.isAssignableFrom(val.getClass());
     }
 
     /**
      * {@inheritDoc}
      */
-    public <R,T extends Option<R>> T getOption(String id,
-                                               Class<T> returnClass) {
+    public <T extends Option> T getOption(String id,
+                                          Class<T> returnClass) {
         if (id == null) {
-            throw new RuntimeException("Null id");
+            throw new RuntimeException("Null id: " + this);
         } else if (!this.optionMap.containsKey(id)) {
             throw new RuntimeException("Missing option: " + id);
         } else {
@@ -407,7 +409,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
                 return returnClass.cast(optionMap.get(id));
             } catch (ClassCastException cce) {
                 throw new RuntimeException("Not a " + returnClass.getName()
-                    + ": " + id);
+                    + ": " + id, cce);
             }
         }
     }
@@ -419,7 +421,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * {@inheritDoc}
      */
     @Override
-    public OptionGroup clone() {
+    public OptionGroup cloneOption() {
         OptionGroup result = new OptionGroup(this.getId(), getSpecification());
         result.editable = this.editable;
         result.setValues(this);

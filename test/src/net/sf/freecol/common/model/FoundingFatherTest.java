@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -81,7 +81,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         dutch.addFather(father3);
 
         assertTrue(any(dutch.getModifiers("some.new.modifier")));
-        assertEquals(6f, dutch.applyModifiers(2, null, "some.new.modifier"));
+        assertEquals(6f, dutch.apply(2, null, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather("father4", spec());
         father4.setType(FoundingFatherType.TRADE);
@@ -151,7 +151,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         List<Scope> scopes = new ArrayList<>();
         scopes.add(dutchScope);
         scopes.add(frenchScope);
-        newFather.setScopes(scopes);
+        newFather.copyScopes(scopes);
         for (Player player : game.getPlayerList(alwaysTrue())) {
             assertEquals(player.getNationId(),
                          (player == french || player == dutch),

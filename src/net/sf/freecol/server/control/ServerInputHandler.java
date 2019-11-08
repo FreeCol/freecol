@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -68,8 +68,8 @@ public final class ServerInputHandler extends FreeColServerHolder
         }
         final Game game = freeColServer.getGame();
         final boolean current = message.currentPlayerMessage();
-        ChangeSet cs = (current && (game == null || serverPlayer == null
-                || serverPlayer != game.getCurrentPlayer()))
+        ChangeSet cs = (current
+            && (game == null || serverPlayer != game.getCurrentPlayer()))
             ? serverPlayer.clientError("Received: " + message.getType()
                 + " out of turn from player: " + serverPlayer.getNation())
             : message.serverHandler(freeColServer, serverPlayer);

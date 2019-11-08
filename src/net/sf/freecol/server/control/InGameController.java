@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Disaster;
@@ -142,6 +143,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.Session;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -246,32 +249,29 @@ public final class InGameController extends Controller {
      * Public version of csAddFoundingFather so it can be used in the
      * test code and DebugMenu.
      *
-     * @param serverPlayer The {@code ServerPlayer} who gains a father.
+     * @param player The {@code Player} who gains a father.
      * @param father The {@code FoundingFather} to add.
      */
-    public void addFoundingFather(ServerPlayer serverPlayer,
-                                  FoundingFather father) {
+    public void addFoundingFather(Player player, FoundingFather father) {
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csAddFoundingFather(father, random, cs);
-        cs.addAttribute(See.only(serverPlayer), "flush",
-                        Boolean.TRUE.toString());
-        getGame().sendTo(serverPlayer, cs);
+        ((ServerPlayer)player).csAddFoundingFather(father, random, cs);
+        cs.addAttribute(See.only(player), "flush", Boolean.TRUE.toString());
+        getGame().sendTo(player, cs);
     }
 
     /**
      * Public change stance and inform all routine.  Mostly used in the
      * test suite, but the AIs also call it.
      *
-     * @param serverPlayer The originating {@code ServerPlayer}.
+     * @param player The originating {@code Player}.
      * @param stance The new {@code Stance}.
-     * @param other The {@code ServerPlayer} wrt which the
-     *     stance changes.
+     * @param other The {@code Player} wrt which the stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
      */
-    public void changeStance(ServerPlayer serverPlayer, Stance stance,
-                             ServerPlayer other, boolean symmetric) {
+    public void changeStance(Player player, Stance stance,
+                             Player other, boolean symmetric) {
         ChangeSet cs = new ChangeSet();
-        if (serverPlayer.csChangeStance(stance, other, symmetric, cs)) {
+        if (((ServerPlayer)player).csChangeStance(stance, other, symmetric, cs)) {
             getGame().sendToAll(cs);
         }
     }
@@ -285,7 +285,7 @@ public final class InGameController extends Controller {
     public void debugChangeOwner(ServerColony colony,
                                  ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
-        ServerPlayer owner = (ServerPlayer)colony.getOwner();
+        final Player owner = colony.getOwner();
         colony.csChangeOwner(serverPlayer, false, cs);//-vis(serverPlayer,owner)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
@@ -299,10 +299,11 @@ public final class InGameController extends Controller {
      * @param serverPlayer The {@code ServerPlayer} to change to.
      */
     public void debugChangeOwner(ServerUnit unit, ServerPlayer serverPlayer) {
+        final Player owner = unit.getOwner();
+
         ChangeSet cs = new ChangeSet();
-        ServerPlayer owner = (ServerPlayer)unit.getOwner();
-        owner.csChangeOwner(unit, serverPlayer, null, null,
-                            cs);//-vis(serverPlayer,owner)
+        ((ServerPlayer)owner).csChangeOwner(unit, serverPlayer, null, null,
+            cs);//-vis(serverPlayer,owner)
         cs.add(See.perhaps().always(owner), unit.getTile());
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
@@ -318,10 +319,11 @@ public final class InGameController extends Controller {
      */
     public int debugApplyDisaster(ServerColony colony, Disaster disaster) {
         final ServerGame game = getGame();
+        final Player owner = colony.getOwner();
+
         ChangeSet cs = new ChangeSet();
-        ServerPlayer owner = (ServerPlayer)colony.getOwner();
         List<ModelMessage> messages
-            = owner.csApplyDisaster(random, colony, disaster, cs);
+            = ((ServerPlayer)owner).csApplyDisaster(random, colony, disaster, cs);
         if (!messages.isEmpty()) {
             cs.addGlobalMessage(game, null,
                 new ModelMessage(MessageType.DISASTERS,
@@ -404,8 +406,9 @@ public final class InGameController extends Controller {
         final Specification spec = getGame().getSpecification();
         final int alarmBonus = -Math.round(price * 0.001f
             * spec.getPercentage(GameOptions.ALARM_BONUS_BUY));
-        final ServerPlayer owner = (ServerPlayer)unit.getOwner();
-        csVisit(owner, sis, 0, cs);
+        final Player owner = unit.getOwner();
+
+        csVisit((ServerPlayer)owner, sis, 0, cs);
         GoodsLocation.moveGoods(sis, goods.getType(), goods.getAmount(), unit);
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(price);
@@ -433,10 +436,11 @@ public final class InGameController extends Controller {
     private void csSell(Unit unit, Goods goods, int price,
                         ServerIndianSettlement sis, ChangeSet cs) {
         final Specification spec = getGame().getSpecification();
-        final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        final Player owner = unit.getOwner();
         final int alarmBonus = -Math.round(price * 0.001f
             * spec.getPercentage(GameOptions.ALARM_BONUS_SELL));
-        csVisit(owner, sis, 0, cs);
+
+        csVisit((ServerPlayer)owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(-price);
@@ -466,10 +470,11 @@ public final class InGameController extends Controller {
     private void csGift(Unit unit, Goods goods, int price,
                         ServerIndianSettlement sis, ChangeSet cs) {
         final Specification spec = getGame().getSpecification();
-        final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        final Player owner = unit.getOwner();
         final int alarmBonus = -Math.round(price * 0.001f
             * spec.getPercentage(GameOptions.ALARM_BONUS_GIFT));
-        csVisit(owner, sis, 0, cs);
+
+        csVisit((ServerPlayer)owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
         sis.csModifyAlarm(owner, alarmBonus, true, cs);
@@ -499,7 +504,8 @@ public final class InGameController extends Controller {
      */
     private void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
                          int scout, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)is.getOwner();
+        final Player owner = is.getOwner();
+
         if (serverPlayer.csContact(owner, cs)) {
             serverPlayer.csNativeFirstContact(owner, null, cs);
         }
@@ -532,14 +538,14 @@ public final class InGameController extends Controller {
         }
 
         if (teleport) { // Teleport in the units.
-            Set<Tile> seen = new HashSet<>();
-            for (Unit u : transform(serverPlayer.getUnits(), Unit::isNaval)) {
+            List<Unit> naval = transform(serverPlayer.getUnits(), Unit::isNaval);
+            Set<Tile> seen = new HashSet<>(naval.size());
+            for (Unit u : naval) {
                 Tile entry = u.getFullEntryLocation();
                 u.setLocation(entry);//-vis(serverPlayer)
                 u.setWorkLeft(-1);
                 u.setState(Unit.UnitState.ACTIVE);
-                if (!seen.contains(entry)) {
-                    seen.add(entry);
+                if (seen.add(entry)) {
                     cs.add(See.only(serverPlayer),
                            serverPlayer.exploreForUnit(u));
                     cs.add(See.perhaps().except(serverPlayer), entry);
@@ -562,11 +568,11 @@ public final class InGameController extends Controller {
      * hence the special handling.
      *
      * @param serverPlayer The REF {@code ServerPlayer} that is granting.
-     * @param independent The newly independent {@code ServerPlayer}.
+     * @param independent The newly independent {@code Player}.
      * @param cs A {@code ChangeSet} to update.
      */
     private void csGiveIndependence(ServerPlayer serverPlayer,
-                                    ServerPlayer independent, ChangeSet cs) {
+                                    Player independent, ChangeSet cs) {
         serverPlayer.csChangeStance(Stance.PEACE, independent, true, cs);
         independent.changePlayerType(PlayerType.INDEPENDENT);
         Game game = getGame();
@@ -629,7 +635,8 @@ public final class InGameController extends Controller {
         cs.add(See.only(independent), independent);
 
         // Reveal the map on independence.
-        cs.add(See.only(independent), independent.exploreMap(true));
+        cs.add(See.only(independent),
+               ((ServerPlayer)independent).exploreMap(true));
     }
 
     private StringTemplate unitTemplate(String base, List<Unit> units) {
@@ -702,7 +709,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, template, monarchKey)
                        .setTax(taxRaise));
-            new MonarchSession(serverPlayer, action, taxRaise, goods);
+            new MonarchSession(serverPlayer, action, taxRaise, goods).register();
             break;
         case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
             int oldTax = serverPlayer.getTax();
@@ -727,9 +734,8 @@ public final class InGameController extends Controller {
                        StringTemplate.template(messageId), monarchKey));
             break;
         case ADD_TO_REF:
-            AbstractUnit refAdditions = monarch.chooseForREF(random);
+            AbstractUnit refAdditions = monarch.addToREF(random);
             if (refAdditions == null) break;
-            monarch.getExpeditionaryForce().add(refAdditions);
             template = StringTemplate.template(messageId)
                 .addAmount("%number%", refAdditions.getNumber())
                 .addNamed("%unit%", refAdditions.getType(spec));
@@ -742,8 +748,7 @@ public final class InGameController extends Controller {
             if (friends.isEmpty()) break;
             Player friend = getRandomMember(logger, "Choose friend",
                                             friends, random);
-            serverPlayer.csChangeStance(Stance.PEACE, (ServerPlayer)friend,
-                                        true, cs);
+            serverPlayer.csChangeStance(Stance.PEACE, friend, true, cs);
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, StringTemplate
                        .template(messageId)
@@ -772,8 +777,7 @@ public final class InGameController extends Controller {
                     + " " + warGold + " gold + " + Messages.message(AbstractUnit
                         .getListLabel(", ", warSupport)));
             }
-            serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
-                                        true, cs);
+            serverPlayer.csChangeStance(Stance.WAR, enemy, true, cs);
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, StringTemplate
                        .template((warSupport.isEmpty()) ? messageId
@@ -809,7 +813,7 @@ public final class InGameController extends Controller {
                        .addStringTemplate("%mercenaries%",
                            AbstractUnit.getListLabel(", ", mercenaries)),
                        monarchKey));
-            new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
+            new MonarchSession(serverPlayer, action, mercenaries, mercPrice).register();
             break;
         case HESSIAN_MERCENARIES:
             final List<AbstractUnit> hessians = new ArrayList<>();
@@ -987,9 +991,9 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer),
                    serverPlayer.collectNewTiles(visible));
             // Coronado
-            for (ServerPlayer sp : transform(game.getConnectedPlayers(serverPlayer),
-                                             coronadoPred)) {
-                cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
+            for (Player sp : transform(game.getConnectedPlayers(serverPlayer),
+                                       coronadoPred)) {
+                cs.add(See.only(sp), ((ServerPlayer)sp).exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(sp,
                     new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
@@ -1064,8 +1068,8 @@ public final class InGameController extends Controller {
      * @param carrier The {@code Unit} to carry the goods.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet buyGoods(ServerPlayer serverPlayer, GoodsType type,
-                              int amount, Unit carrier) {
+    private ChangeSet buyGoods(ServerPlayer serverPlayer, GoodsType type,
+                               int amount, Unit carrier) {
         if (!serverPlayer.canTrade(type, Access.EUROPE)) {
             return serverPlayer.clientError("Can not trade boycotted goods");
         }
@@ -1299,9 +1303,9 @@ public final class InGameController extends Controller {
 
         if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
-            for (ServerPlayer sp : transform(sg.getConnectedPlayers(serverPlayer),
-                                             coronadoPred)) {
-                sp.exploreTile(tile);
+            for (Player sp : transform(sg.getConnectedPlayers(serverPlayer),
+                                       coronadoPred)) {
+                ((ServerPlayer)sp).exploreTile(tile);
                 cs.add(See.only(sp), tile);
                 sp.invalidateCanSeeTiles();//+vis(sp)
             }
@@ -1389,12 +1393,9 @@ public final class InGameController extends Controller {
                            + " has not won the game!");
         } else {
             final Specification spec = game.getSpecification();
-            spec.setBoolean(GameOptions.VICTORY_DEFEAT_REF,
-                            Boolean.FALSE);
-            spec.setBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS,
-                            Boolean.FALSE);
-            spec.setBoolean(GameOptions.VICTORY_DEFEAT_HUMANS,
-                            Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_REF, false);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS, false);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_HUMANS, false);
             logger.info("Disabled victory conditions, as "
                         + serverPlayer.getName()
                         + " has won, but is continuing to play.");
@@ -1496,7 +1497,7 @@ public final class InGameController extends Controller {
                 UnitType toType = spec.getUnitChange(UnitChangeType.INDEPENDENCE,
                                                      fromType).to;
                 List<Unit> units = entry.getValue();
-                while (!units.isEmpty() && n < limit) {
+                while (n < limit && !units.isEmpty()) {
                     Unit unit = units.remove(0);
                     unit.changeType(toType);//-vis
                     cs.add(See.only(serverPlayer), unit);
@@ -1522,9 +1523,10 @@ public final class InGameController extends Controller {
         final Comparator<Player> comp = Comparator.comparingInt(p ->
             p.getTension(serverPlayer).getValue());
         List<Player> natives = transform(game.getLiveNativePlayers(),
-            p -> p.hasContacted(serverPlayer), Function.identity(), comp);
+                                         p -> p.hasContacted(serverPlayer),
+                                         Function.<Player>identity(), comp);
         if (!natives.isEmpty()) {
-            ServerPlayer good = (ServerPlayer)first(natives);
+            Player good = first(natives);
             logger.info("Native ally following independence: " + good);
             cs.addMessage(serverPlayer,
                 new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
@@ -1545,17 +1547,17 @@ public final class InGameController extends Controller {
                     - good.getTension(serverPlayer).getValue();
                 break;
             }
-            good.csModifyTension(serverPlayer, delta, cs);
+            ((ServerPlayer)good).csModifyTension(serverPlayer, delta, cs);
             Player.makeContact(good, refPlayer);
-            good.csModifyTension(refPlayer,
+            ((ServerPlayer)good).csModifyTension(refPlayer,
                 Tension.Level.HATEFUL.getLimit(), cs);
 
             reverse(natives);
-            ServerPlayer bad = null;
+            Player bad = null;
             for (Player p : natives) {
                 if (p == good
                     || p.getStance(serverPlayer) == Stance.ALLIANCE) break;
-                bad = (ServerPlayer)p;
+                bad = p;
                 if (!p.atWarWith(serverPlayer)) break;
             }
             logger.info("Native enemy following independence: " + bad);
@@ -1573,9 +1575,11 @@ public final class InGameController extends Controller {
                     new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "declareIndependence.nativeHostile", bad)
                         .addStringTemplate("%nation%", bad.getNationLabel()));
-                if (delta != 0) bad.csModifyTension(serverPlayer, delta, cs);
+                if (delta != 0) {
+                    ((ServerPlayer)bad).csModifyTension(serverPlayer, delta, cs);
+                }
                 Player.makeContact(bad, refPlayer);
-                bad.csModifyTension(refPlayer,
+                ((ServerPlayer)bad).csModifyTension(refPlayer,
                     -bad.getTension(refPlayer).getValue(), cs);
             }
         }
@@ -1714,7 +1718,7 @@ public final class InGameController extends Controller {
             .addAmount("%amount%", goods.getAmount())
             .addName("%settlement%", settlement.getName());
         cs.addMessage(serverPlayer, m);
-        ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
+        final Player receiver = settlement.getOwner();
         if (receiver.isConnected() && settlement instanceof Colony) {
             cs.add(See.only(receiver), unit);
             cs.add(See.only(receiver), settlement);
@@ -1821,7 +1825,7 @@ public final class InGameController extends Controller {
         if (missionary == null) {
             return serverPlayer.clientError("Denouncing null missionary");
         }
-        ServerPlayer enemy = (ServerPlayer)missionary.getOwner();
+        final Player enemy = missionary.getOwner();
         double denounce = randomDouble(logger, "Denounce base", random)
             * enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
         if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
@@ -1886,12 +1890,12 @@ public final class InGameController extends Controller {
                     + " with " + agreement);
             }
             session = new DiplomacySession(ourUnit, otherColony, getTimeout());
+            session.register();
             logger.info("New diplomacy session: " + session);
         } else {
             logger.info("Continuing diplomacy session: " + session
                         + " from " + ourUnit);
         }
-        ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
         serverPlayer.csDiplomacy(session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
@@ -1920,7 +1924,6 @@ public final class InGameController extends Controller {
             logger.info("Continuing diplomacy session: " + session
                         + " from " + ourColony);
         }
-        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
         serverPlayer.csDiplomacy(session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
@@ -1938,10 +1941,10 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         // Dispose of the unit.
-        cs.add(See.perhaps().always(serverPlayer),
-               (FreeColGameObject)unit.getLocation());
+        Location loc = unit.getLocation();
+        cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
         ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-            unit.getLocation(), cs);//-vis(serverPlayer)
+                                    loc, cs);//-vis(serverPlayer)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see the unit removal and the space it leaves.
@@ -2062,7 +2065,7 @@ public final class InGameController extends Controller {
     public ChangeSet endTurn(ServerPlayer serverPlayer) {
         final FreeColServer freeColServer = getFreeColServer();
         final ServerGame serverGame = getGame();
-        ServerPlayer winner = (ServerPlayer)serverGame.checkForWinner();
+        ServerPlayer winner = serverGame.checkForWinner();
         ServerPlayer current = (ServerPlayer)serverGame.getCurrentPlayer();
 
         if (serverPlayer != current) {
@@ -2106,7 +2109,7 @@ public final class InGameController extends Controller {
             switch (current.checkForDeath()) {
             case IS_DEFEATED:
                 for (Player p : current.getRebels()) {
-                    csGiveIndependence(current, (ServerPlayer)p, cs);
+                    csGiveIndependence(current, p, cs);
                 }
                 // Fall through
             case IS_DEAD:
@@ -2131,12 +2134,12 @@ public final class InGameController extends Controller {
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
-            List<ServerPlayer> connected = serverGame.getConnectedPlayers();
+            List<Player> connected = serverGame.getConnectedPlayers();
             boolean onlyAI = all(connected, Player::isAI);
             if (onlyAI) {
                 final Comparator<Player> scoreComp
                     = Comparator.comparingInt(Player::getScore).reversed();
-                winner = first(sort(connected, scoreComp));
+                winner = (ServerPlayer)first(sort(connected, scoreComp));
                 logger.info("No human player left, winner is: " + winner);
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();
@@ -2207,13 +2210,13 @@ public final class InGameController extends Controller {
             // Prepare to update, with current player last so that it
             // does not immediately start moving and cause further
             // changes which conflict with these updates.
-            List<ServerPlayer> players = serverGame.getConnectedPlayers(current);
+            List<Player> players = serverGame.getConnectedPlayers(current);
             players.add(current);
 
             // If this is a debug run, update everyone and continue.
-            boolean debugSkip = !current.isAI()
-                && freeColServer.getSinglePlayer()
-                && debugOnlyAITurns > 0;
+            boolean debugSkip = debugOnlyAITurns > 0
+                && !current.isAI()
+                && freeColServer.getSinglePlayer();
             if (debugSkip) {
                 serverGame.sendToList(players, cs);
                 cs.clear();
@@ -2265,7 +2268,11 @@ public final class InGameController extends Controller {
                              navalType);//-vis(serverPlayer)
         UnitType landType = getRandomMember(logger, "Choose undead army",
                                             landUnits, random);
-        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);//-vis
+        Unit undead = new ServerUnit(game, theFlyingDutchman,
+                                     serverPlayer, landType);//-vis
+        assert undead != null;
+        cs.add(See.only(serverPlayer),
+                        serverPlayer.exploreForUnit(theFlyingDutchman));
         serverPlayer.setDead(false);
         serverPlayer.changePlayerType(PlayerType.UNDEAD);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
@@ -2273,7 +2280,7 @@ public final class InGameController extends Controller {
         // No one likes the undead.
         for (Player p : transform(game.getLivePlayers(serverPlayer),
                                   p2 -> serverPlayer.hasContacted(p2))) {
-            serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)p, true, cs);
+            serverPlayer.csChangeStance(Stance.WAR, p, true, cs);
         }
 
         // Revenge begins
@@ -2352,18 +2359,18 @@ public final class InGameController extends Controller {
         // Result depends on tension wrt this settlement.
         // Establish if at least not angry.
         final Tension tension = is.getAlarm(serverPlayer);
+        Location loc = unit.getLocation();
         switch (tension.getLevel()) {
         case HATEFUL: case ANGRY:
-            cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject)unit.getLocation());
+            cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-                unit.getLocation(), cs);//-vis(serverPlayer)
+                                        loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
 
         case HAPPY: case CONTENT: case DISPLEASED:
             ServerIndianSettlement sis = (ServerIndianSettlement)is;
-            if (is.hasMissionary()) sis.csKillMissionary(false, cs);
+            if (is.hasMissionary()) sis.csKillMissionary(Boolean.FALSE, cs);
 
             // Always show the tile the unit was on
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
@@ -2440,7 +2447,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet gameState() {
         final FreeColServer freeColServer = getFreeColServer();
-        return ChangeSet.simpleChange((ServerPlayer)null,
+        return ChangeSet.simpleChange((Player)null,
             new GameStateMessage(freeColServer.getServerState()));
     }
 
@@ -2449,6 +2456,7 @@ public final class InGameController extends Controller {
      * Gets the list of high scores.
      *
      * @param serverPlayer The {@code ServerPlayer} querying the scores.
+     * @param key A score category key.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {
@@ -2463,12 +2471,12 @@ public final class InGameController extends Controller {
      * @param serverPlayer The {@code ServerPlayer} that is inciting.
      * @param unit The missionary {@code Unit} inciting.
      * @param is The {@code IndianSettlement} to incite.
-     * @param enemy The {@code ServerPlayer} to be incited against.
+     * @param enemy The {@code Player} to be incited against.
      * @param gold The amount of gold in the bribe.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet incite(ServerPlayer serverPlayer, Unit unit,
-        IndianSettlement is, ServerPlayer enemy, int gold) {
+                            IndianSettlement is, Player enemy, int gold) {
         ChangeSet cs = new ChangeSet();
 
         Tile tile = is.getTile();
@@ -2477,10 +2485,9 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
-        ServerPlayer enemyPlayer = enemy;
-        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
+        Player nativePlayer = is.getOwner();
         int payingValue = nativePlayer.getTension(serverPlayer).getValue();
-        int targetValue = nativePlayer.getTension(enemyPlayer).getValue();
+        int targetValue = nativePlayer.getTension(enemy).getValue();
         int goldToPay = (payingValue > targetValue) ? 10000 : 5000;
         goldToPay += 20 * (payingValue - targetValue);
         goldToPay = Math.max(goldToPay, 650);
@@ -2495,7 +2502,7 @@ public final class InGameController extends Controller {
                                  "missionarySettlement.inciteGoldFail",
                                  serverPlayer, is)
                     .addStringTemplate("%player%",
-                        enemyPlayer.getNationLabel())
+                        enemy.getNationLabel())
                     .addAmount("%amount%", goldToPay));
             unit.setMovesLeft(0);
             cs.addPartial(See.only(serverPlayer), unit,
@@ -2504,9 +2511,9 @@ public final class InGameController extends Controller {
             // Success.  Raise the tension for the native player with respect
             // to the European player.  Let resulting stance changes happen
             // naturally in the AI player turn/s.
-            nativePlayer.csModifyTension(enemyPlayer,
+            ((ServerPlayer)nativePlayer).csModifyTension(enemy,
                 Tension.WAR_MODIFIER, cs);//+til
-            enemyPlayer.csModifyTension(serverPlayer,
+            ((ServerPlayer)enemy).csModifyTension(serverPlayer,
                 Tension.TENSION_ADD_WAR_INCITER, cs);//+til
             serverPlayer.modifyGold(-gold);
             nativePlayer.modifyGold(gold);
@@ -2543,10 +2550,8 @@ public final class InGameController extends Controller {
      */
     public ChangeSet indianDemand(final ServerPlayer serverPlayer, Unit unit,
                                   Colony colony, GoodsType type, int amount,
-                                  Boolean result) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        final ServerPlayer victim = (ServerPlayer) colony.getOwner();
+                                  IndianDemandAction result) {
+        final Player victim = colony.getOwner();
         NativeDemandSession session = Session.lookup(NativeDemandSession.class,
                                                      unit, colony);
         ChangeSet cs = new ChangeSet();
@@ -2557,6 +2562,11 @@ public final class InGameController extends Controller {
             }
             session = new NativeDemandSession(unit, colony, type, amount,
                                               getTimeout());
+            session.register();
+            logger.info("Native demand(begin) " + session.getKey() + ": "
+                + serverPlayer.getName() + " unit " + unit
+                + " demands " + amount + " " + ((type == null) ? "gold" : type)
+                + " from " + colony.getName());
             cs.add(See.only(victim),
                    new IndianDemandMessage(unit, colony, type, amount));
         } else {
@@ -2564,10 +2574,12 @@ public final class InGameController extends Controller {
                 return serverPlayer.clientError("Replying to missing demand: "
                     + unit.getId() + "," + colony.getId());
             }
-            session.complete(result.booleanValue(), cs);
-            logger.info(serverPlayer.getName() + " unit " + unit
+            logger.info("Native demand(" + result + ") " + session.getKey()
+                + ": " + serverPlayer.getName() + " unit " + unit
                 + " demands " + amount + " " + ((type == null) ? "gold" : type)
-                + " from " + colony.getName() + " accepted: " + result);
+                + " from " + colony.getName());
+            session.complete(result == IndianDemandAction.INDIAN_DEMAND_ACCEPT,
+                             cs);
         }
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
@@ -2635,12 +2647,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
         csVisit(serverPlayer, is, 0, cs);
+        Location loc = unit.getLocation();
         switch (is.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
-            cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject)unit.getLocation());
+            cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-                unit.getLocation(), cs);//-vis(serverPlayer)
+                                        loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case ANGRY: // Learn nothing, not even a pet update
@@ -2838,15 +2850,17 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         HighSeas highSeas = serverPlayer.getHighSeas();
         Location current = unit.getDestination();
+        List<Location> destinations = highSeas.getDestinations();
         boolean others = false; // Notify others?
         boolean invalid = false; // Not a highSeas move?
 
         if (!unit.getType().canMoveToHighSeas()) {
             invalid = true;
         } else if (destination instanceof Europe) {
-            if (!highSeas.getDestinations().contains(destination)) {
+            if (!destinations.contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
-                    + destination.getId());
+                    + destination.getId()
+                    + " in " + highSeas.destinationsToString());
             } else if (unit.getLocation() == highSeas) {
                 if (!(current instanceof Europe)) {
                     // Changed direction
@@ -2870,9 +2884,10 @@ public final class InGameController extends Controller {
                 invalid = true;
             }
         } else if (destination instanceof Map) {
-            if (!highSeas.getDestinations().contains(destination)) {
+            if (!destinations.contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
-                    + destination.getId());
+                    + destination.getId()
+                    + " in " + highSeas.destinationsToString());
             } else if (unit.getLocation() == highSeas) {
                 if (current != destination && (current == null
                         || current.getTile() == null
@@ -2895,9 +2910,10 @@ public final class InGameController extends Controller {
             }
         } else if (destination instanceof Settlement) {
             Tile tile = destination.getTile();
-            if (!highSeas.getDestinations().contains(tile.getMap())) {
+            if (!destinations.contains(tile.getMap())) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
-                    + destination.getId());
+                    + destination.getId() + "/" + tile.getMap().getId()
+                    + " in " + highSeas.destinationsToString());
             } else if (unit.getLocation() == highSeas) {
                 // Direction is somewhat moot, so just reset.
                 unit.setWorkLeft(unit.getSailTurns());
@@ -2950,13 +2966,13 @@ public final class InGameController extends Controller {
      * benefit.
      *
      * @param serverPlayer The {@code ServerPlayer} making contact.
-     * @param other The native {@code ServerPlayer} to contact.
+     * @param other The native {@code Player} to contact.
      * @param tile A {@code Tile} on offer at first landing.
      * @param result Whether the initial peace treaty was accepted.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet nativeFirstContact(ServerPlayer serverPlayer,
-                                        ServerPlayer other, Tile tile,
+                                        Player other, Tile tile,
                                         boolean result) {
         ChangeSet cs = new ChangeSet();
         DiplomacySession session = null;
@@ -2980,9 +2996,9 @@ public final class InGameController extends Controller {
         } else {
             // Consider not accepting the treaty to be an insult and
             // ban missions.
-            other.csModifyTension(serverPlayer,
+            ((ServerPlayer)other).csModifyTension(serverPlayer,
                 Tension.TENSION_ADD_MAJOR, cs);//+til
-            other.addMissionBan(serverPlayer);
+            ((ServerPlayer)other).addMissionBan(serverPlayer);
         }
         if (session != null) session.complete(result, cs);
         getGame().sendToOthers(serverPlayer, cs);
@@ -3005,7 +3021,7 @@ public final class InGameController extends Controller {
             return serverPlayer.clientError("No gift to deliver: "
                 + unit.getId());
         }
-        final ServerPlayer otherPlayer = (ServerPlayer)colony.getOwner();
+        final Player otherPlayer = colony.getOwner();
 
         ChangeSet cs = new ChangeSet();
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), colony);
@@ -3022,7 +3038,7 @@ public final class InGameController extends Controller {
         cs.addMessage(otherPlayer, m);
         cs.add(See.only(otherPlayer), colony);
         logger.info("Gift delivered by unit: " + unit.getId()
-            + " to colony " + colony.getName() + ": " + goods.toString());
+            + " to colony " + colony.getName() + ": " + goods);
 
         // Others might see unit capacity?
         getGame().sendToOthers(serverPlayer, cs);
@@ -3038,12 +3054,13 @@ public final class InGameController extends Controller {
      * @param nt The {@code NativeTrade} underway.
      * @return A {@code ChangeSet} encapsulating this action.
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     public ChangeSet nativeTrade(ServerPlayer serverPlayer,
                                  NativeTradeAction action, NativeTrade nt) {
         final Unit unit = nt.getUnit();
         final IndianSettlement is = nt.getIndianSettlement();
-        final ServerPlayer otherPlayer = (ServerPlayer)
-            ((serverPlayer.owns(unit)) ? is.getOwner() : unit.getOwner());
+        final Player otherPlayer = (serverPlayer.owns(unit))
+            ? is.getOwner() : unit.getOwner();
 
         // Server view of the transaction is kept in the NativeTradeSession,
         // which is always updated with what the native player says, and
@@ -3069,10 +3086,8 @@ public final class InGameController extends Controller {
                 return serverPlayer.clientError("Unit " + unit.getId()
                     + " has no moves left.");
             }
-            nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
             // Register a session and ask the natives to price the goods.
-            session = new NativeTradeSession(nt);
-            nt.initialize();
+            nt = NativeTradeSession.openSession(nt);
             cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
@@ -3103,7 +3118,7 @@ public final class InGameController extends Controller {
             nt.mergeFrom(session.getNativeTrade());
             if (item == null) {
                 return serverPlayer.clientError("Null sale: " + nt);
-            } else if (!nt.canSell()) {
+            } else if (item.priceIsSet() && !nt.canSell()) {
                 return serverPlayer.clientError("Can not sell: " + nt);
             } else if (find(nt.getUnitToSettlement(),
                             item.goodsMatcher()) == null) {
@@ -3144,7 +3159,8 @@ public final class InGameController extends Controller {
                 "movesLeft", String.valueOf(unit.getMovesLeft()));
             break;
 
-        case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: // Successful haggle
+        case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: case NAK_GOODS:
+            // Successful haggle or polite refusal of gift
             session.getNativeTrade().mergeFrom(nt);
             cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
@@ -3186,12 +3202,6 @@ public final class InGameController extends Controller {
                    new NativeTradeMessage(action, nt));
             break;
 
-        case NAK_GOODS: // Polite refusal of gift
-            session.getNativeTrade().mergeFrom(nt);
-            cs.add(See.only(otherPlayer),
-                   new NativeTradeMessage(action, nt));
-            break;
-
         case NAK_HAGGLE: case NAK_NOSALE: // Fail, close
             unit.setMovesLeft(0);
             cs.addPartial(See.only(otherPlayer), unit,
@@ -3207,6 +3217,7 @@ public final class InGameController extends Controller {
         default:
             return serverPlayer.clientError("Bogus action: " + action);
         }
+        logger.fine("Native trade(" + downCase(action.toString()) + ": " + nt);
 
         // Update the other player if needed
         getGame().sendToOthers(serverPlayer, cs);
@@ -3345,6 +3356,7 @@ public final class InGameController extends Controller {
      * @param arrangements A list of {@code Arrangement}s to apply.
      * @return A {@code ChangeSet} encapsulating this action.
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     public ChangeSet rearrangeColony(ServerPlayer serverPlayer, Colony colony,
                                      List<Arrangement> arrangements) {
         final Role defaultRole = getGame().getSpecification().getDefaultRole();
@@ -3387,9 +3399,9 @@ public final class InGameController extends Controller {
 
         // Collect roles that cause a change, ordered by simplest change
         for (Arrangement a : transform(arrangements,
-                a -> a.role != a.unit.getRole() && a.role != defaultRole,
-                Function.identity(),
-                Comparator.<Arrangement>reverseOrder())) {
+                a -> a.role != defaultRole && a.role != a.unit.getRole(),
+                Function.<Arrangement>identity(),
+                Arrangement::roleComparison)) {
             if (!colony.equipForRole(a.unit, a.role, a.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
                     + a.unit.getId() + " for role " + a.role
@@ -3489,10 +3501,10 @@ public final class InGameController extends Controller {
         // Hateful natives kill the scout right away.
         Tension tension = is.getAlarm(serverPlayer);
         if (tension.getLevel() == Tension.Level.HATEFUL) {
-            cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject)unit.getLocation());
+            Location loc = unit.getLocation();
+            cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-                unit.getLocation(), cs);//-vis(serverPlayer)
+                                        loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             result = "die";
         } else {
@@ -3542,7 +3554,7 @@ public final class InGameController extends Controller {
             // newly visible tiles, possibly with enhanced radius.
             Set<Tile> tiles = transform(tile.getSurroundingTiles(1, radius),
                 t -> !serverPlayer.canSee(t) && (t.isLand() || t.isShore()),
-                Function.identity(), Collectors.toSet());
+                Function.<Tile>identity(), Collectors.toSet());
             cs.add(See.only(serverPlayer), serverPlayer.exploreTiles(tiles));
 
             // If the unit was promoted, update it completely, otherwise just
@@ -3580,8 +3592,8 @@ public final class InGameController extends Controller {
      * @param carrier The {@code Unit} carrying the goods.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet sellGoods(ServerPlayer serverPlayer, GoodsType type,
-                               int amount, Unit carrier) {
+    private ChangeSet sellGoods(ServerPlayer serverPlayer, GoodsType type,
+                                int amount, Unit carrier) {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();
@@ -3754,7 +3766,7 @@ public final class InGameController extends Controller {
                 + unit.getId() + " provided.");
         }
         ChangeSet cs = new ChangeSet();
-        serverRegion.csDiscover(serverPlayer, game.getTurn(), name, cs);
+        serverRegion.csDiscover(serverPlayer, unit, game.getTurn(), name, cs);
 
         // Others do find out about region name changes.
         getGame().sendToOthers(serverPlayer, cs);
@@ -3844,8 +3856,8 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        if (carrier.getSettlement() != null) {
-            Settlement settlement = carrier.getSettlement();
+        Settlement settlement = carrier.getSettlement();
+        if (settlement != null) {
             GoodsLocation.moveGoods(carrier, goodsType, amount, settlement);
             logger.finest(carrier
                 + " unloaded " + amount + " " + goodsType.getSuffix()

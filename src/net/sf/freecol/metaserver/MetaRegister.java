@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -155,6 +155,7 @@ public final class MetaRegister {
                 } else {
                     items.add(newSi);
                     logger.info("Server added:" + identity);
+                    mc.startReceiving();
                 }
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Server fail: " + identity, ioe);

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -59,16 +59,13 @@ public class FreeColMapLoader implements MapLoader {
      * Constructor for the FreeColMapLoader class.
      *
      * @param file The File to load.
-     * @throws IOException If the game-loading Stream could not be created.
-     * @throws FreeColException If the file could not be read properly.
-     * @throws XMLStreamException If there was a problem loading the XML Stream.
+     * @exception FreeColException if the format is incompatible.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public FreeColMapLoader(File file) throws IOException, FreeColException, XMLStreamException {
-
+    public FreeColMapLoader(File file)
+        throws FreeColException, IOException, XMLStreamException {
         this.importMap = FreeColServer.readMap(file, null);
-        if (this.importMap == null) {
-            throw new RuntimeException("No map found in file (" + file + ").");
-        }
     }
 
     /**
@@ -86,21 +83,16 @@ public class FreeColMapLoader implements MapLoader {
         Map map = new Map(game, width, height);
         if (highestLayer == Layer.LAND) {
             // import only the land / water distinction
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    Tile t = new Tile(game,
+            map.populateTiles((x, y) -> {
+                    return new Tile(game,
                         (importMap.getTile(x, y).getType().isWater())
                         ? TileType.WATER : TileType.LAND,
                         x, y);
-                    map.setTile(t, x, y);
-                }
-            }
+                });
         } else {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
+            map.populateTiles((x, y) -> {
                     Tile template = importMap.getTile(x, y);
                     Tile tile = new Tile(game, null, x, y);
-                    map.setTile(tile, x, y);
 
                     // import tile types
                     tile.setType(game.getSpecification().getTileType(template.getType().getId()));
@@ -119,8 +111,9 @@ public class FreeColMapLoader implements MapLoader {
                         }
                         if (highestLayer.compareTo(Layer.RIVERS) >= 0) {
                             // import tile improvements
-                            tile.setTileItemContainer(new TileItemContainer(game, tile, template
-                                                                            .getTileItemContainer(), layer));
+                            TileItemContainer newTic = new TileItemContainer(game, tile);
+                            newTic.copyFrom(template.getTileItemContainer(), layer);
+                            tile.setTileItemContainer(newTic);
                             if (layer.compareTo(Layer.NATIVES) >= 0) {
                                 // import native settlements
                                 if (template.getOwner() != null) {
@@ -141,8 +134,8 @@ public class FreeColMapLoader implements MapLoader {
                             }
                         }
                     }
-                }
-            }
+                    return tile;
+                });
         }
         for (Region region : regions.values()) {
             map.addRegion(region);

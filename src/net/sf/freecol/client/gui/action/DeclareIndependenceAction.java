@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -52,8 +52,8 @@ public class DeclareIndependenceAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         Player p = freeColClient.getMyPlayer();
-        return super.shouldBeEnabled() && p != null
-            && p.getPlayerType() == PlayerType.COLONIAL;
+        return p != null && p.getPlayerType() == PlayerType.COLONIAL
+            && super.shouldBeEnabled();
     }
 
 

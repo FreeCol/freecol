@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -45,7 +46,7 @@ import net.sf.freecol.server.ai.mission.Mission;
 /**
  * Objects of this class contains AI-information for a single {@link Goods}.
  */
-public class AIGoods extends TransportableAIObject {
+public final class AIGoods extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
@@ -69,6 +70,7 @@ public class AIGoods extends TransportableAIObject {
 
         this.goods = null;
         this.destination = null;
+        this.initialized = false;
     }
 
     /**
@@ -87,8 +89,7 @@ public class AIGoods extends TransportableAIObject {
 
         this.goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
-
-        uninitialized = false;
+        setInitialized();
     }
 
     /**
@@ -104,9 +105,16 @@ public class AIGoods extends TransportableAIObject {
                    FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getGoods() == null;
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getGoods() != null;
+    }
 
     /**
      * Gets the goods this {@code AIGoods} is controlling.
@@ -114,7 +122,7 @@ public class AIGoods extends TransportableAIObject {
      * @return The {@code Goods}.
      */
     public final Goods getGoods() {
-        return goods;
+        return this.goods;
     }
 
     /**
@@ -231,7 +239,7 @@ public class AIGoods extends TransportableAIObject {
 
         PathNode path = (goods.getLocation() == carrier) ? carrier.findPath(dst)
             : (goods.getLocation() instanceof Unit) ? null
-            : carrier.findPath(goods.getLocation(), dst, null, null);
+            : carrier.findPath(goods.getLocation(), dst);
         if (path != null) path.convertToGoodsDeliveryPath();
         return path;
     }
@@ -351,9 +359,9 @@ public class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
-        String why = (result < 0) ? "super"
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
+        String why = (!result.safe()) ? "super"
             : (goods == null) ? "null-goods"
             : (goods.getType() == null) ? "null-goods-type"
             : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
@@ -365,14 +373,14 @@ public class AIGoods extends TransportableAIObject {
             if (fix) {
                 lb.add("\n  Fixing disposed destination for: ", getId());
                 destination = null;
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 why = "disposed-destination";
             }
         }
         if (why != null) {
             lb.add("\n  AIGoods with ", why, ": ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }
@@ -421,16 +429,6 @@ public class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (getGoods() != null) uninitialized = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
@@ -459,14 +457,12 @@ public class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof AIGoods) {
-            AIGoods oa = (AIGoods)other;
-            return super.equals(oa)
-                && Utils.equals(this.goods, oa.goods)
-                && Utils.equals(this.destination, oa.destination);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof AIGoods)) return false;
+        AIGoods other = (AIGoods)o;
+        return Utils.equals(this.goods, other.goods)
+            && Utils.equals(this.destination, other.destination)
+            && super.equals(other);
     }
 
     /**

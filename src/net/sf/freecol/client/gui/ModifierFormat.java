@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -37,6 +37,8 @@ import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Turn;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 public class ModifierFormat {
 
@@ -49,20 +51,19 @@ public class ModifierFormat {
         return Messages.message("modifierFormat.unknown");
     }
 
-    public static final String format(double value) {
-        return (value == Modifier.UNKNOWN)
-            ? getUnknownValue()
-            : modifierFormat.format(value);
+    public static final String format(float value) {
+        return Modifier.isFloatKnown(value) ? modifierFormat.format(value)
+            : getUnknownValue();
     }
 
-    public static final String[] getModifierStrings(Modifier modifier) {
+    private static final String[] getModifierStrings(Modifier modifier) {
         return getModifierStrings(modifier.getValue(), modifier.getType());
     }
 
-    public static final String[] getModifierStrings(float value,
-                                                    ModifierType type) {
+    private static final String[] getModifierStrings(float value,
+                                                     ModifierType type) {
         String bonus = modifierFormat.format(value);
-        if (value == Modifier.UNKNOWN) {
+        if (!Modifier.isFloatKnown(value)) {
             return new String[] { " ", bonus, null };
         }
         String[] result = (value < 0)
@@ -82,6 +83,7 @@ public class ModifierFormat {
         return result;
     }
 
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE")
     private static String getSourceName(FreeColObject source) {
         if (source == null) return getUnknownValue();
 
@@ -92,7 +94,7 @@ public class ModifierFormat {
         }
         if (result == null && source instanceof Named) {
             result = Messages.getName((Named)source);
-            if (result != null && result.isEmpty()) result = null;
+            if (result.isEmpty()) result = null;
         }
         if (result == null) result = Messages.getName(source.getId());
         return result;
@@ -123,6 +125,6 @@ public class ModifierFormat {
 
     public static String getModifierAsString(Modifier modifier) {
         return transform(getModifierStrings(modifier), isNotNull(),
-                         Function.identity(), Collectors.joining());
+                         Function.<String>identity(), Collectors.joining());
     }
 }

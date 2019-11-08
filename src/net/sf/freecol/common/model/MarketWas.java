@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,8 @@ public class MarketWas {
 
     private final Market market;
     private final int tax;
-    private final Map<GoodsType, Integer> costToBuy = new HashMap<>();
-    private final Map<GoodsType, Integer> paidForSale = new HashMap<>();
+    private final Map<GoodsType, Integer> costToBuy;
+    private final Map<GoodsType, Integer> paidForSale;
 
 
     /**
@@ -54,7 +55,10 @@ public class MarketWas {
     public MarketWas(Player player) {
         this.market = player.getMarket();
         this.tax = player.getTax();
-        for (MarketData md : this.market.getMarketDataValues()) {
+        Collection<MarketData> mdv = this.market.getMarketDataValues();
+        this.costToBuy = new HashMap<>(mdv.size());
+        this.paidForSale = new HashMap<>(mdv.size());
+        for (MarketData md : mdv) {
             this.costToBuy.put(md.getGoodsType(), md.getCostToBuy());
             this.paidForSale.put(md.getGoodsType(), md.getPaidForSale());
         }
@@ -79,14 +83,12 @@ public class MarketWas {
     public void fireChanges(GoodsType type, int amount) {
         for (TransactionListener l : this.market.getTransactionListener()) {
             if (amount > 0) {
-                int buy = (this.costToBuy.containsKey(type))
-                    ? this.costToBuy.get(type)
-                    : this.market.getCostToBuy(type);
+                Integer buy = this.costToBuy.get(type);
+                if (buy == null) buy = this.market.getCostToBuy(type);
                 l.logPurchase(type, amount, buy);
             } else if (amount < 0) {
-                int sell = (this.paidForSale.containsKey(type))
-                    ? this.paidForSale.get(type)
-                    : this.market.getPaidForSale(type);
+                Integer sell = this.paidForSale.get(type);
+                if (sell == null) sell = this.market.getPaidForSale(type);
                 l.logSale(type, -amount, sell, this.tax);
             }
         }

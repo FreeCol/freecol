@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,7 +54,7 @@ public abstract class PortPanel extends FreeColPanel {
      * @param layout The {@code LayoutManager} to be used.
      */
     protected PortPanel(FreeColClient freeColClient, LayoutManager layout) {
-        super(freeColClient, layout);
+        super(freeColClient, null, layout);
 
         this.selectedUnitLabel = null;
     }
@@ -85,7 +85,7 @@ public abstract class PortPanel extends FreeColPanel {
      * @param unit The {@code Unit} to select.
      * @return True if the selection succeeds.
      */
-    public boolean setSelectedUnit(Unit unit) {
+    protected boolean setSelectedUnit(Unit unit) {
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;

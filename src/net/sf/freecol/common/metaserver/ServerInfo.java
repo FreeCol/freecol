@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.metaserver;
 
-import static net.sf.freecol.common.util.Utils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -150,6 +150,7 @@ public class ServerInfo {
     /**
      * Set the connection information.
      *
+     * @param name The name of the connection.
      * @param address The IP-address of the server.
      * @param port The port number to connect to.
      */
@@ -171,9 +172,9 @@ public class ServerInfo {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public void update(String name, String address, int port,
-                       int slotsAvailable, int currentlyPlaying,
-                       boolean isGameStarted, String version, int gameState) {
+    public final void update(String name, String address, int port,
+                             int slotsAvailable, int currentlyPlaying,
+                             boolean isGameStarted, String version, int gameState) {
         this.name = name;
         this.address = address;
         this.port = port;
@@ -182,7 +183,7 @@ public class ServerInfo {
         this.isGameStarted = isGameStarted;
         this.version = version;
         this.gameState = gameState;
-        this.lastUpdated = now();
+        this.lastUpdated = Utils.now();
     }
 
     /**
@@ -190,7 +191,7 @@ public class ServerInfo {
      *
      * @param si The new {@code ServerInfo} to update with.
      */
-    public void update(ServerInfo si) {
+    public final void update(ServerInfo si) {
         update(si.getName(), si.getAddress(), si.getPort(),
                si.getSlotsAvailable(), si.getCurrentlyPlaying(),
                si.getIsGameStarted(), si.getVersion(), si.getGameState());
@@ -198,6 +199,43 @@ public class ServerInfo {
 
 
     // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ServerInfo) {
+            ServerInfo other = (ServerInfo)o;
+            return Utils.equals(this.name, other.name)
+                && Utils.equals(this.address, other.address)
+                && this.port == other.port
+                && this.currentlyPlaying == other.currentlyPlaying
+                && this.slotsAvailable == other.slotsAvailable
+                && this.isGameStarted == other.isGameStarted
+                && Utils.equals(this.version, other.version)
+                && this.gameState == other.gameState;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.name);
+        hash = 31 * hash + Utils.hashCode(this.address);
+        hash = 31 * hash + this.port;
+        hash = 31 * hash + this.currentlyPlaying;
+        hash = 31 * hash + this.slotsAvailable;
+        hash = 31 * hash + ((this.isGameStarted) ? 1 : 0);
+        hash = 31 * hash + Utils.hashCode(this.version);
+        hash = 31 * hash + this.gameState;
+        return hash;
+    }
 
     /**
      * {@inheritDoc}

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -89,7 +89,7 @@ public class ServerInfoMessage extends AttributeMessage {
                               getIntegerAttribute(PORT_TAG, -1),
                               getIntegerAttribute(SLOTS_AVAILABLE_TAG, -1),
                               getIntegerAttribute(CURRENTLY_PLAYING_TAG, -1),
-                              getBooleanAttribute(IS_GAME_STARTED_TAG, false),
+                              getBooleanAttribute(IS_GAME_STARTED_TAG, Boolean.FALSE),
                               getStringAttribute(VERSION_TAG),
                               getIntegerAttribute(GAME_STATE_TAG, -1));
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,8 +54,8 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.ExportData;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -78,13 +78,14 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This panel displays the compact colony report.
  */
-public final class ReportCompactColonyPanel extends ReportPanel
-    implements ActionListener {
+public final class ReportCompactColonyPanel extends ReportPanel {
 
     /** Predicate to select units that are not working. */
     private static final Predicate<Unit> notWorkingPred = u ->
         u.getState() != Unit.UnitState.FORTIFIED && u.getState() != Unit.UnitState.SENTRY;
     
+    private static final JLabel emptyLabel = new JLabel();
+
     /** Container class for all the information about a colony. */
     private static class ColonySummary {
 
@@ -102,31 +103,48 @@ public final class ReportCompactColonyPanel extends ReportPanel
             CONSUMPTION, // Positive production but could consume more
         };
 
-        public static BinaryOperator<GoodsProduction> goodsProductionAccumulator
-            = (g1, g2) -> {
-                g1.amount += g2.amount;
-                g1.status = (g1.status == ProductionStatus.NONE
-                        && g2.status == ProductionStatus.NONE)
-                    ? ProductionStatus.NONE
-                    : (g1.amount < 0) ? ProductionStatus.BAD
-                    : (g1.amount > 0) ? ProductionStatus.GOOD
-                    : ProductionStatus.ZERO;
-                g1.extra = 0;
-                return g1;
-            };
 
         /** Container class for goods production. */
         public static class GoodsProduction {
 
+            /** Binary accumulation operator for goods production. */
+            public static final BinaryOperator<GoodsProduction>
+                goodsProductionAccumulator = (g1, g2) -> g1.accumulate(g2);
+            
             public int amount;
             public ProductionStatus status;
             public int extra;
 
+            /**
+             * Build a new goods production container.
+             *
+             * @param amount The amount of goods.
+             * @param status The production status.
+             * @param extra Extra production.
+             */
             public GoodsProduction(int amount, ProductionStatus status,
                                    int extra) {
                 this.amount = amount;
                 this.status = status;
                 this.extra = extra;
+            }
+
+            /**
+             * Accumulate other production into this one.
+             *
+             * @param other The other {@code GoodsProduction}.
+             * @return This {@code GoodsProduction}.
+             */
+            public GoodsProduction accumulate(GoodsProduction other) {
+                this.amount += other.amount;
+                this.status = (this.status == ProductionStatus.NONE
+                        && other.status == ProductionStatus.NONE)
+                    ? ProductionStatus.NONE
+                    : (this.amount < 0) ? ProductionStatus.BAD
+                    : (this.amount > 0) ? ProductionStatus.GOOD
+                    : ProductionStatus.ZERO;
+                this.extra = 0;
+                return this;
             }
         };
 
@@ -390,7 +408,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         this.colonies.addAll(sort(continents.values(), firstColonyComparator));
 
         this.goodsTypes.addAll(transform(spec.getGoodsTypeList(),
-                                         reportGoodsPred, Function.identity(),
+                                         reportGoodsPred,
+                                         Function.<GoodsType>identity(),
                                          GoodsType.goodsTypeComparator));
 
         loadResources();
@@ -444,7 +463,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
     private void addTogether(List<? extends JComponent> components) {
         if (components.isEmpty()) {
-            reportPanel.add(new JLabel());
+            reportPanel.add(emptyLabel);
             return;
         }
         String layout = (components.size() > 1) ? "split " + components.size()
@@ -464,7 +483,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         final String cac = s.colony.getId();
         final UnitType defaultUnitType
             = spec.getDefaultUnitType(s.colony.getOwner());
-        List<JComponent> buttons = new ArrayList<>();
+        List<JComponent> buttons = new ArrayList<>(16);
         JButton b;
         Color c;
         StringTemplate t;
@@ -555,7 +574,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         } else {
             b = null;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+        reportPanel.add((b == null) ? emptyLabel : b);
 
         // Field: The number of potential colony tiles that need
         // exploring.
@@ -570,7 +589,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         } else {
             b = null;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+        reportPanel.add((b == null) ? emptyLabel : b);
 
         // Fields: The number of existing colony tiles that would
         // benefit from improvements.
@@ -612,7 +631,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             } else {
                 b = null;
             }
-            reportPanel.add((b == null) ? new JLabel() : b);
+            reportPanel.add((b == null) ? emptyLabel : b);
         }
 
         // Fields: The net production of each storable+non-trade-goods
@@ -700,7 +719,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             default:
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
-            reportPanel.add((c == null) ? new JLabel()
+            reportPanel.add((c == null) ? emptyLabel
                 : newButton(cac, Integer.toString(gp.amount), null, c, t));
         }
 
@@ -725,7 +744,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         } else {
             b = null;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+        reportPanel.add((b == null) ? emptyLabel : b);
 
         // Field: What is currently being built (clickable if on the
         // buildqueue) and the turns until it completes, including
@@ -738,7 +757,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         if (s.build != null) {
             int turns = s.completeTurns;
             String bname = Messages.getName(s.build);
-            if (turns == FreeColObject.UNDEFINED) {
+            if (turns == UNDEFINED) {
                 t = stpld("report.colony.making.noconstruction")
                         .addName("%colony%", s.colony.getName());
                 b = newButton(qac, bname, null, cWarn, t);
@@ -749,7 +768,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
                         .addAmount("%turns%", turns);
                 b = newButton(qac, bname + " " + Integer.toString(turns), null,
                               cGood, t);
-            } else if (turns < 0) {
+            } else { // turns < 0
                 turns = -(turns + 1);
                 t = stpld("report.colony.making.blocking")
                         .addName("%colony%", s.colony.getName())
@@ -809,7 +828,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The units that could be upgraded, followed by the units
         // that could be added.
         if (s.improve.isEmpty() && s.want.isEmpty()) {
-            reportPanel.add(new JLabel());
+            reportPanel.add(emptyLabel);
         } else {
             buttons.clear();
             buttons.addAll(unitButtons(s.improve, s.couldWork, s.colony));
@@ -826,7 +845,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     private List<JButton> unitButtons(final Map<UnitType, Suggestion> suggestions,
                                       List<UnitType> have, Colony colony) {
         final String cac = colony.getId();
-        List<JButton> result = new ArrayList<>();
+        List<JButton> result = new ArrayList<>(suggestions.size());
         final Comparator<UnitType> buttonComparator
             = Comparator.comparing(ut -> suggestions.get(ut),
                                    Suggestion.descendingAmountComparator);
@@ -882,8 +901,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         Map<GoodsType, ColonySummary.GoodsProduction> rProduction
             = new HashMap<>();
         Map<UnitType, Integer> rTeachers = new HashMap<>();
-        List<Unit> rNotWorking = new ArrayList<>();
-        List<UnitType> rCouldWork = new ArrayList<>();
+        //List<Unit> rNotWorking = new ArrayList<>();
+        //List<UnitType> rCouldWork = new ArrayList<>();
         Map<UnitType, Integer> rImprove = new HashMap<>();
         Map<GoodsType, Double> rNeeded = new HashMap<>();
         for (ColonySummary s : summaries) {
@@ -895,13 +914,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
             rBonus += s.bonus;
             rSizeChange += s.sizeChange;
             accumulateMap(rProduction, s.production,
-                          ColonySummary.goodsProductionAccumulator);
+                ColonySummary.GoodsProduction.goodsProductionAccumulator);
             teacherLen = Math.max(teacherLen, s.teachers.size());
             for (Unit u : s.teachers.keySet()) {
                 accumulateToMap(rTeachers, u.getType(), 1, integerAccumulator);
             }
-            rNotWorking.addAll(s.notWorking);
-            rCouldWork.addAll(s.couldWork);
+            //rNotWorking.addAll(s.notWorking);
+            //rCouldWork.addAll(s.couldWork);
             improveLen = Math.max(improveLen, s.improve.size() + s.want.size());
             for (UnitType ut : s.improve.keySet()) {
                 accumulateToMap(rImprove, ut, 1, integerAccumulator);
@@ -937,7 +956,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         Set<Tile> tiles = transform(rTileSuggestions,
                                     TileImprovementSuggestion::isExploration,
                                     ts -> ts.tile, Collectors.toSet());
-        reportPanel.add((tiles.isEmpty()) ? new JLabel()
+        reportPanel.add((tiles.isEmpty()) ? emptyLabel
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                        stpld("report.colony.exploring.summary")));
 
@@ -950,7 +969,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             tiles.addAll(transform(rTileSuggestions,
                                    matchKey(ti, ts -> ts.tileImprovementType),
                                    ts -> ts.tile, Collectors.toSet()));
-            reportPanel.add((tiles.isEmpty()) ? new JLabel()
+            reportPanel.add((tiles.isEmpty()) ? emptyLabel
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                            stpld("report.colony.tile." + ti.getSuffix()
                                + ".summary")));
@@ -978,7 +997,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             default:
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
-            reportPanel.add((c == null) ? new JLabel()
+            reportPanel.add((c == null) ? emptyLabel
                 : newLabel(Integer.toString(gp.amount), null, c,
                     stpld("report.colony.production.summary")
                         .addNamed("%goods%", gt)));
@@ -1015,7 +1034,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
     private List<JLabel> unitTypeLabels(Map<UnitType, Integer> unitTypeMap,
                                         int maxSize, StringTemplate t) {
-        List<JLabel> result = new ArrayList<>();
+        List<JLabel> result = new ArrayList<>(maxSize);
         int n = 0;
         for (Entry<UnitType, Integer> e
                  : mapEntriesByValue(unitTypeMap, descendingIntegerComparator)) {

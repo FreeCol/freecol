@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,7 +42,7 @@ import net.sf.freecol.server.ai.WorkerWish;
 /**
  * Mission for realizing a {@code Wish}.
  */
-public class WishRealizationMission extends Mission {
+public final class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
@@ -64,8 +64,9 @@ public class WishRealizationMission extends Mission {
      *     the unit and this mission.
      */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
-        super(aiMain, aiUnit, wish.getDestination());
+        super(aiMain, aiUnit);
 
+        setTarget(wish.getDestination());
         this.wish = wish;
         wish.setTransportable(aiUnit);
     }
@@ -104,7 +105,7 @@ public class WishRealizationMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason;
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
             : ((reason = invalidTargetReason(loc,
@@ -148,9 +149,7 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void setTarget(Location target) {
-        // Ignored, target is set by wish
-    }
+    public void setTarget(Location target) {} // ignore
 
     /**
      * {@inheritDoc}
@@ -166,7 +165,7 @@ public class WishRealizationMission extends Mission {
     @Override
     public String invalidReason() {
         return (this.wish == null) ? "wish-null"
-            : invalidReason(getAIUnit(), getTarget());
+            : invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**

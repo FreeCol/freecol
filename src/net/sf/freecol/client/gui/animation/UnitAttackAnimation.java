@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,11 +24,11 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -83,7 +83,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
      */
     private boolean loadAnimation(String startStr, float scale,
                                   Direction direction) {
-        String specialId = startStr + direction.toString().toLowerCase();
+        String specialId = startStr + downCase(direction.toString());
         if ((this.sza = ImageLibrary.getSZA(specialId, scale)) != null) {
             this.mirror = false;
             return true;
@@ -92,7 +92,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
         Direction mirrored = direction.getEWMirroredDirection();
         String mirroredId = "";
         if (mirrored != direction) {
-            mirroredId = startStr + mirrored.toString().toLowerCase();
+            mirroredId = startStr + downCase(mirrored.toString());
             if ((this.sza = ImageLibrary.getSZA(mirroredId, scale)) != null) {
                 this.mirror = true;
                 return true;
@@ -172,8 +172,8 @@ final class UnitAttackAnimation extends FreeColClientHolder {
             }
         }
 
-        if (fcc.getAnimationSpeed(this.defender.getOwner()) > 0
-            && !success) {
+        if (!success
+            && fcc.getAnimationSpeed(this.defender.getOwner()) > 0) {
             def = loadAnimation(this.defender, dirn.getReverseDirection());
             if (def) {
                 new UnitImageAnimation(fcc, this.defender, this.defenderTile,

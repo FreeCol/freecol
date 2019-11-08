@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -50,6 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.Timer;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
@@ -73,6 +74,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -106,8 +108,8 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
-
-import static net.sf.freecol.common.util.StringUtils.lastPart;
+import net.sf.freecol.common.util.Introspector;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -148,7 +150,6 @@ public class SwingGUI extends GUI {
         super(freeColClient, scaleFactor);
         
         this.graphicsDevice = getGoodGraphicsDevice();
-        this.mapViewer = new MapViewer(freeColClient);
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
@@ -172,7 +173,7 @@ public class SwingGUI extends GUI {
             return lge.getDefaultScreenDevice();
         } catch (HeadlessException he) {}
 
-        FreeColClient.fatal("Could not find a GraphicsDevice!");
+        FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         return null;
     }
 
@@ -643,38 +644,35 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(null, Messages.message(textKey),
-            null, okKey, cancelKey);
+        return canvas.showConfirmDialog(null, StringTemplate.key(textKey),
+                                        null, okKey, cancelKey);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean confirm(Tile tile, StringTemplate template,
-                           ImageIcon icon, String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(tile,
-            Utility.localizedTextArea(template), icon, okKey, cancelKey);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected <T> T getChoice(Tile tile, Object explain, ImageIcon icon,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(tile, explain, icon,
-                                       cancelKey, choices);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getInput(Tile tile, StringTemplate template,
-                           String defaultValue,
+    public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey) {
-        return canvas.showInputDialog(tile, template, defaultValue,
+        return canvas.showConfirmDialog(tile, tmpl, icon, okKey, cancelKey);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
+                              String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(tile, tmpl, icon, cancelKey, choices);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
+                           String okKey, String cancelKey) {
+        return canvas.showInputDialog(tile, tmpl, defaultValue,
                                       okKey, cancelKey);
     }
 
@@ -860,10 +858,11 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateGoto(int x, int y, boolean start) {
+        if (start && canvas.isDrag(x, y)) {
+            canvas.startGoto();
+        }
         if (canvas.isGotoStarted()) {
             updateGotoTile(canvas.convertToMapTile(x, y));
-        } else if (start && canvas.isDrag(x, y)) {
-            canvas.startGoto();
         }
     }
 
@@ -904,22 +903,18 @@ public class SwingGUI extends GUI {
         // Always instantiate in game.
         if (enable && mapControls == null) {
             String className = getClientOptions().getString(ClientOptions.MAP_CONTROLS);
+            final String panelName = "net.sf.freecol.client.gui.panel."
+                + lastPart(className, ".");
             try {
-                final String panelName = "net.sf.freecol.client.gui.panel."
-                    + lastPart(className, ".");
-                Class<?> controls = Class.forName(panelName);
-                mapControls = (MapControls)controls
-                    .getConstructor(FreeColClient.class)
-                    .newInstance(getFreeColClient());
-                logger.info("Instantiated " + panelName);
-            } catch (Exception e) {
-                logger.log(Level.INFO, "Fallback to CornerMapControls from "
-                    + className, e);
-                mapControls = new CornerMapControls(getFreeColClient());
-            }
-            if (mapControls != null) {
+                mapControls = (MapControls)Introspector.instantiate(panelName,
+                    new Class[] { FreeColClient.class },
+                    new Object[] { getFreeColClient() });
                 mapControls.addToComponent(canvas);
                 mapControls.update();
+                logger.info("Instantiated " + panelName);
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Failed in make map controls for: "
+                    + panelName, ie);
             }
         } else if (!enable && mapControls != null) {
             mapControls.removeFromComponent(canvas);
@@ -1106,8 +1101,7 @@ public class SwingGUI extends GUI {
             change = true;
             // Bring the selected tile along with the unit.
             Tile tile = (unit == null) ? null : unit.getTile();
-            changeSelectedTile(tile, getClientOptions()
-                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT));
+            changeSelectedTile(tile, true);
 
             // Switch the blink state.
             if (unit != null) {
@@ -1119,7 +1113,6 @@ public class SwingGUI extends GUI {
 
         if (change) updateMapControls();
         updateMenuBar(); // TODO: check
-        // System.err.println("CV " + unit + " " + change);
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -194,10 +194,10 @@ public class DiplomacySession extends TimedSession {
      * Utility to create a message using the current session parameters and
      * trade agreement, given a desired destination player.
      *
-     * @param destination The {@code ServerPlayer} to send the message to.
+     * @param destination The {@code Player} to send the message to.
      * @return A new {@code DiplomacyMessage} for the destination player.
      */
-    public DiplomacyMessage getMessage(ServerPlayer destination) {
+    public DiplomacyMessage getMessage(Player destination) {
         return (destination.owns(this.unit))
             ? ((this.otherUnit == null)
                 ? new DiplomacyMessage(this.unit, this.settlement, this.agreement)
@@ -257,16 +257,14 @@ public class DiplomacySession extends TimedSession {
      * @return Any {@code DiplomacySession} found.
      */
     private static DiplomacySession findContactSession(Player p1, Player p2) {
-        final ServerPlayer s1 = (ServerPlayer)p1;
-        final ServerPlayer s2 = (ServerPlayer)p2;
         final Predicate<Session> pred = s -> (s instanceof DiplomacySession)
             && ((DiplomacySession)s).getAgreement() != null
             && (((DiplomacySession)s).getAgreement().getContext()
                 == DiplomaticTrade.TradeContext.CONTACT)
-            && ((((DiplomacySession)s).getOwner() == s1
-                    && ((DiplomacySession)s).getOtherPlayer() == s2)
-                || (((DiplomacySession)s).getOwner() == s2
-                    && ((DiplomacySession)s).getOtherPlayer() == s1));
+            && ((((DiplomacySession)s).getOwner() == p1
+                    && ((DiplomacySession)s).getOtherPlayer() == p2)
+                || (((DiplomacySession)s).getOwner() == p2
+                    && ((DiplomacySession)s).getOtherPlayer() == p1));
         return (DiplomacySession)findSession(pred);
     }
 
@@ -285,10 +283,10 @@ public class DiplomacySession extends TimedSession {
             }
             this.agreement.setStatus((result) ? TradeStatus.ACCEPT_TRADE
                                               : TradeStatus.REJECT_TRADE);
-            ServerPlayer sp = (ServerPlayer)this.agreement.getSender();
+            Player sp = this.agreement.getSender();
             cs.add(See.only(sp), getMessage(sp));
-            sp = (ServerPlayer)this.agreement.getRecipient();
-            cs.add(See.only(sp), getMessage(sp));
+            Player rp = this.agreement.getRecipient();
+            cs.add(See.only(rp), getMessage(rp));
         }
         this.unit.setMovesLeft(0);
         cs.add(See.only(getOwner()), this.unit);
@@ -323,9 +321,9 @@ public class DiplomacySession extends TimedSession {
         ChangeSet cs = new ChangeSet();
         boolean ret = complete(false, cs);
         if (!ret) { // Withdraw offer
-            cs.add(See.only((ServerPlayer)this.agreement.getSender()),
+            cs.add(See.only(this.agreement.getSender()),
                    new CloseMessage(dialogName));
-            cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
+            cs.add(See.only(this.agreement.getRecipient()),
                    new CloseMessage(dialogName));
         }
         getGame().sendToAll(cs);

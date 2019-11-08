@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,9 +22,12 @@ package net.sf.freecol.common.networking;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +45,108 @@ import org.xml.sax.SAXException;
 final class ReceivingThread extends Thread {
 
     private static final Logger logger = Logger.getLogger(ReceivingThread.class.getName());
+
+    /** A class to handle questions. */
+    private static class QuestionThread extends Thread {
+
+        /** The connection to communicate with. */
+        private final Connection conn;
+
+        /** The message to handle. */
+        private final Message query;
+
+        /** The reply identifier to use when sending a reply. */
+        private final int replyId;
+
+
+        /**
+         * Build a new thread to respond to a question message.
+         *
+         * @param name The thread name.
+         * @param conn The {@code Connection} to use for I/O.
+         * @param query The {@code Message} to handle.
+         * @param replyId The network reply identifier 
+         */
+        public QuestionThread(String name, Connection conn, Message query,
+            int replyId) {
+            super(name);
+
+            this.conn = conn;
+            this.query = query;
+            this.replyId = replyId;
+        }
+            
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            Message reply;
+            try {
+                reply = this.conn.handle(this.query);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, getName() + ": handler fail", fce);
+                return;
+            }
+
+            final String replyTag = (reply == null) ? "null"
+                : reply.getType();
+            try {
+                this.conn.sendMessage(new ReplyMessage(this.replyId, reply));
+                logger.log(Level.FINEST, getName() + " -> " + replyTag);
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, getName() + " -> " + replyTag
+                    + " failed", ex);
+            }                
+        }
+    };
+
+    private static class UpdateThread extends Thread {
+
+        /** The connection to use for I/O. */
+        private final Connection conn;
+
+        /** The message to handle. */
+        private final Message message;
+
+
+        /**
+         * Build a new thread to handle an update.
+         *
+         * @param name The thread name.
+         * @param conn The {@code Connection} to use to send messsages.
+         * @param message The {@code Message} to handle.
+         */
+        public UpdateThread(String name, Connection conn, Message message) {
+            super(name);
+
+            this.conn = conn;
+            this.message = message;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            Message reply;
+            try {
+                reply = this.conn.handle(this.message);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, getName() + ": handler fail", fce);
+                return;
+            }
+
+            final String outTag = (reply == null) ? "null" : reply.getType();
+            try {
+                this.conn.sendMessage(reply);
+                logger.log(Level.FINEST, getName() + " -> " + outTag);
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, getName() + " -> " + outTag
+                    + " failed", ex);
+            }                
+        }
+    };
 
     /** Maximum number of retries before closing the connection. */
     private static final int MAXIMUM_RETRIES = 5;
@@ -110,19 +215,30 @@ final class ReceivingThread extends Thread {
     }
 
     /**
+     * Set the shouldRun state to false.
+     *
+     * @return The old value of shouldRun.
+     */
+    private synchronized boolean stopRun() {
+        if (!this.shouldRun) return false;
+        this.shouldRun = false;
+        return true;
+    }
+        
+    /**
      * Stop this thread.
      *
      * @return True if the thread was previously running and is now stopped.
      */
-    private synchronized boolean stopThread() {
-        boolean ret = this.shouldRun;
-        if (this.shouldRun) {
-            this.shouldRun = false;
-            for (NetworkReplyObject o : this.waitingThreads.values()) {
-                o.interrupt();
-            }
+    private boolean stopThread() {
+        if (!stopRun()) return false;
+        // Explicit extraction from waitingThreads before iterating
+        Collection<NetworkReplyObject> nros;
+        synchronized (this.waitingThreads) {
+            nros = this.waitingThreads.values();
         }
-        return ret;
+        for (NetworkReplyObject o : nros) o.interrupt();
+        return true;
     }
         
     /**
@@ -153,34 +269,11 @@ final class ReceivingThread extends Thread {
      */
     private Thread messageQuestion(final QuestionMessage qm,
                                    final int replyId) {
-        final Connection conn = this.connection;
         final Message query = qm.getMessage();
-        if (query == null) return null;
-        final String tag = query.getType();
-        final String name = getName() + "-question-" + replyId + "-" + tag;
-
-        return new Thread(name) {
-            @Override
-            public void run() {
-                Message reply;
-                try {
-                    reply = conn.handle(query);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, name + ": handler fail", fce);
-                    return;
-                }
-
-                final String replyTag = (reply == null) ? "null"
-                    : reply.getType();
-                try {
-                    conn.sendMessage(new ReplyMessage(replyId, reply));
-                    logger.log(Level.FINEST, name + " -> " + replyTag);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, name + ": response " + replyTag
-                        + "fail", ex);
-                }
-            }
-        };
+        return (query == null) ? null
+            : new QuestionThread(getName() + "-question-" + replyId + "-"
+                                     + query.getType(),
+                                 this.connection, query, replyId);
     }
 
     /**
@@ -192,38 +285,16 @@ final class ReceivingThread extends Thread {
     private Thread messageUpdate(final Message message) {
         if (message == null) return null;
         final String inTag = message.getType();
-        final Connection conn = this.connection;
-        final String name = getName() + "-update-" + inTag;
-        
-        return new Thread(name) {
-            @Override
-            public void run() {
-                Message reply;
-                try {
-                    reply = conn.handle(message);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, name + ": handler fail", fce);
-                    return;
-                }
 
-                final String outTag = (reply == null) ? "null"
-                    : reply.getType();
-                try {
-                    conn.sendMessage(reply);
-                    logger.log(Level.FINEST, name + " -> " + outTag);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, name + ": send exception", ex);
-                }
-            }
-        };
+        return new UpdateThread(getName() + "-update-" + inTag,
+                                this.connection, message);
     }
 
     /**
      * Listens to the InputStream and calls the message handler for
      * each message received.
      * 
-     * @exception IOException If thrown by the
-     *     {@link FreeColNetworkInputStream}.
+     * @exception IOException on low level IO problems.
      * @exception SAXException if a problem occured during parsing.
      * @exception XMLStreamException if a problem occured during parsing.
      */
@@ -272,14 +343,15 @@ final class ReceivingThread extends Thread {
             // A question.  Build a thread to handle it and send a reply.
 
             replyId = this.connection.getReplyId();
+            Message m = null;
             try {
-                Message m = this.connection.reader();
+                m = this.connection.reader();
                 assert m instanceof QuestionMessage;
                 t = messageQuestion((QuestionMessage)m, replyId);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, getName() + ": question fail", ex);
-                askToStop("listen-question-fail");
-            }
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, "No reader for " + replyId, fce);
+                t = null;
+            }                
             break;
             
         default:
@@ -330,11 +402,8 @@ final class ReceivingThread extends Thread {
                     disconnect();
                 }
             }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, getName() + ": unexpected fail", ex);
         } finally {
             askToStop("run complete");
         }
-        logger.info(getName() + ": finished");
     }
 }

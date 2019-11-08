@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -36,6 +36,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -50,22 +53,14 @@ import net.sf.freecol.common.i18n.Messages;
  */
 public class FreeColOptionPaneUI extends BasicOptionPaneUI {
 
-    private Component initialFocusComponent = null;
-
     private int okIndex = -1, cancelIndex = -1;
 
-    private JButton[] newButtons = null;
+    private List<JButton> newButtons = null;
 
 
+    /** Trivial internal constructor. */
     private FreeColOptionPaneUI() {}
 
-    public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
-        return new FreeColOptionPaneUI();
-    }
-
-    public Component getInitialFocusComponent() {
-        return initialFocusComponent;
-    }
 
     /**
      * Choose the number of columns for the OptionPane buttons.
@@ -83,16 +78,17 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     }
 
     /**
-     * Prepare the new buttons for this component.
+     * Prepare the new buttons for this component and cache.
      *
-     * @param buttons An array of objects provided to define the buttons.
+     * @return A list of buttons.
      */
-    private void prepareButtons(Object[] buttons) {
-        if (this.newButtons != null) return;
+    private List<JButton> prepareButtons() {
+        if (this.newButtons != null) return this.newButtons;
 
         final String okLabel = Messages.message("ok");
         final String cancelLabel = Messages.message("cancel");
-        this.newButtons = new JButton[buttons.length];
+        Object[] buttons = getButtons();
+        List<JButton> newButtons = new ArrayList<>(buttons.length);
 
         int maxWidth = 0, maxHeight = 0;
         for (int i = 0; i < buttons.length; i++) {
@@ -101,8 +97,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 ChoiceItem ci = (ChoiceItem)buttons[i];
                 String label = ci.toString();
                 Icon icon = ci.getIcon();
-                b = (icon == null) ? new JButton(label)
-                    : (label == null || label.isEmpty()) ? new JButton(icon)
+                b = (label.isEmpty()) ? new JButton(icon)
                     : new JButton(label, icon);
                 b.setName("OptionPane.button." + label);
                 if (ci.isOK()) this.okIndex = i;
@@ -120,21 +115,40 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
             maxWidth = Math.max(maxWidth, b.getMinimumSize().width);
             maxHeight = Math.max(maxHeight, b.getMinimumSize().height);
             ActionListener buttonListener = createButtonActionListener(i);
-            if (buttonListener != null) b.addActionListener(buttonListener);
-            this.newButtons[i] = b;
+            b.addActionListener(buttonListener);
+            newButtons.add(b);
         }
         if (maxWidth > 0) {
             Dimension dimension = new Dimension(maxWidth, maxHeight);
             for (int i = 0; i < buttons.length; i++) {
                 if (buttons[i] instanceof Icon) continue;
-                newButtons[i].setPreferredSize(dimension);
-                newButtons[i].setMinimumSize(dimension);
+                JButton newb = newButtons.get(i);
+                newb.setPreferredSize(dimension);
+                newb.setMinimumSize(dimension);
             }
         }
+        return newButtons;
     }
 
+    /**
+     * Get a button by index.
+     *
+     * @param index The index to look for.
+     * @return The corresponding button.
+     */
+    private JButton getButton(int index) {
+        return this.newButtons.get(index);
+    }
 
+    
     // Override BasicOptionPaneUI
+
+    /**
+     * {@inheritDoc}
+     */
+    public static ComponentUI createUI(@SuppressWarnings("unused")JComponent c) {
+        return new FreeColOptionPaneUI();
+    }
 
     /**
      * {@inheritDoc}
@@ -142,15 +156,11 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     @Override
     protected Container createButtonArea() {
         Object[] buttons = getButtons();
-        prepareButtons(buttons);
-
-        JPanel bottom;
-        if (this.okIndex >= 0) { // Confirm dialog
-            bottom = new MigPanel(new MigLayout("insets dialog"));
-        } else { // Multi-line choice dialog
-            bottom = new MigPanel(new MigLayout("wrap "
-                    + getColumns(buttons.length)));
-        }
+        JPanel bottom = new MigPanel(new MigLayout((this.okIndex < 0)
+                // Multi-line choice dialog
+                ? "wrap " + getColumns(buttons.length)
+                // Confirm dialog
+                : "insets dialog"));
         bottom.setOpaque(false);
         bottom.setName("OptionPane.buttonArea");
         addButtonComponents(bottom, buttons, getInitialValueIndex());
@@ -165,9 +175,11 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     protected void addButtonComponents(Container container, Object[] buttons,
                                        int initialIndex) {
         if (buttons == null) return;
-
-        if (0 <= initialIndex && initialIndex < buttons.length) {
-            JButton b = newButtons[initialIndex];
+        this.newButtons = prepareButtons();
+        final int nButtons = this.newButtons.size();
+        
+        if (0 <= initialIndex && initialIndex < nButtons) {
+            JButton b = getButton(initialIndex);
             this.initialFocusComponent = b;
             b.addHierarchyListener((HierarchyEvent e) -> {
                     if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
@@ -182,22 +194,22 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
             // If OK is present this is a confirm-dialog.  Put everything
             // in the same span especially the Cancel.
             if (cancelIndex >= 0) {
-                container.add(newButtons[cancelIndex], "tag cancel");
+                container.add(getButton(cancelIndex), "tag cancel");
             }
-            container.add(newButtons[okIndex], "tag ok");
-            for (int i = 0; i < buttons.length; i++) {
+            container.add(getButton(okIndex), "tag ok");
+            for (int i = 0; i < nButtons; i++) {
                 if (i == okIndex || i == cancelIndex) continue;
-                container.add(newButtons[i]);
+                container.add(getButton(i));
             }
         } else {
             // This must be a choice dialog.  The wrap argument to the
             // MigLayout constructor will do the work for us.
-            for (int i = 0; i < buttons.length; i++) {
+            for (int i = 0; i < nButtons; i++) {
                 if (i == cancelIndex) continue;
-                container.add(newButtons[i]);
+                container.add(getButton(i));
             }
             if (cancelIndex >= 0) {
-                container.add(newButtons[cancelIndex],
+                container.add(getButton(cancelIndex),
                               "newline 20, tag cancel");
             }
         }

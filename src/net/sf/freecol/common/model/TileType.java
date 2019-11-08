@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -287,7 +287,7 @@ public final class TileType extends FreeColSpecObjectType
      * @return True if the {@code ResourceType} is compatible.
      */
     public boolean canHaveResourceType(ResourceType resourceType) {
-        return getResourceTypes().contains(resourceType);
+        return getResourceTypeValues().contains(resourceType);
     }
 
     /**
@@ -371,6 +371,8 @@ public final class TileType extends FreeColSpecObjectType
      * of colony center tile and production level.  If the production
      * level is null, all production levels will be returned.
      *
+     * Public for the test suite.
+     *
      * @param unattended Whether the production is unattended.
      * @param level The production level.
      * @return A list of {@code ProductionType}s.
@@ -420,8 +422,7 @@ public final class TileType extends FreeColSpecObjectType
                                       UnitType unitType) {
         if (goodsType == null) return 0;
         int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)applyModifiers(amount, null, goodsType.getId(),
-                                     unitType);
+        amount = (int)apply(amount, null, goodsType.getId(), unitType);
         return (amount < 0) ? 0 : amount;
     }
 
@@ -437,17 +438,7 @@ public final class TileType extends FreeColSpecObjectType
      */
     public Stream<AbstractGoods> getPossibleProduction(boolean unattended) {
         return flatten(getAvailableProductionTypes(unattended),
-                       pt -> pt.getOutputs());
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Kludge to make this public so that MapViewer can see it.
-     */
-    @Override
-    public int getIndex() {
-        return super.getIndex();
+                       ProductionType::getOutputs);
     }
 
 

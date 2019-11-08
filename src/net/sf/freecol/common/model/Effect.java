@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -85,7 +85,7 @@ public class Effect extends FreeColSpecObjectType {
         setId(template.getId());
         setSpecification(template.getSpecification());
         this.probability = template.probability;
-        setScopes(template.getScopeList());
+        copyScopes(template.getScopeList());
         addFeatures(template);
     }
 

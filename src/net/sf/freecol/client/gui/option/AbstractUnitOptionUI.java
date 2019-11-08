@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -91,8 +91,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                                 final boolean editable) {
         super(option, editable);
 
-        this.panel = new MigPanel();
-        this.panel.setLayout(new MigLayout());
+        this.panel = new MigPanel(new MigLayout());
 
         IntegerOption numberOption = option.getNumber();
         UnitTypeOption typeOption = option.getUnitType();
@@ -143,7 +142,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                     n++;
                 }
             }
-            enable = isEditable() && n > 1;
+            enable = n > 1 && isEditable();
         } else {
             model = new DefaultComboBoxModel<>(new String[] {
                     Specification.DEFAULT_ROLE_ID });

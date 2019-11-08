@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -78,7 +78,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         final List<Modifier> defence
             = sort(defenceModifiers, Modifier.ascendingModifierIndexComparator);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 6",
+        JPanel panel = new MigPanel(new MigLayout("wrap 6",
                 "[sg label]20[sg value, right]1px[sg percent]40"
                 + "[sg label]20[sg value, right]1px[sg percent]", ""));
         // left hand side: attacker
@@ -103,7 +103,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                 lib.getScaledSettlementImage(settlement)));
 
         } else {
-            throw new IllegalStateException("Bogus attack");
+            throw new RuntimeException("Bogus attack: " + attacker
+                + " v " + defender);
         }
 
         panel.add(new JLabel(attackerName), "span 3, align center");
@@ -138,12 +139,12 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor());
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
-        JLabel finalOffenceLabel = Utility.localizedLabel("finalResult");
-        finalOffenceLabel.setFont(bigFont);
+        JLabel finalLabel = Utility.localizedLabel("finalResult");
+        finalLabel.setFont(bigFont);
         panel.add(new JSeparator(JSeparator.HORIZONTAL),
                   "newline, span 3, growx");
         panel.add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
-        panel.add(finalOffenceLabel);
+        panel.add(finalLabel);
         JLabel finalOffenceResult
             = new JLabel(ModifierFormat.format(offenceResult));
         finalOffenceResult.setFont(bigFont);
@@ -151,9 +152,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
 
         float defenceResult
             = FeatureContainer.applyModifiers(0f, turn, defenceModifiers);
-        JLabel finalDefenceLabel = Utility.localizedLabel("finalResult");
-        finalDefenceLabel.setFont(bigFont);
-        panel.add(finalDefenceLabel, "skip");
+        panel.add(finalLabel, "skip");
         JLabel finalDefenceResult
             = new JLabel(ModifierFormat.format(defenceResult));
         finalDefenceResult.setFont(bigFont);

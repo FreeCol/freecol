@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -54,13 +55,15 @@ import net.sf.freecol.server.ai.Cargo;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TransportableAIObject;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * Mission for transporting units and goods on a carrier.
  *
  * @see net.sf.freecol.common.model.Unit Unit
  */
-public class TransportMission extends Mission {
+public final class TransportMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(TransportMission.class.getName());
 
@@ -98,7 +101,9 @@ public class TransportMission extends Mission {
      * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit, aiUnit.getTrivialTarget());
+        super(aiMain, aiUnit);
+
+        setTarget(aiUnit.getTrivialTarget());
     }
 
     /**
@@ -343,9 +348,10 @@ public class TransportMission extends Mission {
         Location now = null;
         int ret = 0;
         for (Cargo cargo : tCopy()) {
-            if (!Map.isSameLocation(now, cargo.getCarrierTarget())) {
+            Location t = cargo.getCarrierTarget();
+            if (!Map.isSameLocation(now, t)) {
                 ret++;
-                now = cargo.getCarrierTarget();
+                now = t;
             }
         }
         return ret;
@@ -643,7 +649,7 @@ public class TransportMission extends Mission {
      * @return True if the cargo is no longer on board and not on the
      *     transport list, or is on board but is scheduled to be dumped.
      */
-    public boolean dumpCargo(Cargo cargo, LogBuilder lb) {
+    private boolean dumpCargo(Cargo cargo, LogBuilder lb) {
         TransportableAIObject t = cargo.getTransportable();
         if (isCarrying(t)) t.leaveTransport();
         if (!isCarrying(t) && tFind(t) != null) removeCargo(cargo);
@@ -666,7 +672,7 @@ public class TransportMission extends Mission {
      * @param lb A {@code LogBuilder} to log to.
      * @return True if the queuing succeeded.
      */
-    public boolean requeueCargo(Cargo cargo, LogBuilder lb) {
+    private boolean requeueCargo(Cargo cargo, LogBuilder lb) {
         final TransportableAIObject t = cargo.getTransportable();
         boolean ret = false;
         assert tFind(t) == cargo;
@@ -714,7 +720,7 @@ public class TransportMission extends Mission {
         for (Cargo cargo : tCopy()) {
             dump = false;
             TransportableAIObject t = cargo.getTransportable();
-            reason = invalidReason(aiCarrier, cargo.getCarrierTarget());
+            reason = invalidMissionReason(aiCarrier, cargo.getCarrierTarget());
             if (reason != null || (reason = cargo.check(aiCarrier)) != null) {
                 // Just remove, it is invalid
                 removeCargo(cargo);
@@ -826,6 +832,7 @@ public class TransportMission extends Mission {
      *     TNEXT if it has progressed to the next stage,
      *     TRETRY if a blockage has occurred and it should be retried,
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     private CargoResult tryCargo(Cargo cargo, LogBuilder lb) {
         final Unit carrier = getUnit();
         final Location here = carrier.getLocation();
@@ -851,7 +858,7 @@ public class TransportMission extends Mission {
             if ((d = cargo.getJoinDirection()) == null) {
                 logger.warning("Null pickup direction"
                     + " for " + cargo.toShortString()
-                    + " at " + t.getLocation().toString()
+                    + " at " + t.getLocation()
                     + " to " + carrier);
                 return CargoResult.TFAIL;
             }                    
@@ -988,7 +995,7 @@ public class TransportMission extends Mission {
                     cargo.clear();
                     break;
                 case TNEXT: default:
-                    throw new IllegalStateException("Can not happen");
+                    throw new RuntimeException("Can not happen: " + result);
                 }
             }
             curr.clear();
@@ -1005,10 +1012,7 @@ public class TransportMission extends Mission {
                     ? tryCargo(cargo, lb)
                     : CargoResult.TCONTINUE;
                 switch (result) {
-                case TCONTINUE:
-                    cont.add(cargo);
-                    break;
-                case TNEXT:
+                case TCONTINUE: case TNEXT:
                     cont.add(cargo);
                     break;
                 case TRETRY:
@@ -1022,7 +1026,7 @@ public class TransportMission extends Mission {
                     cargo.clear();
                     break;
                 default:
-                    throw new IllegalStateException("Can not happen");
+                    throw new RuntimeException("Can not happen: " + result);
                 }
             }
 
@@ -1152,7 +1156,6 @@ public class TransportMission extends Mission {
         float bestDirectValue = 0.0f, bestFallbackValue = 0.0f;
         for (TransportableAIObject t : euaip.getUrgentTransportables()) {
             if (t.isDisposed() || !t.carriableBy(carrier)) continue;
-            Location loc = t.getTransportSource();
             Cargo cargo;
             try {
                 cargo = Cargo.newCargo(t, carrier);
@@ -1185,7 +1188,7 @@ public class TransportMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
@@ -1215,13 +1218,23 @@ public class TransportMission extends Mission {
     }
             
     /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The {@code AIUnit} to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
+    }
+
+    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The {@code AIUnit} to check.
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason;
         return ((reason = invalidMissionReason(aiUnit)) != null)
             ? reason
@@ -1232,15 +1245,6 @@ public class TransportMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The {@code AIUnit} to check.
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
-    }
 
     // End of cargoes handling.
 
@@ -1381,7 +1385,7 @@ public class TransportMission extends Mission {
     @Override
     public String invalidReason() {
         final AIUnit aiUnit = getAIUnit();
-        String reason = invalidReason(aiUnit, getTarget());
+        String reason = invalidMissionReason(aiUnit, getTarget());
         Cargo cargo;
         return (reason != null) ? reason
             : ((cargo = tFirst()) == null) ? null

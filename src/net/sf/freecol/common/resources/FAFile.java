@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -134,12 +134,12 @@ public class FAFile {
                 StandardCharsets.UTF_8));
         String line = in.readLine();
         if (line == null || !line.startsWith("FontAnimationFile")) {
-            throw new IllegalStateException("Not a FAF");
+            throw new RuntimeException("Not a FAF: " + this);
         }
 
         line = in.readLine();
         if (line == null) {
-            throw new IllegalStateException("Max height expected");
+            throw new RuntimeException("Max height expected: " + this);
         }
         StringTokenizer st = new StringTokenizer(line);
         maxHeight = Integer.parseInt(st.nextToken());

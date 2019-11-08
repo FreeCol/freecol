@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -649,7 +649,8 @@ public class GUI extends FreeColClientHolder {
     public TradeBuyAction getBuyChoice(Unit unit, Settlement settlement,
                                        Goods goods, int gold, boolean canBuy) {
         //Get Buy price on Europe Market for comparison
-        int euroPrice = unit.getOwner().getMarket().getBidPrice(goods.getType(), goods.getAmount());
+        int euroPrice = unit.getOwner().getMarket()
+            .getBidPrice(goods.getType(), goods.getAmount());
         StringTemplate template = StringTemplate.template("buy.text")
             .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goods.getLabel(true))
@@ -670,16 +671,17 @@ public class GUI extends FreeColClientHolder {
      * General modal choice dialog.
      *
      * @param <T> The choice type.
-     * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param explain A {@code StringTemplate} explaining the choice.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(tile, explain, (ImageIcon)null, cancelKey, choices);
+    public final <T> T getChoice(StringTemplate explain, String cancelKey,
+                                 List<ChoiceItem<T>> choices) {
+        return getChoice(null, explain,
+            new ImageIcon(ImageLibrary.getPlaceholderImage()),
+            cancelKey, choices);
     }
 
     /**
@@ -687,16 +689,17 @@ public class GUI extends FreeColClientHolder {
      *
      * @param <T> The choice type.
      * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param template A {@code StringTemplate} explaining the choice.
      * @param goodsType A {@code GoodsType} to display in dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(tile, explain,
+    private final <T> T getChoice(Tile tile, StringTemplate template,
+                                  GoodsType goodsType, String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
+        return getChoice(tile, template,
             new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
             cancelKey, choices);
     }
@@ -706,16 +709,17 @@ public class GUI extends FreeColClientHolder {
      *
      * @param <T> The choice type.
      * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param template A {@code StringTemplate} explaining the choice.
      * @param nation A {@code Nation} to display in dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain, Nation nation,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(tile, explain,
+    private final <T> T getChoice(Tile tile, StringTemplate template,
+                                  Nation nation, String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
+        return getChoice(tile, template,
             new ImageIcon(imageLibrary.getScaledNationImage(nation)),
             cancelKey, choices);
     }
@@ -725,16 +729,17 @@ public class GUI extends FreeColClientHolder {
      *
      * @param <T> The choice type.
      * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param template A {@code StringTemplate} explaining the choice.
      * @param settlement A {@code Settlement} to display in dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain, Settlement settlement,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(tile, explain,
+    public final <T> T getChoice(Tile tile, StringTemplate template,
+                                 Settlement settlement, String cancelKey,
+                                 List<ChoiceItem<T>> choices) {
+        return getChoice(tile, template,
             new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
             cancelKey, choices);
     }
@@ -744,16 +749,17 @@ public class GUI extends FreeColClientHolder {
      *
      * @param <T> The choice type.
      * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param template A {@code StringTemplate} explaining the choice.
      * @param unit A {@code Unit} to display in dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain, Unit unit,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(tile, explain,
+    public final <T> T getChoice(Tile tile, StringTemplate template,
+                                 Unit unit, String cancelKey,
+                                 List<ChoiceItem<T>> choices) {
+        return getChoice(tile, template,
             new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
             cancelKey, choices);
     }
@@ -1110,7 +1116,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param settlement The {@code Settlement} to display.
      */
-    public final void showSettlement(Settlement settlement) {
+    private final void showSettlement(Settlement settlement) {
         if (settlement instanceof Colony) {
             if (getMyPlayer().owns(settlement)) {
                 showColonyPanel((Colony)settlement, null);
@@ -1128,8 +1134,6 @@ public class GUI extends FreeColClientHolder {
      * to a given player.
      *
      * @param tile The {@code Tile} to check for settlements.
-     * @param foriegn If true, use the foreign settlement functionality
-     *     for colonies.
      */
     public final void showTileSettlement(Tile tile) {
         if (tile == null) return;
@@ -1348,6 +1352,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the animation position.
      *
+     * @param labelWidth The width of the label.
+     * @param labelHeight The height of the label.
+     * @param tileP The position of the {@code Tile} on the screen.
      * @return A point on the map to place a unit for movement.
      */
     public Point getAnimationPosition(int labelWidth, int labelHeight,
@@ -1391,8 +1398,8 @@ public class GUI extends FreeColClientHolder {
      * Simple modal confirmation dialog.
      *
      * @param textKey A string to use as the message key.
-     * @param okKey A key for the "ok" button.
-     * @param cancelKey A key for the "cancel" button.
+     * @param okKey A key for the message on the "ok" button.
+     * @param cancelKey A key for the message on the "cancel" button.
      * @return True if the "ok" button was selected.
      */
     public boolean confirm(String textKey, String okKey, String cancelKey) {
@@ -1405,8 +1412,8 @@ public class GUI extends FreeColClientHolder {
      * @param tile An optional {@code Tile} to expose.
      * @param template The {@code StringTemplate} explaining the choice.
      * @param icon An {@code ImageIcon} to display in dialog.
-     * @param okKey A key for the "ok" button.
-     * @param cancelKey A key for the "cancel" button.
+     * @param okKey A key for the message on the "ok" button.
+     * @param cancelKey A key for the message on the "cancel" button.
      * @return True if the "ok" button was selected.
      */
     public boolean confirm(Tile tile, StringTemplate template,
@@ -1420,15 +1427,16 @@ public class GUI extends FreeColClientHolder {
      *
      * @param <T> The choice type.
      * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param template A {@code StringTemplate} explaining the choice.
      * @param icon An optional {@code ImageIcon} to display in dialog.
-     * @param cancelKey A key for the "cancel" button.
+     * @param cancelKey A key for the message on the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    protected <T> T getChoice(Tile tile, Object explain, ImageIcon icon,
-                              String cancelKey, List<ChoiceItem<T>> choices) {
+    protected <T> T getChoice(Tile tile, StringTemplate template,
+                              ImageIcon icon, String cancelKey,
+                              List<ChoiceItem<T>> choices) {
         return null;
     }
 
@@ -1438,8 +1446,8 @@ public class GUI extends FreeColClientHolder {
      * @param tile An optional {@code Tile} to expose.
      * @param template A {@code StringTemplate} explaining the choice.
      * @param defaultValue The default value to show initially.
-     * @param okKey A key for the "ok" button.
-     * @param cancelKey A key for the "cancel" button.
+     * @param okKey A key for the message on the "ok" button.
+     * @param cancelKey A key for the message on the "cancel" button.
      * @return The chosen value.
      */
     public String getInput(Tile tile, StringTemplate template,
@@ -1556,7 +1564,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Perform an immediate goto to a tile with the active unit.
      *
-     * Called from {@see TilePopup}.
+     * Called from {@link TilePopup}.
      *
      * @param tile The {@code Tile} to go to.
      */
@@ -1565,7 +1573,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Perform an immediate goto to a point on the map.
      *
-     * Called from {@see CanvasMouseListener}.
+     * Called from {@link CanvasMouseListener}.
      *
      * @param x The x coordinate of the goto destination (pixels).
      * @param y The x coordinate of the goto destination (pixels).
@@ -1748,7 +1756,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Change to map transform mode, and select a transform.
      *
-     * @param mt The {@code MapTransform} to select.
+     * @param transform The {@code MapTransform} to select.
      */
     public void changeView(MapTransform transform) {}
     
@@ -1769,15 +1777,15 @@ public class GUI extends FreeColClientHolder {
     }
 
     protected void resetMapZoom() {
-        ResourceManager.clean();
+        ResourceManager.clearImageCache();
     }
 
     public void zoomInMap() {
-        ResourceManager.clean();
+        ResourceManager.clearImageCache();
     }
 
     public void zoomOutMap() {
-        ResourceManager.clean();
+        ResourceManager.clearImageCache();
     }
 
 
@@ -2102,8 +2110,12 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the high scores panel.
+     *
+     * @param messageId The message identifier.
+     * @param scores The {@code HighScore}s to display.
      */
-    public void showHighScoresPanel(String messageId, List<HighScore> scores) {}
+    public void showHighScoresPanel(String messageId,
+                                    List<HighScore> scores) {}
 
     /**
      * Show a panel for a native settlement.
@@ -2154,7 +2166,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show the main panel.
      *
-     * @parm userMsg An optional user message to display.
+     * @param userMsg An optional user message to display.
      */
     public void showMainPanel(String userMsg) {}
 
@@ -2373,6 +2385,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the Turn Report.
+     *
+     * @param messages The {@code ModelMessage}s that make up the report.
      */
     public void showReportTurnPanel(List<ModelMessage> messages) {}
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,8 +20,11 @@
 package net.sf.freecol.tools;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -63,18 +66,24 @@ public class TranslationReport {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
             });
+        if (languageFiles == null) {
+            System.err.println("No language files found in " + directory);
+            System.exit(1);
+        }
 
-        File masterFile = new File(directory, "FreeColMessages.properties");
+        Path filePath = FileSystems.getDefault().getPath(args[0],
+            "FreeColMessages.properties");
         Properties master = new Properties();
-        master.load(new FileInputStream(masterFile));
+        master.load(Files.newInputStream(filePath));
         //System.out.println("*** Found master property file with " + master.size() + " properties.\n");
 
+        Properties properties = new Properties();
         for (String name : languageFiles) {
             LanguageStatsRecord lstat = new LanguageStatsRecord();
             lstat.localFile = name;
-            File propertyFile = new File(directory, name);
-            Properties properties = new Properties();
-            properties.load(new FileInputStream(propertyFile));
+            Path propPath = FileSystems.getDefault().getPath(args[0], name);
+            properties.clear();
+            properties.load(Files.newInputStream(propPath));
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
             System.out.println("*** " + name + " ***");
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
@@ -269,4 +278,3 @@ public class TranslationReport {
     }
 
 }
-

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -48,9 +48,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * The control object that is responsible for setting parameters
- * and starting a new game. {@link PreGameInputHandler} is used
- * to receive and handle network messages from the clients.
+ * The control object that is responsible for setting parameters and
+ * starting a new game.
  *
  * The game enters the state
  * {@link net.sf.freecol.server.FreeColServer.ServerState#IN_GAME}, when the
@@ -95,8 +94,6 @@ public final class PreGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet ready(ServerPlayer serverPlayer, boolean ready) {
-        final FreeColServer freeColServer = getFreeColServer();
-        
         serverPlayer.setReady(ready);
         getFreeColServer().sendToAll(new ReadyMessage(serverPlayer, ready),
                                      serverPlayer);
@@ -129,8 +126,9 @@ public final class PreGameController extends Controller {
         serverPlayer.setReady(true);
 
         // Check that no two players have the same nation
-        List<Nation> nations = new ArrayList<>();
-        for (Player p : game.getLivePlayerList()) {
+        List<Player> players = game.getLivePlayerList();
+        List<Nation> nations = new ArrayList<>(players.size());
+        for (Player p : players) {
             final Nation nation = spec.getNation(p.getNationId());
             if (nations.contains(nation)) {
                 setLaunching(false);
@@ -261,9 +259,11 @@ public final class PreGameController extends Controller {
 
     /**
      * Handle a request for vacant players.
+     *
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet vacantPlayers() {
-        return ChangeSet.simpleChange((ServerPlayer)null,
+        return ChangeSet.simpleChange((Player)null,
             new VacantPlayersMessage()
                 .setVacantPlayers(getFreeColServer().getGame()));
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -45,7 +45,7 @@ import net.sf.freecol.common.util.Utils;
 public final class UnitImageAnimation extends FreeColClientHolder
     implements OutForAnimationCallback {
     
-    protected static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
+    private static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
 
     private final Unit unit;
     private final Tile tile;

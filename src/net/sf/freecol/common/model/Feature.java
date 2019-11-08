@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -29,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -42,7 +44,7 @@ import net.sf.freecol.common.util.Utils;
  * features onto features would be incoherent.
  */
 public abstract class Feature extends FreeColSpecObject
-    implements Named, Scoped {
+    implements Named {
 
     /** The source of this Feature, e.g. a UnitType. */
     private FreeColObject source;
@@ -63,11 +65,8 @@ public abstract class Feature extends FreeColSpecObject
      */
     private boolean temporary;
 
-    /**
-     * A list of Scopes limiting the applicability of this Feature.
-  	 * Allocated on demand.
-     */
-    private List<Scope> scopes = null;
+    /** The scopes limiting the applicability of this Feature. */
+    private ScopeContainer scopeContainer;
 
 
     /**
@@ -180,18 +179,6 @@ public abstract class Feature extends FreeColSpecObject
     }
 
     /**
-     * Does this feature apply to a given object type?
-     *
-     * @param objectType The {@code FreeColSpecObjectType} to test.
-     * @return True if there are no scopes, or at least one scope is
-     *     applicable to the object.
-     */
-    public boolean appliesTo(final FreeColSpecObjectType objectType) {
-        return (!hasScope()) ? true
-            : any(this.scopes, s -> s.appliesTo(objectType));
-    }
-
-    /**
      * Does this feature apply to a given turn?
      *
      * @param turn The {@code Turn} to test.
@@ -256,46 +243,34 @@ public abstract class Feature extends FreeColSpecObject
     }
 
 
-    // Interface Scoped, and scope support
+    // Scope delegation
 
-    /**
-     * {@inheritDoc}
-     */
-    public final List<Scope> getScopeList() {
-        return (this.scopes == null) ? Collections.<Scope>emptyList()
-            : new ArrayList<>(this.scopes);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final Stream<Scope> getScopes() {
-        return (this.scopes == null) ? Stream.<Scope>empty()
-            : getScopeList().stream();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final void setScopes(List<Scope> scopes) {
-        this.scopes = scopes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addScope(Scope scope) {
-        if (this.scopes == null) this.scopes = new ArrayList<>();
-        this.scopes.add(scope);
-    }
-
-    /**
-     * Does this feature have a scope?
-     *
-     * @return True if there are any scopes attached to this feature.
-     */
     public final boolean hasScope() {
-        return this.scopes != null && !this.scopes.isEmpty();
+        return !ScopeContainer.isScopeContainerEmpty(this.scopeContainer);
+    }
+        
+    public final List<Scope> getScopeList() {
+        return ScopeContainer.getScopeList(this.scopeContainer);
+    }
+
+    public final Stream<Scope> getScopes() {
+        return ScopeContainer.getScopes(this.scopeContainer);
+    }
+
+    public final void copyScopes(Collection<Scope> scopes) {
+        this.scopeContainer = ScopeContainer.setScopes(this.scopeContainer, scopes);
+    }
+
+    public final void addScope(Scope scope) {
+        this.scopeContainer = ScopeContainer.addScope(this.scopeContainer, scope);
+    }
+
+    //public final void removeScope(Scope scope) {
+    //    ScopeContainer.removeScope(this.scopeContainer, scope);
+    //}
+
+    public boolean appliesTo(FreeColObject fco) {
+        return ScopeContainer.scopeContainerAppliesTo(this.scopeContainer, fco);
     }
 
 
@@ -313,7 +288,7 @@ public abstract class Feature extends FreeColSpecObject
         this.lastTurn = o.getLastTurn();
         this.duration = o.getDuration();
         this.temporary = o.isTemporary();
-        this.setScopes(o.getScopeList());
+        this.copyScopes(o.getScopeList());
         return true;
     }
 
@@ -378,7 +353,7 @@ public abstract class Feature extends FreeColSpecObject
         if (str == null) {
             setSource(null);
         } else if (spec != null) {
-            setSource(spec.findType(str));
+            setSource(spec.getType(str));
         }
 
         int firstTurn = xr.getAttribute(FIRST_TURN_TAG, UNDEFINED);
@@ -398,8 +373,8 @@ public abstract class Feature extends FreeColSpecObject
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        setScopes(null);
-
+        ScopeContainer.clearScopes(this.scopeContainer);
+        
         super.readChildren(xr);
     }
 
@@ -411,8 +386,7 @@ public abstract class Feature extends FreeColSpecObject
         final String tag = xr.getLocalName();
 
         if (Scope.TAG.equals(tag)) {
-            Scope scope = new Scope(xr);
-            if (scope != null) addScope(scope);
+            this.addScope(new Scope(xr));
 
         } else {
             super.readChild(xr);
@@ -431,34 +405,28 @@ public abstract class Feature extends FreeColSpecObject
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o instanceof Feature) {
-            Feature feature = (Feature)o;
-            if (!super.equals(o)
-                || this.source != feature.source
-                || this.duration != feature.duration
-                || this.temporary != feature.temporary)
+            Feature other = (Feature)o;
+            if (this.source != other.source
+                || this.duration != other.duration
+                || this.temporary != other.temporary)
                 return false;
             if (firstTurn == null) {
-                if (feature.firstTurn != null) return false;
-            } else if (feature.firstTurn == null) {
+                if (other.firstTurn != null) return false;
+            } else if (other.firstTurn == null) {
                 return false;
-            } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
+            } else if (firstTurn.getNumber() != other.firstTurn.getNumber()) {
                 return false;
             }
             if (lastTurn == null) {
-                if (feature.lastTurn != null) return false;
-            } else if (feature.lastTurn == null) {
+                if (other.lastTurn != null) return false;
+            } else if (other.lastTurn == null) {
                 return false;
-            } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
+            } else if (lastTurn.getNumber() != other.lastTurn.getNumber()) {
                 return false;
             }
-            List<Scope> tScopes = getScopeList();
-            List<Scope> fScopes = feature.getScopeList();
-            if (tScopes.size() != fScopes.size()
-                // Not very efficient, but we do not expect many scopes
-                || any(this.scopes, s -> !feature.scopes.contains(s))
-                || any(feature.scopes, s -> !this.scopes.contains(s)))
-                return false;
-            return true;
+            return ScopeContainer.equalScopes(this.scopeContainer,
+                                              other.scopeContainer)
+                && super.equals(other);
         }
         return false;
     }

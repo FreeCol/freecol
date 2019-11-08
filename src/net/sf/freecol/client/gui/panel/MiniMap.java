@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -155,9 +155,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @return a {@code boolean} value
      */
     public boolean canZoomIn() {
-        return (freeColClient.getGame() != null
-                && freeColClient.getGame().getMap() != null
-                && tileSize < MAX_TILE_SIZE);
+        return tileSize < MAX_TILE_SIZE
+            && freeColClient.getGame() != null
+            && freeColClient.getGame().getMap() != null;
     }
 
     /**
@@ -166,9 +166,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @return a {@code boolean} value
      */
     public boolean canZoomOut() {
-        return (freeColClient.getGame() != null
-                && freeColClient.getGame().getMap() != null
-                && tileSize > MIN_TILE_SIZE);
+        return tileSize > MIN_TILE_SIZE
+            && freeColClient.getGame() != null
+            && freeColClient.getGame().getMap() != null;
     }
 
     private void setZoomOption(int tileSize) {
@@ -367,7 +367,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (getParent() != null) {
             int miniRectX = (getGUI().getFocus().getX() - firstColumn) * tileSize;
             int miniRectY = (getGUI().getFocus().getY() - firstRow) * tileSize / 4;
-            Dimension mapTileSize = library.scaleDimension(ImageLibrary.TILE_SIZE);
+            Dimension mapTileSize = library.scale(ImageLibrary.TILE_SIZE);
             int miniRectWidth = (getParent().getWidth() / mapTileSize.width + 1) * tileSize;
             int miniRectHeight = (getParent().getHeight() / mapTileSize.height + 1) * tileSize / 2;
             if (miniRectX + miniRectWidth / 2 > width) {

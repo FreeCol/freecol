@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -251,7 +252,11 @@ public class FreeColDirectories {
      */
     private static File userModsDirectory = null;
 
+    /** The comms writer. */
+    private static AtomicReference<Writer> commsWriter
+        = new AtomicReference<Writer>(null);
 
+    
     /**
      * Get the user home directory.
      *
@@ -299,7 +304,11 @@ public class FreeColDirectories {
             if (dir.mkdir()) {
                 try {
                     Files.setPosixFilePermissions(dir.toPath(), mode0700);
-                } catch (IOException ioe) { /* ignore */ }
+                } catch (IOException|UnsupportedOperationException ex) {
+                    // Just log, error is not fatal
+                    System.err.println("Failed to change permissions of "
+                        + dir.getPath());
+                }
                 return dir;
             }
         }
@@ -353,24 +362,25 @@ public class FreeColDirectories {
         String env = System.getenv(XDG_CONFIG_HOME_ENV);
         File d = (env != null) ? new File(env)
             : new File(home, XDG_CONFIG_HOME_DEFAULT);
-        if ((d = requireDirectory(d)) == null) return badDir(d);
-        File f = new File(d, FREECOL_DIRECTORY);
+        File xd;
+        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        File f = new File(xd, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badConfig(f);
         dirs[0] = d;
 
         env = System.getenv(XDG_DATA_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_DATA_HOME_DEFAULT);
-        if ((d = requireDirectory(d)) == null) return badDir(d);
-        f = new File(d, FREECOL_DIRECTORY);
+        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        f = new File(xd, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badData(f);
         dirs[1] = d;
 
         env = System.getenv(XDG_CACHE_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_CACHE_HOME_DEFAULT);
-        if ((d = requireDirectory(d)) == null) return badDir(d);
-        f = new File(d, FREECOL_DIRECTORY);
+        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        f = new File(xd, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badCache(f);
         dirs[2] = d;
 
@@ -469,8 +479,7 @@ public class FreeColDirectories {
     private static File deriveDirectory(File root, String subdir) {
         File dir;
         return (isGoodDirectory(root)
-            && (dir = new File(root, subdir)) != null
-            && insistDirectory(dir)) ? dir : null;
+            && insistDirectory(dir = new File(root, subdir))) ? dir : null;
     }
 
     /**
@@ -514,6 +523,9 @@ public class FreeColDirectories {
         if (!dir.isDirectory()) return "Not a directory: " + path;
         if (!dir.canRead()) return "Can not read directory: " + path;
         dataDirectory = dir;
+        if (!getBaseDirectory().exists()) {
+            return "Base data directory missing from: " + path;
+        }
         return null;
     }
 
@@ -583,7 +595,7 @@ public class FreeColDirectories {
     /**
      * Remove disallowed parts of a user supplied file name.
      *
-     * @param The input file name.
+     * @param fileName The input file name.
      * @return A sanitized file name.
      */
     private static String sanitize(String fileName) {
@@ -687,7 +699,7 @@ public class FreeColDirectories {
         StringBuilder sb = new StringBuilder();
         sb.append("Deleted outdated (> ").append(validDays)
             .append(" old) autosave/s: ");
-        for (File f : files) sb.append(" ").append(f.getPath());
+        for (File f : files) sb.append(' ').append(f.getPath());
         return sb.toString();        
     }
 
@@ -703,7 +715,7 @@ public class FreeColDirectories {
         deleteFiles(files);
         StringBuilder sb = new StringBuilder();
         sb.append("Deleted autosave/s: ");
-        for (File f : files) sb.append(" ").append(f.getPath());
+        for (File f : files) sb.append(' ').append(f.getPath());
         return sb.toString();        
     }
 
@@ -842,7 +854,7 @@ public class FreeColDirectories {
     public static List<String> getLanguageIdList() {
         File[] files = getI18nDirectory().listFiles();
         return (files == null) ? Collections.<String>emptyList()
-            : transform(files, f -> f.canRead(), f -> getLanguageId(f));
+            : transform(files, File::canRead, f -> getLanguageId(f));
     }
     
     /**
@@ -931,14 +943,15 @@ public class FreeColDirectories {
                 throw new FreeColException("Log file \"" + path
                     + "\" could not be created.");
             } else if (file.isFile()) {
-                try {
-                    file.delete();
-                } catch (SecurityException ex) {} // Do what?
+                deleteFile(file);
             }
         }
         try {
-            file.createNewFile();
-        } catch (IOException e) {
+            if (!file.createNewFile()) {
+                throw new FreeColException("Log file \"" + path
+                    + "\" creation failed.");
+            }
+        } catch (IOException|SecurityException e) {
             throw new FreeColException("Log file \"" + path
                 + "\" could not be created.", e);
         }
@@ -961,22 +974,15 @@ public class FreeColDirectories {
      * @exception FreeColException on error.
      */
     public static Writer getLogCommsWriter() throws FreeColException {
-        File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
-        if (file.exists()) {
-            try {
-                file.delete();
-            } catch (SecurityException se) {
-                throw new FreeColException("Comms log file exists, delete failed: " + file.getPath(), se);
-            }
-        }
-        try {
-            file.createNewFile();
-        } catch (IOException ioe) {
-            throw new FreeColException("Comms log file could not be created: " + file.getPath(), ioe);
-        }
-        Writer writer = getFileUTF8Writer(file);
+        Writer writer = commsWriter.get();
         if (writer == null) {
-            throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
+            File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
+            if (file.exists()) deleteFile(file);
+            writer = getFileUTF8AppendWriter(file);
+            if (writer == null) {
+                throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
+            }
+            commsWriter.set(writer);
         }
         return writer;
     }        

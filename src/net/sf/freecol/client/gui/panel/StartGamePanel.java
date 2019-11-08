@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -34,7 +34,7 @@ import javax.swing.ScrollPaneConstants;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.NationOptions;
@@ -82,7 +82,7 @@ public final class StartGamePanel extends FreeColPanel {
     };
 
     private final ActionListener cancelCmd = ae -> {
-        final SwingGUI gui = getGUI();
+        final GUI gui = getGUI();
         getFreeColClient().getConnectController().newGame();
         gui.removeComponent(this);
         gui.showNewPanel();
@@ -125,7 +125,7 @@ public final class StartGamePanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public StartGamePanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("fill, wrap 2"));
+        super(freeColClient, null, new MigLayout("fill, wrap 2"));
     }
 
 

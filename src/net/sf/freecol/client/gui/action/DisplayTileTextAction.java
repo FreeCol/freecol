@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -34,7 +34,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * Display text over tiles.
  */
-public class DisplayTileTextAction extends SelectableAction {
+public final class DisplayTileTextAction extends SelectableAction {
 
     public static final String id = "displayTileTextAction.";
 
@@ -70,6 +70,7 @@ public class DisplayTileTextAction extends SelectableAction {
         display = type;
         setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
                 KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        setSelected(shouldBeSelected());
     }
 
 
@@ -80,11 +81,11 @@ public class DisplayTileTextAction extends SelectableAction {
      */
     @Override
     public boolean shouldBeSelected() {
-        return super.shouldBeEnabled()
+        return display != null
             && freeColClient.getClientOptions() != null
-            && display != null
             && freeColClient.getClientOptions().getDisplayTileText()
-                == display.ordinal();
+                == display.ordinal()
+            && super.shouldBeEnabled();
     }
 
 

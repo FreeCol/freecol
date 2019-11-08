@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -35,23 +35,23 @@ public interface OptionContainer {
     /**
      * Is an option present in the container.
      *
-     * @param R The underlying type of option.
-     * @param T The actual return type.
+     * @param <T> The actual return type.
      * @param id The object identifier.
+     * @param returnClass The expected option class.
      * @return True if the option is present.
      */
-    <R,T extends Option<R>> boolean hasOption(String id, Class<T> returnClass);
+    public <T extends Option> boolean hasOption(String id, Class<T> returnClass);
     
     /**
      * Get an option in this group (or descendents) by object identifier.
      *
-     * @param R The underlying type of option.
-     * @param T The actual return type.
+     * @param <T> The actual return type.
      * @param id The object identifier.
+     * @param returnClass The expected option class.
      * @return The option, or a run time exception if the option does not
      *     exist or is of the wrong class.
      */
-    <R,T extends Option<R>> T getOption(String id, Class<T> returnClass);
+    public <T extends Option> T getOption(String id, Class<T> returnClass);
 
     /**
      * Gets the value of a {@code BooleanOption}.

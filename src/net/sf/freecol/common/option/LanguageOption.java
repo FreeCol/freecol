@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -37,6 +37,8 @@ import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -130,9 +132,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o instanceof Language) {
-                Language l = (Language)o;
-                return Utils.equals(this.key, l.key)
-                    && super.equals(o);
+                Language other = (Language)o;
+                return Utils.equals(this.key, other.key)
+                    && super.equals(other);
             }
             return false;
         }
@@ -234,7 +236,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * {@inheritDoc}
      */
     @Override
-    public LanguageOption clone() {
+    public LanguageOption cloneOption() {
         LanguageOption result = new LanguageOption(getSpecification());
         result.setValues(this);
         return result;
@@ -267,6 +269,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE")
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         Language l = null;

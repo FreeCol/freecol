@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -73,15 +73,15 @@ public class PartialMessage extends AttributeMessage {
     }
 
 
-    /**
+    /** Currently unused
      * Get the object to update.
      *
      * @param game The {@code Game} to look for the object in.
      * @return The {@code FreeColGameObject} found.
-     */
     private FreeColGameObject getObject(Game game) {
         return game.getFreeColGameObject(getStringAttribute(ID_TAG));
     }
+     */
 
     /**
      * {@inheritDoc}

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
@@ -50,6 +51,7 @@ public class NativeDemandSession extends TimedSession {
      *
      * @param unit The {@code Unit} making the demand.
      * @param colony The {@code Colony} where the demand is made.
+     * @param goodsType The {@code GoodsType} to demand.
      * @param amount The amount of goods.
      * @param timeout The amount of time to wait for a response.
      */
@@ -93,7 +95,9 @@ public class NativeDemandSession extends TimedSession {
         final ServerPlayer colonyPlayer = getColonyOwner();
         
         colonyPlayer.csCompleteNativeDemand(demandPlayer,
-            this.unit, this.colony, this.type, this.amount, result, cs);
+            this.unit, this.colony, this.type, this.amount,
+            ((result) ? IndianDemandAction.INDIAN_DEMAND_ACCEPT
+                : IndianDemandAction.INDIAN_DEMAND_REJECT), cs);
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,7 +69,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
          *        the scaling (old size, new size etc).
          */        
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
         JPanel widthPanel = new JPanel(new FlowLayout());
         JPanel heightPanel = new JPanel(new FlowLayout());
         String str;
@@ -103,11 +103,11 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         inputD.addActionListener(al);
         inputM.addActionListener(al);
 
-        final Parameters fake = null;
         List<ChoiceItem<Parameters>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), fake).okOption());
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                               (Parameters)null).okOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (Parameters)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, null, c);
     }
 

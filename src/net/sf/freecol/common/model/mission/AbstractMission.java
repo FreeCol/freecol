@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,6 +54,27 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
 
 
     /**
+     * Creates a new {@code AbstractMission} instance.
+     *
+     * @param game a {@code Game} value
+     * @param id The object identifier.
+     */
+    public AbstractMission(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
+     * Creates a new {@code AbstractMission} instance.
+     *
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
+     */
+    protected AbstractMission(Game game, FreeColXMLReader xr) {
+        super(game, null);
+    }
+
+
+    /**
      * Returns the Unit this mission was assigned to.
      *
      * @return an {@code Unit} value
@@ -71,29 +92,6 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     public AbstractMission(Game game) {
         super(game);
     }
-
-    /**
-     * Creates a new {@code AbstractMission} instance.
-     *
-     * @param game a {@code Game} value
-     * @param xr a {@code FreeColXMLReader} value
-     * @exception XMLStreamException if an error occurs
-     */
-    public AbstractMission(Game game,
-                           FreeColXMLReader xr) throws XMLStreamException {
-        super(game, null);
-    }
-
-    /**
-     * Creates a new {@code AbstractMission} instance.
-     *
-     * @param game a {@code Game} value
-     * @param id The object identifier.
-     */
-    public AbstractMission(Game game, String id) {
-        super(game, id);
-    }
-
 
     /**
      * Set the {@code Unit} value.
@@ -149,9 +147,8 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      */
     @Override
     public boolean isValid() {
-        return unit != null
-            && !unit.isDisposed()
-            && repeatCount > 0;
+        return repeatCount > 0
+            && unit != null && !unit.isDisposed();
     }
 
     /**

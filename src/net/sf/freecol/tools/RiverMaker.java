@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -173,10 +173,10 @@ public class RiverMaker {
     }
 
     private static String getName(int[] branches) {
-        String name = "";
+        StringBuilder sb = new StringBuilder(32);
         for (int branche : branches) {
-            name += Integer.toString(branche);
+            sb.append(branche);
         }
-        return name;
+        return sb.toString();
     }
 }

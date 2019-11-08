@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.GUI;
 /**
  * An action for toggling between full-screen and windowed mode.
  */
-public class ChangeWindowedModeAction extends SelectableAction {
+public final class ChangeWindowedModeAction extends SelectableAction {
 
     public static final String id = "changeWindowedModeAction";
 
@@ -51,8 +51,8 @@ public class ChangeWindowedModeAction extends SelectableAction {
     @Override
     public boolean shouldBeSelected() {
         final GUI gui = getGUI();
-        return super.shouldBeSelected()
-            && !(gui == null || gui.isWindowed());
+        return !(gui == null || gui.isWindowed())
+            && super.shouldBeSelected();
     }
 
 
@@ -64,8 +64,8 @@ public class ChangeWindowedModeAction extends SelectableAction {
     @Override
     public boolean shouldBeEnabled() {
         final GUI gui = getGUI();
-        return super.shouldBeEnabled()
-            && !(gui == null || gui.isShowingSubPanel());
+        return !(gui == null || gui.isShowingSubPanel())
+            && super.shouldBeEnabled();
     }
     
 

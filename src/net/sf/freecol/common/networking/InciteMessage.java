@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -128,11 +128,11 @@ public class InciteMessage extends AttributeMessage {
         }
 
         MoveType type;
-        ServerPlayer enemy = (ServerPlayer)getEnemy(game);
+        Player enemy = getEnemy(game);
         if (enemy == null) {
             return serverPlayer.clientError("Not a player: "
                 + getStringAttribute(ENEMY_TAG));
-        } else if (enemy == serverPlayer) {
+        } else if (enemy == (Player)serverPlayer) {
             return serverPlayer.clientError("Inciting against oneself!");
         } else if (!enemy.isEuropean()) {
             return serverPlayer.clientError("Inciting against non-European!");

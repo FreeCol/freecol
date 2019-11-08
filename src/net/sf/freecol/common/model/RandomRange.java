@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -33,7 +33,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 /**
  * A range of numbers, and support routines to make a random choice therefrom.
  */
-public class RandomRange {
+public final class RandomRange {
 
     private static final Logger logger = Logger.getLogger(RandomRange.class.getName());
 
@@ -181,10 +181,8 @@ public class RandomRange {
      * Initializes this object from an XML-representation of this object.
      *
      * @param xr The input stream with the XML.
-     * @exception XMLStreamException if there are any problems reading
-     *     from the stream.
      */
-    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+    public void readAttributes(FreeColXMLReader xr) {
         probability = xr.getAttribute(PROBABILITY_TAG, 0);
 
         minimum = xr.getAttribute(MINIMUM_TAG, 0);

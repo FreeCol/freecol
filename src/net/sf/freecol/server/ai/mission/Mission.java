@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -105,28 +105,19 @@ public abstract class Mission extends AIObject {
         super(aiMain);
 
         this.aiUnit = aiUnit;
-        this.uninitialized = aiUnit == null;
-    }
+        setInitialized();
 
-    /**
-     * Creates a mission for the given {@code AIUnit} and target.
-     *
-     * Note that missions are attached to their units, and thus do
-     * not need AI ids, hence the plain superclass constructor.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The {@code AIUnit} this mission is created for.
-     * @param target The initial target {@code Location}.
-     */
-    protected Mission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        this(aiMain, aiUnit);
-
-        setTarget(target);
         if (aiUnit != null && aiUnit.getMission() != this) {
             aiUnit.changeMission(this);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public final void setInitialized() {
+        this.initialized = getAIUnit() != null;
+    }
 
     /**
      * Gets the AI-unit this mission has been created for.
@@ -212,7 +203,7 @@ public abstract class Mission extends AIObject {
      * @param unit The {@code Unit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidUnitReason(Unit unit) {
+    private static String invalidUnitReason(Unit unit) {
         return (unit == null) ? "unit-null"
             : (!unit.isInitialized()) ? "unit-uninitialized"
             : (unit.isDisposed()) ? "unit-disposed"
@@ -364,7 +355,7 @@ public abstract class Mission extends AIObject {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
+    public static String invalidMissionReason(AIUnit aiUnit) {
         return invalidAIUnitReason(aiUnit);
     }
 
@@ -384,7 +375,7 @@ public abstract class Mission extends AIObject {
      * @param loc The target {@code Location} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null) ? reason : invalidTargetReason(loc);
     }
@@ -553,7 +544,7 @@ public abstract class Mission extends AIObject {
             Settlement settlement = tile.getSettlement();
             Location blocker = (settlement != null) ? settlement
                 : tile.getDefendingUnit(unit);
-            if (UnitSeekAndDestroyMission.invalidReason(aiUnit, blocker)
+            if (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit, blocker)
                 == null) return blocker;
         }
         return null;
@@ -660,7 +651,8 @@ public abstract class Mission extends AIObject {
         if (target == null) return MoveType.MOVE_ILLEGAL;
         final Tile targetTile = target.getTile();
         if (!(target instanceof Europe) && targetTile == null) {
-            throw new IllegalStateException("Target neither Europe nor Tile");
+            throw new RuntimeException("Target neither Europe nor Tile: "
+                + target);
         }
         final Unit unit = getUnit();
         AIUnit aiCarrier = aiUnit.getTransport();
@@ -720,7 +712,7 @@ public abstract class Mission extends AIObject {
                     useTransport = true;
                 } else {
                     path = unit.findPath(unit.getLocation(), target,
-                                         null, costDecider);
+                                         null, costDecider, null);
                 }
             } else if (aiCarrier != null) {
                 // Transport already allocated.
@@ -734,7 +726,7 @@ public abstract class Mission extends AIObject {
             } else {
                 // Should not need transport within the same contiguity.
                 path = unit.findPath(unit.getLocation(), target,
-                                     null, costDecider);
+                                     null, costDecider, null);
             }
         }
 
@@ -770,13 +762,13 @@ public abstract class Mission extends AIObject {
                     waiting = true;
 
                 } else if ((path = unit.findPath(unit.getLocation(), pick,
-                                                 null, costDecider)) == null) {
+                            null, costDecider, null)) == null) {
                     // No path to the collection point.
                     lbAt(lb);
                     lb.add(", no path to meet ", aiCarrier.getUnit(),
                            " at ", pick);
                     path = unit.findPath(unit.getLocation(), target,
-                                         null, costDecider);
+                        null, costDecider, null);
                     if (path == null) {
                         // Unable to fall back to going direct.
                         // Return failure in the hope that it is a
@@ -790,7 +782,7 @@ public abstract class Mission extends AIObject {
                     useTransport = false;
 
                 } else if ((ownPath = unit.findPath(unit.getLocation(), 
-                            target, null, costDecider)) == null
+                            target, null, costDecider, null)) == null
                     || (ownTurns = ownPath.getTotalTurns())
                     > (pathTurns = path.getTotalTurns())) {
                     // Either there is no direct path to the target or
@@ -971,6 +963,9 @@ public abstract class Mission extends AIObject {
 
     /**
      * Sets the target of this mission, if any.
+     *
+     * The actual target is handled in the missions that really have
+     * them, this is a helper to make sure the unit is updated.
      *
      * @param target The new target of this mission, or null if none.
      */

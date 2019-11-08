@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -396,13 +396,11 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof TransportableAIObject) {
-            TransportableAIObject ot = (TransportableAIObject)other;
-            return super.equals(ot)
-                && Utils.equals(this.transport, ot.transport);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof TransportableAIObject)) return false;
+        TransportableAIObject other = (TransportableAIObject)o;
+        return Utils.equals(this.transport, other.transport)
+            && super.equals(other);
     }
 
     /**

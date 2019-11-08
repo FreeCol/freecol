@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -63,25 +64,9 @@ public class TileItemContainer extends FreeColGameObject {
         super(game);
 
         if (tile == null) {
-            throw new IllegalArgumentException("Tile must not be 'null'.");
+            throw new RuntimeException("Tile must not be null: " + this);
         }
         this.tile = tile;
-    }
-
-    /**
-     * Create a new {@code TileItemContainer} from an existing template.
-     *
-     * @param game The enclosing {@code Game}.
-     * @param tile The {@code Tile} this {@code TileItemContainer}
-     *     contains {@code TileItems} for.
-     * @param template A {@code TileItemContainer} to copy.
-     * @param layer A maximum allowed {@code Layer}.
-     */
-    public TileItemContainer(Game game, Tile tile, TileItemContainer template,
-                             Layer layer) {
-        this(game, tile);
-
-        copyFrom(template, layer);
     }
 
     /**
@@ -156,11 +141,11 @@ public class TileItemContainer extends FreeColGameObject {
      * @param item The {@code TileItem} to add.
      */
     private final void addTileItem(TileItem item) {
+        final int zIndex = item.getZIndex();
         int i = 0;
-        int size = tileItems.size();
-        int zIndex = item.getZIndex();
         synchronized (tileItems) {
-            while (i < size && tileItems.get(i).getZIndex() < zIndex) {
+            for (TileItem ti : tileItems) {
+                if (ti.getZIndex() < zIndex) break;
                 i++;
             }
             tileItems.add(i, item);
@@ -177,14 +162,16 @@ public class TileItemContainer extends FreeColGameObject {
     public final TileItem tryAddTileItem(TileItem item) {
         if (item == null) return null;
         if (item instanceof TileImprovement) {
-            // Consider merging with improvements of the same type
+            // Disallow improvements of the same type
             TileImprovement newTip = (TileImprovement)item;
             for (TileItem oldItem : getTileItems()) {
                 if (!(oldItem instanceof TileImprovement)) continue;
                 TileImprovement oldTip = (TileImprovement)oldItem;
                 if (oldTip.getType().getId().equals(newTip.getType().getId())) {
                     if (oldTip.getMagnitude() < newTip.getMagnitude()) {
-                        oldTip.copy(newTip); // Override with larger version
+                        oldTip.setMagnitude(newTip.getMagnitude());
+                        oldTip.setStyle(newTip.getStyle());
+                        oldTip.setVirtual(newTip.getVirtual());
                         invalidateCache();
                     }
                     return oldItem;
@@ -529,10 +516,10 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         for (TileItem ti : getTileItems()) {
-            int integ = ti.checkIntegrity(fix, lb);
+            IntegrityType integ = ti.checkIntegrity(fix, lb);
             if (fix) {
                 // There might still be maps floating around with
                 // rivers that go nowhere.
@@ -543,8 +530,8 @@ public class TileItemContainer extends FreeColGameObject {
                         // exist in broken maps from before 0.10.5 which later
                         // got upgraded with 0.11.x (x<6), so better be safe.
                         if (tim.getStyle() == null) {
-                            logger.warning("Style null river: " + tim);
-                            integ = -1;
+                            lb.add("\n  TileImprovement null river style: ", tim);
+                            integ = integ.fail();
                         } else
                         // end @compat
 
@@ -553,20 +540,20 @@ public class TileItemContainer extends FreeColGameObject {
                         // to add any rivers, unless code for map saving
                         // would be changed to filter these out.
                         if ("0000".equals(tim.getStyle().toString())) {
-                            logger.warning("Style 0000 river: " + tim);
-                            integ = -1;
+                            lb.add("\n  TileImprovement 0000 river: ", tim);
+                            integ = integ.fail();
                         }
                     }
                 }
 
-                if (integ < 0) {
-                    logger.warning("Removing broken improvement at: " + tile
-                                   + " / " + ti.getId());
+                if (!integ.safe()) {
+                    logger.warning("Removing broken TileImprovement: "
+                        + ti.getId());
                     removeTileItem(ti);
-                    integ = 0;
+                    integ = integ.fix();
                 }
             }
-            result = Math.min(result, integ);
+            result = result.combine(integ);
         }
         return result;
     }

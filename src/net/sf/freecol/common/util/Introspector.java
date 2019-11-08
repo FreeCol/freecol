@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -62,7 +62,7 @@ public class Introspector {
      */
     public Introspector(Class<?> theClass, String field) {
         if (field == null || field.isEmpty()) {
-            throw new IllegalArgumentException("Field may not be empty");
+            throw new RuntimeException("Field may not be empty: " + this);
         }
         this.theClass = theClass;
         this.field = field;
@@ -154,8 +154,8 @@ public class Introspector {
         if (argType.isEnum()) {
             try {
                 method = Enum.class.getMethod("valueOf", Class.class, String.class);
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalArgumentException("Enum.getMethod(valueOf(Class, String))", e);
+            } catch (NoSuchMethodException|SecurityException e) {
+                throw new RuntimeException("Enum.getMethod(valueOf(Class, String)): " + argType, e);
             }
         } else {
             if (argType.isPrimitive()) {
@@ -311,7 +311,7 @@ public class Introspector {
     /**
      * Get a constructor for a given class and arguments.
      *
-     * @param T The type to construct.
+     * @param <T> The type to construct.
      * @param cl The base class.
      * @param types The types of the constructor arguments.
      * @return The constructor found, or null on error.
@@ -329,7 +329,7 @@ public class Introspector {
     /**
      * Construct a new instance.
      *
-     * @param T The type to construct.
+     * @param <T> The type to construct.
      * @param constructor The {@code Constructor} to use.
      * @param params The constructor parameters.
      * @return The instance created, or null on error.

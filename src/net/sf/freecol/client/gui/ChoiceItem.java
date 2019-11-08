@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -218,9 +218,9 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof ChoiceItem) {
-            ChoiceItem ci = (ChoiceItem)o;
-            return Utils.equals(this.text, ci.toString())
-                && Utils.equals(this.getObject(), ci.getObject());
+            ChoiceItem other = (ChoiceItem)o;
+            return Utils.equals(this.text, other.toString())
+                && Utils.equals(this.getObject(), other.getObject());
         }
         return false;
     }

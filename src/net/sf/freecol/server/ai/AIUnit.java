@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -33,6 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -68,6 +69,9 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 /**
  * Objects of this class contains AI-information for a single {@link Unit}.
  *
+ * AIUnits are successfully initialized by a call to
+ * {@link #setUnit(Unit)} with a non-null actual {@link Unit}.
+
  * The method {@link #doMission(LogBuilder)} is called once each turn,
  * by {@link AIPlayer#startWorking()}, to perform the assigned
  * {@code Mission}.  Most of the methods in this class just
@@ -75,7 +79,7 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
  *
  * @see Mission
  */
-public class AIUnit extends TransportableAIObject {
+public final class AIUnit extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
@@ -99,6 +103,7 @@ public class AIUnit extends TransportableAIObject {
 
         this.unit = null;
         this.mission = null;
+        this.initialized = false;
     }
 
     /**
@@ -112,8 +117,7 @@ public class AIUnit extends TransportableAIObject {
 
         this.unit = unit;
         this.mission = null;
-
-        uninitialized = unit == null;
+        setInitialized();
     }
 
     /**
@@ -129,9 +133,16 @@ public class AIUnit extends TransportableAIObject {
                   FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = unit == null;
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getUnit() != null;
+    }
 
     /**
      * Gets the {@code Unit} this {@code AIUnit} controls.
@@ -140,6 +151,22 @@ public class AIUnit extends TransportableAIObject {
      */
     public final Unit getUnit() {
         return this.unit;
+    }
+
+    /**
+     * Set the {@code Unit} this {@code AIUnit} controls.
+     *
+     * Note: it is an error to change the unit once it is set.
+     *
+     * @param unit The new {@code Unit}.
+     */
+    private final void setUnit(Unit unit) {
+        if (this.unit != null && unit != this.unit) {
+            throw new RuntimeException("Attempt to change AI Unit " + getId()
+                + " to " + unit
+                + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        }
+        this.unit = unit;
     }
 
     /**
@@ -179,6 +206,7 @@ public class AIUnit extends TransportableAIObject {
         Location loc;
         Colony colony;
         AIColony aiColony;
+        final Unit unit = getUnit();
         if (unit != null
             && (loc = unit.getLocation()) != null
             && (colony = loc.getColony()) != null
@@ -192,7 +220,7 @@ public class AIUnit extends TransportableAIObject {
      * consistent.
      */
     private void takeTransport() {
-        Unit carrier = unit.getCarrier();
+        Unit carrier = getUnit().getCarrier();
         AIUnit aiCarrier = (carrier == null) ? null
             : getAIMain().getAIUnit(carrier);
         AIUnit transport = getTransport();
@@ -209,14 +237,23 @@ public class AIUnit extends TransportableAIObject {
     // Public routines
 
     /**
+     * Get the {@code Player} that owns this AIUnit.
+     *
+     * @return The owning {@code Player}.
+     */
+    public Player getOwner() {
+        final Unit unit = getUnit();
+        return (unit == null) ? null : unit.getOwner();
+    }
+
+    /**
      * Gets the AIPlayer that owns this AIUnit.
      *
      * @return The owning AIPlayer.
      */
     public AIPlayer getAIOwner() {
-        return (unit == null) ? null
-            : (unit.getOwner() == null) ? null
-            : getAIMain().getAIPlayer(unit.getOwner());
+        final Player owner = getOwner();
+        return (owner == null) ? null : getAIMain().getAIPlayer(owner);
     }
 
     /**
@@ -225,7 +262,8 @@ public class AIUnit extends TransportableAIObject {
      * @return A {@code Random} instance.
      */
     public Random getAIRandom() {
-        return (unit == null) ? null : getAIOwner().getAIRandom();
+        AIPlayer aiOwner = getAIOwner();
+        return (aiOwner == null) ? null : aiOwner.getAIRandom();
     }
 
     /**
@@ -234,8 +272,10 @@ public class AIUnit extends TransportableAIObject {
      * @return A trivial target, or null if none found.
      */
     public Location getTrivialTarget() {
-        PathNode path = unit.getTrivialPath();
-        return (path == null) ? null
+        final Unit unit = getUnit();
+        PathNode path;
+        return (unit == null
+            || (path = unit.getTrivialPath()) == null) ? null
             : Location.upLoc(path.getLastNode().getLocation());
     }
 
@@ -245,6 +285,7 @@ public class AIUnit extends TransportableAIObject {
      * @return True if the unit has cargo aboard.
      */
     public final boolean hasCargo() {
+        final Unit unit = getUnit();
         return (unit == null) ? false : unit.hasCargo();
     }
 
@@ -358,8 +399,8 @@ public class AIUnit extends TransportableAIObject {
         Location oldTarget = (m == null) ? null : m.getTarget();
         AIPlayer aiPlayer = getAIOwner();
 
-        if(aiPlayer instanceof EuropeanAIPlayer) {
-            EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)getAIOwner();
+        if (aiPlayer instanceof EuropeanAIPlayer) {
+            EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)aiPlayer;
             if (euaiPlayer.getPioneeringMission(this, null) != null) {
                 lb.add(", ", getMission());
                 euaiPlayer.updateTransport(this, oldTarget, lb);
@@ -381,6 +422,7 @@ public class AIUnit extends TransportableAIObject {
         Location oldTarget = (m == null) ? null : m.getTarget();
         AIPlayer aiPlayer = getAIOwner();
 
+        final Unit unit = getUnit();
         if(aiPlayer instanceof EuropeanAIPlayer) {
             EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)getAIOwner();
 
@@ -411,14 +453,13 @@ public class AIUnit extends TransportableAIObject {
         }
     }
 
-
     /**
      * Moves a unit to the new world.
      *
      * @return True if there was no c-s problem.
      */
     public boolean moveToAmerica() {
-        return AIMessage.askMoveTo(this, unit.getOwner().getGame().getMap());
+        return AIMessage.askMoveTo(this, getOwner().getGame().getMap());
     }
 
     /**
@@ -427,7 +468,7 @@ public class AIUnit extends TransportableAIObject {
      * @return True if there was no c-s problem.
      */
     public boolean moveToEurope() {
-        return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
+        return AIMessage.askMoveTo(this, getOwner().getEurope());
     }
 
     /**
@@ -437,6 +478,7 @@ public class AIUnit extends TransportableAIObject {
      * @return True if the move succeeded.
      */
     public boolean move(Direction direction) {
+        final Unit unit = getUnit();
         Tile start = unit.getTile();
         return unit.getMoveType(direction).isProgress()
             && AIMessage.askMove(this, direction)
@@ -454,7 +496,8 @@ public class AIUnit extends TransportableAIObject {
      * @return True if the role change was successful.
      */
     public boolean equipForRole(Role role) {
-        final Player player = unit.getOwner();
+        final Player player = getOwner();
+        final Unit unit = getUnit();
         Location loc = Location.upLoc(unit.getLocation());
         if (!(loc instanceof UnitLocation)) return false;
         int count = role.getMaximumCount();
@@ -471,7 +514,8 @@ public class AIUnit extends TransportableAIObject {
             if (count <= 0) return false;
         }
         return AIMessage.askEquipForRole(this, role, count)
-            && unit.getRole() == role && unit.getRoleCount() == count;
+            && unit.getRole() == role
+            && unit.getRoleCount() == count;
     }
 
     /**
@@ -483,8 +527,8 @@ public class AIUnit extends TransportableAIObject {
      * @return An integer score.
      */
     public int getBuilderScore() {
-        Unit unit = getUnit();
-        if (unit == null || BuildColonyMission.invalidReason(this) != null)
+        final Unit unit = getUnit();
+        if (unit == null || BuildColonyMission.invalidMissionReason(this) != null)
             return -1000;
         int ret = (!unit.hasDefaultRole()) ? 0
             : (unit.getSkillLevel() > 0) ? 100
@@ -499,7 +543,7 @@ public class AIUnit extends TransportableAIObject {
      * @return An integer score.
      */
     public int getPioneerScore() {
-        Unit unit = getUnit();
+        final Unit unit = getUnit();
         return (unit == null) ? -1000 : unit.getPioneerScore();
     }
 
@@ -509,7 +553,7 @@ public class AIUnit extends TransportableAIObject {
      * @return An integer score.
      */
     public int getScoutScore() {
-        Unit unit = getUnit();
+        final Unit unit = getUnit();
         return (unit == null) ? -1000 : unit.getScoutScore();
     }
 
@@ -529,7 +573,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public Locatable getTransportLocatable() {
-        return unit;
+        return getUnit();
     }
 
     /**
@@ -537,6 +581,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public Location getTransportSource() {
+        final Unit unit = getUnit();
         return (unit == null || unit.isDisposed()) ? null
             : unit.getLocation();
     }
@@ -546,9 +591,10 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public Location getTransportDestination() {
+        final Unit unit = getUnit();
         return (unit == null || unit.isDisposed() || !hasMission())
             ? null
-            : mission.getTransportDestination();
+            : this.mission.getTransportDestination();
     }
 
     /**
@@ -563,8 +609,9 @@ public class AIUnit extends TransportableAIObject {
         dst = Location.upLoc(dst);
 
         PathNode path;
+        final Unit unit = getUnit();
         if (unit.getLocation() == carrier) {
-            path = unit.findPath(carrier.getLocation(), dst, carrier, null);
+            path = unit.findPath(carrier.getLocation(), dst, carrier);
             if (path == null && dst.getTile() != null) {
                 path = unit.findPathToNeighbour(carrier.getLocation(),
                     dst.getTile(), carrier, null);
@@ -572,7 +619,7 @@ public class AIUnit extends TransportableAIObject {
         } else if (unit.getLocation() instanceof Unit) {
             return null;
         } else {
-            path = unit.findPath(unit.getLocation(), dst, carrier, null);
+            path = unit.findPath(unit.getLocation(), dst, carrier);
             if (path == null && dst.getTile() != null) {
                 path = unit.findPathToNeighbour(unit.getLocation(),
                     dst.getTile(), carrier, null);
@@ -595,7 +642,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public void setTransportDestination(Location destination) {
-        throw new RuntimeException("AI unit transport destination set by mission.");
+        throw new RuntimeException("AI unit transport destination set by mission:" + destination);
     }
 
     /**
@@ -603,7 +650,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(unit);
+        return carrier.couldCarry(getUnit());
     }
 
     /**
@@ -611,7 +658,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean canMove() {
-        return unit.getMovesLeft() > 0;
+        return getUnit().getMovesLeft() > 0;
     }
 
     /**
@@ -619,6 +666,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean leaveTransport() {
+        final Unit unit = getUnit();
         if (!unit.isOnCarrier()) return true; // Harmless error
 
         // Just leave at once if in Europe
@@ -670,7 +718,7 @@ public class AIUnit extends TransportableAIObject {
 
         // Pick the available tile with the shortest path to one of our
         // settlements, or the tile with the highest defence value.
-        final Player player = unit.getOwner();
+        final Player player = getOwner();
         Tile safe = tiles.get(0);
         Tile best = null;
         int bestTurns = Unit.MANY_TURNS;
@@ -698,13 +746,13 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean leaveTransport(Direction direction) {
+        final Unit unit = getUnit();
         if (!unit.isOnCarrier()) return false;
         final Unit carrier = unit.getCarrier();
         boolean result = (direction == null)
             ? (AIMessage.askDisembark(this)
                 && unit.getLocation() == carrier.getLocation())
             : move(direction);
-if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL");
         if (result) {
             requestLocalRearrange();
             dropTransport();
@@ -719,6 +767,7 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
     public boolean joinTransport(Unit carrier, Direction direction) {
         AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
+        final Unit unit = getUnit();
         boolean result = AIMessage.askEmbark(aiCarrier, unit, direction)
             && unit.getLocation() == carrier;
 
@@ -753,7 +802,7 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
         // Might not be owned by an AI
         if (aiOwner != null) aiOwner.removeAIObject(this);
 
-        if (mission != null) {
+        if (this.mission != null) {
             this.mission.dispose();
             this.mission = null;
         }
@@ -764,11 +813,15 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
-        if (unit == null || unit.isDisposed()) {
-            lb.add("\n  AIUnit without underlying unit: ", getId());
-            result = -1;
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
+        final Unit unit = getUnit();
+        if (unit == null) {
+            lb.add("\n  AIUnit with null unit: ", getId());
+            result = result.fail();
+        } else if (unit.isDisposed()) {
+            lb.add("\n  AIUnit with disposed unit: ", getId());
+            result = result.fail();
         }
         return result;
     }
@@ -798,23 +851,15 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
 
         final AIMain aiMain = getAIMain();
 
-        unit = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
-                                        Unit.class, (Unit)null, true);
-        if (!unit.isInitialized()) {
+        Unit u = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
+                                          Unit.class, (Unit)null, true);
+        if (u.isInitialized()) {
+            setUnit(u);
+        } else {
             xr.nextTag(); // Move off the opening <AIUnit> tag
             throw new XMLStreamException("AIUnit for uninitialized Unit: "
-                + unit.getId());
+                + u.getId());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (unit != null) uninitialized = false;
     }
 
     /**
@@ -892,14 +937,12 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof AIUnit) {
-            AIUnit oa = (AIUnit)other;
-            return super.equals(oa)
-                && Utils.equals(this.unit, oa.unit)
-                && Utils.equals(this.mission, oa.mission);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof AIUnit)) return false;
+        AIUnit other = (AIUnit)o;
+        return Utils.equals(this.unit, other.unit)
+            && Utils.equals(this.mission, other.mission)
+            && super.equals(other);
     }
 
     /**
@@ -917,6 +960,7 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
      */
     @Override
     public String toString() {
-        return (unit == null) ? "AIUnit-null" : unit.toString("AIUnit ");
+        return (this.unit == null) ? "AIUnit-null"
+            : this.unit.toString("AIUnit ");
     }
 }

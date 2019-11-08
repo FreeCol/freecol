@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -475,7 +475,7 @@ public class CombatTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains, true));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         french.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         ServerPlayer refPlayer = igc.createREFPlayer(french);
 
@@ -551,8 +551,8 @@ public class CombatTest extends FreeColTestCase {
         CombatModel combatModel = game.getCombatModel();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
-        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer inca = getServerPlayer(game, "model.nation.inca");
         dutch.setStance(inca, Stance.WAR);
         inca.setStance(dutch, Stance.WAR);
 

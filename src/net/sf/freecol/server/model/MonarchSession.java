@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -83,7 +83,6 @@ public class MonarchSession extends Session {
      * Primitive level to finishing the session with the given result.
      *
      * @param result The result of the session, null means ignored.
-     * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.
      */
     private void completeInternal(Boolean result, ChangeSet cs) {

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -33,8 +33,8 @@ import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
@@ -102,14 +102,13 @@ public class InformationPanel extends FreeColPanel {
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
                             FreeColObject[] fcos, ImageIcon[] images) {
-        super(freeColClient, createLayout(freeColClient));
+        super(freeColClient, null, createLayout(freeColClient));
 
         this.skin = ImageLibrary.getInformationPanelSkin(freeColClient
             .getMyPlayer());
-        final SwingGUI gui = getGUI();
-        JPanel textPanel = new MigPanel();
+        final GUI gui = getGUI();
+        JPanel textPanel = new MigPanel(new MigLayout("wrap 2", "", "top"));
         textPanel.setOpaque(false);
-        textPanel.setLayout(new MigLayout("wrap 2", "", "top"));
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));

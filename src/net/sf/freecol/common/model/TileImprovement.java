@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -41,7 +42,7 @@ import net.sf.freecol.common.util.RandomChoice;
 /**
  * Represents a tile improvement, such as a river or road.
  */
-public class TileImprovement extends TileItem implements Named {
+public class TileImprovement extends TileItem {
 
     private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
@@ -96,7 +97,7 @@ public class TileImprovement extends TileItem implements Named {
                            TileImprovementStyle style) {
         super(game, tile);
         if (type == null) {
-            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
+            throw new RuntimeException("Type must not be null: " + this);
         }
         this.type = type;
         if (!type.isNatural()) {
@@ -105,19 +106,6 @@ public class TileImprovement extends TileItem implements Named {
         }
         this.magnitude = type.getMagnitude();
         this.style = style;
-    }
-
-    /**
-     * Create an new TileImprovement from an existing one.
-     *
-     * @param game The enclosing {@code Game}.
-     * @param tile The {@code Tile} where the improvement resides.
-     * @param template The {@code TileImprovement} to copy.
-     */
-    public TileImprovement(Game game, Tile tile, TileImprovement template) {
-        super(game, tile);
-
-        copy(template);
     }
 
     /**
@@ -132,21 +120,6 @@ public class TileImprovement extends TileItem implements Named {
         super(game, id);
     }
 
-
-    /**
-     * Copy another tile improvement into this one.
-     *
-     * @param template The other {@code TileImprovement} to copy.
-     * @return This tile improvement.
-     */
-    public TileImprovement copy(TileImprovement template) {
-        this.type = template.type;
-        this.turnsToComplete = template.turnsToComplete;
-        this.magnitude = template.magnitude;
-        this.style = template.style;
-        this.virtual = template.virtual;
-        return this;
-    }
 
     /**
      * Gets the type of this tile improvement.
@@ -237,11 +210,20 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
+     * Set the style of this improvement.
+     *
+     * @param style The new {@code TileImprovementStyle}.
+     */
+    public void setStyle(TileImprovementStyle style) {
+        this.style = style;
+    }
+
+    /**
      * Is this a virtual improvement?
      *
      * @return True if this is a virtual improvement.
      */
-    public final boolean isVirtual() {
+    public final boolean getVirtual() {
         return virtual;
     }
 
@@ -273,6 +255,8 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Is this tile improvement connected to a similar improvement on
      * a neighbouring tile?
+     *
+     * Public for the test suite.
      *
      * @param direction The {@code Direction} to check.
      * @return True if this improvement is connected.
@@ -321,8 +305,10 @@ public class TileImprovement extends TileItem implements Named {
     public Map<Direction, Integer> getConnections() {
         final List<Direction> dirns = getConnectionDirections();
         return (dirns == null) ? Collections.<Direction, Integer>emptyMap()
-            : transform(dirns, d -> isConnectedTo(d), Function.identity(),
-                        Collectors.toMap(Function.identity(), d -> magnitude));
+            : transform(dirns, d -> isConnectedTo(d),
+                        Function.<Direction>identity(),
+                        Collectors.toMap(Function.<Direction>identity(),
+                                         d -> magnitude));
     }
 
     /**
@@ -332,7 +318,7 @@ public class TileImprovement extends TileItem implements Named {
      * @param goodsType The {@code GoodsType} to test.
      * @return A production {@code Modifier}, or null if none applicable.
      */
-    public Modifier getProductionModifier(GoodsType goodsType) {
+    private Modifier getProductionModifier(GoodsType goodsType) {
         return (isComplete()) ? type.getProductionModifier(goodsType) : null;
     }
 
@@ -622,14 +608,14 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
-        final Tile tile = getTile();
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
+        Tile tile = getTile();
         if (isRiver()) {
             // @compat 0.11.5 Prevent NPE, TileItemContainer rechecks this.
             if (style == null) {
                 lb.add("\n  Broken null style river at ", tile);
-                return -1;
+                return result.fail();
             }
             // end @compat 0.11.5
 
@@ -650,11 +636,11 @@ public class TileImprovement extends TileItem implements Named {
                                 setConnected(d, false);
                                 lb.add("\n  Removed broken river connection to ",
                                     d, " at ", tile);
-                                result = Math.min(0, result);
+                                result = result.fix();
                             } else {
                                 lb.add("\n  Broken river connection to ", d,
                                     " at ", tile);
-                                result = -1;
+                                result = result.fail();
                             }
                         }
                     } else if (t == null || !t.getType().isWater()) {
@@ -662,11 +648,11 @@ public class TileImprovement extends TileItem implements Named {
                             setConnected(d, false);
                             lb.add("\n  Removed broken river connection to ",
                                 d, " at ", tile);
-                            result = Math.min(0, result);
+                            result = result.fix();
                         } else {
                             lb.add("\n  Broken river connection to ", d,
                                 " at ", tile);
-                            result = -1;
+                            result = result.fail();
                         }
                     }
                 }
@@ -683,12 +669,12 @@ public class TileImprovement extends TileItem implements Named {
                 if (style != oldStyle) {
                     lb.add("\n  Bad road style from ", oldStyle,
                         " to ", style, " fixed at ", tile);
-                    result = Math.min(0, result);
+                    result = result.fix();
                 }
             }
             if (style == null) {
                 lb.add("\n  Broken road with null style at ", tile);
-                result = -1;
+                result = result.fail();
             }
             // end @compat 0.11.6
         }
@@ -709,7 +695,7 @@ public class TileImprovement extends TileItem implements Named {
         this.turnsToComplete = o.getTurnsToComplete();
         this.magnitude = o.getMagnitude();
         this.style = o.getStyle();
-        this.virtual = o.isVirtual();
+        this.virtual = o.getVirtual();
         return true;
     }
 
@@ -773,12 +759,11 @@ public class TileImprovement extends TileItem implements Named {
                 logger.warning("At " + tile + " ignored nonempty style for "
                     + type + ": " + str);
         } else if (str == null) {
-            if (!isComplete() || isVirtual()) {
-                ; // Null style OK for incomplete or virtual roads
-            } else {
-                logger.warning("At " + tile + " unexpected null style for "
-                    + type);
-            }
+            // Null style OK for incomplete roads.  Virtual roads used
+            // to be null, but we are fixing that.  Some cached tiles
+            // were wrongly getting null style.  Do not bother
+            // complaining about these as they will get fixed and
+            // logged in checkIntegrity().
         } else if (str.length() != dirns.size()) {
             logger.warning("At " + tile + " ignored bogus style for "
                 + type + ": " + str);

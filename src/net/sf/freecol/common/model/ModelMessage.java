@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -97,6 +99,11 @@ public class ModelMessage extends StringTemplate {
             return Messages.nameKey("model." + getKey());
         }
     }
+
+    /** Compare messages by type. */
+    public static final Comparator<ModelMessage> messageTypeComparator
+        = (m1, m2) -> m1.getMessageType().ordinal()
+                    - m2.getMessageType().ordinal();
 
     private String sourceId;
     private String displayId;
@@ -325,11 +332,8 @@ public class ModelMessage extends StringTemplate {
             sb.append(getSourceId());
             switch (getTemplateType()) {
             case TEMPLATE:
-                for (String k : getKeys()) {
-                    if ("%goods%".equals(k)) {
-                        sb.append('-').append(getReplacement(k).getId());
-                    }
-                }
+                StringTemplate t = getReplacement("%goods%");
+                if (t != null) sb.append('-').append(t.getId());
                 break;
             default:
                 break;
@@ -356,10 +360,11 @@ public class ModelMessage extends StringTemplate {
         List<Object> result = new ArrayList<>();
         result.add(Messages.message(this));
 
-        for (String key : getKeys()) {
+        for (SimpleEntry<String,StringTemplate> e : entryList()) {
             // Then for each key, check if it can be made into a link.
             // If not, ignore it.
-            String val = Messages.message(getReplacement(key));
+            String key = e.getKey();
+            String val = Messages.message(e.getValue());
             if (val == null) continue;
             Object b = Utility.getMessageButton(key, val, player, source);
             if (b == null) continue;
@@ -386,6 +391,46 @@ public class ModelMessage extends StringTemplate {
             result = next;
         }
         return result;
+    }
+
+    /**
+     * Get a comparator that sorts on the message source object.
+     *
+     * @param game The {@code Game} to look up source objects in.
+     * @param specialized A map of specialized comparators keyed by class name.
+     * @return The {@code Comparator}.
+     */
+    public static Comparator<ModelMessage> getSourceComparator(final Game game,
+            final java.util.Map<String, Comparator<?>> specialized) {
+
+        return new Comparator<ModelMessage>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public int compare(ModelMessage message1, ModelMessage message2) {
+                String sourceId1 = message1.getSourceId();
+                String sourceId2 = message2.getSourceId();
+                if (Utils.equals(sourceId1, sourceId2)) {
+                    return messageTypeComparator.compare(message1, message2);
+                }
+                FreeColGameObject source1 = game.getMessageSource(message1);
+                FreeColGameObject source2 = game.getMessageSource(message2);
+                int base = FreeColObject.getObjectClassIndex(source1)
+                    - FreeColObject.getObjectClassIndex(source2);
+                if (base == 0 && specialized != null && source1 != null) {
+                    String name = source1.getClass().getName();
+                    @SuppressWarnings("unchecked")
+                    Comparator<FreeColObject> c
+                        = (Comparator<FreeColObject>)specialized.get(name);
+                    if (c != null) {
+                        base = c.compare(source1, source2);
+                    }
+                }
+                return base;
+            }
+        };
     }
 
 
@@ -462,12 +507,12 @@ public class ModelMessage extends StringTemplate {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof ModelMessage) {
-            ModelMessage m = (ModelMessage)o;
-            return Utils.equals(sourceId, m.sourceId)
-                && Utils.equals(displayId, m.displayId)
-                && messageType == m.messageType
-                && displayed == m.displayed
-                && super.equals(m);
+            ModelMessage other = (ModelMessage)o;
+            return messageType == other.messageType
+                && displayed == other.displayed
+                && Utils.equals(sourceId, other.sourceId)
+                && Utils.equals(displayId, other.displayId)
+                && super.equals(other);
         }
         return false;
     }

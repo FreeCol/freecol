@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -28,4 +28,8 @@ public final class Merge {
 
     List<String> lineFromFile2;
 
+    public Merge(List<String> l1, List<String> l2) {
+        this.lineFromFile1 = l1;
+        this.lineFromFile2 = l2;
+    }
 }

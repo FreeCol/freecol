@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -166,8 +166,8 @@ public class BuildingToolTip extends JToolTip {
                     .addNamed("%goods%", outputType)));
         }
 
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && outputType != null) {
+        if (outputType != null
+            && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             List<Modifier> mods
                 = sort(building.getProductionModifiers(outputType, null),
                        Modifier.ascendingModifierIndexComparator);

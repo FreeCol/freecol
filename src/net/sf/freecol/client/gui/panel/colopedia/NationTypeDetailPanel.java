@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -82,8 +82,7 @@ public class NationTypeDetailPanel
         nations.addAll(getSpecification().getEuropeanNationTypes());
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
-        ImageIcon icon = new ImageIcon(ImageLibrary
-            .getScaledImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE, false));
+        ImageIcon icon = new ImageIcon(ImageLibrary.getLibertyImage());
         for (NationType type : nations) {
             parent.add(buildItem(type, icon));
         }
@@ -191,10 +190,8 @@ public class NationTypeDetailPanel
                 .getScaledSettlementTypeImage(nationType.getCapitalType())),
             SwingConstants.CENTER));
 
-        List<String> regionNames = new ArrayList<>();
-        for (String regionName : nationType.getRegions()) {
-            regionNames.add(Messages.getName(regionName));
-        }
+        List<String> regionNames = toList(map(nationType.getRegions(),
+                                          n -> Messages.getName(n)));
         panel.add(Utility.localizedLabel("colopedia.nationType.regions"));
         panel.add(new JLabel(join(", ", regionNames)));
 

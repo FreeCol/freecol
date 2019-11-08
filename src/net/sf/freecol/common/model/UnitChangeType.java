@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -149,6 +149,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
     /**
      * Add a new change.
      *
+     * Public for the test suite.
+     *
      * @param uc The {@code UnitTypeChange} to add.
      */
     public void addUnitTypeChange(UnitTypeChange uc) {
@@ -262,8 +264,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
         final String tag = xr.getLocalName();
 
         if (UnitTypeChange.TAG.equals(tag)) {
-            UnitTypeChange utc = new UnitTypeChange(xr, spec);
-            if (utc != null) addUnitTypeChange(utc);
+            addUnitTypeChange(new UnitTypeChange(xr, spec));
 
         } else {
             super.readChild(xr);

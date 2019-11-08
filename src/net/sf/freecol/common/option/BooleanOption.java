@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -68,7 +68,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
      * {@inheritDoc}
      */
     @Override
-    public BooleanOption clone() {
+    public BooleanOption cloneOption() {
         BooleanOption result = new BooleanOption(getId(), getSpecification());
         result.setValues(this);
         return result;
@@ -90,7 +90,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
         final boolean oldValue = this.value;
         this.value = value;
 
-        if (value != oldValue && isDefined) {
+        if (isDefined && value != oldValue) {
             firePropertyChange(VALUE_TAG, oldValue, (boolean)value);
         }
         isDefined = true;

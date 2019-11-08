@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,11 +22,15 @@ package net.sf.freecol.client.gui.dialog;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -57,29 +61,33 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @param choices A list of {@code ChoiceItem}s to create buttons for.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient, JFrame frame,
-            boolean modal, Object obj, ImageIcon icon, String cancelKey,
-            List<ChoiceItem<T>> choices) {
+                               boolean modal, StringTemplate tmpl,
+                               ImageIcon icon, String cancelKey,
+                               List<ChoiceItem<T>> choices) {
         this(freeColClient, frame);
 
-        initializeChoiceDialog(frame, modal, obj, icon, cancelKey, choices);
+        initializeChoiceDialog(frame, modal,
+            Utility.localizedLabel(tmpl, icon, SwingConstants.LEFT),
+            null, cancelKey, choices);
     }
 
 
     /**
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
-     * @param obj An object that explains the choice for the user.
+     * @param jc An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of {@code ChoiceItem}s to create buttons for.
      */
     protected final void initializeChoiceDialog(JFrame frame, boolean modal,
-            Object obj, ImageIcon icon, String cancelKey,
-            List<ChoiceItem<T>> choices) {
+                                                JComponent jc, ImageIcon icon,
+                                                String cancelKey,
+                                                List<ChoiceItem<T>> choices) {
         if (cancelKey != null) {
             choices.add(new ChoiceItem<>(Messages.message(cancelKey), (T)null)
                 .cancelOption().defaultOption());
         }
-        initializeDialog(frame, DialogType.PLAIN, modal, obj, icon, choices);
+        initializeDialog(frame, DialogType.PLAIN, modal, jc, icon, choices);
     }
 }

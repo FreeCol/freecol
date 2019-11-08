@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -181,10 +181,6 @@ public final class CompactLabourReport extends ReportPanel {
         } else {
             addLocations();
         }
-    }
-
-    private Border createBorder() {
-        return new EmptyBorder(0, 20, 20, 20);
     }
 
     /**
@@ -392,7 +388,7 @@ public final class CompactLabourReport extends ReportPanel {
                 + " 1 " + (row - buildingStartRow));
         }
 
-        if (data.getUnitData().showProduction() && row > notProducingStartRow) {
+        if (row > notProducingStartRow && data.getUnitData().showProduction()) {
             reportPanel.add(createEmptyLabel(), "cell " + PRODUCTION_COLUMN
                 + " " + notProducingStartRow
                 + " 1 " + (row - notProducingStartRow));
@@ -425,12 +421,13 @@ public final class CompactLabourReport extends ReportPanel {
             }
         }
         LabourData.LocationData europe = unitData.getUnitsInEurope();
-        if (europe.getRowCount() > 0) {
+        int euRow = europe.getRowCount();
+        if (euRow > 0) {
             String nam = Messages.getName(getMyPlayer().getEurope());
             JButton button = createButton(nam,
                 (ActionEvent ae) -> { getGUI().showEuropePanel(); });
             reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row
-                + " 1 " + europe.getRowCount());
+                + " 1 " + euRow);
             row = addLocationData(europe, null, row);
         }
         row = addNonLinkedLocation(unitData.getUnitsOnLand(),
@@ -522,14 +519,12 @@ public final class CompactLabourReport extends ReportPanel {
 
     private int addNonLinkedLocation(LabourData.LocationData data, String messageKey, int row) {
         int rows = data.getRowCount();
-        if (rows > 0) {
-            JLabel label = Utility.localizedLabel(messageKey);
-            label.setBorder(Utility.LEFTCELLBORDER);
-            label.setForeground(Color.GRAY);
-            reportPanel.add(label, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
-            return addLocationData(data, null, row);
-        }
-        return row;
+        if (rows <= 0) return row;
+        JLabel label = Utility.localizedLabel(messageKey);
+        label.setBorder(Utility.LEFTCELLBORDER);
+        label.setForeground(Color.GRAY);
+        reportPanel.add(label, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
+        return addLocationData(data, null, row);
     }
 
     private int addRow(LabourData.LocationData data, String typeName, String activity, int colonists, int production, int row) {
@@ -553,7 +548,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         reportPanel.add(colonistLabel, "cell " + COLONIST_COLUMN + " " + row);
 
-        if (data.getUnitData().showProduction() && production > 0) {
+        if (production > 0 && data.getUnitData().showProduction()) {
             reportPanel.add(createNumberLabel(production, "report.labour.potentialProduction.tooltip"), "cell " + PRODUCTION_COLUMN + " " + row);
         }
     }

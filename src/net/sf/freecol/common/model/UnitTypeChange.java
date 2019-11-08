@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -18,6 +18,8 @@
  */
 
 package net.sf.freecol.common.model;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -46,7 +48,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     public int turns;
 
     // @compat 0.11.6
-    static int fakeIdIndex = 1;
+    private static AtomicInteger fakeIdIndex = new AtomicInteger(0);
     // end @compat 0.11.6
 
 
@@ -64,6 +66,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
      * Read a unit change from a stream.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @param spec The {@code Specification} to read within.
      * @exception XMLStreamException if there is a problem reading
      *     the stream.
      */
@@ -154,8 +157,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         // handle mods.
         String id = getId();
         if (id == null || "".equals(id)) {
-            id = "model.unitChange.faked." + fakeIdIndex++;
-            setId(id);
+            setId("model.unitChange.faked." + fakeIdIndex.incrementAndGet());
         }
         // end @compat 0.11.6
     }

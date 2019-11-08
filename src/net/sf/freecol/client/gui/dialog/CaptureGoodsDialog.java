@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
@@ -187,8 +188,8 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         this.allButton = Utility.localizedButton("all");
         this.allButton.addActionListener((ActionEvent ae) -> {
                 JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
-                for (int i = 0; i < gl.getModel().getSize()
-                         && i < CaptureGoodsDialog.this.maxCargo; i++) {
+                int siz = gl.getModel().getSize();
+                for (int i = 0; i < siz && i < CaptureGoodsDialog.this.maxCargo; i++) {
                     GoodsItem gi = gl.getModel().getElementAt(i);
                     gi.setSelected(true);
                     updateComponents();
@@ -222,18 +223,17 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
                 }
             });
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]",
-                                                    "[]20[]20[]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]",
+                                                  "[]20[]20[]"));
         panel.add(Utility.localizedHeader("captureGoodsDialog.title", true));
         panel.add(this.allButton, "split 2");
         panel.add(this.noneButton);
         panel.add(this.goodsList);
         panel.setSize(panel.getPreferredSize());
 
-        List<Goods> fake = null;
         List<ChoiceItem<List<Goods>>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), fake)
-            .okOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                               (List<Goods>)null).okOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, false, panel,
             new ImageIcon(getImageLibrary().getScaledUnitImage(winner)), c);
     }

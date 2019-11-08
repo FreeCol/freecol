@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -88,12 +88,10 @@ public class OSUtils {
 
             // Use Runtime to launch browser
             String[] browser = getBrowserExecString(url);
-            if (browser != null) {
-                try {
-                    Runtime.getRuntime().exec(browser);
-                } catch (IOException re) {
-                    logger.log(Level.FINEST, "Web browser failed to launch via Runtime Class.", re);
-                }
+            try {
+                Runtime.getRuntime().exec(browser);
+            } catch (IOException re) {
+                logger.log(Level.FINEST, "Web browser failed to launch via Runtime Class.", re);
             }
         }
     }

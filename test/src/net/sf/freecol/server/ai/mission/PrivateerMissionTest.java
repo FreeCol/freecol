@@ -1,5 +1,5 @@
  /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -60,8 +60,8 @@ public class PrivateerMissionTest extends FreeColTestCase {
         Map map = game.getMap();
 
         // Create player and unit
-        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
-        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
 
         Tile colonyTile = map.getTile(9, 9);
         Tile privateerTile = map.getTile(10, 9);
@@ -108,6 +108,6 @@ public class PrivateerMissionTest extends FreeColTestCase {
         privateerAI.setMission(null);
         assertFalse("Privateer has no mission", privateerAI.hasMission());
         assertEquals("PrivateeringMission valid", null,
-            PrivateerMission.invalidReason(privateerAI));
+            PrivateerMission.invalidMissionReason(privateerAI));
     }
 }

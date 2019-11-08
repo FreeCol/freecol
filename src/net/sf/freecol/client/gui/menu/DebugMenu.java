@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,6 +32,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -39,12 +40,15 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.debug.FreeColDebugger.DebugMode;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -331,7 +335,9 @@ public class DebugMenu extends JMenu {
         //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
         showResourceKeys.addActionListener((ActionEvent ae) -> {
-                gui.showInformationMessage(ImageLibrary.getImageResourceSummary());
+                StringBuilder sb = new StringBuilder(256);
+                ResourceManager.summarizeImageResources(sb);
+                gui.showInformationMessage(sb.toString());
             });
         showResourceKeys.setEnabled(true);
 
@@ -351,9 +357,31 @@ public class DebugMenu extends JMenu {
         //gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
         gc.addActionListener((ActionEvent ae) -> {
-                System.gc();
+                garbageCollect();
             });
         gc.setEnabled(true);
+
+        // debug modes
+        final String debugBase = Messages.message("menuBar.debug");
+        for (DebugMode dm : DebugMode.values()) {
+            if (dm == DebugMode.MENUS) continue; // Must be on already
+            String name = debugBase + ' ' + dm.toString();
+            JCheckBoxMenuItem cb = new JCheckBoxMenuItem(name,
+                FreeColDebugger.isInDebugMode(dm));
+            cb.addChangeListener((ChangeEvent ev) -> {
+                    JCheckBoxMenuItem src = (JCheckBoxMenuItem)ev.getSource();
+                    FreeColDebugger.setDebugMode(dm, src.isSelected());
+                    // Special processing for COMMS
+                    if (dm == DebugMode.COMMS) {
+                        DebugUtils.setCommsLogging(freeColClient, src.isSelected());
+                    }
+                    // Show result
+                    gui.refresh();
+                });
+            cb.setOpaque(false);
+            cb.setEnabled(true);
+            this.add(cb);
+        }
 
         this.addSeparator();
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,11 +23,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -55,18 +58,20 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
-     * @param obj The object containing the input fields and
+     * @param tmpl A {@code StringTemplate} containing the input fields and
      *     explanation to the user.
      * @param icon An optional icon to display.
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
-    protected FreeColInputDialog(final FreeColClient freeColClient, JFrame frame,
-                                 boolean modal, Object obj, ImageIcon icon,
+    protected FreeColInputDialog(FreeColClient freeColClient, JFrame frame,
+                                 boolean modal, StringTemplate tmpl,
+                                 ImageIcon icon,
                                  String okKey, String cancelKey) {
         this(freeColClient, frame);
 
-        initializeInputDialog(frame, modal, obj, icon, okKey, cancelKey);
+        initializeInputDialog(frame, modal, Utility.localizedTextArea(tmpl),
+                              icon, okKey, cancelKey);
     }
 
 
@@ -75,21 +80,23 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      *
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
-     * @param obj The object containing the input fields and
+     * @param jc The object containing the input fields and
      *     explanation to the user.
      * @param icon An optional icon to display.
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
     protected final void initializeInputDialog(JFrame frame, boolean modal,
-            Object obj, ImageIcon icon, String okKey, String cancelKey) {
+                                               JComponent jc, ImageIcon icon,
+                                               String okKey, String cancelKey) {
         List<ChoiceItem<T>> c = choices();
         c.add(new ChoiceItem<>(Messages.message(okKey), (T)null).okOption());
         if (cancelKey != null) {
             c.add(new ChoiceItem<>(Messages.message(cancelKey), (T)null)
                 .cancelOption().defaultOption());
         }
-        initializeDialog(frame, DialogType.QUESTION, modal, obj, icon, c);
+
+        initializeDialog(frame, DialogType.QUESTION, modal, jc, icon, c);
     }
 
     /**

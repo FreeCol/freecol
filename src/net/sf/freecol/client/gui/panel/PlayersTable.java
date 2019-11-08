@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -209,20 +209,27 @@ public final class PlayersTable extends JTable {
                 });
         private final JComboBox<NationState> allStateBox
             = new JComboBox<>(NationState.values());
-        private JComboBox activeBox;
-
-        private final ActionListener listener = (ActionEvent ae) -> {
-            stopCellEditing();
-        };
+        private JComboBox<NationState> activeBox = null;
 
 
         public AvailableCellEditor() {
+            ActionListener listener = (ActionEvent ae) -> {
+                stopCellEditing();
+            };
             aiStateBox.setRenderer(new NationStateRenderer());
             aiStateBox.addActionListener(listener);
             allStateBox.setRenderer(new NationStateRenderer());
             allStateBox.addActionListener(listener);
         }
 
+        private JComboBox<NationState> getActiveBox(int row) {
+            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN))
+                .getType();
+            this.activeBox = (nationType instanceof EuropeanNationType)
+                ? this.allStateBox
+                : this.aiStateBox;
+            return this.activeBox;
+        }
 
         // Implement AbstractCellEditor
 
@@ -232,17 +239,16 @@ public final class PlayersTable extends JTable {
         @Override
         public Component getTableCellEditorComponent(JTable table,
             Object value, boolean isSelected, int row, int column) {
-            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN))
-                .getType();
-            activeBox = (nationType instanceof EuropeanNationType)
-                ? allStateBox
-                : aiStateBox;
-            return activeBox;
+            return getActiveBox(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getCellEditorValue() {
-            return activeBox.getSelectedItem();
+            return (this.activeBox == null) ? null
+                : this.activeBox.getSelectedItem();
         }
     }
 
@@ -427,7 +433,7 @@ public final class PlayersTable extends JTable {
 
         private final List<Nation> nations;
 
-        private final Map<Nation, Player> nationMap = new HashMap<>();
+        private final Map<Nation, Player> nationMap;
 
 
         /**
@@ -448,6 +454,7 @@ public final class PlayersTable extends JTable {
             final Predicate<Nation> nationPred = n -> !n.isUnknownEnemy()
                 && nationOptions.getNations().get(n) != null;
             this.nations = transform(spec.getNations(), nationPred);
+            this.nationMap = new HashMap<>(this.nations.size());
             for (Nation n : this.nations) this.nationMap.put(n, null);
             this.nationMap.put(thisPlayer.getNation(), thisPlayer);
         }

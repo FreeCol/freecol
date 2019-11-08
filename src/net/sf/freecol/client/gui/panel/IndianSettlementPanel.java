@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -57,7 +57,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
      */
     public IndianSettlementPanel(FreeColClient freeColClient,
                                  IndianSettlement is) {
-        super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
+        super(freeColClient, null,
+              new MigLayout("wrap 2, gapx 20", "", ""));
 
         ImageLibrary lib = getImageLibrary();
         JLabel settlementLabel = new JLabel(new ImageIcon(lib

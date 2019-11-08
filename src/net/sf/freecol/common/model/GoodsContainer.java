@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -118,7 +119,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public void setLocation(Location location) {
         if (location == null) {
-            throw new IllegalArgumentException("Null GoodsContainer Location.");
+            throw new RuntimeException("Null GoodsContainer location: " + this);
         }
         this.parent = location;
     }
@@ -185,9 +186,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public int getGoodsCount(GoodsType type) {
         synchronized (this.storedGoods) {
-            return (this.storedGoods.containsKey(type)) 
-                ? this.storedGoods.get(type)
-                : 0;
+            Integer val = this.storedGoods.get(type);
+            return (val == null) ? 0 : val;
         }
     }
 
@@ -200,9 +200,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public int getOldGoodsCount(GoodsType type) {
         synchronized (this.oldStoredGoods) {
-            return (this.oldStoredGoods.containsKey(type))
-                ? this.oldStoredGoods.get(type)
-                : 0;
+            Integer val = this.oldStoredGoods.get(type);
+            return (val == null) ? 0 : val;
         }
     }
 
@@ -542,7 +541,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public <T extends FreeColObject> boolean copyIn(T other) {
         GoodsContainer o = copyInCast(other, GoodsContainer.class);
         if (o == null || !super.copyIn(o)) return false;
-        final Game game = getGame();
         // Parent is fixed, and not serialized
         this.setStoredGoods(o.getStoredGoods());
         this.setOldStoredGoods(o.getOldStoredGoods());

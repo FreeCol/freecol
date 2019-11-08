@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002-2018   The FreeCol Team
+ * Copyright (C) 2002-2019   The FreeCol Team
  *
  * This file is part of FreeCol.
  *
@@ -58,7 +58,9 @@ public final class MarketLabel extends AbstractGoodsLabel
     public MarketLabel(ImageLibrary lib, GoodsType type, Market market) {
         super(lib, new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
 
-        if (market == null) throw new IllegalArgumentException("Null market");
+        if (market == null) {
+            throw new RuntimeException("Null market for " + this);
+        }
         this.market = market;
         update();
     }
@@ -67,7 +69,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Update this label.
      */
-    public void update() {
+    private void update() {
         final GoodsType type = getType();
         final Player player = market.getOwner();
         String toolTipText = Messages.getName(type);
@@ -145,26 +147,25 @@ public final class MarketLabel extends AbstractGoodsLabel
     }
 
 
-    //Interface CargoLabel
-
+    // Interface CargoLabel
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
+    public boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
         MarketLabel label = (MarketLabel) comp;
         Player player = carrier.getOwner();
         if (!player.canTrade(label.getType())) {
             cargoPanel.igc().payArrears(label.getType());
-            return null;
+            return false;
         }
         int loadable = carrier.getLoadableAmount(label.getType());
-        if (loadable <= 0) return null;
+        if (loadable <= 0) return false;
         if (loadable > label.getAmount()) loadable = label.getAmount();
         cargoPanel.igc().buyGoods(label.getType(), loadable, carrier);
         cargoPanel.igc().nextModelMessage();
         cargoPanel.update();
-        return comp;
+        return true;
     }
 }

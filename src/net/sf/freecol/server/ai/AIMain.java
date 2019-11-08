@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.FreeColObject;
@@ -91,7 +92,6 @@ public class AIMain extends FreeColObject
      * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
-     * @see #readFromXML
      */
     public AIMain(FreeColServer freeColServer,
                   FreeColXMLReader xr) throws XMLStreamException {
@@ -188,7 +188,7 @@ public class AIMain extends FreeColObject
      * @see #getAIObject(String)
      * @return The {@code AIObject}.
      */
-    public AIObject getAIObject(FreeColGameObject fcgo) {
+    private AIObject getAIObject(FreeColGameObject fcgo) {
         return getAIObject(fcgo.getId());
     }
 
@@ -208,13 +208,17 @@ public class AIMain extends FreeColObject
     /**
      * Adds a reference to the given {@code AIObject}.
      *
+     * Note: this is called only for new AI objects, thus it is an
+     * error for the object to already be present in the aiObjects
+     * map.
+     *
      * @param id The object identifier.
      * @param aiObject The {@code AIObject} to store a reference
      *        for.
      */
     public void addAIObject(String id, AIObject aiObject) {
         if (aiObject == null) {
-            throw new NullPointerException("aiObject == null");
+            throw new NullPointerException("aiObject == null: " + this);
         }
         boolean present;
         synchronized (aiObjects) {
@@ -310,17 +314,17 @@ public class AIMain extends FreeColObject
         Map<String, Long> stats = new HashMap<>();
         for (AIObject aio : getAIObjects()) {
             String className = aio.getClass().getSimpleName();
-            if (stats.containsKey(className)) {
-                Long count = stats.get(className);
-                count++;
-                stats.put(className, count);
+            Long count = stats.get(className);
+            if (count == null) {
+                stats.put(className, 1L);
             } else {
-                Long count = (long) 1;
-                stats.put(className, count);
+                stats.put(className, count + 1L);
             }
         }
-        return transform(stats.entrySet(), alwaysTrue(), Function.identity(),
-            Collectors.toMap(Entry::getKey, e -> Long.toString(e.getValue())));
+        return transform(stats.entrySet(), alwaysTrue(),
+                         Function.<Entry<String,Long>>identity(),
+                         Collectors.toMap(Entry::getKey,
+                                          e -> Long.toString(e.getValue())));
     }
 
     /**
@@ -358,21 +362,21 @@ public class AIMain extends FreeColObject
      * @return -1 if there are problems remaining, zero if problems
      *     were fixed, +1 if no problems found at all.
      */
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = 1;
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
         for (AIObject aio : getAIObjects()) {
-            int integ = aio.checkIntegrity(fix, lb);
-            if (integ < 0) {
+            IntegrityType integ = aio.checkIntegrity(fix, lb);
+            if (!integ.safe()) {
                 if (fix) {
                     lb.add("\n  Invalid AIObject dropped: ", aio.getId(),
                         "(", lastPart(aio.getClass().getName(), "."), ")");
                     removeAIObject(aio.getId());
                     aio.dispose();
-                    result = Math.min(result, 0);
+                    result = result.fix();
                 } else {
                     lb.add("\n  Invalid AIObject: ", aio.getId(),
                         "(", lastPart(aio.getClass().getName(), "."), ")");
-                    result = -1;
+                    result = result.fail();
                 }
             }
         }
@@ -383,10 +387,10 @@ public class AIMain extends FreeColObject
                 if (fix) {
                     lb.add("\n  Missing AIObject added: ", fcgo.getId());
                     setFreeColGameObject(fcgo.getId(), fcgo);
-                    result = Math.min(result, 0);
+                    result = result.fix();
                 } else {
                     lb.add("\n  Missing AIObject: ", fcgo.getId());
-                    result = -1;
+                    result = result.fail();
                 }
             }
         }
@@ -411,12 +415,13 @@ public class AIMain extends FreeColObject
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (getAIObject(id) != null || !shouldHaveAIObject(fcgo)) return;
         if (!id.equals(fcgo.getId())) {
-            throw new IllegalArgumentException("!id.equals(fcgo.getId())");
+            throw new RuntimeException("!id.equals(fcgo.getId()): " + id);
         }
+        AIObject aio = null;
         if (fcgo instanceof Colony) {
-            new AIColony(this, (Colony)fcgo);
-        } else if (fcgo instanceof ServerPlayer) {
-            ServerPlayer player = (ServerPlayer)fcgo;
+            aio = new AIColony(this, (Colony)fcgo);
+        } else if (fcgo instanceof Player) {
+            Player player = (Player)fcgo;
             if (player.getPlayerType() == null) {
                 // No point doing anything with the object yet, as we
                 // need the player type before we can create the
@@ -424,16 +429,19 @@ public class AIMain extends FreeColObject
                 logger.info("Temporarily ignoring incomplete AI player: "
                     + fcgo.getId());
             } else if (player.isIndian()) {
-                new NativeAIPlayer(this, player);
+                aio = new NativeAIPlayer(this, player);
             } else if (player.isREF()) {
-                new REFAIPlayer(this, player);
+                aio = new REFAIPlayer(this, player);
             } else if (player.isEuropean()) {
-                new EuropeanAIPlayer(this, player);
+                aio = new EuropeanAIPlayer(this, player);
             } else {
-                throw new IllegalArgumentException("Bogus player: " + player);
+                throw new RuntimeException("Bogus player: " + player);
             }
         } else if (fcgo instanceof Unit) {
-            new AIUnit(this, (Unit)fcgo);
+            aio = new AIUnit(this, (Unit)fcgo);
+        }
+        if (aio == null) {
+            throw new RuntimeException("Bogus non-AI FCGO: " + fcgo);
         }
     }
 
@@ -467,10 +475,8 @@ public class AIMain extends FreeColObject
 
         AIPlayer oldAIOwner = getAIPlayer(oldOwner);
         if (oldAIOwner != null) oldAIOwner.removeAIObject(ao);
-        if (ao != null) {
-            ao.dispose();
-            setFreeColGameObject(source.getId(), source);
-        }
+        ao.dispose();
+        setFreeColGameObject(source.getId(), source);
     }
 
 
@@ -491,7 +497,7 @@ public class AIMain extends FreeColObject
     public <T extends FreeColObject> boolean copyIn(T other) {
         AIMain o = copyInCast(other, AIMain.class);
         if (o == null || !super.copyIn(o)) return false;
-        this.nextId = Integer.valueOf(o.getNextId());
+        this.nextId = o.nextId;
         return true;
     }
 
@@ -524,7 +530,7 @@ public class AIMain extends FreeColObject
         super.writeChildren(xw);
 
         for (AIObject aio : sort(getAIObjects())) {
-            if (aio.checkIntegrity(false) < 0) {
+            if (!aio.checkIntegrity(false).safe()) {
                 // We expect to see integrity failure when AIGoods are
                 // aboard a unit that gets destroyed or if its
                 // destination is destroyed, and probably more.  These
@@ -581,71 +587,74 @@ public class AIMain extends FreeColObject
         final String oid = xr.readId();
 
         try {
-            Wish wish = null;
-
             // The AI data is quite shallow, so we can get away with
             // fixing up forward references just with this simple
-            // lookup.  AIObjects that can be forward referenced must
-            // ensure they complete initialization somewhere in their
-            // serialization read* routines.
-            AIObject aio;
+            // lookup.  We complete initialization of such objects
+            // with the call to setInitialized().
+            AIObject aio = null;
+            boolean indirect = false;
             if (oid != null && (aio = getAIObject(oid)) != null) {
                 aio.readFromXML(xr);
+                aio.setInitialized();
 
             } else if (AIColony.TAG.equals(tag)) {
-                new AIColony(this, xr);
+                aio = new AIColony(this, xr);
 
             } else if (AIGoods.TAG.equals(tag)) {
-                new AIGoods(this, xr);
+                aio = new AIGoods(this, xr);
 
             } else if (AIPlayer.TAG.equals(tag)) {
                 Player p = getGame().getFreeColGameObject(oid, Player.class);
                 if (p != null) {
                     if (p.isIndian()) {
-                        new NativeAIPlayer(this, xr);
+                        aio = new NativeAIPlayer(this, xr);
                     } else if (p.isREF()) {
-                        new REFAIPlayer(this, xr);
+                        aio = new REFAIPlayer(this, xr);
                     } else if (p.isEuropean()) {
-                        new EuropeanAIPlayer(this, xr);
+                        aio = new EuropeanAIPlayer(this, xr);
                     } else {
-                        throw new RuntimeException("Bogus AIPlayer: " + p);
+                        throw new XMLStreamException("Bogus AIPlayer: " + p);
                     }
                 }
 
             } else if (AIUnit.TAG.equals(tag)) {
-                new AIUnit(this, xr);
+                aio = new AIUnit(this, xr);
 
             } else if (GoodsWish.TAG.equals(tag)
                 // @compat 0.11.3
                 || OLD_GOODS_WISH_TAG.equals(tag)
                 // end @compat 0.11.3
                        ) {
-                wish = new GoodsWish(this, xr);
+                aio = new GoodsWish(this, xr);
 
             } else if (TileImprovementPlan.TAG.equals(tag)
                 // @compat 0.11.3
                 || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
-                new TileImprovementPlan(this, xr);
+                aio = new TileImprovementPlan(this, xr);
 
             } else if (WorkerWish.TAG.equals(tag)) {
-                wish = new WorkerWish(this, xr);
+                aio = new WorkerWish(this, xr);
             
             } else {
+                System.err.println("AT " + tag + " with " + oid);
+                indirect = true;
                 super.readChild(xr);
             }
-            
-            if (wish != null) {
-                AIColony ac = wish.getDestinationAIColony();
-                if (ac != null) ac.addWish(wish);
+            if (aio == null && !indirect) {
+                throw new XMLStreamException("Bad AI object at " + tag
+                    + " with " + oid);
             }
-
+        } catch (XMLStreamException xse) { // Expected
+            throw xse;
         } catch (Exception e) {
+            // Nothing above apparently tries to throw an exception
+            // that can end up here, but that keeps changing and
+            // this is a great place to resynchronize the reader
+            // so keep this in place.
             logger.log(Level.WARNING, "Exception reading AIObject: "
                        + tag + ", id=" + oid, e);
-            // We are hosed.  Try to resynchronize at the end of the tag
-            // or aiMain.
             final String mainTag = TAG;
             while (xr.moreTags() || !(xr.atTag(tag) || xr.atTag(mainTag)));
         }

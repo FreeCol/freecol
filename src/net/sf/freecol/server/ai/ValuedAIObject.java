@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -129,11 +129,11 @@ public abstract class ValuedAIObject extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof ValuedAIObject) {
-            ValuedAIObject ov = (ValuedAIObject)other;
-            return super.equals(ov)
-                && this.value == ov.value;
+    public boolean equals(Object o) {
+        if (o instanceof ValuedAIObject) {
+            ValuedAIObject other = (ValuedAIObject)o;
+            return this.value == other.value
+                && super.equals(other);
         }
         return false;
     }

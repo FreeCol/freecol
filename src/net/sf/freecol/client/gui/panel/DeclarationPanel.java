@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,7 +69,7 @@ public final class DeclarationPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DeclarationPanel(FreeColClient freeColClient) {
-        super(freeColClient, null);
+        super(freeColClient);
 
         Image image = ImageLibrary.getUnscaledImage("image.flavor.Declaration");
         setSize(image.getWidth(null), image.getHeight(null));

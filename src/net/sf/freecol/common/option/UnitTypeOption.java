@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -117,7 +117,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * {@inheritDoc}
      */
     @Override
-    public UnitTypeOption clone() {
+    public UnitTypeOption cloneOption() {
         UnitTypeOption ret = new UnitTypeOption(getId(), getSpecification());
         ret.value = this.value;
         ret.addNone = this.addNone;
@@ -185,7 +185,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     public void generateChoices() {
         if (this.selector == null) {
             UnitType val = getValue();
-            if (this.choices.isEmpty() && val != null) this.choices.add(val);
+            if (val != null && this.choices.isEmpty()) this.choices.add(val);
         } else {
             List<UnitType> unitTypeList = getSpecification().getUnitTypeList();
             this.choices.clear();

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,12 +21,14 @@ package net.sf.freecol.common.i18n;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -38,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -49,6 +52,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -127,7 +131,7 @@ public class Messages {
      * @return A suitable {@code Selector}.
      */
     private static Selector getSelector(String tag) {
-        return tagMap.get(tag.toLowerCase(Locale.US));
+        return tagMap.get(downCase(tag));
     }
 
     /**
@@ -150,19 +154,13 @@ public class Messages {
     public static void loadMessageBundle(Locale locale) {
         messageBundle.clear(); // Reset the message bundle.
 
-        if (!Locale.getDefault().equals(locale)) {
-            Locale.setDefault(locale);
-        }
-
         if (!NumberRules.isInitialized()) {
             // attempt to read grammatical rules
             File cldr = FreeColDirectories.getI18nPluralsFile();
             if (cldr.exists()) {
-                try {
-                    try (FileInputStream in = new FileInputStream(cldr)) {
-                        NumberRules.load(in);
-                    }
-                } catch (IOException e) {
+                try (InputStream in = Files.newInputStream(cldr.toPath())) {
+                    NumberRules.load(in);
+                } catch (IOException|XMLStreamException e) {
                     System.err.println("Failed to read CLDR rules: "
                         + e.getMessage());
                 }
@@ -178,8 +176,8 @@ public class Messages {
 
         for (File f : FreeColDirectories.getI18nMessageFileList(locale)) {
             if (!f.canRead()) continue;
-            try {
-                loadMessages(new FileInputStream(f));
+            try (InputStream in = Files.newInputStream(f.toPath())) {
+                loadMessages(in);
             } catch (IOException ioe) {
                 System.err.println("Failed to load messages from "
                     + f.getPath() + ": " + ioe.getMessage());
@@ -418,7 +416,7 @@ public class Messages {
         return getBestDescription(object.getId());
     }
 
-    public static String getBestDescription(String id) {
+    private static String getBestDescription(String id) {
         String key = find(map(DESCRIPTION_KEYS, s -> id + s),
                           k -> containsKey(k));
         return (key == null) ? id : message(key);
@@ -506,7 +504,7 @@ public class Messages {
         // the role twice, e.g. "Seasoned Scout Scout".
         StringTemplate type;
         String roleKey;
-        String baseKey = typeId + "." + Role.getRoleSuffix(roleId);
+        String baseKey = typeId + "." + Role.getRoleIdSuffix(roleId);
         if (containsKey(baseKey)) {
             type = StringTemplate.template(baseKey)
                 .addAmount("%number%", number);
@@ -728,13 +726,13 @@ public class Messages {
         String result = "";
         switch (template.getTemplateType()) {
         case LABEL:
-            List<StringTemplate> replacements = template.getReplacements();
-            if (replacements.isEmpty()) {
+            if (template.isEmpty()) {
                 result = message(template.getId());
             } else {
                 StringBuilder sb = new StringBuilder(64);
-                for (StringTemplate other : replacements) {
-                    sb.append(template.getId()).append(message(other));
+                for (SimpleEntry<String,StringTemplate> e
+                         : template.entryList()) {
+                    sb.append(template.getId()).append(message(e.getValue()));
                 }
                 if (sb.length() >= template.getId().length()) {
                     result = sb.toString().substring(template.getId().length());
@@ -750,9 +748,11 @@ public class Messages {
                 result = messageBundle.get(template.getDefaultId());
             }
             result = replaceChoices(result, template);
-            for (String key : template.getKeys()) {
-                result = result.replace(key,
-                                        message(template.getReplacement(key)));
+            for (SimpleEntry<String, StringTemplate> e
+                     : template.entryList()) {
+                if (e.getKey() != null) {
+                    result = result.replace(e.getKey(), message(e.getValue()));
+                }
             }
             break;
         case KEY:
@@ -841,8 +841,8 @@ public class Messages {
             if (keyIndex < 0 || keyIndex > closeChoice) {
                 // key not found, choice might be a key itself
                 String otherKey = input.substring(pipeIndex + 1, closeChoice);
-                if (otherKey.startsWith("%") && otherKey.endsWith("%")
-                    && template != null) {
+                if (template != null
+                    && otherKey.startsWith("%") && otherKey.endsWith("%")) {
                     StringTemplate replacement
                         = template.getReplacement(otherKey);
                     if (replacement == null) {

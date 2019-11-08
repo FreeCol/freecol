@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -51,9 +51,9 @@ public class RetireAction extends FreeColAction {
     @Override
     protected boolean shouldBeEnabled() {
         Player player = freeColClient.getMyPlayer();
-        return super.shouldBeEnabled()
-            && player != null
-            && player.getPlayerType() != Player.PlayerType.RETIRED;
+        return player != null
+            && player.getPlayerType() != Player.PlayerType.RETIRED
+            && super.shouldBeEnabled();
     }
 
 

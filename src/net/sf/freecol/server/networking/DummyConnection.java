@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -90,11 +90,10 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean sendMessage(Message message)
+    public void sendMessage(Message message)
         throws FreeColException, IOException {
         Message reply = askMessage(message);
         assert reply == null;
-        return true;
     }
 
     /**

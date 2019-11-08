@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -93,7 +93,7 @@ public class NewLandNameMessage extends AttributeMessage {
         final Unit unit = getUnit(freeColClient.getMyPlayer());
         final String defaultName = getNewLandName();
 
-        if (unit == null || defaultName == null || !unit.hasTile()) return;
+        if (defaultName == null || !unit.hasTile()) return;
 
         igc(freeColClient).newLandNameHandler(unit, defaultName);
         clientGeneric(freeColClient);

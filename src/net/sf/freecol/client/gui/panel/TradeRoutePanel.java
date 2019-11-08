@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -90,7 +90,7 @@ public final class TradeRoutePanel extends FreeColPanel {
      * @param unit The optional {@code Unit} to operate on.
      */
     public TradeRoutePanel(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient, new MigLayout("wrap 2", "[fill][fill]"));
+        super(freeColClient, null, new MigLayout("wrap 2", "[fill][fill]"));
 
         final Player player = getMyPlayer();
 
@@ -279,7 +279,7 @@ public final class TradeRoutePanel extends FreeColPanel {
 
         // Update the counts
         this.counts.clear();
-        for (Unit u : player.getUnitList()) {
+        for (Unit u : player.getUnitSet()) {
             TradeRoute tradeRoute = u.getTradeRoute();
             if (tradeRoute != null && routes.contains(tradeRoute)) {
                 Integer i = counts.get(tradeRoute);
@@ -310,7 +310,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
         if (null == command) return;
-        if (command.equals(OK)) {
+        if (OK.equals(command)) {
             final TradeRoute route = getRoute();
             if (this.unit != null && route != null) {
                 igc().assignTradeRoute(this.unit, route);

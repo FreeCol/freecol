@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -37,7 +39,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Represents the need for goods within a {@code Colony}.
  */
-public class GoodsWish extends Wish {
+public final class GoodsWish extends Wish {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());
@@ -60,8 +62,9 @@ public class GoodsWish extends Wish {
     public GoodsWish(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        goodsType = null;
-        amountRequested = -1;
+        this.goodsType = null;
+        this.amountRequested = -1;
+        this.initialized = false;
     }
 
     /**
@@ -82,14 +85,14 @@ public class GoodsWish extends Wish {
         this(aiMain, TAG + ":" + aiMain.getNextId());
 
         if (destination == null) {
-            throw new NullPointerException("destination == null");
+            throw new NullPointerException("destination == null: " + this);
         }
 
         this.destination = destination;
         setValue(value);
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
-        uninitialized = false;
+        setInitialized();
     }
 
     /**
@@ -104,10 +107,17 @@ public class GoodsWish extends Wish {
     public GoodsWish(AIMain aiMain,
                      FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
-
-        uninitialized = goodsType == null;
+        
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
+    }
 
     /**
      * Updates this {@code GoodsWish} with the given attributes.
@@ -163,6 +173,13 @@ public class GoodsWish extends Wish {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean satisfiedBy(Unit unit) {
+        return false;
+    }
+
+    /**
      * Does some specified goods satisfy this wish?
      *
      * @param <T> The base type of the goods.
@@ -179,14 +196,14 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (goodsType == null) {
             lb.add("\n  GoodsWish without type: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (amountRequested <= 0) {
             lb.add("\n  GoodsWish with non-positive requested: ", getId());
-            result = -1;
+            result = result.fail();
         }            
         return result;
     }
@@ -238,16 +255,6 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (goodsType != null && amountRequested > 0) uninitialized = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getXMLTagName() { return TAG; }
 
 
@@ -257,14 +264,12 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof GoodsWish) {
-            GoodsWish og = (GoodsWish)other;
-            return super.equals(og)
-                && Utils.equals(this.goodsType, og.goodsType)
-                && this.amountRequested == og.amountRequested;
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof GoodsWish)) return false;
+        GoodsWish other = (GoodsWish)o;
+        return this.amountRequested == other.amountRequested
+            && Utils.equals(this.goodsType, other.goodsType)
+            && super.equals(other);
     }
 
     /**

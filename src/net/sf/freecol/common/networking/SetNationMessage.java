@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -102,7 +102,7 @@ public class SetNationMessage extends AttributeMessage {
         
         final Game game = freeColServer.getGame();
         final Player other = getPlayer(game);
-        if (other != null && (ServerPlayer)other != serverPlayer) {
+        if (other != null && other != (Player)serverPlayer) {
             return serverPlayer.clientError("Player " + other.getId()
                 + " set from " + serverPlayer.getId());
         }

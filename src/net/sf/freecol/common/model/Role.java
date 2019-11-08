@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -128,7 +128,7 @@ public class Role extends BuildableType {
      * @return The role suffix.
      */
     public String getRoleSuffix() {
-        return Role.getRoleSuffix(getId());
+        return Role.getRoleIdSuffix(getId());
     }
 
     /**
@@ -137,7 +137,7 @@ public class Role extends BuildableType {
      * @param roleId A role identifier.
      * @return The role suffix.
      */
-    public static String getRoleSuffix(String roleId) {
+    public static String getRoleIdSuffix(String roleId) {
         return lastPart(roleId, ".");
     }
 
@@ -247,7 +247,7 @@ public class Role extends BuildableType {
     /**
      * Set the role change list.
      *
-     * @param roleChange The new list of {@code RoleChange}s.
+     * @param roleChanges The new list of {@code RoleChange}s.
      */
     protected final void setRoleChanges(List<RoleChange> roleChanges) {
         if (this.roleChanges == null) {
@@ -264,7 +264,7 @@ public class Role extends BuildableType {
      * @param from The source role identifier.
      * @param capture The identifier for the role to capture.
      */
-    public void addRoleChange(String from, String capture) {
+    private void addRoleChange(String from, String capture) {
         if (roleChanges == null) roleChanges = new ArrayList<>();
         roleChanges.add(new RoleChange(from, capture));
     }
@@ -275,7 +275,7 @@ public class Role extends BuildableType {
      * @return The offense value.
      */
     public double getOffence() {
-        return applyModifiers(0.0f, null, Modifier.OFFENCE);
+        return apply(0.0f, null, Modifier.OFFENCE);
     }
 
     /**
@@ -293,7 +293,7 @@ public class Role extends BuildableType {
      * @return The defence value.
      */
     private double getDefence() {
-        return applyModifiers(0.0f, null, Modifier.DEFENCE);
+        return apply(0.0f, null, Modifier.DEFENCE);
     }
 
     /**
@@ -312,7 +312,7 @@ public class Role extends BuildableType {
      * @return True if the other role is compatible.
      */
     public boolean isCompatibleWith(Role other) {
-        return isCompatibleWith(this, other);
+        return Role.rolesCompatible(this, other);
     }
 
     /**
@@ -322,7 +322,7 @@ public class Role extends BuildableType {
      * @param role2 The other {@code Role} to compare.
      * @return True if the roles are compatible.
      */
-    public static boolean isCompatibleWith(Role role1, Role role2) {
+    public static boolean rolesCompatible(Role role1, Role role2) {
         if (role1 == null) {
             return role2 == null;
         } else if (role2 == null) {

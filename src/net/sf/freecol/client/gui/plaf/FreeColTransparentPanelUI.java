@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -44,7 +44,7 @@ public class FreeColTransparentPanelUI extends BasicPanelUI {
     @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            throw new IllegalStateException("FreeColTransparentPanelUI can only be used on components which are !isOpaque()");
+            throw new RuntimeException("FreeColTransparentPanelUI can only be used on components which are !isOpaque(): " + c);
         }
 
         int width = c.getWidth();

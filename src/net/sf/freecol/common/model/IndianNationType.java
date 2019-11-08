@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -141,9 +141,10 @@ public class IndianNationType extends NationType {
     public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {
         final List<RandomChoice<UnitType>> skills = getSkills();
         final Map<GoodsType, Integer> scale
-            = transform(skills, alwaysTrue(), Function.identity(),
-                Collectors.toMap(rc -> rc.getObject().getExpertProduction(),
-                                 rc -> 1));
+            = transform(skills, alwaysTrue(),
+                        Function.<RandomChoice<UnitType>>identity(),
+                        Collectors.toMap(rc ->
+                            rc.getObject().getExpertProduction(), rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             forEachMapEntry(scale, e -> {

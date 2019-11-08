@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -137,7 +138,6 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Creates a {@code MapGenerator}
      *
-     * @param game The {@code Game} to generate for.
      * @param random The {@code Random} number source to use.
      * @see #generateMap
      */
@@ -149,6 +149,7 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Gets the approximate number of land tiles.
      *
+     * @param game The {@code Game} to look up options in.
      * @return The approximate number of land tiles
      */
     private int getApproximateLandCount(Game game) {
@@ -241,9 +242,9 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Make new settlements.
-        Set<IndianSettlement> newSettlements = new HashSet<>();
-        for (Tile iTile : transform(importMap.getAllTiles(),
-                                    isNotNull(Tile::getIndianSettlement))) {
+        List<Tile> iTiles = importMap.getTileList(isNotNull(Tile::getIndianSettlement)); 
+        Set<IndianSettlement> newSettlements = new HashSet<>(iTiles.size());
+        for (Tile iTile : iTiles) {
             final IndianSettlement is = iTile.getIndianSettlement();
             if (is.getOwner() == null) continue;
             final Player owner = game.getPlayerByNationId(is.getOwner()
@@ -320,10 +321,11 @@ public class SimpleMapGenerator implements MapGenerator {
         
         float shares = 0f;
         List<IndianSettlement> settlements = new ArrayList<>();
-        List<Player> indians = new ArrayList<>();
         HashMap<String, Territory> territoryMap = new HashMap<>();
 
-        for (Player player : game.getLiveNativePlayerList()) {
+        List<Player> players = game.getLiveNativePlayerList();
+        List<Player> indians = new ArrayList<>(players.size());
+        for (Player player : players) {
             switch (player.getNationType().getNumberOfSettlements()) {
             case HIGH:
                 shares += 4;
@@ -389,8 +391,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // order picking out as many as possible suitable tiles for
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
-        List<Tile> allTiles = toList(map.getAllTiles());
-        randomShuffle(logger, "All tile shuffle", allTiles, random);
+        List<Tile> allTiles = map.getShuffledTiles(random);
         final int minDistance = spec.getRange(GameOptions.SETTLEMENT_NUMBER);
         List<Tile> settlementTiles = new ArrayList<>();
         for (Tile tile : allTiles) {
@@ -645,7 +646,8 @@ public class SimpleMapGenerator implements MapGenerator {
             = Comparator.comparingInt(t -> t.getDistanceTo(center));
         // Choose a tile that is free and half the expected tile claims
         // can succeed, preventing capitals on small islands.
-        Tile t = first(transform(tiles, terrPred, Function.identity(), comp));
+        Tile t = first(transform(tiles, terrPred, Function.<Tile>identity(),
+                                 comp));
         if (t == null) return null;
 
         String name = (territory.region == null) ? "default region"
@@ -704,9 +706,10 @@ public class SimpleMapGenerator implements MapGenerator {
         List<RandomChoice<UnitType>> skills
             = ((IndianNationType)nationType).getSkills();
         java.util.Map<GoodsType, Integer> scale
-            = transform(skills, alwaysTrue(), Function.identity(),
-                Collectors.toMap(rc -> rc.getObject().getExpertProduction(),
-                                 rc -> 1));
+            = transform(skills, alwaysTrue(),
+                        Function.<RandomChoice<UnitType>>identity(),
+                        Collectors.toMap(rc ->
+                            rc.getObject().getExpertProduction(), rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             forEachMapEntry(scale, e -> {
@@ -877,28 +880,30 @@ public class SimpleMapGenerator implements MapGenerator {
         return null;
     }
 
-    private void createDebugUnits(Map map, Player player, Tile startTile,
-                                  LogBuilder lb) {
+    private List<Unit> createDebugUnits(Map map, Player player, Tile startTile,
+                                        LogBuilder lb) {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
+        List<Unit> ret = new ArrayList<>(20);
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
         Unit galleon = new ServerUnit(game, startTile, player, unitType);
         galleon.setName(player.getNameForUnit(unitType, random));
+        ret.add(galleon);
         unitType = spec.getUnitType("model.unit.privateer");
         Unit privateer = new ServerUnit(game, startTile, player, unitType);
+        ret.add(privateer);
         privateer.setName(player.getNameForUnit(unitType, random));
         ((ServerPlayer)player).exploreForUnit(privateer);
         unitType = spec.getUnitType("model.unit.freeColonist");
-        new ServerUnit(game, galleon, player, unitType);
+        ret.add(new ServerUnit(game, galleon, player, unitType));
         unitType = spec.getUnitType("model.unit.veteranSoldier");
-        new ServerUnit(game, galleon, player, unitType);
+        ret.add(new ServerUnit(game, galleon, player, unitType));
         unitType = spec.getUnitType("model.unit.jesuitMissionary");
-        new ServerUnit(game, galleon, player, unitType);
+        ret.add(new ServerUnit(game, galleon, player, unitType));
 
         Tile colonyTile = null;
-        for (Tile tempTile : map.getCircleTiles(startTile, true, 
-                                                FreeColObject.INFINITY)) {
+        for (Tile tempTile : map.getCircleTiles(startTile, true, INFINITY)) {
             if (tempTile.isPolar()) continue; // No initial polar colonies
             if (player.canClaimToFoundSettlement(tempTile)) {
                 colonyTile = tempTile;
@@ -908,12 +913,13 @@ public class SimpleMapGenerator implements MapGenerator {
 
         if (colonyTile == null) {
             lb.add("Could not find a debug colony site.\n");
-            return;
+            return ret;
         }
         colonyTile.setType(find(spec.getTileTypeList(), t -> !t.isWater()));
         unitType = spec.getUnitType("model.unit.expertFarmer");
         Unit buildColonyUnit = new ServerUnit(game, colonyTile,
                                               player, unitType);
+        ret.add(buildColonyUnit);
         String colonyName = Messages.message(player.getNationLabel())
             + " " + Messages.message("Colony");
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
@@ -945,11 +951,13 @@ public class SimpleMapGenerator implements MapGenerator {
 
         unitType = spec.getUnitType("model.unit.elderStatesman");
         Unit statesman = new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(statesman);
         statesman.setLocation(colony.getWorkLocationFor(statesman,
                 statesman.getType().getExpertProduction()));
 
         unitType = spec.getUnitType("model.unit.expertLumberJack");
         Unit lumberjack = new ServerUnit(game, colony, player, unitType);
+        ret.add(lumberjack);
         Tile lt = lumberjack.getWorkTile();
         if (lt != null) {
             TileType tt = find(spec.getTileTypeList(), TileType::isForested);
@@ -959,32 +967,36 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         unitType = spec.getUnitType("model.unit.masterCarpenter");
-        new ServerUnit(game, colony, player, unitType);
+        ret.add(new ServerUnit(game, colony, player, unitType));
 
         unitType = spec.getUnitType("model.unit.seasonedScout");
         Unit scout = new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(scout);
         ((ServerPlayer)player).exploreForUnit(scout);
 
         unitType = spec.getUnitType("model.unit.veteranSoldier");
-        new ServerUnit(game, colonyTile, player, unitType);
-        new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
         unitType = spec.getUnitType("model.unit.artillery");
-        new ServerUnit(game, colonyTile, player, unitType);
-        new ServerUnit(game, colonyTile, player, unitType);
-        new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
         unitType = spec.getUnitType("model.unit.treasureTrain");
         Unit train = new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(train);
         train.setTreasureAmount(10000);
         unitType = spec.getUnitType("model.unit.wagonTrain");
         Unit wagon = new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(wagon);
         GoodsType cigarsType = spec.getGoodsType("model.goods.cigars");
         Goods cigards = new Goods(game, wagon, cigarsType, 5);
         wagon.add(cigards);
         unitType = spec.getUnitType("model.unit.jesuitMissionary");
-        new ServerUnit(game, colonyTile, player, unitType);
-        new ServerUnit(game, colonyTile, player, unitType);
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
+        ret.add(new ServerUnit(game, colonyTile, player, unitType));
 
         ((ServerPlayer)player).exploreForSettlement(colony);
+        return ret;
     }
 
     private List<Position> generateStartingPositions(Map map,

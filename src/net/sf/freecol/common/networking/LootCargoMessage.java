@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -146,7 +146,7 @@ public class LootCargoMessage extends ObjectMessage {
         final String loserId = getLoserId();
         final List<Goods> goods = getGoods();
 
-        if (unit == null || goods == null) return;
+        if (unit == null) return;
 
         igc(freeColClient).lootCargoHandler(unit, goods, loserId);
         clientGeneric(freeColClient);

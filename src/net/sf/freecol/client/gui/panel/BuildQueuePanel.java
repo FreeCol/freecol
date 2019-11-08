@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,7 +31,9 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,7 +125,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * This class represents a buildable, that is dragged/dropped
      * accompanied by its index in the source list where it is dragged from.
      */
-    private class IndexedBuildable {
+    private static class IndexedBuildable {
         private final BuildableType buildable;
         private final int index;
 
@@ -197,7 +199,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              */
             @Override
             public DataFlavor[] getTransferDataFlavors() {
-                return supportedFlavors;
+                // findbugs warns against returning supportedFlavors directly
+                // as it exposes internal representation
+                return Arrays.copyOf(supportedFlavors, supportedFlavors.length);
             }
 
             /**
@@ -210,8 +214,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
 
         private JList<? extends BuildableType> source = null;
-        //private int[] indices = null;
-        private int numberOfItems = 0; // number of items to be added
 
         
         // Override TransferHandler
@@ -239,12 +241,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 return false;
             }
             if (!(transferData instanceof List<?>)) return false;
-
+            List<?> transferList = (List<?>)transferData;
+            
             // Collect the transferred buildables.
             final JList<BuildableType> bql
                 = BuildQueuePanel.this.buildQueueList;
-            List<IndexedBuildable> queue = new ArrayList<>();
-            for (Object object : (List<?>)transferData) {
+            List<IndexedBuildable> queue = new ArrayList<>(transferList.size());
+            for (Object object : transferList) {
                 // Fail if:
                 // - dropping a non-Buildable
                 // - dropping a unit in the Building list
@@ -302,8 +305,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     return false;
                 }
 
-                this.numberOfItems = queue.size();
-
                 // Remove all transferring elements from the build queue.
                 for (IndexedBuildable ib : queue) {
                     targetModel.removeElementAt(ib.getIndex());
@@ -331,12 +332,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         if (minimumIndex < preferredIndex + index) {
                             minimumIndex = preferredIndex + index;
                         }
-                        if (minimumIndex > targetModel.size()) {
-                            minimumIndex = targetModel.size();
-                        }
-                        if (minimumIndex > maximumIndex) {
-                            minimumIndex = maximumIndex;
-                        }
+                        minimumIndex = Math.min(Math.min(minimumIndex,
+                                targetModel.size()), maximumIndex);
                     }
                 }
                 targetModel.add(minimumIndex, toBuild);
@@ -357,7 +354,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         protected void exportDone(JComponent source, Transferable data, 
                                   int action) {
             //this.indices = null;
-            this.numberOfItems = 0;
             updateAllLists();
         }
 
@@ -453,25 +449,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private class DefaultBuildQueueCellRenderer
         implements ListCellRenderer<BuildableType> {
 
-        private final JPanel itemPanel = new JPanel();
-        private final JPanel selectedPanel = new JPanel();
-        private final JLabel imageLabel = new JLabel(new ImageIcon());
-        private final JLabel nameLabel = new JLabel();
-
-        private final JLabel lockLabel
-            = new JLabel(new ImageIcon(getImageLibrary()
-                .getSmallerImage(ImageLibrary.ICON_LOCK)));
-
         private final Dimension buildingDimension = new Dimension(-1, 48);
 
 
-        public DefaultBuildQueueCellRenderer() {
-            itemPanel.setOpaque(false);
-            itemPanel.setLayout(new MigLayout());
-            selectedPanel.setOpaque(false);
-            selectedPanel.setLayout(new MigLayout());
-            selectedPanel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(selectedPanel));
-        }
+        public DefaultBuildQueueCellRenderer() {}
 
 
         /**
@@ -479,27 +460,30 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public Component getListCellRendererComponent(JList<? extends BuildableType> list,
-                        BuildableType value,
-                        int index,
-                        boolean isSelected,
-                        boolean cellHasFocus) {
-            JPanel panel = (isSelected) ? selectedPanel : itemPanel;
-            panel.removeAll();
+                                                      BuildableType value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            final ImageLibrary lib = getImageLibrary();
+            JPanel panel = new MigPanel(new MigLayout());
+            panel.setOpaque(false);
+            if (isSelected) {
+                panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
+            }
 
-            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary
-                .getBuildableTypeImage(value, buildingDimension));
-
-            nameLabel.setText(Messages.getName(value));
-            panel.setToolTipText(lockReasons.get(value));
+            JLabel imageLabel = new JLabel(new ImageIcon(ImageLibrary
+                    .getBuildableTypeImage(value, buildingDimension)));
+            JLabel nameLabel = new JLabel(Messages.getName(value));
+            String reason = lockReasons.get(value);
             panel.add(imageLabel, "span 1 2");
-            if (lockReasons.get(value) == null) {
+            if (reason == null) {
                 panel.add(nameLabel, "wrap");
             } else {
                 panel.add(nameLabel, "split 2");
-                panel.add(lockLabel, "wrap");
+                panel.add(lib.getLockLabel(), "wrap");
+                panel.setToolTipText(reason);
             }
 
-            ImageLibrary lib = getImageLibrary();
             List<AbstractGoods> required = value.getRequiredGoodsList();
             int size = required.size();
             for (int i = 0; i < size; i++) {
@@ -567,8 +551,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * @param colony The enclosing {@code Colony}.
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient, new MigLayout("wrap 3",
-                "[260:][390:, fill][260:]", "[][][300:400:][]"));
+        super(freeColClient, null,
+              new MigLayout("wrap 3", "[260:][390:, fill][260:]",
+                            "[][][300:400:][]"));
 
         this.colony = colony;
         this.featureContainer = new FeatureContainer();
@@ -792,7 +777,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // Only one building of any kind
             if (current.contains(bt) || hasBuildingType(bt)) continue;
             
-            List<String> reasons = new ArrayList<>();
+            List<String> reasons = new ArrayList<>(8);
 
             // Coastal limit
             if (bt.hasAbility(Ability.COASTAL_ONLY)
@@ -856,7 +841,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         for (UnitType ut : spec.getBuildableUnitTypes()) {
             if (unbuildableTypes.contains(ut)) continue;
 
-            List<String> reasons = new ArrayList<>();
+            List<String> reasons = new ArrayList<>(8);
 
             // Population limit
             if (ut.getRequiredPopulation() > this.colony.getUnitCount()) {
@@ -903,7 +888,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      *      {@link #updateBuildingList()} and
      *      {@link #updateUnitList()}
      */
-    private void updateAllLists() {
+    private final void updateAllLists() {
         final DefaultListModel<BuildableType> current
             = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
 
@@ -971,9 +956,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private List<BuildableType> getBuildableTypes(JList<? extends BuildableType> list) {
-        List<BuildableType> result = new ArrayList<>();
-        if (list == null) return result;
+        if (list == null) return Collections.<BuildableType>emptyList();
         ListModel<? extends BuildableType> model = list.getModel();
+        List<BuildableType> result = new ArrayList<>(model.getSize());
         for (int index = 0; index < model.getSize(); index++) {
             result.add(model.getElementAt(index));
         }

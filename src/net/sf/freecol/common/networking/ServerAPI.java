@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,9 +26,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
@@ -98,6 +101,9 @@ public abstract class ServerAPI {
 
     /**
      * Reconnect to the server.
+     *
+     * @return The reestablished {@code Connection}.
+     * @exception IOException on failure to connect.
      */
     public abstract Connection reconnect() throws IOException;
 
@@ -144,8 +150,7 @@ public abstract class ServerAPI {
         final Connection c = getConnection();
         if (c == null) {
             logger.log(Level.WARNING, "Not connected, did not " + operation
-                       + ": " + type);
-            return null;
+                + ": " + type);
         }
         return c;
     }
@@ -159,7 +164,15 @@ public abstract class ServerAPI {
     private boolean send(Message message) {
         if (message == null) return true;
         final Connection c = check("send", message.getType());
-        return (c == null) ? false : c.send(message);
+        if (c != null) {
+            try {
+                c.send(message);
+                return true;
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, "Failed to send", ex);
+            }
+        }
+        return false;
     }
 
     /**
@@ -179,7 +192,16 @@ public abstract class ServerAPI {
     private boolean ask(Message message) {
         if (message == null) return true;
         final Connection c = check("ask", message.getType());
-        return (c == null) ? false : c.request(message);
+        if (c != null) {
+            try {
+                c.request(message);
+                return true;
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, "Failed to ask", ex);
+            }
+        }
+        return false;
+                
     }
 
 
@@ -571,7 +593,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount, Boolean result) {
+                                GoodsType type, int amount,
+                                IndianDemandAction result) {
         return ask(new IndianDemandMessage(unit, colony, type, amount)
                        .setResult(result));
     }

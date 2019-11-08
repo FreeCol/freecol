@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -35,7 +35,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -81,14 +80,13 @@ public class ConstructionPanel extends MigPanel
      */
     public ConstructionPanel(FreeColClient freeColClient,
                              Colony colony, boolean openBuildQueue) {
-        super("ConstructionPanelUI");
+        super("ConstructionPanelUI",
+            new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
 
         this.freeColClient = freeColClient;
         this.colony = colony;
         this.openBuildQueue = openBuildQueue;
 
-        setLayout(new MigLayout("fill, gapy 2:5, wrap 2",
-                "push[]10[center]push"));
         setOpaque(openBuildQueue);
     }
 
@@ -150,7 +148,7 @@ public class ConstructionPanel extends MigPanel
      */
     public void update(BuildableType buildable) {
         removeAll();
-        final ImageLibrary lib = ((SwingGUI)freeColClient.getGUI())
+        final ImageLibrary lib = freeColClient.getGUI()
             .getTileImageLibrary();
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.SMALLER, lib.getScaleFactor());

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -41,9 +41,6 @@ public abstract class Session {
     /** A map of all active sessions. */
     private static final Map<String, Session> allSessions = new HashMap<>();
 
-    /** Lock for access to allSessions. */
-    private static final Object sessionLock = new Object();
-
     /** The key to this session. */
     private String key;
 
@@ -65,7 +62,6 @@ public abstract class Session {
         }
         this.key = key;
         this.completed = false;
-        addSession(key, this);
         logger.finest("Created session: " + key);
     }
 
@@ -80,14 +76,11 @@ public abstract class Session {
     }
 
     /**
-     * Add a new session.
-     *
-     * @param key The session key.
-     * @param session The associated {@code Session}.
+     * Register a new session.
      */
-    private static void addSession(String key, Session session) {
-        synchronized (sessionLock) {
-            allSessions.put(key, session);
+    public void register() {
+        synchronized (allSessions) {
+            allSessions.put(this.getKey(), this);
         }
     }
 
@@ -98,7 +91,7 @@ public abstract class Session {
      * @return The {@code session} found.
      */
     private static Session getSession(String key) {
-        synchronized (sessionLock) {
+        synchronized (allSessions) {
             return allSessions.get(key);
         }
     }
@@ -108,10 +101,8 @@ public abstract class Session {
      *
      * @return True if the session is complete.
      */
-    public boolean isComplete() {
-        synchronized (this) {
-            return this.completed;
-        }
+    private synchronized boolean isComplete() {
+        return this.completed;
     }
     
     /**
@@ -125,12 +116,9 @@ public abstract class Session {
      *     occur when completing this session.
      * @return True if the session was already complete.
      */
-    public boolean complete(ChangeSet cs) {
-        boolean ret;
-        synchronized (this) {
-            ret = this.completed;
-            this.completed = true;
-        }
+    protected synchronized boolean complete(ChangeSet cs) {
+        boolean ret = this.completed;
+        this.completed = true;
         return ret;
     }
 
@@ -175,7 +163,7 @@ public abstract class Session {
      */
     public static void completeAll(ChangeSet cs) {
         List<Session> sessions;
-        synchronized (sessionLock) {
+        synchronized (allSessions) {
             sessions = transform(allSessions.values(), s -> !s.isComplete());
             allSessions.clear();
         }
@@ -186,7 +174,7 @@ public abstract class Session {
      * Clear all sessions.
      */
     public static void clearAll() {
-        synchronized (sessionLock) {
+        synchronized (allSessions) {
             allSessions.clear();
         }
     }
@@ -198,7 +186,7 @@ public abstract class Session {
      * @return The {@code Session} found if any.
      */
     public static Session findSession(Predicate<Session> pred) {
-        synchronized (sessionLock) {
+        synchronized (allSessions) {
             return find(allSessions.values(), pred);
         }
     }
@@ -245,7 +233,7 @@ public abstract class Session {
     public static <T extends Session> T lookup(Class<T> type, String key) {
         Session ts = getSession(key);
         if (ts != null && ts.isComplete()) {
-            synchronized (sessionLock) {
+            synchronized (allSessions) {
                 allSessions.remove(key);
             }
             ts = null;

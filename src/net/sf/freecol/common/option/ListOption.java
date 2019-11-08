@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -106,7 +106,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * Sets the maximum number of allowed values.
      *
-     * @param maximumValue The new maximum number of allowed values.
+     * @param maximumNumber The new maximum number of allowed values.
      */
     public void setMaximumNumber(int maximumNumber) {
         this.maximumNumber = maximumNumber;
@@ -118,7 +118,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * @return A list of option values.
      */
     public List<T> getOptionValues() {
-        return transform(this.value, isNotNull(), o -> o.getValue());
+        return transform(this.value, isNotNull(), AbstractOption::getValue);
     }
 
     /**
@@ -161,7 +161,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * Set the list option values from another list option.
      *
-     * @param T The list option type.
      * @param lo The other {@code ListOption}.
      */
     protected void setListValues(ListOption<T> lo) {
@@ -191,7 +190,9 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     @Override
     public void setValue(List<AbstractOption<T>> value) {
         // Fail fast: the list value may be empty, but it must not be null.
-        if (value==null) throw new IllegalArgumentException("Null ListOption");
+        if (value == null) {
+            throw new RuntimeException("Null ListOption: " + this);
+        }
 
         List<AbstractOption<T>> oldValue = new ArrayList<>(this.value);
         this.value.clear();
@@ -302,6 +303,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      *
      * @param xr The {@code FreeColXMLReader} to read from.
      * @return A child typed {@code AbstractOption}.
+     * @exception XMLStreamException if the stream is corrupt.
      */
     @SuppressWarnings("unchecked")
     private AbstractOption<T> readChildOption(FreeColXMLReader xr)

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -46,7 +46,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * A mission for a Privateer unit.
  */
-public class PrivateerMission extends Mission {
+public final class PrivateerMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
@@ -72,7 +72,9 @@ public class PrivateerMission extends Mission {
      * @param target The target {@code Location} for this mission.
      */
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**
@@ -101,7 +103,7 @@ public class PrivateerMission extends Mission {
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
-    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+    private static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Unit unit = aiUnit.getUnit();
         final Player owner = unit.getOwner();
@@ -111,7 +113,7 @@ public class PrivateerMission extends Mission {
         Unit other = (tile == null) ? null : tile.getDefendingUnit(unit);
         return (loc instanceof Europe) ? loc
             : (other != null
-                && invalidUnitReason(aiUnit, other) == null) ? other
+                && invalidMissionReason(aiUnit, other) == null) ? other
             : (settlement != null
                 && invalidTargetReason(settlement, owner) == null) ? settlement
             : null;
@@ -167,7 +169,7 @@ public class PrivateerMission extends Mission {
      * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-                                              boolean deferOK) {
+        @SuppressWarnings("unused") boolean deferOK) {
         return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
@@ -197,8 +199,8 @@ public class PrivateerMission extends Mission {
      * @param deferOK Not implemented in this mission.
      * @return A path to the new target.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range, 
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range, 
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
@@ -217,8 +219,8 @@ public class PrivateerMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A {@code PathNode} to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
@@ -231,7 +233,7 @@ public class PrivateerMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
@@ -265,7 +267,7 @@ public class PrivateerMission extends Mission {
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
-    private static String invalidUnitReason(AIUnit aiUnit, Unit unit) {
+    private static String invalidAttackReason(AIUnit aiUnit, Unit unit) {
         final Player player = aiUnit.getUnit().getOwner();
         String reason;
         return (unit == null)
@@ -287,8 +289,8 @@ public class PrivateerMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -298,7 +300,7 @@ public class PrivateerMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         final Player owner = aiUnit.getUnit().getOwner();
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
@@ -312,7 +314,7 @@ public class PrivateerMission extends Mission {
             : (loc instanceof Settlement)
             ? invalidSettlementReason(aiUnit, (Settlement)loc)
             : (loc instanceof Unit)
-            ? invalidUnitReason(aiUnit, (Unit)loc)
+            ? invalidAttackReason(aiUnit, (Unit)loc)
             : (loc instanceof Tile)
             ? ((((Tile)loc).isExploredBy(owner)) ? "tile-is-explored"
                 : null)
@@ -356,7 +358,7 @@ public class PrivateerMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 8, true);
+        return findMissionTarget(getAIUnit(), 8, true);
     }
     
     /**
@@ -364,7 +366,7 @@ public class PrivateerMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -396,7 +398,7 @@ public class PrivateerMission extends Mission {
         }
         if (unit.isAtSea()) return lbAt(lb);
 
-        Location newTarget = findTarget(aiUnit, 1, true);
+        Location newTarget = findMissionTarget(aiUnit, 1, true);
         if (newTarget == null) {
             moveRandomlyTurn(tag);
             return lbAt(lb);

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -93,18 +93,6 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Reload the main panel when done with the map editor.
-     */
-    private void reloadMainPanel () {
-        SwingUtilities.invokeLater(() -> {
-                getGUI().closeMainPanel();
-                getGUI().showMainPanel(null);
-                getSoundController().playSound("sound.intro.general");
-            });
-    }
-
-
-    /**
      * Enters map editor mode.
      *
      * FIXME: The TC and difficulty level can now be set at the
@@ -140,9 +128,8 @@ public final class MapEditorController extends FreeColClientHolder {
      * Get the default specification from the default TC.
      *
      * @return A {@code Specification} to use in the map editor.
-     * @throws IOException on failure to find the spec.
      */
-    public Specification getDefaultSpecification() throws IOException {
+    public Specification getDefaultSpecification() {
         return FreeCol.loadSpecification(FreeCol.getTCFile(), 
             FreeCol.getAdvantages(), FreeCol.getDifficulty());
     }
@@ -266,7 +253,7 @@ public final class MapEditorController extends FreeColClientHolder {
      *
      * @param file The {@code File}.
      */
-    public void loadGame(File file) {
+    private void loadGame(File file) {
         final FreeColClient fcc = getFreeColClient();
         final GUI gui = getGUI();
 

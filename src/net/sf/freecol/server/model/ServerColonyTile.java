@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -106,8 +107,8 @@ public class ServerColonyTile extends ColonyTile implements TurnTaker {
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        Colony colony = getColony();
-        ServerPlayer owner = (ServerPlayer)colony.getOwner();
+        final Colony colony = getColony();
+        final Player owner = colony.getOwner();
 
         Tile workTile = getWorkTile();
         if (!isColonyCenterTile() && !isEmpty() && canBeWorked()) {

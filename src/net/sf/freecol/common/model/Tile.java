@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -613,7 +614,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Set<Tile> getContiguityAdjacent(final int contiguity) {
         return transform(getSurroundingTiles(1, 1),
                          matchKey(contiguity, Tile::getContiguity),
-                         Function.identity(), Collectors.toSet());
+                         Function.<Tile>identity(), Collectors.toSet());
     }
 
     /**
@@ -1012,7 +1013,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return concat(type.getDisasterChoices(),
                       flatten(getCompleteTileImprovements(),
-                              ti -> ti.getDisasterChoices()));
+                              TileImprovement::getDisasterChoices));
     }
 
 
@@ -1051,11 +1052,27 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get a label for a nearby location.
+     *
+     * @param direction The {@code Direction} from this tile to the
+     *     nearby location.
+     * @param location A {@code StringTemplate} describing the location.
+     * @return A {@code StringTemplate} stating that the location
+     *     is nearby.
+     */
+    private StringTemplate getNearLocationLabel(Direction direction,
+                                               StringTemplate location) {
+        return StringTemplate.template("model.tile.nearLocation")
+            .addNamed("%direction%", direction)
+            .addStringTemplate("%location%", location);
+    }
+    
+    /**
      * Get a detailed label for this tile.
      *
      * @return A suitable {@code StringTemplate}.
      */
-    public StringTemplate getDetailedLocationLabel() {
+    private StringTemplate getDetailedLocationLabel() {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
@@ -1090,7 +1107,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param player The {@code Player} to produce a label for.
      * @return A suitable {@code StringTemplate}.
      */
-    public StringTemplate getDetailedLocationLabelFor(Player player) {
+    private StringTemplate getDetailedLocationLabelFor(Player player) {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
@@ -1417,8 +1434,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The percentage defence bonus.
      */
     public int getDefenceBonusPercentage() {
-        return (int)getType().applyModifiers(100f, getGame().getTurn(),
-                                             Modifier.DEFENCE)
+        return (int)getType().apply(100f, getGame().getTurn(), Modifier.DEFENCE)
             - 100;
     }
 
@@ -1437,7 +1453,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         final Comparator<Tile> defenceComp
             = cachingDoubleComparator(Tile::getDefenceValue).reversed();
         return transform(getSurroundingTiles(0, 1), safeTilePred,
-                         Function.identity(), defenceComp);
+                         Function.<Tile>identity(), defenceComp);
     }
                     
     /**
@@ -1486,7 +1502,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                          t -> (!t.isLand() && t.isHighSeasConnected()
                              && !t.isDangerousToShip(unit)));
     }
-                
+
 
     //
     // Type and Ownership
@@ -1573,8 +1589,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         boolean ownedByIndians = false;
 
         // Collect the building and food goods types
-        java.util.Map<GoodsType, Integer> goodsMap = new HashMap<>();
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+        List<GoodsType> typeList = spec.getGoodsTypeList();
+        java.util.Map<GoodsType, Integer> goodsMap
+            = new HashMap<>(typeList.size());
+        for (GoodsType goodsType : typeList) {
             if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
                     goodsType = goodsType.getInputType();
@@ -1700,7 +1718,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         int amount = getBaseProduction(null, goodsType, unitType);
         amount = (int)applyModifiers(amount, getGame().getTurn(),
-            getProductionModifiers(goodsType, unitType));
+                                     getProductionModifiers(goodsType, unitType));
         return (amount < 0) ? 0 : amount;
     }
 
@@ -1713,7 +1731,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
-        return (canProduce(goodsType, unitType) && tileItemContainer != null)
+        return (tileItemContainer != null && canProduce(goodsType, unitType))
             ? tileItemContainer.getProductionModifiers(goodsType, unitType)
             : Stream.<Modifier>empty();
     }
@@ -1837,7 +1855,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             = Comparator.comparingInt(ag ->
                 getPotentialProduction(ag.getType(), null));
         return maximize(flatten(getType().getAvailableProductionTypes(true),
-                                pt -> pt.getOutputs()),
+                                ProductionType::getOutputs),
                         AbstractGoods::isFoodType, goodsComp);
     }
 
@@ -1980,7 +1998,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     should not cache it.
      * @param copied An optional {@code Tile} to cache.
      */
-    public void cacheUnseen(Player player, Tile copied) {
+    private void cacheUnseen(Player player, Tile copied) {
         if (cachedTiles == null) return;
         for (Player p : transform(getGame().getLiveEuropeanPlayers(player),
                 p -> !p.canSee(this) && getCachedTile(p) == this)) {
@@ -2033,8 +2051,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param skill The skill taught by the settlement.
      * @param wanted The goods wanted by the settlement.
      */
-    public void setIndianSettlementInternals(Player player, UnitType skill,
-                                             List<GoodsType> wanted) {
+    private void setIndianSettlementInternals(Player player, UnitType skill,
+                                              List<GoodsType> wanted) {
         IndianSettlementInternals isi = getPlayerIndianSettlement(player);
         if (isi == null) {
             isi = new IndianSettlementInternals();
@@ -2192,22 +2210,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return this;
     }
 
-    /**
-     * Get a label for a nearby location.
-     *
-     * @param direction The {@code Direction} from this tile to the
-     *     nearby location.
-     * @param location A {@code StringTemplate} describing the location.
-     * @return A {@code StringTemplate} stating that the location
-     *     is nearby.
-     */
-    public StringTemplate getNearLocationLabel(Direction direction,
-                                               StringTemplate location) {
-        return StringTemplate.template("model.tile.nearLocation")
-            .addNamed("%direction%", direction)
-            .addStringTemplate("%location%", location);
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -2395,22 +2397,25 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         Settlement settlement = getSettlement();
         if (settlement != null) {
-            result = Math.min(result, settlement.checkIntegrity(fix, lb));
+            result = result.combine(settlement.checkIntegrity(fix, lb));
         }
         if (tileItemContainer != null) {
-            result = Math.min(result, tileItemContainer.checkIntegrity(fix, lb));
+            result = result.combine(tileItemContainer.checkIntegrity(fix, lb));
         }
         if (type == null) {
-            result = -1; // Fundamentally unfixable
-        } else if (isLand() && moveToEurope == Boolean.TRUE) {
+            lb.add("\n  Tile has no type: ", getId());
+            result = result.fail(); // Fundamentally unfixable
+        } else if (isLand() && Boolean.TRUE.equals(moveToEurope)) {
+            lb.add("\n  Tile is land but has move-to-Europe: ", getId());
             if (fix) {
-                moveToEurope = false;
+                moveToEurope = Boolean.FALSE;
+                result = result.fix();
             } else {
-                result = -1;
+                result = result.fail();
             }
         }
         return result;
@@ -2529,7 +2534,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public void internalToXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+    private void internalToXML(FreeColXMLWriter xw, String tag)
+        throws XMLStreamException {
         xw.writeStartElement(tag);
 
         writeAttributes(xw);
@@ -2614,7 +2620,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (tileItemContainer != null) tileItemContainer.toXML(xw);
 
         // Save the cached tiles to saved games.
-        if (xw.validForSave() && cachedTiles != null) {
+        if (cachedTiles != null && xw.validForSave()) {
             for (Player p : getGame().getLiveEuropeanPlayerList()) {
                 Tile t = getCachedTile(p);
                 if (t == null) continue;
@@ -2725,7 +2731,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
@@ -2744,10 +2749,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
                     // Temporary workaround for BR#2618 on input
                     Colony colony = tile.getColony();
-                    if (colony != null && colony.getApparentUnitCount() <= 0) {
+                    int apparent;
+                    if (colony != null
+                        && (apparent = colony.getApparentUnitCount()) <= 0) {
                         logger.warning("Copied colony " + colony.getId()
                             + " display unit count set to 1 from corrupt: "
-                            + colony.getApparentUnitCount());
+                            + apparent);
                         colony.setDisplayUnitCount(1);
                     }
                     // end workaround

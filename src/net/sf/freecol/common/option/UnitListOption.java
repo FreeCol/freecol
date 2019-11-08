@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -56,7 +56,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public UnitListOption clone() {
+    public UnitListOption cloneOption() {
         UnitListOption ret = new UnitListOption(getId(), getSpecification());
         ret.setValues(this);
         ret.setListValues(this);

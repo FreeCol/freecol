@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -61,8 +61,7 @@ public final class ClassicMapControls extends MapControls {
         arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.SMALL, Font.BOLD);
 
-        panel = new MigPanel();
-        panel.setLayout(new MigLayout("wrap 3"));
+        panel = new MigPanel(new MigLayout("wrap 3"));
         panel.add(miniMap, "span, width " + MAP_WIDTH
                            + ", height " + MAP_HEIGHT);
 

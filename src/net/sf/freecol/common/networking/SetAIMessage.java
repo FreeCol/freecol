@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -115,6 +115,6 @@ public class SetAIMessage extends AttributeMessage {
      * @return The AI state.
      */
     public boolean getAI() {
-        return getBooleanAttribute(AI_TAG, false);
+        return getBooleanAttribute(AI_TAG, Boolean.FALSE);
     }
 }

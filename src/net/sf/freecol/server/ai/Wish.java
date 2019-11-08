@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,7 +25,10 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.util.LogBuilder;
@@ -73,6 +76,9 @@ public abstract class Wish extends ValuedAIObject {
      */
     public Wish(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
+
+        AIColony ac = getDestinationAIColony();
+        if (ac != null) ac.addWish(this);
     }
 
 
@@ -116,7 +122,7 @@ public abstract class Wish extends ValuedAIObject {
      *     {@link #getTransportable transportable} assigned to
      *     this {@code Wish} will have to reach.
      */
-    public Location getDestination() {
+    public final Location getDestination() {
         return destination;
     }
 
@@ -125,12 +131,31 @@ public abstract class Wish extends ValuedAIObject {
      *
      * @return The destination {@code AIColony}.
      */
-    public AIColony getDestinationAIColony() {
+    public final AIColony getDestinationAIColony() {
         return (destination instanceof Colony)
             ? getAIMain().getAIColony((Colony)destination)
             : null;
     }
 
+    /**
+     * Does a specified unit satisfy this wish?
+     *
+     * @param unit The {@code Unit} to test.
+     * @return True if the unit either matches exactly if expertRequired,
+     *     or at least matches in a land/naval sense if not.
+     */
+    public abstract boolean satisfiedBy(Unit unit);
+
+    /**
+     * Does some specified goods satisfy this wish?
+     *
+     * @param <T> The base type of the goods.
+     * @param goods The goods to test.
+     * @return True if the goods type matches and amount is not less than
+     *     that requested.
+     */
+    public abstract <T extends AbstractGoods> boolean satisfiedBy(T goods);
+    
 
     // Override AIObject
 
@@ -149,15 +174,17 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (transportable != null) {
-            result = Math.min(result, 
-                              transportable.checkIntegrity(fix, lb));
+            result = result.combine(transportable.checkIntegrity(fix, lb));
         }
-        if (destination == null
-            || ((FreeColGameObject)destination).isDisposed()) {
-            result = -1;
+        if (destination == null) {
+            lb.add("\n  Wish destination null for: ", getId());
+            result = result.fail();
+        } else if (((FreeColGameObject)destination).isDisposed()) {
+            lb.add("\n  Wish destination disposed for: ", getId());
+            result = result.fail();
         }
         return result;
     }
@@ -208,14 +235,12 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof Wish) {
-            Wish ow = (Wish)other;
-            return super.equals(ow)
-                && Utils.equals(this.destination, ow.destination)
-                && Utils.equals(this.transportable, ow.transportable);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof Wish)) return false;
+        Wish other = (Wish)o;
+        return Utils.equals(this.destination, other.destination)
+            && Utils.equals(this.transportable, other.transportable)
+            && super.equals(other);
     }
 
     /**

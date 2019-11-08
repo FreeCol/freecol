@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -73,8 +73,9 @@ public class NumberRules {
      * CLDR plural rules.
      *
      * @param in an {@code InputStream} value
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public NumberRules(InputStream in) {
+    public NumberRules(InputStream in) throws XMLStreamException {
         load(in);
     }
 
@@ -96,14 +97,9 @@ public class NumberRules {
     }
 
 
-    public static void load(InputStream in) {
-        try (
-            FreeColXMLReader xr = new FreeColXMLReader(in);
-        ) {
+    public static void load(InputStream in) throws XMLStreamException {
+        try (FreeColXMLReader xr = new FreeColXMLReader(in)) {
             readFromXML(xr);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Load parse", e);
-            throw new RuntimeException("Error parsing number rules.", e);
         }
     }
 
@@ -123,10 +119,7 @@ public class NumberRules {
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (null != tag) switch (tag) {
-                case VERSION_TAG:
-                    xr.nextTag();
-                    break;
-                case GENERATION_TAG:
+                case VERSION_TAG: case GENERATION_TAG:
                     xr.nextTag();
                     break;
                 case PLURALS_TAG:
@@ -161,17 +154,16 @@ public class NumberRules {
             case 1:
                 Rule rule = numberRule.getRule(Category.one);
                 if (rule != null) {
-                    if (null != rule.toString()) {
-                        switch (rule.toString()) {
-                        case "n is 1":
-                            number = PLURAL_NUMBER_RULE;
-                            break;
-                        case "n in 0..1":
-                            number = ZERO_ONE_NUMBER_RULE;
-                            break;
-                        default:
-                            break;
-                        }
+                    String val = rule.toString();
+                    switch (val) {
+                    case "n is 1":
+                        number = PLURAL_NUMBER_RULE;
+                        break;
+                    case "n in 0..1":
+                        number = ZERO_ONE_NUMBER_RULE;
+                        break;
+                    default:
+                        break;
                     }
                 }
                 break;

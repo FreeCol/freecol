@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,8 +22,8 @@ package net.sf.freecol.client.gui.panel;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -80,17 +80,19 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     protected FreeColPanel(FreeColClient freeColClient) {
-        this(freeColClient, new FlowLayout());
+        this(freeColClient, null, new FlowLayout());
     }
 
     /**
      * Default constructor.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
+     * @param uiClassId An optional L+F class to render this component.
      * @param layout The {@code LayoutManager} to be used.
      */
-    protected FreeColPanel(FreeColClient freeColClient, LayoutManager layout) {
-        super(layout);
+    protected FreeColPanel(FreeColClient freeColClient, String uiClassId,
+                           LayoutManager layout) {
+        super(uiClassId, layout);
 
         this.freeColClient = freeColClient;
 
@@ -134,8 +136,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The current {@code GUI}.
      */
-    protected final SwingGUI getGUI() {
-        return (SwingGUI)freeColClient.getGUI();
+    protected final GUI getGUI() {
+        return freeColClient.getGUI();
     }
 
     /**

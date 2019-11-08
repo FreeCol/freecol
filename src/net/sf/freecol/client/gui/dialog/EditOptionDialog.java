@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.dialog;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -48,7 +49,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
         super(freeColClient, frame);
 
         this.ui = OptionUI.getOptionUI(getGUI(), option, true);
-        MigPanel panel = new MigPanel(new MigLayout());
+        JPanel panel = new MigPanel(new MigLayout());
         if (this.ui.getJLabel() == null) {
             panel.add(this.ui.getJLabel(), "split 2");
         }
@@ -64,7 +65,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
     @Override
     public Boolean getResponse() {
         Boolean result = super.getResponse();
-        if (result && this.ui != null) this.ui.updateOption();
+        if (this.ui != null && result) this.ui.updateOption();
         return result;
     }
 }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -89,7 +90,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The role identifier.
      */
     public final String getRoleId() {
-        return roleId;
+        return this.roleId;
     }
 
     /**
@@ -107,7 +108,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The number of units.
      */
     public final int getNumber() {
-        return number;
+        return this.number;
     }
 
     /**
@@ -117,6 +118,15 @@ public class AbstractUnit extends FreeColObject {
      */
     public final void setNumber(final int newNumber) {
         this.number = newNumber;
+    }
+
+    /**
+     * Add to the number.
+     *
+     * @param diff The amount to add.
+     */
+    public final void addToNumber(int diff) {
+        this.number += diff;
     }
 
     /**
@@ -134,20 +144,9 @@ public class AbstractUnit extends FreeColObject {
      * @return A {@code StringTemplate} describing the abstract unit.
      */
     public StringTemplate getLabel() {
-        return getLabel(getId(), getRoleId(), getNumber());
+        return getLabelInternal(getId(), getRoleId(), getNumber());
     }
-
-    /**
-     * Gets a template describing an arbitrary single abstract unit.
-     *
-     * @param typeId The unit type identifier.
-     * @param roleId The role identifier.
-     * @return A {@code StringTemplate} describing the abstract unit.
-     */
-    public static StringTemplate getLabel(String typeId, String roleId) {
-        return getLabel(typeId, roleId, 1);
-    }
-        
+       
     /**
      * Gets a template describing an arbitrary abstract unit.
      *
@@ -156,8 +155,9 @@ public class AbstractUnit extends FreeColObject {
      * @param number The number of units.
      * @return A {@code StringTemplate} describing the abstract unit.
      */
-    public static StringTemplate getLabel(String typeId, String roleId,
-                                          int number) {
+    private static StringTemplate getLabelInternal(String typeId,
+                                                   String roleId,
+                                                   int number) {
         StringTemplate tmpl = Messages.getUnitLabel(null, typeId, number,
                                                     null, roleId, null);
         return StringTemplate.template("model.abstractUnit.label")
@@ -245,6 +245,68 @@ public class AbstractUnit extends FreeColObject {
             template.addStringTemplate(au.getLabel());
         }
         return template;
+    }
+
+    /**
+     * Does another AbstractUnit match in all fields.
+     *
+     * @param other The other <code>AbstractUnit</code> to test.
+     * @return True if all fields match.
+     */
+    public boolean matchAll(AbstractUnit other) {
+        return getId().equals(other.getId())
+            && this.getRoleId().equals(other.getRoleId())
+            && this.getNumber() == other.getNumber();
+    }
+
+    /**
+     * Create a predicate to match the type+role of an abstract unit.
+     *
+     * @param ut The {@code UnitType} to match.
+     * @param roleId The role identifier to match.
+     * @return A suitable {@code Predicate}.
+     */
+    public static Predicate<AbstractUnit> matcher(UnitType ut, String roleId) {
+        return (AbstractUnit a) ->
+            a.getId().equals(ut.getId()) && a.roleId.equals(roleId);
+    }
+
+    /**
+     * Create a predicate to match the type+role of an abstract unit.
+     *
+     * @param au The {@code AbstractUnit} to match.
+     * @return A suitable {@code Predicate}.
+     */
+    public static Predicate<AbstractUnit> matcher(AbstractUnit au) {
+        return (AbstractUnit a) ->
+            a.getId().equals(au.getId())
+                && a.getRoleId().equals(au.getRoleId());
+    }
+
+    /**
+     * Create a predicate to match the type+role of a unit.
+     *
+     * @param unit The {@code Unit} to match.
+     * @return A suitable {@code Predicate}.
+     */
+    public static Predicate<AbstractUnit> matcher(Unit unit) {
+        return matcher(unit.getType(), unit.getRole().getId());
+    }
+
+    /**
+     * Do two lists of abstract units match completely.
+     *
+     * @param l1 The first <code>AbstractUnit</code>.
+     * @param l2 The first <code>AbstractUnit</code>.
+     * @return True if the lists match.
+     */
+    public static boolean matchUnits(List<AbstractUnit> l1,
+                                     List<AbstractUnit> l2) {
+        if (l1.size() != l2.size()) return false;
+        for (AbstractUnit au : l1) {
+            if (none(l2, a -> a.matchAll(au))) return false;
+        }
+        return true;
     }
 
 

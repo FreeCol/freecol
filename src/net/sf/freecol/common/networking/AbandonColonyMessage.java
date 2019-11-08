@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -91,10 +91,11 @@ public class AbandonColonyMessage extends AttributeMessage {
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }
-        if (colony.getUnitCount() != 0) {
+        int count = colony.getUnitCount();
+        if (count != 0) {
             return serverPlayer.clientError("Attempt to abandon colony "
                 + colonyId + " with non-zero unit count "
-                + Integer.toString(colony.getUnitCount()));
+                + Integer.toString(count));
         }
 
         // Proceed to abandon

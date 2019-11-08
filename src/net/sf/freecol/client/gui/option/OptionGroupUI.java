@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -53,6 +53,44 @@ public final class OptionGroupUI extends MigPanel
 
     private static final Logger logger = Logger.getLogger(OptionGroupUI.class.getName());
 
+    private static class OptionTree extends JTree {
+
+        private static final Color bgColor = new Color(0, 0, 0, 1);
+
+        /**
+         * Build a new option tree.
+         *
+         * @param dtm The tree model.
+         */
+        public OptionTree(DefaultTreeModel dtm) {
+            super(dtm);
+
+            DefaultTreeCellRenderer renderer
+                = (DefaultTreeCellRenderer)getCellRenderer();
+            renderer.setBackgroundNonSelectionColor(bgColor);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(200, super.getPreferredSize().height);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String convertValueToText(Object value, boolean selected,
+                                         boolean expanded, boolean leaf,
+                                         int row, boolean hasFocus) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+            Option option = (Option)node.getUserObject();
+            return Messages.getName(option.getId());
+        }
+    };
+            
     private final List<OptionUpdater> optionUpdaters = new ArrayList<>();
 
     private final HashMap<String, OptionUI> optionUIs = new HashMap<>();
@@ -67,6 +105,7 @@ public final class OptionGroupUI extends MigPanel
 
     private final boolean editable;
 
+    
 
     /**
      * The constructor that will add the items to this panel.
@@ -76,44 +115,23 @@ public final class OptionGroupUI extends MigPanel
      * @param editable Is the group editable.
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
-        super("ReportPanelUI");
+        super("ReportPanelUI",
+            new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
+                          "[top]"));
 
         this.gui = gui;
         this.group = group;
         this.editable = editable;
 
-        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
-                                "[top]"));
-
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(group);
         buildTree(group, root);
 
-        DefaultTreeModel treeModel = new DefaultTreeModel(root);
-        tree = new JTree(treeModel) {
-                @Override
-                public Dimension getPreferredSize() {
-                    return new Dimension(200, super.getPreferredSize().height);
-                }
-                @Override
-                public String convertValueToText(Object value,
-                    boolean selected, boolean expanded,
-                    boolean leaf, int row, boolean hasFocus) {
-                    DefaultMutableTreeNode node
-                        = (DefaultMutableTreeNode)value;
-                    Option option = (Option)node.getUserObject();
-                    return Messages.getName(option.getId());
-                }
-            };
-
+        tree = new OptionTree(new DefaultTreeModel(root));
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
-        DefaultTreeCellRenderer renderer
-            = (DefaultTreeCellRenderer)tree.getCellRenderer();
-        renderer.setBackgroundNonSelectionColor(new Color(0, 0, 0, 1));
 
         add(tree);
-        detailPanel = new MigPanel();
-        detailPanel.setLayout(new MigLayout("wrap 2", "[fill]related[fill]"));
+        detailPanel = new MigPanel(new MigLayout("wrap 2", "[fill]related[fill]"));
         detailPanel.setOpaque(false);
         add(detailPanel, "grow");
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,6 +22,7 @@ package net.sf.freecol.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.DateFormat;
@@ -59,6 +60,11 @@ public class MergeTranslations {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
             });
+        if (sourceFiles == null) {
+            System.err.println("No messages files found in "
+                + sourceDirectory);
+            System.exit(1);
+        }
         
         for (String name : sourceFiles) {
 
@@ -119,11 +125,10 @@ public class MergeTranslations {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch (Exception e) {
-            // forget it
+        } catch (IOException ioe) {
+            System.err.println("Error reading file " + file.getName()
+                + ": " + ioe);
         }
         return result;
     }
-
 }
-

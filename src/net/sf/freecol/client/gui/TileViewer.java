@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -99,7 +99,7 @@ public final class TileViewer extends FreeColClientHolder {
             if (other instanceof SortableImage) {
                 return this.compareTo((SortableImage)other) == 0;
             }
-            return super.equals(other);
+            return false;
         }
 
         /**
@@ -148,7 +148,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Gets the contained {@code ImageLibrary}.
      *
-     * Public for {@see GUI.getTileImageLibrary}.
+     * Public for {@link GUI#getTileImageLibrary}.
      * 
      * @return The image library;
      */
@@ -188,7 +188,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      *
-     * Public for {@see GUI.createTileImageWithOverlayAndForest}.
+     * Public for {@link GUI#createTileImageWithOverlayAndForest}.
      *
      * @param type The type of the terrain-image to return.
      * @param size The maximum size of the terrain image to return.
@@ -204,8 +204,7 @@ public final class TileViewer extends FreeColClientHolder {
             -1);
         BufferedImage terrainImage = ImageLibrary.getTerrainImage(
             type, 0, 0, size2);
-        BufferedImage overlayImage = ImageLibrary.getOverlayImage(
-            type, type.getId(), size2);
+        BufferedImage overlayImage = ImageLibrary.getOverlayImage(type, size2);
         BufferedImage forestImage = type.isForested()
             ? ImageLibrary.getForestImage(type, size2)
             : null;
@@ -239,24 +238,23 @@ public final class TileViewer extends FreeColClientHolder {
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      * Draws the terrain and improvements.
      *
-     * Public for {@see GUI.createTileImageWithBeachBorderAndItems}.
+     * Public for {@link GUI#createTileImageWithBeachBorderAndItems}.
      *
      * @param tile The Tile to draw.
      * @return The image.
      */
     public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         if (!tile.isExplored())
-            return lib.getTerrainImage(null, tile.getX(), tile.getY());
+            return lib.getScaledTerrainImage(null, tile.getX(), tile.getY());
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.tileSize;
-        BufferedImage overlayImage = lib.getOverlayImage(tile);
-        final int compoundHeight = (overlayImage != null)
-            ? overlayImage.getHeight()
-            : tileType.isForested()
-                ? lib.tileForestSize.height
-                : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(
-            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage overlayImage = lib.getScaledOverlayImage(tile);
+        final int compoundHeight
+            = (overlayImage != null) ? overlayImage.getHeight()
+            : (tileType.isForested()) ? lib.tileForestSize.height
+            : terrainTileSize.height;
+        BufferedImage image = new BufferedImage(terrainTileSize.width,
+            compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - terrainTileSize.height);
         displayTileWithBeachAndBorder(g, tile);
@@ -268,7 +266,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      *
-     * Public for {@see GUI.createTileImage}.
+     * Public for {@link GUI#createTileImage}.
      *
      * @param tile The {@code Tile} to draw.
      * @param player The {@code Player} to draw for.
@@ -277,7 +275,7 @@ public final class TileViewer extends FreeColClientHolder {
     public BufferedImage createTileImage(Tile tile, Player player) {
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.tileSize;
-        BufferedImage overlayImage = lib.getOverlayImage(tile);
+        BufferedImage overlayImage = lib.getScaledOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : (tileType.isForested()) ? lib.tileForestSize.height
@@ -297,7 +295,7 @@ public final class TileViewer extends FreeColClientHolder {
      * from the corresponding {@code ColonyTile} of the given
      * {@code Colony}.
      *
-     * Public for {@see GUI.createColonyTileImage}.
+     * Public for {@link GUI#createColonyTileImage}.
      *
      * @param tile The {@code Tile} to draw.
      * @param colony The {@code Colony} to create the visualization
@@ -308,7 +306,7 @@ public final class TileViewer extends FreeColClientHolder {
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.tileSize;
-        BufferedImage overlayImage = lib.getOverlayImage(tile);
+        BufferedImage overlayImage = lib.getScaledOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : tileType.isForested()
@@ -326,7 +324,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
      * 
-     * Public for {@see GUI.displayColonyTles}.
+     * Public for {@link GUI#displayColonyTiles}.
      *
      * @param g The {@code Graphics2D} object on which to draw
      *      the {@code Tile}.
@@ -343,8 +341,8 @@ public final class TileViewer extends FreeColClientHolder {
                     int xx = (((2 - x) + y) * tileSize.width) / 2;
                     int yy = ((x + y) * tileSize.height) / 2;
                     g.translate(xx, yy);
-                    BufferedImage overlayImage = lib.getOverlayImage(
-                        tiles[x][y], overlayCache);
+                    BufferedImage overlayImage
+                        = lib.getScaledOverlayImage(tiles[x][y], overlayCache);
                     displayColonyTile(g, tiles[x][y], colony, overlayImage);
                     g.translate(-xx, -yy);
                 }
@@ -440,7 +438,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param g a {@code Graphics2D}
      * @param image the BufferedImage
      */
-    public void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
+    private void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
         int y = tileHeight - image.getHeight();
         if (y > 0) y /= 2;
         g.drawImage(image, (tileWidth - image.getWidth())/2, y, null);
@@ -459,7 +457,7 @@ public final class TileViewer extends FreeColClientHolder {
         final int y = tile.getY();
 
         // ATTENTION: we assume that all base tiles have the same size
-        g.drawImage(lib.getTerrainImage(tileType, x, y), 0, 0, null);
+        g.drawImage(lib.getScaledTerrainImage(tileType, x, y), 0, 0, null);
 
         if (!tile.isExplored()) return;
         if (!tile.isLand() && tile.getStyle() > 0) {
@@ -501,14 +499,16 @@ public final class TileViewer extends FreeColClientHolder {
                     }
                 }
             } else if (!tile.isLand() || borderingTile.isLand()) {
-                if (borderingTileType.getIndex() < tileType.getIndex()
-                    && !lib.getTerrainImage(tileType, 0, 0).equals(lib.getTerrainImage(borderingTileType, 0, 0))) {
+                int bTIndex = borderingTileType.getIndex();
+                if (bTIndex < tileType.getIndex()
+                    && !ImageLibrary.getTerrainImageKey(tileType, 0, 0)
+                    .equals(ImageLibrary.getTerrainImageKey(borderingTileType, 0, 0))) {
                     // Draw land terrain with bordering land type, or
                     // ocean/high seas limit, if the tiles do not
                     // share same graphics (ocean & great river)
                     si = new SortableImage(lib.getBorderImage(borderingTileType,
-                            direction, x, y),
-                        borderingTileType.getIndex());
+                                                              direction, x, y),
+                                           bTIndex);
                     imageBorders.add(si);
                 }
             }
@@ -661,8 +661,9 @@ public final class TileViewer extends FreeColClientHolder {
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip
                     chip = lib.getIndianSettlementChip(g, is);
+                    int cWidth = chip.getWidth();
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
-                    xOffset += chip.getWidth() + 2;
+                    xOffset += cWidth + 2;
 
                     // Draw the mission chip if needed.
                     Unit missionary = is.getMissionary();
@@ -672,7 +673,7 @@ public final class TileViewer extends FreeColClientHolder {
                         g.drawImage(lib.getMissionChip(g, missionary.getOwner(),
                                                        expert),
                                     (int)xOffset, (int)yOffset, null);
-                        xOffset += chip.getWidth() + 2;
+                        xOffset += cWidth + 2;
                     }
                 }
 
@@ -732,8 +733,8 @@ public final class TileViewer extends FreeColClientHolder {
         }
         // Forest
         if (tile.isForested()) {
-            BufferedImage forestImage = lib.getForestImage(
-                tile.getType(), tile.getRiverStyle());
+            BufferedImage forestImage = lib.getScaledForestImage(tile.getType(),
+                tile.getRiverStyle());
             g1.drawImage(forestImage,
                 0, (tileHeight - forestImage.getHeight()), null);
         }
@@ -780,7 +781,7 @@ public final class TileViewer extends FreeColClientHolder {
                 rp.displayRoad(g, tile);
             } else {
                 BufferedImage im = (ti.isRiver())
-                    ? lib.getRiverImage(ti.getStyle())
+                    ? lib.getScaledRiverImage(ti.getStyle())
                     : lib.getTileImprovementImage(ti.getType().getId());
                 if (im != null) g.drawImage(im, 0, 0, null);
             }

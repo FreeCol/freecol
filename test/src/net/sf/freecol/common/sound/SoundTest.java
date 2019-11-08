@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -58,7 +58,7 @@ public class SoundTest extends FreeColTestCase {
         } catch (Exception e) {
             fail("Could not load base data: " + e.getMessage());
         }
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        ResourceManager.addMapping("testbase", baseData.getResourceMapping());
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SoundTest extends FreeColTestCase {
 
     public void testClassic() {
         FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        ResourceManager.addMapping("testtc", tcData.getResourceMapping());
 
         playSound("sound.intro.model.nation.english");
         playSound("sound.intro.model.nation.dutch");

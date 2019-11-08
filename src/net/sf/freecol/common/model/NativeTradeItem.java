@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -224,13 +224,12 @@ public class NativeTradeItem extends GoodsTradeItem {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof NativeTradeItem) {
-            return this.price == ((NativeTradeItem)other).price
-                && this.haggleCount == ((NativeTradeItem)other).haggleCount
-                && super.equals((NativeTradeItem)other);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof NativeTradeItem)) return false;
+        NativeTradeItem other = (NativeTradeItem)o;
+        return this.price == other.price
+            && this.haggleCount == other.haggleCount
+            && super.equals(other);
     }
 
     /**

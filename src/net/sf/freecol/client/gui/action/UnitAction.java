@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,9 @@
 package net.sf.freecol.client.gui.action;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -47,9 +50,13 @@ public abstract class UnitAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled()
-            && getGUI().getActiveUnit() != null
-            && getGUI().getActiveUnit().getOwner()
-            == getFreeColClient().getMyPlayer();
+        final GUI gui = getGUI();
+        Player player;
+        Unit unit;
+        return gui != null
+            && (player = getFreeColClient().getMyPlayer()) != null
+            && (unit = gui.getActiveUnit()) != null
+            && player.owns(unit)
+            && super.shouldBeEnabled();
     }
 }

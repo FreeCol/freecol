@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -121,6 +121,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     public boolean isValid(Player player) {
         return (location instanceof TradeLocation)
             && !((FreeColGameObject)location).isDisposed()
+            && ((FreeColGameObject)location).isInitialized()
             && ((location instanceof Ownable)
                 && player.owns((Ownable)location));
     }
@@ -233,9 +234,9 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int getGoodsCount(GoodsType goodsType) {
+    public int getAvailableGoodsCount(GoodsType goodsType) {
         return (location instanceof TradeLocation)
-            ? ((TradeLocation)location).getGoodsCount(goodsType)
+            ? ((TradeLocation)location).getAvailableGoodsCount(goodsType)
             : 0;
     }
 
@@ -259,6 +260,9 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
             : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         return null;

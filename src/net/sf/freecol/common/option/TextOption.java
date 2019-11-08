@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -68,7 +68,7 @@ public class TextOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     @Override
-    public TextOption clone() {
+    public TextOption cloneOption() {
         TextOption result = new TextOption(getId(), getSpecification());
         result.setValues(this);
         return result;

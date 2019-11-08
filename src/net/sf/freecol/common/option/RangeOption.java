@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,6 +22,7 @@ package net.sf.freecol.common.option;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Specification;
 
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -64,6 +64,7 @@ import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
 
@@ -129,20 +130,12 @@ public final class FreeColClient {
      */
     private boolean loggedIn = false;
 
-    /** Run in headless mode. */
-    private final boolean headless;
-
     /** Cached value of server state. */
     private ServerState cachedServerState = null;
 
     /** Cached list of vacant players. */
     private List<String> cachedVacantPlayerNames = new ArrayList<>();
 
-    
-    public FreeColClient(final InputStream splashStream,
-                         final String fontName) {
-        this(splashStream, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
-    }
 
     /**
      * Creates a new {@code FreeColClient}.  Creates the control
@@ -151,23 +144,14 @@ public final class FreeColClient {
      * @param splashStream A stream to read the splash image from.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
-     * @param headless Run in headless mode.
      */
     public FreeColClient(final InputStream splashStream, final String fontName,
-                         final float scale, boolean headless) {
+                         final float scale) {
         mapEditor = false;
-        this.headless = headless
-            || System.getProperty("java.awt.headless", "false").equals("true");
-        if (this.headless) {
-            if (!FreeColDebugger.isInDebugMode()
-                || FreeColDebugger.getDebugRunTurns() <= 0) {
-                fatal(Messages.message("client.headlessDebug"));
-            }
-        }
 
         // Get the splash screen up early on to show activity.
-        gui = (this.headless) ? new GUI(this, scale)
-                              : new SwingGUI(this, scale);
+        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
+                                      : new SwingGUI(this, scale);
         gui.displaySplashScreen(splashStream);
 
         // Look for base data directory.  Failure is fatal.
@@ -182,14 +166,15 @@ public final class FreeColClient {
             }
         }
         if (baseData == null) {
-            fatal(Messages.message(StringTemplate.template("client.baseData")
-                          .addName("%dir%", baseDirectory.getName()))
+            FreeCol.fatal(logger,
+                Messages.message(StringTemplate.template("client.baseData")
+                    .addName("%dir%", baseDirectory.getName()))
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        ResourceManager.addMapping("base", baseData.getResourceMapping());
 
         // Once the basic resources are in place construct other things.
-        this.serverAPI = new UserServerAPI(gui);
+        this.serverAPI = new UserServerAPI();
 
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);
@@ -205,25 +190,40 @@ public final class FreeColClient {
         //   - resources in the default actions
         //
         // FIXME: probably should not need to load "classic", but there
-        // are a bunch of things in there (e.g. order buttons) that first
-        // need to move to base because the action manager requires them.
+        // are a bunch of things in there that need to move to base because
+        // the action manager requires them.
         //
         // Not so easy, since the ActionManager also creates tile
         // improvement actions, which depend on the specification.
         // However, this step could probably be delayed.
         FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        ResourceManager.addMapping("tc", tcData.getResourceMapping());
 
         // Swing system and look-and-feel initialization.
-        if (!this.headless) {
+        if (!FreeCol.getHeadless()) {
             try {
                 gui.installLookAndFeel(fontName);
             } catch (Exception e) {
-                fatal(Messages.message("client.laf") + "\n" + e.getMessage());
+                FreeCol.fatal(logger,
+                    Messages.message("client.laf") + "\n" + e.getMessage());
             }
         }
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
+    }
+
+    /**
+     * Wrapper for the test suite to start a test client.
+     *
+     * @param spec The {@code Specification} to use in the new client.
+     * @return The new {@code FreeColClient}.
+     */
+    public static FreeColClient startTestClient(Specification spec) {
+        FreeCol.setHeadless(true);
+        FreeColClient freeColClient
+            = new FreeColClient(null, null, FreeCol.GUI_SCALE_DEFAULT);
+        freeColClient.startClient(null, null, false, false, null, spec);
+        return freeColClient;
     }
 
     /**
@@ -261,8 +261,8 @@ public final class FreeColClient {
                             final boolean showOpeningVideo,
                             final File savedGame,
                             final Specification spec) {
-        if (headless && savedGame == null && spec == null) {
-            fatal(Messages.message("client.headlessRequires"));
+        if (FreeCol.getHeadless() && savedGame == null && spec == null) {
+            FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
         }
 
         // Load the client options, which handle reloading the
@@ -273,11 +273,9 @@ public final class FreeColClient {
         // Reset the mod resources as a result of the client option update.
         ResourceMapping modMappings = new ResourceMapping();
         for (FreeColModFile f : this.clientOptions.getActiveMods()) {
-            modMappings.addAll(f.getResourceMapping());
+            ResourceManager.addMapping("mod " + f.getId(),
+                                       f.getResourceMapping());
         }
-        ResourceManager.setModMapping(modMappings);
-        // Update the actions, resources may have changed.
-        if (this.actionManager != null) updateActions();
 
         // Initialize Sound (depends on client options)
         this.soundController = new SoundController(this, sound);
@@ -286,6 +284,9 @@ public final class FreeColClient {
         gui.hideSplashScreen();
         gui.startGUI(size);
 
+        // Update the actions with the running GUI, resources may have changed.
+        if (this.actionManager != null) updateActions();
+        
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied
         //   - use the debug shortcut to immediately start a new game with
@@ -384,16 +385,6 @@ public final class FreeColClient {
 
         //logger.info("Final client options: " + clop.toString());
         return clop;
-    }
-
-    /**
-     * Quit and exit with an error.
-     *
-     * @param err The error message.
-     */
-    public static void fatal(String err) {
-        logger.log(Level.SEVERE, err);
-        FreeCol.fatal(err);
     }
 
 
@@ -629,15 +620,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Is the game in headless mode?
-     *
-     * @return a {@code boolean} value
-     */
-    public boolean isHeadless() {
-        return this.headless;
-    }
-
-    /**
      * Get the server state, or at least our most recently cached value.
      *
      * @return A server state.
@@ -735,8 +717,7 @@ public final class FreeColClient {
      * @return True if the current player is owned by this client.
      */
     public boolean currentPlayerIsMyPlayer() {
-        return isInGame()
-            && this.game != null
+        return this.game != null && isInGame()
             && this.player != null
             && this.player.equals(this.game.getCurrentPlayer());
     }
@@ -781,9 +762,9 @@ public final class FreeColClient {
     private FreeColServer failToMain(Exception ex, StringTemplate template) {
         GUI.ErrorJob ej = gui.errorJob(ex, template);
         logger.log(Level.WARNING, Messages.message(template), ex);
-        if (isHeadless() // If this is a debug run, fail hard.
+        if (FreeCol.getHeadless() // If this is a debug run, fail hard.
             || FreeColDebugger.getDebugRunTurns() >= 0) {
-            FreeCol.fatal(ej.toString());
+            FreeCol.fatal(logger, ej.toString());
         }
         ej.setRunnable(invokeMainPanel(null)).invokeLater();
         return null;
@@ -828,7 +809,7 @@ public final class FreeColClient {
         if (freeColServer != null) {
             freeColServer.getController().shutdown();
             setFreeColServer(null);
-            ResourceManager.setScenarioMapping(null);
+            ResourceManager.clearImageCache();
         }
     }
 
@@ -851,7 +832,7 @@ public final class FreeColClient {
         } catch (IOException ioe) {
             return failToMain(ioe, "server.initialize");
         }
-        if (publicServer && fcs != null && !fcs.getPublicServer()) {
+        if (publicServer && !fcs.getPublicServer()) {
             return failToMain(null, "server.noRouteToServer");
         }
 
@@ -893,7 +874,7 @@ public final class FreeColClient {
         setFreeColServer(fcs);
         setSinglePlayer(singlePlayer);
         this.inGameController.setGameConnected();
-        ResourceManager.setScenarioMapping(fsg.getResourceMapping());
+        ResourceManager.addMapping("game", fsg.getResourceMapping());
         return fcs;
     }
     
@@ -928,8 +909,10 @@ public final class FreeColClient {
      * Log this client out.
      *
      * Called when the ConnectController processes a logout.
+     *
+     * @param inGame Whether the server is in-game.
      */
-    public synchronized void logout(boolean inGame) {
+    public synchronized void logout(@SuppressWarnings("unused") boolean inGame) {
         this.loggedIn = false;
         changeClientState(inGame);
         setGame(null);
@@ -1004,12 +987,11 @@ public final class FreeColClient {
         if (logMe != null) logger.info(logMe);
 
         // Exit
-        int ret = 0;
         try {
             gui.quit();
         } catch (Exception e) {
-            ret = 1;
+            FreeCol.fatal(logger, "Failed to shutdown gui: " + e);
         }
-        System.exit(ret);
+        FreeCol.quit(0);
     }
 }

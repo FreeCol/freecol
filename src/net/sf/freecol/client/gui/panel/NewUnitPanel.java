@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,9 +69,9 @@ public class NewUnitPanel extends FreeColPanel {
      * @param label The label for the panel.
      * @param units A list of {@code UnitType}s to offer.
      */
-    public NewUnitPanel(FreeColClient freeColClient, LayoutManager layout,
-                        String label, List<UnitType> units) {
-        super(freeColClient, layout);
+    protected NewUnitPanel(FreeColClient freeColClient, LayoutManager layout,
+                           String label, List<UnitType> units) {
+        super(freeColClient, null, layout);
 
         this.question = new JLabel(label);
         this.units.addAll(units);
@@ -80,15 +80,13 @@ public class NewUnitPanel extends FreeColPanel {
             europe.getUnitPrice(ut));
 
         okButton.setText(Messages.message("close"));
-
-        update();
     }
 
     /**
      * Updates this panel's labels so that the information it displays
      * is up to date.
      */
-    public final void update() {
+    public void update() {
         removeAll();
 
         final Player player = getMyPlayer();

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -64,7 +64,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      * @param option The {@code Option} to display.
      * @param editable True if the option should be editable.
      */
-    public OptionUI(T option, boolean editable) {
+    protected OptionUI(T option, boolean editable) {
         this.option = option;
         this.editable = editable;
 

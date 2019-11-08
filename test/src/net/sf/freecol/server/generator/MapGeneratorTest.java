@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,9 +20,14 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColObject;
@@ -37,7 +42,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.MapGeneratorOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
@@ -109,16 +113,6 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Apply the difficulty level
         //spec().applyDifficultyLevel("model.difficulty.medium");
 
-        Vector<Player> players = new Vector<Player>();
-
-        for (Nation n : spec().getNations()) {
-            if (n.isUnknownEnemy()) continue;
-            Player p = new ServerPlayer(g, false, n);
-            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
-            g.addPlayer(p);
-            players.add(p);
-        }
-
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         gen.generateMap(g, null, new LogBuilder(-1));
         assertNotNull("New map", g.getMap());
@@ -132,7 +126,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         // Sufficient land?
         int total = m.getWidth() * m.getHeight();
-        int land = count(m.getAllTiles(), Tile::isLand);
+        int land = m.getTileSet(Tile::isLand).size();
         // Land Mass requirement fulfilled?
         assertTrue(100 * land / total >= g.getMapGeneratorOptions()
                    .getInteger(MapGeneratorOptions.LAND_MASS));
@@ -155,8 +149,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
 
-        Vector<Player> players = new Vector<Player>();
-
+        List<Player> players = new ArrayList<>();
         for (Nation n : spec().getNations()) {
             if (n.isUnknownEnemy()) continue;
             Player p = new ServerPlayer(g, false, n);
@@ -194,9 +187,15 @@ public class MapGeneratorTest extends FreeColTestCase {
         final Specification spec = game.getSpecification();
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
+        Map importMap = null;
         for (File importFile : FreeColDirectories.getMapFileList()) {
             spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
-            Map importMap = FreeColServer.readMap(importFile, spec);
+            try {
+                importMap = FreeColServer.readMap(importFile, spec);
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                fail("Map read of " + importFile.getName() + " failed: "
+                    + ex.toString());
+            }
             assertNotNull(gen.generateMap(game, importMap, new LogBuilder(-1)));
         }
         // Clear import file option
@@ -225,7 +224,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Player player = new Player(game, FreeColObject.ID_ATTRIBUTE_TAG);
         ServerUnit unit = new ServerUnit(game, null, player,
             spec().getUnitType("model.unit.caravel"));
-        pacific.discover(player, new Turn(1));
+        pacific.discover(player, unit, new Turn(1));
 
         assertFalse(pacific.getDiscoverable());
         assertNull(pacific.getDiscoverableRegion());

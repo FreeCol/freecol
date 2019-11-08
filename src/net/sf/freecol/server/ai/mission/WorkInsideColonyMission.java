@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,7 +38,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for working inside an AI colony.
  */
-public class WorkInsideColonyMission extends Mission {
+public final class WorkInsideColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
 
@@ -61,7 +61,9 @@ public class WorkInsideColonyMission extends Mission {
      */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
                                    AIColony aiColony) {
-        super(aiMain, aiUnit, aiColony.getColony());
+        super(aiMain, aiUnit);
+
+        setTarget(aiColony.getColony());
     }
 
     /**
@@ -98,7 +100,7 @@ public class WorkInsideColonyMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason;
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
             : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
@@ -150,7 +152,7 @@ public class WorkInsideColonyMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**

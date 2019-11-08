@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,9 +20,9 @@
 package net.sf.freecol.common.sound;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -145,7 +145,9 @@ public class OggVorbisDecoderFactory {
             while (n > 0) {
                 if (bufCount <= 0) {
                     int ret = getBody(inputStream);
-                    if (ret < 0) throw new IOException("Ogg decoding error");
+                    if (ret < 0) {
+                        throw new IOException("Ogg decoding error: " + this);
+                    }
                     if (ret == 0) break;
                     bufCount = ret;
                     offset = 0;
@@ -173,7 +175,9 @@ public class OggVorbisDecoderFactory {
             while (n > 0) {
                 if (bufCount <= 0) {
                     int ret = getBody(inputStream);
-                    if (ret < 0) throw new IOException("Ogg decoding error");
+                    if (ret < 0) {
+                        throw new IOException("Ogg decoding error: " + this);
+                    }
                     if (ret == 0) break;
                     bufCount = ret;
                     offset = 0;
@@ -456,7 +460,7 @@ public class OggVorbisDecoderFactory {
      * @exception IOException if unable to open the stream.
      */
     public AudioInputStream getOggStream(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
+        InputStream fis = Files.newInputStream(file.toPath());
         return new OggVorbisAudioInputStream(new OggStream(fis));
     }
 }

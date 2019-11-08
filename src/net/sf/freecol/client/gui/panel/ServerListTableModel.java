@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002-${year}   The FreeCol Team
+ * Copyright (C) 2002-2019ar}   The FreeCol Team
  * <p>
  * This file is part of FreeCol.
  * <p>
@@ -100,7 +100,8 @@ class ServerListTableModel extends AbstractTableModel {
      */
     @Override
     public Object getValueAt(int row, int column) {
-        if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
+        if (0 <= row && 0 <= column
+            && row < getRowCount() && column < getColumnCount()) {
             ServerInfo si = items.get(row);
             switch (column) {
             case 0:

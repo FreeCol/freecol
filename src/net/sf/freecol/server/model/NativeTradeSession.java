@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -46,7 +46,7 @@ public class NativeTradeSession extends Session {
      *
      * @param nt The {@code NativeTrade}
      */
-    public NativeTradeSession(NativeTrade nt) {
+    private NativeTradeSession(NativeTrade nt) {
         super(makeSessionKey(NativeTradeSession.class, nt.getUnit(),
                              nt.getIndianSettlement()));
 
@@ -63,6 +63,21 @@ public class NativeTradeSession extends Session {
         return this.nt;
     }
 
+
+    /**
+     * Helper function to update a tentative native trade and open
+     * a session for it.
+     *
+     * @param nt The proposed {@code NativeTrade}.
+     * @return The updated {@code NativeTrade}.
+     */
+    public static NativeTrade openSession(NativeTrade nt) {
+        nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
+        new NativeTradeSession(nt).register();
+        nt.initialize();
+        return nt;
+    }
+        
     /**
      * {@inheritDoc}
      */
@@ -73,7 +88,7 @@ public class NativeTradeSession extends Session {
         if (this.nt.hasNotTraded()) { // Reset the moves if nothing happened
             Unit unit = this.nt.getUnit();
             unit.setMovesLeft(this.movesLeft);
-            cs.addPartial(See.only((ServerPlayer)unit.getOwner()), unit,
+            cs.addPartial(See.only(unit.getOwner()), unit,
                 "movesLeft", String.valueOf(unit.getMovesLeft()));
         }
         this.nt.setDone();

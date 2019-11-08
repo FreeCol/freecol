@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.HashMap;
@@ -484,8 +485,9 @@ public class ClientOptions extends OptionGroup {
         = Comparator.comparingInt(c -> c.getEstablished().getNumber());
 	
     /** Compare by name, initialized at run time. */
-    private static Comparator<Colony> colonyNameComparator = null;
-
+    private static AtomicReference<Comparator<Colony>> colonyNameComparator
+        = new AtomicReference<Comparator<Colony>>(null);
+    
     /** Compare by descending size then liberty. */
     private static final Comparator<Colony> colonySizeComparator
         = Comparator.comparingInt(Colony::getUnitCount)
@@ -500,55 +502,7 @@ public class ClientOptions extends OptionGroup {
 
     /** Compare by position on the map. */
     private static final Comparator<Colony> colonyPositionComparator
-        = Comparator.comparingInt(c -> Location.getRank(c));
-
-
-    private class MessageSourceComparator implements Comparator<ModelMessage> {
-        private final Game game;
-
-        // sort according to message source
-
-        private MessageSourceComparator(Game game) {
-            this.game = game;
-        }
-
-        @Override
-        public int compare(ModelMessage message1, ModelMessage message2) {
-            String sourceId1 = message1.getSourceId();
-            String sourceId2 = message2.getSourceId();
-            if (Utils.equals(sourceId1, sourceId2)) {
-                return messageTypeComparator.compare(message1, message2);
-            }
-            FreeColGameObject source1 = game.getMessageSource(message1);
-            FreeColGameObject source2 = game.getMessageSource(message2);
-            int base = getClassIndex(source1) - getClassIndex(source2);
-            if (base == 0) {
-                if (source1 instanceof Colony) {
-                    return getColonyComparator().compare((Colony) source1, (Colony) source2);
-                }
-            }
-            return base;
-        }
-
-        /**
-         * Determine the class index of an object.
-         *
-         * @param object The object to check
-         * @return The object's class index or the default if the
-         *     object is not a {@code FreeColObject}.
-         */
-        private int getClassIndex(Object object) {
-            return (object instanceof FreeColObject)
-                ? ((FreeColObject)object).getClassIndex()
-                : FreeColObject.DEFAULT_CLASS_INDEX;
-        }
-    }
-
-    /** Compare messages by type. */
-    private static final Comparator<ModelMessage> messageTypeComparator
-        = (m1, m2) -> m1.getMessageType().ordinal()
-                    - m2.getMessageType().ordinal();
-
+        = Comparator.comparingInt(c -> Location.rankOf(c));
 
     /** Friendly move animation speed option values. */
     private static final Map<Integer, String> friendlyMoveAnimationSpeeds
@@ -649,21 +603,21 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
-     * Return the client's preferred comparator for colonies.
+     * Get the client's preferred comparator for colonies.
      *
-     * @return a {@code Comparator} value
+     * @return The current colony {@code Comparator}.
      */
     public Comparator<Colony> getColonyComparator() {
-        return getColonyComparator(getInteger(COLONY_COMPARATOR));
+        return getColonyComparatorInternal(getInteger(COLONY_COMPARATOR));
     }
 
     /**
-     * Return the colony comparator identified by type.
+     * Get the colony comparator identified by type.
      *
-     * @param type an {@code int} value
-     * @return a {@code Comparator} value
+     * @param type The colony comparator option integer value.
+     * @return The corresponding colony {@code Comparator}.
      */
-    public static Comparator<Colony> getColonyComparator(int type) {
+    private static Comparator<Colony> getColonyComparatorInternal(int type) {
         switch (type) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;
@@ -674,14 +628,16 @@ public class ClientOptions extends OptionGroup {
         case COLONY_COMPARATOR_SOL:
             return colonySoLComparator;
         case COLONY_COMPARATOR_NAME:
-            if (colonyNameComparator == null) {
+            Comparator<Colony> cnc = colonyNameComparator.get();
+            if (cnc == null) {
                 // Can not be done statically, must wait for CLI parsing
-                colonyNameComparator = Comparator.comparing(Colony::getName,
+                cnc = Comparator.comparing(Colony::getName,
                     Collator.getInstance(FreeCol.getLocale()));
+                colonyNameComparator.set(cnc);
             }
-            return colonyNameComparator;
+            return cnc;
         default:
-            throw new IllegalStateException("Unknown comparator");
+            throw new RuntimeException("Unknown comparator: " + type);
         }
     }
 
@@ -694,9 +650,12 @@ public class ClientOptions extends OptionGroup {
     public Comparator<ModelMessage> getModelMessageComparator(Game game) {
         switch (getInteger(MESSAGES_GROUP_BY)) {
         case MESSAGES_GROUP_BY_SOURCE:
-            return new MessageSourceComparator(game);
+            Map<String, Comparator<?>> specialized
+                = new HashMap<>();
+            specialized.put("Colony", getColonyComparator());
+            return ModelMessage.getSourceComparator(game, specialized);
         case MESSAGES_GROUP_BY_TYPE:
-            return messageTypeComparator;
+            return ModelMessage.messageTypeComparator;
         default:
             return null;
         }
@@ -772,6 +731,7 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
+    /** Currently unused.
     private void addIntegerOption(String id, String gr, int val) {
         if (!hasOption(id, IntegerOption.class)) {
             IntegerOption op = new IntegerOption(id, null);
@@ -779,16 +739,25 @@ public class ClientOptions extends OptionGroup {
             op.setValue(val);
             add(op);
         }
-    }
+    }*/
 
+    /** Currently unused.
     private void addOptionGroup(String id, String gr) {
         if (!hasOption(id, OptionGroup.class)) {
             OptionGroup og = new OptionGroup(id);
             og.setGroup(gr);
             add(og);
         }
-    }
+    }*/
 
+    /**
+     * Add a new range option.
+     *
+     * @param id The option identifier.
+     * @param gr The group identifier.
+     * @param rank The option rank.
+     * @param entries The options in the range.
+     */
     private void addRangeOption(String id, String gr, int rank,
                                 Map<Integer, String> entries) {
         if (!hasOption(id, RangeOption.class)) {
@@ -803,6 +772,13 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
+    /**
+     * Add a new text option.
+     *
+     * @param id The option identifier.
+     * @param gr The group identifier.
+     * @param val The the text value.
+     */
     private void addTextOption(String id, String gr, String val) {
         if (!hasOption(id, TextOption.class)) {
             TextOption op = new TextOption(id, null);
@@ -821,12 +797,14 @@ public class ClientOptions extends OptionGroup {
      */
     public Point getPanelPosition(String className) {
         OptionGroup etc = getOptionGroup(ETC);
-        if (etc == null) return null;
         try {
-            return new Point(etc.getInteger(className + ".x"),
-                             etc.getInteger(className + ".y"));
-        } catch (Exception e) {}
-        return null;
+            return (etc == null) ? null
+                : new Point(etc.getInteger(className + ".x"),
+                    etc.getInteger(className + ".y"));
+        } catch (Exception ex) {
+            logger.log(Level.FINEST, "Missing position option", ex);
+            return null;
+        }
     }
 
     /**
@@ -838,12 +816,14 @@ public class ClientOptions extends OptionGroup {
      */
     public Dimension getPanelSize(String className) {
         OptionGroup etc = getOptionGroup(ETC);
-        if (etc == null) return null;
         try {
-            return new Dimension(etc.getInteger(className + ".w"),
-                                 etc.getInteger(className + ".h"));
-        } catch (Exception e) {}
-        return null;
+            return (etc == null) ? null
+                : new Dimension(etc.getInteger(className + ".w"),
+                                etc.getInteger(className + ".h"));
+        } catch (Exception ex) {
+            logger.log(Level.FINEST, "Missing size option", ex);
+            return null;
+        }
     }
 
     /**
@@ -857,14 +837,14 @@ public class ClientOptions extends OptionGroup {
     public static Map<String,String> getSpecialOptions()
         throws FreeColException {
         // Initialize the map
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(specialKeys.size());
         for (String key : specialKeys) ret.put(key, null);
 
         // Extract the values and return
         final File optionsFile = FreeColDirectories.getClientOptionsFile();
         try (FreeColXMLReader xr = new FreeColXMLReader(optionsFile)) {
             xr.readAttributeValues(ret, "value");
-        } catch (FileNotFoundException|XMLStreamException xe) {
+        } catch (IOException|XMLStreamException xe) {
             throw new FreeColException(xe);
         }
         return ret;

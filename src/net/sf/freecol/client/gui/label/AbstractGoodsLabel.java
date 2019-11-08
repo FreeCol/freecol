@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -160,5 +161,36 @@ public class AbstractGoodsLabel extends FreeColLabel {
      */
     public void setDefaultAmount() {
         // do nothing
+    }
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof AbstractGoodsLabel) {
+            AbstractGoodsLabel other = (AbstractGoodsLabel)o;
+            return Utils.equals(this.abstractGoods, other.abstractGoods)
+                && this.partialChosen == other.partialChosen
+                && this.fullChosen == other.fullChosen
+                && this.superFullChosen == other.superFullChosen;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.abstractGoods);
+        hash = 31 * hash + ((this.partialChosen) ? 1 : 0)
+            + ((this.fullChosen) ? 2 : 0)
+            + ((this.superFullChosen) ? 4 : 0);
+        return hash;
     }
 }

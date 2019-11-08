@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,11 +21,14 @@ package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -368,8 +371,12 @@ public final class SpecificationTest extends FreeColTestCase {
             + "</unit-types>"
             + "</freecol-specification>";
 
-        Specification spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
-
+        Specification spec = null;
+        try {
+            spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
+        } catch (XMLStreamException xse) {
+            fail("Spec read fail");
+        }
         assertNotNull(spec.getUnitType("model.unit.milkmaid"));
         assertNotNull(spec.getUnitType("model.unit.caravel"));
 
@@ -389,24 +396,17 @@ public final class SpecificationTest extends FreeColTestCase {
             + "</unit-types>"
             + "</freecol-specification>";
 
-        Specification spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
-
+        Specification spec = null;
         try {
-            spec.getUnitType("model.unit.caravel");
-            fail("Caravel is defined.");
-        } catch (IllegalArgumentException e) {
+            spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
+        } catch (XMLStreamException xse) {
+            fail("Spec read fail");
         }
+        assertNull("Caravel should be undefined",
+                   spec.getUnitType("model.unit.caravel"));
 
         for (UnitType unitType : spec.getUnitTypeList()) {
             assertFalse("model.unit.caravel".equals(unitType.getId()));
-        }
-
-        // restore original values
-        try {
-            spec = FreeColTcFile.getFreeColTcFile("freecol")
-                .getSpecification();
-        } catch (Exception e) {
-            System.out.println(e);
         }
     }
 
@@ -445,8 +445,8 @@ public final class SpecificationTest extends FreeColTestCase {
             spec.loadMods(mods);
             UnitType milkmaid = spec.getUnitType("model.unit.milkmaid");
             assertEquals(numberOfUnitTypes + 1, spec.getUnitTypeList().size());
-        } catch (Exception e) {
-            fail(e.getMessage());
+        } catch (IOException|XMLStreamException ex) {
+            fail(ex.toString());
         }
     }
 }

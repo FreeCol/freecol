@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -77,7 +78,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csTeach(ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        final Player owner = getColony().getOwner();
         
         for (Unit teacher : getUnitList()) {
             Unit student = teacher.getStudent();
@@ -116,7 +117,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      * @return True if teaching occurred.
      */
     public boolean csCheckTeach(Unit teacher, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        final Player owner = getColony().getOwner();
 
         Unit student = teacher.getStudent();
         if (student != null
@@ -140,9 +141,8 @@ public class ServerBuilding extends Building implements TurnTaker {
      * @return True if teaching occurred.
      */
     private boolean csTrainStudent(Unit teacher, Unit student, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        final Player owner = getColony().getOwner();
         StringTemplate oldName = student.getLabel();
-        UnitType teach = teacher.getType().getSkillTaught();
         UnitType skill = student.getTeachingType(teacher);
         boolean ret = skill != null;
         if (skill == null) {
@@ -179,7 +179,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      */
     private boolean csAssignStudent(Unit teacher, ChangeSet cs) {
         final Colony colony = getColony();
-        final ServerPlayer owner = (ServerPlayer)colony.getOwner();
+        final Player owner = colony.getOwner();
         final Unit student = colony.findStudent(teacher);
         if (student == null) {
             cs.addMessage(owner,
@@ -221,18 +221,30 @@ public class ServerBuilding extends Building implements TurnTaker {
     public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
         if (canAutoProduce()) return;
         List<AbstractGoods> production = pi.getProduction();
-        if (!production.isEmpty()
-            && all(production, ag -> ag.getAmount() == 0)) {
-            for (GoodsType gt : transform(getInputs(),
-                                          ag -> ag.getAmount() > 0,
-                                          AbstractGoods::getType)) {
-                cs.addMessage(getOwner(),
-                    new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                     "model.building.notEnoughInput",
-                                     this, gt)
-                        .addNamed("%inputGoods%", gt)
-                        .addNamed("%building%", this)
-                        .addName("%colony%", getColony().getName()));
+        if (!production.isEmpty()) {
+            if (all(production, ag -> ag.getAmount() == 0)) {
+                for (GoodsType gt : transform(getInputs(),
+                                              ag -> ag.getAmount() > 0,
+                                              AbstractGoods::getType)) {
+                    cs.addMessage(getOwner(),
+                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                         "model.building.noProduction",
+                                         this, gt)
+                            .addNamed("%inputGoods%", gt)
+                            .addNamed("%building%", this)
+                            .addName("%colony%", getColony().getName()));
+                }
+            } else {
+                for (AbstractGoods ag : pi.getConsumptionDeficit()) {
+                    cs.addMessage(getOwner(),
+                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                         "model.building.notEnoughInput",
+                                         this, ag.getType())
+                            .addNamed("%building%", this)
+                            .addName("%colony%", getColony().getName())
+                            .addAmount("%number%", ag.getAmount())
+                            .addNamed("%goodsType%", ag.getType()));
+                }
             }
         }
     }

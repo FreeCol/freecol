@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,6 +38,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
@@ -81,7 +82,7 @@ public abstract class Settlement extends GoodsLocation
      * @param name The settlement name.
      * @param tile The containing {@code Tile}.
      */
-    public Settlement(Game game, Player owner, String name, Tile tile) {
+    protected Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
 
         this.owner = owner;
@@ -205,7 +206,7 @@ public abstract class Settlement extends GoodsLocation
      * @param tile The {@code Tile} to add.
      */
     public void addTile(Tile tile) {
-        if (!ownedTiles.contains(tile)) ownedTiles.add(tile);
+        ownedTiles.add(tile);
     }
 
     /**
@@ -233,7 +234,7 @@ public abstract class Settlement extends GoodsLocation
      * @return The line of sight value.
      */
     public int getLineOfSight() {
-        return (int)applyModifiers((float)getType().getVisibleRadius(),
+        return (int)apply((float)getType().getVisibleRadius(),
             getGame().getTurn(), Modifier.LINE_OF_SIGHT_BONUS);
     }
 
@@ -306,7 +307,7 @@ public abstract class Settlement extends GoodsLocation
         settlementTile.setSettlement(null);//-vis(owner),-til
         settlementTile.changeOwnership(null, null);//-til
         TileImprovement road = settlementTile.getRoad();
-        if (road != null && road.isVirtual()) {
+        if (road != null && road.getVirtual()) {
             settlementTile.removeRoad();//-til
         }
     }
@@ -326,7 +327,7 @@ public abstract class Settlement extends GoodsLocation
     public void changeOwner(Player newOwner) {
         final Player oldOwner = this.owner;
         if (newOwner.isIndian() != oldOwner.isIndian()) {
-            throw new IllegalArgumentException("Can not transfer settlements between native and European players.");
+            throw new RuntimeException("Can not transfer settlements between native and European players: " + oldOwner + " -> " + newOwner);
         }
         getGame().notifyOwnerChanged(this, oldOwner, newOwner);
 
@@ -370,7 +371,7 @@ public abstract class Settlement extends GoodsLocation
      * @param goodsType a {@code GoodsType} value
      * @return an {@code int} value
      */
-    public int getConsumptionOf(GoodsType goodsType) {
+    protected int getConsumptionOf(GoodsType goodsType) {
         return Math.max(0, sum(getUnits(),
                                u -> u.getType().getConsumptionOf(goodsType)));
     }
@@ -382,7 +383,7 @@ public abstract class Settlement extends GoodsLocation
      * @param goodsTypes {@code GoodsType} values
      * @return an {@code int} value
      */
-    public int getConsumptionOf(List<GoodsType> goodsTypes) {
+    protected int getConsumptionOf(List<GoodsType> goodsTypes) {
         return (goodsTypes == null) ? 0
             : sum(goodsTypes, gt -> getConsumptionOf(gt));
     }
@@ -404,13 +405,11 @@ public abstract class Settlement extends GoodsLocation
      * @param goods A list of {@code AbstractGoods}
      * @return True if the settlement can provide the equipment.
      */
-    public boolean canProvideGoods(List<AbstractGoods> goods) {
+    protected boolean canProvideGoods(List<AbstractGoods> goods) {
         return all(goods, ag -> {
                 int available = getGoodsCount(ag.getType());
                 int breedingNumber = ag.getType().getBreedingNumber();
-                if (breedingNumber != GoodsType.INFINITY) {
-                    available -= breedingNumber;
-                }
+                if (breedingNumber != INFINITY) available -= breedingNumber;
                 return available >= ag.getAmount();
             });
     }
@@ -598,18 +597,8 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public final int getRank() {
-        return Location.getRank(getTile());
+        return Location.rankOf(getTile());
     }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNameForLabel(Player player) {
-        return Messages.message(this.getLocationLabelFor(player));
-    }
-
 
     /**
      * {@inheritDoc}
@@ -795,12 +784,12 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         final Player owner = getOwner();
         if (owner == null) {
             lb.add("\n  Settlement without owner: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

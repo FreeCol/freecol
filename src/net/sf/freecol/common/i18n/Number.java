@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -64,7 +64,7 @@ public abstract class Number implements Selector {
      * @param selector a {@code double} value
      * @return a {@code String} value
      */
-    public String getKey(double selector) {
+    private String getKey(double selector) {
         return getCategory(selector).toString();
     }
 }

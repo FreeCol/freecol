@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -103,9 +103,8 @@ public class SetBuildQueueMessage extends AttributeMessage {
      * @return A list of {@code BuildableType}s.
      */
     private List<BuildableType> getQueue(Specification spec) {
-        List<String> aa = getArrayAttributes();
         return transform(getArrayAttributes(), alwaysTrue(),
-                         id -> spec.getType(id, BuildableType.class),
+                         id -> spec.getBuildableType(id),
                          toListNoNulls());
     }
 

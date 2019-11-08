@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.resources;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Map;
@@ -161,8 +162,7 @@ public class ResourceFactory {
      *      already been created, or a new instance if not.
      */
     public static void createResource(URI uri, ResourceSink output) {
-        if(findResource(uri, output))
-            return;
+        if (findResource(uri, output)) return;
 
         try {
             if ("urn".equals(uri.getScheme())) {
@@ -176,8 +176,8 @@ public class ResourceFactory {
                     fontResources.put(uri, new WeakReference<>(fr));
                 }
             } else if (uri.getPath().endsWith("\"")
-                    && uri.getPath().lastIndexOf('"',
-                            uri.getPath().length()-1) >= 0) {
+                && uri.getPath().lastIndexOf('"',
+                    uri.getPath().length()-1) >= 0) {
                 StringResource sr = new StringResource(uri);
                 output.add(sr);
                 stringResources.put(uri, new WeakReference<>(sr));
@@ -212,9 +212,8 @@ public class ResourceFactory {
                 output.add(ir);
                 imageResources.put(uri, new WeakReference<>(ir));
             }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to create resource with URI: " + uri, e);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to create " + uri, ioe);
         }
     }
-
 }

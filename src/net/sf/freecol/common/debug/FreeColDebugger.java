@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,12 +20,15 @@
 package net.sf.freecol.common.debug;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import static java.nio.file.StandardOpenOption.*;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -90,6 +93,10 @@ public class FreeColDebugger {
     /** Show full mission information? */
     private static boolean showMissionInfo = false;
 
+    /** Stream for debugLog. */
+    private static final AtomicReference<PrintStream> debugStream
+        = new AtomicReference<PrintStream>(null);
+
 
     /**
      * Is a debug mode enabled in this game?
@@ -111,12 +118,17 @@ public class FreeColDebugger {
     }
 
     /**
-     * Sets the debug mode
+     * Set a debug mode.
      *
-     * @param mode The new debug mode.
+     * @param mode The {@code DebugMode} to set.
+     * @param val The value to set to.
      */
-    private static void setDebugMode(int mode) {
-        FreeColDebugger.debugMode = mode;
+    public static void setDebugMode(DebugMode mode, boolean val) {
+        if (val) {
+            enableDebugMode(mode);
+        } else {
+            disableDebugMode(mode);
+        }
     }
 
     /**
@@ -126,6 +138,17 @@ public class FreeColDebugger {
      */
     public static void enableDebugMode(DebugMode mode) {
         FreeColDebugger.debugMode |= 1 << mode.ordinal();
+    }
+
+    /**
+     * Disable a particular debug mode.
+     *
+     * @param mode The {@code DebugMode} to disable.
+     */
+    private static void disableDebugMode(DebugMode mode) {
+        if (mode != DebugMode.MENUS) { // Can not leave menus mode!
+            FreeColDebugger.debugMode &= ~(1 << mode.ordinal());
+        }
     }
 
     /**
@@ -357,22 +380,21 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
-        FileOutputStream fos = null;
-        PrintStream prs = null;
-        try {
-            fos = new FileOutputStream("/tmp/freecol.debug", true);
-            prs = new PrintStream(fos, true, "UTF-8");
-            prs.println(msg);
-        } catch (FileNotFoundException|UnsupportedEncodingException ex) {
-            ; // Ignore failure
-        } finally {
+        PrintStream print = debugStream.get();
+        if (print == null) {
+            String tmp = System.getenv("TMPDIR");
+            if (tmp == null) tmp = "/tmp";
+            final Path path = Paths.get(tmp, "freecol.debug");
             try {
-                if (prs != null) prs.close();
-                if (fos != null) fos.close();
-            } catch (IOException ioe) {
-                ; // Ignore failure
+                OutputStream fos
+                    = Files.newOutputStream(path, CREATE, APPEND);
+                print = new PrintStream(fos, true, "UTF-8");
+            } catch (IOException ex) {
+                ; // ignored
             }
+            debugStream.set(print);
         }
+        if (print != null) print.println(msg);
     }
 
     /**
@@ -392,23 +414,10 @@ public class FreeColDebugger {
      * @param thread The {@code Thread} to print.
      * @return A stack trace as a string.
      */
-    public static String stackTraceToString(Thread thread) {
+    private static String stackTraceToString(Thread thread) {
         LogBuilder lb = new LogBuilder(512);
         addStackTrace(lb, thread);
         return lb.toString();
-    }
-
-    /**
-     * Helper that adds a stack trace to a log builder.
-     *
-     * @param lb The {@code LogBuilder} to add to.
-     * @param thread The {@code Thread} to print.
-     */
-    public static void addStackTrace(LogBuilder lb, Thread thread) {
-        for (StackTraceElement s : thread.getStackTrace()) {
-            lb.add(s.toString(), "\n");
-        }
-        lb.shrink("\n");
     }
 
     /**
@@ -421,6 +430,19 @@ public class FreeColDebugger {
     }
 
     /**
+     * Helper that adds a stack trace to a log builder.
+     *
+     * @param lb The {@code LogBuilder} to add to.
+     * @param thread The {@code Thread} to print.
+     */
+    private static void addStackTrace(LogBuilder lb, Thread thread) {
+        for (StackTraceElement s : thread.getStackTrace()) {
+            lb.add(s.toString(), "\n");
+        }
+        lb.shrink("\n");
+    }
+
+    /**
      * Log a warning with a stack trace.
      *
      * @param logger The {@code Logger} to log to.
@@ -430,6 +452,10 @@ public class FreeColDebugger {
         LogBuilder lb = new LogBuilder(512);
         lb.add(warn, "\n");
         addStackTrace(lb);
-        logger.warning(lb.toString());
+        if (logger == null) {
+            System.err.println(lb.toString());
+        } else {
+            logger.warning(lb.toString());
+        }
     }
 }

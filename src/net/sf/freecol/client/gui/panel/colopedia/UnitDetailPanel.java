@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -81,10 +81,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         super.addSubTrees(root, getId(),
-            new ArrayList<>(getSpecification().getUnitTypeList()));
+            new ArrayList<UnitType>(getSpecification().getUnitTypeList()));
     }
 
     /**

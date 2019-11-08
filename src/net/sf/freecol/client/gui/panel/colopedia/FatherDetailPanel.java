@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -86,10 +86,9 @@ public class FatherDetailPanel
         for (FoundingFather foundingFather : spec.getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
-        ImageIcon icon = new ImageIcon(ImageLibrary
-            .getScaledImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE, false));
+        ImageIcon icon = new ImageIcon(ImageLibrary.getLibertyImage());
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
-            String id = FoundingFather.getTypeKey(fatherType);
+            String id = fatherType.getTypeKey();
             String typeName = Messages.message(id);
             DefaultMutableTreeNode node
                 = new DefaultMutableTreeNode(new ColopediaTreeItem(this, id,

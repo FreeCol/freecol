@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -57,8 +57,8 @@ public class TensionTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
-        ServerPlayer european = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        ServerPlayer indian = (ServerPlayer) game.getPlayerByNationId("model.nation.tupi");
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
         NativeAIPlayer indianAI = (NativeAIPlayer)aiMain.getAIPlayer(indian);
 
         // initially, the players are unknown to each other

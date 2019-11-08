@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.util.LogBuilder;
 
@@ -66,7 +67,7 @@ public class Resource extends TileItem {
         super(game, tile);
 
         if (type == null) {
-            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
+            throw new RuntimeException("Type must not be null: " + this);
         }
         this.type = type;
         this.quantity = quantity;
@@ -163,7 +164,7 @@ public class Resource extends TileItem {
      * @param usedQuantity The quantity that was used up.
      * @return The final value of quantity.
      */
-    public int useQuantity(int usedQuantity) {
+    private int useQuantity(int usedQuantity) {
         if (quantity == UNLIMITED) {
             ; // No change
         } else if (quantity >= usedQuantity) {
@@ -272,11 +273,11 @@ public class Resource extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (type == null) {
             lb.add("\n  Resource without type: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

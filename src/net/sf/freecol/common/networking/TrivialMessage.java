@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -75,7 +75,9 @@ public abstract class TrivialMessage extends Message {
      * @param type The message type.
      */
     protected TrivialMessage(String type) {
-        super(type);
+        super();
+
+        this.type = type;
     }
 
     /**
@@ -88,11 +90,9 @@ public abstract class TrivialMessage extends Message {
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
-     * @exception FreeColException if the internal message can not be read.
      */
     protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
-                             FreeColXMLReader xr)
-        throws FreeColException, XMLStreamException {
+                             FreeColXMLReader xr) throws XMLStreamException {
         this(tag);
 
         xr.closeTag(tag);
@@ -206,13 +206,6 @@ public abstract class TrivialMessage extends Message {
      */
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean canMerge() {
-        return false;
     }
 
     /**

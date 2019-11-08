@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,13 +22,12 @@ package net.sf.freecol.common.io;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,6 +65,31 @@ public class FreeColXMLReader extends StreamReaderDelegate
     implements Closeable {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLReader.class.getName());
+
+    /** Map for the XMLStreamConstants. */
+    private static final Map<Integer, String> tagStrings
+        = makeUnmodifiableMap(new Integer[] {
+                XMLStreamConstants.ATTRIBUTE,
+                XMLStreamConstants.CDATA,
+                XMLStreamConstants.CHARACTERS,
+                XMLStreamConstants.COMMENT,
+                XMLStreamConstants.DTD,
+                XMLStreamConstants.END_DOCUMENT,
+                XMLStreamConstants.END_ELEMENT,
+                XMLStreamConstants.ENTITY_DECLARATION,
+                XMLStreamConstants.ENTITY_REFERENCE,
+                XMLStreamConstants.NAMESPACE,
+                XMLStreamConstants.NOTATION_DECLARATION,
+                XMLStreamConstants.PROCESSING_INSTRUCTION,
+                XMLStreamConstants.SPACE,
+                XMLStreamConstants.START_DOCUMENT,
+                XMLStreamConstants.START_ELEMENT },
+            new String[] {
+                "Attribute", "CData", "Characters", "Comment", "DTD",
+                "EndDocument", "EndElement", "EntityDeclaration",
+                "EntityReference", "Namespace", "NotationDeclaration",
+                "ProcessingInstruction", "Space", "StartDocument",
+                "StartElement" });
 
     public static enum ReadScope {
         SERVER,     // Loading the game in the server
@@ -127,12 +151,11 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * Creates a new {@code FreeColXMLReader}.
      *
      * @param file The {@code File} to create an {@code FreeColXMLReader} for.
+     * @exception IOException if the file is missing.
      * @exception XMLStreamException can be thrown while creating the reader.
-     * @exception FileNotFoundException if the file is missing.
      */
-    public FreeColXMLReader(File file)
-        throws FileNotFoundException, XMLStreamException {
-        this(new FileInputStream(file));
+    public FreeColXMLReader(File file) throws IOException, XMLStreamException {
+        this(Files.newInputStream(file.toPath()));
     }
     
     /**
@@ -291,7 +314,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         // games upgraded from 0.10.x could still contain them.  We
         // should have done this earlier, but that fell through the
         // cracks...
-        int idx = id.indexOf(":");
+        int idx = id.indexOf(':');
         if (idx > 10) {
             String prefix = id.substring(0, idx);
             if ("tileitemcontainer".equals(prefix)) {
@@ -305,31 +328,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
         return id;
     }
     // end @compat 0.11.x
-
-    /** Map for the XMLStreamConstants. */
-    private static final Map<Integer, String> tagStrings
-        = makeUnmodifiableMap(new Integer[] {
-                XMLStreamConstants.ATTRIBUTE,
-                XMLStreamConstants.CDATA,
-                XMLStreamConstants.CHARACTERS,
-                XMLStreamConstants.COMMENT,
-                XMLStreamConstants.DTD,
-                XMLStreamConstants.END_DOCUMENT,
-                XMLStreamConstants.END_ELEMENT,
-                XMLStreamConstants.ENTITY_DECLARATION,
-                XMLStreamConstants.ENTITY_REFERENCE,
-                XMLStreamConstants.NAMESPACE,
-                XMLStreamConstants.NOTATION_DECLARATION,
-                XMLStreamConstants.PROCESSING_INSTRUCTION,
-                XMLStreamConstants.SPACE,
-                XMLStreamConstants.START_DOCUMENT,
-                XMLStreamConstants.START_ELEMENT },
-            new String[] {
-                "Attribute", "CData", "Characters", "Comment", "DTD",
-                "EndDocument", "EndElement", "EntityDeclaration",
-                "EntityReference", "Namespace", "NotationDeclaration",
-                "ProcessingInstruction", "Space", "StartDocument",
-                "StartElement" });
 
     /**
      * {@inheritDoc}
@@ -346,9 +344,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 System.err.println(getLocalName() + "]");
                 break;
             default:
-                System.err.println((tagStrings.containsKey(tag))
-                    ? tagStrings.get(tag)
-                    : "Weird tag: " + tag);
+                String val = tagStrings.get(tag);
+                System.err.println((val == null) ? "Weird tag: " + tag : val);
                 break;
             }
         }
@@ -682,7 +679,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @return A map of attributes.
      */
     public Map<String, String> getAttributeMap(String... attributes) {
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(attributes.length);
         for (String a : attributes) ret.put(a, getAttribute(a, (String)null));
         return ret;
     }
@@ -712,8 +709,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @return A map of all the attributes.
      */
     public Map<String, String> getAllAttributes() {
-        Map<String, String> ret = new HashMap<>();
         int n = getParent().getAttributeCount();
+        Map<String, String> ret = new HashMap<>(n);
         for (int i = 0; i < n; i++) {
             String key = getParent().getAttributeLocalName(i);
             String value = getParent().getAttributeValue(i);
@@ -871,7 +868,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
         String id = readId();
         if (id == null) {
-            throw new XMLStreamException("Object identifier not found.");
+            throw new XMLStreamException("Null object identifier for: " + returnClass.getName());
         }
         T ret;
         FreeColObject fco = uninterned.get(id);
@@ -919,15 +916,15 @@ public class FreeColXMLReader extends StreamReaderDelegate
     /**
      * Read a {@code FreeColObject} from a stream.
      *
+     * @param <T> The actual return type.
      * @param game The {@code Game} to look in.
-     * @param returnClass The class to expect.
      * @return The {@code FreeColObject} found.
      * @exception XMLStreamException if there is problem reading the stream.
      */
     public <T extends FreeColObject> T readFreeColObject(Game game)
         throws XMLStreamException {
         final String tag = getLocalName();
-        Class<T> returnClass = FreeColObject.getFreeColObjectClass(tag);
+        Class<T> returnClass = FreeColObject.getFreeColObjectClassByName(tag);
         if (returnClass == null) {
             throw new XMLStreamException("No class: " + tag);
         }
@@ -1059,7 +1056,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             getAttribute(attributeName, (String)null);
 
         return (attrib == null) ? defaultValue
-            : spec.getType(attrib, returnClass);
+            : spec.findType(attrib, returnClass);
     }
 
     /**

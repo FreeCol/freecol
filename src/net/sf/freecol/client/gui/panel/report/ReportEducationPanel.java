@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -66,7 +66,8 @@ public final class ReportEducationPanel extends ReportPanel {
                     reportPanel.add(bp);
                     JPanel teacherPanel = getPanel("report.education.teachers");
                     List<Unit> teachers = transform(colony.getUnits(),
-                        u -> building.canAdd(u), Function.identity(),
+                        u -> building.canAdd(u),
+                        Function.<Unit>identity(),
                         Unit.increasingSkillComparator);
                     for (Unit u : teachers) {
                         teacherPanel.add(new UnitLabel(freeColClient, u,

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,8 +19,10 @@
 
 package net.sf.freecol.tools;
 
+import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 
@@ -79,7 +81,7 @@ public class ColonizationSaveGameReader {
 
     }
 
-    private class ColonyData {
+    private static class ColonyData {
 
         public static final int LENGTH = 202;
         public static final int COLONIST_OCCUPATION = 0x20;
@@ -185,8 +187,8 @@ public class ColonizationSaveGameReader {
 
     private final byte[] data;
 
-    public ColonizationSaveGameReader(byte[] data) {
-        this.data = data;
+    private ColonizationSaveGameReader(byte[] data) {
+        this.data = Arrays.copyOf(data, data.length);
     }
 
     public static void main(String[] args) throws Exception {
@@ -194,9 +196,12 @@ public class ColonizationSaveGameReader {
         byte[] data;
         try (RandomAccessFile reader = new RandomAccessFile(args[0], "r")) {
             data = new byte[(int) reader.length()];
-            reader.read(data);
+            reader.readFully(data);
+            new ColonizationSaveGameReader(data).run();
+        } catch (EOFException ee) {
+            System.err.println("Could not read from " + args[0] + ": " + ee);
+            System.exit(1);
         }
-        new ColonizationSaveGameReader(data).run();
     }
 
 
@@ -222,16 +227,8 @@ public class ColonizationSaveGameReader {
 
     public static String getString(byte[] data, int start, int length) {
         byte[] bytes = Arrays.copyOfRange(data, start, start + length);
-        try {
-            String value = new String(bytes, "UTF-8");
-            int index = value.indexOf(0);
-            if (index < 0) {
-                return value;
-            } else {
-                return value.substring(0, index);
-            }
-        } catch (UnsupportedEncodingException uee) {
-            return null;
-        }
+        String value = new String(bytes, StandardCharsets.UTF_8);
+        int index = value.indexOf(0);
+        return (index < 0) ? value : value.substring(0, index);
     }
 }

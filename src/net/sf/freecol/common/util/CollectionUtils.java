@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -69,15 +70,15 @@ public class CollectionUtils {
 
     /** Useful comparators for mapEntriesBy* */
     public static final Comparator<Integer> ascendingIntegerComparator
-        = Comparator.comparingInt(i -> i);
+        = Comparator.comparingInt(Integer::intValue);
     public static final Comparator<Integer> descendingIntegerComparator
         = ascendingIntegerComparator.reversed();
     public static final Comparator<Double> ascendingDoubleComparator
-        = Comparator.comparingDouble(d -> d);
+        = Comparator.comparingDouble(Double::doubleValue);
     public static final Comparator<Double> descendingDoubleComparator
         = ascendingDoubleComparator.reversed();
     public static final Comparator<List<?>> ascendingListLengthComparator
-        = Comparator.comparingInt(l -> l.size());
+        = Comparator.comparingInt(List::size);
     public static final Comparator<List<?>> descendingListLengthComparator
         = ascendingListLengthComparator.reversed();
 
@@ -91,7 +92,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> Set<T> makeUnmodifiableSet(T... members) {
-        Set<T> tmp = new HashSet<>();
+        Set<T> tmp = new HashSet<>(members.length);
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableSet(tmp);
     }
@@ -105,7 +106,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> List<T> makeUnmodifiableList(T... members) {
-        List<T> tmp = new ArrayList<>();
+        List<T> tmp = new ArrayList<>(members.length);
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableList(tmp);
     }
@@ -123,9 +124,10 @@ public class CollectionUtils {
      */
     public static <K,V> Map<K,V> makeUnmodifiableMap(K[] keys, V[] values) {
         if (keys.length != values.length) {
-            throw new RuntimeException("Length mismatch");
+            throw new RuntimeException("Length mismatch: " + keys.length
+                + " != " + values.length);
         }
-        Map<K,V> tmp = new HashMap<K,V>();
+        Map<K,V> tmp = new HashMap<K,V>(keys.length);
         for (int i = 0; i < keys.length; i++) {
             tmp.put(keys[i], values[i]);
         }
@@ -143,7 +145,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> Map<T, T> asMap(T... values) {
-        Map<T, T> ret = new HashMap<>();
+        Map<T, T> ret = new HashMap<>(values.length / 2);
         for (int i = 0; i < values.length-1; i += 2) {
             ret.put(values[i], values[i+1]);
         }
@@ -173,10 +175,11 @@ public class CollectionUtils {
 
     public static <K,V> void accumulateToMap(Map<K,V> map, K key, V value,
                                              BinaryOperator<V> accumulator) {
-        if (map.containsKey(key)) {
-            map.put(key, accumulator.apply(map.get(key), value));
-        } else {
+        V val = map.get(key);
+        if (val == null) {
             map.put(key, value);
+        } else {
+            map.put(key, accumulator.apply(val, value));
         }
     }
 
@@ -195,9 +198,10 @@ public class CollectionUtils {
      * @return The new count associated with the key.
      */
     public static <K> int incrementMapCount(Map<K, Integer> map, K key) {
-        int count = map.containsKey(key) ? map.get(key) : 0;
-        map.put(key, count+1);
-        return count+1;
+        Integer val = map.get(key);
+        if (val == null) val = 1; else val += 1;
+        map.put(key, val);
+        return val;
     }
 
     /**
@@ -236,8 +240,11 @@ public class CollectionUtils {
                     // FIXME: see if we can do it with one array:-)
                     @Override
                     public List<T> next() {
+                        if (!hasNext()) {
+                            throw new NoSuchElementException("Permutations exhausted: " + n);
+                        }
                         List<T> pick = new ArrayList<>(original);
-                        List<T> result = new ArrayList<>();
+                        List<T> result = new ArrayList<>(n);
                         int current = index++;
                         int divisor = np;
                         for (int i = n; i > 0; i--) {
@@ -251,7 +258,7 @@ public class CollectionUtils {
 
                     @Override
                     public void remove() {
-                        throw new RuntimeException("remove() not implemented");
+                        throw new RuntimeException("remove() not implemented: " + this);
                     }
                 };
             }
@@ -1045,7 +1052,8 @@ public class CollectionUtils {
      */
     public static <K,V> void forEachMapEntry(Map<K,V> map,
                                              Consumer<Entry<K,V>> consumer) {
-        if (map != null && !map.isEmpty() && consumer != null) {
+        if (consumer != null
+            && map != null && !map.isEmpty()) {
             forEach_internal(map.entrySet().stream(), alwaysTrue(), consumer);
         }
     }
@@ -1062,7 +1070,8 @@ public class CollectionUtils {
     public static <K,V> void forEachMapEntry(Map<K,V> map,
                                              Predicate<Entry<K,V>> predicate,
                                              Consumer<Entry<K,V>> consumer) {
-        if (map != null && !map.isEmpty() && consumer != null) {
+        if (consumer != null
+            && map != null && !map.isEmpty()) {
             forEach_internal(map.entrySet().stream(), predicate, consumer);
         }
     }
@@ -1927,9 +1936,9 @@ public class CollectionUtils {
      * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
-    public static <T> double product_internal(Stream<T> stream,
-                                              Predicate<? super T> predicate,
-                                              ToDoubleFunction<T> tdf) {
+    private static <T> double product_internal(Stream<T> stream,
+                                               Predicate<? super T> predicate,
+                                               ToDoubleFunction<T> tdf) {
         final DoubleBinaryOperator mult = (d1, d2) -> d1 * d2;
         return stream.filter(predicate).mapToDouble(tdf)
             .reduce(PRODUCT_DEFAULT, mult);

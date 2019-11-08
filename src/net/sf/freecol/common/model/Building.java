@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,6 +42,8 @@ public class Building extends WorkLocation
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
+
+    private final static double EPSILON = 0.0001;
 
     public static final String TAG = "building";
     
@@ -156,7 +158,7 @@ public class Building extends WorkLocation
             : map(unitType.getModifiers(id, getType(), turn),
                 m -> {
                     return (m.getType() == Modifier.ModifierType.ADDITIVE)
-                        ? new Modifier(m).setValue(m.getValue() * competence)
+                        ? Modifier.makeModifier(m).setValue(m.getValue() * competence)
                         : m;
                 });
     }
@@ -268,9 +270,9 @@ public class Building extends WorkLocation
                 if (available >= capacity) {
                     minimumRatio = maximumRatio = 0.0;
                 } else {
-                    int divisor = (int)getType().applyModifiers(0f, turn,
+                    int divisor = (int)getType().apply(0f, turn,
                         Modifier.BREEDING_DIVISOR);
-                    int factor = (int)getType().applyModifiers(0f, turn,
+                    int factor = (int)getType().apply(0f, turn,
                         Modifier.BREEDING_FACTOR);
                     int production = (available < goodsType.getBreedingNumber()
                         || divisor <= 0) ? 0
@@ -289,7 +291,7 @@ public class Building extends WorkLocation
                 // Unattended production always applies for buildings!
                 production += getBaseProduction(null, goodsType, null);
                 production = applyModifiers(production, turn,
-                    getProductionModifiers(goodsType, null));
+                                            getProductionModifiers(goodsType, null));
                 production = (int)Math.floor(production);
                 // Beware!  If we ever unify this code with ColonyTile,
                 // ColonyTiles have outputs with zero amount.
@@ -346,12 +348,11 @@ public class Building extends WorkLocation
             }
         }
 
-        final double epsilon = 0.0001;
         for (AbstractGoods input : iterable(getInputs())) {
             GoodsType type = input.getType();
             // maximize consumption
             int consumption = (int)Math.floor(input.getAmount()
-                * minimumRatio + epsilon);
+                * minimumRatio + EPSILON);
             int maximumConsumption = (int)Math.floor(input.getAmount()
                 * maximumRatio);
             result.addConsumption(new AbstractGoods(type, consumption));
@@ -364,7 +365,7 @@ public class Building extends WorkLocation
             // minimize production, but add a magic little something
             // to counter rounding errors
             int production = (int)Math.floor(output.getAmount() * minimumRatio
-                + epsilon);
+                + EPSILON);
             int maximumProduction = (int)Math.floor(output.getAmount()
                 * maximumRatio);
             result.addProduction(new AbstractGoods(type, production));
@@ -462,7 +463,7 @@ public class Building extends WorkLocation
     //   WorkLocation.getClaimTemplate: buildings do not need to be claimed.
 
     @Override
-    public Boolean goodSuggestionCheck(UnitType better, Unit unit, GoodsType goodsType) {
+    public boolean goodSuggestionCheck(UnitType better, Unit unit, GoodsType goodsType) {
         // Make sure the type can be added.
         if (this.canAddType(better)) {
             Colony colony = getColony();
@@ -622,6 +623,14 @@ public class Building extends WorkLocation
     @Override
     public int getPriority() {
         return getType().getPriority();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Stream<Modifier> getConsumptionModifiers(String id) {
+        return getModifiers(id);
     }
 
 

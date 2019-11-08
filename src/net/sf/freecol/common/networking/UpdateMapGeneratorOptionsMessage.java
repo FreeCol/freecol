@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -112,8 +112,6 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
-        final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = getMapGeneratorOptions();
 
         if (freeColClient.isInGame()) {
@@ -129,14 +127,14 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        if (serverPlayer == null || !serverPlayer.isAdmin()) {
+        if (serverPlayer == null) {
+            return ChangeSet.clientError((ChangeSet.See)null, "Missing serverPlayer");
+        } else if (!serverPlayer.isAdmin()) {
             return serverPlayer.clientError("Not an admin: " + serverPlayer);
-        }
-        if (freeColServer.getServerState() != FreeColServer.ServerState.PRE_GAME) {
+        } else if (freeColServer.getServerState() != FreeColServer.ServerState.PRE_GAME) {
             return serverPlayer.clientError("Can not change map generator options, "
                 + "server state = " + freeColServer.getServerState());
         }
-        final Specification spec = freeColServer.getGame().getSpecification();
         final OptionGroup mapOptions = getMapGeneratorOptions();
         if (mapOptions == null) {
             return serverPlayer.clientError("No map generator options to merge");

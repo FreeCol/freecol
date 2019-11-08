@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -55,7 +55,7 @@ import net.sf.freecol.server.ai.TileImprovementPlan;
 /**
  * Mission for controlling a pioneer.
  */
-public class PioneeringMission extends Mission {
+public final class PioneeringMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
@@ -94,7 +94,9 @@ public class PioneeringMission extends Mission {
      * @param target The target {@code Location}.
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**
@@ -134,7 +136,7 @@ public class PioneeringMission extends Mission {
      * @param tile The {@code Tile} to get a plan for.
      * @return The {@code TileImprovementPlan}, or null if not found.
      */
-    private static TileImprovementPlan getBestPlan(AIUnit aiUnit, Tile tile) {
+    private static TileImprovementPlan getBestMissionPlan(AIUnit aiUnit, Tile tile) {
         return ((EuropeanAIPlayer)aiUnit.getAIOwner()).getBestPlan(tile);
     }
 
@@ -195,7 +197,7 @@ public class PioneeringMission extends Mission {
      * @param aiUnit The pioneer {@code AIUnit} to check.
      * @return True if the pioneer has tools.
      */
-    private static boolean hasTools(AIUnit aiUnit) {
+    private static boolean hasMissionTools(AIUnit aiUnit) {
         return aiUnit.getUnit().hasAbility(Ability.IMPROVE_TERRAIN);
     }
 
@@ -205,7 +207,7 @@ public class PioneeringMission extends Mission {
      * @return True if the pioneer has tools.
      */
     private boolean hasTools() {
-        return hasTools(getAIUnit());
+        return hasMissionTools(getAIUnit());
     }
 
     /**
@@ -215,14 +217,14 @@ public class PioneeringMission extends Mission {
      * @param path A {@code PathNode} to extract a target from.
      * @return A target for this mission, or null if none found.
      */
-    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+    private static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         return (loc == null) ? null
-            : ((hasTools(aiUnit))
-                ? ((invalidReason(aiUnit, loc.getTile()) != null) ? null
+            : ((hasMissionTools(aiUnit))
+                ? ((invalidTileReason(aiUnit, loc.getTile()) != null) ? null
                     : loc.getTile())
-                : ((invalidReason(aiUnit, loc.getColony()) != null) ? null
+                : ((invalidColonyReason(aiUnit, loc.getColony()) != null) ? null
                     : loc.getColony()));
     }
 
@@ -236,10 +238,10 @@ public class PioneeringMission extends Mission {
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
         final Location loc = extractTarget(aiUnit, path);
-        if (hasTools(aiUnit)) {
+        if (hasMissionTools(aiUnit)) {
             TileImprovementPlan tip;
             if (loc instanceof Tile
-                && (tip = getBestPlan(aiUnit, (Tile)loc)) != null) {
+                && (tip = getBestMissionPlan(aiUnit, (Tile)loc)) != null) {
                 return 1000 * tip.getValue() / (path.getTotalTurns() + 1);
             }
         } else {
@@ -292,8 +294,8 @@ public class PioneeringMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
@@ -337,14 +339,14 @@ public class PioneeringMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, false);
         if (path != null) return extractTarget(aiUnit, path);
         if (deferOK) return getBestPioneeringColony(aiUnit);
         Location loc = findCircleTarget(aiUnit, getGoalDecider(aiUnit, false),
                                         range*3, false);
-        return (hasTools(aiUnit)) ? loc : Location.upLoc(loc);
+        return (hasMissionTools(aiUnit)) ? loc : Location.upLoc(loc);
     }
 
     /**
@@ -355,14 +357,14 @@ public class PioneeringMission extends Mission {
      *     if none.
      */
     public static String prepare(AIUnit aiUnit) {
-        String reason = invalidReason(aiUnit);
+        String reason = invalidUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
-        if (!hasTools(aiUnit)
+        if (!hasMissionTools(aiUnit)
             && !aiUnit.equipForRole(unit.getSpecification().getPioneerRole())) {
             return "unit-could-not-equip";
         }
-        return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
+        return (hasMissionTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
             ? null
             : "unit-missing-tools";
     }
@@ -374,7 +376,7 @@ public class PioneeringMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null) ? reason
             : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
@@ -394,7 +396,7 @@ public class PioneeringMission extends Mission {
         Role role = aiUnit.getUnit().getSpecification().getRole("model.role.pioneer");
         return (reason != null)
             ? reason
-            : (!hasTools(aiUnit)
+            : (!hasMissionTools(aiUnit)
                && !colony.canProvideGoods(role.getRequiredGoodsList()))
             ? "colony-can-not-provide-equipment"
             : null;
@@ -427,10 +429,10 @@ public class PioneeringMission extends Mission {
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
         return (tile == null)
             ? Mission.TARGETINVALID
-            : (!hasTools(aiUnit))
+            : (!hasMissionTools(aiUnit))
             ? "unit-needs-tools"
             : (getPlan(aiUnit, tile) == null
-                && getBestPlan(aiUnit, tile) == null)
+                && getBestMissionPlan(aiUnit, tile) == null)
             ? "tile-has-no-plan"
             : (tile.getOwningSettlement() != null)
             ? invalidTargetReason(tile.getOwningSettlement(),
@@ -444,8 +446,8 @@ public class PioneeringMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -455,14 +457,14 @@ public class PioneeringMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
             : (loc instanceof Tile)
             ? invalidTileReason(aiUnit, (Tile)loc)
             : (loc instanceof Colony)
-            ? ((aiUnit.getUnit().getLocation() instanceof Tile)
+            ? ((aiUnit.getUnit().isOnTile())
                 ? invalidColonyReason(aiUnit, (Colony)loc)
                 : invalidTargetReason(loc, aiUnit.getUnit().getOwner()))
             : Mission.TARGETINVALID;
@@ -507,7 +509,7 @@ public class PioneeringMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 10, true);
+        return findMissionTarget(getAIUnit(), 10, true);
     }
     
     /**
@@ -522,7 +524,7 @@ public class PioneeringMission extends Mission {
             }
             if (tileImprovementPlan.isComplete()) return null;
         }
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -606,13 +608,13 @@ public class PioneeringMission extends Mission {
             if (aiUnit.equipForRole(getSpecification().getPioneerRole())
                 && hasTools()) {
                 lb.add(", equips");
-                newTarget = findTarget(aiUnit, 10, false);
+                newTarget = findMissionTarget(aiUnit, 10, false);
                 if (newTarget == null) {
                     return lbFail(lb, false, "no pioneering target");
                 }
             } else {
                 lb.add(", fails to equip");
-                newTarget = findTarget(aiUnit, 10, false);
+                newTarget = findMissionTarget(aiUnit, 10, false);
                 if (newTarget == null
                     || Map.isSameLocation(newTarget, getTarget())) {
                     return lbFail(lb, false, "no tools target");
@@ -644,7 +646,7 @@ public class PioneeringMission extends Mission {
             }
 
             lbAt(lb);
-            newTarget = findTarget(aiUnit, 10, false);
+            newTarget = findMissionTarget(aiUnit, 10, false);
             if (newTarget == null) {
                 return lbFail(lb, false, "found no pioneering target");
             }
@@ -727,7 +729,7 @@ public class PioneeringMission extends Mission {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
                 lb.add(", land claim failed at ", tile);
-                if ((newTarget = findTarget(aiUnit, 10, false)) == null) {
+                if ((newTarget = findMissionTarget(aiUnit, 10, false)) == null) {
                     return lbFail(lb, false, "no alternate target");
                 }
                 setTarget(newTarget);

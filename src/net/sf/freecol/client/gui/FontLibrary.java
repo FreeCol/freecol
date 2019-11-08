@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -210,8 +210,7 @@ public class FontLibrary {
         Font font = (fontKey == null)
             ? mainFont
             : ResourceManager.getFont(fontKey);
-        font = font.deriveFont(style, scaledSize);
-        return font;
+        return font.deriveFont(style, scaledSize);
     }
 
     /**
@@ -228,28 +227,27 @@ public class FontLibrary {
      * @param scaleFactor The applied scale factor.
      * @return The created Font.
      */
-    public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize,
-                                            int style, float scaleFactor) {
+    private static Font createCompatibleFont(String string, FontType fontType,
+                                             FontSize fontSize,
+                                             int style, float scaleFactor) {
         // TODO: Consider testing the normal font for compatibility and try
         //       some or all other available fonts for complete/longest match:
         //       header/simple->main->normal->simple/header->emergency
         float scaledSize = calcScaledSize(fontSize, scaleFactor);
         String fontKey = getFontKey(fontType);
         Font font = null;
-        if(fontType != FontType.NORMAL) {
+        if (fontType != FontType.NORMAL) {
             font = ResourceManager.getFont(fontKey);
-            if(font.canDisplayUpTo(string) != -1)
+            if (font.canDisplayUpTo(string) != -1)
                 font = null;
         }
-        if(font == null) {
+        if (font == null) {
             fontKey = getFontKey(FontType.NORMAL);
             font = (fontKey == null)
                 ? mainFont
                 : ResourceManager.getFont(fontKey);
         }
-        font = font.deriveFont(style, scaledSize);
-        return font;
+        return font.deriveFont(style, scaledSize);
     }
 
     private static float calcScaledSize(FontSize fontSize, float scaleFactor) {

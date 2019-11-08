@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -349,7 +349,7 @@ public class ColonyTile extends WorkLocation {
     // Interface WorkLocation
 
     @Override
-    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
+    protected boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
         final Tile tile = getWorkTile();
         final Player owner = getOwner();
         return owner.owns(tile) || owner.canClaimForSettlement(tile);

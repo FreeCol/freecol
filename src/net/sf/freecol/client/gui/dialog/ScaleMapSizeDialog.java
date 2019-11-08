@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -70,7 +70,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
          * size, new size etc).
          */
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
         JPanel widthPanel = new JPanel(new FlowLayout());
         JPanel heightPanel = new JPanel(new FlowLayout());
         String str;
@@ -104,11 +104,11 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         inputWidth.addActionListener(al);
         inputHeight.addActionListener(al);
 
-        final Dimension fake = null;
         List<ChoiceItem<Dimension>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), fake).okOption());
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                               (Dimension)null).okOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (Dimension)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, null, c);
     }
 

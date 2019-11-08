@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -91,7 +91,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      */
     private void setFatherAttributes(List<FoundingFather> fathers) {
         setStringAttributeMap(transform(fathers, alwaysTrue(),
-                Function.identity(),
+                Function.<FoundingFather>identity(),
                 Collectors.toMap(ff -> ff.getType().getKey(),
                                  FoundingFather::getId)));
     }
@@ -103,7 +103,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * @return A map of attributes.
      */
     private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(fatherKeys.size());
         for (String key : fatherKeys) {
             String val = xr.getAttribute(key, (String)null);
             ret.put(key, val);

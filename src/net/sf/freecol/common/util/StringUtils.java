@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.awt.FontMetrics;
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +62,7 @@ public class StringUtils {
      * @return Each of the strings in the given array delimited by the given
      *         string.
      */
-    public static String join(String delimiter, List<String> strings) {
+    public static String join(String delimiter, Collection<String> strings) {
         return join(delimiter, strings.toArray(new String[0]));
     }
 
@@ -154,7 +155,7 @@ public class StringUtils {
      * @param delim Characters to consider as word delimiting.
      * @return The best breaking point or negative if none found.
      */
-    public static int getBreakingPoint(String string, String delim) {
+    private static int getBreakingPoint(String string, String delim) {
         int center = string.length() / 2;
         for (int offset = 0; offset < center; offset++) {
             if (delim.indexOf(string.charAt(center + offset)) >= 0) {
@@ -233,7 +234,7 @@ public class StringUtils {
      */
     public static String capitalize(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s
-            : s.substring(0, 1).toUpperCase(locale) + s.substring(1);
+            : upCase(s.substring(0, 1), locale) + s.substring(1);
     }
 
     /**
@@ -253,7 +254,7 @@ public class StringUtils {
      * @param locale The {@code Locale} to apply.
      * @return The converted string.
      */
-    public static String downCase(String s, Locale locale) {
+    private static String downCase(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s : s.toLowerCase(locale);
     }
 
@@ -274,9 +275,7 @@ public class StringUtils {
      * @param locale The {@code Locale} to apply.
      * @return The converted string.
      */
-    public static String upCase(String s, Locale locale) {
+    private static String upCase(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s : s.toUpperCase(locale);
     }
-
-   
 }

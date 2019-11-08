@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -211,9 +211,10 @@ public class TileTypeChange extends FreeColSpecObjectType {
     @Override
     public boolean equals(Object other) {
         if (other instanceof TileTypeChange) {
-            return this.compareTo((TileTypeChange)other) == 0;
+            return this.compareTo((TileTypeChange)other) == 0
+                && super.equals(other);
         }
-        return super.equals(other);
+        return false;
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -49,7 +49,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for controlling a scout.
  */
-public class ScoutingMission extends Mission {
+public final class ScoutingMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(ScoutingMission.class.getName());
 
@@ -76,7 +76,9 @@ public class ScoutingMission extends Mission {
      * @param target The target {@code Location}.
      */
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**
@@ -191,8 +193,8 @@ public class ScoutingMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
@@ -214,14 +216,13 @@ public class ScoutingMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A {@code PathNode} to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
-        Location ret = Location.upLoc((path != null)
+        return Location.upLoc((path != null)
             ? extractTarget(aiUnit, path)
             : findCircleTarget(aiUnit,
                 getGoalDecider(aiUnit, deferOK), range*3, deferOK));
-        return ret;
     }
 
     /**
@@ -233,7 +234,7 @@ public class ScoutingMission extends Mission {
      *     if none.
      */
     public static String prepare(AIUnit aiUnit) {
-        String reason = invalidReason(aiUnit);
+        String reason = invalidMissionReason(aiUnit);
         return (reason != null) ? reason
             : (canScoutNatives(aiUnit)
                 || aiUnit.equipForRole(aiUnit.getUnit().getSpecification()
@@ -249,7 +250,7 @@ public class ScoutingMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null) ? reason
             : (!canScoutNatives(aiUnit)) ? "unit-not-a-SCOUT"
@@ -326,8 +327,8 @@ public class ScoutingMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -337,7 +338,7 @@ public class ScoutingMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -384,7 +385,7 @@ public class ScoutingMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
+        return findMissionTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -392,7 +393,7 @@ public class ScoutingMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -470,7 +471,7 @@ public class ScoutingMission extends Mission {
         // the mission.
         lbAt(lb);
         Location completed = getTarget();
-        Location newTarget = findTarget(aiUnit, 20, false);
+        Location newTarget = findMissionTarget(aiUnit, 20, false);
         if (newTarget == null
             || (completed instanceof Colony && newTarget == completed)) {
             if (completed instanceof Colony && canScoutNatives(aiUnit)) {

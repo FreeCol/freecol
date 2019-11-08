@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -48,7 +48,7 @@ public final class ColorChooserPanel extends FreeColPanel {
      * @param l The ActionListener for the OK and cancel buttons.
      */
     public ColorChooserPanel(FreeColClient freeColClient, ActionListener l) {
-        super(freeColClient, new MigLayout("", "", ""));
+        super(freeColClient, null, new MigLayout("", "", ""));
 
         this.colorChooser = new JColorChooser();
         add(this.colorChooser);

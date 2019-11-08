@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -91,9 +91,11 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * Gets the Specification.
      *
      * @return The {@code Specification}, or null if none present.
-     * @exception IOException if an error occurs reading the specification.
+     * @exception IOException if an error occurs creating a stream to read.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
-    public Specification getSpecification() throws IOException {
+    public Specification getSpecification() throws IOException,
+                                                   XMLStreamException {
         try (InputStream si = getSpecificationInputStream()) {
             return (si == null) ? null : new Specification(si);
         }
@@ -115,7 +117,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      *
      * @exception IOException if thrown while reading the "mod.xml" file.
      */
-    protected void readModDescriptor() throws IOException {
+    protected final void readModDescriptor() throws IOException {
         try (
             FreeColXMLReader xr
                 = new FreeColXMLReader(getModDescriptorInputStream());

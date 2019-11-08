@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -51,7 +52,7 @@ import net.sf.freecol.common.util.RandomChoice;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * {@code Colony} where working is possible.
  */
-public class Colony extends Settlement implements Nameable, TradeLocation {
+public class Colony extends Settlement implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -384,7 +385,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Set the build queue.
      *
-     * @param newBuildQueue A list of new values for the build queue.
+     * @param buildQueue A list of new values for the build queue.
      */
     public void setBuildQueue(final List<BuildableType> buildQueue) {
         this.buildQueue.setValues(buildQueue);
@@ -402,7 +403,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Set the population queue.
      *
-     * @param newPopulationQueue A list of new values for the population queue.
+     * @param populationQueue A list of new values for the population queue.
      */
     public void setPopulationQueue(final List<UnitType> populationQueue) {
         this.populationQueue.setValues(populationQueue);
@@ -638,10 +639,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public Stream<WorkLocation> getAllWorkLocations() {
         Stream<WorkLocation> ret = Stream.<WorkLocation>empty();
         synchronized (this.colonyTiles) {
-            ret = concat(ret, map(this.colonyTiles, ct -> (WorkLocation)ct));
+            ret = concat(ret, map(this.colonyTiles,
+                                  Function.<WorkLocation>identity()));
         }
         synchronized (this.buildingMap) {
-            ret = concat(ret, map(this.buildingMap.values(), b -> (WorkLocation)b));
+            ret = concat(ret, map(this.buildingMap.values(),
+                                  Function.<WorkLocation>identity()));
         }
         return ret;
     }
@@ -929,7 +932,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return True if the building is available at zero cost.
      */
     public boolean isAutomaticBuild(BuildingType buildingType) {
-        float value = owner.applyModifiers(100f, getGame().getTurn(),
+        float value = owner.apply(100f, getGame().getTurn(),
                 Modifier.BUILDING_PRICE_BONUS, buildingType);
         return value == 0f && canBuild(buildingType);
     }
@@ -1023,8 +1026,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public boolean canBreed(GoodsType goodsType) {
         int breedingNumber = goodsType.getBreedingNumber();
-        return (breedingNumber < GoodsType.INFINITY &&
-                breedingNumber <= getGoodsCount(goodsType));
+        return (breedingNumber < INFINITY
+            && breedingNumber <= getGoodsCount(goodsType));
     }
 
     /**
@@ -1220,9 +1223,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<GoodsType> libertyTypeList = getSpecification()
                 .getLibertyGoodsTypeList();
         final int uc = getUnitCount();
-        if (calculateRebels(uc, sonsOfLiberty) <= uc + 1
-                && amount > 0
-                && !libertyTypeList.isEmpty()) {
+        if (amount > 0 && !libertyTypeList.isEmpty()
+            && calculateRebels(uc, sonsOfLiberty) <= uc + 1) {
             addGoods(libertyTypeList.get(0), amount);
         }
         updateSoL();
@@ -1279,7 +1281,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         float membership = (liberty * 100.0f) / (LIBERTY_PER_REBEL * uc);
         membership = applyModifiers(membership, getGame().getTurn(),
-                getOwner().getModifiers(Modifier.SOL));
+                                    getOwner().getModifiers(Modifier.SOL));
         if (membership < 0.0f) {
             membership = 0.0f;
         } else if (membership > 100.0f) {
@@ -1363,7 +1365,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             }
             return -i;
         } else {
-            final Specification spec = getSpecification();
             limit = CHANGE_UPPER_BOUND;
             for (i = 1; i <= limit; i++) {
                 if (governmentChange(pop + i) == -1) break;
@@ -1410,7 +1411,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return True if the population can be reduced.
      */
     public boolean canReducePopulation() {
-        return getUnitCount() > applyModifiers(0f, getGame().getTurn(),
+        return getUnitCount() > apply(0f, getGame().getTurn(),
                 Modifier.MINIMUM_COLONY_SIZE);
     }
 
@@ -2620,8 +2621,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getGoodsCapacity() {
-        return (int)applyModifiers(0f, getGame().getTurn(),
-                Modifier.WAREHOUSE_STORAGE);
+        return (int)apply(0f, getGame().getTurn(), Modifier.WAREHOUSE_STORAGE);
     }
 
     /**
@@ -2752,9 +2752,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             int available = getGoodsCount(goods.getType());
 
             int breedingNumber = goods.getType().getBreedingNumber();
-            if (breedingNumber != GoodsType.INFINITY) {
-                available -= breedingNumber;
-            }
+            if (breedingNumber != INFINITY) available -= breedingNumber;
 
             if (buildable != null) {
                 available -= AbstractGoods.getCount(goods.getType(),
@@ -2807,14 +2805,33 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
 
     // Interface TradeLocation
-    //   getGoodsCount provided in GoodsContainer
+
+    /**
+     * Calculate the present field.
+     *
+     * @param goodsType The {@link GoodsType} to check for got import/export.
+     * @param turns The number of turns before the goods is required.
+     * @return The amount of goods to export.
+     */
+    private int returnPresent(GoodsType goodsType, int turns) {
+        return Math.max(0, getGoodsCount(goodsType)
+            + turns * getNetProductionOf(goodsType));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getAvailableGoodsCount(GoodsType goodsType) {
+        return getGoodsCount(goodsType);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
-        final int present = ReturnPresent(goodsType, turns);
+        final int present = returnPresent(goodsType, turns);
         final ExportData ed = getExportData(goodsType);
         return Math.max(0, present - ed.getExportLevel());
     }
@@ -2826,35 +2843,29 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public int getImportAmount(GoodsType goodsType, int turns) {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
-        final int present = ReturnPresent(goodsType, turns);
+        final int present = returnPresent(goodsType, turns);
         final ExportData ed = getExportData(goodsType);
         int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
         return Math.max(0, capacity - present);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         Colony colony = (Colony) tradeLocation;
         return colony.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Boolean canBeInput() {
+    public boolean canBeInput() {
         return true;
     }
 
-    /**
-     *  Used to calculated the present field.
-     *
-     * @param goodsType The {@link GoodsType} to check for got import/export.
-     * @param turns The number of turns before the goods is required.
-     * @return  The amount of goods to export.
-     */
-    private int ReturnPresent(GoodsType goodsType, int turns) {
-        final int present = Math.max(0, getGoodsCount(goodsType)
-                + turns * getNetProductionOf(goodsType));
-        return present;
-    }
 
     //
     // Miscellaneous low level
@@ -2873,11 +2884,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @param fix Fix problems if possible.
      * @param lb An optional {@code LogBuilder} to log to.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * @return The integrity found.
      */
-    public int checkBuildQueueIntegrity(boolean fix, LogBuilder lb) {
-        int result = 1;
+    public IntegrityType checkBuildQueueIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
         List<BuildableType> buildables = buildQueue.getValues();
         List<BuildableType> assumeBuilt = new ArrayList<>();
         for (int i = 0; i < buildables.size(); i++) {
@@ -2888,10 +2898,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             } else if (fix) {
                 if (lb != null) lb.add("\n  Invalid build queue item removed: ", bt.getId());
                 buildQueue.remove(i);
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 if (lb != null) lb.add("\n  Invalid build queue item: ", bt.getId());
-                result = -1;
+                result = result.fail();
             }
         }
         List<UnitType> unitTypes = populationQueue.getValues();
@@ -2904,10 +2914,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             } else if (fix) {
                 if (lb != null) lb.add("\n  Invalid population queue item removed: ", ut.getId());
                 populationQueue.remove(i);
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 if (lb != null) lb.add("\n  Invalid population queue item: ", ut.getId());
-                result = -1;
+                result = result.fail();
             }
         }
         return result;
@@ -2920,10 +2930,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
 
-        return Math.min(result, checkBuildQueueIntegrity(fix, lb));
+        return result.combine(checkBuildQueueIntegrity(fix, lb));
     }
 
 

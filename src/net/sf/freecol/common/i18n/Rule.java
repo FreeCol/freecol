@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -70,7 +70,7 @@ public class Rule {
      *
      * @param input a {@code String} value
      */
-    public final void parse(String input) {
+    private final void parse(String input) {
         StringTokenizer st = new StringTokenizer(downCase(input), " .");
         List<String> tokens = new ArrayList<>();
         while (st.hasMoreTokens()) {

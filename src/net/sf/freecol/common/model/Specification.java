@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,10 +21,10 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,6 +47,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.option.AbstractOption;
@@ -68,6 +69,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * This class encapsulates any parts of the "specification" for
@@ -79,30 +82,156 @@ public final class Specification implements OptionContainer {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
-    public static final String TAG = "freecol-specification";
+    /** Fixed class array argument used in newType(). */
+    private static final Class[] newTypeClasses
+        = new Class[] { String.class, Specification.class };
+    
+    // Special reader classes for spec objects
+    private interface ChildReader {
+        public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
+    }
 
-    /** The difficulty levels option group is special. */
-    public static final String DIFFICULTY_LEVELS = "difficultyLevels";
+    /**
+     * Modifiers have to be hooked to the specification and added to
+     * the special modifiers list, hence the special purpose reader.
+     */
+    private class ModifierReader implements ChildReader {
 
-    /** Roles backward compatibility fragment. */
-    public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void readChildren(FreeColXMLReader xr)
+            throws XMLStreamException {
+            while (xr.moreTags()) {
+                Modifier modifier = new Modifier(xr, Specification.this);
+                Specification.this.addModifier(modifier);
+                Specification.this.specialModifiers.add(modifier);
+            }
+        }
+    }
 
-    /** Unit change types backward compatibility fragment. */
-    public static final String UNIT_CHANGE_TYPES_COMPAT_FILE_NAME
-        = "unit-change-types-compat.xml";
+    /**
+     * Options are special as they live in the allOptionGroups
+     * collection, which has its own particular semantics.  So they
+     * need their own reader.
+     */
+    private class OptionReader implements ChildReader {
 
-    /** The default role. */
-    public static final String DEFAULT_ROLE_ID = "model.role.default";
+        private static final String RECURSIVE_TAG = "recursive";
 
-    /** How many game ages. */
-    public static final int NUMBER_OF_AGES = 3;
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void readChildren(FreeColXMLReader xr)
+            throws XMLStreamException {
+            while (xr.moreTags()) {
+                readChild(xr);
+            }
+        }
 
-    /** The option groups to save. */
-    private static final String[] coreOptionGroups = {
-        GameOptions.TAG, MapGeneratorOptions.TAG, DIFFICULTY_LEVELS
-    };
+        private void readChild(FreeColXMLReader xr) throws XMLStreamException {
+            final String tag = xr.getLocalName();
+
+            boolean recursive = xr.getAttribute(RECURSIVE_TAG, true);
+
+            if (OptionGroup.TAG.equals(tag)) {
+                String id = xr.readId();
+                OptionGroup group = allOptionGroups.get(id);
+                if (group == null) {
+                    group = new OptionGroup(id, Specification.this);
+                    allOptionGroups.put(id, group);
+                }
+                group.readFromXML(xr);
+                Specification.this.addOptionGroup(group, recursive);
+
+            } else {
+                logger.warning(OptionGroup.TAG + " expected in OptionReader"
+                    + ", not: " + tag);
+                xr.nextTag();
+            }
+        }
+    }
+
+    /** A reader for ordinary spec object types. */
+    private class TypeReader<T extends FreeColSpecObjectType>
+        implements ChildReader {
+
+        /** The class of objects to read. */
+        private final Class<T> type;
+
+        /** The list to append new objects to. */
+        private final List<T> result;
+
+        /** Internal index to impose an ordering. */
+        private int index = 0;
+
+        /**
+         * Build a type read.
+         *
+         * @param type The class to read.
+         * @param listToFill A list of read types.
+         */
+        public TypeReader(Class<T> type, List<T> listToFill) {
+            result = listToFill;
+            this.type = type;
+        }
 
 
+        /**
+         * {@inheritDoc}
+         */
+        @SuppressFBWarnings(value="DLC_DUBIOUS_LIST_COLLECTION",
+                            justification="List required externally")
+        @Override
+        public void readChildren(FreeColXMLReader xr)
+            throws XMLStreamException {
+            while (xr.moreTags()) {
+                final String tag = xr.getLocalName();
+                String id = xr.readId();
+                if (id == null) {
+                    logger.warning("Null identifier, tag: " + tag);
+
+                } else if (FreeColSpecObjectType.DELETE_TAG.equals(tag)) {
+                    FreeColSpecObjectType object = removeType(id);
+                    if (object != null) {
+                        result.remove(object);
+                    } else {
+                        logger.warning("Delete " + id + " failed");
+                    }
+
+                } else {
+                    T object = getType(id, type);
+                    if (object == null) {
+                        object = newType(id, type);
+                        addType(id, object);
+                    }
+                    // If this an existing object (with id) and the
+                    // PRESERVE tag is present, then leave the
+                    // attributes intact and only read the child
+                    // elements, otherwise do a full attribute
+                    // inclusive read.  This allows mods and spec
+                    // extensions to not have to re-specify all the
+                    // attributes when just changing the children.
+                    if (object.getId() != null
+                        && xr.getAttribute(FreeColSpecObjectType.PRESERVE_TAG,
+                                           false)) {
+                        object.readChildren(xr);
+                    } else {
+                        object.readFromXML(xr);
+                    }
+                    if (!object.isAbstractType() && !result.contains(object)) {
+                        result.add(object);
+                        object.setIndex(index);
+                        index++;
+                    }
+                }
+            }
+        }
+    }
+
+    /** Sources.  Special static spec objects. */
     public static class Source extends FreeColSpecObjectType {
 
         /**
@@ -119,7 +248,7 @@ public final class Specification implements OptionContainer {
          */
         @Override
         public void toXML(FreeColXMLWriter xw) {
-            throw new RuntimeException("Can not happen");
+            throw new RuntimeException("Can not happen: " + this);
         }
 
         /**
@@ -215,11 +344,40 @@ public final class Specification implements OptionContainer {
     }
     // end @compat 0.10.x/0.11.x
 
+    public static final String TAG = "freecol-specification";
+
+    /** The difficulty levels option group is special. */
+    public static final String DIFFICULTY_LEVELS = "difficultyLevels";
+
+    /** Roles backward compatibility fragment. */
+    public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
+
+    /** Unit change types backward compatibility fragment. */
+    public static final String UNIT_CHANGE_TYPES_COMPAT_FILE_NAME
+        = "unit-change-types-compat.xml";
+
+    /** The default food type. */
+    private static final String DEFAULT_FOOD_TYPE = "model.goods.food";
+
+    /** The default nation type, which does nothing special. */
+    private static final String DEFAULT_NATION_TYPE
+        = "model.nationType.default";
+
+    /** The default role. */
+    public static final String DEFAULT_ROLE_ID = "model.role.default";
+
+    /** How many game ages. */
+    public static final int NUMBER_OF_AGES = 3;
+
+    /** The option groups to save. */
+    private static final String[] coreOptionGroups = {
+        GameOptions.TAG, MapGeneratorOptions.TAG, DIFFICULTY_LEVELS
+    };
+
     /** A map from specification object group identifier to a reader for it. */
-    private final Map<String, ChildReader> readerMap = new HashMap<>();
+    private final Map<String, ChildReader> readerMap = new HashMap<>(20);
 
-    /* Containers filled from readers in the readerMap. */
-
+    // Containers filled from readers in the readerMap
     // readerMap("building-types")
     private final List<BuildingType> buildingTypeList = new ArrayList<>();
     // readerMap("disasters")
@@ -287,11 +445,12 @@ public final class Specification implements OptionContainer {
     private UnitType fastestNavalUnitType = null;
     private final List<UnitType> defaultUnitTypes = new ArrayList<>();
 
-    /* Other containers. */
+    // Other containers
+    /** All the FreeColSpecObjectType objects, indexed by identifier. */
+    private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>(256);
 
-    private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>();
-
-    private final Map<String, List<Ability>> allAbilities = new HashMap<>();
+    /** All the abilities by identifier. */
+    private final Map<String, List<Ability>> allAbilities = new HashMap<>(128);
 
     /** A cache of the military roles in decreasing order.  Do not serialize. */
     private List<Role> militaryRoles = null;
@@ -316,7 +475,7 @@ public final class Specification implements OptionContainer {
      */
     public Specification() {
         logger.fine("Initializing Specification");
-        for (Source source : sources) allTypes.put(source.getId(), source);
+        for (Source source : sources) addType(source.getId(), source);
 
         readerMap.put(BUILDING_TYPES_TAG,
                       new TypeReader<>(BuildingType.class, buildingTypeList));
@@ -361,28 +520,15 @@ public final class Specification implements OptionContainer {
      * given {@code FreeColXMLReader}.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem with the stream.
      */
-    public Specification(FreeColXMLReader xr) {
+    public Specification(FreeColXMLReader xr) throws XMLStreamException {
         this();
         initialized = false;
-        load(xr);
+        readFromXML(xr);
         prepare(null, difficultyLevel);
         clean("load from stream");
         initialized = true;
-    }
-
-
-    /**
-     * Load a specification or fragment from a stream.
-     *
-     * @param xr The {@code FreeColXMLReader} to read from.
-     */
-    private void load(FreeColXMLReader xr) {
-        try {
-            readFromXML(xr);
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing specification", e);
-        }
     }
 
     /**
@@ -390,8 +536,9 @@ public final class Specification implements OptionContainer {
      * given {@code InputStream}.
      *
      * @param in The {@code InputStream} to read from.
+     * @exception XMLStreamException if there is a problem with the stream.
      */
-    public Specification(InputStream in) {
+    public Specification(InputStream in) throws XMLStreamException {
         this();
         initialized = false;
         load(in);
@@ -404,16 +551,46 @@ public final class Specification implements OptionContainer {
      * Load a specification or fragment from a stream.
      *
      * @param in The {@code InputStream} to read from.
+     * @exception XMLStreamException if there is a problem with the stream.
      */
-    private void load(InputStream in) {
+    private void load(InputStream in) throws XMLStreamException {
         try (
             FreeColXMLReader xr = new FreeColXMLReader(in);
         ) {
             xr.nextTag();
-            load(xr);
-        } catch (Exception e) {
-            throw new RuntimeException("Load specification stream error", e);
+            readFromXML(xr);
         }
+    }
+
+    /**
+     * Load mods into this specification.
+     *
+     * @param mods A list of {@code FreeColModFile}s for the active mods.
+     * @return True if any mod was loaded.
+     */
+    public boolean loadMods(List<FreeColModFile> mods) {
+        initialized = false;
+        boolean loadedMod = false;
+        for (FreeColModFile mod : mods) {
+            InputStream sis = null;
+            try {
+                if ((sis = mod.getSpecificationInputStream()) != null) {
+                    // Some mods are resource only
+                    load(sis);
+                }
+                loadedMod = true;
+                logger.info("Loaded mod " + mod.getId());
+            } catch (IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, "Read error in mod " + mod.getId(),
+                    ex);
+            } catch (RuntimeException rte) {
+                logger.log(Level.WARNING, "Parse error in mod " + mod.getId(),
+                    rte);
+            }
+        }
+        if (loadedMod) clean("mod loading");
+        initialized = true;
+        return loadedMod;
     }
 
     /**
@@ -442,89 +619,6 @@ public final class Specification implements OptionContainer {
             setDifficultyOptionGroup(difficulty);
             applyDifficultyLevel(difficulty);
         }
-    }
-
-    /**
-     * Update the game and map options from the user configuration files.
-     */
-    public void updateGameAndMapOptions() {
-        String gtag = GameOptions.TAG;
-        File gof = FreeColDirectories
-            .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
-        OptionGroup gog = (gof.exists()) ? OptionGroup.load(gof, gtag, this)
-            : null;
-        if (gog != null) {
-            gog = mergeGroup(gog);
-            fixGameOptions();
-        } else {
-            gog = getOptionGroup(gtag);
-        }
-        gog.save(gof, null, true);
-        
-        String mtag = MapGeneratorOptions.TAG;
-        File mof = FreeColDirectories
-            .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-        OptionGroup mog = (mof.exists()) ? OptionGroup.load(mof, mtag, this)
-            : null;
-        if (mog != null) {
-            mog = mergeGroup(mog);
-            fixMapGeneratorOptions();
-        } else {
-            mog = getOptionGroup(mtag);
-        }
-        mog.save(mof, null, true);
-    }
-        
-    /**
-     * Load mods into this specification.
-     *
-     * @param mods A list of {@code FreeColModFile}s for the active mods.
-     * @return True if any mod was loaded.
-     */
-    public boolean loadMods(List<FreeColModFile> mods) {
-        initialized = false;
-        boolean loadedMod = false;
-        for (FreeColModFile mod : mods) {
-            InputStream sis = null;
-            try {
-                if ((sis = mod.getSpecificationInputStream()) != null) {
-                    // Some mods are resource only
-                    load(sis);
-                }
-                loadedMod = true;
-                logger.info("Loaded mod " + mod.getId());
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Read error in mod " + mod.getId(),
-                    ioe);
-            } catch (RuntimeException rte) {
-                logger.log(Level.WARNING, "Parse error in mod " + mod.getId(),
-                    rte);
-            }
-        }
-        if (loadedMod) clean("mod loading");
-        initialized = true;
-        return loadedMod;
-    }
-
-    /**
-     * Merge an option group into the spec.
-     *
-     * @param group The {@code OptionGroup} to merge.
-     * @return The merged {@code OptionGroup} from this
-     *     {@code Specification}.
-     */
-    public OptionGroup mergeGroup(OptionGroup group) {
-        OptionGroup realGroup = allOptionGroups.get(group.getId());
-        if (realGroup == null || !realGroup.isEditable()) return realGroup;
-
-        for (Option o : group.getOptions()) {
-            if (o instanceof OptionGroup) {
-                mergeGroup((OptionGroup)o);
-            } else {
-                realGroup.add(o);
-            }
-        }
-        return realGroup;
     }
 
     /**
@@ -684,279 +778,40 @@ public final class Specification implements OptionContainer {
             a.setValue(customsOnCoast);
         }
 
-        logger.info("Specification clean following " + why + " complete"
-            + ", starting year=" + Turn.getStartingYear()
-            + ", season year=" + Turn.getSeasonYear()
-            + ", ages=[" + ages[0] + "," + ages[1] + "," + ages[2] + "]"
-            + ", seasons=" + Turn.getSeasonNumber()
-            + ", difficulty=" + difficultyLevel
-            + ", " + allTypes.size() + " FreeColSpecObjectTypes"
-            + ", " + allAbilities.size() + " Abilities"
-            + ", " + buildingTypeList.size() + " BuildingTypes"
-            + ", " + disasters.size() + " Disasters"
-            + ", " + europeanNationTypes.size() + " EuropeanNationTypes"
-            + ", " + events.size() + " Events"
-            + ", " + foundingFathers.size() + " FoundingFathers"
-            + ", " + goodsTypeList.size() + " GoodsTypes"
-            + ", " + indianNationTypes.size() + " IndianNationTypes"
-            + ", " + allModifiers.size() + " Modifiers"
-            + ", " + nations.size() + " Nations"
-            + ", " + allOptions.size() + " Options"
-            + ", " + allOptionGroups.size() + " Option Groups"
-            + ", " + resourceTypeList.size() + " ResourceTypes"
-            + ", " + roles.size() + " Roles"
-            + ", " + tileTypeList.size() + " TileTypes"
-            + ", " + tileImprovementTypeList.size() + " TileImprovementTypes"
-            + ", " + unitChangeTypeList.size() + " UnitChangeTypes"
-            + ", " + unitTypeList.size() + " UnitTypes"
-            + " read.");
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append("Specification clean following ").append(why)
+            .append(" complete, starting year=").append(Turn.getStartingYear())
+            .append(", season year=").append(Turn.getSeasonYear())
+            .append(", ages=[").append(ages[0])
+            .append(',').append(ages[1])
+            .append(',').append(ages[2])
+            .append("], seasons=").append(Turn.getSeasonNumber())
+            .append(", difficulty=").append(difficultyLevel)
+            .append(", ").append(allTypes.size()).append(" Types")
+            .append(", ").append(allAbilities.size()).append(" Abilities")
+            .append(", ").append(buildingTypeList.size()).append(" BuildingTypes")
+            .append(", ").append(disasters.size()).append(" Disasters")
+            .append(", ").append(europeanNationTypes.size()).append(" EuropeanNationTypes")
+            .append(", ").append(events.size()).append(" Events")
+            .append(", ").append(foundingFathers.size()).append(" FoundingFathers")
+            .append(", ").append(goodsTypeList.size()).append(" GoodsTypes")
+            .append(", ").append(indianNationTypes.size()).append(" IndianNationTypes")
+            .append(", ").append(allModifiers.size()).append(" Modifiers")
+            .append(", ").append(nations.size()).append(" Nations")
+            .append(", ").append(allOptions.size()).append(" Options")
+            .append(", ").append(allOptionGroups.size()).append(" Option Groups")
+            .append(", ").append(resourceTypeList.size()).append(" ResourceTypes")
+            .append(", ").append(roles.size()).append(" Roles")
+            .append(", ").append(tileTypeList.size()).append(" TileTypes")
+            .append(", ").append(tileImprovementTypeList.size()).append(" TileImprovementTypes")
+            .append(", ").append(unitChangeTypeList.size()).append(" UnitChangeTypes")
+            .append(", ").append(unitTypeList.size()).append(" UnitTypes")
+            .append(" read.");
+        logger.info(sb.toString());
     }
 
-    /**
-     * Add a father, for test purposes.
-     *
-     * @param ff The {@code FoundingFather} to add.
-     */
-    public void addTestFather(FoundingFather ff) {
-        allTypes.put(ff.getId(), ff);
-        foundingFathers.add(ff);
-    }
 
-    /**
-     * Disable editing of some critical option groups.
-     */
-    public void disableEditing() {
-        for (String s : coreOptionGroups) {
-            OptionGroup og = allOptionGroups.get(s);
-            if (og != null) og.setEditable(false);
-        }
-    }
-
-    /**
-     * Generate the dynamic options.
-     *
-     * Only call this in the server.  If clients call it the European
-     * prices can be desynchronized.
-     */
-    public void generateDynamicOptions() {
-        logger.finest("Generating dynamic options.");
-        OptionGroup prices = new OptionGroup(GameOptions.GAMEOPTIONS_PRICES, this);
-        allOptionGroups.put(prices.getId(), prices);
-        for (GoodsType goodsType : goodsTypeList) {
-            String name = goodsType.getSuffix("model.goods.");
-            String base = "model.option." + name + ".";
-            if (goodsType.getInitialSellPrice() > 0) {
-                int diff = (goodsType.isNewWorldGoodsType()
-                    || goodsType.isNewWorldLuxuryType()) ? 3 : 0;
-                IntegerOption minimum
-                    = new IntegerOption(base + "minimumPrice", this);
-                minimum.setValue(goodsType.getInitialSellPrice());
-                minimum.setMinimumValue(1);
-                minimum.setMaximumValue(100);
-                prices.add(minimum);
-                addAbstractOption(minimum);
-                IntegerOption maximum
-                    = new IntegerOption(base + "maximumPrice", this);
-                maximum.setValue(goodsType.getInitialSellPrice() + diff);
-                maximum.setMinimumValue(1);
-                maximum.setMaximumValue(100);
-                prices.add(maximum);
-                addAbstractOption(maximum);
-                IntegerOption spread
-                    = new IntegerOption(base + "spread", this);
-                spread.setValue(goodsType.getPriceDifference());
-                spread.setMinimumValue(1);
-                spread.setMaximumValue(100);
-                prices.add(spread);
-                addAbstractOption(spread);
-            } else if (goodsType.getPrice() < FreeColSpecObjectType.INFINITY) {
-                IntegerOption price
-                    = new IntegerOption(base + "price", this);
-                price.setValue(goodsType.getPrice());
-                price.setMinimumValue(1);
-                price.setMaximumValue(100);
-                prices.add(price);
-                addAbstractOption(price);
-            }
-        }
-        getGameOptions().add(prices);
-    }
-
-    /**
-     * Merge in a new set of game options.
-     *
-     * @param newGameOptions The new game options {@code OptionGroup}
-     *     to merge.
-     * @param who Where are we, client or server?
-     * @return True if the merge succeeded.
-     */
-    public boolean mergeGameOptions(OptionGroup newGameOptions, String who) {
-        OptionGroup go = getGameOptions();
-        LogBuilder lb = new LogBuilder(64);
-        boolean ret = go.merge(newGameOptions, lb);
-        lb.shrink("\n"); lb.log(logger, Level.FINEST);
-        if (!ret) return false;
-        addOptionGroup(go, true); // make sure allOptions is seeing any changes
-        clean("merged game options (" + who + ")");
-        return true;
-    }
-
-    /**
-     * Merge in a new set of map options.
-     *
-     * @param newMapGeneratorOptions The new game options
-     *     {@code OptionGroup} to merge.
-     * @param who Where are we, client or server?
-     * @return True if the merge succeeded.
-     */
-    public boolean mergeMapGeneratorOptions(OptionGroup newMapGeneratorOptions,
-                                            String who) {
-        OptionGroup go = getMapGeneratorOptions();
-        LogBuilder lb = new LogBuilder(64);
-        boolean ret = go.merge(newMapGeneratorOptions, lb);
-        lb.shrink("\n"); lb.log(logger, Level.FINEST);
-        if (!ret) return false;
-        addOptionGroup(go, true); // make sure allOptions is seeing any changes
-        clean("merged map options (" + who + ")");
-        return true;
-    }
-
-    /**
-     * Compare a spec version number with the current one.
-     *
-     * @param other The other spec version number.
-     * @return Positive if the current version is greater than the other,
-     *     negative if the current version is lower than the other,
-     *     zero if they are equal.
-     */
-    private int compareVersion(String other) {
-        String version = getVersion();
-        if (version == null) return 0;
-
-        final String rex = "\\.";
-        String[] sv = version.split(rex, 2);
-        String[] so = other.split(rex, 2);
-        if (sv.length == 2 && so.length == 2) {
-            int cmp;
-            try {
-                cmp = Integer.compare(Integer.parseInt(sv[0]),
-                                      Integer.parseInt(so[0]));
-                if (cmp != 0) return cmp;
-                return Integer.compare(Integer.parseInt(sv[1]),
-                                       Integer.parseInt(so[1]));
-            } catch (NumberFormatException nfe) {}
-        }
-        throw new RuntimeException("Bad version: " + other);
-    }
-
-    private interface ChildReader {
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
-    }
-
-    private class ModifierReader implements ChildReader {
-
-        @Override
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            while (xr.moreTags()) {
-                Modifier modifier = new Modifier(xr, Specification.this);
-                Specification.this.addModifier(modifier);
-                Specification.this.specialModifiers.add(modifier);
-            }
-        }
-    }
-
-    private class TypeReader<T extends FreeColSpecObjectType> implements ChildReader {
-
-        private final Class<T> type;
-        private final List<T> result;
-        private int index = 0;
-
-        // Is there really no easy way to capture T?
-        public TypeReader(Class<T> type, List<T> listToFill) {
-            result = listToFill;
-            this.type = type;
-        }
-
-        @Override
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            while (xr.moreTags()) {
-                final String tag = xr.getLocalName();
-                String id = xr.readId();
-                if (id == null) {
-                    logger.warning("Null identifier, tag: " + tag);
-
-                } else if (FreeColSpecObjectType.DELETE_TAG.equals(tag)) {
-                    FreeColSpecObjectType object = allTypes.remove(id);
-                    if (object != null) result.remove(object);
-
-                } else {
-                    T object = getType(id, type);
-                    allTypes.put(id, object);
-
-                    // If this an existing object (with id) and the
-                    // PRESERVE tag is present, then leave the
-                    // attributes intact and only read the child
-                    // elements, otherwise do a full attribute
-                    // inclusive read.  This allows mods and spec
-                    // extensions to not have to re-specify all the
-                    // attributes when just changing the children.
-                    if (object.getId() != null
-                        && xr.getAttribute(FreeColSpecObjectType.PRESERVE_TAG,
-                                           (String)null) != null) {
-                        object.readChildren(xr);
-                    } else {
-                        object.readFromXML(xr);
-                    }
-                    if (!object.isAbstractType() && !result.contains(object)) {
-                        result.add(object);
-                        object.setIndex(index);
-                        index++;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Options are special as they live in the allOptionGroups
-     * collection, which has its own particular semantics.  So they
-     * need their own reader.
-     */
-    private class OptionReader implements ChildReader {
-
-        private static final String RECURSIVE_TAG = "recursive";
-
-        @Override
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            while (xr.moreTags()) {
-                readChild(xr);
-            }
-        }
-
-        private void readChild(FreeColXMLReader xr) throws XMLStreamException {
-            final String tag = xr.getLocalName();
-
-            boolean recursive = xr.getAttribute(RECURSIVE_TAG, true);
-
-            if (OptionGroup.TAG.equals(tag)) {
-                String id = xr.readId();
-                OptionGroup group = allOptionGroups.get(id);
-                if (group == null) {
-                    group = new OptionGroup(id, Specification.this);
-                    allOptionGroups.put(id, group);
-                }
-                group.readFromXML(xr);
-                Specification.this.addOptionGroup(group, recursive);
-
-            } else {
-                logger.warning(OptionGroup.TAG + " expected in OptionReader, not: " + tag);
-                xr.nextTag();
-            }
-        }
-    }
-
-    // ---------------------------------------------------------- retrieval
-    // methods
+    // Basic methods
 
     /**
      * Get the specification identifier.
@@ -976,6 +831,50 @@ public final class Specification implements OptionContainer {
         return version;
     }
 
+    /**
+     * Get a {@code FreeColSpecObjectType} by id.
+     *
+     * @param id The identifier to look for.
+     * @return The {@code FreeColSpecObjectType} found if any.
+     */
+    public FreeColSpecObjectType getType(String id) {
+        return allTypes.get(id);
+    }
+
+    /**
+     * Find a {@code FreeColSpecObjectType} by id and class.
+     *
+     * @param <T> The actual return type.
+     * @param id The object identifier to look for.
+     * @param returnClass The expected {@code Class}.
+     * @return The {@code FreeColSpecObjectType} found if any.
+     */
+    private <T extends FreeColSpecObjectType> T getType(String id,
+                                                        Class<T> returnClass) {
+        FreeColSpecObjectType ret = getType(id);
+        return (ret == null) ? null : returnClass.cast(ret);
+    }
+
+    /**
+     * Add a type by identifier.
+     *
+     * @param id The identifier to associate with.
+     * @param type The {@code FreeColSpecObjectType} to add.
+     */
+    private void addType(String id, FreeColSpecObjectType type) {
+        allTypes.put(id, type);
+    }
+
+    /**
+     * Remove reference to a type.
+     *
+     * @param id The type identifier to remove.
+     * @return The removed {@code FreeColSpecObjectType}.
+     */
+    private FreeColSpecObjectType removeType(String id) {
+        return allTypes.remove(id);
+    }
+    
     /**
      * Registers an Ability as defined.
      *
@@ -1035,8 +934,102 @@ public final class Specification implements OptionContainer {
         return (result == null) ? Stream.<Modifier>empty() : result.stream();
     }
 
+    /**
+     * Add a father, for test purposes.
+     *
+     * @param ff The {@code FoundingFather} to add.
+     */
+    public void addTestFather(FoundingFather ff) {
+        addType(ff.getId(), ff);
+        foundingFathers.add(ff);
+    }
 
-    // Option routines
+    /**
+     * Disable editing of some critical option groups.
+     */
+    public void disableEditing() {
+        for (String s : coreOptionGroups) {
+            OptionGroup og = allOptionGroups.get(s);
+            if (og != null) og.setEditable(false);
+        }
+    }
+
+    /**
+     * Compare a spec version number with the current one.
+     *
+     * @param other The other spec version number.
+     * @return Positive if the current version is greater than the other,
+     *     negative if the current version is lower than the other,
+     *     zero if they are equal.
+     */
+    private int compareVersion(String other) {
+        String version = getVersion();
+        if (version == null) return 0;
+
+        final String rex = "\\.";
+        String[] sv = version.split(rex, 2);
+        String[] so = other.split(rex, 2);
+        if (sv.length == 2 && so.length == 2) {
+            int cmp;
+            try {
+                cmp = Integer.compare(Integer.parseInt(sv[0]),
+                                      Integer.parseInt(so[0]));
+                if (cmp != 0) return cmp;
+                return Integer.compare(Integer.parseInt(sv[1]),
+                                       Integer.parseInt(so[1]));
+            } catch (NumberFormatException nfe) {}
+        }
+        throw new RuntimeException("Bad version: " + other);
+    }
+
+
+    // Option routines including DifficultyLevels which are option groups
+    // Interface OptionContainer
+
+    /**
+     * {@inheritDoc}
+     */
+    public <T extends Option> boolean hasOption(String id,
+                                                Class<T> returnClass) {
+        if (id == null) return false;
+        AbstractOption val = this.allOptions.get(id);
+        return (val == null) ? false
+            : returnClass.isAssignableFrom(val.getClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <T extends Option> T getOption(String id,
+                                          Class<T> returnClass) {
+        if (id == null) {
+            throw new RuntimeException("Null identifier for "
+                + returnClass.getName());
+        } else if (!this.allOptions.containsKey(id)) {
+            throw new RuntimeException("Missing option: " + id);
+        } else {
+            AbstractOption op = this.allOptions.get(id);
+            try {
+                return returnClass.cast(op);
+            } catch (ClassCastException cce) {
+                throw new RuntimeException("Not a " + returnClass.getName()
+                    + ": " + id, cce);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OptionGroup getOptionGroup(String id) {
+        if (id == null) {
+            throw new RuntimeException("OptionGroup with null id: " + this);
+        } else if (!this.allOptionGroups.containsKey(id)) {
+            throw new RuntimeException("Missing OptionGroup: " + id);
+        } else {
+            return this.allOptionGroups.get(id);
+        }
+    }
 
     /**
      * Adds an {@code OptionGroup} to this specification.
@@ -1068,52 +1061,273 @@ public final class Specification implements OptionContainer {
         allOptions.put(abstractOption.getId(), abstractOption);
     }
 
-
-    // Interface OptionContainer
-
     /**
-     * {@inheritDoc}
+     * Merge an option group into the spec.
+     *
+     * @param group The {@code OptionGroup} to merge.
+     * @return The merged {@code OptionGroup} from this
+     *     {@code Specification}.
      */
-    public <R,T extends Option<R>> boolean hasOption(String id,
-                                                     Class<T> returnClass) {
-        return id != null && allOptions.containsKey(id)
-            && returnClass.isAssignableFrom(allOptions.get(id).getClass());
-    }
+    private OptionGroup mergeGroup(OptionGroup group) {
+        OptionGroup realGroup = allOptionGroups.get(group.getId());
+        if (realGroup == null || !realGroup.isEditable()) return realGroup;
 
-    /**
-     * {@inheritDoc}
-     */
-    public <R,T extends Option<R>> T getOption(String id,
-                                               Class<T> returnClass) {
-        if (id == null) {
-            throw new RuntimeException("Null identifier for "
-                + returnClass.getName());
-        } else if (!this.allOptions.containsKey(id)) {
-            throw new RuntimeException("Missing option: " + id);
-        } else {
-            AbstractOption op = this.allOptions.get(id);
-            try {
-                return returnClass.cast(op);
-            } catch (ClassCastException cce) {
-                throw new RuntimeException("Not a " + returnClass.getName()
-                    + ": " + id);
+        for (Option o : group.getOptions()) {
+            if (o instanceof OptionGroup) {
+                mergeGroup((OptionGroup)o);
+            } else {
+                realGroup.add(o);
             }
         }
+        return realGroup;
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the difficulty levels in this specification.
+     *
+     * @return A list of difficulty levels in this specification.
      */
-    public OptionGroup getOptionGroup(String id) {
-        if (id == null) {
-            throw new RuntimeException("OptionGroup with null id.");
-        } else if (!this.allOptionGroups.containsKey(id)) {
-            throw new RuntimeException("Missing OptionGroup: " + id);
-        } else {
-            return this.allOptionGroups.get(id);
-        }
+    public List<OptionGroup> getDifficultyLevels() {
+        OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
+        Stream<Option> stream = (group == null) ? Stream.<Option>empty()
+            : group.getOptions().stream();
+        return transform(stream, (Option o) -> o instanceof OptionGroup,
+                         o -> (OptionGroup)o);
     }
 
+    /**
+     * Get the current difficulty level.
+     *
+     * @return The difficulty level.
+     */
+    public String getDifficultyLevel() {
+        return this.difficultyLevel;
+    }
+
+    /**
+     * Gets the current difficulty level options.
+     *
+     * @return The current difficulty level {@code OptionGroup}.
+     */
+    public OptionGroup getDifficultyOptionGroup() {
+        return getDifficultyOptionGroup(this.difficultyLevel);
+    }
+
+    /**
+     * Gets difficulty level options by id.
+     *
+     * @param id The difficulty level identifier to look for.
+     * @return The corresponding difficulty level {@code OptionGroup},
+     *     if any.
+     */
+    public OptionGroup getDifficultyOptionGroup(String id) {
+        return find(getDifficultyLevels(),
+                    matchKeyEquals(id, FreeColObject::getId));
+    }
+
+    /**
+     * Add/overwrite a difficulty option group.
+     *
+     * @param difficulty The {@code OptionGroup} to add.
+     */
+    private void setDifficultyOptionGroup(OptionGroup difficulty) {
+        OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
+        if (group != null) group.add(difficulty);
+        allOptionGroups.put(difficulty.getId(), difficulty);
+    }
+
+    /**
+     * Applies the difficulty level identified by the given String to
+     * the current specification.
+     *
+     * @param difficulty The identifier of a difficulty level to apply.
+     */
+    public void applyDifficultyLevel(String difficulty) {
+        applyDifficultyLevel(getDifficultyOptionGroup(difficulty));
+    }
+
+    /**
+     * Applies the given difficulty level to the current
+     * specification.
+     *
+     * Public for the test suite.
+     *
+     * @param level The difficulty level {@code OptionGroup} to apply.
+     */
+    public void applyDifficultyLevel(OptionGroup level) {
+        if (level == null) {
+            logger.warning("Null difficulty level supplied");
+            return;
+        }
+        logger.config("Applying difficulty level " + level.getId());
+        addOptionGroup(level, true);
+        this.difficultyLevel = level.getId();
+    }
+
+    public OptionGroup getGameOptions() {
+        return getOptionGroup(GameOptions.TAG);
+    }
+
+    public void setGameOptions(OptionGroup go) {
+        allOptionGroups.put(GameOptions.TAG, go);
+        addOptionGroup(go, true);
+    }
+
+    public OptionGroup getMapGeneratorOptions() {
+        return getOptionGroup(MapGeneratorOptions.TAG);
+    }
+
+    public void setMapGeneratorOptions(OptionGroup mgo) {
+        allOptionGroups.put(MapGeneratorOptions.TAG, mgo);
+        addOptionGroup(mgo, true);
+    }
+
+    /**
+     * Update the game and map options from the user configuration files.
+     *
+     * @return True if any option was fixed.
+     */
+    public boolean updateGameAndMapOptions() {
+        boolean ret = false;
+        String gtag = GameOptions.TAG;
+        File gof = FreeColDirectories
+            .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
+        OptionGroup gog = (!gof.exists()) ? null
+            : OptionGroup.loadOptionGroup(gof, gtag, this);
+        if (gog != null) {
+            gog = mergeGroup(gog);
+            ret |= fixGameOptions();
+        } else {
+            gog = getOptionGroup(gtag);
+        }
+        gog.save(gof, null, true);
+        
+        String mtag = MapGeneratorOptions.TAG;
+        File mof = FreeColDirectories
+            .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+        OptionGroup mog = (!mof.exists()) ? null
+            : OptionGroup.loadOptionGroup(mof, mtag, this);
+        if (mog != null) {
+            mog = mergeGroup(mog);
+            ret |= fixMapGeneratorOptions();
+        } else {
+            mog = getOptionGroup(mtag);
+        }
+        mog.save(mof, null, true);
+        return ret;
+    }
+
+    /**
+     * Generate the dynamic options.
+     *
+     * Only call this in the server.  If clients call it the European
+     * prices can be desynchronized.
+     */
+    public void generateDynamicOptions() {
+        logger.finest("Generating dynamic options.");
+        OptionGroup prices = new OptionGroup(GameOptions.GAMEOPTIONS_PRICES, this);
+        allOptionGroups.put(prices.getId(), prices);
+        for (GoodsType goodsType : goodsTypeList) {
+            String name = goodsType.getSuffix("model.goods.");
+            String base = "model.option." + name + ".";
+            if (goodsType.getInitialSellPrice() > 0) {
+                int diff = (goodsType.isNewWorldGoodsType()
+                    || goodsType.isNewWorldLuxuryType()) ? 3 : 0;
+                IntegerOption minimum
+                    = new IntegerOption(base + "minimumPrice", this);
+                minimum.setValue(goodsType.getInitialSellPrice());
+                minimum.setMinimumValue(1);
+                minimum.setMaximumValue(100);
+                prices.add(minimum);
+                addAbstractOption(minimum);
+                IntegerOption maximum
+                    = new IntegerOption(base + "maximumPrice", this);
+                maximum.setValue(goodsType.getInitialSellPrice() + diff);
+                maximum.setMinimumValue(1);
+                maximum.setMaximumValue(100);
+                prices.add(maximum);
+                addAbstractOption(maximum);
+                IntegerOption spread
+                    = new IntegerOption(base + "spread", this);
+                spread.setValue(goodsType.getPriceDifference());
+                spread.setMinimumValue(1);
+                spread.setMaximumValue(100);
+                prices.add(spread);
+                addAbstractOption(spread);
+            } else if (goodsType.getPrice() < INFINITY) {
+                IntegerOption price
+                    = new IntegerOption(base + "price", this);
+                price.setValue(goodsType.getPrice());
+                price.setMinimumValue(1);
+                price.setMaximumValue(100);
+                prices.add(price);
+                addAbstractOption(price);
+            }
+        }
+        getGameOptions().add(prices);
+    }
+
+    /**
+     * Merge in a new set of game options.
+     *
+     * @param newGameOptions The new game options {@code OptionGroup}
+     *     to merge.
+     * @param who Where are we, client or server?
+     * @return True if the merge succeeded.
+     */
+    public boolean mergeGameOptions(OptionGroup newGameOptions, String who) {
+        OptionGroup go = getGameOptions();
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = go.merge(newGameOptions, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        if (!ret) return false;
+        addOptionGroup(go, true); // make sure allOptions is seeing any changes
+        clean("merged game options (" + who + ")");
+        return true;
+    }
+
+    /**
+     * Merge in a new set of map options.
+     *
+     * @param newMapGeneratorOptions The new game options
+     *     {@code OptionGroup} to merge.
+     * @param who Where are we, client or server?
+     * @return True if the merge succeeded.
+     */
+    public boolean mergeMapGeneratorOptions(OptionGroup newMapGeneratorOptions,
+                                            String who) {
+        OptionGroup go = getMapGeneratorOptions();
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = go.merge(newMapGeneratorOptions, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        if (!ret) return false;
+        addOptionGroup(go, true); // make sure allOptions is seeing any changes
+        clean("merged map options (" + who + ")");
+        return true;
+    }
+
+
+    // -- Ages --
+
+    /**
+     * Gets the age corresponding to a given turn.
+     *
+     * @param turn The {@code Turn} to check.
+     * @return The age of the given turn.
+     */
+    public int getAge(Turn turn) {
+        int n = turn.getNumber();
+        return (n < ages[0]) ? -1
+            : (n < ages[1]) ? 0
+            : (n < ages[2]) ? 1
+            : 2;
+    }
+
+    // -- Buildables --
+
+    public BuildableType getBuildableType(String id) {
+        return getType(id, BuildableType.class);
+    }
 
     // -- Buildings --
 
@@ -1129,6 +1343,54 @@ public final class Specification implements OptionContainer {
      */
     public BuildingType getBuildingType(String id) {
         return getType(id, BuildingType.class);
+    }
+
+    // -- Disasters --
+
+    public List<Disaster> getDisasters() {
+        return disasters;
+    }
+
+    /**
+     * Get a disaster by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code Disaster} found.
+     */
+    public Disaster getDisaster(String id) {
+        return getType(id, Disaster.class);
+    }
+
+    // -- Events --
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    /**
+     * Get an event by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code Event} found.
+     */
+    public Event getEvent(String id) {
+        return getType(id, Event.class);
+    }
+
+    // -- Founding Fathers --
+
+    public List<FoundingFather> getFoundingFathers() {
+        return foundingFathers;
+    }
+
+    /**
+     * Get a founding father type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code FoundingFather} found.
+     */
+    public FoundingFather getFoundingFather(String id) {
+        return getType(id, FoundingFather.class);
     }
 
     // -- Goods --
@@ -1170,14 +1432,17 @@ public final class Specification implements OptionContainer {
     }
 
     /**
-     * The general "Food" type is handled as a special case in many places.
-     * Introduce this routine to collect them into one place, in the hope
-     * we can one day deprecate this routine and clean up the special cases.
+     * Get the primary food type.
      *
-     * @return The main food type ("model.goods.food").
+     * FIXME: The "Food" type is handled as a special case in many
+     * places.  This routine was added to collect them into one place,
+     * in the hope we can one day deprecate this routine and clean up
+     * the special cases.
+     *
+     * @return The main food type.
      */
     public GoodsType getPrimaryFoodType() {
-        return getGoodsType("model.goods.food");
+        return getGoodsType(DEFAULT_FOOD_TYPE);
     }
 
     /**
@@ -1207,6 +1472,101 @@ public final class Specification implements OptionContainer {
         return getType(id, GoodsType.class);
     }
 
+    // -- Improvements --
+
+    public List<TileImprovementType> getTileImprovementTypeList() {
+        return tileImprovementTypeList;
+    }
+
+    /**
+     * Get a tile improvement type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code TileImprovementType} found.
+     */
+    public TileImprovementType getTileImprovementType(String id) {
+        return getType(id, TileImprovementType.class);
+    }
+
+    // -- NationTypes --
+
+    public List<NationType> getNationTypes() {
+        return nationTypes;
+    }
+
+    public List<EuropeanNationType> getEuropeanNationTypes() {
+        return europeanNationTypes;
+    }
+
+    public List<EuropeanNationType> getREFNationTypes() {
+        return REFNationTypes;
+    }
+
+    public List<IndianNationType> getIndianNationTypes() {
+        return indianNationTypes;
+    }
+
+    /**
+     * Get a nation type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code NationType} found.
+     */
+    public NationType getNationType(String id) {
+        return getType(id, NationType.class);
+    }
+
+    public NationType getDefaultNationType() {
+        return getNationType(DEFAULT_NATION_TYPE);
+    }
+
+
+    // -- Nations --
+
+    public List<Nation> getNations() {
+        return nations;
+    }
+
+    public List<Nation> getEuropeanNations() {
+        return europeanNations;
+    }
+
+    public List<Nation> getIndianNations() {
+        return indianNations;
+    }
+
+    public List<Nation> getREFNations() {
+        return REFNations;
+    }
+
+    /**
+     * Get a nation by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code Nation} found.
+     */
+    public Nation getNation(String id) {
+        return getType(id, Nation.class);
+    }
+
+    /**
+     * Get the special unknown enemy nation.
+     *
+     * @return The unknown enemy {@code Nation}.
+     */
+    public Nation getUnknownEnemyNation() {
+        return getNation(Nation.UNKNOWN_NATION_ID);
+    }
+
+    /**
+     * Clear all European advantages.  Implements the Advantages==NONE setting.
+     */
+    public void clearEuropeanNationalAdvantages() {
+        for (Nation n : getEuropeanNations()) {
+            n.setType(getDefaultNationType());
+        }
+    }
+
     // -- Resources --
 
     public List<ResourceType> getResourceTypeList() {
@@ -1223,6 +1583,132 @@ public final class Specification implements OptionContainer {
         return getType(id, ResourceType.class);
     }
 
+    // -- Roles --
+
+    /**
+     * Get all the available roles.
+     *
+     * @return A list of available {@code Role}s.
+     */
+    public List<Role> getRolesList() {
+        return this.roles;
+    }
+
+    /**
+     * Get all the available roles as a stream.
+     *
+     * @return A stream of available {@code Role}s.
+     */
+    public Stream<Role> getRoles() {
+        return getRolesList().stream();
+    }
+
+    /**
+     * Get a role by identifier.
+     *
+     * @param id The object identifier.
+     * @return The {@code Role} found.
+     */
+    public Role getRole(String id) {
+        return getType(id, Role.class);
+    }
+
+    /**
+     * Get the default role.
+     *
+     * @return The default {@code Role}.
+     */
+    public Role getDefaultRole() {
+        return getRole(DEFAULT_ROLE_ID);
+    }
+
+    /**
+     * Get the military roles in this specification, in decreasing order
+     * of effectiveness.
+     *
+     * @return An unmodifiable list of military {@code Role}s.
+     */
+    public List<Role> getMilitaryRolesList() {
+        if (this.militaryRoles == null) {
+            this.militaryRoles = Collections.<Role>unmodifiableList(
+                transform(this.roles, Role::isOffensive,
+                          Function.<Role>identity(),
+                          Role.militaryComparator));
+        }
+        return this.militaryRoles;
+    }
+
+    /**
+     * Get the available military roles as a stream.
+     *
+     * @return A stream of military {@code Role}s.
+     */
+    public Stream<Role> getMilitaryRoles() {
+        return getMilitaryRolesList().stream();
+    }
+
+    /**
+     * Gets the roles suitable for a REF unit.
+     *
+     * @param naval If true, choose roles for naval units, if not, land units.
+     * @return A list of {@code Role}s suitable for REF units.
+     */
+    public List<Role> getREFRolesList(boolean naval) {
+        return transform(((naval) ? Stream.of(getDefaultRole())
+                             : getMilitaryRoles()),
+                         r -> r.requiresAbility(Ability.REF_UNIT));
+    }
+
+    /**
+     * Gets the roles suitable for a REF unit as a stream.
+     *
+     * @param naval If true, choose roles for naval units, if not, land units.
+     * @return A stream of {@code Role}s suitable for REF units.
+     */
+    public Stream<Role> getREFRoles(boolean naval) {
+        return getREFRolesList(naval).stream();
+    }
+
+    /**
+     * Get a role with an ability.
+     *
+     * @param id The ability identifier to look for.
+     * @param roles An optional list of {@code Role}s to look in,
+     *     if null all roles are used.
+     * @return The first {@code Role} found with the required
+     *     ability, or null if none found.
+     */
+    public Role getRoleWithAbility(String id, List<Role> roles) {
+        return find(getRoles(), r -> r.hasAbility(id));
+    }
+
+    /**
+     * Get the missionary role.
+     *
+     * @return The missionary {@code Role}.
+     */
+    public Role getMissionaryRole() {
+        return getRoleWithAbility(Ability.ESTABLISH_MISSION, null);
+    }
+
+    /**
+     * Get the pioneer role.
+     *
+     * @return The pioneer {@code Role}.
+     */
+    public Role getPioneerRole() {
+        return getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
+    }
+
+    /**
+     * Get the scout role.
+     *
+     * @return The scout {@code Role}.
+     */
+    public Role getScoutRole() {
+        return getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
+    }
+
     // -- Tiles --
 
     public List<TileType> getTileTypeList() {
@@ -1237,22 +1723,6 @@ public final class Specification implements OptionContainer {
      */
     public TileType getTileType(String id) {
         return getType(id, TileType.class);
-    }
-
-    // -- Improvements --
-
-    public List<TileImprovementType> getTileImprovementTypeList() {
-        return tileImprovementTypeList;
-    }
-
-    /**
-     * Get a tile improvement type by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code TileImprovementType} found.
-     */
-    public TileImprovementType getTileImprovementType(String id) {
-        return getType(id, TileImprovementType.class);
     }
 
     // -- UnitChangeTypes --
@@ -1346,7 +1816,6 @@ public final class Specification implements OptionContainer {
         }
         return getUnitChange(UnitChangeType.EDUCATION, typeStudent, learn).turns;
     }
-
 
     // -- Units --
 
@@ -1498,426 +1967,50 @@ public final class Specification implements OptionContainer {
         return getType(id, UnitType.class);
     }
 
-    // -- Founding Fathers --
-
-    public List<FoundingFather> getFoundingFathers() {
-        return foundingFathers;
-    }
-
-    /**
-     * Get a founding father type by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code FoundingFather} found.
-     */
-    public FoundingFather getFoundingFather(String id) {
-        return getType(id, FoundingFather.class);
-    }
-
-    // -- NationTypes --
-
-    public List<NationType> getNationTypes() {
-        return nationTypes;
-    }
-
-    public List<EuropeanNationType> getEuropeanNationTypes() {
-        return europeanNationTypes;
-    }
-
-    public List<EuropeanNationType> getREFNationTypes() {
-        return REFNationTypes;
-    }
-
-    public List<IndianNationType> getIndianNationTypes() {
-        return indianNationTypes;
-    }
-
-    /**
-     * Get a nation type by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code NationType} found.
-     */
-    public NationType getNationType(String id) {
-        return getType(id, NationType.class);
-    }
-
-    public NationType getDefaultNationType() {
-        return getNationType("model.nationType.default");
-    }
-
-
-    // -- Nations --
-
-    public List<Nation> getNations() {
-        return nations;
-    }
-
-    public List<Nation> getEuropeanNations() {
-        return europeanNations;
-    }
-
-    public List<Nation> getIndianNations() {
-        return indianNations;
-    }
-
-    public List<Nation> getREFNations() {
-        return REFNations;
-    }
-
-    /**
-     * Get a nation by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code Nation} found.
-     */
-    public Nation getNation(String id) {
-        return getType(id, Nation.class);
-    }
-
-    /**
-     * Get the special unknown enemy nation.
-     *
-     * @return The unknown enemy {@code Nation}.
-     */
-    public Nation getUnknownEnemyNation() {
-        return getNation(Nation.UNKNOWN_NATION_ID);
-    }
-
-    /**
-     * Clear all European advantages.  Implements the Advantages==NONE setting.
-     */
-    public void clearEuropeanNationalAdvantages() {
-        for (Nation n : getEuropeanNations()) {
-            n.setType(getDefaultNationType());
-        }
-    }
-
-    // -- Roles --
-
-    /**
-     * Get all the available roles.
-     *
-     * @return A list of available {@code Role}s.
-     */
-    public List<Role> getRolesList() {
-        return this.roles;
-    }
-
-    /**
-     * Get all the available roles as a stream.
-     *
-     * @return A stream of available {@code Role}s.
-     */
-    public Stream<Role> getRoles() {
-        return getRolesList().stream();
-    }
-
-    /**
-     * Get a role by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code Role} found.
-     */
-    public Role getRole(String id) {
-        return getType(id, Role.class);
-    }
-
-    /**
-     * Get the default role.
-     *
-     * @return The default {@code Role}.
-     */
-    public Role getDefaultRole() {
-        return getRole(DEFAULT_ROLE_ID);
-    }
-
-    /**
-     * Get the military roles in this specification, in decreasing order
-     * of effectiveness.
-     *
-     * @return An unmodifiable list of military {@code Role}s.
-     */
-    public List<Role> getMilitaryRolesList() {
-        if (this.militaryRoles == null) {
-            this.militaryRoles = Collections.<Role>unmodifiableList(
-                transform(this.roles, Role::isOffensive, Function.identity(),
-                          Role.militaryComparator));
-        }
-        return this.militaryRoles;
-    }
-
-    /**
-     * Get the available military roles as a stream.
-     *
-     * @return A stream of military {@code Role}s.
-     */
-    public Stream<Role> getMilitaryRoles() {
-        return getMilitaryRolesList().stream();
-    }
-
-    /**
-     * Gets the roles suitable for a REF unit.
-     *
-     * @param naval If true, choose roles for naval units, if not, land units.
-     * @return A list of {@code Role}s suitable for REF units.
-     */
-    public List<Role> getREFRolesList(boolean naval) {
-        return transform(((naval) ? Stream.of(getDefaultRole())
-                             : getMilitaryRoles()),
-                         r -> r.requiresAbility(Ability.REF_UNIT));
-    }
-
-    /**
-     * Gets the roles suitable for a REF unit as a stream.
-     *
-     * @param naval If true, choose roles for naval units, if not, land units.
-     * @return A stream of {@code Role}s suitable for REF units.
-     */
-    public Stream<Role> getREFRoles(boolean naval) {
-        return getREFRolesList(naval).stream();
-    }
-
-    /**
-     * Get a role with an ability.
-     *
-     * @param id The ability identifier to look for.
-     * @param roles An optional list of {@code Role}s to look in,
-     *     if null all roles are used.
-     * @return The first {@code Role} found with the required
-     *     ability, or null if none found.
-     */
-    public Role getRoleWithAbility(String id, List<Role> roles) {
-        return find(getRoles(), r -> r.hasAbility(id));
-    }
-
-    /**
-     * Get the missionary role.
-     *
-     * @return The missionary {@code Role}.
-     */
-    public Role getMissionaryRole() {
-        return getRoleWithAbility(Ability.ESTABLISH_MISSION, null);
-    }
-
-    /**
-     * Get the pioneer role.
-     *
-     * @return The pioneer {@code Role}.
-     */
-    public Role getPioneerRole() {
-        return getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
-    }
-
-    /**
-     * Get the scout role.
-     *
-     * @return The scout {@code Role}.
-     */
-    public Role getScoutRole() {
-        return getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
-    }
-
-
-    // -- DifficultyLevels --
-
-    /**
-     * Gets the difficulty levels in this specification.
-     *
-     * @return A list of difficulty levels in this specification.
-     */
-    public List<OptionGroup> getDifficultyLevels() {
-        OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
-        Stream<Option> stream = (group == null) ? Stream.<Option>empty()
-            : group.getOptions().stream();
-        return transform(stream, (Option o) -> o instanceof OptionGroup,
-                         o -> (OptionGroup)o);
-    }
-
-    /**
-     * Get the current difficulty level.
-     *
-     * @return The difficulty level.
-     */
-    public String getDifficultyLevel() {
-        return this.difficultyLevel;
-    }
-
-    /**
-     * Gets the current difficulty level options.
-     *
-     * @return The current difficulty level {@code OptionGroup}.
-     */
-    public OptionGroup getDifficultyOptionGroup() {
-        return getDifficultyOptionGroup(this.difficultyLevel);
-    }
-
-    /**
-     * Gets difficulty level options by id.
-     *
-     * @param id The difficulty level identifier to look for.
-     * @return The corresponding difficulty level {@code OptionGroup},
-     *     if any.
-     */
-    public OptionGroup getDifficultyOptionGroup(String id) {
-        return find(getDifficultyLevels(),
-                    matchKeyEquals(id, FreeColObject::getId));
-    }
-
-    /**
-     * Add/overwrite a difficulty option group.
-     *
-     * @param difficulty The {@code OptionGroup} to add.
-     */
-    private void setDifficultyOptionGroup(OptionGroup difficulty) {
-        OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
-        if (group != null) group.add(difficulty);
-        allOptionGroups.put(difficulty.getId(), difficulty);
-    }
-
-    /**
-     * Applies the difficulty level identified by the given String to
-     * the current specification.
-     *
-     * @param difficulty The identifier of a difficulty level to apply.
-     */
-    public void applyDifficultyLevel(String difficulty) {
-        applyDifficultyLevel(getDifficultyOptionGroup(difficulty));
-    }
-
-    /**
-     * Applies the given difficulty level to the current
-     * specification.
-     *
-     * @param level The difficulty level {@code OptionGroup} to apply.
-     */
-    public void applyDifficultyLevel(OptionGroup level) {
-        if (level == null) {
-            logger.warning("Null difficulty level supplied");
-            return;
-        }
-        logger.config("Applying difficulty level " + level.getId());
-        addOptionGroup(level, true);
-        this.difficultyLevel = level.getId();
-    }
-
-    public OptionGroup getGameOptions() {
-        return getOptionGroup(GameOptions.TAG);
-    }
-
-    public void setGameOptions(OptionGroup go) {
-        allOptionGroups.put(GameOptions.TAG, go);
-        addOptionGroup(go, true);
-    }
-
-    public OptionGroup getMapGeneratorOptions() {
-        return getOptionGroup(MapGeneratorOptions.TAG);
-    }
-
-    public void setMapGeneratorOptions(OptionGroup mgo) {
-        allOptionGroups.put(MapGeneratorOptions.TAG, mgo);
-        addOptionGroup(mgo, true);
-    }
-
-
-    // -- Events --
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    /**
-     * Get an event by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code Event} found.
-     */
-    public Event getEvent(String id) {
-        return getType(id, Event.class);
-    }
-
-    // -- Disasters --
-
-    public List<Disaster> getDisasters() {
-        return disasters;
-    }
-
-    /**
-     * Get a disaster by identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code Disaster} found.
-     */
-    public Disaster getDisaster(String id) {
-        return getType(id, Disaster.class);
-    }
-
-    // -- Ages --
-
-    /**
-     * Gets the age corresponding to a given turn.
-     *
-     * @param turn The {@code Turn} to check.
-     * @return The age of the given turn.
-     */
-    public int getAge(Turn turn) {
-        int n = turn.getNumber();
-        return (n < ages[0]) ? -1
-            : (n < ages[1]) ? 0
-            : (n < ages[2]) ? 1
-            : 2;
-    }
-
-
     // General type retrieval
 
     /**
-     * Get the {@code FreeColSpecObjectType} with the given identifier.
+     * Find the {@code FreeColSpecObjectType} with the given identifier.
      *
      * @param <T> The actual return type.
      * @param id The object identifier to look for.
      * @param returnClass The expected {@code Class}.
      * @return The {@code FreeColSpecObjectType} found.
      */
-    public <T extends FreeColSpecObjectType> T getType(String id,
-                                                       Class<T> returnClass) {
-        FreeColSpecObjectType o = findType(id);
-        if (o != null) {
-            return returnClass.cast(allTypes.get(id));
+    public <T extends FreeColSpecObjectType> T findType(String id,
+                                                        Class<T> returnClass) {
+        T o = getType(id, returnClass);
+        if (o != null) return o;
 
-        } else if (initialized) {
-            throw new IllegalArgumentException("Undefined FCGOT: " + id);
-
-        } else { // forward declaration of new type
-            try {
-                Constructor<T> c = returnClass.getConstructor(String.class,
-                    Specification.class);
-                T result = c.newInstance(id, this);
-                allTypes.put(id, result);
-                return result;
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not construct: " + id, e);
-            }
+        if (initialized) {
+            throw new RuntimeException("Undefined FCGOT: " + id);
         }
-        return null;
+
+        // forward declaration of new type
+        o = newType(id, returnClass);
+        addType(id, o);
+        return o;
     }
 
     /**
-     * Find a {@code FreeColSpecObjectType} by id.
+     * Build a new {@code FreeColSpecObjectType} with given identifier
+     * and class.
      *
-     * @param id The identifier to look for, which must not be null.
-     * @return The {@code FreeColSpecObjectType} found if any.
+     * @param <T> The actual return type.
+     * @param id The identifier to look for.
+     * @param returnClass The expected {@code Class}.
+     * @return The new {@code FreeColSpecObjectType} or null on error.
      */
-    public FreeColSpecObjectType findType(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Null id");
-
-        } else if (allTypes.containsKey(id)) {
-            return allTypes.get(id);
-
-        } else {
-            return null;
+    private <T extends FreeColSpecObjectType> T newType(String id,
+                                                        Class<T> returnClass) {
+        try {
+            return Introspector.instantiate(returnClass, newTypeClasses,
+                                            new Object[] { id, this });
+        } catch (Introspector.IntrospectorException ie) {
+            logger.log(Level.WARNING, "newType(" + id
+                + "," + returnClass.getName() + ") failed", ie);
         }
+        return null;
     }
 
     /**
@@ -1979,26 +2072,32 @@ public final class Specification implements OptionContainer {
 
     /**
      * Apply all the special fixes to bring older specifications up to date.
+     *
+     * @return True if a change was made.
      */
-    private void applyFixes() {
-        fixDifficultyOptions();
-        fixGameOptions();
-        fixMapGeneratorOptions();
-        fixOrphanOptions();
+    private boolean applyFixes() {
+        boolean ret = false;
+        ret |= fixDifficultyOptions();
+        ret |= fixGameOptions();
+        ret |= fixMapGeneratorOptions();
+        ret |= fixOrphanOptions();
         // @compat 0.11.0
-        fixRoles();
+        ret |= fixRoles();
         // end @compat 0.11.0
         // @compat 0.11.6
-        fixUnitChanges();
+        ret |= fixUnitChanges();
         // end @compat 0.11.6
-        fixSpec();
+        ret |= fixSpec();
+        return ret;
     }
 
     /**
      * Find and remove orphan options/groups that are not part of the
      * core tree of options.
+     *
+     * @return True if a fix was made.
      */
-    private void fixOrphanOptions() {
+    private boolean fixOrphanOptions() {
         Collection<AbstractOption> allO = new HashSet<>(allOptions.values());
         Collection<AbstractOption> allG = new HashSet<>(allOptionGroups.values());
         for (String id : coreOptionGroups) {
@@ -2015,6 +2114,7 @@ public final class Specification implements OptionContainer {
             allOptionGroups.remove(ao.getId());
             logger.warning("Dropping orphan option group: " + ao);
         }
+        return !allO.isEmpty() || !allG.isEmpty();
     }
 
     /**
@@ -2041,32 +2141,33 @@ public final class Specification implements OptionContainer {
      *
      * Deliberately not part of applyFixes(), this is called from readFromXML
      * which can most accurately determine whether it is needed.
+     *
+     * @return True if a fix was made.
      */
-    private void fixRoles() {
-        if (!roles.isEmpty()) return; // Trust what is there
+    private boolean fixRoles() {
+        if (!roles.isEmpty()) return false; // Trust what is there
 
-        if (compareVersion("0.85") > 0) return;
+        if (compareVersion("0.85") > 0) return false;
 
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
-        try (
-            FileInputStream fis = new FileInputStream(rolf);
-        ) {
+        try (InputStream fis = Files.newInputStream(rolf.toPath())) {
             load(fis);
-        } catch (Exception e) {
+        } catch (IOException|XMLStreamException e) {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
-            return;
+            return false;
         }
 
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: "
             + transform(getRoles(), alwaysTrue(), Role::getId,
                         Collectors.joining(" ")));
+        return true;
     }
     // end @compat 0.11.0
 
     // @compat 0.11.6
-    private void fixUnitChanges() {
-        if (compareVersion("0.116") > 0) return;
+    private boolean fixUnitChanges() {
+        if (compareVersion("0.116") > 0) return false;
 
         // Unlike roles, we can not trust what is already there, as the changes
         // are deeper.  However we preserve the ENTER_COLONY change as that
@@ -2074,13 +2175,11 @@ public final class Specification implements OptionContainer {
         UnitChangeType enter = find(unitChangeTypeList,
             matchKeyEquals(UnitChangeType.ENTER_COLONY, UnitChangeType::getId));
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME);
-        try (
-             FileInputStream fis = new FileInputStream(uctf);
-             ) {
+        try (InputStream fis = Files.newInputStream(uctf.toPath())) {
             load(fis);
-        } catch (Exception e) {
+        } catch (IOException|XMLStreamException e) {
             logger.log(Level.WARNING, "Failed to load unit changes.", e);
-            return;
+            return false;
         }
         if (enter != null) {
             unitChangeTypeList.add(enter);
@@ -2090,13 +2189,17 @@ public final class Specification implements OptionContainer {
             + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
             + transform(getUnitChangeTypeList(), alwaysTrue(),
                 UnitChangeType::getId, Collectors.joining(" ")));
+        return true;
     }
     // end @compat 0.11.6
 
     /**
      * Backward compatibility for the Specification in general.
+     *
+     * @return True if a fix was made.
      */
-    private void fixSpec() {
+    private boolean fixSpec() {
+        boolean ret = false;
         // @compat 0.10.x/0.11.x
         // This section contains a bunch of things that were
         // discovered and fixed post 0.11.0.
@@ -2106,15 +2209,19 @@ public final class Specification implements OptionContainer {
 
         // 0.10.x had no unknown enemy nation, just an unknown enemy
         // player, and the type was poorly established.
-        Nation ue = getUnknownEnemyNation();
+        Nation ue = findType(Nation.UNKNOWN_NATION_ID, Nation.class);
         ue.setType(getNationType("model.nationType.default"));
-        if (!nations.contains(ue)) nations.add(ue);
+        if (!nations.contains(ue)) {
+            nations.add(ue);
+            ret = true;
+        }
 
         // Nation colour moved (back) into the spec in 0.11.0, but the fixup
         // code was just a wrapper, and did not modify the underlying spec.
         for (Nation nation : nations) {
             if (nation.getColor() == null) {
                 nation.setColor(defaultColors.get(nation.getId()));
+                ret = true;
             }
         }
 
@@ -2125,6 +2232,7 @@ public final class Specification implements OptionContainer {
             && !coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
             coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
                                             coronado, true));
+            ret = true;
         }
 
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
@@ -2135,8 +2243,10 @@ public final class Specification implements OptionContainer {
             Option refSize = ((OptionGroup)((monarch instanceof OptionGroup)
                     ? monarch : level)).getOption(GameOptions.REF_FORCE);
             if (!(refSize instanceof UnitListOption)) continue;
+            boolean changed;
             for (AbstractUnit au
                      : ((UnitListOption)refSize).getOptionValues()) {
+                changed = true;
                 if ("DEFAULT".equals(au.getRoleId())) {
                     au.setRoleId(DEFAULT_ROLE_ID);
                 } else if ("model.role.soldier".equals(au.getRoleId())
@@ -2145,7 +2255,10 @@ public final class Specification implements OptionContainer {
                 } else if ("model.role.dragoon".equals(au.getRoleId())
                     || "DRAGOON".equals(au.getRoleId())) {
                     au.setRoleId("model.role.cavalry");
+                } else {
+                    changed = false;
                 }
+                if (changed) ret = true;
             }
         }
 
@@ -2157,12 +2270,14 @@ public final class Specification implements OptionContainer {
                 List<Option> next = ((OptionGroup)o).getOptions();
                 todo.addAll(new ArrayList<>(next));
             } else if (o instanceof UnitListOption) {
+                boolean changed;
                 for (AbstractUnit au : ((UnitListOption)o).getOptionValues()) {
                     String roleId = au.getRoleId();
+                    changed = true;
                     if (roleId == null) {
                         au.setRoleId(DEFAULT_ROLE_ID);
                     } else if (au.getRoleId().startsWith("model.role.")) {
-                        ; // OK
+                        changed = false; // OK
                     } else if ("DEFAULT".equals(au.getRoleId())) {
                         au.setRoleId(DEFAULT_ROLE_ID);
                     } else if ("DRAGOON".equals(au.getRoleId())) {
@@ -2178,15 +2293,22 @@ public final class Specification implements OptionContainer {
                     } else {
                         au.setRoleId(DEFAULT_ROLE_ID);
                     }
+                    if (changed) ret = true;
                 }
             }
         }
 
         // is-military was added to goods type
         GoodsType goodsType = getGoodsType("model.goods.horses");
-        goodsType.setMilitary();
+        if (!goodsType.getMilitary()) {
+            goodsType.setMilitary();
+            ret = true;
+        }
         goodsType = getGoodsType("model.goods.muskets");
-        goodsType.setMilitary();
+        if (!goodsType.getMilitary()) {
+            goodsType.setMilitary();
+            ret = true;
+        }
         // end @compat 0.10.x/0.11.x
 
         // @compat 0.11.0
@@ -2205,12 +2327,14 @@ public final class Specification implements OptionContainer {
         if (bolivarAdd) {
             bolivar.addModifier(new Modifier(Modifier.SOL, 20,
                     Modifier.ModifierType.ADDITIVE, bolivar, 0));
+            ret = true;
         }
 
         // The COASTAL_ONLY attribute was added to customs house.
         BuildingType customs = getBuildingType("model.building.customHouse");
         if (!customs.hasAbility(Ability.COASTAL_ONLY)) {
             customs.addAbility(new Ability(Ability.COASTAL_ONLY, null, false));
+            ret = true;
         }
         // end @compat 0.11.0
 
@@ -2220,6 +2344,7 @@ public final class Specification implements OptionContainer {
             addModifier(new Modifier(Modifier.CARGO_PENALTY, -12.5f,
                     Modifier.ModifierType.PERCENTAGE, CARGO_PENALTY_SOURCE,
                     Modifier.GENERAL_COMBAT_INDEX));
+            ret = true;
         }
 
         // Backwards compatibility for the fixes to BR#2873.
@@ -2229,6 +2354,7 @@ public final class Specification implements OptionContainer {
             if (limit != null) {
                 limit.setOperator(Limit.Operator.GE);
                 limit.getRightHandSide().setValue(1);
+                ret = true;
             }
         }
         // end @compat 0.11.3
@@ -2243,12 +2369,14 @@ public final class Specification implements OptionContainer {
             scope.setType("model.goods.lumber");
             m.addScope(scope);
             hardyPioneer.addModifier(m);
+            ret = true;
         }
 
         // Added modifier to Coronado
         if (!coronado.hasModifier(Modifier.EXPOSED_TILES_RADIUS)) {
             coronado.addModifier(new Modifier(Modifier.EXPOSED_TILES_RADIUS,
                     3.0f, Modifier.ModifierType.ADDITIVE, coronado, 0));
+            ret = true;
         }
         // end @compat 0.11.5
 
@@ -2265,6 +2393,7 @@ public final class Specification implements OptionContainer {
                             + ((st.isCapital()) ? ".capital" : "")
                             + ((scope == null) ? "" : ".extra");
                         pt.setId(id);
+                        ret = true;
                     }
                 }
             }
@@ -2278,12 +2407,14 @@ public final class Specification implements OptionContainer {
             Ability uc = new Ability(Ability.UPGRADE_CONVERT, casas, true);
             addAbility(uc);
             casas.addAbility(uc);
+            ret = true;
         }
 
         // Added mercenary-price to manOWar
         UnitType mow = getUnitType("model.unit.manOWar");
         if (mow != null && mow.getMercenaryPrice() < 0) {
             mow.setMercenaryPrice(10000);
+            ret = true;
         }
         // Old manOWars required independenceDeclared which was moved to
         // independentNation a while back, but surfaced again in old games
@@ -2291,6 +2422,7 @@ public final class Specification implements OptionContainer {
         if (mow != null && mow.requiresAbility(maidId)) {
             mow.removeRequiredAbility(maidId);
             mow.addRequiredAbility(Ability.INDEPENDENT_NATION, true);
+            ret = true;
         }
 
         // Added canBeSurrendered ability to all the REF units.
@@ -2301,10 +2433,12 @@ public final class Specification implements OptionContainer {
         for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
             if (!ut.containsAbilityKey(Ability.CAN_BE_SURRENDERED)) {
                 ut.addAbility(new Ability(Ability.CAN_BE_SURRENDERED, null,
-                        ut.getId().equals("model.unit.artillery")));
+                        "model.unit.artillery".equals(ut.getId())));
+                ret = true;
             }
         }
         // end @compat 0.11.6
+        return ret;
     }
 
     /**
@@ -2767,7 +2901,7 @@ public final class Specification implements OptionContainer {
      *
      * @return True if an option was missing and added.
      */
-    public boolean fixGameOptions() {
+    private boolean fixGameOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
 
@@ -2776,7 +2910,7 @@ public final class Specification implements OptionContainer {
         // @compat 0.10.5
         ret |= checkOp(GameOptions.ENABLE_UPKEEP,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.NATURAL_DISASTERS,
                        GameOptions.GAMEOPTIONS_COLONY,
                        0, PercentageOption.class);
@@ -2788,7 +2922,7 @@ public final class Specification implements OptionContainer {
                        10, PercentageOption.class);
         ret |= checkOp(GameOptions.EMPTY_TRADERS,
                        GameOptions.GAMEOPTIONS_MAP,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         // end @compat 0.10.5
 
         // SAVEGAME_VERSION == 13
@@ -2796,7 +2930,7 @@ public final class Specification implements OptionContainer {
         // @compat 0.10.7
         ret |= checkOp(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         ret |= checkOp(GameOptions.PEACE_PROBABILITY,
                        GameOptions.GAMEOPTIONS_MAP,
                        90, PercentageOption.class);
@@ -2811,28 +2945,28 @@ public final class Specification implements OptionContainer {
                        2, IntegerOption.class);
         ret |= checkOp(GameOptions.FOUND_COLONY_DURING_REBELLION,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         // end @compat 0.10.7
 
         // @compat 0.11.0
         ret |= checkOp(GameOptions.BELL_ACCUMULATION_CAPPED,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.CAPTURE_UNITS_UNDER_REPAIR,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.PAY_FOR_BUILDING,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         ret |= checkOp(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.CUSTOMS_ON_COAST,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.EQUIP_EUROPEAN_RECRUITS,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         // end @compat 0.11.0
 
         // @compat 0.11.3
@@ -2850,10 +2984,10 @@ public final class Specification implements OptionContainer {
                        2, IntegerOption.class);
         ret |= checkOp(GameOptions.DISEMBARK_IN_COLONY,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.ENHANCED_TRADE_ROUTES,
                        GameOptions.GAMEOPTIONS_MAP,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         // end @compat 0.11.3
 
         // @compat 0.11.6
@@ -2884,7 +3018,7 @@ public final class Specification implements OptionContainer {
      *
      * @return True if an option was missing and added.
      */
-    public boolean fixMapGeneratorOptions() {
+    private boolean fixMapGeneratorOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
         // SAVEGAME_VERSION == 12
@@ -2898,8 +3032,8 @@ public final class Specification implements OptionContainer {
      *
      * FIXME: Handles failure to create a needed option badly.
      *
-     * @param R The underlying type encapsulated by the option.
-     * @param T The option type.
+     * @param <R> The underlying type encapsulated by the option.
+     * @param <T> The option type.
      * @param id The option identifier.
      * @param gr The option group identifier.
      * @param defaultValue The default value of the option.
@@ -3062,7 +3196,7 @@ public final class Specification implements OptionContainer {
         while (xr.moreTags()) {
             String childName = xr.getLocalName();
             // @compat 0.11.0
-            if (childName.equals(OLD_EQUIPMENT_TYPES_TAG)) {
+            if (OLD_EQUIPMENT_TYPES_TAG.equals(childName)) {
                 xr.swallowTag(OLD_EQUIPMENT_TYPES_TAG);
                 continue;
             }

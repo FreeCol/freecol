@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -108,18 +108,6 @@ public class Force extends FreeColSpecObject {
     }
 
     /**
-     * Update the space and capacity variables.
-     */
-    public final void updateSpaceAndCapacity() {
-        final Specification spec = getSpecification();
-        this.capacity = sum(this.navalUnits,
-                            nu -> nu.getType(spec).canCarryUnits(),
-                            nu -> nu.getType(spec).getSpace() * nu.getNumber());
-        this.spaceRequired = sum(this.landUnits,
-                                 lu -> lu.getType(spec).getSpaceTaken() * lu.getNumber());
-    }
-
-    /**
      * Gets all units.
      *
      * @return A copy of the list of all units.
@@ -199,18 +187,16 @@ public class Force extends FreeColSpecObject {
      *
      * @param au The addition to this {@code Force}.
      */
-    public void add(AbstractUnit au) {
+    public final void add(AbstractUnit au) {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
         final int n = au.getNumber();
-        final Predicate<AbstractUnit> matchPred = a ->
-            spec.getUnitType(a.getId()) == unitType
-                && a.getRoleId().equals(au.getRoleId());
+        final Predicate<AbstractUnit> matchPred = AbstractUnit.matcher(au);
 
         if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
             AbstractUnit refUnit = find(this.navalUnits, matchPred);
             if (refUnit != null) {
-                refUnit.setNumber(refUnit.getNumber() + n);
+                refUnit.addToNumber(n);
                 if (unitType.canCarryUnits()) {
                     this.capacity += unitType.getSpace() * n;
                 }
@@ -220,7 +206,7 @@ public class Force extends FreeColSpecObject {
         } else {
             AbstractUnit refUnit = find(this.landUnits, matchPred);
             if (refUnit != null) {
-                refUnit.setNumber(refUnit.getNumber() + n);
+                refUnit.addToNumber(n);
                 this.spaceRequired += unitType.getSpaceTaken() * n;
             } else {
                 this.landUnits.add(au);
@@ -242,23 +228,35 @@ public class Force extends FreeColSpecObject {
 
     /**
      * Defend against underprovisioned navies.
+     *
+     * @return True if the navy can carry the army.
      */
     public boolean prepareToBoard() {
-        if (this.navalUnits.isEmpty()) return false;
-        updateSpaceAndCapacity();
-        AbstractUnit ship0 = this.navalUnits.get(0);
-        int n = ship0.getNumber(),
-            sp = ship0.getType(getSpecification()).getSpace(),
-            space = getSpaceRequired(),
-            capacity = getCapacity();
-        while (space > capacity) {
-            n++;
-            ship0.setNumber(n);
-            capacity += sp;
+        final Specification spec = getSpecification();
+        AbstractUnit ship0 = find(this.navalUnits,
+            au -> au.getType(spec).getSpace() > 0);
+        if (ship0 != null) {
+            int sp = ship0.getType(spec).getSpace(),
+                more = (this.spaceRequired - this.capacity) / sp + 1;
+            if (more > 0) {
+                ship0.setNumber(ship0.getNumber() + more);
+                this.capacity += sp * more;
+            }
         }
-        return true;
+        return this.spaceRequired <= this.capacity;
     }
-        
+
+    /**
+     * Does another force match?
+     *
+     * @param other The other <code>Force</code> to test.
+     * @return True if the other force contains the same units.
+     */
+    public boolean matchAll(Force other) {
+        return AbstractUnit.matchUnits(this.landUnits, other.landUnits)
+            && AbstractUnit.matchUnits(this.navalUnits, other.navalUnits);
+    }
+
 
     // Override FreeColObject
 
@@ -319,13 +317,11 @@ public class Force extends FreeColSpecObject {
 
             if (LAND_UNITS_TAG.equals(tag)) {
                 while (xr.moreTags()) {
-                    AbstractUnit au = new AbstractUnit(xr);
-                    if (au != null) add(au);
+                    add(new AbstractUnit(xr));
                 }
             } else if (NAVAL_UNITS_TAG.equals(tag)) {
                 while (xr.moreTags()) {
-                    AbstractUnit au = new AbstractUnit(xr);
-                    if (au != null) add(au);
+                    add(new AbstractUnit(xr));
                 }
             } else {
                 logger.warning("Bogus Force tag: " + tag);
@@ -337,4 +333,20 @@ public class Force extends FreeColSpecObject {
      * {@inheritDoc}
      */
     public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("<Force");
+        for (AbstractUnit au : this.landUnits) sb.append(' ').append(au);
+        for (AbstractUnit au : this.navalUnits) sb.append(' ').append(au);
+        sb.append('>');
+        return sb.toString();
+    }
 }

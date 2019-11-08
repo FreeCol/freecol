@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -50,7 +50,7 @@ public class UnitWanderMission extends Mission {
      * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public UnitWanderMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit, null);
+        super(aiMain, aiUnit);
     }
 
     /**
@@ -86,7 +86,7 @@ public class UnitWanderMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void setTarget(Location target) {}
+    public void setTarget(Location target) {} // ignore
 
     /**
      * {@inheritDoc}

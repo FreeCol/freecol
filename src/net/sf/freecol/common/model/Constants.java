@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,70 @@ package net.sf.freecol.common.model;
  */
 public interface Constants {
 
+    /** Generic "huge" value. */
+    public static final int INFINITY = Integer.MAX_VALUE;
+
+    /** Generic "unsure" value. */
+    public static final int UNDEFINED = Integer.MIN_VALUE;
+
+    /** The result of checkIntegrity. */
+    public static enum IntegrityType {
+        INTEGRITY_FAIL(-1),
+        INTEGRITY_FIXED(0),
+        INTEGRITY_GOOD(1);
+
+        /** The magic value. */
+        private int val;
+
+        /**
+         * Build an integrity type with the given value.
+         *
+         * @param val The value.
+         */
+        IntegrityType(int val) {
+            this.val = val;
+        }
+
+        /**
+         * Is this integrity safe (i.e. non-failed).
+         *
+         * @return True if the integrity is safe.
+         */
+        public boolean safe() {
+            return this != INTEGRITY_FAIL;
+        }
+
+        /**
+         * Combine this integrity with another.
+         *
+         * @param it The other {@code IntegrityType}.
+         * @return The combined integrity.
+         */
+        public IntegrityType combine(IntegrityType it) {
+            return values()[1 + Math.min(this.val, it.val)];
+        }
+
+        /**
+         * Get the fixed version of this integrity.
+         *
+         * If the integrity is broken, nothing can happen.
+         *
+         * @return The fixed {@code IntegrityType}.
+         */
+        public IntegrityType fix() {
+            return combine(INTEGRITY_FIXED);
+        }
+
+        /**
+         * Get the failed version of this integrity.
+         *
+         * @return INTEGRITY_FAIL.
+         */
+        public IntegrityType fail() {
+            return INTEGRITY_FAIL;
+        }
+    };
+    
     /** Actions when an armed unit contacts a settlement. */
     public static enum ArmedUnitSettlementAction {
         SETTLEMENT_ATTACK,
@@ -45,9 +109,13 @@ public interface Constants {
         CLAIM_STEAL
     }
 
-    /** Price used to denote claiming land by stealing it. */
-    public static final int STEAL_LAND = -1;
-
+    /** Actions surrounding native demands at colonies. */
+    public static enum IndianDemandAction {
+        INDIAN_DEMAND_ACCEPT,
+        INDIAN_DEMAND_REJECT,
+        INDIAN_DEMAND_DONE
+    }
+    
     /** Actions with a missionary at a native settlement. */
     public static enum MissionaryAction {
         MISSIONARY_ESTABLISH_MISSION,
@@ -68,6 +136,9 @@ public interface Constants {
         SCOUT_SETTLEMENT_TRIBUTE,
         SCOUT_SETTLEMENT_ATTACK
     }
+
+    /** Price used to denote claiming land by stealing it. */
+    public static final int STEAL_LAND = -1;
 
     /** Choice of sales action at a native settlement. */
     public static enum TradeAction {

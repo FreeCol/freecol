@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,6 +25,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -36,7 +38,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Represents the need for a worker within a {@code Colony}.
  */
-public class WorkerWish extends Wish {
+public final class WorkerWish extends Wish {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkerWish.class.getName());
@@ -60,8 +62,9 @@ public class WorkerWish extends Wish {
     public WorkerWish(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        unitType = null;
-        expertNeeded = false;
+        this.unitType = null;
+        this.expertNeeded = false;
+        this.initialized = false;
     }
 
     /**
@@ -83,14 +86,14 @@ public class WorkerWish extends Wish {
         this(aiMain, TAG + ":" + aiMain.getNextId());
 
         if (destination == null) {
-            throw new NullPointerException("destination == null");
+            throw new NullPointerException("destination == null: " + this);
         }
 
         this.destination = destination;
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
-        uninitialized = false;
+        setInitialized();
     }
 
     /**
@@ -106,9 +109,15 @@ public class WorkerWish extends Wish {
                       FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = unitType == null;
+        setInitialized();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = this.destination != null && this.unitType != null;
+    }
 
     /**
      * Updates this {@code WorkerWish} with the given attributes.
@@ -146,6 +155,13 @@ public class WorkerWish extends Wish {
             : unit.getType().isNaval() == unitType.isNaval();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public <T extends AbstractGoods> boolean satisfiedBy(T goods) {
+        return false;
+    }
+
 
     // Override AIObject
 
@@ -153,11 +169,11 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (unitType == null) {
             lb.add("\n  Wish unit without type: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }
@@ -208,16 +224,6 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (unitType != null) uninitialized = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getXMLTagName() { return TAG; }
 
 
@@ -227,14 +233,12 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof WorkerWish) {
-            WorkerWish ow = (WorkerWish)other;
-            return super.equals(ow)
-                && Utils.equals(this.unitType, ow.unitType)
-                && this.expertNeeded == ow.expertNeeded;
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof WorkerWish)) return false;
+        WorkerWish other = (WorkerWish)o;
+        return this.expertNeeded == other.expertNeeded
+            && Utils.equals(this.unitType, other.unitType)
+            && super.equals(other);
     }
 
     /**

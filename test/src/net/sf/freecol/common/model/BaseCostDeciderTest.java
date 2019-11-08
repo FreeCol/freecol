@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,7 +69,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
 
         final CostDecider decider = CostDeciders.avoidSettlements();
         Tile start = game.getMap().getTile(5, 5);
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Unit unit = new ServerUnit(game, start, french, pioneerType);
         for (Direction dir : Direction.values()) {
             Tile end = start.getNeighbourOrNull(dir);
@@ -90,7 +90,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         game.setMap(map);
 
         final CostDecider decider = CostDeciders.avoidSettlements();
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Unit unit = new ServerUnit(game, game.getMap().getTile(1, 1),
                                    french, pioneerType);
         int cost = decider.getCost(unit, game.getMap().getTile(1, 1),
@@ -111,7 +111,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
 
         Tile unitTile = map.getTile(9, 9);
         assertTrue("Unit tile should be land",unitTile.isLand());
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Unit unit = new ServerUnit(game, unitTile, french, pioneerType);
         
         Tile seaTile = map.getTile(10, 9);
@@ -135,7 +135,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean", unitTile.isLand());
 
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Unit unit = new ServerUnit(game, unitTile, french, galleonType);
         
         Tile landTile = map.getTile(9, 9);
@@ -163,7 +163,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         settlementTile.changeOwningSettlement(settlement);
 
         Tile unitTile = map.getTile(1, 1);
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Unit unit = new ServerUnit(game, unitTile, french, pioneerType);
         // unit is going somewhere else
         Tile unitDestination = map.getTile(3, 1);
@@ -187,7 +187,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean",unitTile.isLand());
 
-        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Unit galleon = new ServerUnit(game, unitTile, french, galleonType);
         
         Tile settlementTile = map.getTile(9, 9);
@@ -242,8 +242,8 @@ public class BaseCostDeciderTest extends FreeColTestCase {
                        cost == CostDecider.ILLEGAL_MOVE);
         }
         assertNotNull("Path should be valid from carrier to settlement",
-                      map.findPath(colonist, unitTile, settlementTile,
-                                   galleon, base, null));
+                      colonist.findPath(unitTile, settlementTile,
+                                        galleon, base, null));
 
         // Set players at war
         Player indianPlayer = settlement.getOwner();

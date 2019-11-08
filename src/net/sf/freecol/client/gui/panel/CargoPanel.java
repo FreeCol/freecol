@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -60,7 +60,8 @@ public class CargoPanel extends FreeColPanel
      * @param withTitle Should the panel have a title?
      */
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
-        super(freeColClient, new MigLayout("wrap 6, fill, insets 0"));
+        super(freeColClient, "CargoPanelUI",
+              new MigLayout("wrap 6, fill, insets 0"));
 
         this.carrier = null;
         this.defaultTransferHandler
@@ -194,16 +195,15 @@ public class CargoPanel extends FreeColPanel
     }
 
     /**
-     * Add a {@code Component} of interface type {@code CargoLabel} to a carrier
-     *
      * {@inheritDoc}
      */
     @Override
     public Component add(Component comp, boolean editState) {
         if (carrier == null) {
             return null;
-        } else if (editState && comp instanceof CargoLabel) {
-            return ((CargoLabel) comp).addCargo(comp, carrier, this);
+        } else if (editState && comp instanceof CargoLabel
+            && ((CargoLabel)comp).addCargo(comp, carrier, this)) {
+            return comp;
         } else {
             super.add(comp);
         }
@@ -228,22 +228,6 @@ public class CargoPanel extends FreeColPanel
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();
-    }
-
-
-    // Override JLabel
-
-    /**
-     * {@inheritDoc}
-     *
-     * Specifies that this Panel uses the CargoPanelUI, which
-     * directs the Program Look and Feel (PLAF) by specifying the
-     * {@code FreeColBrightPanelUI} class, which is called from
-     * {@link FreeColLookAndFeel#getDefaults()} method.
-     */
-    @Override
-    public String getUIClassID() {
-        return "CargoPanelUI";
     }
 
 

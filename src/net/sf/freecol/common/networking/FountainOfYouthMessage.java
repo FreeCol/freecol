@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -83,7 +83,6 @@ public class FountainOfYouthMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final int n = getMigrants();
 
         if (n <= 0) {

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -50,7 +50,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * <li>Complete the mission by delivering the gift.
  * </ol>
  */
-public class IndianBringGiftMission extends Mission {
+public final class IndianBringGiftMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianBringGiftMission.class.getName());
 
@@ -74,8 +74,9 @@ public class IndianBringGiftMission extends Mission {
      * @param target The {@code Colony} receiving the gift.
      */
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
 
+        setTarget(target);
         this.collected = hasGift();
     }
 
@@ -114,7 +115,7 @@ public class IndianBringGiftMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         IndianSettlement home;
         return (reason != null)
@@ -158,8 +159,8 @@ public class IndianBringGiftMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -169,7 +170,7 @@ public class IndianBringGiftMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null) ? reason
             : (loc instanceof Colony)
@@ -223,7 +224,7 @@ public class IndianBringGiftMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), this.colony);
+        return invalidMissionReason(getAIUnit(), this.colony);
     }
 
     /**

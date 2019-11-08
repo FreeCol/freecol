@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -84,6 +84,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         }
 
 
+        // Override JButton
+
         /**
          * {@inheritDoc}
          */
@@ -108,8 +110,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
          * {@inheritDoc}
          */
         @Override
-        public void setLabelValues(JLabel c, T value) {
-            c.setText(Messages.message(prefix + value.toString()));
+        protected void setLabelValues(JLabel c, T value) {
+            c.setText(Messages.message(prefix + value));
         }
     }
 
@@ -279,8 +281,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         this.label.setIcon(new ImageIcon(this.flag.getImage()));
 
         // Create the main panel
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
-                                                    "[fill]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
+                                                  "[fill]"));
         panel.add(Utility.localizedTextArea(sure), "span");
         panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterCountry"), "span");
         panel.add(this.countryField, "span");
@@ -340,17 +342,14 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
             }
         }
 
-        panel.setPreferredSize(panel.getPreferredSize()); // Prevent NPE
-
         // Use the coat of arms image icon.  Is there something better?
         ImageIcon icon = new ImageIcon(getImageLibrary().getSmallNationImage(player.getNation()));
 
-        final List<String> fake = null;
         List<ChoiceItem<List<String>>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.yes"),
-                fake).okOption());
+                               (List<String>)null).okOption());
         c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.no"),
-                fake).cancelOption().defaultOption());
+                               (List<String>)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
     }
 
@@ -435,13 +434,11 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     @Override
     public List<String> getResponse() {
         Object value = getValue();
-        if (options.get(0).equals(value)) {
-            List<String> result = new ArrayList<>();
-            // Sanitize user input, used in save file name
-            result.add(this.nationField.getText().replaceAll("[^\\s\\w]", ""));
-            result.add(this.countryField.getText());
-            return result;
-        }
-        return null;
+        if (!options.get(0).equals(value)) return null;
+        List<String> result = new ArrayList<>();
+        // Sanitize user input, used in save file name
+        result.add(this.nationField.getText().replaceAll("[^\\s\\w]", ""));
+        result.add(this.countryField.getText());
+        return result;
     }
 }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -47,6 +47,11 @@ import net.sf.freecol.client.gui.dialog.Flag.UnionShape;
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
+    private static final String[] FLAG_NAMES = {
+        "England", "Spain", "France", "Netherlands",
+        "Portugal", "Sweden", "Denmark", "Russia", "Custom"
+    };
+
     private final Flag[] FLAGS = {
         ConfirmDeclarationDialog.ENGLISH_FLAG,
         ConfirmDeclarationDialog.SPANISH_FLAG,
@@ -57,11 +62,6 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         ConfirmDeclarationDialog.DANISH_FLAG,
         ConfirmDeclarationDialog.RUSSIAN_FLAG,
         null // custom
-    };
-
-    private static final String[] FLAG_NAMES = {
-        "England", "Spain", "France", "Netherlands",
-        "Portugal", "Sweden", "Denmark", "Russia", "Custom"
     };
 
     private Flag flag;
@@ -166,7 +166,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {
+    public final void itemStateChanged(ItemEvent e) {
         Background newBackground = (Background) background.getSelectedItem();
         Decoration newDecoration = (Decoration) decoration.getSelectedItem();
         UnionPosition newPosition = (UnionPosition) union.getSelectedItem();
@@ -237,7 +237,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         }
     }
 
-    public final String[] getNumbers(int count) {
+    private final String[] getNumbers(int count) {
         String[] result = new String[count];
         for (int index = 0; index < count; index++) {
             result[index] = Integer.toString(index + 1);

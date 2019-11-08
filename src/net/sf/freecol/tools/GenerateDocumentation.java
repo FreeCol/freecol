@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,6 +22,7 @@ package net.sf.freecol.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
@@ -68,7 +69,7 @@ public class GenerateDocumentation {
 
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         System.setProperty("jaxp.debug", "1");
         if (args.length > 0) {
             Arrays.sort(args);
@@ -82,8 +83,8 @@ public class GenerateDocumentation {
         System.out.println("Processing source file: resources.properties");
         File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
         try (
-                Reader reader = Utils.getFileUTF8Reader(sourceFile);
-                BufferedReader bufferedReader = new BufferedReader(reader);
+             Reader reader = Utils.getFileUTF8Reader(sourceFile);
+             BufferedReader bufferedReader = new BufferedReader(reader);
         ) {
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -95,12 +96,12 @@ public class GenerateDocumentation {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            System.err.println("Error reading resources: " + ioe);
         }
     }
 
-
+    /* Currently unused
     private static void generateTMX() {
 
         Map<String, Map<String, String>> translations = new HashMap<>();
@@ -169,8 +170,9 @@ public class GenerateDocumentation {
             e.printStackTrace();
         }
     }
-
-    public static void generateDocumentation(String[] languages) {
+    */
+    
+    private static void generateDocumentation(String[] languages) {
         for (String name : sourceFiles) {
 
             String languageCode = name.substring(15, name.length() - 11);
@@ -200,8 +202,7 @@ public class GenerateDocumentation {
                         stylesheet = factory.newTransformer(xsl);
                     } catch (TransformerException tce) {
                         System.err.println("Problem with " + XSL + " at: "
-                                                   + tce.getLocationAsString());
-                        tce.printStackTrace();
+                            + tce.getLocationAsString() + '\n' + tce);
                         continue;
                     }
 
@@ -211,7 +212,7 @@ public class GenerateDocumentation {
                     stylesheet.transform(request, response);
                 }
                 catch (TransformerException e) {
-                    e.printStackTrace();
+                    System.err.println("Transformation error: " + e);
                 }
             }
         }
@@ -224,8 +225,8 @@ public class GenerateDocumentation {
         final String[] splitKey = key.split("\\.");
         String found = resources.get(ourKey);
         if (found == null && splitKey.length > 2
-                && splitKey[0].equals("model")) {
-            String suffix = (splitKey[1].equals("tile")) ? ".center.r0" : "";
+                && "model".equals(splitKey[0])) {
+            String suffix = ("tile".equals(splitKey[1])) ? ".center.r0" : "";
             options[0] = splitKey[1];
             options[1] = splitKey[1] + "icon";
             for (String x : options) {

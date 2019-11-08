@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,10 +54,8 @@ public class VacantPlayersMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to (null here).
      * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if the stream is corrupt.
      */
-    public VacantPlayersMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public VacantPlayersMessage(Game game, FreeColXMLReader xr) {
         super(TAG, xr.getArrayAttributeMap());
     }
 
@@ -112,7 +110,7 @@ public class VacantPlayersMessage extends AttributeMessage {
     public VacantPlayersMessage setVacantPlayers(Game game) {
         if (game == null) return this;
         final Predicate<Player> vacantPred = p ->
-            !p.isREF() && (p.isAI() || !((ServerPlayer)p).isConnected());
+            !p.isREF() && (p.isAI() || !p.isConnected());
         setArrayAttributes(transform(game.getLiveEuropeanPlayers(),
                                      vacantPred, Player::getNationId));
         return this;

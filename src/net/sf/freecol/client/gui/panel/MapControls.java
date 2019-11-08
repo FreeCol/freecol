@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -100,8 +100,8 @@ public abstract class MapControls extends FreeColClientHolder {
                 for (TileImprovementType type : spec.getTileImprovementTypeList()) {
                     FreeColAction action = am.getFreeColAction(type.getSuffix()
                                                                + "Action");
-                    if (!type.isNatural() && action != null
-                        && action.hasOrderButtons()) {
+                    if (action != null && action.hasOrderButtons()
+                        && !type.isNatural()) {
                         unitButtons.add(new UnitButton(am, type.getSuffix() + "Action"));
                     }
                 }

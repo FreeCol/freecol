@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -84,7 +84,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private final FreeColClient freeColClient;
 
-    private final SwingGUI gui;
+    private final GUI gui;
 
     private final FreeColPanel parentPanel;
 
@@ -98,7 +98,7 @@ public final class QuickActionMenu extends JPopupMenu {
     public QuickActionMenu(FreeColClient freeColClient,
                            FreeColPanel freeColPanel) {
         this.freeColClient = freeColClient;
-        this.gui = (SwingGUI)freeColClient.getGUI();
+        this.gui = freeColClient.getGUI();
         this.parentPanel = freeColPanel;
     }
 
@@ -464,11 +464,10 @@ public final class QuickActionMenu extends JPopupMenu {
                                                    expertType);
             if (uc != null) {
                 int maxExperience = unit.getType().getMaximumExperience();
-                double probability = uc.probability * experience
-                    / (double)maxExperience;
+                float probability = uc.probability * experience
+                    / (float)maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
-                JPanel experiencePanel = new MigPanel();
-                experiencePanel.setLayout(new MigLayout("wrap 3"));
+                JPanel experiencePanel = new MigPanel(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(new ImageIcon(
                         lib.getSmallerUnitTypeImage(expertType))),
                     "spany 2");
@@ -565,7 +564,7 @@ public final class QuickActionMenu extends JPopupMenu {
             menuItem = Utility.localizedMenuItem((tempUnit.getSettlement() != null) ? "unload" : "dumpCargo");
             menuItem.setActionCommand(UnitAction.UNLOAD.toString());
             menuItem.addActionListener(unitLabel);
-            menuItem.setEnabled(tempUnit.hasCargo() && !isUnitAtSea);
+            menuItem.setEnabled(!isUnitAtSea && tempUnit.hasCargo());
             this.add(menuItem);
         }
 
@@ -657,7 +656,6 @@ public final class QuickActionMenu extends JPopupMenu {
      * @return True if menu items were added and a separator is now needed.
      */
     private boolean addRoleItems(final UnitLabel unitLabel) {
-        final Specification spec = freeColClient.getGame().getSpecification();
         final Unit unit = unitLabel.getUnit();
         final Role role = unit.getRole();
         final int roleCount = unit.getRoleCount();

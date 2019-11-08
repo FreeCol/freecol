@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,13 +20,12 @@
 package net.sf.freecol.common.model;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -308,7 +307,8 @@ public class HighScore extends FreeColObject {
      * @return The date.
      */
     public final Date getDate() {
-        return date;
+        // findbugs says not to expose this.date directly
+        return new Date(date.getTime());
     }
 
     /**
@@ -394,21 +394,22 @@ public class HighScore extends FreeColObject {
             }
             return scores;
         }
+        // Do not crash on high score fail
+        try (InputStream fis = Files.newInputStream(hsf.toPath())) {
+            try (FreeColXMLReader xr = new FreeColXMLReader(fis)) {
+                xr.nextTag();
 
-        try (
-            FileInputStream fis = new FileInputStream(hsf);
-            FreeColXMLReader xr = new FreeColXMLReader(fis);
-        ) {
-            xr.nextTag();
-
-            while (xr.moreTags()) {
-                final String tag = xr.getLocalName();
-                if (HighScore.TAG.equals(tag)) {
-                    scores.add(new HighScore(xr));
+                while (xr.moreTags()) {
+                    final String tag = xr.getLocalName();
+                    if (HighScore.TAG.equals(tag)) {
+                        scores.add(new HighScore(xr));
+                    }
                 }
-            }
-        } catch (Exception e) { // Do not crash on high score fail.
-            logger.log(Level.WARNING, "Error loading high scores.", e);
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Stream error loading high scores.", xse);
+            }                
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "I/O error loading high scores.", ioe);
         }
         tidyScores(scores);
         return scores;
@@ -426,19 +427,16 @@ public class HighScore extends FreeColObject {
         tidyScores(scores);
 
         File hsf = FreeColDirectories.getHighScoreFile();
-        try (
-            FileOutputStream fos = new FileOutputStream(hsf);
-            FreeColXMLWriter xw = new FreeColXMLWriter(fos,
-                FreeColXMLWriter.WriteScope.toSave(), true);
-        ) {
-            xw.writeStartDocument("UTF-8", "1.0");
-            xw.writeStartElement(HIGH_SCORES_TAG);
-            for (HighScore score : scores) score.toXML(xw);
-            xw.writeEndElement();
-            xw.writeEndDocument();
-            ret = true;
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);
+        try (OutputStream fos = Files.newOutputStream(hsf.toPath())) {
+            try (FreeColXMLWriter xw = new FreeColXMLWriter(fos,
+                    FreeColXMLWriter.WriteScope.toSave(), true)) {
+                xw.writeStartDocument("UTF-8", "1.0");
+                xw.writeStartElement(HIGH_SCORES_TAG);
+                for (HighScore score : scores) score.toXML(xw);
+                xw.writeEndElement();
+                xw.writeEndDocument();
+                ret = true;
+            }
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
         } catch (XMLStreamException xse) {

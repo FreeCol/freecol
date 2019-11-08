@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -44,8 +44,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * A {@code Resource} wrapping an {@code Image}.
  * @see Resource
  */
-public class ImageResource extends Resource
-                           implements Resource.Preloadable {
+public class ImageResource extends Resource {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
@@ -105,6 +104,23 @@ public class ImageResource extends Resource
     }
 
     /**
+     * Find the loaded image that satisfies a predicate.
+     *
+     * @param pred The <code>Predicate</code> to satisfy.
+     * @return The <code>BufferedImage</code> found, or if not found, the
+     *     one at the end of the loaded images list.
+     */
+    private synchronized BufferedImage findLoadedImage(Predicate<BufferedImage> pred) {
+        BufferedImage oim = find(this.loadedImages, pred);
+        return (oim != null) ? oim
+            : this.loadedImages.get(this.loadedImages.size() - 1);
+    }
+
+    private synchronized boolean haveAlternatives() {
+        return this.loadedImages != null;
+    }
+
+    /**
      * Gets the image using the specified dimension.
      * 
      * @param d The {@code Dimension} of the requested image.
@@ -128,13 +144,11 @@ public class ImageResource extends Resource
         }
         if (wNew == w && hNew == h) return im; // Matching dimension
 
-        if (this.loadedImages != null) {
+        if (this.haveAlternatives()) {
             final int fwNew = wNew, fhNew = hNew;
             final Predicate<BufferedImage> sizePred = img ->
                 img.getWidth() >= fwNew && img.getHeight() >= fhNew;
-            BufferedImage oim = find(this.loadedImages, sizePred);
-            im = (oim != null) ? oim
-                : this.loadedImages.get(this.loadedImages.size() - 1);
+            im = findLoadedImage(sizePred);
             w = im.getWidth();
             h = im.getHeight();
             if (wNew*h > w*hNew) {
@@ -199,9 +213,6 @@ public class ImageResource extends Resource
         return filter.filter(srcImage, null);
     }
 
-
-    // Interface Preloadable
-
     /**
      * {@inheritDoc}
      */
@@ -227,6 +238,7 @@ public class ImageResource extends Resource
     /**
      * Load an image from a URI.
      *
+     * @param uri The {@code URI} to load from.
      * @return The loaded {@code BufferedImage}, or null on error.
      */
     private static BufferedImage loadImage(URI uri) {

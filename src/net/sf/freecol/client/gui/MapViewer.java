@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -74,8 +74,9 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-
 import static net.sf.freecol.common.util.StringUtils.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -234,14 +235,14 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib = lib;
     }
 
-    /**
+    /** Currently unused
      * Get the map size.
      *
      * @return The size.
-     */
     private Dimension getSize() {
         return this.size;
     }
+     */
     
     /**
      * Get the displayed map width.
@@ -658,14 +659,13 @@ public final class MapViewer extends FreeColClientHolder {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
             final JLabel unitLabel = createUnitLabel(unit);
-
-            i = 1;
-            Point tileP = calculateTilePosition(sourceTile, false);
-            Point unitP = calculateUnitLabelPositionInTile(unitLabel.getWidth(),
-                unitLabel.getHeight(), tileP);
-            unitLabel.setLocation(unitP);
+            unitLabel.setLocation(
+                calculateUnitLabelPositionInTile(unitLabel.getWidth(),
+                    unitLabel.getHeight(),
+                    calculateTilePosition(sourceTile, false)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
             getGUI().getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
+            i = 1;
         } else {
             i++;
         }
@@ -676,7 +676,7 @@ public final class MapViewer extends FreeColClientHolder {
     private void releaseUnitOutForAnimation(final Unit unit) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
-            throw new IllegalStateException("Tried to release unit that was not out for animation");
+            throw new RuntimeException("Unit not out for animation: " + unit);
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
@@ -781,21 +781,17 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param labelWidth The width of the unit label.
      * @param labelHeight The width of the unit label.
-     * @param tileP The position of the Tile on the screen.
+     * @param tileP The position of the {@code Tile} on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
-    Point calculateUnitLabelPositionInTile(int labelWidth,int labelHeight,
-                                           Point tileP) {
-        if (tileP != null) {
-            int labelX = tileP.x + tileWidth
-                / 2 - labelWidth / 2;
-            int labelY = tileP.y + tileHeight
-                / 2 - labelHeight / 2
-                - (int) (UNIT_OFFSET * lib.getScaleFactor());
-            return new Point(labelX, labelY);
-        } else {
-            return null;
-        }
+    public Point calculateUnitLabelPositionInTile(int labelWidth,
+                                                  int labelHeight,
+                                                  Point tileP) {
+        if (tileP == null) return null;
+        int labelX = tileP.x + tileWidth / 2 - labelWidth / 2;
+        int labelY = tileP.y + tileHeight / 2 - labelHeight / 2
+            - (int) (UNIT_OFFSET * lib.getScaleFactor());
+        return new Point(labelX, labelY);
     }
 
     /**
@@ -1218,6 +1214,8 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param g The Graphics2D object on which to draw the Map.
      */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
+                        justification="lazy load of extra tiles")
     public void displayMap(Graphics2D g) {
         //final long now = now();
         final ClientOptions options = getClientOptions();
@@ -1355,8 +1353,8 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Apply fog of war to flat parts of all tiles
         RescaleOp fow = null;
-        if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
-            && player != null) {
+        if (player != null
+            && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
             // Knowing that we have FOW, prepare a rescaling for the
             // overlay step below.
             fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
@@ -1395,7 +1393,8 @@ public final class MapViewer extends FreeColClientHolder {
             g.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
             
-            BufferedImage overlayImage = lib.getOverlayImage(t, overlayCache);
+            BufferedImage overlayImage
+                = lib.getScaledOverlayImage(t, overlayCache);
             RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
             tv.displayTileItems(g, t, rop, overlayImage);
             tv.displaySettlementWithChipsOrPopulationNumber(g, t, withNumbers,
@@ -1604,77 +1603,70 @@ public final class MapViewer extends FreeColClientHolder {
             specs[0] = new TextSpecification(name, font);
 
             BufferedImage nameImage = createLabel(g, specs, backgroundColor);
-            if (nameImage != null) {
-                int spacing = 3;
-                BufferedImage leftImage = null;
-                BufferedImage rightImage = null;
-                if (settlement instanceof Colony) {
-                    Colony colony = (Colony)settlement;
-                    String string = Integer.toString(
-                        colony.getApparentUnitCount());
-                    leftImage = createLabel(g, string,
-                        ((colony.getPreferredSizeChange() > 0)
-                            ? italicFont : font),
-                        backgroundColor);
-                    if (player.owns(settlement)) {
-                        int bonusProduction = colony.getProductionBonus();
-                        if (bonusProduction != 0) {
-                            String bonus = (bonusProduction > 0)
-                                ? "+" + bonusProduction
-                                : Integer.toString(bonusProduction);
-                            rightImage = createLabel(g, bonus, font,
-                                                     backgroundColor);
-                        }
-                    }
-                } else if (settlement instanceof IndianSettlement) {
-                    IndianSettlement is = (IndianSettlement) settlement;
-                    if (is.getType().isCapital()) {
-                        leftImage = createCapitalLabel(
-                            nameImage.getHeight(), 5, backgroundColor);
-                    }
-
-                    Unit missionary = is.getMissionary();
-                    if (missionary != null) {
-                        boolean expert = missionary.hasAbility(
-                            Ability.EXPERT_MISSIONARY);
-                        backgroundColor = missionary.getOwner()
-                                                    .getNationColor();
-                        backgroundColor = new Color(
-                            backgroundColor.getRed(),
-                            backgroundColor.getGreen(),
-                            backgroundColor.getBlue(), 128);
-                        rightImage = createReligiousMissionLabel(
-                            nameImage.getHeight(), 5,
-                            backgroundColor, expert);
+            int spacing = 3;
+            BufferedImage leftImage = null;
+            BufferedImage rightImage = null;
+            if (settlement instanceof Colony) {
+                Colony colony = (Colony)settlement;
+                String string = Integer.toString(colony.getApparentUnitCount());
+                leftImage = createLabel(g, string,
+                    ((colony.getPreferredSizeChange() > 0)
+                        ? italicFont : font),
+                    backgroundColor);
+                if (player.owns(settlement)) {
+                    int bonusProduction = colony.getProductionBonus();
+                    if (bonusProduction != 0) {
+                        String bonus = (bonusProduction > 0)
+                            ? "+" + bonusProduction
+                            : Integer.toString(bonusProduction);
+                        rightImage = createLabel(g, bonus, font,
+                            backgroundColor);
                     }
                 }
-
-                int width = (int)((nameImage.getWidth()
-                        * lib.getScaleFactor())
-                    + ((leftImage != null)
-                        ? (leftImage.getWidth()
-                            * lib.getScaleFactor()) + spacing
-                        : 0)
-                    + ((rightImage != null)
-                        ? (rightImage.getWidth()
-                            * lib.getScaleFactor()) + spacing
-                        : 0));
-                int labelOffset = (tileWidth - width)/2;
-                yOffset -= (nameImage.getHeight()
-                    * lib.getScaleFactor())/2;
-                if (leftImage != null) {
-                    g.drawImage(leftImage, labelOffset, yOffset, null);
-                    labelOffset += (leftImage.getWidth()
-                        * lib.getScaleFactor()) + spacing;
+            } else if (settlement instanceof IndianSettlement) {
+                IndianSettlement is = (IndianSettlement) settlement;
+                if (is.getType().isCapital()) {
+                    leftImage = createCapitalLabel(nameImage.getHeight(),
+                        5, backgroundColor);
                 }
-                g.drawImage(nameImage, labelOffset, yOffset, null);
-                if (rightImage != null) {
-                    labelOffset += (nameImage.getWidth()
-                        * lib.getScaleFactor()) + spacing;
-                    g.drawImage(rightImage, labelOffset, yOffset, null);
+                
+                Unit missionary = is.getMissionary();
+                if (missionary != null) {
+                    boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                    backgroundColor = missionary.getOwner().getNationColor();
+                    backgroundColor = new Color(backgroundColor.getRed(),
+                                                backgroundColor.getGreen(),
+                                                backgroundColor.getBlue(), 128);
+                    rightImage = createReligiousMissionLabel(nameImage.getHeight(), 5,
+                                                             backgroundColor, expert);
                 }
-                break;
             }
+            
+            int width = (int)((nameImage.getWidth()
+                    * lib.getScaleFactor())
+                + ((leftImage != null)
+                    ? (leftImage.getWidth()
+                        * lib.getScaleFactor()) + spacing
+                    : 0)
+                + ((rightImage != null)
+                    ? (rightImage.getWidth()
+                        * lib.getScaleFactor()) + spacing
+                    : 0));
+            int labelOffset = (tileWidth - width)/2;
+            yOffset -= (nameImage.getHeight()
+                * lib.getScaleFactor())/2;
+            if (leftImage != null) {
+                g.drawImage(leftImage, labelOffset, yOffset, null);
+                labelOffset += (leftImage.getWidth()
+                    * lib.getScaleFactor()) + spacing;
+            }
+            g.drawImage(nameImage, labelOffset, yOffset, null);
+            if (rightImage != null) {
+                labelOffset += (nameImage.getWidth()
+                    * lib.getScaleFactor()) + spacing;
+                g.drawImage(rightImage, labelOffset, yOffset, null);
+            }
+            break;
         }
     }
 
@@ -1950,8 +1942,7 @@ public final class MapViewer extends FreeColClientHolder {
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && player != null
-            && !player.owns(unit)
+            && player != null && !player.owns(unit)
             && unit.getOwner().isAI()
             && getFreeColServer() != null
             && getFreeColServer().getAIMain() != null

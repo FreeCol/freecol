@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -332,7 +332,7 @@ public class TerrainGenerator {
             for (int x = 0; x < map.getWidth(); x++) {
                 if (landmap[x][y]) { // Found a new region.
                     continents++;
-                    boolean[][] continent = Map.floodFill(landmap, x, y);
+                    boolean[][] continent = Map.floodFillBool(landmap, x, y);
 
                     for (int yy = 0; yy < map.getHeight(); yy++) {
                         for (int xx = 0; xx < map.getWidth(); xx++) {
@@ -381,7 +381,7 @@ public class TerrainGenerator {
                         targetsize = continentsize[c]/2;
                     }
                     continents++; //index of the new region in continentmap[][]
-                    boolean[][] newregion = Map.floodFill(splitcontinent,
+                    boolean[][] newregion = Map.floodFillBool(splitcontinent,
                         splitX, splitY, targetsize);
                     for (int x = 0; x < map.getWidth(); x++) {
                         for (int y = 0; y < map.getHeight(); y++) {
@@ -436,35 +436,6 @@ public class TerrainGenerator {
     }
 
     /**
-     * Pick a good tile to put elevated terrain on.
-     *
-     * @param map A {@code Map} to choose from.
-     * @return A suitable {@code Tile}, or null if none found.
-     */
-    private Tile getGoodMountainTile(Map map) {
-        final Specification spec = map.getGame().getSpecification();
-        final TileType hills = spec.getTileType("model.tile.hills");
-        final TileType mountains = spec.getTileType("model.tile.mountains");
-        Tile tile = null;
-        while ((tile = map.getRandomLandTile(random)) != null) {
-            // Can not be high ground already
-            if (tile.getType() != hills && tile.getType() != mountains
-                
-                // Not too close to a mountain range as this would
-                // defeat the purpose of adding random hills
-                && none(tile.getSurroundingTiles(1, 3), t -> t.getType() == mountains)
-
-                // Do not add hills too close to the ocean/lake, as
-                // this helps with good locations for building
-                // colonies on shore.
-                && none(tile.getSurroundingTiles(1, 1), t -> !t.isLand())) {
-                return tile;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Creates mountain ranges on the given map.  The number and size
      * of mountain ranges depends on the map size.
      *
@@ -476,7 +447,6 @@ public class TerrainGenerator {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = game.getMapGeneratorOptions();
-        List<ServerRegion> result = new ArrayList<>();
         float randomHillsRatio = 0.5f;
         // 50% of user settings will be allocated for random hills
         // here and there the rest will be allocated for large
@@ -489,12 +459,13 @@ public class TerrainGenerator {
                 / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER)));
         lb.add("Number of mountain tiles is ", number, "\n",
             "Maximum length of mountain ranges is ", maximumLength, "\n");
+        List<ServerRegion> result = new ArrayList<>(number);
 
         // lookup the resources from specification
         final TileType hills = spec.getTileType("model.tile.hills");
         final TileType mountains = spec.getTileType("model.tile.mountains");
         if (hills == null || mountains == null) {
-            throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
+            throw new RuntimeException("Both Hills and Mountains TileTypes must be defined: " + spec);
         }
 
         // Generate the mountain ranges
@@ -665,8 +636,8 @@ public class TerrainGenerator {
         Game game = map.getGame();
         final TileType lakeType = map.getSpecification()
             .getTileType("model.tile.lake");
-        List<Tile> todo = new ArrayList<>();
-        List<ServerRegion> result = new ArrayList<>();
+        List<Tile> todo = new ArrayList<>(lakes.size()/10);
+        List<ServerRegion> result = new ArrayList<>(lakes.size()/10);
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = first(lakes);
@@ -744,7 +715,7 @@ public class TerrainGenerator {
             // get an additional +1 bonus
             // FIXME: This probably has some false positives, means
             // river tiles that are NOT a river mouth next to this tile!
-            if (!t.hasRiver() && adjacentRiver) {
+            if (adjacentRiver && !t.hasRiver()) {
                 t.add(new TileImprovement(game, t, fishBonusRiverType, null));
             }
 
@@ -836,7 +807,6 @@ public class TerrainGenerator {
      */
     public Map generateMap(Game game, Map importMap, LandMap landMap,
                            LogBuilder lb) {
-        final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = game.getMapGeneratorOptions();
         final int width = landMap.getWidth();
         final int height = landMap.getHeight();
@@ -847,16 +817,9 @@ public class TerrainGenerator {
         final boolean importTerrain = (importMap != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
 
-        Map map = game.getMap();
-        if (map == null) {
-            map = new Map(game, width, height);
-            game.setMap(map);
-        } else {
-            map.setTiles(width, height);
-        }
-        map.clearRegions();
+        Map map = new Map(game, width, height);
+        game.setMap(map);
         
-        boolean mapHasLand = false;
         int minimumLatitude = mapOptions
             .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
         int maximumLatitude = mapOptions
@@ -889,33 +852,18 @@ public class TerrainGenerator {
             lb.add("\n");
         }
 
+        final Map.Layer layer = (importRumours) ? Map.Layer.RUMOURS
+            : (importBonuses) ? Map.Layer.RESOURCES
+            : Map.Layer.RIVERS;
         List<Tile> fixRegions = new ArrayList<>();
-        for (int y = 0; y < height; y++) {
-            int latitude = map.getLatitude(y);
-            for (int x = 0; x < width; x++) {
-                if (landMap.isLand(x, y)) mapHasLand = true;
-                Tile t, importTile = null;
+        map.populateTiles((x, y) -> {
+                Tile t, otherTile = null;
                 if (importTerrain
                     && importMap.isValid(x, y)
-                    && (importTile = importMap.getTile(x, y)) != null
-                    && importTile.isLand() == landMap.isLand(x, y)) {
-                    String id = importTile.getType().getId();
-                    t = new Tile(game, spec.getTileType(id), x, y);
-                    if (importTile.getMoveToEurope() != null) {
-                        t.setMoveToEurope(importTile.getMoveToEurope());
-                    }
-                    if (importTile.getTileItemContainer() != null) {
-                        TileItemContainer container
-                            = new TileItemContainer(game, t);
-                        // TileItemContainer copies every natural item
-                        // including Resource if importBonuses is true.
-                        container.copyFrom(importTile.getTileItemContainer(),
-                            (importRumours) ? Map.Layer.RUMOURS
-                            : (importBonuses) ? Map.Layer.RESOURCES
-                            : Map.Layer.RIVERS);
-                        t.setTileItemContainer(container);
-                    }
-                    Region r = importTile.getRegion();
+                    && (otherTile = importMap.getTile(x, y)) != null
+                    && otherTile.isLand() == landMap.isLand(x, y)) {
+                    t = map.importTile(otherTile, x, y, layer);
+                    Region r = otherTile.getRegion();
                     if (r == null) {
                         fixRegions.add(t);
                     } else {
@@ -929,14 +877,14 @@ public class TerrainGenerator {
                         }
                     }
                 } else {
+                    final int latitude = map.getLatitude(y);
                     TileType tt = (landMap.isLand(x, y))
                         ? getRandomLandTileType(game, latitude)
                         : getRandomOceanTileType(game, latitude);
                     t = new Tile(game, tt, x, y);
                 }
-                map.setTile(t, x, y);
-            }
-        }
+                return t;
+            });
 
         // Build the regions.
         List<ServerRegion> fixed = ServerRegion.requireFixedRegions(map, lb);
@@ -950,7 +898,7 @@ public class TerrainGenerator {
             map.resetHighSeas(
                 mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
                 mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
-            if (mapHasLand) {
+            if (landMap.hasLand()) {
                 newRegions.addAll(createMountains(map, lb));
                 newRegions.addAll(createRivers(map, lb));
                 newRegions.addAll(createLakeRegions(map, lb));

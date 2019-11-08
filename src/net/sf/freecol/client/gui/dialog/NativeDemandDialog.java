@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
@@ -89,8 +90,8 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
             no = "indianDemand.other.no";
         }
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
-                                                    "[400, align center]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
+                                                  "[400, align center]"));
         JLabel header = Utility.localizedHeaderLabel(StringTemplate
                 .template("nativeDemandDialog.name")
                 .addName("%colony%", colony.getName()),

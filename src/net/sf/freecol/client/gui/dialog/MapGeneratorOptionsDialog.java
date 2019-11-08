@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -178,8 +178,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      *     on failure.
      */
     private JButton makeMapButton(File file) {
-        final String mapName = file.getName()
-            .substring(0, file.getName().lastIndexOf('.'));
+        String mapName = file.getName();
+        mapName = mapName.substring(0, mapName.lastIndexOf('.'));
         JButton mapButton = null;
 
         FreeColSavegameFile savegame;

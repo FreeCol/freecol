@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -166,7 +166,6 @@ public class ServerUnit extends Unit implements TurnTaker {
                       UnitType type, Role role) {
         super(game);
 
-        final Specification spec = getSpecification();
         this.owner = owner;
         this.type = type;
         this.state = UnitState.ACTIVE; // placeholder
@@ -230,11 +229,11 @@ public class ServerUnit extends Unit implements TurnTaker {
         if (deliver != null) { // Deliver goods if any
             final Turn turn = getGame().getTurn();
             int amount = deliver.getAmount();
-            amount = (int)this.applyModifiers(amount, turn,
+            amount = (int)this.apply(amount, turn,
                 Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
             Settlement settlement = tile.getOwningSettlement();
             if (settlement != null && owner.owns(settlement)) {
-                amount = (int)settlement.applyModifiers(amount, turn,
+                amount = (int)settlement.apply(amount, turn,
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
             }
@@ -274,7 +273,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         if (changeRoleCount(-ti.getType().getExpendedAmount())) {
             // FIXME: assumes tools, make more generic, use
             // ti.getType().getRequiredRole().getRequiredGoods()
-            ServerPlayer owner = (ServerPlayer)getOwner();
+            final Player owner = getOwner();
             StringTemplate locName
                 = getLocation().getLocationLabelFor(owner);
             String messageId = getType() + ".noMoreTools";
@@ -307,7 +306,7 @@ public class ServerUnit extends Unit implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csEmbark(Unit carrier, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getOwner();
+        final Player owner = getOwner();
 
         Location oldLocation = getLocation();
         Colony colony = (oldLocation instanceof WorkLocation) ? getColony()
@@ -322,10 +321,10 @@ public class ServerUnit extends Unit implements TurnTaker {
             cs.add(See.only(owner), carrier);
         }
         if (oldLocation instanceof Tile) {
-            if (carrier.getTile() != oldLocation) {
-                cs.addMove(See.only(owner), this, oldLocation,
-                           carrier.getTile());
-                owner.invalidateCanSeeTiles();//+vis(serverPlayer)
+            Tile tile = carrier.getTile();
+            if (tile != oldLocation) {
+                cs.addMove(See.only(owner), this, oldLocation, tile);
+                owner.invalidateCanSeeTiles();//+vis(owner)
             }
             cs.addDisappear(owner, (Tile)oldLocation, this);
         }
@@ -337,7 +336,7 @@ public class ServerUnit extends Unit implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csRepairUnit(ChangeSet cs) {
-        ServerPlayer owner = (ServerPlayer) getOwner();
+        final Player owner =  getOwner();
         setHitPoints(getHitPoints() + 1);
         if (!isDamaged()) {
             Location loc = getLocation();
@@ -381,8 +380,9 @@ public class ServerUnit extends Unit implements TurnTaker {
                 || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
             for (Unit enemyUnit : transform(tile.getUnits(), u ->
                     (u.isNaval()
-                        && ((u.isOffensiveUnit() && player.atWarWith(enemy))
-                            || pirate || u.hasAbility(Ability.PIRACY))))) {
+                        && (pirate || u.hasAbility(Ability.PIRACY)
+                            || (u.isOffensiveUnit()
+                                && player.atWarWith(enemy)))))) {
                 double power = combatModel.getOffencePower(enemyUnit, this);
                 totalAttackPower += power;
                 if (power > attackPower) {
@@ -415,17 +415,17 @@ public class ServerUnit extends Unit implements TurnTaker {
      * @param cs A {@code ChangeSet} to add changes to.
      */
     private void csNativeBurialGround(ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer)getOwner();
-        Tile tile = getTile();
-        ServerPlayer indianPlayer = (ServerPlayer)tile.getOwner();
-        serverPlayer.csContact(indianPlayer, cs);
-        indianPlayer.csModifyTension(serverPlayer, 
+        final Player owner = getOwner();
+        final Tile tile = getTile();
+        final Player indianPlayer = tile.getOwner();
+        ((ServerPlayer)owner).csContact(indianPlayer, cs);
+        ((ServerPlayer)indianPlayer).csModifyTension(owner,
             Tension.Level.HATEFUL.getLimit(), cs);//+til
-        serverPlayer.csChangeStance(Stance.WAR, indianPlayer, true, cs);
-        cs.addMessage(serverPlayer,
+        ((ServerPlayer)owner).csChangeStance(Stance.WAR, indianPlayer, true, cs);
+        cs.addMessage(owner,
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                              RumourType.BURIAL_GROUND.getDescriptionKey(),
-                             serverPlayer, this)
+                             owner, this)
                 .addStringTemplate("%nation%", indianPlayer.getNationLabel()));
     }
 
@@ -437,7 +437,7 @@ public class ServerUnit extends Unit implements TurnTaker {
      * @return True if the unit survives.
      */
     private boolean csExploreLostCityRumour(Random random, ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer) getOwner();
+        final Player owner = getOwner();
         Tile tile = getTile();
         LostCityRumour lostCity = tile.getLostCityRumour();
         if (lostCity == null) return true;
@@ -516,14 +516,14 @@ public class ServerUnit extends Unit implements TurnTaker {
             csNativeBurialGround(cs);
             break;
         case EXPEDITION_VANISHES:
-            cs.addMessage(serverPlayer,
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 key, serverPlayer));
+                                 key, owner));
             result = false;
             break;
         case NOTHING:
-            cs.addMessage(serverPlayer,
-                lostCity.getNothingMessage(serverPlayer, mounds, random));
+            cs.addMessage(owner,
+                lostCity.getNothingMessage(owner, mounds, random));
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
@@ -531,37 +531,37 @@ public class ServerUnit extends Unit implements TurnTaker {
                 spec.getUnitChanges(UnitChangeType.LOST_CITY, getType()),
                 random);
             changeType(uc.to);//-vis(serverPlayer)
-            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
-            cs.addMessage(serverPlayer,
+            owner.invalidateCanSeeTiles();//+vis(serverPlayer)
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 key, serverPlayer, this)
+                                 key, owner, this)
                     .addStringTemplate("%unit%", oldName)
                     .addNamed("%type%", getType()));
             break;
         case TRIBAL_CHIEF:
             int chiefAmount = randomInt(logger, "Chief base amount",
                                         random, dx * 10) + dx * 5;
-            serverPlayer.modifyGold(chiefAmount);
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                "gold", String.valueOf(serverPlayer.getGold()),
-                "score", String.valueOf(serverPlayer.getScore()));
+            owner.modifyGold(chiefAmount);
+            cs.addPartial(See.only(owner), owner,
+                "gold", String.valueOf(owner.getGold()),
+                "score", String.valueOf(owner.getScore()));
             if (mounds) key = rumour.getAlternateDescriptionKey("mounds");
-            cs.addMessage(serverPlayer,
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 key, serverPlayer, this)
+                                 key, owner, this)
                     .addAmount("%money%", chiefAmount));
-            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+            owner.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case COLONIST:
             List<UnitType> foundTypes
                 = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);
             unitType = getRandomMember(logger, "Choose found",
                                        foundTypes, random);
-            newUnit = new ServerUnit(game, tile, serverPlayer,
+            newUnit = new ServerUnit(game, tile, owner,
                                      unitType);//-vis: safe, scout on tile
-            cs.addMessage(serverPlayer,
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 key, serverPlayer, newUnit));
+                                 key, owner, newUnit));
             break;
         case CIBOLA:
             String cityName = NameCache.getNextCityOfCibola();
@@ -570,18 +570,18 @@ public class ServerUnit extends Unit implements TurnTaker {
                     "Base treasure amount", random, dx * 600) + dx * 300;
                 unitType = getRandomMember(logger, "Choose train",
                                            treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer,
+                newUnit = new ServerUnit(game, tile, owner,
                                          unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(treasureAmount);
-                cs.addMessage(serverPlayer,
+                cs.addMessage(owner,
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                     key, serverPlayer, newUnit)
+                                     key, owner, newUnit)
                         .addName("%city%", cityName)
                         .addAmount("%money%", treasureAmount));
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
-                        HistoryEvent.HistoryEventType.CITY_OF_GOLD, serverPlayer)
-                    .addStringTemplate("%nation%", serverPlayer.getNationLabel())
+                        HistoryEvent.HistoryEventType.CITY_OF_GOLD, owner)
+                    .addStringTemplate("%nation%", owner.getNationLabel())
                     .addName("%city%", cityName)
                     .addAmount("%treasure%", treasureAmount));
                 break;
@@ -591,47 +591,47 @@ public class ServerUnit extends Unit implements TurnTaker {
             int ruinsAmount = randomInt(logger, "Base ruins amount", random,
                                         dx * 2) * 300 + 50;
             if (ruinsAmount < 500) { // FIXME: remove magic number
-                serverPlayer.modifyGold(ruinsAmount);
-                cs.addPartial(See.only(serverPlayer), serverPlayer,
-                    "gold", String.valueOf(serverPlayer.getGold()),
-                    "score", String.valueOf(serverPlayer.getScore()));
+                owner.modifyGold(ruinsAmount);
+                cs.addPartial(See.only(owner), owner,
+                    "gold", String.valueOf(owner.getGold()),
+                    "score", String.valueOf(owner.getScore()));
             } else {
                 unitType = getRandomMember(logger, "Choose train",
                                            treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer,
+                newUnit = new ServerUnit(game, tile, owner,
                                          unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             if (mounds) key = rumour.getAlternateDescriptionKey("mounds");
-            cs.addMessage(serverPlayer,
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 key, serverPlayer,
+                                 key, owner,
                                  ((newUnit != null) ? newUnit : this))
                     .addAmount("%money%", ruinsAmount));
             break;
         case FOUNTAIN_OF_YOUTH:
-            ServerEurope europe = (ServerEurope)serverPlayer.getEurope();
+            ServerEurope europe = (ServerEurope)owner.getEurope();
             if (europe == null) {
                 // FoY should now be disabled for non-colonial
                 // players, but leave this in for now as it is harmless.
-                cs.addMessage(serverPlayer,
+                cs.addMessage(owner,
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                      rumour.getAlternateDescriptionKey("noEurope"),
-                                     serverPlayer, this));
+                                     owner, this));
             } else {
-                if (serverPlayer.isAI()) { // FIXME: let the AI select
+                if (owner.isAI()) { // FIXME: let the AI select
                     europe.generateFountainRecruits(dx, random);
-                    cs.add(See.only(serverPlayer), europe);
+                    cs.add(See.only(owner), europe);
                 } else {
                     // Remember, and ask player to select
-                    serverPlayer.setRemainingEmigrants(dx);
-                    cs.add(See.only(serverPlayer),
+                    ((ServerPlayer)owner).setRemainingEmigrants(dx);
+                    cs.add(See.only(owner),
                            new FountainOfYouthMessage(dx));
                 }
-                cs.addMessage(serverPlayer,
+                cs.addMessage(owner,
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                      key, serverPlayer, this));
-                cs.addAttribute(See.only(serverPlayer),
+                                      key, owner, this));
+                cs.addAttribute(See.only(owner),
                                 "sound", "sound.event.fountainOfYouth");
             }
             break;
@@ -654,7 +654,7 @@ public class ServerUnit extends Unit implements TurnTaker {
      */
     public void csNewContactCheck(Tile newTile, boolean firstLanding,
                                   ChangeSet cs) {
-        final ServerPlayer serverPlayer = (ServerPlayer)this.getOwner();
+        final Player owner = this.getOwner();
         Set<ServerPlayer> pending = new HashSet<>();
         for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
                                 nt -> nt != null && nt.isLand())) {
@@ -666,36 +666,36 @@ public class ServerUnit extends Unit implements TurnTaker {
                 ? (ServerPlayer)unit.getOwner()
                 : null;
             if (other == null
-                || other == serverPlayer
+                || other == owner
                 || pending.contains(other)) continue; // No contact
-            if (serverPlayer.csContact(other, cs)) {
+            if (((ServerPlayer)owner).csContact(other, cs)) {
                 // First contact.  Note contact pending because
                 // European first contact now requires a diplomacy
                 // interaction to complete before leaving UNCONTACTED
                 // state.
                 pending.add(other);
-                if (serverPlayer.isEuropean()) {
+                if (owner.isEuropean()) {
                     if (other.isIndian()) {
                         Tile offer = (firstLanding && other.owns(newTile))
                             ? newTile
                             : null;
-                        serverPlayer.csNativeFirstContact(other, offer, cs);
+                        ((ServerPlayer)owner).csNativeFirstContact(other, offer, cs);
                     } else {
-                        serverPlayer.csEuropeanFirstContact(this,
+                        ((ServerPlayer)owner).csEuropeanFirstContact(this,
                             settlement, unit, cs);
                     }
                 } else {
                     if (other.isIndian()) {
                         ; // Do nothing
                     } else {
-                        other.csNativeFirstContact(serverPlayer, null, cs);
+                        other.csNativeFirstContact(owner, null, cs);
                     }
                 }
             }
 
             // Initialize alarm for native settlements or units and
             // notify of contact.
-            ServerPlayer contactPlayer = serverPlayer;
+            Player contactPlayer = owner;
             IndianSettlement is = (settlement instanceof IndianSettlement)
                 ? (IndianSettlement)settlement
                 : null;
@@ -703,8 +703,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                 || (unit != null
                     && (is = unit.getHomeIndianSettlement()) != null)
                 || (unit != null
-                    && (contactPlayer = (ServerPlayer)unit.getOwner())
-                    .isEuropean()
+                    && (contactPlayer = unit.getOwner()).isEuropean()
                     && (is = getHomeIndianSettlement()) != null
                     && is.getTile() != null)) {
                 Tile copied = is.getTile().getTileToCache();
@@ -751,14 +750,19 @@ public class ServerUnit extends Unit implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csMove(Tile newTile, Random random, ChangeSet cs) {
-        final ServerPlayer serverPlayer = (ServerPlayer)getOwner();
+        final Player owner = getOwner();
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
         final Location oldLocation = getLocation();
+        if (oldLocation == null) {
+            // This "can not happen", but if it did what follows would crash.
+            // Probably best to log and return in the hope of not breaking it worse.
+            logger.warning("Unit with null location: " + this.toString());
+            return;
+        }
         Set<Tile> oldTiles = getVisibleTileSet();
-        Set<Tile> newTiles
-            = serverPlayer.collectNewTiles(newTile, getLineOfSight());
+        Set<Tile> newTiles = ((ServerPlayer)owner).collectNewTiles(newTile, getLineOfSight());
 
         // Update unit state.
         setState(UnitState.ACTIVE);
@@ -770,8 +774,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         } else {
             if (getMoveCost(newTile) <= 0) {
                 logger.warning("Move of unit: " + getId()
-                    + " from: " + ((oldLocation == null) ? "null"
-                        : oldLocation.getTile().getId())
+                    + " from: " + oldLocation.getTile().getId()
                     + " to: " + newTile.getId()
                     + " has bogus cost: " + getMoveCost(newTile));
                 setMovesLeft(0);
@@ -784,32 +787,32 @@ public class ServerUnit extends Unit implements TurnTaker {
             oldLocation.getTile().cacheUnseen();//+til
         }
         setLocation(newTile);//-vis(serverPlayer),-til if in colony
-        if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()
+        if (newTile.hasLostCityRumour() && owner.isEuropean()
             && !csExploreLostCityRumour(random, cs)) {
-            this.csRemove(See.perhaps().always(serverPlayer),
+            this.csRemove(See.perhaps().always(owner),
                 oldLocation, cs);//-vis(serverPlayer)
         }
-        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+        owner.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Update tiles that are now invisible.
-        removeInPlace(oldTiles, t -> serverPlayer.canSee(t));
-        if (!oldTiles.isEmpty()) cs.add(See.only(serverPlayer), oldTiles);
+        removeInPlace(oldTiles, t -> owner.canSee(t));
+        if (!oldTiles.isEmpty()) cs.add(See.only(owner), oldTiles);
 
         // Unless moving in from off-map, update the old location and
         // make sure the move is always visible even if the unit
         // dies (including the animation).  However, dead units
         // make no discoveries.  Always update the new tile.
         if (oldLocation.getTile() != null) {
-            cs.addMove(See.perhaps().always(serverPlayer), this,
+            cs.addMove(See.perhaps().always(owner), this,
                        oldLocation, newTile);
-            cs.add(See.perhaps().always(serverPlayer),
+            cs.add(See.perhaps().always(owner),
                    (FreeColGameObject)oldLocation);
         } else {
-            cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
+            cs.add(See.only(owner), (FreeColGameObject)oldLocation);
         }
-        cs.add(See.perhaps().always(serverPlayer), newTile);
+        cs.add(See.perhaps().always(owner), newTile);
         if (isDisposed()) return;
-        serverPlayer.csSeeNewTiles(newTiles, cs);
+        ((ServerPlayer)owner).csSeeNewTiles(newTiles, cs);
 
         if (newTile.isLand()) {
             Settlement settlement;
@@ -819,27 +822,27 @@ public class ServerUnit extends Unit implements TurnTaker {
             if ((newTile.getOwner() == null
                     || (newTile.getOwner().isEuropean()
                         && newTile.getOwningSettlement() == null))
-                && serverPlayer.isIndian()
+                && owner.isIndian()
                 && (settlement = getHomeIndianSettlement()) != null
                 && ((d = newTile.getDistanceTo(settlement.getTile()))
                     < (settlement.getRadius()
                         + settlement.getType().getExtraClaimableRadius()))
                 && randomInt(logger, "Claim tribal land", random, d + 1) == 0) {
                 newTile.cacheUnseen();//+til
-                newTile.changeOwnership(serverPlayer, settlement);//-til
+                newTile.changeOwnership(owner, settlement);//-til
             }
 
             // Check for first landing
             String newLand = null;
-            boolean firstLanding = !serverPlayer.isNewLandNamed();
-            if (serverPlayer.isEuropean() && firstLanding) {
-                newLand = serverPlayer.getNameForNewLand();
+            boolean firstLanding = !owner.isNewLandNamed();
+            if (firstLanding && owner.isEuropean()) {
+                newLand = owner.getNameForNewLand();
                 // Set the default value now to prevent multiple attempts.
                 // The user setNewLandName can override.
-                serverPlayer.setNewLandName(newLand);
-                cs.add(See.only(serverPlayer),
+                owner.setNewLandName(newLand);
+                cs.add(See.only(owner),
                        new NewLandNameMessage(this, newLand));
-                logger.finest("First landing for " + serverPlayer
+                logger.finest("First landing for " + owner
                     + " at " + newTile + " with " + this);
             }
 
@@ -849,7 +852,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
                     nt -> (nt != null && !nt.isLand()
                         && nt.getFirstUnit() != null
-                        && nt.getFirstUnit().getOwner() != serverPlayer))) {
+                        && nt.getFirstUnit().getOwner() != owner))) {
                 csActivateSentries(t, cs);
             }
         }
@@ -867,7 +870,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         Unit slowedBy = getSlowedBy(newTile, random);
         if (slowedBy != null) {
             StringTemplate enemy = slowedBy.getApparentOwnerName();
-            cs.addMessage(serverPlayer,
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "model.unit.slowed", this, slowedBy)
                     .addStringTemplate("%unit%",
@@ -879,12 +882,11 @@ public class ServerUnit extends Unit implements TurnTaker {
 
         // Check for region discovery
         Region region = newTile.getDiscoverableRegion();
-        if (serverPlayer.isEuropean() && region != null
-            && region.getDiscoverer() == null) {
-            cs.add(See.only(serverPlayer),
+        if (region != null && region.checkDiscover(this)
+            && owner.isEuropean()) {
+            cs.add(See.only(owner),
                    new NewRegionNameMessage(region, newTile, this,
-                       serverPlayer.getNameForRegion(region)));
-            region.setDiscoverer(getId());
+                       owner.getNameForRegion(region)));
         }
     }
 
@@ -897,7 +899,7 @@ public class ServerUnit extends Unit implements TurnTaker {
      */
     public void csRemove(See see, Location loc, ChangeSet cs) {
         IndianSettlement is = changeHomeIndianSettlement(null);
-        if (is != null) cs.add(See.only((ServerPlayer)getOwner()), is);
+        if (is != null) cs.add(See.only(getOwner()), is);
         cs.addRemove(see, loc, this);
         this.dispose();
     }
@@ -914,12 +916,13 @@ public class ServerUnit extends Unit implements TurnTaker {
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        lb.add(this);
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        Specification spec = getSpecification();
-        Location loc = getLocation();
+        final Specification spec = getSpecification();
+        final Player owner = getOwner();
+        final Location loc = getLocation();
+        
         boolean locDirty = false;
         boolean unitDirty = false;
+        lb.add(this);
 
         // Attrition.  Do it first as the unit might die.
         if (getType().hasMaximumAttrition() && loc instanceof Tile

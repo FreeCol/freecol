@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -103,6 +103,7 @@ public class DiplomacyMessage extends ObjectMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException on stream error.
      */
     public DiplomacyMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {

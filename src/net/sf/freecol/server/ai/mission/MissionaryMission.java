@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -48,7 +48,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for sending a missionary to a native settlement.
  */
-public class MissionaryMission extends Mission {
+public final class MissionaryMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(MissionaryMission.class.getName());
 
@@ -73,7 +73,9 @@ public class MissionaryMission extends Mission {
      * @param target The target {@code Location} for this mission.
      */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**
@@ -102,7 +104,7 @@ public class MissionaryMission extends Mission {
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
-    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+    private static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         Settlement settlement = (loc == null) ? null : loc.getSettlement();
@@ -197,8 +199,8 @@ public class MissionaryMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path == null) ? null : extractTarget(aiUnit, path);
     }
@@ -211,7 +213,7 @@ public class MissionaryMission extends Mission {
      *     if none.
      */
     public static String prepare(AIUnit aiUnit) {
-        String reason = invalidReason(aiUnit);
+        String reason = invalidUnitReason(aiUnit);
         if (reason == null) {
             final Unit unit = aiUnit.getUnit();
             if (!unit.hasAbility(Ability.ESTABLISH_MISSION)
@@ -232,7 +234,7 @@ public class MissionaryMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason to not perform the mission, or null if none.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
@@ -287,8 +289,8 @@ public class MissionaryMission extends Mission {
      * @param aiUnit The {@code AIUnit} to test.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -298,7 +300,7 @@ public class MissionaryMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -344,7 +346,7 @@ public class MissionaryMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
+        return findMissionTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -352,7 +354,7 @@ public class MissionaryMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
     
     /**
@@ -380,7 +382,7 @@ public class MissionaryMission extends Mission {
             // accept fallback targets.
             lbAt(lb);
             Location completed = getTarget();
-            Location newTarget = findTarget(aiUnit, 20, false);
+            Location newTarget = findMissionTarget(aiUnit, 20, false);
             if (newTarget == null || newTarget == completed) {
                 return lbFail(lb, false, "retarget failed");
             }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -85,31 +85,31 @@ public class DeliverGiftMessage extends ObjectMessage {
     }
     
 
-    /**
+    /** Currently unused
      * Get the {@code Unit} which is delivering the gift.  This
      * is a helper routine to be called in-client as it blindly trusts
      * its field.
      *
      * @param game The {@code Game} to lookup the unit in.
      * @return The {@code Unit}, or null if none.
-     */
     private Unit getUnit(Game game) {
         return game.getFreeColGameObject(getStringAttribute(UNIT_TAG),
                                          Unit.class);
     }
+     */
 
-    /**
+    /** Currently unused
      * Get the {@code Settlement} which is receiving the gift.
      * This is a helper routine to be called in-client as it blindly trusts
      * its field.
      *
      * @param game The {@code Game} to lookup the unit in.
      * @return The {@code Settlement}, or null if none.
-     */
     private IndianSettlement getSettlement(Game game) {
         return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
                                          IndianSettlement.class);
     }
+     */
 
     /**
      * Get the {@code Goods} delivered as a gift.

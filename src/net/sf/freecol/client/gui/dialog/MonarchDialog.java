@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
@@ -82,8 +83,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         JLabel header = Utility.localizedHeaderLabel(hdrKey,
             SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
-                                                    "[]20[]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
+                                                  "[]20[]"));
         panel.add(header, "span, align center, wrap 20");
         if (action == MonarchAction.RAISE_TAX_ACT
             || action == MonarchAction.RAISE_TAX_WAR) {

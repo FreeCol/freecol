@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,9 +22,12 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -164,18 +167,21 @@ public class ColonyPlan {
     private final List<GoodsType> produce = new ArrayList<>();
 
     /**
-     * Lists of goods types to be produced in this colony.
+     * Sets of goods types to be produced in this colony.
      * Temporary variables that do not need to be serialized.
+     * Note: food and luxury groups disabled as not currently used, but
+     * will probably be needed in due course.  Raw building goods types
+     * need to be sorted so they are a list.
      */
-    private final List<GoodsType> foodGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> libertyGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> immigrationGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> militaryGoodsTypes = new ArrayList<>();
+    //private final Set<GoodsType> foodGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> libertyGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> immigrationGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> militaryGoodsTypes = new HashSet<>();
     private final List<GoodsType> rawBuildingGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> buildingGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> rawLuxuryGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> luxuryGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> otherRawGoodsTypes = new ArrayList<>();
+    private final Set<GoodsType> buildingGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> rawLuxuryGoodsTypes = new HashSet<>();
+    //private final Set<GoodsType> luxuryGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> otherRawGoodsTypes = new HashSet<>();
 
 
     /**
@@ -185,8 +191,8 @@ public class ColonyPlan {
      * @param colony The colony to make a {@code ColonyPlan} for.
      */
     public ColonyPlan(AIMain aiMain, Colony colony) {
-        if (aiMain == null) throw new IllegalArgumentException("Null AIMain");
-        if (colony == null) throw new IllegalArgumentException("Null colony");
+        if (aiMain == null) throw new RuntimeException("Null AIMain: " + this);
+        if (colony == null) throw new RuntimeException("Null colony: " + this);
 
         this.aiMain = aiMain;
         this.colony = colony;
@@ -431,18 +437,18 @@ public class ColonyPlan {
      * @param production The production map.
      */
     private void updateGoodsTypeLists(Map<GoodsType, Map<WorkLocation, Integer>> production) {
-        foodGoodsTypes.clear();
+        //foodGoodsTypes.clear();
         libertyGoodsTypes.clear();
         immigrationGoodsTypes.clear();
         militaryGoodsTypes.clear();
         rawBuildingGoodsTypes.clear();
         buildingGoodsTypes.clear();
         rawLuxuryGoodsTypes.clear();
-        luxuryGoodsTypes.clear();
+        //luxuryGoodsTypes.clear();
         otherRawGoodsTypes.clear();
         for (GoodsType g : new ArrayList<>(production.keySet())) {
             if (g.isFoodType()) {
-                foodGoodsTypes.add(g);
+                ;//foodGoodsTypes.add(g);
             } else if (g.isLibertyType()) {
                 libertyGoodsTypes.add(g);
             } else if (g.isImmigrationType()) {
@@ -458,7 +464,7 @@ public class ColonyPlan {
                 rawLuxuryGoodsTypes.add(g);
             } else if (g.isRefined()
                 && g.getInputType().isNewWorldGoodsType()) {
-                luxuryGoodsTypes.add(g);
+                ;//luxuryGoodsTypes.add(g);
             } else if (g.isFarmed()) {
                 otherRawGoodsTypes.add(g);
             } else { // Not interested in this goods type.  Should not happen.
@@ -513,10 +519,9 @@ public class ColonyPlan {
             if (value > secondaryValue && secondaryRawMaterial != null) {
                 production.remove(secondaryRawMaterial);
                 production.remove(secondaryRawMaterial.getOutputType());
-                if (rawLuxuryGoodsTypes.contains(secondaryRawMaterial)) {
-                    rawLuxuryGoodsTypes.remove(secondaryRawMaterial);
-                    luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
-                } else if (otherRawGoodsTypes.contains(secondaryRawMaterial)) {
+                if (rawLuxuryGoodsTypes.remove(secondaryRawMaterial)) {
+                    ;//luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
+                } else {
                     otherRawGoodsTypes.remove(secondaryRawMaterial);
                 }
             }
@@ -648,7 +653,7 @@ public class ColonyPlan {
         } else if (produce.contains(goodsType)) {
             if ("trade".equals(advantage)) factor = 1.2;
             double f = 0.1 * colony.getTotalProductionOf(goodsType.getInputType());
-            ret = prioritize(type, PRODUCTION_WEIGHT,
+            ret = prioritize(type, PRODUCTION_WEIGHT * factor,
                 f/*FIXME: improvement?*/);
         }
         return ret;
@@ -769,7 +774,7 @@ public class ColonyPlan {
                 }
             }
 
-            if (findBuildPlan(type) == null && !expectFail) {
+            if (!expectFail && findBuildPlan(type) == null) {
                 logger.warning("No building priority found for: " + type);
             }
         }
@@ -789,13 +794,12 @@ public class ColonyPlan {
                     prioritize(unitType, DEFENCE_WEIGHT,
                         1.0/*FIXME: how badly defended?*/);
                 }
-            } else if (unitType.hasAbility(Ability.CARRY_GOODS)) {
-                if (wagonNeed > 0.0) {
-                    double factor = 1.0;
-                    if ("trade".equals(advantage)) factor = 1.1;
-                    prioritize(unitType, TRANSPORT_WEIGHT * factor,
-                        wagonNeed/*FIXME: type.getSpace()*/);
-                }
+            } else if (wagonNeed > 0.0
+                && unitType.hasAbility(Ability.CARRY_GOODS)) {
+                double factor = 1.0;
+                if ("trade".equals(advantage)) factor = 1.1;
+                prioritize(unitType, TRANSPORT_WEIGHT * factor,
+                    wagonNeed/*FIXME: type.getSpace()*/);
             }
         }
 
@@ -869,8 +873,8 @@ public class ColonyPlan {
                 })
             .thenComparingInt((WorkLocationPlan wp) ->
                 wp.getWorkLocation().getGenericPotential(wp.getGoodsType()))
-            .thenComparing((WorkLocationPlan wp) ->
-                wp.getGoodsType(), GoodsType.goodsTypeComparator);
+            .thenComparing(WorkLocationPlan::getGoodsType,
+                           GoodsType.goodsTypeComparator);
         workPlans.sort(comp);
     }
 
@@ -891,7 +895,7 @@ public class ColonyPlan {
         if (colony.getSoL() < 100) {
             produce.addAll(0, transform(libertyGoodsTypes,
                     gt -> production.containsKey(gt),
-                    Function.identity(), productionComparator));
+                    Function.<GoodsType>identity(), productionComparator));
         }
 
         // Always add raw/building materials first.
@@ -904,7 +908,7 @@ public class ColonyPlan {
                     && (colony.getGoodsCount(gt.getInputType())
                         >= GoodsContainer.CARGO_SIZE/2
                         || production.containsKey(gt.getInputType())),
-                Function.identity(),
+                Function.<GoodsType>identity(),
                 Comparator.comparingInt(indexer).reversed()));
 
         for (int i = toAdd.size()-1; i >= 0; i--) {
@@ -926,46 +930,16 @@ public class ColonyPlan {
         // Military goods after lucrative production.
         produce.addAll(transform(militaryGoodsTypes,
                                  gt -> production.containsKey(gt),
-                                 Function.identity(), productionComparator));
+                                 Function.<GoodsType>identity(),
+                                 productionComparator));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
             produce.addAll(transform(immigrationGoodsTypes,
                                      gt -> production.containsKey(gt),
-                                     Function.identity(), productionComparator));
+                                     Function.<GoodsType>identity(),
+                                     productionComparator));
         }
-    }
-
-    /**
-     * Tries to swap an expert unit for another doing its job.
-     *
-     * @param expert The expert {@code Unit}.
-     * @param others A list of other {@code Unit}s to test against.
-     * @param colony The {@code Colony} the units are working in.
-     * @return The unit that was replaced by the expert, or null if none.
-     */
-    private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
-        final Role oldRole = expert.getRole();
-        final int oldRoleCount = expert.getRoleCount();
-        final GoodsType work = expert.getType().getExpertProduction();
-        final GoodsType oldWork = expert.getWorkType();
-        final Unit other = find(others, u ->
-            (u.isPerson() && u.getWorkType() == work
-                && u.getType().getExpertProduction() != work));
-        if (other != null) {
-            Location l1 = expert.getLocation();
-            Location l2 = other.getLocation();
-            other.setLocation(colony.getTile());
-            expert.setLocation(l2);
-            expert.changeWorkType(work);
-            other.setLocation(l1);
-            if (oldWork != null) other.changeWorkType(oldWork);
-            Role tmpRole = other.getRole();
-            int tmpRoleCount = other.getRoleCount();
-            other.changeRole(oldRole, oldRoleCount);
-            expert.changeRole(tmpRole, tmpRoleCount);
-        }
-        return other;
     }
 
     /**
@@ -1000,8 +974,8 @@ public class ColonyPlan {
      * @param workers A list of potential {@code Unit}s to try.
      * @return The best worker for the job.
      */
-    public static Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
-                                     List<Unit> workers) {
+    protected static Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
+                                        List<Unit> workers) {
         if (workers == null || workers.isEmpty()) return null;
         final Colony colony = wl.getColony();
         final GoodsType outputType = (goodsType.isStoredAs())
@@ -1221,7 +1195,7 @@ public class ColonyPlan {
         List<WorkLocationPlan> wlps;
         WorkLocationPlan wlp;
         boolean done = false;
-        while (!workers.isEmpty() && !done) {
+        while (!done && !workers.isEmpty()) {
             // Decide what to produce: set the work location plan to
             // try (wlp), and the list the plan came from so it can
             // be recycled if successful (wlps).
@@ -1429,25 +1403,24 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             }
         }
         int expert = 0;
-        while (expert < experts.size()) {
-            Unit u1 = experts.get(expert);
-            Unit other;
-            if ((other = trySwapExpert(u1, experts, col)) != null) {
+        Iterator<Unit> expertIterator = experts.iterator();
+        while (expertIterator.hasNext()) {
+            Unit u1 = expertIterator.next();
+            Unit other = u1.trySwapExpert(experts);
+            if (other != null) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
-                experts.remove(u1);
-            } else if ((other = trySwapExpert(u1, nonExperts, col)) != null) {
+                expertIterator.remove();
+            } else if ((other = u1.trySwapExpert(nonExperts)) != null) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
-                experts.remove(u1);
-            } else {
-                expert++;
+                expertIterator.remove();
             }
         }
         for (Unit u : new ArrayList<>(workers)) {
             GoodsType work = u.getType().getExpertProduction();
             if (work != null) {
-                Unit other = trySwapExpert(u, col.getUnitList(), col);
+                Unit other = u.trySwapExpert(col.getUnitList());
                 if (other != null) {
                     lb.add("    Swapped ", u.getId(), "(",
                         u.getType().getSuffix(), ") for ", other, "\n");

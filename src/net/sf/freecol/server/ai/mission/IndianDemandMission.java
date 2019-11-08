@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -56,7 +56,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for demanding goods from a specified player.
  */
-public class IndianDemandMission extends Mission {
+public final class IndianDemandMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
@@ -72,10 +72,10 @@ public class IndianDemandMission extends Mission {
     private static final List<Predicate<GoodsType>> selectPredicates
         = new ArrayList<>();
     static {
-        selectPredicates.add(gt -> gt.getMilitary());
-        selectPredicates.add(gt -> gt.isBuildingMaterial());
-        selectPredicates.add(gt -> gt.isTradeGoods());
-        selectPredicates.add(gt -> gt.isRefined());
+        selectPredicates.add(GoodsType::getMilitary);
+        selectPredicates.add(GoodsType::isBuildingMaterial);
+        selectPredicates.add(GoodsType::isTradeGoods);
+        selectPredicates.add(GoodsType::isRefined);
     };
     
     /** The colony to demand from. */
@@ -96,8 +96,9 @@ public class IndianDemandMission extends Mission {
      * @param target The {@code Colony} receiving the gift.
      */
     public IndianDemandMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
 
+        setTarget(target);
         this.demanded = this.succeeded = false;
     }
 
@@ -124,7 +125,7 @@ public class IndianDemandMission extends Mission {
      * @return True if the unit is carrying goods.
      */
     private boolean hasTribute() {
-        return hasTribute(getAIUnit());
+        return hasMissionTribute(getAIUnit());
     }
 
     /**
@@ -133,7 +134,7 @@ public class IndianDemandMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return True if the unit is carrying goods.
      */
-    private static boolean hasTribute(AIUnit aiUnit) {
+    private static boolean hasMissionTribute(AIUnit aiUnit) {
         return aiUnit.getUnit().hasGoodsCargo();
     }
 
@@ -152,7 +153,7 @@ public class IndianDemandMission extends Mission {
      * @param target The target {@code Colony}.
      * @return The goods to demand.
      */
-    public Goods selectGoods(Colony target) {
+    private Goods selectGoods(Colony target) {
         final Specification spec = getSpecification();
         final List<GoodsType> goodsTypes = transform(spec.getGoodsTypeList(),
             gt -> target.getGoodsCount(gt) > 0);
@@ -219,7 +220,7 @@ public class IndianDemandMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         IndianSettlement home;
         return (reason != null)
@@ -263,8 +264,8 @@ public class IndianDemandMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -274,7 +275,7 @@ public class IndianDemandMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -330,7 +331,7 @@ public class IndianDemandMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -405,7 +406,7 @@ public class IndianDemandMission extends Mission {
             int tension = Math.max(unitTension,
                 unit.getOwner().getTension(enemy).getValue());
             d = unit.getTile().getDirection(colony.getTile());
-            if (tension >= Tension.Level.CONTENT.getLimit() && d != null) {
+            if (d != null && tension >= Tension.Level.CONTENT.getLimit()) {
                 if (AIMessage.askAttack(aiUnit, d)) lbAttack(lb, colony);
             }
             return lbDone(lb, false, "refused at ", colony);

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
@@ -71,12 +72,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
     /**
      * Records the number of units indexed by colony and unit type.
      */
-    private final Map<Colony, TypeCountMap<UnitType>> unitCount = new HashMap<>();
+    private final Map<Colony, TypeCountMap<UnitType>> unitCount;
 
     /**
      * Records whether a colony can train a type of unit.
      */
-    private final Map<Colony, Set<UnitType>> canTrain = new HashMap<>();
+    private final Map<Colony, Set<UnitType>> canTrain;
 
 
     /**
@@ -97,6 +98,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         StyledDocument doc = textPane.getStyledDocument();
 
         // check which colonies can train which units
+        unitCount = new HashMap<>(colonies.size());
+        canTrain = new HashMap<>(colonies.size());
         for (Colony colony : colonies) {
             TypeCountMap<UnitType> newUnitCount = new TypeCountMap<>();
             Set<UnitType> newCanTrain = new HashSet<>();
@@ -155,9 +158,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 GoodsType workType = unit.getWorkType();
                 UnitType expert = spec.getExpertForProducing(workType);
                 if (unitCount.get(colony).getCount(expert) == 0
-                    && !missingExpertWarning.contains(expert)) {
+                    && missingExpertWarning.add(expert)) {
                     addExpertWarning(doc, colony, workType, expert);
-                    missingExpertWarning.add(expert);
                 }
             }
         }
@@ -181,11 +183,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 ProductionInfo info = building.getProductionInfo();
                 if (goodsType != null
                     && info != null
-                    && !info.hasMaximumProduction()
-                    && !productionWarning.contains(goodsType)) {
+                    && !info.atMaximumProduction()
+                    && productionWarning.add(goodsType)) {
                     forEach(map(building.getInputs(), AbstractGoods::getType),
                         gt -> addProductionWarning(doc, colony, goodsType, gt));
-                    productionWarning.add(goodsType);
                 }
             }
         }
@@ -273,7 +274,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             for (Colony colony : colonies) {
                 for (Unit unit : colony.getUnitList()) {
                     GoodsType expertise = unit.getType().getExpertProduction();
-                    if ((unit.getSkillLevel() > 0) && (expertise == goodsType)) {
+                    if (expertise == goodsType && unit.getSkillLevel() > 0) {
                         if (unit.getLocation() instanceof Building) {
                             if (!((Building) unit.getLocation()).canProduce(goodsType, unit.getType())) {
                                 misusedExperts.add(colony);
@@ -345,10 +346,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage,
-                             doc.getStyle("regular"));
+                doc.getStyle("regular"));
 
-            ArrayList<Colony> withSurplus = new ArrayList<>();
-            ArrayList<Integer> theSurplus = new ArrayList<>();
+            List<Colony> withSurplus = new ArrayList<>();
+            List<Integer> theSurplus = new ArrayList<>();
             for (Colony col : colonies) {
                 int amount = colony.getAdjustedNetProductionOf(input);
                 if (amount > 0) {
@@ -366,22 +367,19 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
                     String amount = " (" + theSurplus.get(index) + ")";
                     StyleConstants.setComponent(doc.getStyle("button"),
-                                                createColonyButton(withSurplus.get(index), amount, false));
+                        createColonyButton(withSurplus.get(index), amount, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                     doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
                 }
                 Colony lastColony = withSurplus.get(withSurplus.size() - 1);
                 String amount = " (" + theSurplus.get(theSurplus.size() - 1) + ")";
                 StyleConstants.setComponent(doc.getStyle("button"),
-                                            createColonyButton(lastColony, amount, false));
+                    createColonyButton(lastColony, amount, false));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
             }
-
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Production warning fail", e);
+        } catch (BadLocationException ble) {
+            logger.log(Level.WARNING, "Bad insert location", ble);
         }
-
     }
 
     private JButton createColonyButton(Colony colony, boolean headline) {

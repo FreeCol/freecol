@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,6 +23,7 @@ import java.util.List;
 
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
@@ -312,7 +313,8 @@ public class AIMessage {
      */
     public static boolean askIndianDemand(AIPlayer aiPlayer, Unit unit,
                                           Colony colony, GoodsType type,
-                                          int amount, Boolean result) {
+                                          int amount,
+                                          IndianDemandAction result) {
         return aiPlayer.askServer()
             .indianDemand(unit, colony, type, amount, result);
     }

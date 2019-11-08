@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -195,7 +196,7 @@ public class Operand extends Scope {
             for (Player player : game.getLivePlayerList()) {
                 switch (this.operandType) {
                 case UNITS:
-                    result += ourCount(player.getUnitList());
+                    result += ourCount(player.getUnitSet());
                     break;
                 case BUILDINGS:
                     result += sum(player.getColonies(),
@@ -236,7 +237,7 @@ public class Operand extends Scope {
         final String methodName = getMethodName();
         switch (this.operandType) {
         case UNITS:
-            return ourCount(player.getUnitList());
+            return ourCount(player.getUnitSet());
         case BUILDINGS:
             return sum(player.getColonies(), c -> ourCount(c.getBuildings()));
         case SETTLEMENTS:
@@ -362,12 +363,15 @@ public class Operand extends Scope {
      */
     @Override
     public boolean equals(Object o) {
-        return this == o
-            || (o instanceof Operand
-                && this.operandType == ((Operand)o).operandType
-                && this.scopeLevel == ((Operand)o).scopeLevel
-                && Utils.equals(this.value, ((Operand)o).value)
-                && super.equals(o));
+        if (this == o) return true;
+        if (o instanceof Operand) {
+            Operand other = (Operand)o;
+            return this.operandType == other.operandType
+                && this.scopeLevel == other.scopeLevel
+                && Utils.equals(this.value, other.value)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**
@@ -388,7 +392,7 @@ public class Operand extends Scope {
     @Override
     public String toString() {
         if (this.value != null) return Integer.toString(value);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[Operand type=").append(this.operandType)
             .append(" scopeLevel=").append(this.scopeLevel);
         return super.toString().replaceFirst("^[^ ]*", sb.toString());

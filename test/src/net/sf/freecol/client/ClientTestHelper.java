@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -53,8 +53,7 @@ public class ClientTestHelper {
 
         logger.info("Debug value: " + FreeColDebugger.isInDebugMode());
 
-        client = new FreeColClient(null, null);
-        client.startClient(null, null, false, false, null, specification);
+        client = FreeColClient.startTestClient(specification);
         assertNotNull(client);
 
         ConnectController connectController = client.getConnectController();

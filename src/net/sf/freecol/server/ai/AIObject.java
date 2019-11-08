@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
@@ -43,8 +44,8 @@ public abstract class AIObject extends FreeColObject {
     /** The AI this object exists within. */
     private final AIMain aiMain;
 
-    /** Whether the object is uninitialized. */
-    protected boolean uninitialized = false;
+    /** Whether the object is initialized. */
+    protected boolean initialized;
 
 
     /**
@@ -52,9 +53,9 @@ public abstract class AIObject extends FreeColObject {
      *
      * @param aiMain The main AI-object.
      */
-    public AIObject(AIMain aiMain) {
+    protected AIObject(AIMain aiMain) {
         this.aiMain = aiMain;
-        uninitialized = true;
+        this.initialized = false;
     }
 
     /**
@@ -65,14 +66,13 @@ public abstract class AIObject extends FreeColObject {
      * @param id The object identifier.
      * @see AIMain#addAIObject(String, AIObject)
      */
-    public AIObject(AIMain aiMain, String id) {
+    protected AIObject(AIMain aiMain, String id) {
         this(aiMain);
 
         if (id != null) {
             setId(id);
             aiMain.addAIObject(id, this);
         }
-        uninitialized = true;
     }
 
     /**
@@ -84,8 +84,8 @@ public abstract class AIObject extends FreeColObject {
      *     during parsing.
      * @see AIObject#readFromXML
      */
-    public AIObject(AIMain aiMain,
-                    FreeColXMLReader xr) throws XMLStreamException {
+    protected AIObject(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
         this(aiMain);
 
         readFromXML(xr);
@@ -94,24 +94,35 @@ public abstract class AIObject extends FreeColObject {
 
 
     /**
+     * Is this AI object initialized?
+     *
+     * That is: it has been fully initialized by a detailed
+     * constructor, or built with a simple constructor due to being
+     * referenced by another object, but then updated with
+     * {@link #readFromXML}.
+     *
+     * @return True if this {@code AIObject} is initialized.
+     */
+    private final boolean isInitialized() {
+        return this.initialized;
+    }
+
+    /**
+     * Set the initialized flag in this object.
+     *
+     * To be implemented by leaf classes, and called in their constructors
+     * plus the special case in readChild below where we resolve forward
+     * references.
+     */
+    public abstract void setInitialized();
+    
+    /**
      * Convenience accessor for the main AI-object.
      *
      * @return The {@code AIMain}.
      */
     public final AIMain getAIMain() {
-        return aiMain;
-    }
-
-    /**
-     * Checks if this {@code AIObject}
-     * is uninitialized. That is: it has been referenced
-     * by another object, but has not yet been updated with
-     * {@link #readFromXML}.
-     *
-     * @return {@code true} if this object is not initialized.
-     */
-    public final boolean isUninitialized() {
-        return uninitialized;
+        return this.aiMain;
     }
 
     /**
@@ -149,12 +160,13 @@ public abstract class AIObject extends FreeColObject {
      * @return -1 if there are problems remaining, zero if problems
      *     were fixed, +1 if no problems found at all.
      */
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        if (isUninitialized()) {
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
+        if (!isInitialized()) {
             lb.add("\n  Uninitialized AI Object: ", getId());
-            return -1;
+            result = result.fail();
         }
-        return 1;
+        return result;
     }
 
     /**
@@ -164,7 +176,7 @@ public abstract class AIObject extends FreeColObject {
      * @return Negative if there are problems remaining, zero if
      *     problems were fixed, positive if no problems found at all.
      */
-    public int checkIntegrity(boolean fix) {
+    public IntegrityType checkIntegrity(boolean fix) {
         return checkIntegrity(fix, new LogBuilder(-1));
     }
 
@@ -184,7 +196,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final void setSpecification(Specification specification) {
-        throw new RuntimeException("Can not set specification");
+        throw new RuntimeException("Can not set specification: " + this);
     }
     
     /**
@@ -200,7 +212,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final void setGame(Game game) {
-        throw new RuntimeException("Can not set game");
+        throw new RuntimeException("Can not set game: " + this);
     }
 
     // Overide FreeColObject
@@ -213,7 +225,7 @@ public abstract class AIObject extends FreeColObject {
         AIObject o = copyInCast(other, AIObject.class);
         if (o == null || !super.copyIn(o)) return false;
         //this.aiMain is fixed
-        this.uninitialized = o.isUninitialized();
+        this.initialized = o.isInitialized();
         return true;
     }
 }

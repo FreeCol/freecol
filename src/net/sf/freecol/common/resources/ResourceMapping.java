@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -273,6 +273,15 @@ public final class ResourceMapping {
     }
 
     /**
+     * Get the complete set of image keys.
+     *
+     * @return A set of image keys.
+     */
+    public Set<String> getImageKeySet() {
+        return imageResources.keySet();
+    }
+    
+    /**
      * Get the image keys in this mapping with a given prefix as a set.
      *
      * @param prefix The prefix to check for.
@@ -280,7 +289,7 @@ public final class ResourceMapping {
      */
     public Set<String> getImageKeySet(String prefix) {
         return transform(imageResources.keySet(), k -> k.startsWith(prefix),
-                         Function.identity(), Collectors.toSet());
+                         Function.<String>identity(), Collectors.toSet());
     }
 
     public Map<String, ImageResource> getImageResources() {

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -121,12 +121,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                                         bestSize.width, bestSize.height);
                 Point point = new Point(bestSize.width / 2,
                                         bestSize.height / 2);
-                try {
-                    return tk.createCustomCursor(scaled, point,
-                                                 "freeColDragIcon");
-                } catch (Exception ex) {
-                    ; // Fall through
-                }
+                return tk.createCustomCursor(scaled, point,
+                                             "freeColDragIcon");
             }
             return null;
         }
@@ -259,7 +255,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
 
-    public JComponent getDropTarget(JComponent component) {
+    private JComponent getDropTarget(JComponent component) {
         return (component instanceof DropTarget)
             ? component
             : (component.getParent() instanceof JComponent)
@@ -360,7 +356,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                         if (amountToTransfer > GoodsContainer.CARGO_SIZE * availableHolds) {
                             amountToTransfer = GoodsContainer.CARGO_SIZE * availableHolds;
                             label.setAmount(amountToTransfer);
-                            goods = label.getGoods();
                         }
                     }
                 }
@@ -577,7 +572,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 : importFail(comp, data.toString());
         } catch (Exception e) { // FIXME: Suggest a reconnect?
             logger.log(Level.WARNING, "Import fail", e);
-            ret = importFail(comp, "crash: " + e.toString());
+            ret = importFail(comp, "crash: " + e);
         }
         return ret;
     }

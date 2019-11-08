@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,7 +38,7 @@ public class RemoveServerMessage extends ServerInfoMessage {
     /**
      * Create a new {@code RemoveServerMessage}.
      *
-     * @param conn A {@code Connection} to the meta-server.
+     * @param si The {@code ServerInfo} describing the server to remove.
      */
     public RemoveServerMessage(ServerInfo si) {
         super(TAG, si);

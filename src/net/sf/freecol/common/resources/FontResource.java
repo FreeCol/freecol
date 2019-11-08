@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -67,20 +67,23 @@ public class FontResource extends Resource {
                 String name = resourceLocator.getSchemeSpecificPart();
                 font = Font.decode(name.substring(SCHEME.length()));
             }
-
-            if (font != null) {
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .registerFont(font);
-            }
+            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .registerFont(font);
 
             logger.info("Loaded font: " + font.getFontName()
                 + " from: " + resourceLocator);
         } catch (FontFormatException|IOException ex) {
             logger.log(Level.WARNING,
                 "Failed loading font from: " + resourceLocator, ex);
-            throw new IOException(ex.getMessage());
+            throw new IOException("Font load failed from: " + resourceLocator,
+                ex);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
 
 
     /**

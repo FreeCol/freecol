@@ -45,6 +45,8 @@
         <!-- JOgg/JOrbis libraries -->
         <pathelement location="${basedir}/jars/jogg-0.0.17.jar"/>
         <pathelement location="${basedir}/jars/jorbis-0.0.17.jar"/>
+        <!-- findbugs annotations -->
+        <pathelement location="${basedir}/jars/findbugs-annotations.jar"/>
     </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />

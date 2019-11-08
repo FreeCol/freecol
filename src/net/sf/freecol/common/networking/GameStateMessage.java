@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -65,10 +65,8 @@ public class GameStateMessage extends AttributeMessage {
      * @param game The {@code Game} to read within (unused, no game
      *     exists at this point).
      * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if the stream is corrupt.
      */
-    public GameStateMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public GameStateMessage(Game game, FreeColXMLReader xr) {
         this(xr.getAttribute(STATE_TAG, ServerState.class, (ServerState)null));
     }
         

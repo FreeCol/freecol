@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -239,30 +239,6 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new {@code Modifier} instance from another.
-     *
-     * @param template A {@code Modifier} to copy.
-     */
-    public Modifier(Modifier template) {
-        this(template.getSpecification());
-
-        setId(template.getId());
-        copyIn(template);
-    }
-
-    /**
-     * Creates a new {@code Modifier} instance from another with
-     * an identifier override.
-     *
-     * @param id The object identifier.
-     * @param template A {@code Modifier} to copy.
-     */
-    public Modifier(String id, Modifier template) {
-        this(template);
-        setId(id);
-    }
-
-    /**
      * Creates a new {@code Modifier} instance.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
@@ -276,6 +252,19 @@ public class Modifier extends Feature {
         readFromXML(xr);
     }
 
+
+    /**
+     * Make a copy of a modifier.
+     *
+     * @param modifier The {@code Modifier} to copy.
+     * @return A copy of the modifier.
+     */
+    public static Modifier makeModifier(Modifier modifier) {
+        Modifier ret = new Modifier(modifier.getSpecification());
+        ret.setId(modifier.getId());
+        ret.copyIn(modifier);
+        return ret;
+    }
 
     /**
      * Makes a timed modifier (one with start/end turn and increment)
@@ -292,7 +281,8 @@ public class Modifier extends Feature {
      */
     public static Modifier makeTimedModifier(String id, Modifier template,
                                              Turn start) {
-        Modifier modifier = new Modifier(id, template);
+        Modifier modifier = makeModifier(template);
+        modifier.setId(id);
         float inc = template.getIncrement();
         int duration = template.getDuration();
         modifier.setTemporary(template.isTemporary());
@@ -326,12 +316,33 @@ public class Modifier extends Feature {
     }
 
     /**
+     * Is this a "known" value.
+     *
+     * @param value The value to test.
+     * @return True if the value is known.
+     */
+    public static boolean isFloatKnown(float value) {
+        return Float.compare(value, UNKNOWN) != 0;
+    }
+
+    /**
+     * Does this modifier have a known value?
+     *
+     * That is, is it not set to the UNKNOWN value.
+     *
+     * @return True if the value is known.
+     */
+    public boolean isKnown() {
+        return Modifier.isFloatKnown(this.value);
+    }
+
+    /**
      * Get the modifier value.
      *
      * @return The modifier value.
      */
     public final float getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -345,9 +356,9 @@ public class Modifier extends Feature {
             if (hasIncrement()) {
                 float f = (turn.getNumber() - getFirstTurn().getNumber())
                     * increment;
-                return apply(value, f, incrementType);
+                return apply(this.value, f, incrementType);
             } else {
-                return value;
+                return this.value;
             }
         } else {
             return 0;
@@ -429,7 +440,7 @@ public class Modifier extends Feature {
                                        final float increment,
                                        Turn firstTurn, Turn lastTurn) {
         if (firstTurn == null) {
-            throw new IllegalArgumentException("Null firstTurn");
+            throw new RuntimeException("Null firstTurn: " + this);
         }
         this.incrementType = incrementType;
         this.increment = increment;
@@ -616,13 +627,13 @@ public class Modifier extends Feature {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o instanceof Modifier) { 
-            Modifier m = (Modifier)o;
-            return Utils.equals(this.modifierType, m.modifierType)
-                && this.value == m.value
-                && this.increment == m.increment
-                && Utils.equals(this.incrementType, m.incrementType)
-                && this.modifierIndex == m.modifierIndex
-                && super.equals(o);
+            Modifier other = (Modifier)o;
+            return Float.compare(this.value, other.value) == 0
+                && Float.compare(this.increment, other.increment) == 0
+                && this.modifierIndex == other.modifierIndex
+                && Utils.equals(this.modifierType, other.modifierType)
+                && Utils.equals(this.incrementType, other.incrementType)
+                && super.equals(other);
         }
         return false;
     }
@@ -648,7 +659,7 @@ public class Modifier extends Feature {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[Modifier ").append(getId());
         if (getSource() != null) {
-            sb.append(" (" + getSource().getId() + ")");
+            sb.append(" (").append(getSource().getId()).append(')');
         }
         sb.append(' ').append(modifierType)
             .append(' ').append(value);

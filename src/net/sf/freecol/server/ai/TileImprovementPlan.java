@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -62,25 +63,23 @@ public class TileImprovementPlan extends ValuedAIObject {
 
 
     /**
-     * Creates a new uninitialized {@code TileImprovementPlan}
-     * from the given XML-representation.
+     * Creates a new uninitialized {@code TileImprovementPlan}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
      */
-    public TileImprovementPlan(AIMain aiMain, String id)
-        throws XMLStreamException {
+    public TileImprovementPlan(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        type = null;
-        target = null;
-        pioneer = null;
+        this.type = null;
+        this.target = null;
+        this.pioneer = null;
+        this.initialized = false;
     }
 
     /**
-     * Creates a new {@code TileImprovementPlan}.
+     * Creates a new {@code TileImprovementPlan} and initializes its
+     * critical fields.
      *
      * @param aiMain The main AI-object.
      * @param target The target {@code Tile} for the improvement.
@@ -97,7 +96,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         this.type = type;
         this.pioneer = null;
         setValue(value);
-        uninitialized = getType() == null || getTarget() == null;
+        setInitialized();
     }
 
     /**
@@ -113,10 +112,17 @@ public class TileImprovementPlan extends ValuedAIObject {
                                FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getType() == null || getTarget() == null;
+        setInitialized();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public final void setInitialized() {
+        this.initialized = getType() != null && getTarget() != null;
+    }
+        
     /**
      * Gets the pioneer who have been assigned to making the
      * improvement described by this object.
@@ -272,17 +278,17 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (pioneer != null) {
-            result = Math.min(result, pioneer.checkIntegrity(fix, lb));
+            result = result.combine(pioneer.checkIntegrity(fix, lb));
         }
         if (type == null) {
             lb.add("\n  Tile improvement plan without type: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (target == null) {
             lb.add("\n  Tile improvement plan without target: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }
@@ -314,7 +320,9 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         xw.writeAttribute(TARGET_TAG, target);
 
-        if (pioneer != null && pioneer.checkIntegrity(false) > 0) {
+        // Only write the pioneer if it is in good condition
+        if (pioneer != null
+            && pioneer.checkIntegrity(false) == IntegrityType.INTEGRITY_GOOD) {
             xw.writeAttribute(PIONEER_TAG, pioneer);
         }
     }
@@ -345,16 +353,6 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (type != null && target != null) uninitialized = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getXMLTagName() { return TAG; }
 
 
@@ -364,15 +362,13 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof TileImprovementPlan) {
-            TileImprovementPlan op = (TileImprovementPlan)other;
-            return super.equals(op)
-                && Utils.equals(this.type, op.type)
-                && Utils.equals(this.target, op.target)
-                && Utils.equals(this.pioneer, op.pioneer);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (!(o instanceof TileImprovementPlan)) return false;
+        TileImprovementPlan other = (TileImprovementPlan)o;
+        return Utils.equals(this.type, other.type)
+            && Utils.equals(this.target, other.target)
+            && Utils.equals(this.pioneer, other.pioneer)
+            && super.equals(other);
     }
 
     /**

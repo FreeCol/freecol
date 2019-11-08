@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -38,7 +39,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
@@ -121,7 +122,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         this.units = new JSpinner(spinnerModel);
         spinnerModel.setValue(unitCount);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
         panel.add(Utility.localizedLabel("name"));
         panel.add(this.name);
         panel.add(Utility.localizedLabel("nation"));
@@ -133,12 +134,11 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         panel.add(Utility.localizedLabel("units"));
         panel.add(this.units);
 
-        final IndianSettlement fake = null;
         List<ChoiceItem<IndianSettlement>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), is).okOption());
-        c.add(new ChoiceItem<>(Messages.message("editSettlementDialog.removeSettlement"), fake));
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("editSettlementDialog.removeSettlement"), null));
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (IndianSettlement)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, new ImageIcon(
             getImageLibrary().getSmallSettlementImage(is)), c);
     }
@@ -160,11 +160,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         return getOwnerNationType().getSettlementType(this.capital.isSelected());
     }
         
-    private int getAverageSize() {
-        SettlementType t = getSettlementType();
-        return (t.getMinimumSize() + t.getMaximumSize()) / 2;
-    }
-
     private DefaultComboBoxModel<UnitType> getSkillModel() {
         IndianNationType ownerType = getOwnerNationType();
         DefaultComboBoxModel<UnitType> skillModel
@@ -203,7 +198,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @Override
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
-        final SwingGUI gui = getGUI();
+        final GUI gui = getGUI();
         IndianSettlement ret = null;
         Set<Tile> tiles = is.getOwnedTiles();
         Object value = getValue();

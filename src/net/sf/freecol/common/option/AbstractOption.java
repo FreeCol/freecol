@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -57,7 +57,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      * @param id The object identifier.
      * @param specification The {@code Specification} to refer to.
      */
-    public AbstractOption(String id, Specification specification) {
+    protected AbstractOption(String id, Specification specification) {
         super(specification);
 
         setId(id);
@@ -68,7 +68,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      *
      * @param id The object identifier.
      */
-    public AbstractOption(String id) {
+    protected AbstractOption(String id) {
         this(id, null);
     }
 
@@ -108,7 +108,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      */
     protected void setValue(String valueString, String defaultValueString)
         throws XMLStreamException {
-        throw new XMLStreamException("Unsupported method: setValue.");
+        throw new XMLStreamException("setValue unsupported: " + this);
     }
 
     /**
@@ -138,7 +138,8 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      * {@inheritDoc}
      */
     @Override
-    public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
+    public abstract AbstractOption<T> cloneOption()
+        throws CloneNotSupportedException;
 
     /**
      * {@inheritDoc}

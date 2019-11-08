@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -154,7 +154,6 @@ public class MetaServerUtils {
         // since an additional update should be sent when a new
         // player is added to/removed from this server etc.
         Timer t = new Timer(true);
-        if (t == null) return false;
         updaters.put(t, si);
         t.scheduleAtFixedRate(new TimerTask() {
                 @Override
@@ -219,8 +218,10 @@ public class MetaServerUtils {
         String host = FreeCol.getMetaServerAddress();
         int port = FreeCol.getMetaServerPort();
         try {
-            return new Connection(host, port, "MetaServer")
+            Connection c = new Connection(host, port, "MetaServer")
                 .setMessageHandler(new MetaInputHandler(consumer));
+            c.startReceiving();
+            return c;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not connect to meta-server: "
                 + host + ":" + port, ioe);
@@ -251,12 +252,10 @@ public class MetaServerUtils {
                 return updateTimer(si);
             default:
                 logger.log(Level.WARNING, "Wrong metaMessage type: " + type);
-                return false;
+                break;
             }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Meta-server " + type.toString()
-                + " failed: " + FreeCol.getMetaServerAddress()
-                + ":" + FreeCol.getMetaServerPort(), ex);
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Meta message " + type + " failure", ex);
         }
         return false;
     }
@@ -278,10 +277,8 @@ public class MetaServerUtils {
             return null;
         }
         try {
-            if (!mc.sendMessage(new ServerListMessage())) {
-                logger.warning("Error querying metaserver.");
-                return null;
-            }
+            mc.sendMessage(new ServerListMessage());
+
             final int MAXTRIES = 5;
             final int SLEEP_TIME = 1000; // 1s
             for (int n = MAXTRIES; n > 0; n--) {
@@ -292,8 +289,8 @@ public class MetaServerUtils {
                 delay(SLEEP_TIME, "Delay interrupted");
             }
             if (ret == null) logger.warning("No response from metaserver.");
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Exception getting server list", ex);
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Get server list failure", ex);
         } finally {
             mc.close();
         }
@@ -306,6 +303,7 @@ public class MetaServerUtils {
      * If successful, an update timer will be returned, which will
      * continually send update messages to the meta-server until cancelled.
      *
+     * @param si The {@code ServerInfo} describing the server to register.
      * @return True if the server was registered.
      */
     public static boolean registerServer(ServerInfo si) {
@@ -315,6 +313,7 @@ public class MetaServerUtils {
     /**
      * Remove a public server.
      *
+     * @param si The {@code ServerInfo} describing the server to remove.
      * @return True if the server was removed.
      */
     public static boolean removeServer(ServerInfo si) {
@@ -324,6 +323,7 @@ public class MetaServerUtils {
     /**
      * Update a public server.
      *
+     * @param si The {@code ServerInfo} describing the server to update.
      * @return True if the server was updated.
      */
     public static boolean updateServer(ServerInfo si) {

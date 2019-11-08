@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -32,6 +33,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -78,7 +80,7 @@ public abstract class AIPlayer extends AIObject {
         = Comparator.comparing(AIUnit::getUnit, Unit.locComparator);
 
     /** The FreeColGameObject this AIObject contains AI-information for. */
-    private ServerPlayer player;
+    private Player player;
 
     /** The PRNG to use for this AI player. */
     private Random aiRandom;
@@ -91,17 +93,15 @@ public abstract class AIPlayer extends AIObject {
      * Creates a new AI player.
      *
      * @param aiMain The {@code AIMain} the player exists within.
-     * @param player The {@code ServerPlayer} to associate this
-     *            AI player with.
+     * @param player The {@code Player} to associate this AI player with.
      */
-    public AIPlayer(AIMain aiMain, ServerPlayer player) {
+    protected AIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player.getId());
 
         this.player = player;
         this.aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
         this.serverAPI = new AIServerAPI(this);
-
-        uninitialized = false;
+        setInitialized();
     }
 
     /**
@@ -118,9 +118,16 @@ public abstract class AIPlayer extends AIObject {
         super(aiMain, xr);
         
         this.serverAPI = new AIServerAPI(this);
-        uninitialized = player == null;
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void setInitialized() {
+        this.initialized = getPlayer() != null;
+    }
 
     /**
      * Gets the {@code Player} this {@code AIPlayer} is
@@ -221,7 +228,7 @@ public abstract class AIPlayer extends AIObject {
      */
     protected List<AIUnit> getAIUnits() {
         List<AIUnit> aiUnits = new ArrayList<>();
-        for (Unit u : getPlayer().getUnitList()) {
+        for (Unit u : getPlayer().getUnitSet()) {
             if (u.isDisposed()) {
                 logger.warning("getAIUnits ignoring: " + u.getId());
                 continue;
@@ -256,14 +263,14 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (player == null || player.isDisposed()) {
             lb.add("\n  AIPlayer without underlying player: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (!player.isAI()) {
             lb.add("\n  AIPlayer that is not an AI: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }
@@ -273,21 +280,11 @@ public abstract class AIPlayer extends AIObject {
      *
      * @param runnable The {@code Runnable} work to do.
      */
-    public void invoke(final Runnable runnable) {
-        final String name = FreeCol.SERVER_THREAD + "AIPlayer("
-            + getPlayer().getName() + ")";
-        Thread thread = new Thread(name) {
-                @Override
-                public void run() {
-                    try {
-                        runnable.run();
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Thread " + name + " fail", e);
-                    }
-                }
-            };
-        logger.finest("Starting " + name + " " + thread.toString());
+    protected void invoke(final Runnable runnable) {
+        Thread thread = new Thread(runnable,
+            FreeCol.SERVER_THREAD + "AIPlayer(" + getPlayer().getName() + ")");
         thread.start();
+        logger.finest("Started " + thread);
     }
 
     // Message.aiHandler support
@@ -372,11 +369,12 @@ public abstract class AIPlayer extends AIObject {
      * @param initial The acceptance state of the demand.
      */
     public void indianDemandHandler(Unit unit, Colony colony, GoodsType type,
-                                    int amount, Boolean initial) {
-        Boolean result = indianDemand(unit, colony, type, amount, initial);
+                                    int amount, IndianDemandAction initial) {
+        IndianDemandAction result
+            = indianDemand(unit, colony, type, amount, initial);
         logger.finest("AI handling native demand by " + unit
             + " at " + colony + " result: " + initial + " -> " + result);
-        if (result != null) {
+        if (result != IndianDemandAction.INDIAN_DEMAND_DONE) {
             invoke(() -> {
                     AIMessage.askIndianDemand(this, unit, colony, type,
                                               amount, result);
@@ -398,7 +396,7 @@ public abstract class AIPlayer extends AIObject {
                                  market.getSalePriceComparator());
         List<Goods> loot = new ArrayList<>();
         int space = unit.getSpaceLeft();
-        while (!goods.isEmpty() && space > 0) {
+        while (space > 0 && !goods.isEmpty()) {
             Goods g = goods.remove(0);
             if (g.getSpaceTaken() > space) continue; // Approximate
             loot.add(g);
@@ -491,18 +489,6 @@ public abstract class AIPlayer extends AIObject {
     }    
 
     /**
-     * Handle a multiple message.
-     */
-    public void multipleHandler() {
-        // We want to let the handlers for the parts of this message
-        // get a chance to run.  Perhaps we should even insist they
-        // all run to completion but let us try not being that severe.
-        // So invoke a null thread and yield.
-        invoke(nullRunnable);
-        Thread.yield();
-    }
-
-    /**
      * Handle reconnect.
      */
     public void reconnectHandler() {
@@ -552,12 +538,12 @@ public abstract class AIPlayer extends AIObject {
      * @param type The {@code GoodsType} demanded.
      * @param amount The amount of gold demanded.
      * @param accept The acceptance state of the demand.
-     * @return True if this player accepts the demand, false if the demand
-     *     is rejected, null if no further consideration is required.
+     * @return The result of the demand.
      */
-    public Boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount, Boolean accept) {
-        return false;
+    public IndianDemandAction indianDemand(Unit unit, Colony colony,
+                                           GoodsType type, int amount,
+                                           IndianDemandAction accept) {
+        return IndianDemandAction.INDIAN_DEMAND_REJECT;
     }
 
     /**
@@ -614,18 +600,46 @@ public abstract class AIPlayer extends AIObject {
     }
 
 
-    // European players need to implement these for AIColony
+    // European players need to implement these for AIColony, other players
+    // can throw a can-not-happen error
 
-    public int getNeededWagons(Tile tile) {
-        return 0;
-    }
+    /**
+     * Gets the needed wagons for a tile/contiguity.
+     *
+     * @param tile The {@code Tile} to derive the contiguity from.
+     * @return The number of wagons needed.
+     */
+    public abstract int getNeededWagons(Tile tile);
 
-    public int scoutsNeeded() {
-        return 0;
-    }
+    /**
+     * How many pioneers should we have?
+     *
+     * This is the desired total number, not the actual number which would
+     * take into account the number of existing PioneeringMissions.
+     *
+     * @return The desired number of pioneers for this player.
+     */
+    public abstract int pioneersNeeded();
 
-    public void completeWish(Wish w) {
-    }
+    /**
+     * How many scouts should we have?
+     *
+     * This is the desired total number, not the actual number which would
+     * take into account the number of existing ScoutingMissions.
+     *
+     * Current scheme for European AIs is to use up to three scouts in
+     * the early part of the game, then one.
+     *
+     * @return The desired number of scouts for this player.
+     */
+    public abstract int scoutsNeeded();
+
+    /**
+     * Notify that a wish has been completed.  Called from AIColony.
+     *
+     * @param w The {@code Wish} to complete.
+     */
+    public abstract void completeWish(Wish w);
 
 
     // Serialization
@@ -637,10 +651,18 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw)
+        throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(aiRandom));
+        String rs;
+        try {
+            rs = Utils.getRandomState(aiRandom);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not get random state", ioe);
+            return;
+        }
+        xw.writeAttribute(RANDOM_STATE_TAG, rs);
     }
 
     /**
@@ -659,16 +681,6 @@ public abstract class AIPlayer extends AIObject {
                                                               (String)null));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (getPlayer() != null) uninitialized = false;
     }
 
     /**

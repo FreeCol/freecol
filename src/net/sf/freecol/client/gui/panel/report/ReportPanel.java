@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -52,16 +52,17 @@ public class ReportPanel extends FreeColPanel {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
+    /**
+     * The default layout contrains of the {@code JScrollPane}s in this class.
+     */
+    private static final String SCROLL_PANE_SIZE
+        = "cell 0 1, height 100%, width 100%";
+
     protected final JPanel reportPanel;
 
     protected final JLabel header;
 
     protected JScrollPane scrollPane;
-
-    /**
-     * The default layout contrains of the {@code JScrollPane}s in this class.
-     */
-    private static final String SCROLL_PANE_SIZE = "cell 0 1, height 100%, width 100%";
 
 
     /**
@@ -70,9 +71,9 @@ public class ReportPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param key A key for the title.
      */
-    public ReportPanel(FreeColClient freeColClient, String key) {
-        super(freeColClient, new MigLayout("wrap 1", "[fill]",
-                                           "[]30[fill]30[]"));
+    protected ReportPanel(FreeColClient freeColClient, String key) {
+        super(freeColClient, "ReportPanelUI",
+              new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 
         header = Utility.localizedHeader(Messages.nameKey(key), false);
         add(header, "cell 0 0, align center");

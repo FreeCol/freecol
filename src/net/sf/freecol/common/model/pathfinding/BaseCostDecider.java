@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -127,8 +127,8 @@ class BaseCostDecider implements CostDecider {
      * @return The new movement cost, with this.movesLeft and this.newTurns
      *     adjusted.
      */
-    public int adjust(Unit unit, Tile oldTile, Tile newTile,
-                      int movesLeftBefore) {
+    protected int adjust(Unit unit, Tile oldTile, Tile newTile,
+                         int movesLeftBefore) {
         int cost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
         if (cost <= movesLeftBefore) {
             this.movesLeft = movesLeftBefore - cost;

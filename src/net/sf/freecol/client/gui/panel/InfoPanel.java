@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -77,13 +77,17 @@ public final class InfoPanel extends FreeColPanel {
 
     private static final int SLACK = 5; // Small gap
 
-    /**
-     * Panel for ending the turn.
-     */
-    public class EndTurnPanel extends MigPanel {
+    /** Panel for ending the turn. */
+    private static class EndTurnPanel extends FreeColPanel {
 
-        public EndTurnPanel() {
-            super(new MigLayout("wrap 1, center", "[center]", ""));
+        /**
+         * Build a new end panel.
+         *
+         * @param freeColClient The {@code FreeColClient} for the game.
+         */
+        public EndTurnPanel(FreeColClient freeColClient) {
+            super(freeColClient, null,
+                  new MigLayout("wrap 1, center", "[center]", ""));
 
             final ImageLibrary lib = getGUI().getTileImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
@@ -101,6 +105,7 @@ public final class InfoPanel extends FreeColPanel {
                 .getFreeColAction(EndTurnAction.id));
             button.setFont(font);
             add(button);
+            setBorder(null);
             setOpaque(false);
             setSize(getPreferredSize());
         }
@@ -109,7 +114,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying {@code Tile}-information.
      */
-    public class TileInfoPanel extends MigPanel {
+    public static class TileInfoPanel extends FreeColPanel {
 
         private static final int PRODUCTION = 4;
         
@@ -118,14 +123,17 @@ public final class InfoPanel extends FreeColPanel {
         // TODO: Find a way of removing the need for an extremely tiny font.
         //private final Font font = new JLabel().getFont().deriveFont(8f);
 
-
         /**
          * Create a {@code TileInfoPanel}.
+         *
+         * @param freeColClient The {@code FreeColClient} for the game.
          */
-        public TileInfoPanel() {
-            super(new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
+        public TileInfoPanel(FreeColClient freeColClient) {
+            super(freeColClient, null,
+                  new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
 
             setSize(260, 130);
+            setBorder(null);
             setOpaque(false);
         }
 
@@ -219,7 +227,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying {@code Unit}-information.
      */
-    public class UnitInfoPanel extends JPanel
+    public static class UnitInfoPanel extends FreeColPanel
         implements PropertyChangeListener {
 
         /** The unit to display. */
@@ -228,11 +236,15 @@ public final class InfoPanel extends FreeColPanel {
 
         /**
          * Create a new unit information panel.
+         *
+         * @param freeColClient The {@code FreeColClient} for the game.
          */
-        public UnitInfoPanel() {
-            super(new MigLayout("wrap 5, fill, gap 0 0", "", ""));
+        public UnitInfoPanel(FreeColClient freeColClient) {
+            super(freeColClient, null,
+                  new MigLayout("wrap 5, fill, gap 0 0", "", ""));
 
             setSize(260, 130);
+            setBorder(null);
             setOpaque(false);
         }
 
@@ -371,7 +383,7 @@ public final class InfoPanel extends FreeColPanel {
 
     private final UnitInfoPanel unitInfoPanel;
 
-    private final transient Image skin;
+    private final Image skin;
 
 
     /**
@@ -392,12 +404,12 @@ public final class InfoPanel extends FreeColPanel {
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
         super(freeColClient);
 
-        this.endTurnPanel = new EndTurnPanel();
+        this.endTurnPanel = new EndTurnPanel(freeColClient);
         this.mapEditorPanel = new JPanel(null);
         this.mapEditorPanel.setSize(130, 100);
         this.mapEditorPanel.setOpaque(false);
-        this.tileInfoPanel = new TileInfoPanel();
-        this.unitInfoPanel = new UnitInfoPanel();
+        this.tileInfoPanel = new TileInfoPanel(freeColClient);
+        this.unitInfoPanel = new UnitInfoPanel(freeColClient);
         this.skin = (!useSkin) ? null
             : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 
@@ -508,7 +520,7 @@ public final class InfoPanel extends FreeColPanel {
      * Update this {@code InfoPanel} by selecting the correct internal
      * panel to display.
      */
-    public void update() {
+    private void update() {
         InfoPanelMode newMode = getMode();
         Player player = getFreeColClient().getMyPlayer();
         boolean fail = newMode == InfoPanelMode.END && player != null

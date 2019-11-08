@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,7 +22,6 @@ package net.sf.freecol.client.networking;
 import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -30,13 +29,10 @@ import net.sf.freecol.common.networking.ServerAPI;
 
 
 /**
- * Implementation of the ServerAPI for a player with attached GUI and
- * real connection to the server.
+ * Implementation of the ServerAPI for a player with a real connection
+ * to the server.
  */
 public class UserServerAPI extends ServerAPI {
-
-    /** The GUI to use for error and client processing. */
-    private final GUI gui;
 
     /** The connection used to communicate with the server. */
     private Connection connection = null;
@@ -56,22 +52,72 @@ public class UserServerAPI extends ServerAPI {
 
     /**
      * Create the new user wrapper for the server API.
-     *
-     * @param gui The {@code GUI} to use for user interaction.
      */
-    public UserServerAPI(GUI gui) {
+    public UserServerAPI() {
         super();
-
-        this.gui = gui;
     }
 
-
-    // Implement ServerAPI
+    /**
+     * Name accessor.
+     *
+     * @return The connection name.
+     */
+    private synchronized String getName() {
+        return this.name;
+    }
 
     /**
-     * {@inheritDoc}
+     * Host accessor.
+     *
+     * @return The connection host.
      */
-    public synchronized Connection connect(String name, String host, int port)
+    private synchronized String getHost() {
+        return this.host;
+    }
+
+    /**
+     * Port accessor.
+     *
+     * @return The connection port.
+     */
+    private synchronized int getPort() {
+        return this.port;
+    }
+
+    /**
+     * Update the connection parameters so as to allow reconnection.
+     *
+     * @param name The connection name.
+     * @param host The host connected to.
+     * @param port The port connected to.
+     */
+    private synchronized void updateParameters(String name, String host, int port) {
+        this.name = name;
+        this.host = host;
+        this.port = port;
+    }        
+
+    /**
+     * A connection has been made, save it and its parameters.
+     *
+     * @param c The new {@code Connection}.
+     */
+    private synchronized void updateConnection(Connection c) {
+        c.setMessageHandler(this.messageHandler);
+        c.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
+        this.connection = c;
+    }
+
+    /**
+     * Create a new connection.
+     *
+     * @param name The name to associate with the connection.
+     * @param host The name of the host to connect to.
+     * @param port The port to connect to.
+     * @return The new <code>Connection</code>.
+     * @exception IOException on failure to connect.
+     */
+    private static Connection newConnection(String name, String host, int port)
         throws IOException {
         int tries;
         if (port < 0) {
@@ -80,23 +126,32 @@ public class UserServerAPI extends ServerAPI {
         } else {
             tries = 1;
         }
+        Connection conn = null;
         for (int i = tries; i > 0; i--) {
             try {
-                this.connection = new Connection(host, port, name)
-                    .setMessageHandler(messageHandler);
-                if (this.connection != null) {
-                    // Connected, save the connection information
-                    this.name = name;
-                    this.host = host;
-                    this.port = port;
-                    this.connection.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
-                    break;
-                }
+                conn = new Connection(host, port, name);
+                conn.startReceiving();
+                break;
             } catch (IOException e) {
                 if (i <= 1) throw e;
             }
         }
-        return this.connection;
+        return conn;
+    }
+
+
+    // Implement ServerAPI
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection connect(String name, String host, int port)
+        throws IOException {
+        Connection c = newConnection(name, host, port);
+        if (c == null) return null;
+        updateConnection(c);
+        updateParameters(name, host, port);
+        return c;
     }
 
     /**
@@ -114,7 +169,9 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection reconnect() throws IOException {
-        return connect(this.name, this.host, this.port);
+        Connection c = newConnection(getName(), getHost(), getPort());
+        if (c != null) updateConnection(c);
+        return c;
     }
 
     /**
@@ -128,7 +185,7 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     @Override
-    public void setMessageHandler(MessageHandler mh) {
+    public synchronized void setMessageHandler(MessageHandler mh) {
         super.setMessageHandler(mh);
         this.messageHandler = mh;
     }

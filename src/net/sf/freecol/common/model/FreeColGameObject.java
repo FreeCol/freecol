@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -60,12 +61,26 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     /**
+     * Special constructor solely for initializing a Game.
+     *
+     * Do *not* call internId as the Game is not ready to register objects.
+     */
+    protected FreeColGameObject() {
+        this.game = (Game)this;
+        this.disposed = false;
+        this.initialized = false;
+    }
+    
+    /**
      * Create and initialize a new {@code FreeColGameObject}.
      *
      * @param game The enclosing {@code Game}.
      */
     public FreeColGameObject(Game game) {
-        initialize(game);
+        this.game = game; // Set game before calling internId
+        internId(getXMLTagName() + ":" + game.getNextId());
+        this.disposed = false;
+        this.initialized = getId() != null;
     }        
 
     /**
@@ -79,26 +94,12 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
-        setGame(game); // Set game before calling internId
-        if (id != null) internId(id);
+        this.game = game;
+        internId(id);
         this.initialized = false;
         this.disposed = false;
     }
 
-    /**
-     * Initialize and register this object in a given game.
-     *
-     * @param game The {@code Game} to attach this object to.
-     */
-    public void initialize(Game game) {
-        if (game != null) {
-            setGame(game); // Set game before calling internId
-            internId(getXMLTagName() + ":" + game.getNextId());
-        }
-        this.initialized = getId() != null;
-        this.disposed = false;
-    }
-        
     /**
      * Sets the unique identifier of this object and registers it in its
      * {@code Game} with that identifier, i.e. "intern" this object.
@@ -106,18 +107,17 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param newId The unique identifier of this object.
      */
     public final void internId(final String newId) {
-        final Game game = getGame();
-        if (game != null && newId != null && isInternable()) {
+        if (this.game != null && newId != null && isInternable()) {
             final String oldId = getId();
             if (newId.equals(oldId)) {
                 // This happens when the client receives an update.
-                game.setFreeColGameObject(newId, this);
+                this.game.setFreeColGameObject(newId, this);
             } else {
                 if (oldId != null) {
-                    game.removeFreeColGameObject(oldId, "override");
+                    this.game.removeFreeColGameObject(oldId, "override");
                 }
                 setId(newId);
-                game.addFreeColGameObject(newId, this);
+                this.game.addFreeColGameObject(newId, this);
             }
         } else {
             setId(newId);
@@ -247,11 +247,10 @@ public abstract class FreeColGameObject extends FreeColObject {
      *
      * @param fix If true, fix problems if possible.
      * @param lb A {@code LogBuilder} to log to.
-     * @return -1 if there are problems remaining, zero if problems
-     *     were fixed, +1 if no problems found at all.
+     * @return A suitable {@code IntegrityType}.
      */
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        return 1;
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        return IntegrityType.INTEGRITY_GOOD;
     }
 
     // Override FreeColObject
@@ -269,14 +268,14 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public void setSpecification(Specification specification) {
-        throw new RuntimeException("Can not set specification");
+        throw new RuntimeException("Can not set specification for: " + this);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Game getGame() {
+    public final Game getGame() {
         return this.game;
     }
 
@@ -284,8 +283,8 @@ public abstract class FreeColGameObject extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void setGame(Game game) {
-        if (game == null) throw new RuntimeException("Null game");
+    public final void setGame(Game game) {
+        if (game == null) throw new RuntimeException("Null game: " + this);
         this.game = game;
     }
 
@@ -334,9 +333,9 @@ public abstract class FreeColGameObject extends FreeColObject {
         if (o instanceof FreeColGameObject) {
             // FreeColGameObjects are equal if the two fcgos are in
             // the same game and have the same identifier.
-            FreeColGameObject fco = (FreeColGameObject)o;
-            return this.getGame() == fco.getGame()
-                && super.equals(o);
+            FreeColGameObject other = (FreeColGameObject)o;
+            return this.getGame() == other.getGame()
+                && super.equals(other);
         }
         return false;
     }

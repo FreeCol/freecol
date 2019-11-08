@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.generator;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -118,18 +119,23 @@ public class ColonizationMapLoader implements MapLoader {
     private static final byte[] header = {
         58, 0, 72, 0, 4, 0
     };
-    private static byte[] layer1;
 
-    public ColonizationMapLoader(File file) throws FileNotFoundException, IOException {
+    private byte[] layer1;
+
+
+    public ColonizationMapLoader(File file) throws IOException {
 
         try {
             RandomAccessFile reader = new RandomAccessFile(file, "r");
-            reader.read(header);
+            reader.readFully(header);
 
             int size = header[WIDTH] * header[HEIGHT];
             layer1 = new byte[size];
-            reader.read(layer1);
+            reader.readFully(layer1);
+        } catch (EOFException ee) {
+            logger.log(Level.SEVERE, "File (" + file + ") is too short.", ee);
         } catch (FileNotFoundException fe) {
+            
             logger.log(Level.SEVERE, "File (" + file + ") was not found.", fe);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "File (" + file + ") is corrupt and cannot be read.", e);

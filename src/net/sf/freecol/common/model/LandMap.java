@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -115,7 +115,7 @@ public class LandMap {
      *
      * @return The map width.
      */
-    public int getWidth() {
+    public final int getWidth() {
         return this.width;
     }
 
@@ -124,7 +124,7 @@ public class LandMap {
      *
      * @return The map height.
      */
-    public int getHeight() {
+    public final int getHeight() {
         return this.height;
     }
 
@@ -136,7 +136,7 @@ public class LandMap {
      * @return True if there coordinate is valid.
      */
     public boolean isValid(int x, int y) {
-        return x >= 0 && x < getWidth() && y >= 0 && y < getHeight();
+        return x >= 0  && y >= 0 && x < getWidth() && y < getHeight();
     }
 
     /**
@@ -148,6 +148,20 @@ public class LandMap {
      */
     public boolean isLand(int x, int y) {
         return (isValid(x, y)) ? this.map[x][y] : false;
+    }
+
+    /**
+     * Is there any land in this land map?
+     *
+     * @return True if any land is present.
+     */
+    public boolean hasLand() {
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; y < this.width; x++) {
+                if (this.map[x][y]) return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -199,8 +213,8 @@ public class LandMap {
      * @param distanceToEdge The preferred distance to the map edge.
      * @param random A pseudo random number source.
      */
-    private void generate(int type, int distanceToEdge,
-                          int minNumberOfTiles, Random random) {
+    private final void generate(int type, int distanceToEdge,
+                                int minNumberOfTiles, Random random) {
         switch (type) {
         case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
             createClassicLandMap(distanceToEdge, minNumberOfTiles, random);

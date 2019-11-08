@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,8 +54,8 @@ public class ScaleMapAction extends FreeColAction {
      * @param height The height of the resulting map.
      */
     private void scaleMapTo(final int width, final int height) {
-        final Map map = getGame().getMap();
-        map.scale(width, height);
+        final Game game = getGame();
+        game.changeMap(game.getMap().scale(width, height));
         getGUI().refresh();
     }
 

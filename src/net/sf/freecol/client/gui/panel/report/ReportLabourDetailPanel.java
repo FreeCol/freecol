@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,8 +42,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This panel displays the Labour Report.
  */
-public final class ReportLabourDetailPanel extends ReportPanel
-    implements ActionListener {
+public final class ReportLabourDetailPanel extends ReportPanel {
     
     private final Map<UnitType, Map<Location, Integer>> data;
     private final TypeCountMap<UnitType> unitCount;
@@ -76,9 +75,7 @@ public final class ReportLabourDetailPanel extends ReportPanel
 
     @Override
     public void initialize() {
-        JPanel detailPanel = new MigPanel();
-        detailPanel.setLayout(new MigLayout("wrap 7", "[]30[][]30[][]30[][]",
-                                            ""));
+        JPanel detailPanel = new MigPanel(new MigLayout("wrap 7", "[]30[][]30[][]30[][]", ""));
         detailPanel.setOpaque(false);
 
 

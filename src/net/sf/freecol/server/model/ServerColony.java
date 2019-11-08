@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -256,9 +257,12 @@ public class ServerColony extends Colony implements TurnTaker {
     private BuildableType csNextBuildable(BuildQueue<? extends BuildableType> queue,
                                           ChangeSet cs) {
         Specification spec = getSpecification();
-        ServerPlayer owner = (ServerPlayer) getOwner();
+        Player owner = getOwner();
         BuildableType buildable;
         boolean invalidate = false;
+        final Predicate<GoodsType> notBuildingPred
+            = gt -> gt.isBuildingMaterial() && !gt.isStorable()
+                && getTotalProductionOf(gt) > 0;
 
         while ((buildable = queue.getCurrentlyBuilding()) != null) {
             switch (getNoBuildReason(buildable, null)) {
@@ -269,11 +273,7 @@ public class ServerColony extends Colony implements TurnTaker {
             case NONE:
                 return buildable;
             case NOT_BUILDING:
-                for (GoodsType goodsType : transform(spec.getGoodsTypeList(),
-                        gt -> (gt.isBuildingMaterial()
-                            && !gt.isStorable()
-                            && getTotalProductionOf(gt) > 0))) {
-                    // Production is idle
+                if (any(spec.getGoodsTypeList(), notBuildingPred)) {
                     cs.addMessage(owner,
                         new ModelMessage(MessageType.WARNING,
                                          "model.colony.cannotBuild", this)
@@ -312,7 +312,7 @@ public class ServerColony extends Colony implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csEvictUsers(Unit enemyUnit, ChangeSet cs) {
-        ServerPlayer serverPlayer = (ServerPlayer)getOwner();
+        Player player = getOwner();
         Tile tile = enemyUnit.getTile();
         ServerColonyTile ct = (ServerColonyTile)getColonyTile(tile);
         if (ct == null) return;
@@ -320,14 +320,14 @@ public class ServerColony extends Colony implements TurnTaker {
         Tile copied = colonyTile.getTileToCache();
         if (!ejectUnits(ct, ct.getUnitList())) return;//-til
         colonyTile.cacheUnseen(copied);//+til
-        cs.addMessage(serverPlayer,
+        cs.addMessage(player,
             new ModelMessage(MessageType.WARNING,
                              "model.colony.workersEvicted",
                              this, this)
                 .addName("%colony%", getName())
                 .addStringTemplate("%location%", tile.getLocationLabel())
                 .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
-        cs.add(See.only(serverPlayer), ct);
+        cs.add(See.only(player), ct);
         cs.add(See.perhaps(), getTile()); // Colony size might have changed
     }
 
@@ -336,16 +336,17 @@ public class ServerColony extends Colony implements TurnTaker {
      *
      * -vis: Owner and new owner
      *
-     * @param newOwner The new owning {@code ServerPlayer}.
+     * @param newOwner The new owning {@code Player}.
      * @param reassign If true, reassign the colony tiles.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csChangeOwner(ServerPlayer newOwner, boolean reassign,
+    public void csChangeOwner(Player newOwner, boolean reassign,
                               ChangeSet cs) {
-        final ServerPlayer oldOwner = (ServerPlayer)getOwner();
+        final Player oldOwner = getOwner();
         final Tile tile = getTile();
         final Set<Tile> owned = getOwnedTiles();
-        final Set<Tile> unseen = newOwner.collectNewTiles(getVisibleTileSet());
+        final Set<Tile> unseen
+            = ((ServerPlayer)newOwner).collectNewTiles(getVisibleTileSet());
 
         for (Tile t : owned) t.cacheUnseen(newOwner);//+til
         changeOwner(newOwner);//-vis(both),-til
@@ -354,7 +355,7 @@ public class ServerColony extends Colony implements TurnTaker {
             : UnitChangeType.CAPTURE;
         List<Unit> units = getAllUnitsList();
         for (Unit u : units) {//-vis(both)
-            oldOwner.csChangeOwner(u, newOwner, change, null, cs);
+            ((ServerPlayer)oldOwner).csChangeOwner(u, newOwner, change, null, cs);
         }
         cs.addRemoves(See.only(oldOwner), this, units);
 
@@ -367,7 +368,7 @@ public class ServerColony extends Colony implements TurnTaker {
         buildQueue.clear();
 
         // Add free buildings from new owner
-        for (BuildingType bt : newOwner.getFreeBuildingTypes()) {
+        for (BuildingType bt : ((ServerPlayer)newOwner).getFreeBuildingTypes()) {
             csFreeBuilding(bt, cs);
         }
 
@@ -381,7 +382,7 @@ public class ServerColony extends Colony implements TurnTaker {
         // are not seen as tile occupiers that will impeded tile transfers.
         if (reassign) {
             owned.remove(tile);
-            oldOwner.reassignTiles(owned, this);//-til
+            ((ServerPlayer)oldOwner).reassignTiles(owned, this);//-til
             owned.add(tile);
 
             // Make sure units are ejected when a tile is no longer
@@ -417,7 +418,7 @@ public class ServerColony extends Colony implements TurnTaker {
         List<Unit> present = (found == null) ? Collections.<Unit>emptyList()
             : found.getUnitList();
 
-        final ServerPlayer owner = (ServerPlayer)getOwner();
+        final Player owner = getOwner();
         Building build = new ServerBuilding(getGame(), this, type);
         buildBuilding(build);//-til
         checkBuildQueueIntegrity(true, null);
@@ -435,7 +436,7 @@ public class ServerColony extends Colony implements TurnTaker {
      * @param building The {@code Building} to build.
      * @return True if the building was built.
      */
-    public boolean buildBuilding(Building building) {
+    private boolean buildBuilding(Building building) {
         Tile copied = (building.getType().isDefenceType())
             ? getTile().getTileToCache() : null;
         if (!addBuilding(building)) return false;
@@ -476,8 +477,9 @@ public class ServerColony extends Colony implements TurnTaker {
      */
     public void csAddConvert(Unit brave, ChangeSet cs) {
         if (brave == null) return;
-        ServerPlayer newOwner = (ServerPlayer)getOwner();
-        ServerPlayer oldOwner = (ServerPlayer)brave.getOwner();
+        final Player newOwner = getOwner();
+        final ServerPlayer oldOwner = (ServerPlayer)brave.getOwner();
+
         if (oldOwner.csChangeOwner(brave, newOwner, UnitChangeType.CONVERSION,
                                    getTile(), cs)) { //-vis(other)
             brave.changeRole(getSpecification().getDefaultRole(), 0);
@@ -525,7 +527,7 @@ public class ServerColony extends Colony implements TurnTaker {
      * @param lb A {@code LogBuilder} to log to.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csWarnings(Random random, LogBuilder lb, ChangeSet cs) {
+    public void csNewTurnWarnings(Random random, LogBuilder lb, ChangeSet cs) {
         final Specification spec = getSpecification();
         final BuildQueue<?>[] queues = new BuildQueue<?>[] {
             this.buildQueue, this.populationQueue };
@@ -539,7 +541,6 @@ public class ServerColony extends Colony implements TurnTaker {
             }
         }
 
-        List<BuildQueue<? extends BuildableType>> built = new ArrayList<>();
         for (BuildQueue<?> queue : queues) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
@@ -669,7 +670,7 @@ public class ServerColony extends Colony implements TurnTaker {
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add("COLONY ", this);
         final Specification spec = getSpecification();
-        final ServerPlayer owner = (ServerPlayer) getOwner();
+        final ServerPlayer owner = (ServerPlayer)getOwner();
         BuildQueue<?>[] queues = new BuildQueue<?>[] { buildQueue,
                  populationQueue };
         final Tile tile = getTile();

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,7 +69,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
 
         // Get player, colony and unit
         final ServerPlayer player
-            = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+            = getServerPlayer(game, "model.nation.dutch");
         final EuropeanAIPlayer aiPlayer
             = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
         final Colony colony = getStandardColony();
@@ -94,20 +94,20 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertFalse("Colonist can improve",
                     colonist.hasAbility(Ability.IMPROVE_TERRAIN));
         assertEquals("Pioneering should be valid (despite no tools)", null,
-                     PioneeringMission.invalidReason(aiUnit));
+                     PioneeringMission.invalidMissionReason(aiUnit));
         assertNull("Pioneering should find no targets though",
-                   PioneeringMission.findTarget(aiUnit, 10, false));
+                   PioneeringMission.findMissionTarget(aiUnit, 10, false));
 
         // Add some tools to the colony, mission should become viable.
         colony.addGoods(toolsGoodsType, 100);
         assertTrue("Colony can provide tools",
                    colony.canProvideGoods(pioneerRole.getRequiredGoodsList()));
         assertEquals("Colony found", colony,
-                     PioneeringMission.findTarget(aiUnit, 10, false));
+                     PioneeringMission.findMissionTarget(aiUnit, 10, false));
         assertNull("Pioneer has no mission",
                    aiUnit.getMission());
         assertNull("Pioneering should be valid (tools present in colony)",
-                   PioneeringMission.invalidReason(aiUnit));
+                   PioneeringMission.invalidMissionReason(aiUnit));
 
         // Remove the tools as if to the unit and try again.
         colony.addGoods(toolsGoodsType, -100);
@@ -117,11 +117,11 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertTrue("Colonist can improve",
                    colonist.hasAbility(Ability.IMPROVE_TERRAIN));
         assertNotNull("TileImprovementPlan found",
-                      PioneeringMission.findTarget(aiUnit, 10, false));
+                      PioneeringMission.findMissionTarget(aiUnit, 10, false));
         assertNull("Pioneering should be valid (unit has tools)",
-                   PioneeringMission.invalidReason(aiUnit));
+                   PioneeringMission.invalidMissionReason(aiUnit));
 
-        Location loc = PioneeringMission.findTarget(aiUnit, 10, false);
+        Location loc = PioneeringMission.findMissionTarget(aiUnit, 10, false);
         assertTrue("Pioneer should find a tile to improve",
                    loc instanceof Tile);
         PioneeringMission mission

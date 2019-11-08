@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -174,8 +174,8 @@ public class ColonyPlanTest extends FreeColTestCase {
     private Map buildMap(boolean withBuildRawMat) {
         MapBuilder builder = new MapBuilder(getGame());
         if(withBuildRawMat){
-            builder.setTile(4, 8, forestType);
-            builder.setTile(6, 8, mountainType);
+            builder.setTileType(4, 8, forestType);
+            builder.setTileType(6, 8, mountainType);
         }
         return builder.build();
     }

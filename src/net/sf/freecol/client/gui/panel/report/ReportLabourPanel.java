@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -62,16 +62,19 @@ import net.sf.freecol.common.model.UnitType;
 public final class ReportLabourPanel extends ReportPanel {
 
     /** An individual unit type panel. */
-    private class LabourUnitPanel extends JPanel {
+    private static class LabourUnitPanel extends FreeColPanel {
 
         public boolean selected;
         public final UnitType unitType;
 
 
-        public LabourUnitPanel(UnitType unitType, int count) {
+        public LabourUnitPanel(FreeColClient freeColClient, UnitType unitType,
+                               int count) {
+            super(freeColClient, null,
+                  new MigLayout("wrap 2", "[60, right][left]"));
+
             this.unitType = unitType;
             setOpaque(false);
-            setLayout(new MigLayout("wrap 2", "[60, right][left]"));
             add(new JLabel(new ImageIcon(getImageLibrary()
                         .getSmallUnitTypeImage(unitType, (count == 0)))),
                 "spany 2");
@@ -139,7 +142,7 @@ public final class ReportLabourPanel extends ReportPanel {
         final Player player = getMyPlayer();
         this.data = new HashMap<>();
         this.unitCount = new TypeCountMap<>();
-        for (Unit unit : player.getUnitList()) {
+        for (Unit unit : player.getUnitSet()) {
             UnitType type = unit.getType();
             this.unitCount.incrementCount(type, 1);
             Map<Location, Integer> unitMap = this.data.get(type);
@@ -173,7 +176,7 @@ public final class ReportLabourPanel extends ReportPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(player)) {
                 int count = this.unitCount.getCount(unitType);
-                model.addElement(new LabourUnitPanel(unitType, count));
+                model.addElement(new LabourUnitPanel(freeColClient, unitType, count));
             }
         }
         Action selectAction = new AbstractAction() {

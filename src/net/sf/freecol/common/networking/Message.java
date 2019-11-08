@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -69,6 +69,10 @@ public abstract class Message {
         = Collections.synchronizedMap(new HashMap<String,
             Constructor<? extends Message>>());
 
+    /** Classes used by Message.read() */
+    private static final Class[] readClasses = {
+        Game.class, FreeColXMLReader.class };
+
     // Convenient way to specify the relative priorities of the messages
     // types in one place.
     public static enum MessagePriority {
@@ -108,15 +112,6 @@ public abstract class Message {
         // empty constructor
     }
 
-    /**
-     * Build a new message with the given type.
-     * 
-     * @param type The main message type.
-     */
-    protected Message(String type) {
-        setType(type);
-    }
-    
 
     /**
      * Get the message tag.
@@ -187,7 +182,7 @@ public abstract class Message {
     /**
      * Append a new child.
      *
-     * @param T The child type.
+     * @param <T> The child type.
      * @param fco The new child object.
      */
     abstract protected <T extends FreeColObject> void appendChild(T fco);
@@ -195,7 +190,7 @@ public abstract class Message {
     /**
      * Append a multiple new children.
      *
-     * @param T The child type.
+     * @param <T> The child type.
      * @param fcos The new child objects.
      */
     abstract protected <T extends FreeColObject> void appendChildren(Collection<T> fcos);
@@ -281,7 +276,7 @@ public abstract class Message {
     protected Boolean getBooleanAttribute(String key, Boolean defaultValue) {
         if (hasAttribute(key)) {
             try {
-                return Boolean.parseBoolean(getStringAttribute(key));
+                return Boolean.valueOf(getStringAttribute(key));
             } catch (NumberFormatException nfe) {}
         }
         return defaultValue;
@@ -297,7 +292,7 @@ public abstract class Message {
     protected Integer getIntegerAttribute(String key, int defaultValue) {
         if (hasAttribute(key)) {
             try {
-                return Integer.parseInt(getStringAttribute(key));
+                return Integer.valueOf(getStringAttribute(key));
             } catch (NumberFormatException nfe) {}
         }
         return defaultValue;
@@ -317,7 +312,7 @@ public abstract class Message {
                                                      T defaultValue) {
         T result = defaultValue;
         if (hasAttribute(key)) {
-            String kv = getStringAttribute(key);
+            String kv = upCase(getStringAttribute(key));
             try {
                 result = Enum.valueOf(returnClass, kv);
             } catch (Exception e) {
@@ -329,13 +324,23 @@ public abstract class Message {
     }
             
     /**
-     * Sets an attribute in this message with n boolean value.
+     * Sets an attribute in this message with a boolean value.
      *
      * @param key The attribute to set.
      * @param value The value of the attribute.
      */
     protected void setBooleanAttribute(String key, Boolean value) {
         if (value != null) setStringAttribute(key, Boolean.toString(value));
+    }
+
+    /**
+     * Sets an attribute in this message with an enum value.
+     *
+     * @param key The attribute to set.
+     * @param value The value of the attribute.
+     */
+    protected void setEnumAttribute(String key, Enum<?> value) {
+        if (value != null) setStringAttribute(key, downCase(value.toString()));
     }
 
     /**
@@ -433,7 +438,7 @@ public abstract class Message {
     /**
      * Get a child object.
      *
-     * @param T The actual class of {@code FreeColObject} to get.
+     * @param <T> The actual class of {@code FreeColObject} to get.
      * @param index The index of the child to get.
      * @param returnClass The expected class of child.
      * @return The child object found, or null if the index is invalid or
@@ -454,7 +459,7 @@ public abstract class Message {
     /**
      * Get the child objects.
      *
-     * @param T The actual class of {@code FreeColObject} to get.
+     * @param <T> The actual class of {@code FreeColObject} to get.
      * @param returnClass The expected class of children.
      * @return The children with the expected class.
      */
@@ -593,7 +598,7 @@ public abstract class Message {
             }
             // If there is a "flush" attribute present, encourage the
             // client to display any new messages.
-            if (getBooleanAttribute("flush", false)) {
+            if (getBooleanAttribute("flush", Boolean.FALSE)) {
                 final Runnable displayModelMessagesRunnable = () -> {
                     freeColClient.getInGameController()
                         .displayModelMessages(false);
@@ -624,6 +629,7 @@ public abstract class Message {
      *
      * @param game The {@code Game} within which to construct the message.
      * @param xr A {@code FreeColXMLReader} to read from.
+     * @return The new {@code Message}.
      * @exception FreeColException if there is problem reading the message.
      */
     public static Message read(Game game, FreeColXMLReader xr)
@@ -642,8 +648,7 @@ public abstract class Message {
                     .preserveDebug();
             }
 
-            final Class[] types = { Game.class, FreeColXMLReader.class };
-            mb = Introspector.getConstructor(cl, types);
+            mb = Introspector.getConstructor(cl, readClasses);
             if (mb == null) {
                 throw new FreeColException("No constructor for: " + tag)
                     .preserveDebug();

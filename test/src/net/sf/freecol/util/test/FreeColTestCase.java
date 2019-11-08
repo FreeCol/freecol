@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -274,14 +274,14 @@ public class FreeColTestCase extends TestCase {
         int landWidth = (int) Math.floor(totalWidth/2);
         for (int x = 0; x < landWidth; x++) {
             for (int y = 0; y < totalHeight; y++) {
-                builder.setTile(x, y, landTileType);
+                builder.setTileType(x, y, landTileType);
             }
         }
 
         // Add high seas.
         final TileType highSeasType = spec().getTileType("model.tile.highSeas");
         for (int y = 0; y < totalHeight; y++) {
-            builder.setTile(totalWidth - 1, y, highSeasType);
+            builder.setTileType(totalWidth - 1, y, highSeasType);
         }
 
         return builder.build();
@@ -354,7 +354,7 @@ public class FreeColTestCase extends TestCase {
         // Required parameter
         private final Game game;
 
-        private TileType[][] tiles = null;
+        private TileType[][] tileTypes = null;
         private int width;
         private int height;
         private TileType baseTile;
@@ -373,12 +373,12 @@ public class FreeColTestCase extends TestCase {
             exploredByAll = false;
             initiated = false;
             // set empty grid
-            if(tiles == null){
-                tiles = new TileType[width][height];
+            if(tileTypes == null){
+                tileTypes = new TileType[width][height];
             }
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    tiles[x][y] = null;
+                    tileTypes[x][y] = null;
                 }
             }
         }
@@ -393,17 +393,17 @@ public class FreeColTestCase extends TestCase {
 
         public MapBuilder setDimensions(int width, int heigth){
             if(width <= 0){
-                throw new IllegalArgumentException("Width must be positive");
+                throw new RuntimeException("Width must be positive");
             }
             if(heigth <= 0){
-                throw new IllegalArgumentException("Heigth must be positive");
+                throw new RuntimeException("Heigth must be positive");
             }
             if(initiated){
                 throw new IllegalStateException("Cannot resize map after setting a tile");
             }
             this.width = width;
             this.height = heigth;
-            this.tiles = new TileType[width][height];
+            this.tileTypes = new TileType[width][height];
             return this;
         }
 
@@ -412,18 +412,18 @@ public class FreeColTestCase extends TestCase {
             return this;
         }
 
-        public MapBuilder setTile(int x, int y, TileType tileType){
+        public MapBuilder setTileType(int x, int y, TileType tileType){
             if(x < 0 || y < 0){
-                throw new IllegalArgumentException("Coordenates cannot be negative");
+                throw new RuntimeException("Coordenates cannot be negative");
             }
             if(x >= width || y >= height ){
-                throw new IllegalArgumentException("Coordenate out of bounds");
+                throw new RuntimeException("Coordenate out of bounds");
             }
             if(tileType == null){
                 throw new NullPointerException("Tile type cannot be null");
             }
 
-            tiles[x][y]= tileType;
+            tileTypes[x][y]= tileType;
             initiated = true;
 
             return this;
@@ -435,10 +435,10 @@ public class FreeColTestCase extends TestCase {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     // Already manually set by the tester
-                    if(tiles[x][y] != null){
+                    if(tileTypes[x][y] != null){
                         continue;
                     }
-                    tiles[x][y] = baseTile;
+                    tileTypes[x][y] = baseTile;
                 }
             }
             initiated=true;
@@ -449,14 +449,12 @@ public class FreeColTestCase extends TestCase {
             Map map = new Map(game, width, height);
             Region region = new Region(game);
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    TileType tileType = tiles[x][y];
+            map.populateTiles((x, y) -> {
+                    TileType tileType = tileTypes[x][y];
                     Tile t = new Tile(game, tileType, x, y);
                     t.setRegion(region);
-                    map.setTile(t, x, y);
-                }
-            }
+                    return t;
+                });
 
             map.resetContiguity();
             map.resetHighSeasCount();
@@ -479,11 +477,12 @@ public class FreeColTestCase extends TestCase {
 
     public static class IndianSettlementBuilder{
 
+        private static final String defaultIndianPlayer = "model.nation.tupi";
+
         // Required parameter
         private final Game game;
 
         private Player indianPlayer;
-        private final String defaultIndianPlayer = "model.nation.tupi";
         private String skillTaught;
         private int initialBravesInCamp;
         private Tile settlementTile;
@@ -492,16 +491,17 @@ public class FreeColTestCase extends TestCase {
         private boolean isCapital;
         private Unit residentMissionary;
 
-        public IndianSettlementBuilder(Game game){
+
+        public IndianSettlementBuilder(Game game) {
             this.game = game;
             setStartingParams();
         }
 
-        private void setStartingParams(){
-            // Some params can only be set in build(), because the default values
-            //may not be valid for the game set
-            // However, the tester himself may set them to valid values later,
-            //so they are set to null for now
+        private void setStartingParams() {
+            // Some params can only be set in build(), because the
+            // default values may not be valid for the game set
+            // However, the tester himself may set them to valid values
+            // later, so they are set to null for now
             indianPlayer = null;
             initialBravesInCamp = 1;
             settlementTile = null;
@@ -510,45 +510,46 @@ public class FreeColTestCase extends TestCase {
             residentMissionary = null;
         }
 
-        public IndianSettlementBuilder player(Player player){
+        public IndianSettlementBuilder player(Player player) {
             if (player == null
                 || none(game.getPlayers(matchKey(player)))) {
-                throw new IllegalArgumentException("Indian player not in game");
+                throw new RuntimeException("Indian player not in game");
             }
             this.indianPlayer = player;
             return this;
         }
 
-        public IndianSettlementBuilder initialBravesInCamp(int nBraves){
-            if(nBraves <= 0){
-                throw new IllegalArgumentException("Number of braves must be positive");
+        public IndianSettlementBuilder initialBravesInCamp(int nBraves) {
+            if (nBraves <= 0) {
+                throw new RuntimeException("Number of braves must be positive");
             }
             this.initialBravesInCamp = nBraves;
             return this;
         }
 
-        public IndianSettlementBuilder settlementTile(Tile tile){
-            Tile tileOnMap = this.game.getMap().getTile(tile.getX(), tile.getY());
-            if(tile != tileOnMap){
-                throw new IllegalArgumentException("Given tile not on map");
+        public IndianSettlementBuilder settlementTile(Tile tile) {
+            Tile tileOnMap = this.game.getMap()
+                .getTile(tile.getX(), tile.getY());
+            if (tile != tileOnMap) {
+                throw new RuntimeException("Given tile not on map");
             }
             this.settlementTile = tile;
             return this;
         }
 
-        public IndianSettlementBuilder capital(boolean isCapital){
+        public IndianSettlementBuilder capital(boolean isCapital) {
             this.isCapital = isCapital;
 
             return this;
         }
 
-        public IndianSettlementBuilder missionary(Unit missionary){
+        public IndianSettlementBuilder missionary(Unit missionary) {
             this.residentMissionary = missionary;
 
             return this;
         }
 
-        public IndianSettlementBuilder skillToTeach(String skill){
+        public IndianSettlementBuilder skillToTeach(String skill) {
             this.skillTaught = skill;
 
             return this;
@@ -559,41 +560,43 @@ public class FreeColTestCase extends TestCase {
                 : "Settlement-" + settlementNumber++;
         }
 
-        public IndianSettlement build(){
+        public IndianSettlement build() {
             UnitType skillToTeach = null;
 
-            if(skillTaught != null){
+            if (skillTaught != null) {
                 skillToTeach = spec().getUnitType(skillTaught);
             }
 
             // indianPlayer not set, get default
             if (indianPlayer == null) {
                 indianPlayer = game.getPlayerByNationId(defaultIndianPlayer);
-                if(indianPlayer == null){
-                    throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
+                if (indianPlayer == null) {
+                    throw new RuntimeException("Default Indian player "
+                        + defaultIndianPlayer + " not in game");
                 }
             }
             UnitType indianBraveType = spec().getDefaultUnitType(indianPlayer);
 
             // settlement tile no set, get default
-            if(settlementTile == null){
+            if (settlementTile == null) {
                 settlementTile = game.getMap().getTile(5, 8);
-                if(settlementTile == null){
-                    throw new IllegalArgumentException("Default tile not in game");
+                if (settlementTile == null) {
+                    throw new RuntimeException("Default tile not in game");
                 }
             }
 
-            IndianSettlement camp
-                = new ServerIndianSettlement(game, indianPlayer,
-                                             getSimpleName(indianPlayer, isCapital),
-                                             settlementTile, isCapital,
-                                             skillToTeach, residentMissionary);
+            IndianSettlement camp = new ServerIndianSettlement(game,
+                indianPlayer, getSimpleName(indianPlayer, isCapital),
+                settlementTile, isCapital, skillToTeach, residentMissionary);
             indianPlayer.addSettlement(camp);
 
             // Add braves
-            for(int i=0; i < initialBravesInCamp; i++){
+            for (int i = 0; i < initialBravesInCamp; i++) {
                 Unit brave = new ServerUnit(game, camp, indianPlayer,
                                             indianBraveType);
+                if (brave == null) {
+                    throw new RuntimeException("Null brave");
+                }
                 camp.addOwnedUnit(brave);
             }
             camp.placeSettlement(true);
@@ -616,13 +619,14 @@ public class FreeColTestCase extends TestCase {
      * @param value an {@code int} value
      */
     public void setProductionBonus(Colony colony, int value) {
+        Field productionBonus;
         try {
-            Field productionBonus = Colony.class.getDeclaredField("productionBonus");
+            productionBonus = Colony.class.getDeclaredField("productionBonus");
             productionBonus.setAccessible(true);
             productionBonus.setInt(colony, value);
             colony.invalidateCache();
-        } catch (Exception e) {
-            // do nothing
+        } catch (NoSuchFieldException|IllegalAccessException ex) {
+            fail(ex.toString());
         }
     }
 
@@ -733,5 +737,16 @@ public class FreeColTestCase extends TestCase {
             spec().getUnitChangeTypeList().add(uct);
         }
         uct.addUnitTypeChange(utc);
+    }
+
+    /**
+     * Helper function to get a server player by id.
+     *
+     * @param game The {@code Game} to look in.
+     * @param id The player identifier.
+     * @return The {@code ServerPlayer} found.
+     */
+    public ServerPlayer getServerPlayer(Game game, String id) {
+        return (ServerPlayer)game.getPlayerByNationId(id);
     }
 }

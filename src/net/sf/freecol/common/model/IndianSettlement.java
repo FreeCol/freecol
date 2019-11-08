@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -39,6 +39,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -510,17 +511,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Get the contact levels.
-     *
-     * @return The contact level map.
-     */
-    private java.util.Map<Player, ContactLevel> getContactLevels() {
-        synchronized (this.contactLevels) {
-            return this.contactLevels;
-        }
-    }
-
-    /**
      * Set the contact levels.
      *
      * @param contactLevels The new contact level map.
@@ -827,8 +817,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public int getPriceToBuy(GoodsType type, int amount) {
         if (amount > GoodsContainer.CARGO_SIZE) {
-            throw new IllegalArgumentException("Amount > "
-                + GoodsContainer.CARGO_SIZE);
+            throw new RuntimeException("Amount " + amount
+                + " > " + GoodsContainer.CARGO_SIZE);
         }
 
         int price = 0;
@@ -993,8 +983,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public int getPriceToSell(GoodsType type, int amount) {
         if (amount > GoodsContainer.CARGO_SIZE) {
-            throw new IllegalArgumentException("Amount > "
-                + GoodsContainer.CARGO_SIZE);
+            throw new RuntimeException("Amount " + amount
+                + " > " + GoodsContainer.CARGO_SIZE);
         }
         final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
 
@@ -1038,17 +1028,18 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public List<Goods> getSellGoods(Unit unit) {
         // Collect all the candidate goods
-        List<Goods> result = new ArrayList<>();
-        for (Goods g : transform(getCompactGoodsList(),
-                                 g2 -> willSell(g2.getType()))) {
+        List<Goods> sellGoods = transform(getCompactGoodsList(),
+                                          g2 -> willSell(g2.getType()));
+        List<Goods> result = new ArrayList<>(sellGoods.size());
+        for (Goods g : sellGoods) {
             int amount = g.getAmount();
             int retain = getWantedGoodsAmount(g.getType());
             if (retain >= amount) continue;
             amount -= retain;
             if (unit != null) {
                 amount = Math.round(applyModifiers((float)amount,
-                        getGame().getTurn(),
-                        unit.getModifiers(Modifier.TRADE_VOLUME_PENALTY)));
+                                                   getGame().getTurn(),
+                                                   unit.getModifiers(Modifier.TRADE_VOLUME_PENALTY)));
             }
             if (amount < TRADE_MINIMUM_SIZE) continue;
             if (amount > GoodsContainer.CARGO_SIZE) {
@@ -1113,7 +1104,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
-        final Function<GoodsType, GoodsType> identity = Function.identity();
+        final Function<GoodsType, GoodsType> identity
+            = Function.<GoodsType>identity();
         final java.util.Map<GoodsType, Integer> prices
             = transform(spec.getGoodsTypeList(),
                         gt -> !gt.getMilitary() && gt.isStorable(),
@@ -1469,7 +1461,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
 
     // Interface TradeLocation
-    //   getGoodsCount provided by GoodsLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getAvailableGoodsCount(GoodsType goodsType) {
+        return getGoodsCount(goodsType);
+    }
 
     /**
      * {@inheritDoc}
@@ -1495,6 +1494,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return capacity - present;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         return ((IndianSettlement) tradeLocation).getName();
@@ -1507,18 +1509,19 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         final Player owner = getOwner();
         if (owner != null) {
             for (Unit u : getOwnedUnitList()) {
                 if (u.getOwner() != owner) {
                     if (fix) {
-                        lb.add("\n  Owned unit with wrong ownership reassigned: ", u.getId());
-                        result = Math.min(result, 0);
+                        lb.add("\n  Owned unit with wrong owner reassigned: ",
+                               u.getId());
+                        result = result.fix();
                     } else {
-                        lb.add("\n  Owned unit with wrong ownership: ", u.getId());
-                        result = -1;
+                        lb.add("\n  Owned unit with wrong owner: ", u.getId());
+                        result = result.fail();
                     }
                 }
             }

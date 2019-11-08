@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -247,7 +247,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * @param unitType The {@code UnitType} to check.
      * @return True if the {@code UnitType} can build this improvement.
      */
-    public boolean isWorkerTypeAllowed(UnitType unitType) {
+    private boolean isWorkerTypeAllowed(UnitType unitType) {
         return allowedWorkers == null || allowedWorkers.isEmpty()
             || allowedWorkers.contains(unitType.getId());
     }
@@ -393,8 +393,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             if (tt == null) { // simple bonus
                 int production = tile.getPotentialProduction(goodsType, colonistType);
                 if (production > 0) {
-                    float chg = applyModifiers(production, null,
-                                               goodsType.getId());
+                    float chg = apply(production, null, goodsType.getId());
                     value = (int)(chg - production);
                 }
             } else { // tile type change
@@ -643,8 +642,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             || OLD_CHANGE_TAG.equals(tag)
             // end @compat 0.11.6
             ) {
-            TileTypeChange change = new TileTypeChange(xr, spec);
-            if (change != null) addChange(change);
+            addChange(new TileTypeChange(xr, spec));
 
         } else if (DISASTER_TAG.equals(tag)) {
             Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,

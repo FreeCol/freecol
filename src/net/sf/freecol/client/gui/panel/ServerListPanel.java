@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -47,6 +47,21 @@ public final class ServerListPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(ServerListPanel.class.getName());
 
+    private static class ServerListTableCellRenderer
+        extends DefaultTableCellRenderer {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component getTableCellRendererComponent(JTable t, Object o,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+            setOpaque(isSelected);
+            return super.getTableCellRendererComponent(t, o, isSelected,
+                                                       hasFocus, row, column);
+        }
+    };
+        
     private final ConnectController connectController;
 
     private final JTable table;
@@ -65,7 +80,7 @@ public final class ServerListPanel extends FreeColPanel {
      */
     public ServerListPanel(FreeColClient freeColClient,
                            ConnectController connectController) {
-        super(freeColClient, new MigLayout("", "", ""));
+        super(freeColClient, null, new MigLayout("", "", ""));
 
         this.connectController = connectController;
 
@@ -79,14 +94,7 @@ public final class ServerListPanel extends FreeColPanel {
         tableModel = new ServerListTableModel(new ArrayList<ServerInfo>());
         table = new JTable(tableModel);
 
-        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable t, Object o, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                setOpaque(isSelected);
-                return super.getTableCellRendererComponent(t, o, isSelected, hasFocus, row, column);
-            }
-        };
+        DefaultTableCellRenderer dtcr = new ServerListTableCellRenderer();
         for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(dtcr);
         }

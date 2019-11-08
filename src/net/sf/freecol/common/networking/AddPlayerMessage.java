@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -43,16 +42,16 @@ public class AddPlayerMessage extends ObjectMessage {
     public static final String TAG = "addPlayer";
 
     /** The player to specialize the players for. */
-    private final ServerPlayer destination;
+    private final Player destination;
 
 
     /**
      * Create a new {@code AddPlayerMessage}.
      *
+     * @param destination An optional {@code Player} that will see this message.
      * @param players A list of {@code Player}s to add.
      */
-    public AddPlayerMessage(ServerPlayer destination,
-                            List<? extends Player> players) {
+    public AddPlayerMessage(Player destination, List<Player> players) {
         super(TAG);
 
         this.destination = destination;
@@ -140,9 +139,9 @@ public class AddPlayerMessage extends ObjectMessage {
         List<Player> players = getPlayers();
         
         if (freeColClient.isInGame()) {
-            igc(freeColClient).addPlayerHandler(getPlayers());
+            igc(freeColClient).addPlayerHandler(players);
         } else {
-            pgc(freeColClient).addPlayerHandler(getPlayers());
+            pgc(freeColClient).addPlayerHandler(players);
         }
     }
 }

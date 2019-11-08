@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -117,7 +117,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      *
      * @return True if single player is selected.
      */
-    public boolean isSinglePlayer() {
+    private boolean isSinglePlayer() {
         return singlePlayer.isSelected();
     }
 

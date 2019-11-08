@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -48,7 +48,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * An class describing the action needed to make progress in a
  * transportation action for a specific transportable.
  */
-public class Cargo {
+public final class Cargo {
 
     private static final Logger logger = Logger.getLogger(Cargo.class.getName());
 
@@ -165,7 +165,7 @@ public class Cargo {
             // Where is the transportable dropped?  At the drop node,
             // or at its predecessor from the carrier point of view.
             PathNode drop = pick.getTransportDropNode();
-            if (drop == null || drop.previous == null) {
+            if (drop.previous == null) {
                 throw new IllegalStateException("Cargo failure " + t
                     + " " + deliver.fullPathToString()
                     + " " + pick.fullPathToString()

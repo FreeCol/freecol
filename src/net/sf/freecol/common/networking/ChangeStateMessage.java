@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -105,7 +105,7 @@ public class ChangeStateMessage extends AttributeMessage {
         }
         if (!unit.checkSetState(state)) {
             return serverPlayer.clientError("Unit " + unitId
-                + " can not change state: " + unit.getState().toString()
+                + " can not change state: " + unit.getState()
                 + " -> " + stateString);
         }
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -60,10 +60,8 @@ public class GoToMission extends AbstractMission {
      *
      * @param game a {@code Game} value
      * @param xr a {@code FreeColXMLReader} value
-     * @exception XMLStreamException if an error occurs
      */
-    public GoToMission(Game game,
-                       FreeColXMLReader xr) throws XMLStreamException {
+    public GoToMission(Game game, FreeColXMLReader xr) {
         super(game, xr);
     }
 
@@ -132,10 +130,9 @@ public class GoToMission extends AbstractMission {
      */
     @Override
     public boolean isValid() {
-        return super.isValid()
-            && destination != null
-            // FIXME: check for disposed destinations
-            && destination.canAdd(getUnit());
+        // FIXME: check for disposed destinations
+        return destination != null && destination.canAdd(getUnit())
+            && super.isValid();
     }
 
     /**

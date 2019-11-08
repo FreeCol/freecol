@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018  The FreeCol Team
+ *  Copyright (C) 2002-2019  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -90,7 +90,7 @@ public class ServerColonyTest extends FreeColTestCase {
 
     public void testFoodConsumption() {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         // Setting test colony and colonist
         Colony colony = FreeColTestUtils.getColonyBuilder()
             .colonyTile(game.getMap().getTile(5, 8)).build();

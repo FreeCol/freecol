@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -169,7 +169,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 JButton settlementButton = Utility.getLinkButton(locationName,
                     null, is.getTile().getId());
                 Utility.localizeToolTip(settlementButton, is.getTile()
-                    .getDetailedLocationLabelFor(player));
+                    .getLocationLabelFor(player));
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 

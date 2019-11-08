@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -76,7 +76,7 @@ public class AttributeMessage extends TrivialMessage {
      * @param type The message type.
      * @param attributeMap A map of key,value pairs.
      */
-    public AttributeMessage(String type, Map<String, String> attributeMap) {
+    protected AttributeMessage(String type, Map<String, String> attributeMap) {
         this(type);
 
         setStringAttributeMap(attributeMap);

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -51,7 +51,11 @@ public class MapConverter {
                 try {
                     String newName = filename + ".old";
                     File in = new File(newName);
-                    out.renameTo(in);
+                    if (!out.renameTo(in)) {
+                        System.err.println("Could not rename " + filename
+                            + " to " + newName);
+                        continue;
+                    }
                     System.out.println("Renamed " + filename + " to " + newName + ".");
                     FreeColSavegameFile savegame = new FreeColSavegameFile(in);
                     BufferedImage thumbnail = null;
@@ -59,7 +63,7 @@ public class MapConverter {
                         thumbnail = ImageIO.read(savegame.getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
                         System.out.println("Loaded thumbnail.");
                     } catch (FileNotFoundException e) {
-                        System.out.println("No thumbnail present.");
+                        System.err.println("No thumbnail present.");
                     }
                     FreeColServer server
                         = new FreeColServer(savegame, specification,
@@ -70,8 +74,9 @@ public class MapConverter {
                     System.out.println("Saved updated savegame.");
                     server.shutdown();
                     System.out.println("Shut down server.");
-                } catch (IOException | XMLStreamException | FreeColException e) {
-                    System.out.println(e);
+                } catch (IOException | NullPointerException | SecurityException
+                    | XMLStreamException | FreeColException e) {
+                    System.err.println(e);
                 }
             }
         }

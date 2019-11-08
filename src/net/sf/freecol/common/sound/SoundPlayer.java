@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2018   The FreeCol Team
+ *  Copyright (C) 2002-2019   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,8 +32,10 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -45,12 +47,134 @@ import static net.sf.freecol.common.util.Utils.*;
 /**
  * Stripped down class for playing sound.
  */
-public class SoundPlayer {
+public final class SoundPlayer {
 
     private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
 
+    /**
+     * Thread for playing sound files.
+     */
+    private class SoundPlayerThread extends Thread {
+
+        /** How long to sleep when idle. */
+        private static final int WAIT_TIMEOUT = 100; // 100ms
+
+        /** A buffer to hold data to be written to the mixer. */
+        private final byte[] data = new byte[8192];
+
+        /** A playlist of files queued to be played. */
+        private final List<File> playList = new ArrayList<>();
+
+        /**
+         * Flag to allow a sound that is being played to be cancelled.
+         * Volatile to allow asynchronous update from SoundPlayer.
+         */
+        private volatile boolean playDone = true;
+
+
+        /**
+         * Create a new sound player thread.
+         */
+        public SoundPlayerThread() {
+            super(FreeCol.CLIENT_THREAD + "SoundPlayer");
+        }
+
+        /**
+         * Signal that a sound that is being played should stop.
+         */
+        public void stopPlaying() {
+            this.playDone = true;
+        }
+
+        /**
+         * Queue a sound to be played.
+         *
+         * @param sound The new sound {@code File}.
+         */
+        public void add(File sound) {
+            synchronized (this.playList) {
+                this.playList.add(sound);
+            }
+        }
+
+        /**
+         * Dequeue the next file to be played.
+         *
+         * @return A {@code File} to be played, or null if none present.
+         */
+        private File remove() {
+            synchronized (this.playList) {
+                return (this.playList.isEmpty()) ? null
+                    : this.playList.remove(0);
+            }
+        }
+
+        /**
+         * Play a sound.
+         *
+         * @param sound The {@code File} to play.
+         * @return True if the sound was played without incident.
+         * @exception IOException if unable to read or write the sound data.
+         */
+        private boolean playSound(File sound) throws IOException {
+            boolean ret = false;
+            try (AudioInputStream in = getAudioInputStream(sound)) {
+                SourceDataLine line = openLine(in.getFormat(), getMixer(),
+                                               data.length);
+                if (line == null) return false;
+                changeVolume(line, getVolume());
+                try {
+                    this.playDone = false;
+                    int rd;
+                    while (!this.playDone && (rd = in.read(data)) > 0) {
+                        line.write(data, 0, rd);
+                    }
+                    ret = true;
+                    //logger.finest("Played " + sound);
+                } finally {
+                    this.playDone = true;
+                    line.drain();
+                    line.stop();
+                    line.close();
+                }
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Can not open "
+                    + sound + " as audio stream", ioe);
+                return false;
+            }
+            return ret;
+        }
+
+        // Override Thread
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            for (;;) {
+                File sound = remove();
+                if (sound == null) {
+                    delay(WAIT_TIMEOUT, null);
+                } else {
+                    try {
+                        playSound(sound);
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Failure playing audio.", e);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /** The mixer to write to. */
     private Mixer mixer;
+
+    /** The current volume. */
     private int volume;
+
+    /** The subthread that actually writes sound data to the mixer. */
     private final SoundPlayerThread soundPlayerThread;
 
 
@@ -63,8 +187,8 @@ public class SoundPlayer {
     public SoundPlayer(AudioMixerOption mixerOption,
                        PercentageOption volumeOption) {
         setMixer(mixerOption.getValue());
-        if (mixer == null) {
-            throw new IllegalStateException("Mixer unavailable.");
+        if (getMixer() == null) {
+            throw new RuntimeException("Mixer unavailable: " + mixerOption);
         }
         mixerOption.addPropertyChangeListener((PropertyChangeEvent e) -> {
                 setMixer((MixerWrapper)e.getNewValue());
@@ -73,31 +197,8 @@ public class SoundPlayer {
         volumeOption.addPropertyChangeListener((PropertyChangeEvent e) -> {
                 setVolume((Integer)e.getNewValue());
             });
-        soundPlayerThread = new SoundPlayerThread();
-        soundPlayerThread.start();
-    }
-
-    /**
-     * Gets an audio input stream given a file, hopefully containing audio data.
-     *
-     * @param file The {@code File} to test.
-     * @return An {@code AudioInputStream}, or null on failure.
-     * @throws Exception if the file does not contain valid audio.
-     */
-    public static AudioInputStream getAudioInputStream(File file)
-        throws Exception {
-        AudioInputStream in;
-        if (file.getName().endsWith(".ogg")) {
-            // We used to use tritonus to provide ogg (strictly,
-            // Vorbis-audio-in-ogg-container) decoding to the Java
-            // sound system.  It was buggy and appears to be
-            // unmaintained since 2009.  So now for ogg we have our
-            // own jorbis-based decoder.
-            in = new OggVorbisDecoderFactory().getOggStream(file);
-        } else {
-            in = AudioSystem.getAudioInputStream(file);
-        }
-        return in;
+        this.soundPlayerThread = new SoundPlayerThread();
+        this.soundPlayerThread.start();
     }
 
     /**
@@ -106,15 +207,23 @@ public class SoundPlayer {
      * @return The current mixer.
      */
     public Mixer getMixer () {
-        return mixer;
+        return this.mixer;
     }
 
+    /**
+     * Sets the mixer.
+     *
+     * @param mw The new mixer.
+     */
     private void setMixer(MixerWrapper mw) {
         try {
-            mixer = AudioSystem.getMixer(mw.getMixerInfo());
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not set mixer", e);
-            mixer = null;
+            this.mixer = AudioSystem.getMixer(mw.getMixerInfo());
+        } catch (SecurityException se) {
+            logger.log(Level.WARNING, "Access to mixer denied: " + mw, se);
+            this.mixer = null;
+        } catch (IllegalArgumentException ie) {
+            logger.log(Level.WARNING, "Not a recognized mixer: " + mw, ie);
+            this.mixer = null;
         }
     }
 
@@ -124,9 +233,14 @@ public class SoundPlayer {
      * @return The current volume.
      */
     public int getVolume() {
-        return volume;
+        return this.volume;
     }
 
+    /**
+     * Set the volume.
+     *
+     * @param volume The new volume.
+     */
     private void setVolume(int volume) {
         this.volume = volume;
     }
@@ -135,191 +249,139 @@ public class SoundPlayer {
      * Plays a file once.
      *
      * @param file The {@code File} to be played.
+     * @return True if the file was queued to play.
      */
-    public void playOnce(File file) {
-        if (getMixer() == null) return; // Fail faster.
-        try {
-            soundPlayerThread.add(getAudioInputStream(file));
-            soundPlayerThread.awaken();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Unable to play: " + file.getName(), e);
-        }
+    public boolean playOnce(File file) {
+        if (getMixer() == null) return false; // Fail faster.
+        this.soundPlayerThread.add(file);
+        return true;
     }
 
     /**
-     * Stops the current sound.
+     * Stop any playing sound.
      */
     public void stop() {
-        soundPlayerThread.stopPlaying();
-        soundPlayerThread.awaken();
+        this.soundPlayerThread.stopPlaying();
+    }
+
+
+    // Audio manipulation utilities
+
+    /**
+     * Gets an audio input stream given a file, hopefully containing
+     * audio data.
+     *
+     * Public so the file can be tested at load time for suitability for
+     * use as audio.
+     *
+     * @param file The {@code File} to examine.
+     * @return An {@code AudioInputStream}, or null on failure.
+     * @exception IOException if the file does not contain valid audio.
+     */
+    public static AudioInputStream getAudioInputStream(File file)
+        throws IOException {
+        AudioInputStream in;
+        if (file.getName().endsWith(".ogg")) {
+            // We used to use tritonus to provide ogg (strictly,
+            // Vorbis-audio-in-ogg-container) decoding to the Java
+            // sound system.  It was buggy and appears to be
+            // unmaintained since 2009.  So now for ogg we have our
+            // own jorbis-based decoder.
+            in = new OggVorbisDecoderFactory().getOggStream(file);
+        } else {
+            try {
+                in = AudioSystem.getAudioInputStream(file);
+            } catch (UnsupportedAudioFileException uafe) {
+                // Hide the UAFE, upstream only cares that failure occurred
+                throw new IOException(uafe);
+            }
+        }
+        return in;
     }
 
     /**
-     * Thread for playing sound files.
+     * Change the volume on a line.
+     *
+     * @param line The {@code SourceDataLine} to change the volume on.
+     * @param vol The new volume.
      */
-    private class SoundPlayerThread extends Thread {
-
-        private static final int BUFSIZ = 8192;
-
-        private final byte[] data = new byte[BUFSIZ];
-
-        private final List<AudioInputStream> playList = new ArrayList<>();
-
-        private boolean playDone = true;
-
-
-
-        public SoundPlayerThread() {
-            super(FreeCol.CLIENT_THREAD + "SoundPlayer");
+    private static void changeVolume(SourceDataLine line, int vol) {
+        FloatControl.Type type
+            = (line.isControlSupported(FloatControl.Type.VOLUME))
+            ? FloatControl.Type.VOLUME
+            : (line.isControlSupported(FloatControl.Type.MASTER_GAIN))
+            ? FloatControl.Type.MASTER_GAIN
+            : null;
+        if (type == null) {
+            logger.warning("No volume or master gain controls.");
+            return;
         }
-
-        private synchronized void awaken() {
-            notify();
+        FloatControl control;
+        try {
+            control = (FloatControl)line.getControl(type);
+        } catch (IllegalArgumentException e) {
+            return; // Should not happen
         }
-
-        private synchronized void goToSleep() throws InterruptedException {
-            wait();
+        //
+        // The units of MASTER_GAIN seem to consistently be dB, but
+        // in the case of VOLUME this is unclear (there is even a query
+        // to that effect in the source).  getUnits() says "pulseaudio
+        // units" on my boxen, and the PulseAudio doco talks about dB
+        // so for now we are assuming that the controls we are using
+        // are both logarithmic:
+        //
+        //   gain = A.log_10(k.vol)
+        // So scale vol <= 1 to gain_min and vol >= 100 to gain_max
+        //   gain_min = A.log_10(k.1)
+        //   gain_max = A.log_10(k.100)
+        // Solving for A,k yields:
+        //   A = (gain_max - gain_min)/2
+        //   k = 10^(gain_min/A)
+        // =>
+        //   gain = gain_min + (gain_max - gain_min)/2 * log_10(vol)
+        //
+        float min = control.getMinimum();
+        float max = control.getMaximum();
+        float gain = (vol <= 0) ? min
+            : (vol >= 100) ? max
+            : min + 0.5f * (max - min) * (float)Math.log10(vol);
+        try {
+            control.setValue(gain);
+            logger.finest("Using volume " + vol + "%, "
+                + control.getUnits() + "=" + gain
+                + " control=" + type);
+        } catch (IllegalArgumentException ie) {
+            logger.log(Level.WARNING, "Could not set volume "
+                + " (control=" + type + " in [" + min + "," + max + "])"
+                + " to " + gain + control.getUnits(), ie);
         }
+    }
 
-        public synchronized boolean keepPlaying() {
-            return !playDone;
+    /**
+     * Open a line to the mixer for a given format.
+     *
+     * @param audioFormat The {@code AudioFormat} to write.
+     * @param mixer The {@code Mixer} to write to.
+     * @param len The size of buffer to expect.
+     * @return The newly opened {@code SourceDataLine} or null on error.
+     */
+    private static SourceDataLine openLine(AudioFormat audioFormat,
+                                           Mixer mixer, int len) {
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class,
+            audioFormat);
+        if (!mixer.isLineSupported(info)) {
+            logger.log(Level.WARNING, "Mixer does not support " + info);
+            return null;
         }
-
-        public synchronized void startPlaying() {
-            playDone = false;
+        SourceDataLine line = null;
+        try {
+            line = (SourceDataLine)mixer.getLine(info);
+            line.open(audioFormat, len);
+        } catch (LineUnavailableException|IllegalArgumentException|SecurityException e) {
+            logger.log(Level.WARNING, "Can not open SourceDataLine", e);
+            return null;
         }
-
-        public synchronized void stopPlaying() {
-            playDone = true;
-        }
-
-        public synchronized void add(AudioInputStream ais) {
-            playList.add(ais);
-        }
-
-        @Override
-        public void run() {
-            for (;;) {
-                if (playList.isEmpty()) {
-                    try {
-                        goToSleep();
-                    } catch (InterruptedException e) {
-                        continue;
-                    }
-                } else {
-                    try (
-                        AudioInputStream in = playList.remove(0);
-                    ) {
-                        playSound(in);
-                    } catch (IOException e) {
-                        logger.log(Level.WARNING, "Failure playing audio.", e);
-                    }
-                }
-            }
-        }
-
-        private void sleep(int t) {
-            delay(t, "Sound player interrupted.");
-        }
-
-        private void setVolume(SourceDataLine line, int vol) {
-            FloatControl.Type type
-                = (line.isControlSupported(FloatControl.Type.VOLUME))
-                ? FloatControl.Type.VOLUME
-                : (line.isControlSupported(FloatControl.Type.MASTER_GAIN))
-                ? FloatControl.Type.MASTER_GAIN
-                : null;
-            if (type == null) {
-                logger.warning("No volume or master gain controls.");
-                return;
-            }
-            FloatControl control;
-            try {
-                control = (FloatControl)line.getControl(type);
-            } catch (IllegalArgumentException e) {
-                return; // Should not happen
-            }
-            //
-            // The units of MASTER_GAIN seem to consistently be dB, but
-            // in the case of VOLUME this is unclear (there is even a query
-            // to that effect in the source).  getUnits() says "pulseaudio
-            // units" on my boxen, and the PulseAudio doco talks about dB
-            // so for now we are assuming that the controls we are using
-            // are both logarithmic:
-            //
-            //   gain = A.log_10(k.vol)
-            // So scale vol <= 1 to gain_min and vol >= 100 to gain_max
-            //   gain_min = A.log_10(k.1)
-            //   gain_max = A.log_10(k.100)
-            // Solving for A,k yields:
-            //   A = (gain_max - gain_min)/2
-            //   k = 10^(gain_min/A)
-            // =>
-            //   gain = gain_min + (gain_max - gain_min)/2 * log_10(vol)
-            //
-            float min = control.getMinimum();
-            float max = control.getMaximum();
-            float gain = (vol <= 0) ? min
-                : (vol >= 100) ? max
-                : min + 0.5f * (max - min) * (float)Math.log10(vol);
-            try {
-                control.setValue(gain);
-                logger.finest("Using volume " + vol + "%, "
-                    + control.getUnits() + "=" + gain
-                    + " control=" + type);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not set volume "
-                    + " (control=" + type + " in [" + min + "," + max + "])"
-                    + " to " + gain + control.getUnits(), e);
-            }
-        }
-
-        private SourceDataLine openLine(AudioFormat audioFormat) {
-            SourceDataLine line = null;
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class,
-                                                   audioFormat);
-            if (!mixer.isLineSupported(info)) {
-                logger.log(Level.WARNING, "Mixer does not support " + info);
-                return null;
-            }
-            try {
-                line = (SourceDataLine)mixer.getLine(info);
-                line.open(audioFormat, BUFSIZ);
-                line.start();
-                setVolume(line, volume);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Can not open SourceDataLine", e);
-                return null;
-            }
-            return line;
-        }
-
-        /**
-         * Play a sound.
-         *
-         * @param in The {@code AudioInputStream} to play.
-         * @return True if the stream was played without incident.
-         * @exception IOException if unable to read or write the sound data.
-         */
-        private boolean playSound(AudioInputStream in) throws IOException {
-            boolean ret = false;
-
-            SourceDataLine line = openLine(in.getFormat());
-            if (line == null) return false;
-            try {
-                startPlaying();
-                int rd;
-                while (keepPlaying() && (rd = in.read(data)) > 0) {
-                    line.write(data, 0, rd);
-                }
-                ret = true;
-            } finally {
-                stopPlaying();
-                line.drain();
-                line.stop();
-                line.close();
-            }
-            return ret;
-        }
+        line.start();
+        return line;
     }
 }
