@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk12
 env:
   - DSTAMP=$(date +%F)
 addons:
