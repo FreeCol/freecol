@@ -192,3 +192,8 @@ FreeCol.toc
 FreeCol.xref
 idxmake.dvi
 idxmake.log
+
+### Jekyll cache and build output
+www.freecol.org/.jekyll-cache
+www.freecol.org/.jekyll-metadata
+www.freecol.org/_site
