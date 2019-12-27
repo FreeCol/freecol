@@ -122,7 +122,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         throws XMLStreamException {
         super();
 
-        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLInputFactory xif = newXMLInputFactory();
         XMLStreamReader xsr;
         try {
             xsr = xif.createXMLStreamReader(bis, "UTF-8");
@@ -168,7 +168,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public FreeColXMLReader(Reader reader) throws XMLStreamException {
         super();
 
-        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLInputFactory xif = newXMLInputFactory();
         XMLStreamReader xsr = xif.createXMLStreamReader(reader);
         setParent(xsr);
         this.inputStream = null;
@@ -176,6 +176,21 @@ public class FreeColXMLReader extends StreamReaderDelegate
         this.uninterned.clear();
     }
 
+    /**
+     * Create a new XMLInputFactory.
+     *
+     * Respond to CVE 2018-1000825.
+     *
+     * @return A new <code>XMLInputFactory</code>.
+     */
+    private static XMLInputFactory newXMLInputFactory() {
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        // This disables DTDs entirely for that factory
+        xif.setProperty(XMLInputFactory.SUPPORT_DTD, false); 
+        // disable external entities
+        xif.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
+        return xif;
+    }
 
     /**
      * Set the tracing state.

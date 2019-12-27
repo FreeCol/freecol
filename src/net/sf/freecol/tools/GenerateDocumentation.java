@@ -36,6 +36,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.XMLConstants;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
@@ -196,6 +197,8 @@ public class GenerateDocumentation {
                 Messages.loadMessageBundle(Messages.getLocale(languageCode));
                 try {
                     TransformerFactory factory = TransformerFactory.newInstance();
+                    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
                     Source xsl = new StreamSource(new File("doc", XSL));
                     Transformer stylesheet;
                     try {
