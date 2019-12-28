@@ -12,5 +12,4 @@ Disallow: /media/
 Disallow: /modules/
 Disallow: /templates/
 Disallow: /installation/
-
- 
+Disallow: /bugtracker/

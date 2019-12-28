@@ -3,7 +3,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-        <link rel="alternate" type="application/rss+xml" title="FreeCol News" href="../component/option,com_rss/feed,RSS1.0/no_html,1/" />
         <title>FreeCol - Improvements to upgrade and downgrade elements</title>
         <meta name="title" content="Improvements to upgrade and downgrade elements" />
         <meta name="author" content="Michael Burschik" />
@@ -60,35 +59,6 @@
 				</div>
 			</div>
 		</div>
-				<div class="module">
-			<div>
-				<div>
-					<div>
-						<h3>Syndicate</h3><div class="syndicate">
-			<div align="center">
-			<a href="../component/option,com_rss/feed,RSS0.91/no_html,1/">
-				<img src="../images/M_images/rss091.gif"  alt="RSS 0.91" name="RSS091" align="middle" border="0" /></a>
-		</div>
-				<div align="center">
-			<a href="../component/option,com_rss/feed,RSS1.0/no_html,1/">
-				<img src="../images/M_images/rss10.gif"  alt="RSS 1.0" name="RSS10" align="middle" border="0" /></a>
-		</div>
-				<div align="center">
-			<a href="../component/option,com_rss/feed,RSS2.0/no_html,1/">
-				<img src="../images/M_images/rss20.gif"  alt="RSS 2.0" name="RSS20" align="middle" border="0" /></a>
-		</div>
-				<div align="center">
-			<a href="../component/option,com_rss/feed,ATOM0.3/no_html,1/">
-				<img src="../images/M_images/atom03.gif"  alt="ATOM 0.3" name="ATOM03" align="middle" border="0" /></a>
-		</div>
-				<div align="center">
-			<a href="../component/option,com_rss/feed,OPML/no_html,1/">
-				<img src="../images/M_images/opml.png"  alt="OPML" name="OPML" align="middle" border="0" /></a>
-		</div>
-		</div>					</div>
-				</div>
-			</div>
-		</div>
 		                </div>
                 <div id="maincol-wide-800" >
                     <div class="clr"></div>
@@ -114,7 +84,21 @@
 			<td valign="top" colspan="2">
 				In response to a user request, the upgrades and downgrades of unit types have been improved by the addition of scope elements and additional change types, enabling new types of rule changes.  <br /><br /> 
 
-One of our users (Andron) wanted to know how to change the game rules in order to upgrade native converts to free colonists through education after Las Casas has joined the Continental Congress. Unfortunately, this was impossible, as the upgrades paths for unit types were completely static. In order to make the desired feature possible, we have added scope elements, which were already used as children of ability and modifier elements, to upgrade and downgrade elements.<br /> <br /> These scopes are applied to the owner of a unit in order to determine which unit type changes are possible. Scopes can be restricted to abilities, and abilities can be provided by Founding Fathers. Thus, you could add an ability like this to Las Casas:<br /> <br /> &lt;ability value=&quot;true&quot; id=&quot;model.ability.upgradeConverts&quot; /&gt;<br /> <br /> And you could refer to that definition in the upgrade path of the native convert, like this:<br /> <br /> &lt;upgrade learninschool=&quot;true&quot; unit=&quot;model.unit.freeColonist&quot;&gt; <br /> &nbsp; &lt;scope ability-id=&quot;model.ability.upgradeConverts&quot; /&gt;<br /> &lt;/upgrade&gt;<br /> &lt;upgrade learninschool=&quot;false&quot; unit=&quot;model.unit.freeColonist&quot; /&gt; <br /> <br /> &quot;creation&quot;, &quot;enterColony&quot; and &quot;independence&quot; have been added as new upgrade types. They are applied to a unit when it is newly created, when it enters a colony work location, and when you declare independence, respectively. If you were to define the following upgrade path, for example, Las Casas would cause all native converts to be upgraded to free colonists upon entering a colony:<br /> <br /> &lt;upgrade entercolony=&quot;true&quot; unit=&quot;model.unit.freeColonist&quot;&gt; <br /> &nbsp; &lt;scope ability-id=&quot;model.ability.upgradeConverts&quot; /&gt;<br /> &lt;/upgrade&gt;<br /> &lt;upgrade learninschool=&quot;false&quot; unit=&quot;model.unit.freeColonist&quot; /&gt;<br /> <br /> The &quot;independence&quot; upgrade type is used to promote (a certain percentage of) veteran soldiers to continental regulars when you declare independence (the Continental Army Muster). However, the upgrade type could also be applied to other units.			</td>
+        One of our users (Andron) wanted to know how to change the game rules in order to upgrade native converts to free colonists through education after Las Casas has joined the Continental Congress. Unfortunately, this was impossible, as the upgrades paths for unit types were completely static. In order to make the desired feature possible, we have added scope elements, which were already used as children of ability and modifier elements, to upgrade and downgrade elements.<br /><br />
+        These scopes are applied to the owner of a unit in order to determine which unit type changes are possible. Scopes can be restricted to abilities, and abilities can be provided by Founding Fathers. Thus, you could add an ability like this to Las Casas:
+<pre>    &lt;ability value=&quot;true&quot; id=&quot;model.ability.upgradeConverts&quot; /&gt;</pre>
+        And you could refer to that definition in the upgrade path of the native convert, like this:
+<pre>    &lt;upgrade learninschool=&quot;true&quot; unit=&quot;model.unit.freeColonist&quot;&gt;</pre>
+<pre>        &lt;scope ability-id=&quot;model.ability.upgradeConverts&quot; /&gt;</pre>
+<pre>    &lt;/upgrade&gt;</pre>
+<pre>    &lt;upgrade learninschool=&quot;false&quot; unit=&quot;model.unit.freeColonist&quot; /&gt;</pre>
+        &quot;creation&quot;, &quot;enterColony&quot; and &quot;independence&quot; have been added as new upgrade types. They are applied to a unit when it is newly created, when it enters a colony work location, and when you declare independence, respectively. If you were to define the following upgrade path, for example, Las Casas would cause all native converts to be upgraded to free colonists upon entering a colony:
+<pre>    &lt;upgrade entercolony=&quot;true&quot; unit=&quot;model.unit.freeColonist&quot;&gt;</pre>
+<pre>        &lt;scope ability-id=&quot;model.ability.upgradeConverts&quot; /&gt;</pre>
+<pre>    &lt;/upgrade&gt;</pre>
+<pre>    &lt;upgrade learninschool=&quot;false&quot; unit=&quot;model.unit.freeColonist&quot; /&gt;</pre>
+        The &quot;independence&quot; upgrade type is used to promote (a certain percentage of) veteran soldiers to continental regulars when you declare independence (the Continental Army Muster). However, the upgrade type could also be applied to other units.
+			</td>
 		</tr>
 				</table>
 
