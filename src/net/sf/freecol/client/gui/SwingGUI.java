@@ -809,6 +809,10 @@ public class SwingGUI extends GUI {
         updateUnitPath();
     }
 
+    public boolean isGotoStarted() {
+        return canvas.isGotoStarted();
+    }
+
     /**
      * {@inheritDoc}
      */
