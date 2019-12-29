@@ -14,8 +14,8 @@
     <link href="../templates/freecol/css/template_css.css" rel="stylesheet" type="text/css" />
     <link href="../templates/freecol/css/css_color_green.css" rel="stylesheet" type="text/css" />
 </head>
-<body>
 
+<body>
 <div id="pagewidth-800" >
     <div id="header" >
         <div id="top-top">
@@ -67,34 +67,10 @@
         <div id="maincol-wide-800" >
             <div class="clr"></div>
             <div class="content"><a name="content"></a>
-
                 <table class="contentpaneopen"><tr><td class="contentheading" width="100%">
                     {{ page.title }}
                 </td></tr></table>
-                <table class="contentpaneopen"><tr><td valign="top" colspan="2" class="createdate">
-                    {{ page.date | date: "%A, %Y-%m-%d" }}
-                </td></tr>
-                    <tr>
-                        <td valign="top" colspan="2">
-                            {{ content }}
-                        </td>
-                    </tr>
-                </table>
-
-                <span class="article_seperator">&nbsp;</span>
-
-                <table align="center" style="margin-top: 25px;">
-                    <tr>
-                        <th class="pagenav_prev">
-                            <a href="{{ page.previous.url }}">&lt; Prev</a>
-                        </th>
-                        <td width="50">&nbsp;
-                        </td>
-                        <th class="pagenav_next">
-                            <a href="{{ page.next.url }}">Next &gt;</a>
-                        </th>
-                    </tr>
-                </table>
+{{ content }}
                 <div class="back_button">
                     <a href='javascript:history.go(-1)'>
                         [ Back ]</a>

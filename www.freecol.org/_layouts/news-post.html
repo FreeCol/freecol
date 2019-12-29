@@ -1,0 +1,27 @@
+---
+  layout: news
+---
+                <table class="contentpaneopen"><tr><td valign="top" colspan="2" class="createdate">
+                    {{ page.date | date: "%A, %Y-%m-%d" }}
+                </td></tr>
+                    <tr>
+                        <td valign="top" colspan="2">
+{{ content }}
+                        </td>
+                    </tr>
+                </table>
+
+                <span class="article_seperator">&nbsp;</span>
+
+                <table align="center" style="margin-top: 25px;">
+                    <tr>
+                        <th class="pagenav_prev">
+                            <a href="{{ page.previous.url }}">&lt; Prev</a>
+                        </th>
+                        <td width="50">&nbsp;
+                        </td>
+                        <th class="pagenav_next">
+                            <a href="{{ page.next.url }}">Next &gt;</a>
+                        </th>
+                    </tr>
+                </table>
