@@ -1571,6 +1571,17 @@ public class GUI extends FreeColClientHolder {
     public void performGoto(Tile tile) {}
 
     /**
+     * Check if the user has  GoTo mode enabled.
+     *
+     * Called from {@link CanvasMouseListener}.
+     *
+     * @return True if the user has toggled GoTo mode.
+     */
+    public boolean isGotoStarted() {
+        return false;
+    }
+
+    /**
      * Perform an immediate goto to a point on the map.
      *
      * Called from {@link CanvasMouseListener}.
