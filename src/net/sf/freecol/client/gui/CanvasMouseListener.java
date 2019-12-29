@@ -78,7 +78,14 @@ public final class CanvasMouseListener extends FreeColClientHolder
         }
 
         switch (e.getButton()) {
-        case MouseEvent.BUTTON1: // Drag and selection
+        case MouseEvent.BUTTON1: 
+            // If we have GoTo mode enabled then GoTo takes precedence
+            if (getGUI().isGotoStarted()) {
+                getGUI().performGoto(e.getX(), e.getY());
+                break;
+            }
+
+            // Drag and selection
             // Enable dragging with button 1
             // @see CanvasMouseMotionListener#mouseDragged
             getGUI().prepareDrag(e.getX(), e.getY());

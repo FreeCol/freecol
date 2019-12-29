@@ -813,6 +813,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public boolean isGotoStarted() {
+        return canvas.isGotoStarted();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void performGoto(Tile tile) {
         if (canvas.isGotoStarted()) canvas.stopGoto();
 

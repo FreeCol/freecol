@@ -4083,7 +4083,7 @@ public class Unit extends GoodsLocation
      * -til: While units do not contribute to tile appearance as such, if
      *     they move in/out of a colony the visible colony size changes.
      *
-     * @param newLocation The new {@code Location}.
+     * @param newLocation The Tile where this Unit is located. Or null if its location is Europe.
      * @return True if the location change succeeds.
      */
     @Override

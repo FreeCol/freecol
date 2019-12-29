@@ -249,7 +249,7 @@ public class DiplomacyMessage extends ObjectMessage {
         String otherId = getStringAttribute(OTHER_ID_TAG);
         if (our == null) {
             cs = serverPlayer.clientError("Missing our object: " + ourId);
-        } if (our instanceof Unit) {
+        } else if (our instanceof Unit) {
             ourUnit = (Unit)our;
             if (!serverPlayer.owns(ourUnit)) {
                 cs = serverPlayer.clientError("Not our unit: " + ourId);
