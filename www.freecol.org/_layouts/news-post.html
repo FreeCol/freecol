@@ -1,9 +1,15 @@
 ---
   layout: news
 ---
-                <table class="contentpaneopen"><tr><td valign="top" colspan="2" class="createdate">
-                    {{ page.date | date: "%A, %Y-%m-%d" }}
-                </td></tr>
+                <table class="contentpaneopen">
+                  <tr>
+                    <td valign="top" class="createdate">
+                      {{ page.date | date: "%A, %Y-%m-%d" }}
+                    </td>
+                    <td valign="top" align="right" class="createdate">
+                      {{ page.author }}
+                    </td>
+                  </tr>
                     <tr>
                         <td valign="top" colspan="2">
 {{ content }}
