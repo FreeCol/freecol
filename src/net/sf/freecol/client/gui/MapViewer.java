@@ -1909,7 +1909,20 @@ public final class MapViewer extends FreeColClientHolder {
                 && player != null && !player.canSee(unit.getTile()));
         BufferedImage image = lib.getScaledUnitImage(unit, fade);
         Point p = calculateUnitImagePositionInTile(image);
+        
+        // if the unit is selected and flashUnit is enabled
+        // then flash it to the controlling player
+        // as a visual indication of its selection like with TerrainCursor
+        boolean flashUnitEnabled = getClientOptions().getBoolean(ClientOptions.FLASH_UNIT);
+        if (getGUI().getActiveUnit().getId().equals(unit.getId()) && 
+            unit.getOwner().equals(player) &&
+            getCursorTile(true) == null &&
+            flashUnitEnabled) {
+           g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.35f));
+        }
+
         g.drawImage(image, p.x, p.y, null);
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));

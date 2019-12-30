@@ -55,6 +55,9 @@
            mapboard. -->
       <booleanOption id="model.option.autoScroll"
                      defaultValue="false"/>
+      <!-- Whether to flash the unit when its active. -->
+      <booleanOption id="model.option.flashUnit"
+                     defaultValue="false"/>
       <!-- Whether to display a compass rose or not. -->
       <booleanOption id="model.option.displayCompassRose"
                      defaultValue="false"/>

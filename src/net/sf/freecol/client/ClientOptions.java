@@ -168,6 +168,10 @@ public class ClientOptions extends OptionGroup {
     public static final String AUTO_SCROLL
         = "model.option.autoScroll";
 
+    /** Whether to flash the unit when its active. */
+    public static final String FLASH_UNIT
+        = "model.option.flashUnit";
+
     /** Whether to display a compass rose or not. */
     public static final String DISPLAY_COMPASS_ROSE
         = "model.option.displayCompassRose";
