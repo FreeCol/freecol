@@ -6,3 +6,6 @@ defaults:
     values:
       permalink: news/:categories/:title:output_ext
       layout: "news-post"
+      folder:
+        path: /news/
+        name: News
