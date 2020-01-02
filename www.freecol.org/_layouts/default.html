@@ -59,7 +59,17 @@
                             <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                 <tr align="left"><td><a href="/" class="mainlevel"{% if page.folder==nil %} id="active_menu"{% endif %}>Home</a></td></tr>
                                 <tr align="left"><td><a href="/news/" class="mainlevel"{% if page.folder and page.folder.name=="News" %} id="active_menu"{% endif %}>News</a></td></tr>
-                                <tr align="left"><td><a href="/about.html" class="mainlevel"{% if page.folder and page.folder.name=="About" %} id="active_menu"{% endif %}>About FreeCol</a></td></tr>
+                                <tr align="left"><td>
+                                    <a href="/about.html" class="mainlevel"{% if page.folder and page.folder.name=="About FreeCol" and page.title!="Current Status" and page.title!="A History of FreeCol's Development" and page.title!="Roadmap" and page.title!="Team and Credits" and page.title!="How to Contribute" and page.title!="Contact Information" %} id="active_menu"{% endif %}>About FreeCol</a>
+{% if page.folder and page.folder.name=="About FreeCol" %}
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="status.html" class="sublevel"{% if page.title=="Current Status" %} id="active_menu"{% endif %}>Current Status</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="history.html" class="sublevel"{% if page.title=="A History of FreeCol's Development" %} id="active_menu"{% endif %}>History</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="roadmap.html" class="sublevel"{% if page.title=="Roadmap" %} id="active_menu"{% endif %}>Roadmap</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="team-and-credits.html" class="sublevel"{% if page.title=="Team and Credits" %} id="active_menu"{% endif %}>Team and Credits</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="how-to-contribute.html" class="sublevel"{% if page.title=="How to Contribute" %} id="active_menu"{% endif %}>How to Contribute</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="contact.html" class="sublevel"{% if page.title=="Contact Information" %} id="active_menu"{% endif %}>Contact Us</a></div>
+{% endif %}
+                                </td></tr>
                                 <tr align="left"><td><a href="/documentation/" class="mainlevel"{% if page.folder and page.folder.name=="Documentation" %} id="active_menu"{% endif %}>Documentation</a></td></tr>
                                 <tr align="left"><td><a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" %} id="active_menu"{% endif %}>Screenshots</a></td></tr>
                                 <tr align="left"><td><a href="/download.html" class="mainlevel"{% if page.folder and page.folder.name=="Download" %} id="active_menu"{% endif %}>Download</a></td></tr>
