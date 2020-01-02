@@ -71,7 +71,15 @@
 {% endif %}
                                 </td></tr>
                                 <tr align="left"><td><a href="/documentation/" class="mainlevel"{% if page.folder and page.folder.name=="Documentation" %} id="active_menu"{% endif %}>Documentation</a></td></tr>
-                                <tr align="left"><td><a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" %} id="active_menu"{% endif %}>Screenshots</a></td></tr>
+                                <tr align="left"><td>
+                                    <a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" and page.title!="More Screenshots" and page.title!="Units" and page.title!="Colonies" and page.title!="Goods" %} id="active_menu"{% endif %}>Screenshots</a>
+{% if page.folder and page.folder.name=="Screenshots" %}
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="more-screenshots.html" class="sublevel"{% if page.title=="More Screenshots" %} id="active_menu"{% endif %}>More Screenshots</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="art-units.html" class="sublevel"{% if page.title=="Units" %} id="active_menu"{% endif %}>Units</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="art-colonies.html" class="sublevel"{% if page.title=="Colonies" %} id="active_menu"{% endif %}>Colonies</a></div>
+                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="art-goods.html" class="sublevel"{% if page.title=="Goods" %} id="active_menu"{% endif %}>Goods</a></div>
+{% endif %}
+                                </td></tr>
                                 <tr align="left"><td><a href="/download.html" class="mainlevel"{% if page.folder and page.folder.name=="Download" %} id="active_menu"{% endif %}>Download</a></td></tr>
                                 <tr align="left"><td>
                                     <a href="/community.html" class="mainlevel"{% if page.folder and page.folder.name=="Community" and page.title!="Web Links" %} id="active_menu"{% endif %}>Community</a>
