@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreeCol - {{ page.title }}</title>
     <meta name="title" content="{{ page.title }}" />
 {% if page.author %}
@@ -12,9 +12,9 @@
     <meta name="keywords" content="FreeCol, Colonization, Free Colonization Game, Colonization, Sid Meier's Colonization, Colonization 2, Microprose" />
     <meta name="robots" content="index, follow" />
 
-    <link rel="shortcut icon" href="../images/favicon.ico" />
-    <link href="/templates/freecol/css/template_css.css" rel="stylesheet" type="text/css" />
-    <link href="/templates/freecol/css/css_color_green.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/templates/freecol/css/template_css.css" />
+    <link rel="stylesheet" type="text/css" href="/templates/freecol/css/css_color_green.css" />
 </head>
 
 <body>
@@ -62,29 +62,29 @@
                                 <tr align="left"><td>
                                     <a href="/about.html" class="mainlevel"{% if page.folder and page.folder.name=="About FreeCol" and page.title!="Current Status" and page.title!="A History of FreeCol's Development" and page.title!="Roadmap" and page.title!="Team and Credits" and page.title!="How to Contribute" and page.title!="Contact Information" %} id="active_menu"{% endif %}>About FreeCol</a>
 {% if page.folder and page.folder.name=="About FreeCol" %}
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="status.html" class="sublevel"{% if page.title=="Current Status" %} id="active_menu"{% endif %}>Current Status</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="history.html" class="sublevel"{% if page.title=="A History of FreeCol's Development" %} id="active_menu"{% endif %}>History</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="roadmap.html" class="sublevel"{% if page.title=="Roadmap" %} id="active_menu"{% endif %}>Roadmap</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="team-and-credits.html" class="sublevel"{% if page.title=="Team and Credits" %} id="active_menu"{% endif %}>Team and Credits</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="how-to-contribute.html" class="sublevel"{% if page.title=="How to Contribute" %} id="active_menu"{% endif %}>How to Contribute</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt="" /><a href="contact.html" class="sublevel"{% if page.title=="Contact Information" %} id="active_menu"{% endif %}>Contact Us</a></div>
+                                    <div class="submenu"><a href="status.html" class="sublevel"{% if page.title=="Current Status" %} id="active_menu"{% endif %}>Current Status</a></div>
+                                    <div class="submenu"><a href="history.html" class="sublevel"{% if page.title=="A History of FreeCol's Development" %} id="active_menu"{% endif %}>History</a></div>
+                                    <div class="submenu"><a href="roadmap.html" class="sublevel"{% if page.title=="Roadmap" %} id="active_menu"{% endif %}>Roadmap</a></div>
+                                    <div class="submenu"><a href="team-and-credits.html" class="sublevel"{% if page.title=="Team and Credits" %} id="active_menu"{% endif %}>Team and Credits</a></div>
+                                    <div class="submenu"><a href="how-to-contribute.html" class="sublevel"{% if page.title=="How to Contribute" %} id="active_menu"{% endif %}>How to Contribute</a></div>
+                                    <div class="submenu"><a href="contact.html" class="sublevel"{% if page.title=="Contact Information" %} id="active_menu"{% endif %}>Contact Us</a></div>
 {% endif %}
                                 </td></tr>
                                 <tr align="left"><td><a href="/documentation/" class="mainlevel"{% if page.folder and page.folder.name=="Documentation" %} id="active_menu"{% endif %}>Documentation</a></td></tr>
                                 <tr align="left"><td>
                                     <a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" and page.title!="More Screenshots" and page.title!="Units" and page.title!="Colonies" and page.title!="Goods" %} id="active_menu"{% endif %}>Screenshots</a>
 {% if page.folder and page.folder.name=="Screenshots" %}
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="more-screenshots.html" class="sublevel"{% if page.title=="More Screenshots" %} id="active_menu"{% endif %}>More Screenshots</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="art-units.html" class="sublevel"{% if page.title=="Units" %} id="active_menu"{% endif %}>Units</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="art-colonies.html" class="sublevel"{% if page.title=="Colonies" %} id="active_menu"{% endif %}>Colonies</a></div>
-                                    <div class="submenu"><img src="templates/freecol/images/indent1.png" alt=""/><a href="art-goods.html" class="sublevel"{% if page.title=="Goods" %} id="active_menu"{% endif %}>Goods</a></div>
+                                    <div class="submenu"><a href="more-screenshots.html" class="sublevel"{% if page.title=="More Screenshots" %} id="active_menu"{% endif %}>More Screenshots</a></div>
+                                    <div class="submenu"><a href="art-units.html" class="sublevel"{% if page.title=="Units" %} id="active_menu"{% endif %}>Units</a></div>
+                                    <div class="submenu"><a href="art-colonies.html" class="sublevel"{% if page.title=="Colonies" %} id="active_menu"{% endif %}>Colonies</a></div>
+                                    <div class="submenu"><a href="art-goods.html" class="sublevel"{% if page.title=="Goods" %} id="active_menu"{% endif %}>Goods</a></div>
 {% endif %}
                                 </td></tr>
                                 <tr align="left"><td><a href="/download.html" class="mainlevel"{% if page.folder and page.folder.name=="Download" %} id="active_menu"{% endif %}>Download</a></td></tr>
                                 <tr align="left"><td>
                                     <a href="/community.html" class="mainlevel"{% if page.folder and page.folder.name=="Community" and page.title!="Web Links" %} id="active_menu"{% endif %}>Community</a>
 {% if page.folder and page.folder.name=="Community" %}
-                                    <div class="submenu"><img src="/templates/freecol/images/indent1.png" alt="" /><a href="/links/" class="sublevel"{% if page.title=="Web Links" %} id="active_menu"{% endif %}>Links</a></div>
+                                    <div class="submenu"><a href="/links/" class="sublevel"{% if page.title=="Web Links" %} id="active_menu"{% endif %}>Links</a></div>
 {% endif %}
                                 </td></tr>
                             </table>					</div>
