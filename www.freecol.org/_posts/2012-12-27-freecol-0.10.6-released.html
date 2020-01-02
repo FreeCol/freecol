@@ -2,4 +2,37 @@
   title: FreeCol 0.10.6 released
   author: Mike Pope
 ---
-				<div align="left">FreeCol 0.10.6 has been released, to coincide with the end of the world.&nbsp; Thanks to all contributors, but particularly to izzieliu (see below) and reflame (most prolific bug reporter).</div><div align="left"><br />The main user-visible changes since 0.10.5 are:<br /><ul><li>&gt;80 bugs fixed.<br /></li><li>colony names (freecol ruleset): The colony names have been revised for accuracy and chronological order, contributed by izzieliu.<br /></li><li>disasters: Colonies are subject to natural disasters.</li><li>editor: The map editor should be working again.</li><li>European trade: Trading of goods with other European nations should be working again.</li><li>intervention force: A foreign power may intervene and aid you against the REF.</li><li>map reveal: The map is fully revealed on independence, as in Col1.</li><li>native anger: Native settlements now have a `most hated nation&#39;, visible in the various popups, reports and the `!&#39; chip by the settlement name.</li><li>native trade: An option has been added to allow trading with empty carrier units.</li><li>options panel: New tree-view of the options.</li><li>path finding: The path finding code has been reworked, and should now find the fastest path in more cases.</li><li>peace: The monarch now sometimes declares peace.</li><li>ship names: Ships now have names by default. Historic ship name list contributed by izzieliu.</li><li>AI:<ol><li>Following the path finding rewrite, most AI actions have been reworked and are now more robust and efficient, fixing many long standing bugs.&nbsp; This was a lot of work and the main reason for the long release cycle.&nbsp; Much of this is not really obvious to a casual player, the AI just fails less often.<br />For example: In a 0.10.5 test game the Russian AI sent a unit to build a colony on a small island, but when it arrived the colony site had already been taken by the Swedish.&nbsp; The Russian unit just hung around until eventually captured.&nbsp; With 0.10.6 a new colony site is chosen as soon as the existing one becomes unavailable, and if needed a transport unit will be sent to take the colony founders there.</li><li>European AI nations now send missionaries to nearby native settlements.</li><li>European AI player cheating has been reduced, some explicit cheats are now controllable in the game options.</li><li>Native AI gift and tribute demand probabilities are now game options.</li><li>Note though, with very few exceptions, the AI is concerned only with the efficiency of its movements.&nbsp; It makes no attempt to check if it is moving its units into danger.&nbsp; Not yet.&nbsp; That is the next major thing to do with the AI.&nbsp; For now, do not bother reporting bugs where the AI moved a unit into unnecessary danger.&nbsp; We know.</li></ol></li></ul></div><div align="left">&nbsp;</div><div align="left">A serious bug has been discovered in 0.10.6 that removes all colonists from captured colonies. 0.10.7 will be releasd soon, fixing this and other less serious bugs. </div>
+<div align="left">
+  FreeCol 0.10.6 has been released, to coincide with the end of the world.&nbsp; Thanks to all contributors, but particularly to izzieliu (see below) and reflame (most prolific bug reporter).
+</div>
+<div align="left"><br />The main user-visible changes since 0.10.5 are:<br />
+  <ul>
+    <li>&gt;80 bugs fixed.<br /></li>
+    <li>colony names (freecol ruleset): The colony names have been revised for accuracy and chronological order, contributed by izzieliu.<br /></li>
+    <li>disasters: Colonies are subject to natural disasters.</li>
+    <li>editor: The map editor should be working again.</li>
+    <li>European trade: Trading of goods with other European nations should be working again.</li>
+    <li>intervention force: A foreign power may intervene and aid you against the REF.</li>
+    <li>map reveal: The map is fully revealed on independence, as in Col1.</li>
+    <li>native anger: Native settlements now have a `most hated nation&#39;, visible in the various popups, reports and the `!&#39; chip by the settlement name.</li>
+    <li>native trade: An option has been added to allow trading with empty carrier units.</li>
+    <li>options panel: New tree-view of the options.</li>
+    <li>path finding: The path finding code has been reworked, and should now find the fastest path in more cases.</li>
+    <li>peace: The monarch now sometimes declares peace.</li>
+    <li>ship names: Ships now have names by default. Historic ship name list contributed by izzieliu.</li>
+    <li>AI:
+      <ol>
+        <li>Following the path finding rewrite, most AI actions have been reworked and are now more robust and efficient, fixing many long standing bugs.&nbsp; This was a lot of work and the main reason for the long release cycle.&nbsp; Much of this is not really obvious to a casual player, the AI just fails less often.<br />
+          For example: In a 0.10.5 test game the Russian AI sent a unit to build a colony on a small island, but when it arrived the colony site had already been taken by the Swedish.&nbsp; The Russian unit just hung around until eventually captured.&nbsp; With 0.10.6 a new colony site is chosen as soon as the existing one becomes unavailable, and if needed a transport unit will be sent to take the colony founders there.</li>
+        <li>European AI nations now send missionaries to nearby native settlements.</li>
+        <li>European AI player cheating has been reduced, some explicit cheats are now controllable in the game options.</li>
+        <li>Native AI gift and tribute demand probabilities are now game options.</li>
+        <li>Note though, with very few exceptions, the AI is concerned only with the efficiency of its movements.&nbsp; It makes no attempt to check if it is moving its units into danger.&nbsp; Not yet.&nbsp; That is the next major thing to do with the AI.&nbsp; For now, do not bother reporting bugs where the AI moved a unit into unnecessary danger.&nbsp; We know.</li>
+      </ol>
+    </li>
+  </ul>
+</div>
+<div align="left">&nbsp;</div>
+<div align="left">
+  A serious bug has been discovered in 0.10.6 that removes all colonists from captured colonies. 0.10.7 will be releasd soon, fixing this and other less serious bugs.
+</div>
