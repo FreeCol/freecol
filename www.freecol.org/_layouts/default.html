@@ -73,9 +73,12 @@
                                     <div class="submenu"><a href="subversion.html" class="sublevel"{% if page.title=="Subversion Usage" %} id="active_menu"{% endif %}>SVN Usage</a></div>
                                     <div class="submenu"><a href="trackers-use.html" class="sublevel"{% if page.title=="Tracker Usage" %} id="active_menu"{% endif %}>Tracker Usage</a></div>
 {% endif %}
-                                <div class="mainmenu"><a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" and page.title!="More Screenshots" and page.title!="Units" and page.title!="Colonies" and page.title!="Goods" %} id="active_menu"{% endif %}>Screenshots</a></div>
+                                <div class="mainmenu"><a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" and page.title!="More Screenshots" %} id="active_menu"{% endif %}>Screenshots</a></div>
 {% if page.folder and page.folder.name=="Screenshots" %}
                                     <div class="submenu"><a href="more-screenshots.html" class="sublevel"{% if page.title=="More Screenshots" %} id="active_menu"{% endif %}>More Screenshots</a></div>
+{% endif %}
+                                <div class="mainmenu"><a href="/art.html" class="mainlevel"{% if page.folder and page.folder.name=="Art" and page.title!="Units" and page.title!="Colonies" and page.title!="Goods" %} id="active_menu"{% endif %}>Art</a></div>
+{% if page.folder and page.folder.name=="Art" %}
                                     <div class="submenu"><a href="art-units.html" class="sublevel"{% if page.title=="Units" %} id="active_menu"{% endif %}>Units</a></div>
                                     <div class="submenu"><a href="art-colonies.html" class="sublevel"{% if page.title=="Colonies" %} id="active_menu"{% endif %}>Colonies</a></div>
                                     <div class="submenu"><a href="art-goods.html" class="sublevel"{% if page.title=="Goods" %} id="active_menu"{% endif %}>Goods</a></div>
