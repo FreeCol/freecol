@@ -2,4 +2,28 @@
   title: New modifiers available
   author: Michael Burschik
 ---
-				<div align="left"><span>One of the attractions of the original Colonization game are its many</span><br /> <span>small features that sometimes affect game play in subtle and</span><br /> <span>unexpected ways. Although we have been working on implementing all</span><br /> <span>these features for years, we still haven&#39;t completed the job.</span><br /> <span>Recently, we were made aware of one feature that had escaped our</span><br /> <span>attention so far: Inca and Aztec cities, as well as native capitals</span><br /> <span>have a higher defence bonus than other native settlements.</span><br /> <br /> <span>Adding special cases to handle these bonuses would have been pretty</span><br /> <span>simple, but would have added more hard-coded modifiers to the game.</span><br /> <span>As it turned out, the combat model already contained about half a</span><br /> <span>dozen hard-coded modifiers interfering with our on-going effort to</span><br /> <span>make FreeCol more configurable. The (more or less) obvious solution</span><br /> <span>was to move these modifiers to the specification. This, of course,</span><br /> <span>created several smaller problems, which seem to have been fixed,</span><br /> <span>however.</span><br /> <br /> <span>The net result of the changes is that you can now tune six modifiers</span><br /> <span>that directly affect the combat model, such as the defence bonus</span><br /> <span>granted to a fortified unit. Nation types now have two additional</span><br /> <span>modifiers, namely the settlement defence modifier and the capital</span><br /> <span>defence modifier, which are added to the defensive modifiers of all</span><br /> <span>units defending these settlements. At the moment, European nation</span><br /> <span>types do not make use of the capital defence modifier, since they do</span><br /> <span>not have capitals, but this might well be changed in the future.</span><br /> </div>
+<div align="left">
+  <span>One of the attractions of the original Colonization game are its many</span><br />
+  <span>small features that sometimes affect game play in subtle and</span><br />
+  <span>unexpected ways. Although we have been working on implementing all</span><br />
+  <span>these features for years, we still haven&#39;t completed the job.</span><br />
+  <span>Recently, we were made aware of one feature that had escaped our</span><br />
+  <span>attention so far: Inca and Aztec cities, as well as native capitals</span><br />
+  <span>have a higher defence bonus than other native settlements.</span><br /><br />
+  <span>Adding special cases to handle these bonuses would have been pretty</span><br />
+  <span>simple, but would have added more hard-coded modifiers to the game.</span><br />
+  <span>As it turned out, the combat model already contained about half a</span><br />
+  <span>dozen hard-coded modifiers interfering with our on-going effort to</span><br />
+  <span>make FreeCol more configurable. The (more or less) obvious solution</span><br />
+  <span>was to move these modifiers to the specification. This, of course,</span><br />
+  <span>created several smaller problems, which seem to have been fixed,</span><br />
+  <span>however.</span><br /><br />
+  <span>The net result of the changes is that you can now tune six modifiers</span><br />
+  <span>that directly affect the combat model, such as the defence bonus</span><br />
+  <span>granted to a fortified unit. Nation types now have two additional</span><br />
+  <span>modifiers, namely the settlement defence modifier and the capital</span><br />
+  <span>defence modifier, which are added to the defensive modifiers of all</span><br />
+  <span>units defending these settlements. At the moment, European nation</span><br />
+  <span>types do not make use of the capital defence modifier, since they do</span><br />
+  <span>not have capitals, but this might well be changed in the future.</span><br />
+</div>

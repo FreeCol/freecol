@@ -1,0 +1,18 @@
+---
+  layout: default-with-title
+---
+                <table class="contentpaneopen">
+                    <tr>
+                        <td valign="top" class="createdate">
+                            {{ page.date | date: "%A, %Y-%m-%d" }}
+                        </td>
+                        <td valign="top" align="right" class="createdate">
+                            {{ page.author }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" colspan="2">
+{{ content }}
+                        </td>
+                    </tr>
+                </table>

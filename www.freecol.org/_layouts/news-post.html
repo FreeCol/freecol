@@ -1,15 +1,15 @@
 ---
-  layout: news
+  layout: default-with-title
 ---
                 <table class="contentpaneopen">
-                  <tr>
-                    <td valign="top" class="createdate">
-                      {{ page.date | date: "%A, %Y-%m-%d" }}
-                    </td>
-                    <td valign="top" align="right" class="createdate">
-                      {{ page.author }}
-                    </td>
-                  </tr>
+                    <tr>
+                        <td valign="top" class="createdate">
+                            {{ page.date | date: "%A, %Y-%m-%d" }}
+                        </td>
+                        <td valign="top" align="right" class="createdate">
+                            {{ page.author }}
+                        </td>
+                    </tr>
                     <tr>
                         <td valign="top" colspan="2">
 {{ content }}
@@ -22,12 +22,12 @@
                 <table align="center" style="margin-top: 25px;">
                     <tr>
                         <th class="pagenav_prev">
-                            <a href="{{ page.previous.url }}">&lt; Prev</a>
+                            {% if page.previous %}<a href="{{ page.previous.url }}">{% endif %}&lt; Prev{% if page.previous %}</a>{% endif %}
                         </th>
                         <td width="50">&nbsp;
                         </td>
                         <th class="pagenav_next">
-                            <a href="{{ page.next.url }}">Next &gt;</a>
+                            {% if page.next %}<a href="{{ page.next.url }}">{% endif %}Next &gt;{% if page.next %}</a>{% endif %}
                         </th>
                     </tr>
                 </table>

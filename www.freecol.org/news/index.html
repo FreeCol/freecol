@@ -1,14 +1,16 @@
 ---
   title: News Index
-  layout: news-page
+  layout: page
   folder:
-    path: /news/index.html
+    path: /news/
     name: News
 ---
-<ul>
-  {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url }}">{{ post.title }}</a>
-    </li>
-  {% endfor %}
-</ul>
+<div class="blog_more">
+    <ul>
+{% for post in site.posts %}
+        <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+        </li>
+{% endfor %}
+    </ul>
+</div>
