@@ -18,19 +18,17 @@
 </head>
 
 <body>
-<div id="pagewidth-800" >
-    <div id="header" >
+<div id="pagewidth-800">
+    <header id="header">
         <div id="top-top">
-            <div id="topmenu">
-            </div>
         </div>
         <div class="clr"></div>
         <div id="top-bottom">
             <a href="index.html"><img src="/templates/freecol/images/logo.png" border="0" width="600" height="89" alt="logo" /></a>
         </div>
-    </div>
+    </header>
     <div id="outer-800" >
-        <div id="pathway">
+        <nav id="pathway">
           <span class="pathway"><a href="/" class="pathway">Home</a>
 {% if page.folder %}
             <img src="/images/M_images/arrow.png" alt="arrow" />
@@ -48,9 +46,8 @@
           <span class="pathway-right">
             <a href="/sitemap.html"><img src="/templates/freecol/images/sitemap.png" border="0" width="14" height="16" alt="SITEMAP" /></a>
           </span>
-        </div>
-        <div id="leftcol">
-            <a name="menu"></a>
+        </nav>
+        <nav id="leftcol">
             <div class="module">
                 <div>
                     <div>
@@ -87,34 +84,33 @@
                                     <div class="submenu"><a href="/links/" class="sublevel"{% if page.title=="Web Links" %} id="active_menu"{% endif %}>Links</a></div>
 {% endif %}
                                 </td></tr>
-                            </table>					</div>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </nav>
         <div id="maincol-wide-800" >
             <div class="clr"></div>
-            <div class="content"><a name="content"></a>
+            <main class="content">
 {{ content }}
+            </main>
 {% if page.folder %}
-                <span class="article_seperator">&nbsp;</span>
-                <div class="back_button">
-                    <a href='javascript:history.go(-1)'>
-                        [ Back ]</a>
-                </div>
+            <nav class="back_button">
+                <a href='javascript:history.go(-1)'>[ Back ]</a>
+            </nav>
 {% endif %}
-            </div>
         </div>
         <div class="clr"></div>
     </div>
     <div id="sflogo">
         <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=43225&amp;type=2" width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
     </div>
-    <div id="footer-800" >
+    <footer id="footer-800" >
         <div align="center" class="footer-copyright">
             &copy; 2002-2019 FreeCol - <a href="/contact.html">Contact Us</a>
         </div>
-    </div>
+    </footer>
 </div>
 </body>
 </html>

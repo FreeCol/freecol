@@ -64,8 +64,8 @@ a:hover {
 }
 
 #top-bottom {
-    height: 80px;
-    width: 200px;
+    height: 89px;
+    width: 100%;
     background: transparent;
     float: left;
 }
@@ -106,13 +106,7 @@ a:hover {
     padding: 0;
 }
 
-#topmenu {
-    height: 20px;
-    float: right;
-    width: 600px;
-}
-
-div#pathway {
+#pathway {
     width: 740px;
     height: 19px;
     padding-left: 20px;
@@ -264,11 +258,6 @@ iframe.wrapper {
 .footer-copyright {
     position: relative;
     top: 5px;
-}
-
-#leftcol div.module div div div div, #rightcol-normal div.module div div div div {
-    padding: 0;
-    margin: 0;
 }
 
 #rightcol-broad div.module {
@@ -691,6 +680,12 @@ table.moduletable th {
     text-align: center;
 }
 
+.back_button {
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-right: 0;
+}
+
 .back_button a {
     font-size: 12px;
     font-weight: normal;
@@ -738,7 +733,7 @@ tr.trLine .leftcell {
     text-align: right;
 }
 
-div.content table.contentpane {
+.content table.contentpane {
     margin-bottom: 2em;
 }
 
