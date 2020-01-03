@@ -251,8 +251,12 @@ iframe.wrapper {
     font-size: 12px;
 }
 
-#leftcol div.module div div div table tr td div.submenu {
-    padding-left: 4px;
+#leftcol div.module div div div div.mainmenu {
+    padding: 0;
+}
+
+#leftcol div.module div div div div.submenu {
+    padding: 0 0 0 4px;
 }
 
 .footer-copyright {
