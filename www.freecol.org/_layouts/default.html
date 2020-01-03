@@ -64,7 +64,15 @@
                                     <div class="submenu"><a href="how-to-contribute.html" class="sublevel"{% if page.title=="How to Contribute" %} id="active_menu"{% endif %}>How to Contribute</a></div>
                                     <div class="submenu"><a href="contact.html" class="sublevel"{% if page.title=="Contact Information" %} id="active_menu"{% endif %}>Contact Us</a></div>
 {% endif %}
-                                <div class="mainmenu"><a href="/documentation/" class="mainlevel"{% if page.folder and page.folder.name=="Documentation" %} id="active_menu"{% endif %}>Documentation</a></div>
+                                <div class="mainmenu"><a href="/documentation/" class="mainlevel"{% if page.folder and page.folder.name=="Documentation" and page.title!="FreeCol User Manual" and page.title!="Javadoc" and page.title!="Git Repository Usage" and page.title!="Subversion Repository Layout" and page.title!="Subversion Usage" and page.title!="Tracker Usage" %} id="active_menu"{% endif %}>Documentation</a></div>
+{% if page.folder and page.folder.name=="Documentation" %}
+                                    <div class="submenu"><a href="freecol-user-manual.html" class="sublevel"{% if page.title=="FreeCol User Manual" %} id="active_menu"{% endif %}>User Manual</a></div>
+                                    <div class="submenu"><a href="javadoc.html" class="sublevel"{% if page.title=="Javadoc" %} id="active_menu"{% endif %}>Javadoc</a></div>
+                                    <div class="submenu"><a href="git.html" class="sublevel"{% if page.title=="Git Repository Usage" %} id="active_menu"{% endif %}>Git Usage</a></div>
+                                    <div class="submenu"><a href="subversion-repository-layout.html" class="sublevel"{% if page.title=="Subversion Repository Layout" %} id="active_menu"{% endif %}>SVN Layout</a></div>
+                                    <div class="submenu"><a href="subversion.html" class="sublevel"{% if page.title=="Subversion Usage" %} id="active_menu"{% endif %}>SVN Usage</a></div>
+                                    <div class="submenu"><a href="trackers-use.html" class="sublevel"{% if page.title=="Tracker Usage" %} id="active_menu"{% endif %}>Tracker Usage</a></div>
+{% endif %}
                                 <div class="mainmenu"><a href="/screenshots.html" class="mainlevel"{% if page.folder and page.folder.name=="Screenshots" and page.title!="More Screenshots" and page.title!="Units" and page.title!="Colonies" and page.title!="Goods" %} id="active_menu"{% endif %}>Screenshots</a></div>
 {% if page.folder and page.folder.name=="Screenshots" %}
                                     <div class="submenu"><a href="more-screenshots.html" class="sublevel"{% if page.title=="More Screenshots" %} id="active_menu"{% endif %}>More Screenshots</a></div>
