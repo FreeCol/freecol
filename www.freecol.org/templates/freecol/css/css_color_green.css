@@ -9,10 +9,6 @@ background: #FFF url(../images/top-bg.jpg) repeat-x top;
 background: #FFF url(../images/top-bg.jpg) repeat-x top;
  }
  
-#search {
-background: url(../images/back_search.jpg) right top no-repeat;
-}
-
 #outer-800 {
 background: transparent url(../images/content-top.gif) no-repeat top;
 }
@@ -25,7 +21,7 @@ background: transparent url(../images/content-top1024.gif) no-repeat top;
 /* background: url(../images/banner_back.jpg) no-repeat; */
 }
 
-a, #search .inputbox, #search .button{
+a {
 color: #555555;
 }
 

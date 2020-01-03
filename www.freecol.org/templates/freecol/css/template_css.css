@@ -70,42 +70,6 @@ a:hover {
     float: left;
 }
 
-#search {
-    margin: 0;
-    width: 148px;
-    height: 28px;
-    float: right;
-    background: url(../images/back_search.jpg) right top no-repeat;
-    padding: 2px 0 0 10px;
-    vertical-align: top;
-}
-
-#search .inputbox {
-    width: 100px;
-    height: 18px;
-    font-size: 12px;
-    background: transparent;
-    border: none;
-    margin: 0;
-    padding: 0;
-    line-height: 14px;
-}
-
-#search .button {
-    margin: 0;
-    padding: 0;
-    height: 14px;
-    font-size: 12px;
-    background: transparent;
-    border: none;
-    line-height: 10px;
-}
-
-#search form {
-    margin: 0;
-    padding: 0;
-}
-
 #pathway {
     width: 740px;
     height: 19px;
@@ -311,26 +275,6 @@ div.module h3 {
     margin: 0 0 5px;
 }
 
-#user1 {
-    float: left;
-    width: 49%;
-}
-
-#user2 {
-    float: right;
-    width: 49%;
-}
-
-#user3 {
-    width: 100%;
-}
-
-#user1 ul, #user2 ul, #user3 ul {
-    list-style: none;
-    padding: 0 0 0 0.7em;
-    margin: 2px 0 5px 0.7em;
-}
-
 #maincol-normal-800 div.moduletable, #maincol-wide-800 div.moduletable, #maincol-broad-800 div.moduletable, #maincol-normal-1024 div.moduletable, #maincol-wide-1024 div.moduletable, #maincol-broad-1024 div.moduletable {
     width: 100%;
     margin-bottom: 10px;
@@ -455,9 +399,6 @@ html > body a.sublevel:hover, a.sublevel#active_menu {
 
 /* Other Mambo Stuff */
 
-#title {
-}
-
 span.pathway {
     color: #BBBBBB;
     font-size: 12px;
@@ -486,32 +427,12 @@ span.pathway {
     font-weight: normal;
 }
 
-.mosimage {
-    border: 1px solid #cccccc;
-    margin: 5px
-}
-
-.mosimage_caption {
-    margin-top: 2px;
-    background: #efefef;
-    padding: 1px 2px;
-    color: #666;
-    font-size: 12px;
-    border-top: 1px solid #cccccc;
-}
-
 hr {
     width: 90%;
 }
 
 hr.separator {
     width: 40%;
-}
-
-a.pnav {
-}
-
-.pnav:hover {
 }
 
 .small {
@@ -556,14 +477,6 @@ a.pnav {
     height: 10px;
     line-height: 0.7;
     padding-bottom: 15px;
-}
-
-.modifydate {
-    font-size: 12px;
-    color: #ABABAB;
-    height: 20px;
-    line-height: 20px;
-    margin-bottom: 5px;
 }
 
 a.readon {
@@ -679,11 +592,6 @@ table.moduletable th {
     font-size: 80%;
 }
 
-.poll {
-    font-size: 12px;
-    text-align: center;
-}
-
 .back_button {
     margin-top: 20px;
     margin-left: 5px;
@@ -714,11 +622,6 @@ table.contenttoc th {
     font-weight: bold;
     font-size: 12px;
     border-bottom: 1px solid #BBBBBB;
-}
-
-form {
-    margin: 0;
-    padding: 0;
 }
 
 /* New CSS for site cleanup */
