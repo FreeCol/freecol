@@ -3797,6 +3797,8 @@ public final class InGameController extends Controller {
                                    Settlement settlement) {
         ChangeSet cs = new ChangeSet();
 
+        logger.info("Spy settlement for " + unit.getId()
+            + " at " + settlement.getId() + "(" + settlement.getName() + ")");
         cs.addSpy(unit, settlement);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit,
@@ -3814,7 +3816,6 @@ public final class InGameController extends Controller {
      */
     public ChangeSet trainUnitInEurope(ServerPlayer serverPlayer,
                                        UnitType type) {
-
         Europe europe = serverPlayer.getEurope();
         if (europe == null) {
             return serverPlayer.clientError("No Europe to train in.");
