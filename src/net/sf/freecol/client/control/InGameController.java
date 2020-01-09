@@ -185,7 +185,7 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param soundKey The sound resource key.
      */
-    private void sound(String soundKey) {
+    public void sound(String soundKey) {
         getSoundController().playSound(soundKey);
     }
     
@@ -4884,8 +4884,12 @@ public final class InGameController extends FreeColClientHolder {
      * @param tile A special copy of the {@code Tile} with the settlement.
      */
     public void spySettlementHandler(Tile tile) {
-        invokeLater(() ->
-            getGUI().showTileSettlement(tile));
+        final Colony colony = tile.getColony();
+        if (colony != null) {
+            invokeLater(() -> {
+                    getGUI().showColonyPanel(colony, null);
+                });
+        }
     }
     
     /**
