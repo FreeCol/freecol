@@ -3987,7 +3987,8 @@ public final class InGameController extends FreeColClientHolder {
                     nt.setItem(nti);
                 }
                 TradeBuyAction tba = getGUI().getBuyChoice(unit, is,
-                    nti.getGoods(), nti.getPrice(), true);
+                    nti.getGoods(), nti.getPrice(),
+                    unit.getOwner().checkGold(nti.getPrice()));
                 if (tba == TradeBuyAction.BUY) {
                     askServer().nativeTrade(NativeTradeAction.BUY, nt);
                     return;

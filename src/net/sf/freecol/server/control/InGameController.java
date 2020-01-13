@@ -3118,6 +3118,9 @@ public final class InGameController extends Controller {
                             item.goodsMatcher()) == null) {
                 return serverPlayer.clientError("Item missing for "
                     + action + ": " + nt);
+            } else if (!serverPlayer.checkGold(item.getPrice())) {
+                return serverPlayer.clientError("Player can not afford item: "
+                    + nt);
             }
             nt.setItem(item);
             cs.add(See.only(otherPlayer),
