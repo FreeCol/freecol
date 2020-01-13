@@ -107,7 +107,8 @@ public class FatherDetailPanel
     @Override
     public void buildDetail(String id, JPanel panel) {
         FoundingFather father = getSpecification().getFoundingFather(id);
-        buildDetail(father, panel);
+        if(father!=null)
+            buildDetail(father, panel);
     }
 
     /**

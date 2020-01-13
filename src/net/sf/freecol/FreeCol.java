@@ -594,7 +594,7 @@ public final class FreeCol {
         { "a", "advantages", getAdvantagesDescription(), "cli.arg.advantages" },
         { null,  "check-savegame", "cli.check-savegame", argFile },
         { "O", "clientOptions", "cli.clientOptions", "cli.arg.clientOptions" },
-        { "D", "debug", getDebugDescription(), "cli.arg.debug" },
+        { null, "debug", getDebugDescription(), "cli.arg.debug" },
         { "R", "debug-run", "cli.debug-run", "cli.arg.debugRun" },
         { "S", "debug-start", "cli.debug-start", null },
         { "D", "difficulty", "cli.difficulty", "cli.arg.difficulty" },
