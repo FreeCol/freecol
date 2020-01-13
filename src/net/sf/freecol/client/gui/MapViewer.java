@@ -1127,7 +1127,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param unitTile The {@code Tile} to check.
      * @return The {@code Unit} to display or null if none found.
      */
-    private Unit findUnitInFront(Tile unitTile) {
+    public Unit findUnitInFront(Tile unitTile) {
         Unit result;
 
         if (unitTile == null || unitTile.isEmpty()) {
