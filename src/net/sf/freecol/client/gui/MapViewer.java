@@ -1536,9 +1536,11 @@ public final class MapViewer extends FreeColClientHolder {
                 final int yt = (y-y0) * halfHeight;
                 g.translate(xt - xt0, yt - yt0); 
                 xt0 = xt; yt0 = yt;
+                RescaleOp rop = (player == null || player.canSee(t))
+                    ? null : fow;
 
                 displaySettlementLabels(g, settlement, player, colonyLabels,
-                                        font, italicFont, productionFont);
+                                        font, italicFont, productionFont, rop);
 
             }
             g.translate(-xt0, -yt0);
@@ -1563,7 +1565,7 @@ public final class MapViewer extends FreeColClientHolder {
     private void displaySettlementLabels(Graphics2D g, Settlement settlement,
                                          Player player, int colonyLabels,
                                          Font font, Font italicFont,
-                                         Font productionFont) {
+                                         Font productionFont, RescaleOp rop) {
         if (settlement.isDisposed()) {
             logger.warning("Settlement display race detected: "
                            + settlement.getName());
@@ -1579,8 +1581,7 @@ public final class MapViewer extends FreeColClientHolder {
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
             BufferedImage img = lib.getStringImage(g, name, backgroundColor, font);
-            g.drawImage(img, (tileWidth - img.getWidth())/2 + 1,
-                        yOffset, null);
+            g.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
             break;
 
         case ClientOptions.COLONY_LABELS_MODERN:
@@ -1656,15 +1657,15 @@ public final class MapViewer extends FreeColClientHolder {
             yOffset -= (nameImage.getHeight()
                 * lib.getScaleFactor())/2;
             if (leftImage != null) {
-                g.drawImage(leftImage, labelOffset, yOffset, null);
+                g.drawImage(leftImage, rop, labelOffset, yOffset);
                 labelOffset += (leftImage.getWidth()
                     * lib.getScaleFactor()) + spacing;
             }
-            g.drawImage(nameImage, labelOffset, yOffset, null);
+            g.drawImage(nameImage, rop, labelOffset, yOffset);
             if (rightImage != null) {
                 labelOffset += (nameImage.getWidth()
                     * lib.getScaleFactor()) + spacing;
-                g.drawImage(rightImage, labelOffset, yOffset, null);
+                g.drawImage(rightImage, rop, labelOffset, yOffset);
             }
             break;
         }

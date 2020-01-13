@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
@@ -48,11 +47,9 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.Utils;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -379,8 +376,8 @@ public final class TileViewer extends FreeColClientHolder {
         }
         int price = colony.getOwner().getLandPrice(tile);
         if (price > 0 && !tile.hasSettlement()) {
-            displayCenteredImage(g, lib
-                .getScaledImage(ImageLibrary.TILE_OWNED_BY_INDIANS));
+            displayCenteredImage(g,
+                lib.getScaledImage(ImageLibrary.TILE_OWNED_BY_INDIANS));
         }
 
         Unit unit = colonyTile.getOccupyingUnit();
@@ -425,10 +422,23 @@ public final class TileViewer extends FreeColClientHolder {
      * @param image the BufferedImage
      */
     public void displayCenteredImage(Graphics2D g, BufferedImage image) {
-        g.drawImage(image,
-                    (tileWidth - image.getWidth())/2,
-                    (tileHeight - image.getHeight())/2,
-                    null);
+        displayCenteredImage(g, image, null);
+    }
+
+    /**
+     * Centers the given Image on the tile.
+     *
+     * @param g a {@code Graphics2D}
+     * @param image the BufferedImage
+     * @param rop An optional RescaleOp for fog of war.
+     */
+    public void displayCenteredImage(Graphics2D g, BufferedImage image,
+            RescaleOp rop) {
+        g.drawImage(
+            image,
+            rop,
+            (tileWidth - image.getWidth())/2,
+            (tileHeight - image.getHeight())/2);
     }
 
     /**
@@ -437,11 +447,13 @@ public final class TileViewer extends FreeColClientHolder {
      *
      * @param g a {@code Graphics2D}
      * @param image the BufferedImage
+     * @param rop An optional RescaleOp for fog of war.
      */
-    private void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
+    private void displayLargeCenteredImage(Graphics2D g, BufferedImage image,
+            RescaleOp rop) {
         int y = tileHeight - image.getHeight();
         if (y > 0) y /= 2;
-        g.drawImage(image, (tileWidth - image.getWidth())/2, y, null);
+        g.drawImage(image, rop, (tileWidth - image.getWidth())/2, y);
     }
 
     /**
@@ -615,7 +627,6 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public void displaySettlementWithChipsOrPopulationNumber(Graphics2D g,
         Tile tile, boolean withNumber, RescaleOp rop) {
-        //TODO: Use rop to apply Fog of War!
         final Player player = getMyPlayer();
         final Settlement settlement = tile.getSettlement();
 
@@ -625,7 +636,7 @@ public final class TileViewer extends FreeColClientHolder {
 
                 // Draw image of colony in center of the tile.
                 BufferedImage colonyImage = lib.getScaledSettlementImage(settlement);
-                displayLargeCenteredImage(g, colonyImage);
+                displayLargeCenteredImage(g, colonyImage, rop);
 
                 if (withNumber) {
                     String populationString
@@ -643,7 +654,7 @@ public final class TileViewer extends FreeColClientHolder {
                             FontLibrary.FontType.SIMPLE,
                             FontLibrary.FontSize.TINY,
                             Font.BOLD);
-                    displayCenteredImage(g, stringImage);
+                    displayCenteredImage(g, stringImage, rop);
                 }
 
             } else if (settlement instanceof IndianSettlement) {
@@ -651,7 +662,7 @@ public final class TileViewer extends FreeColClientHolder {
                 BufferedImage settlementImage = lib.getScaledSettlementImage(settlement);
 
                 // Draw image of indian settlement in center of the tile.
-                displayCenteredImage(g, settlementImage);
+                displayLargeCenteredImage(g, settlementImage, rop);
 
                 BufferedImage chip;
                 float xOffset = STATE_OFFSET_X * lib.getScaleFactor();
@@ -662,7 +673,7 @@ public final class TileViewer extends FreeColClientHolder {
                     // Draw the settlement chip
                     chip = lib.getIndianSettlementChip(g, is);
                     int cWidth = chip.getWidth();
-                    g.drawImage(chip, (int)xOffset, (int)yOffset, null);
+                    g.drawImage(chip, rop, (int)xOffset, (int)yOffset);
                     xOffset += cWidth + 2;
 
                     // Draw the mission chip if needed.
@@ -670,16 +681,17 @@ public final class TileViewer extends FreeColClientHolder {
                     if (missionary != null) {
                         boolean expert
                             = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                        g.drawImage(lib.getMissionChip(g, missionary.getOwner(),
-                                                       expert),
-                                    (int)xOffset, (int)yOffset, null);
+                        g.drawImage(
+                            lib.getMissionChip(
+                                g, missionary.getOwner(), expert),
+                            rop, (int)xOffset, (int)yOffset);
                         xOffset += cWidth + 2;
                     }
                 }
 
                 // Draw the alarm chip if needed.
                 if ((chip = lib.getAlarmChip(g, is, player)) != null) {
-                    g.drawImage(chip, (int)xOffset, (int)yOffset, null);
+                    g.drawImage(chip, rop, (int)xOffset, (int)yOffset);
                 }
             } else {
                 logger.warning("Bogus settlement: " + settlement);
