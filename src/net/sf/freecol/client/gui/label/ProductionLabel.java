@@ -85,7 +85,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag,
                            int maximumProduction) {
-        this(freeColClient, ag, maximumProduction, -1);
+        this(freeColClient, ag, maximumProduction, 0);
     }
 
     /**
@@ -111,7 +111,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
                            AbstractGoods ag) {
-        this(freeColClient, lib, ag, -1, -1);
+        this(freeColClient, lib, ag, -1, 0);
     }
 
     /**
