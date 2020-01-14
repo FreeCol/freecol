@@ -88,7 +88,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         super();
 
         try {
-            XMLInputFactory xif = XMLInputFactory.newInstance();
+            XMLInputFactory xif = newXMLInputFactory();
             setParent(xif.createXMLStreamReader(inputStream, "UTF-8"));
         } catch (XMLStreamException e) {
             throw new IOException(e);
@@ -109,13 +109,29 @@ public class FreeColXMLReader extends StreamReaderDelegate
         super();
 
         try {
-            XMLInputFactory xif = XMLInputFactory.newInstance();
+            XMLInputFactory xif = newXMLInputFactory();
             setParent(xif.createXMLStreamReader(reader));
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
         this.inputStream = null;
         this.readScope = ReadScope.NORMAL;
+    }
+
+    /**
+     * Create a new XMLInputFactory.
+     *
+     * Respond to CVE 2018-1000825.
+     *
+     * @return A new <code>XMLInputFactory</code>.
+     */
+    private static XMLInputFactory newXMLInputFactory() {
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        // This disables DTDs entirely for that factory
+        xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        // disable external entities
+        xif.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
+        return xif;
     }
 
 

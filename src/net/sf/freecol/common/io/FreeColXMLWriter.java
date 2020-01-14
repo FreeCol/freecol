@@ -42,6 +42,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.XMLConstants;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
@@ -237,6 +238,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
                                                                .toString()));
                 result = new StreamResult(this.outputWriter);
                 factory = TransformerFactory.newInstance();
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
                 transformer = factory.newTransformer();
                 for (int i = 0; i < indentProps.length; i += 2) {
                     transformer.setOutputProperty(indentProps[i],

@@ -37,6 +37,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.XMLConstants;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -448,6 +449,8 @@ public class DOMMessage {
     public static String elementToString(Element element) {
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
             Transformer xt = factory.newTransformer();
             StringWriter sw = new StringWriter();
             xt.transform(new DOMSource(element), new StreamResult(sw));
