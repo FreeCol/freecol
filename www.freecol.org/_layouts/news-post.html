@@ -24,12 +24,12 @@
         <table align="center" style="margin-top: 25px;">
             <tr>
                 <th class="pagenav_prev">
-                    {% if page.previous %}<a href="{{ page.previous.url }}">{% endif %}&lt; Prev{% if page.previous %}</a>{% endif %}
+                    {% if page.previous %}<a href="{{ page.previous.url }}" rel="prev">{% endif %}&lt; Prev{% if page.previous %}</a>{% endif %}
                 </th>
                 <td width="50">&nbsp;
                 </td>
                 <th class="pagenav_next">
-                    {% if page.next %}<a href="{{ page.next.url }}">{% endif %}Next &gt;{% if page.next %}</a>{% endif %}
+                    {% if page.next %}<a href="{{ page.next.url }}" rel="next">{% endif %}Next &gt;{% if page.next %}</a>{% endif %}
                 </th>
             </tr>
         </table>
