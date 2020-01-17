@@ -144,10 +144,17 @@ public final class InfoPanel extends FreeColPanel {
          * @param tile The displayed tile (or null if none)
          */
         public void update(Tile tile) {
-            this.tile = tile;
+            if (this.tile != tile) {
+                this.tile = tile;
+                update();
+            }
+        }
 
+        /**
+         * Update this panel unconditionally.
+         */
+        public void update() {
             removeAll();
-
             final ImageLibrary lib = getGUI().getTileImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScaleFactor());
@@ -275,17 +282,9 @@ public final class InfoPanel extends FreeColPanel {
                     GoodsContainer gc = unit.getGoodsContainer();
                     if (gc != null) gc.addPropertyChangeListener(this);
                 }
-                logger.info("Switching UnitInfoPanel from " +
-                    (this.unit == null ? "null" :
-                        (this.unit.getId() + " " + this.unit.getDescription() +
-                        " " + this.unit.getMovesAsString())) +
-                     " to " +
-                    (unit == null ? "null" :
-                        (unit.getId() + " " + unit.getDescription() +
-                        " " + unit.getMovesAsString())));
                 this.unit = unit;
+                update();
             }
-            update();
         }
 
         /**
@@ -351,6 +350,7 @@ public final class InfoPanel extends FreeColPanel {
                 }
             }
             revalidate();
+            repaint();
         }
 
 
@@ -466,7 +466,7 @@ public final class InfoPanel extends FreeColPanel {
             ? InfoPanelMode.MAP
             : (getGUI().getViewMode() == GUI.ViewMode.TERRAIN)
             ? InfoPanelMode.TILE
-            : (unitInfoPanel.hasUnit())
+            : (getGUI().getViewMode() == GUI.ViewMode.MOVE_UNITS)
             ? InfoPanelMode.UNIT
             : (getFreeColClient().getMyPlayer() == null)
             ? InfoPanelMode.NONE
@@ -488,8 +488,8 @@ public final class InfoPanel extends FreeColPanel {
                 this.mapEditorPanel.getWidth(), d.height);
             this.mapEditorPanel.removeAll();
             this.mapEditorPanel.add(p, BorderLayout.CENTER);
-            this.mapEditorPanel.validate();
             this.mapEditorPanel.revalidate();
+            this.mapEditorPanel.repaint();
         }
         update();
     }
@@ -500,9 +500,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param tile The displayed tile (or null if none)
      */
     public void update(Tile tile) {
-        if (this.tileInfoPanel.getTile() != tile) {
-            this.tileInfoPanel.update(tile);
-        }
+        this.tileInfoPanel.update(tile);
         update();
     }
 
@@ -526,7 +524,7 @@ public final class InfoPanel extends FreeColPanel {
         boolean fail = newMode == InfoPanelMode.END && player != null
             && player.hasNextActiveUnit();
         logger.info("InfoPanel " + this.mode + " -> " + newMode
-            + ((fail) ? "inconsistent" : ""));
+            + ((fail) ? " inconsistent" : ""));
         if (this.mode != newMode) {
             switch (this.mode = newMode) {
             case END:

@@ -191,9 +191,6 @@ public class SwingGUI extends GUI {
         ViewMode oldViewMode = getViewMode();
         if (newViewMode == oldViewMode) return false;
         this.mapViewer.setViewMode(newViewMode);
-        if (oldViewMode == ViewMode.MOVE_UNITS) {
-            this.mapViewer.stopCursorBlinking();
-        }
         return true;
     }
 
@@ -207,7 +204,6 @@ public class SwingGUI extends GUI {
      */
     private boolean changeActiveUnit(Unit newUnit) {
         final Unit oldUnit = getActiveUnit();
-        // System.err.println("CAU " + newUnit + " " + (newUnit != oldUnit));
         if (newUnit == oldUnit) return false;
         
         this.mapViewer.setActiveUnit(newUnit);
@@ -1085,6 +1081,23 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Finish a view mode change.
+     *
+     * @param update Update the map controls if true.
+     */
+    private void changeDone(boolean update) {
+        if (getViewMode() == ViewMode.MOVE_UNITS
+            && getActiveUnit() != null) {
+            this.mapViewer.startCursorBlinking();
+        } else {
+            this.mapViewer.stopCursorBlinking();
+        }
+            
+        if (update) updateMapControls();
+        updateMenuBar();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1093,10 +1106,7 @@ public class SwingGUI extends GUI {
         // Do not change active unit, we might come back to it
         change |= changeSelectedTile(tile, getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER));
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
-        // System.err.println("CV " + tile + " " + change);
+        changeDone(change);
     }
 
     /**
@@ -1106,18 +1116,11 @@ public class SwingGUI extends GUI {
     public void changeView(Unit unit) {
         boolean change = changeViewMode(ViewMode.MOVE_UNITS);
         change |= changeActiveUnit(unit);
-        if (change) {
-            updateMapControls();
+        if (unit != null) {
             // Bring the selected tile along with the unit.
-            Tile tile = (unit == null) ? null : unit.getTile();
-            changeSelectedTile(tile, true);
-            if (unit != null) { // Update the blink state.
-                this.mapViewer.startCursorBlinking();
-            } else {
-                this.mapViewer.stopCursorBlinking();
-            }
-        }            
-        updateMenuBar(); // TODO: check
+            change |= changeSelectedTile(unit.getTile(), true);
+        }
+        changeDone(change);
     }
 
     /**
@@ -1126,11 +1129,8 @@ public class SwingGUI extends GUI {
     @Override
     public void changeView(MapTransform mt) {
         boolean change = changeViewMode(ViewMode.MAP_TRANSFORM);
-        // do not change selected tile
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
-        // System.err.println("CV " + mt + " " + change);
+        // Do not change selected tile
+        changeDone(change);
     }
     
     /**
@@ -1139,12 +1139,9 @@ public class SwingGUI extends GUI {
     @Override
     public void changeView() {
         boolean change = changeViewMode(ViewMode.END_TURN);
-        changeActiveUnit(null);
-        changeSelectedTile(null, false);
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
-        // System.err.println("CV end " + change);
+        change |= changeActiveUnit(null);
+        change |= changeSelectedTile(null, false);
+        changeDone(change);
     }
 
 
