@@ -940,35 +940,33 @@ public class GUI extends FreeColClientHolder {
         final Player player = getMyPlayer();
         final Player owner = is.getOwner();
 
-        StringTemplate template = StringTemplate.label("")
-            .addStringTemplate(is.getAlarmLevelLabel(player))
-            .addName("\n\n")
-            .addStringTemplate(StringTemplate
-                .template("scoutSettlement.greetings")
+        StringTemplate skillPart = (is.getLearnableSkill() != null)
+            ? StringTemplate.template("scoutSettlement.skill")
+                            .addNamed("%skill%", is.getLearnableSkill())
+            : StringTemplate.name(" ");
+        StringTemplate goodsPart;
+        int present = is.getWantedGoodsCount();
+        if (present > 0) {
+            goodsPart = StringTemplate.template("scoutSettlement.trade."
+                + Integer.toString(present));
+            for (int i = 0; i < present; i++) {
+                String tradeKey = "%goods" + Integer.toString(i+1) + "%";
+                goodsPart.addNamed(tradeKey, is.getWantedGoods(i));
+            }
+        } else {
+            goodsPart = StringTemplate.name(" ");
+        }
+
+        StringTemplate template
+            = StringTemplate.template("scoutSettlement.greetings")
+                .addStringTemplate("%alarmPart%", is.getAlarmLevelLabel(player))
                 .addStringTemplate("%nation%", owner.getNationLabel())
                 .addName("%settlement%", is.getName())
                 .addName("%number%", numberString)
                 .add("%settlementType%",
-                    ((IndianNationType)owner.getNationType()).getSettlementTypeKey(true)))
-            .addName(" ");
-        if (is.getLearnableSkill() != null) {
-            template
-                .addStringTemplate(StringTemplate
-                    .template("scoutSettlement.skill")
-                    .addNamed("%skill%", is.getLearnableSkill()))
-                .addName(" ");
-        }
-        int present = is.getWantedGoodsCount();
-        if (present > 0) {
-            StringTemplate t = StringTemplate.template("scoutSettlement.trade."
-                + Integer.toString(present));
-            for (int i = 0; i < present; i++) {
-                String tradeKey = "%goods" + Integer.toString(i+1) + "%";
-                t.addNamed(tradeKey, is.getWantedGoods(i));
-            }
-            template.addStringTemplate(t).addName("\n\n");
-        }
-
+                    ((IndianNationType)owner.getNationType()).getSettlementTypeKey(true))
+                .addStringTemplate("%skillPart%", skillPart)
+                .addStringTemplate("%goodsPart%", goodsPart);
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.speak"),

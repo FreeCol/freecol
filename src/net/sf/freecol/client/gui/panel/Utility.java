@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
@@ -34,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
@@ -626,6 +628,21 @@ public final class Utility {
         return getDefaultTextArea(Messages.message(template), columns);
     }
 
+    /**
+     * Get a panel with a localized message and icon.
+     *
+     * @param icon An <code>ImageIcon</code> to use.
+     * @param template The <code>StringTemplate</code> to use.
+     */
+    public static JPanel localizedTextPanel(StringTemplate template,
+                                            ImageIcon icon) {
+        JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.add(new JLabel(icon));
+        panel.add(Utility.localizedTextArea(template));
+        panel.setBorder(DIALOG_BORDER);
+        return panel;
+    }
+        
     /**
      * Localize the tool tip message for a JComponent.
      *
