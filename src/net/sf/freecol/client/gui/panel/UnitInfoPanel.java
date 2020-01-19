@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -69,6 +70,16 @@ public final class UnitInfoPanel extends FreeColPanel
         setBorder(null);
         setOpaque(false);
         this.unit = null;
+    }
+
+
+    /**
+     * Get the tile under the unit displayed.
+     *
+     * @return The <code>Tile</code>.
+     */
+    public Tile getTile() {
+        return (this.unit == null) ? null : this.unit.getTile();
     }
 
     /**

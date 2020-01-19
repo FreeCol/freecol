@@ -142,9 +142,10 @@ public final class InfoPanel extends FreeColPanel {
         addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    Unit activeUnit = getGUI().getActiveUnit();
-                    if (activeUnit != null && activeUnit.hasTile()) {
-                        getGUI().setFocus(activeUnit.getTile());
+                    if (mode == InfoPanelMode.TILE) {
+                        getGUI().setFocus(InfoPanel.this.tileInfoPanel.getTile());
+                    } else if (mode == InfoPanelMode.UNIT) {
+                        getGUI().setFocus(InfoPanel.this.unitInfoPanel.getTile());
                     }
                 }
             });
@@ -199,7 +200,9 @@ public final class InfoPanel extends FreeColPanel {
             this.mapEditorInfoPanel.revalidate();
             this.mapEditorInfoPanel.repaint();
         }
-        update();
+        InfoPanelMode oldMode = update();
+        logger.info("InfoPanel " + oldMode + " -> " + this.mode
+            + " with " + mapTransform);
     }
 
     /**
@@ -209,7 +212,9 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(Tile tile) {
         this.tileInfoPanel.update(tile);
-        update();
+        InfoPanelMode oldMode = update();
+        logger.info("InfoPanel " + oldMode + " -> " + this.mode
+            + " with tile " + tile);
     }
 
     /**
@@ -219,17 +224,21 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(Unit unit) {
         this.unitInfoPanel.update(unit);
-        update();
+        InfoPanelMode oldMode = update();
+        logger.info("InfoPanel " + oldMode + " -> " + this.mode
+            + " with unit " + unit);
     }
 
     /**
      * Update this {@code InfoPanel} by selecting the correct internal
      * panel to display.
+     *
+     * @return The old <code>InfoPanelMode</code>.
      */
-    private void update() {
+    private InfoPanelMode update() {
+        InfoPanelMode oldMode = this.mode;
         InfoPanelMode newMode = getMode();
-        logger.info("InfoPanel " + this.mode + " -> " + newMode);
-        if (this.mode != newMode) {
+        if (oldMode != newMode) {
             switch (this.mode = newMode) {
             case END:
                 this.mapEditorInfoPanel.setVisible(false);
@@ -264,6 +273,7 @@ public final class InfoPanel extends FreeColPanel {
             }
         }
         revalidate();
+        return oldMode;
     }
 
 

@@ -75,6 +75,15 @@ public final class TileInfoPanel extends FreeColPanel {
 
 
     /**
+     * Get the tile displayed.
+     *
+     * @return The <code>Tile</code>.
+     */
+    public Tile getTile() {
+        return this.tile;
+    }
+
+    /**
      * Updates this {@code InfoPanel}.
      *
      * @param tile The displayed tile (or null if none)
@@ -109,7 +118,6 @@ public final class TileInfoPanel extends FreeColPanel {
                     add(label, "span, align center");
                 }
                 add(new JLabel(new ImageIcon(image)), "spany");
-
                 final Player owner = this.tile.getOwner();
                 if (owner == null) {
                     add(new JLabel(), "span " + PRODUCTION);
@@ -154,5 +162,6 @@ public final class TileInfoPanel extends FreeColPanel {
             }
         }
         revalidate();
+        repaint();
     }
 }
