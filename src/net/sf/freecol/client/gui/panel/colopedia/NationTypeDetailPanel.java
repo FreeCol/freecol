@@ -84,6 +84,8 @@ public class NationTypeDetailPanel
         nations.addAll(getSpecification().getIndianNationTypes());
         ImageIcon icon = new ImageIcon(ImageLibrary.getLibertyImage());
         for (NationType type : nations) {
+            // Suppress special case.  FIXME: This is a kludge
+            if ("model.nationType.optionOnly".equals(type.getId())) continue;
             parent.add(buildItem(type, icon));
         }
         root.add(parent);
