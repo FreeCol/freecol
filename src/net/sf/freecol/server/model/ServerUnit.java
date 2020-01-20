@@ -880,14 +880,59 @@ public class ServerUnit extends Unit implements TurnTaker {
                     .addStringTemplate("%enemyNation%", enemy));
         }
 
-        // Check for region discovery
-        Region region = newTile.getDiscoverableRegion();
-        if (region != null && region.checkDiscover(this)
-            && owner.isEuropean()) {
+        csCheckDiscoverRegion(newTile, cs);
+    }
+
+    /**
+     * Check for a new region.
+     *
+     * @param tile The {@code Tile} to chack at.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csCheckDiscoverRegion(Tile tile, ChangeSet cs) {
+        final Region region = tile.getDiscoverableRegion();
+        if (region == null || !region.checkDiscover(this)) return;
+        final Player owner = this.getOwner();
+        if (owner.isEuropean()) {
             cs.add(See.only(owner),
-                   new NewRegionNameMessage(region, newTile, this,
+                   new NewRegionNameMessage(region, tile, this,
                        owner.getNameForRegion(region)));
         }
+    }
+        
+    /**
+     * Visits a native settlement, possibly scouting it fully if
+     * as a result of a scout actually asking to speak to the chief,
+     * or for other settlement-contacting events such as missionary
+     * actions, demanding tribute, learning skills and trading if the
+     * settlementActionsContactChief game option is enabled.  It is
+     * still unclear what Col1 did here.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that is contacting
+     *     the settlement.
+     * @param is The {@code IndianSettlement} to contact.
+     * @param scout Positive if this contact is due to a scout asking to
+     *     speak to the chief, zero if it is another unit, negative if
+     *     this is from the greeting dialog generation.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
+                        int scout, ChangeSet cs) {
+        final Player owner = is.getOwner();
+
+        if (serverPlayer.csContact(owner, cs)) {
+            serverPlayer.csNativeFirstContact(owner, null, cs);
+        }
+        is.setVisited(serverPlayer);
+        if (scout > 0 || (scout == 0 && getGame().getSpecification()
+                .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
+            is.setScouted(serverPlayer);
+        }
+        // Force the settlement tile to become uncached.  Should not
+        // be necessary but this might mitigate BR#3128.
+        final Tile tile = is.getTile();
+        tile.seeTile(serverPlayer);
+        csCheckDiscoverRegion(tile, cs);
     }
 
     /**

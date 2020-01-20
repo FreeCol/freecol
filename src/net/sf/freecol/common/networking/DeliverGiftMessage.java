@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -170,6 +171,6 @@ public class DeliverGiftMessage extends ObjectMessage {
 
         // Proceed to deliver.
         return igc(freeColServer)
-            .deliverGiftToSettlement(serverPlayer, unit, is, goods);
+            .deliverGiftToSettlement(serverPlayer, (ServerUnit)unit, is, goods);
     }
 }

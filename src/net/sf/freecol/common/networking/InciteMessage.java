@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -113,7 +114,7 @@ public class InciteMessage extends AttributeMessage {
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
         
-        Unit unit;
+        ServerUnit unit;
         try {
             unit = getUnit(serverPlayer);
         } catch (Exception e) {
@@ -152,8 +153,8 @@ public class InciteMessage extends AttributeMessage {
 
     // Public interface
 
-    public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
+    public ServerUnit getUnit(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), ServerUnit.class);
     }
 
     public IndianSettlement getSettlement(Unit unit) {

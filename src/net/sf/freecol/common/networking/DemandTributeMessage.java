@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -130,6 +131,6 @@ public class DemandTributeMessage extends AttributeMessage {
 
         // Do the demand
         return igc(freeColServer)
-            .demandTribute(serverPlayer, unit, is);
+            .demandTribute(serverPlayer, (ServerUnit)unit, is);
     }
 }
