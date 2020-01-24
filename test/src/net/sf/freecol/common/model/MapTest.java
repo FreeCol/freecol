@@ -120,7 +120,7 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         MapBuilder builder = new MapBuilder(game);
         Map map = builder.setDimensions(10, 15).build();
-        game.setMap(map);
+        game.changeMap(map);
 
         // Check in the middle
         List<Tile> surroundingTiles = new ArrayList<>();
@@ -210,7 +210,7 @@ public class MapTest extends FreeColTestCase {
     public void testNoPathAvailableDueToCampInTheWay() {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
-        game.setMap(map);
+        game.changeMap(map);
 
         // set obstructing indian camp
         Tile settlementTile = map.getTile(2,10);
@@ -237,7 +237,7 @@ public class MapTest extends FreeColTestCase {
     public void testNoPathAvailableDueToColonyInTheWay() {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
-        game.setMap(map);
+        game.changeMap(map);
 
         // set obstructing french colony
         Player frenchPlayer = game.getPlayerByNationId("model.nation.french");
@@ -261,7 +261,7 @@ public class MapTest extends FreeColTestCase {
     public void testMoveThroughTileWithEnemyUnit() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         //Setup
         Tile enemyUnitTile = map.getTile(2,1);
@@ -293,7 +293,7 @@ public class MapTest extends FreeColTestCase {
     public void testNoPathAvailableDueToUnitInTheWay() {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
-        game.setMap(map);
+        game.changeMap(map);
 
         // set obstructing unit
         Tile unitObstructionTile = map.getTile(2,10);
@@ -317,7 +317,7 @@ public class MapTest extends FreeColTestCase {
     public void testShortestPathObstructed() {
         Game game = getStandardGame();
         Map map = getShortLongPathMap(getGame());
-        game.setMap(map);
+        game.changeMap(map);
 
         // set obstructing indian camp
         Tile settlementTile = map.getTile(2, 10);
@@ -340,7 +340,7 @@ public class MapTest extends FreeColTestCase {
     public void testSearchForColony() {
         Game game = getStandardGame();
         Map map = getCoastTestMap(plainsType, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutchPlayer = game.getPlayerByNationId("model.nation.dutch");
         Player frenchPlayer = game.getPlayerByNationId("model.nation.french");
@@ -451,7 +451,7 @@ public class MapTest extends FreeColTestCase {
     public void testFindPath() {
         Game game = getStandardGame();
         Map map = getCoastTestMap(plainsType, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Europe europe = dutch.getEurope();
@@ -582,7 +582,7 @@ public class MapTest extends FreeColTestCase {
     public void testCopy() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();

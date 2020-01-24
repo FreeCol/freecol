@@ -47,7 +47,7 @@ public class LimitTest extends FreeColTestCase {
     public void testWagonTrainLimit() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(3);
@@ -77,7 +77,7 @@ public class LimitTest extends FreeColTestCase {
     public void testIndependenceLimits() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(3);
@@ -158,7 +158,7 @@ public class LimitTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(3);

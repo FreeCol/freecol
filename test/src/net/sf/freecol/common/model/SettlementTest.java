@@ -46,7 +46,7 @@ public class SettlementTest extends FreeColTestCase {
     public void testSettlementRadius() throws FreeColException {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         FreeColTestCase.IndianSettlementBuilder builder =
             new FreeColTestCase.IndianSettlementBuilder(game);
@@ -82,7 +82,7 @@ public class SettlementTest extends FreeColTestCase {
     public void testColonyRadius() {
         Game game = getGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony();
         assertEquals(1, colony.getOwner().getNationType().getSettlementType(false).getClaimableRadius());
@@ -95,7 +95,7 @@ public class SettlementTest extends FreeColTestCase {
     public void testSettlementDoesNotClaimWater() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         map.getTile(4, 8).setType(spec().getTileType("model.tile.ocean"));
         assertFalse(map.getTile(4, 8).isLand());
@@ -113,7 +113,7 @@ public class SettlementTest extends FreeColTestCase {
     public void testColonyClaimsWater() {
         Game game = getGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         map.getTile(4, 8).setType(spec().getTileType("model.tile.ocean"));
         assertFalse(map.getTile(4, 8).isLand());
@@ -132,7 +132,7 @@ public class SettlementTest extends FreeColTestCase {
     public void testLineOfSight() {
         Game game = getGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony();
 
@@ -151,7 +151,7 @@ public class SettlementTest extends FreeColTestCase {
     public void testCanImproveUnitMilitaryRole() {
         Game game = getGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony(4);
 

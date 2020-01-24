@@ -94,7 +94,7 @@ public class CombatTest extends FreeColTestCase {
     public void testColonistAttackedByVeteran() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         CombatModel combatModel = game.getCombatModel();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -160,7 +160,7 @@ public class CombatTest extends FreeColTestCase {
     public void testGalleonAttackedByPrivateer() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(ocean);
-        game.setMap(map);
+        game.changeMap(map);
 
         CombatModel combatModel = game.getCombatModel();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -262,7 +262,7 @@ public class CombatTest extends FreeColTestCase {
     public void testDefendColonyWithUnarmedColonist() {
         Game game = getGame();
         Map map = getTestMap(true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -288,7 +288,7 @@ public class CombatTest extends FreeColTestCase {
     public void testDefendColonyWithRevere() {
         final Game game = getGame();
         final Map map = getTestMap(true);
-        game.setMap(map);
+        game.changeMap(map);
 
         final SimpleCombatModel combatModel = new SimpleCombatModel();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -321,7 +321,7 @@ public class CombatTest extends FreeColTestCase {
     public void testDefendSettlement() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         SimpleCombatModel combatModel = new SimpleCombatModel();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -355,7 +355,7 @@ public class CombatTest extends FreeColTestCase {
     public void testAttackIgnoresMovementPoints() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");
@@ -387,7 +387,7 @@ public class CombatTest extends FreeColTestCase {
     public void testSpanishAgainstNatives() throws Exception {
         final Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         final Player spanish = game.getPlayerByNationId("model.nation.spanish");
         final Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -441,7 +441,7 @@ public class CombatTest extends FreeColTestCase {
     public void testAttackShipWithLandUnit() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player spanish = game.getPlayerByNationId("model.nation.spanish");
         Player tupi = game.getPlayerByNationId("model.nation.tupi");

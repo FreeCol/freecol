@@ -91,7 +91,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testBolivar() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         final int pop = 5;
         Colony colony = getStandardColony(pop);
@@ -181,7 +181,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testCortes() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
@@ -202,7 +202,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testDeLasCasas() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
@@ -240,7 +240,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testJefferson() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Modifier jeffersonModifier = first(thomasJefferson.getModifiers("model.goods.bells"));
         assertNotNull(jeffersonModifier);
@@ -268,7 +268,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testMinuit() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         Unit unit = colony.getUnitList().get(0);
@@ -306,7 +306,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testPaine() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
@@ -356,7 +356,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testRevere() {
         Game game = getGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Colony colony = getStandardColony();
         Player player = colony.getOwner();
@@ -386,7 +386,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testStuyvesant() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();

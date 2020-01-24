@@ -818,7 +818,7 @@ public class TerrainGenerator {
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
 
         Map map = new Map(game, width, height);
-        game.setMap(map);
+        game.changeMap(map);
         
         int minimumLatitude = mapOptions
             .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);

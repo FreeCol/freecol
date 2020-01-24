@@ -39,7 +39,7 @@ public class PlayerTest extends FreeColTestCase {
     public void testUnits() {
         Game game = getStandardGame();
         Map map = getTestMap(spec().getTileType("model.tile.plains"));
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");
@@ -264,7 +264,7 @@ public class PlayerTest extends FreeColTestCase {
     public void testAddAnotherPlayersUnit(){
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch =  game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");

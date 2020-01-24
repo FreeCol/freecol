@@ -38,7 +38,7 @@ public class IndianSettlementTest extends FreeColTestCase {
     public void testAutomaticEquipBraves() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -63,7 +63,7 @@ public class IndianSettlementTest extends FreeColTestCase {
     public void testSettlementDoesNotOwnWaterTiles(){
         Game game = getStandardGame();
         Map map = getCoastTestMap(spec().getTileType("model.tile.plains"));
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile campTile = map.getTile(9, 9);
         Tile landTile = map.getTile(8, 9);
@@ -91,7 +91,7 @@ public class IndianSettlementTest extends FreeColTestCase {
     public void testTradeGoodsWithSetlement(){
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile camp2Tile = map.getTile(3, 3);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);

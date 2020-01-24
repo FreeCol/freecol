@@ -26,7 +26,7 @@ public class SoLTest extends FreeColTestCase {
 
     public void testSoL() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         Colony colony = getStandardColony(7);

@@ -58,7 +58,7 @@ public class MockMapGenerator implements MapGenerator {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
-        game.setMap(map);
+        game.changeMap(map);
         for (FreeColGameObject fcgo : oldGame.getFreeColGameObjectList()) {
             if (fcgo instanceof Europe
                 || fcgo instanceof HighSeas

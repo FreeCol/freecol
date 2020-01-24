@@ -180,7 +180,7 @@ public class BuildingTest extends FreeColTestCase {
         
     private void productionTest(BuildingType[] buildings, int[][][]values) {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         // Enable factory
         Colony colony = getStandardColony(8); // Big enough for factory
@@ -255,7 +255,7 @@ public class BuildingTest extends FreeColTestCase {
         
     public void testCanBuildNext() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         // First check with a building that can be fully built with a
         // normal colony
@@ -284,7 +284,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testStockadeRequiresMinimumPopulation() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(2);
         assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
@@ -299,7 +299,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testFortRequiresMinimumPopulation() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(2);
         assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
@@ -315,7 +315,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testFortressRequiresMinimumPopulation() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(7);
         colony.addBuilding(new ServerBuilding(game, colony, stockadeType));
@@ -333,7 +333,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testInitialColony() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         Building warehouse = colony.getBuilding(warehouseType);
@@ -351,7 +351,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testChurch() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         // Make a colony big enough to build a cathedral, and add enough
         // liberty to zero the production bonus.
@@ -498,7 +498,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCanAddToBuilding() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         Tile tile = colony.getTile();
@@ -542,7 +542,7 @@ public class BuildingTest extends FreeColTestCase {
      */
     public void testCanAddToSchool() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(10);
         Iterator<Unit> units = colony.getUnitList().iterator();
@@ -668,7 +668,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testSerialize() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         for (Building building : colony.getBuildings()) {
@@ -684,7 +684,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testStockade() {
         final Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         final Turn turn = game.getTurn();
         List<Modifier> modifiers;
@@ -719,7 +719,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCottonClothProduction() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(2);
         List<Unit> units = colony.getUnitList();
@@ -757,7 +757,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testPasture() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
         Building country = colony.getBuilding(countryType);
@@ -826,7 +826,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testTownhallProduction() {
         final Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         final Turn turn = game.getTurn();
         Colony colony = getStandardColony(6);
@@ -922,7 +922,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testPrintingPressBonus() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
@@ -949,7 +949,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testNewspaperBonus() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
@@ -980,7 +980,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testUnitProduction() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Unit unit = colony.getUnitList().get(0);
@@ -1103,7 +1103,7 @@ public class BuildingTest extends FreeColTestCase {
     public void testToolsMusketProduction() {
         // Test the interaction between tools and muskets
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(8);
         Tile tile = colony.getTile();

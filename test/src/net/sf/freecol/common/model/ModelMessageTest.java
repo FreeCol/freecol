@@ -30,7 +30,7 @@ public class ModelMessageTest extends FreeColTestCase {
 
     public void testHashCode() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
@@ -56,7 +56,7 @@ public class ModelMessageTest extends FreeColTestCase {
     
     public void testModelMapSet2() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
@@ -85,7 +85,7 @@ public class ModelMessageTest extends FreeColTestCase {
 
     public void testDefaultId() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Player player = game.getPlayerByNationId("model.nation.dutch");
         String realMessageId = "player"; // Must exist

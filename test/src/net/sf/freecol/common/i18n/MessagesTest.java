@@ -160,7 +160,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testStringTemplates() {
         final Game game = getGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Messages.loadMessageBundle(Locale.US);
         // template with key not in message bundle
