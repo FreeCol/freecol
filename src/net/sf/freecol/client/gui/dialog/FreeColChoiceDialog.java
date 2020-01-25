@@ -67,7 +67,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
         this(freeColClient, frame);
 
         initializeChoiceDialog(frame, modal,
-            Utility.localizedLabel(tmpl, icon, SwingConstants.LEFT),
+            Utility.localizedTextPanel(tmpl, icon),
             null, cancelKey, choices);
     }
 

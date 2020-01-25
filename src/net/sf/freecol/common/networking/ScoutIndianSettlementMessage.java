@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -94,9 +95,9 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
         final String unitId = getStringAttribute(UNIT_TAG);
         final String directionString = getStringAttribute(DIRECTION_TAG);
 
-        Unit unit;
+        ServerUnit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }

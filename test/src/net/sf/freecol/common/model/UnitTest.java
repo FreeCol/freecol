@@ -98,7 +98,7 @@ public class UnitTest extends FreeColTestCase {
     public void testIsColonist() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player sioux = game.getPlayerByNationId("model.nation.sioux");
@@ -166,7 +166,7 @@ public class UnitTest extends FreeColTestCase {
     public void testFailedAddGoods() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = this.getStandardColony();
         int foodInColony = 300;
@@ -196,7 +196,7 @@ public class UnitTest extends FreeColTestCase {
     public void testMissionary() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player sioux = game.getPlayerByNationId("model.nation.sioux");
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -234,7 +234,7 @@ public class UnitTest extends FreeColTestCase {
     public void testGetLineOfSight() {
         final Game game = getStandardGame();
         final Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player player = game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
@@ -266,7 +266,7 @@ public class UnitTest extends FreeColTestCase {
     public void testUnitCanBuildColony() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player sioux = game.getPlayerByNationId("model.nation.sioux");
@@ -298,7 +298,7 @@ public class UnitTest extends FreeColTestCase {
     public void testIndianDies() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player indianPlayer = game.getPlayerByNationId("model.nation.sioux");
         FreeColTestCase.IndianSettlementBuilder builder
@@ -355,7 +355,7 @@ public class UnitTest extends FreeColTestCase {
     public void testUnitLocationAfterBuildingColony() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile colonyTile = map.getTile(6, 8);
@@ -397,7 +397,7 @@ public class UnitTest extends FreeColTestCase {
     public void testUnitLosesExperienceWithRoleChange() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
@@ -421,7 +421,7 @@ public class UnitTest extends FreeColTestCase {
     public void testOwnerChange(){
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");
@@ -448,7 +448,7 @@ public class UnitTest extends FreeColTestCase {
     public void testCarrierOwnerChange(){
         Game game = getStandardGame();
         Map map = getTestMap(ocean);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");
@@ -491,7 +491,7 @@ public class UnitTest extends FreeColTestCase {
     public void testGetMovesAsString() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony(1);
         Unit unit = colony.getUnitList().get(0);
@@ -548,7 +548,7 @@ public class UnitTest extends FreeColTestCase {
     public void testCopy() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(6, 8);

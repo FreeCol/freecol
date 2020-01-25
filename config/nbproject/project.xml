@@ -97,7 +97,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">jars/commons-cli-1.4.jar;jars/cortado-0.6.0.jar;jars/jogg-0.0.17.jar;jars/jorbis-0.0.17.jar;jars/miglayout-core-5.0.jar;jars/miglayout-swing-5.0.jar</classpath>
+                <classpath mode="compile">jars/commons-cli-1.4.jar;jars/cortado-0.6.0.jar;jars/jogg-0.0.17.jar;jars/jorbis-0.0.17.jar;jars/miglayout-core-5.0.jar;jars/miglayout-swing-5.0.jar;jars/findbugs-annotations.jar</classpath>
                 <built-to>build</built-to>
                 <built-to>.</built-to>
                 <javadoc-built-to>doc</javadoc-built-to>

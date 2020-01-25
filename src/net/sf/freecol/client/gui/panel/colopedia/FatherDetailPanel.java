@@ -24,6 +24,7 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -53,6 +54,7 @@ import net.sf.freecol.common.model.Turn;
 public class FatherDetailPanel
     extends ColopediaGameObjectTypePanel<FoundingFather> {
 
+    private static final Logger logger = Logger.getLogger(FatherDetailPanel.class.getName());
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
@@ -107,7 +109,11 @@ public class FatherDetailPanel
     @Override
     public void buildDetail(String id, JPanel panel) {
         FoundingFather father = getSpecification().getFoundingFather(id);
-        buildDetail(father, panel);
+        if (father == null) {
+            logger.warning("Bogus father detail requested for: " + id);
+        } else {
+            buildDetail(father, panel);
+        }
     }
 
     /**

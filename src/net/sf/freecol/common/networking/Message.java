@@ -585,29 +585,27 @@ public abstract class Message {
     }
 
     /**
-     * Do some generic client checks that can apply to any message.
+     * Create a runnable to execute generic message actions.
      *
      * @param freeColClient The client.
      */
-    protected void clientGeneric(final FreeColClient freeColClient) {
-        if (freeColClient.currentPlayerIsMyPlayer()) {
-            // Play a sound if specified
-            String sound = getStringAttribute("sound");
-            if (sound != null && !sound.isEmpty()) {
-                freeColClient.getGUI().playSound(sound);
-            }
+    protected void clientGeneric(FreeColClient freeColClient) {
+        final FreeColClient fcc = freeColClient;
+        if (fcc.currentPlayerIsMyPlayer()) {
+            // If there is a "sound" attribute present, play that sound
+            final String soundId = getStringAttribute("sound");
             // If there is a "flush" attribute present, encourage the
             // client to display any new messages.
-            if (getBooleanAttribute("flush", Boolean.FALSE)) {
-                final Runnable displayModelMessagesRunnable = () -> {
-                    freeColClient.getInGameController()
-                        .displayModelMessages(false);
-                };
-                invokeLater(freeColClient, displayModelMessagesRunnable);
+            final boolean flush = getBooleanAttribute("flush", Boolean.FALSE);
+            if (soundId != null || flush) {
+                invokeLater(freeColClient, () -> {
+                        if (soundId != null) igc(fcc).sound(soundId);
+                        if (flush) igc(fcc).displayModelMessages(false);
+                    });
             }
         }
-    }    
-
+    }
+    
     /**
      * Complain about finding the wrong XML element.
      *

@@ -1584,7 +1584,7 @@ public class Game extends FreeColGameObject {
 
         // Allow creation, might be first sight of the map.
         // Do map early, so map references work
-        setMap(update(o.getMap(), Map.class, true));
+        changeMap(update(o.getMap(), Map.class, true));
 
         this.unknownEnemy = update(o.getUnknownEnemy(), false);
         setNationOptions(o.getNationOptions());
@@ -1764,7 +1764,7 @@ public class Game extends FreeColGameObject {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
-            setMap(xr.readFreeColObject(game, Map.class));
+            changeMap(xr.readFreeColObject(game, Map.class));
 
         } else if (NationOptions.TAG.equals(tag)) {
             if (this.specification == null) {

@@ -65,7 +65,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveFromPlainsToPlains() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
@@ -95,7 +95,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveFromPlainsToHills() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
@@ -116,7 +116,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveAlongRoad() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
@@ -151,7 +151,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveAlongRiver() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(ocean);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
@@ -212,7 +212,7 @@ public class MovementTest extends FreeColTestCase {
     public void testScoutColony() {
         Game game = getGame();
         Map map = getTestMap(true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player french = game.getPlayerByNationId("model.nation.french");
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -263,7 +263,7 @@ public class MovementTest extends FreeColTestCase {
     public void testScoutIndianSettlement() {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player french = game.getPlayerByNationId("model.nation.french");
         Player inca = game.getPlayerByNationId("model.nation.inca");

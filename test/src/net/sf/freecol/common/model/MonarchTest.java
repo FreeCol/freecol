@@ -49,7 +49,7 @@ public class MonarchTest extends FreeColTestCase {
 
     public void testTaxActionChoices() {
         Game game = getStandardGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
 

@@ -95,7 +95,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testAddAllFathers() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();

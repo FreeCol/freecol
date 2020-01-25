@@ -280,7 +280,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile = camp.getTile().getNeighbourOrNull(Direction.N);
         ServerUnit dutchJesuit = new ServerUnit(game, tile, dutch, missionaryType);
         dutch.exploreForUnit(dutchJesuit);
-        Unit frenchJesuit = new ServerUnit(game, tile, french, missionaryType);
+        ServerUnit frenchJesuit = new ServerUnit(game, tile, french, missionaryType);
         french.exploreForUnit(frenchJesuit);
 
         // Set Dutch tension to HATEFUL

@@ -372,7 +372,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     public void testBestImprovements() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setType(savannah);

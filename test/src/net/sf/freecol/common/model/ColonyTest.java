@@ -87,7 +87,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testCurrentlyBuilding() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         colony.setCurrentlyBuilding(warehouseType);
@@ -101,7 +101,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testBuildQueueDoesNotAcceptBuildingDoubles() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
 
@@ -124,7 +124,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testBuildQueueAcceptsUnitDoubles() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         colony.setCurrentlyBuilding(wagonTrainType);
@@ -139,7 +139,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testOccupationWithFood() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         int population = 1;
         Colony colony = getStandardColony(population);
@@ -190,7 +190,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testTeaParty() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(5);
         Player player = colony.getOwner();
@@ -206,7 +206,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testAddUnitToColony() {
         Game game = getGame();
-        game.setMap(getTestMap(arcticTileType, true));
+        game.changeMap(getTestMap(arcticTileType, true));
 
         int population = 1;
         Colony colony = getStandardColony(population);
@@ -293,7 +293,7 @@ public class ColonyTest extends FreeColTestCase {
     public void testFoundColony() {
         Game game = getGame();
         Map map = getCoastTestMap(plainsTileType);
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony(3, 1, 8);
         Player dutch = colony.getOwner();
@@ -426,7 +426,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testUnderSiege() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(5);
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
@@ -466,7 +466,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testUpkeep() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(5);
 
@@ -484,7 +484,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testCopyColony() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony(2);
         Player player = colony.getOwner();

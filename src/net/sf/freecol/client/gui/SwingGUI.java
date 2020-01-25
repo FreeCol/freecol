@@ -191,9 +191,6 @@ public class SwingGUI extends GUI {
         ViewMode oldViewMode = getViewMode();
         if (newViewMode == oldViewMode) return false;
         this.mapViewer.setViewMode(newViewMode);
-        if (oldViewMode == ViewMode.MOVE_UNITS) {
-            this.mapViewer.stopCursorBlinking();
-        }
         return true;
     }
 
@@ -207,7 +204,6 @@ public class SwingGUI extends GUI {
      */
     private boolean changeActiveUnit(Unit newUnit) {
         final Unit oldUnit = getActiveUnit();
-        // System.err.println("CAU " + newUnit + " " + (newUnit != oldUnit));
         if (newUnit == oldUnit) return false;
         
         this.mapViewer.setActiveUnit(newUnit);
@@ -1085,6 +1081,23 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Finish a view mode change.
+     *
+     * @param update Update the map controls if true.
+     */
+    private void changeDone(boolean update) {
+        if (getViewMode() == ViewMode.MOVE_UNITS
+            && getActiveUnit() != null) {
+            this.mapViewer.startCursorBlinking();
+        } else {
+            this.mapViewer.stopCursorBlinking();
+        }
+            
+        if (update) updateMapControls();
+        updateMenuBar();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1093,10 +1106,7 @@ public class SwingGUI extends GUI {
         // Do not change active unit, we might come back to it
         change |= changeSelectedTile(tile, getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER));
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
-        // System.err.println("CV " + tile + " " + change);
+        changeDone(change);
     }
 
     /**
@@ -1105,22 +1115,12 @@ public class SwingGUI extends GUI {
     @Override
     public void changeView(Unit unit) {
         boolean change = changeViewMode(ViewMode.MOVE_UNITS);
-        if (changeActiveUnit(unit)) {
-            change = true;
+        change |= changeActiveUnit(unit);
+        if (unit != null) {
             // Bring the selected tile along with the unit.
-            Tile tile = (unit == null) ? null : unit.getTile();
-            changeSelectedTile(tile, true);
-
-            // Switch the blink state.
-            if (unit != null) {
-                this.mapViewer.startCursorBlinking();
-            } else {
-                this.mapViewer.stopCursorBlinking();
-            }
+            change |= changeSelectedTile(unit.getTile(), true);
         }
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
+        changeDone(change);
     }
 
     /**
@@ -1129,11 +1129,8 @@ public class SwingGUI extends GUI {
     @Override
     public void changeView(MapTransform mt) {
         boolean change = changeViewMode(ViewMode.MAP_TRANSFORM);
-        // do not change selected tile
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
-        // System.err.println("CV " + mt + " " + change);
+        // Do not change selected tile
+        changeDone(change);
     }
     
     /**
@@ -1142,12 +1139,9 @@ public class SwingGUI extends GUI {
     @Override
     public void changeView() {
         boolean change = changeViewMode(ViewMode.END_TURN);
-        changeActiveUnit(null);
-        changeSelectedTile(null, false);
-
-        if (change) updateMapControls();
-        updateMenuBar(); // TODO: check
-        // System.err.println("CV end " + change);
+        change |= changeActiveUnit(null);
+        change |= changeSelectedTile(null, false);
+        changeDone(change);
     }
 
 
@@ -1214,25 +1208,39 @@ public class SwingGUI extends GUI {
         
         final Tile tile = canvas.convertToMapTile(x, y);
         if (tile == null) return;
-        Unit other;
+        Unit other = null;
 
-        if (!tile.isExplored()) {
-            // If the tile is unexplored, just select it
+        if (!tile.isExplored()) { // Select unexplored tiles
             changeView(tile);
-        } else if (tile.hasSettlement()) {
-            // If there is a settlement present, pop it up
+        } else if (tile.hasSettlement()) { // Pop up settlements if any
             showTileSettlement(tile);
-        } else if ((other = tile.getFirstUnit()) != null
-            && getMyPlayer().owns(other)) {
-            // If there is one of the player units present, select it
-            // as the active unit unless the active unit is at the tile.
-            final Unit active = getActiveUnit();
-            if (active == null || active.getTile() != tile) {
+        } else if ((other = this.mapViewer.findUnitInFront(tile)) != null) {
+            if (getMyPlayer().owns(other)) {
+                // If there is one of the player units present, select it,
+                // unless we are on the same tile as the active unit,
+                // in which case select the active unit if not in units mode
+                // otherwise the unit *after* the active.
+                final Unit active = getActiveUnit();
+                if (active != null && active.getTile() == tile) {
+                    if (getViewMode() != ViewMode.MOVE_UNITS) {
+                        other = active;
+                    } else {
+                        List<Unit> units = tile.getUnitList();
+                        while (!units.isEmpty()) {
+                            Unit u = units.remove(0);
+                            if (u == active) {
+                                if (!units.isEmpty()) other = units.remove(0);
+                                break;
+                            }
+                        }
+                    }
+                }
                 changeView(other);
+            } else { // Select the tile under the unit if it is not ours
+                changeView(tile);
             }
-        } else {
-            // Otherwise select the tile in terrain mode
-            changeView(tile);
+        } else { // Otherwise select the tile in terrain mode on multiclick
+            if (count > 1) changeView(tile);
         }
     }    
 
