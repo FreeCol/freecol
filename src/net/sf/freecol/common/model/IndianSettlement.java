@@ -861,13 +861,16 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         GoodsType rawType = type.getInputType();
         if (rawType != null) {
             int rawProduction = getMaximumProduction(rawType);
-            int add = (rawProduction < 5) ? 10 * rawProduction
+            // Pretend that we can "easily" produce a certain amount of the
+            // manufactured goods
+            int fakeProduction = (rawProduction < 5) ? 10 * rawProduction
                 : (rawProduction < 10) ? 5 * rawProduction + 25
                 : (rawProduction < 20) ? 2 * rawProduction + 55
                 : 100;
-            // Decrease bonus in proportion to current stock, up to capacity.
-            add = add * Math.max(0, capacity - current) / capacity;
-            current += add;
+            fakeProduction *= 0.5;
+            // Pretend that we have actually done so, in proportion to
+            // the available space
+            current += fakeProduction * Math.max(0, capacity - current) / capacity;
         } else if (type.isTradeGoods()) {
             // Small artificial increase of the trade goods stored.
             current += tradeGoodsAdd;
