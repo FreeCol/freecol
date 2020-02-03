@@ -1368,11 +1368,13 @@ public final class ImageLibrary {
      * Get the unit image key for the given parameters.
      *
      * @param unitType The type of unit to be represented.
+     * @param owner An optional owning {@code Player}.
      * @param roleId The id of the unit role.
      * @param nativeEthnicity If true the unit is a former native.
      * @return A suitable key.
      */
-    private static String getUnitTypeImageKey(UnitType unitType, String roleId,
+    private static String getUnitTypeImageKey(UnitType unitType, Player owner,
+                                              String roleId,
                                               boolean nativeEthnicity) {
         // Units that can only be native don't need the .native key part
         if (nativeEthnicity
@@ -1387,6 +1389,10 @@ public final class ImageLibrary {
         if (nativeEthnicity && !ResourceManager.hasImageResource(key)) {
             key = "image.unit." + unitType.getId() + roleQual;
         }
+        if (owner != null) {
+            final String extraKey = key + "." + owner.getNationResourceKey();
+            if (ResourceManager.hasImageResource(extraKey)) key = extraKey;
+        }
         return key;
     }
 
@@ -1394,6 +1400,7 @@ public final class ImageLibrary {
      * Fundamental unit image accessor.
      *
      * @param unitType The type of unit to be represented.
+     * @param owner An optional owning {@code Player}.
      * @param roleId The id of the unit role.
      * @param nativeEthnicity If true the unit is a former native.
      * @param grayscale If true draw in inactive/disabled-looking state.
@@ -1401,44 +1408,45 @@ public final class ImageLibrary {
      * @return A suitable {@code BufferedImage}.
      */
     private static BufferedImage getUnitTypeImage(UnitType unitType,
+                                                  Player owner,
                                                   String roleId,
                                                   boolean nativeEthnicity,
                                                   boolean grayscale,
                                                   float scale) {
-        final String key = getUnitTypeImageKey(unitType, roleId,
+        final String key = getUnitTypeImageKey(unitType, null, roleId,
                                                nativeEthnicity);
         return getScaledImageInternal(key, scale, grayscale);
     }
 
     private static BufferedImage getUnitTypeImage(UnitType unitType,
                                                   float scale) {
-        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
-                                false, scale);
+        return getUnitTypeImage(unitType, null, unitType.getDisplayRoleId(),
+                                false, false, scale);
     }
 
     private static BufferedImage getUnitTypeImage(UnitType unitType,
                                                   String roleId,
                                                   boolean nativeEthnicity,
                                                   Dimension size) {
-        final String key = getUnitTypeImageKey(unitType, roleId,
+        final String key = getUnitTypeImageKey(unitType, null, roleId,
                                                nativeEthnicity);
         return getSizedImageInternal(key, size, false);
     }
 
     private static BufferedImage getUnitTypeImage(UnitType unitType,
                                                   Dimension size) {
-        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
-                                size);
+        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(),
+                                false, size);
     }
 
     public BufferedImage getScaledUnitTypeImage(UnitType unitType) {
-        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
-                                false, this.scaleFactor);
+        return getUnitTypeImage(unitType, null, unitType.getDisplayRoleId(),
+                                false, false, this.scaleFactor);
     }
 
     public BufferedImage getSmallUnitTypeImage(UnitType unitType, String roleId,
                                                boolean grayscale) {
-        return getUnitTypeImage(unitType, roleId, false,
+        return getUnitTypeImage(unitType, null, roleId, false,
                                 grayscale, this.scaleFactor * SMALL_SCALE);
     }
 
@@ -1454,14 +1462,16 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getSmallerUnitTypeImage(UnitType unitType) {
-        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(),
-                                false, false, this.scaleFactor * SMALLER_SCALE);
+        return getUnitTypeImage(unitType, null, unitType.getDisplayRoleId(),
+                                false, false,
+                                this.scaleFactor * SMALLER_SCALE);
     }
 
     public BufferedImage getTinyUnitTypeImage(UnitType unitType,
                                               boolean grayscale) {
-        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
-                                grayscale, this.scaleFactor * TINY_SCALE);
+        return getUnitTypeImage(unitType, null, unitType.getDisplayRoleId(),
+                                false, grayscale,
+                                this.scaleFactor * TINY_SCALE);
     }
 
     public BufferedImage getTinyUnitTypeImage(UnitType unitType) {
@@ -1470,7 +1480,8 @@ public final class ImageLibrary {
 
     private static BufferedImage getUnitImage(Unit unit, boolean grayscale,
                                               float scale) {
-        return getUnitTypeImage(unit.getType(), unit.getRole().getId(),
+        return getUnitTypeImage(unit.getType(), unit.getOwner(),
+                                unit.getRole().getId(),
                                 unit.hasNativeEthnicity(), grayscale, scale);
     }
 
