@@ -886,17 +886,17 @@ public class ServerUnit extends Unit implements TurnTaker {
     /**
      * Check for a new region.
      *
-     * @param tile The {@code Tile} to chack at.
+     * @param tile The {@code Tile} to check at.
      * @param cs A {@code ChangeSet} to update.
      */
     public void csCheckDiscoverRegion(Tile tile, ChangeSet cs) {
         final Region region = tile.getDiscoverableRegion();
-        if (region == null || !region.checkDiscover(this)) return;
         final Player owner = this.getOwner();
-        if (owner.isEuropean()) {
+        if (region != null && owner.isEuropean()
+            && region.checkDiscover(this)) {
             cs.add(See.only(owner),
-                   new NewRegionNameMessage(region, tile, this,
-                       owner.getNameForRegion(region)));
+                new NewRegionNameMessage(region, tile, this,
+                    owner.getNameForRegion(region)));
         }
     }
         
