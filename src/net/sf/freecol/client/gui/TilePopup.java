@@ -90,86 +90,94 @@ public final class TilePopup extends JPopupMenu {
 
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
+
         final Unit activeUnit = gui.getActiveUnit();
-        final boolean owned = player != null && activeUnit != null
-            && player.owns(activeUnit);
-        Tile unitTile;
-        if (activeUnit != null && owned
-            && (unitTile = activeUnit.getTile()) != null) {
-            JMenuItem gotoMenuItem = null;
-            if (activeUnit.isOffensiveUnit()
-                && unitTile.isAdjacent(tile)
-                && activeUnit.getMoveType(tile).isAttack()) {
-                gotoMenuItem = Utility.localizedMenuItem(activeUnit
-                    .getCombatLabel(tile));
-            } else if (activeUnit.getSimpleMoveType(unitTile, tile).isLegal()) {
-                gotoMenuItem = Utility.localizedMenuItem("goToThisTile");
-            }
-            if (gotoMenuItem != null) {
-                gotoMenuItem.addActionListener((ActionEvent ae) -> {
-                        if (!freeColClient.currentPlayerIsMyPlayer()) return;
-                        TilePopup.this.gui.performGoto(tile);
-                    });
-                add(gotoMenuItem);
-            }
-
-            // Add move to Europe entry if the unit can do so
-            if (unitTile == tile && activeUnit.canMoveToHighSeas()) {
-                JMenuItem europeMenuItem = Utility.localizedMenuItem(StringTemplate
-                    .template("goToEurope"));
-                europeMenuItem.addActionListener((ActionEvent ae) -> {
-                        if (!freeColClient.currentPlayerIsMyPlayer()) return;
-                        igc.moveTo(activeUnit, player.getEurope());
-                    });
-                add(europeMenuItem);
-                hasAnItem = true;
-            }
-
-            // Add state changes if present
-            if (unitTile == tile) {
-                JMenuItem ji = null;
-                if (activeUnit.checkSetState(UnitState.ACTIVE)) {
-                    ji = Utility.localizedMenuItem("activateUnit");
-                    ji.addActionListener((ActionEvent ae) -> {
-                            igc.changeState(activeUnit, Unit.UnitState.ACTIVE);
-                        });
-                    add(ji);
-                    hasAnItem = true;
+        if (activeUnit != null) {
+            final boolean owned = player != null && player.owns(activeUnit);
+            Tile unitTile = activeUnit.getTile();
+            if (owned && unitTile != null) {
+                // Check for unit to tile interactions: attack, goto
+                JMenuItem gotoMenuItem = null;
+                if (activeUnit.isOffensiveUnit()
+                    && unitTile.isAdjacent(tile)
+                    && activeUnit.getMoveType(tile).isAttack()) {
+                    gotoMenuItem = Utility.localizedMenuItem(activeUnit
+                        .getCombatLabel(tile));
+                } else if (activeUnit.getSimpleMoveType(unitTile, tile).isLegal()) {
+                    gotoMenuItem = Utility.localizedMenuItem("goToThisTile");
                 }
-                if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
-                    ji = Utility.localizedMenuItem("fortify");
-                    ji.addActionListener((ActionEvent ae) -> {
-                            igc.changeState(activeUnit, Unit.UnitState.FORTIFYING);
+                if (gotoMenuItem != null) {
+                    gotoMenuItem.addActionListener((ActionEvent ae) -> {
+                            if (!freeColClient.currentPlayerIsMyPlayer())
+                                return;
+                            TilePopup.this.gui.performGoto(tile);
                         });
-                    add(ji);
-                    hasAnItem = true;
-                }
-                if (activeUnit.checkSetState(UnitState.SKIPPED)) {
-                    ji = Utility.localizedMenuItem("skip");
-                    ji.addActionListener((ActionEvent ae) -> {
-                            igc.changeState(activeUnit, Unit.UnitState.SKIPPED);
-                        });
-                    add(ji);
-                    hasAnItem = true;
-                }
-                if (activeUnit.canCarryTreasure()
-                    && activeUnit.canCashInTreasureTrain()) {
-                    ji = Utility.localizedMenuItem("cashInTreasureTrain");
-                    ji.addActionListener((ActionEvent ae) -> {
-                            igc.checkCashInTreasureTrain(activeUnit);
-                        });
-                    ji.setEnabled(true);
-                    add(ji);
-                    hasAnItem = true;
+                    add(gotoMenuItem);
                 }
 
-                if (activeUnit.getDestination() != null) {
-                    ji = Utility.localizedMenuItem("clearOrders");
-                    ji.addActionListener((ActionEvent ae) -> {
-                            igc.clearOrders(activeUnit);
-                        });
-                    add(ji);
-                    hasAnItem = true;
+                // Special cases for active unit on the tile
+                if (unitTile == tile) {
+                    // Add move to Europe entry if the unit can do so
+                    if (activeUnit.canMoveToHighSeas()) {
+                        JMenuItem europeMenuItem
+                            = Utility.localizedMenuItem(StringTemplate.template("goToEurope"));
+                        europeMenuItem.addActionListener((ActionEvent ae) -> {
+                                if (!freeColClient.currentPlayerIsMyPlayer())
+                                    return;
+                                igc.moveTo(activeUnit, player.getEurope());
+                            });
+                        add(europeMenuItem);
+                        hasAnItem = true;
+                    }
+
+                    // Add state changes if present
+                    JMenuItem ji = null;
+                    if (activeUnit.checkSetState(UnitState.ACTIVE)) {
+                        ji = Utility.localizedMenuItem("activateUnit");
+                        ji.addActionListener((ActionEvent ae) -> {
+                                igc.changeState(activeUnit, Unit.UnitState.ACTIVE);
+                            });
+                        add(ji);
+                        hasAnItem = true;
+                    }
+                    if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
+                        ji = Utility.localizedMenuItem("fortify");
+                        ji.addActionListener((ActionEvent ae) -> {
+                                igc.changeState(activeUnit, Unit.UnitState.FORTIFYING);
+                            });
+                        add(ji);
+                        hasAnItem = true;
+                    }
+                    if (activeUnit.checkSetState(UnitState.SKIPPED)) {
+                        ji = Utility.localizedMenuItem("skip");
+                        ji.addActionListener((ActionEvent ae) -> {
+                                igc.changeState(activeUnit, Unit.UnitState.SKIPPED);
+                            });
+                        add(ji);
+                        hasAnItem = true;
+                    }
+
+                    // Treasure train cashin
+                    if (activeUnit.canCarryTreasure()
+                        && activeUnit.canCashInTreasureTrain()) {
+                        ji = Utility.localizedMenuItem("cashInTreasureTrain");
+                        ji.addActionListener((ActionEvent ae) -> {
+                                igc.checkCashInTreasureTrain(activeUnit);
+                            });
+                        ji.setEnabled(true);
+                        add(ji);
+                        hasAnItem = true;
+                    }
+                    
+                    // Clear orders is possible if there is a destination
+                    if (activeUnit.getDestination() != null) {
+                        ji = Utility.localizedMenuItem("clearOrders");
+                        ji.addActionListener((ActionEvent ae) -> {
+                                igc.clearOrders(activeUnit);
+                            });
+                        add(ji);
+                        hasAnItem = true;
+                    }
                 }
             }
             if (hasAnItem) addSeparator();
