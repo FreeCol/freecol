@@ -103,9 +103,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.getVerticalScrollBar().setUnitIncrement(16);
             scrollPane.getViewport().setOpaque(false);
-            // FIXME: find out how to do this properly
-            scrollPane.setMinimumSize(new Dimension(400, 110));
-            panel.add(scrollPane);
+            panel.add(scrollPane, "height 80%, width 100%");
         }
         initialize(frame, choices());
     }
