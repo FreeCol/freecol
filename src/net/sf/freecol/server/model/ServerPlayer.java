@@ -1200,7 +1200,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             // Always break up into chunks, so the price can adjust
             // dynamically during large transactions, avoiding
             // exploitable market manipulation.
-            int a =  (amount <= GoodsContainer.CARGO_SIZE) ? amount
+            int a = (amount <= GoodsContainer.CARGO_SIZE) ? amount
                 : GoodsContainer.CARGO_SIZE;
             int price = market.getBidPrice(type, a);
             if (!checkGold(price)) {

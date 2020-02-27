@@ -455,15 +455,13 @@ public final class InGameController extends FreeColClientHolder {
         if (amount > loadable) amount = loadable;
 
         final Player player = carrier.getOwner();
-        final Market market = player.getMarket();
-        MarketWas marketWas = (market != null) ? new MarketWas(player) : null;
 
         if (carrier.isInEurope()) {
             // Are the goods boycotted?
             if (!player.canTrade(type)) return false;
 
             // Check that the purchase is funded.
-            if (!player.checkGold(market.getBidPrice(type, amount))) {
+            if (!player.checkGold(player.getMarket().getBidPrice(type, amount))) {
                 getGUI().showInformationMessage("info.notEnoughGold");
                 return false;
             }
@@ -473,7 +471,6 @@ public final class InGameController extends FreeColClientHolder {
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askServer().loadGoods(loc, type, amount, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            if (marketWas != null) marketWas.fireChanges(type, amount);
             return true;
         }
         return false;
@@ -505,14 +502,10 @@ public final class InGameController extends FreeColClientHolder {
         // Do not check for trade location, unloading can include dumping
         // which can happen anywhere
         final Player player = getMyPlayer();
-        final Market market = player.getMarket();
-        MarketWas marketWas = (market != null) ? new MarketWas(player) : null;
 
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askServer().unloadGoods(type, amount, carrier)
-            && !(carrier.isInEurope() && !player.canTrade(type))
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            if (marketWas != null) marketWas.fireChanges(type, -amount);
             return true;
         }
         return false;
@@ -2144,8 +2137,13 @@ public final class InGameController extends FreeColClientHolder {
             final GoodsType type = ag.getType();
             final int amount = ag.getAmount();
             if (!done) {
-                done = unit.getLoadableAmount(type) < amount
-                    || !askLoadGoods(stop.getLocation(), type, amount, unit);
+                if (unit.getLoadableAmount(type) < amount) {
+                    done = true;
+                } else if (stop.getLocation() instanceof Europe) {
+                    done = !buyGoods(type, amount, unit);
+                } else {
+                    done = !askLoadGoods(stop.getLocation(), type, amount, unit);
+                }
             }
             if (done) {
                 left.addNamed(ag);
@@ -2561,18 +2559,21 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the purchase succeeds.
      */
     public boolean buyGoods(GoodsType type, int amount, Unit carrier) {
+        final Player player = getMyPlayer();
         if (type == null || amount <= 0
             || carrier == null || !carrier.isInEurope()
-            || !getMyPlayer().owns(carrier)
-            || !requireOurTurn()) return false;
+            || !player.owns(carrier) || !requireOurTurn()) return false;
 
-        final Europe europe = carrier.getOwner().getEurope();
+        final Europe europe = player.getEurope();
         EuropeWas europeWas = new EuropeWas(europe);
+        MarketWas marketWas = new MarketWas(player);
         UnitWas unitWas = new UnitWas(carrier);
+
         boolean ret = askLoadGoods(europe, type, amount, carrier);
         if (ret) {
             sound("sound.event.loadCargo");
             europeWas.fireChanges();
+            marketWas.fireChanges(type, amount);
             unitWas.fireChanges();
             updateGUI(null, false);
         }
@@ -3112,15 +3113,15 @@ public final class InGameController extends FreeColClientHolder {
 
         final Player player = getMyPlayer();
         final Colony colony = unit.getColony();
-        ColonyWas colonyWas = (colony != null) ? new ColonyWas(colony) : null;
-        final Europe europe = player.getEurope();
-        EuropeWas europeWas = (europe != null) ? new EuropeWas(europe) : null;
-        final Market market = (europe != null) ? player.getMarket() : null;
-        MarketWas marketWas = (market != null) ? new MarketWas(player) : null;
+        ColonyWas colonyWas = null;
+        EuropeWas europeWas = null;
+        MarketWas marketWas = null;
         int price = -1;
 
         List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
         if (unit.isInEurope()) {
+            europeWas = new EuropeWas(player.getEurope());
+            marketWas = new MarketWas(player);
             for (AbstractGoods ag : req) {
                 GoodsType goodsType = ag.getType();
                 if (!player.canTrade(goodsType) && !payArrears(goodsType)) {
@@ -3134,6 +3135,7 @@ public final class InGameController extends FreeColClientHolder {
                 return false;
             }
         } else if (colony != null) {
+            colonyWas = new ColonyWas(colony);
             for (AbstractGoods ag : req) {
                 if (colony.getGoodsCount(ag.getType()) < ag.getAmount()) {
                     StringTemplate template = StringTemplate
@@ -4651,13 +4653,15 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         Unit carrier = (Unit)goods.getLocation();
 
-        Europe europe = player.getEurope();
-        EuropeWas europeWas = new EuropeWas(europe);
+        EuropeWas europeWas = new EuropeWas(player.getEurope());
+        MarketWas marketWas = new MarketWas(player);
+        
         UnitWas unitWas = new UnitWas(carrier);
         boolean ret = askUnloadGoods(goods.getType(), goods.getAmount(), carrier);
         if (ret) {
             sound("sound.event.sellCargo");
             europeWas.fireChanges();
+            marketWas.fireChanges(goods.getType(), goods.getAmount());
             unitWas.fireChanges();
             updateGUI(null, false);
         }

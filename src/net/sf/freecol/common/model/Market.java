@@ -50,6 +50,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public static final int MINIMUM_AMOUNT = 100;
 
+    public static final String PRICE_CHANGE = "priceChange";
+    
     /**
      * Constant for specifying the access to this {@code Market}
      * when selling goods.
