@@ -65,7 +65,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testGetCostLandLand() {
         Map map = getTestMap(plainsType);
-        game.setMap(map);
+        game.changeMap(map);
 
         final CostDecider decider = CostDeciders.avoidSettlements();
         Tile start = game.getMap().getTile(5, 5);
@@ -87,7 +87,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testGetRemainingMovesAndNewTurn() {
         Map map = getTestMap(plainsType);
-        game.setMap(map);
+        game.changeMap(map);
 
         final CostDecider decider = CostDeciders.avoidSettlements();
         ServerPlayer french = getServerPlayer(game, "model.nation.french");
@@ -107,7 +107,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     public void testInvalidMoveOfLandUnitToAnOceanTile() {
         // For this test we need a different map
         Map map = getCoastTestMap(plainsType);
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile unitTile = map.getTile(9, 9);
         assertTrue("Unit tile should be land",unitTile.isLand());
@@ -130,7 +130,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     public void testInvalidMoveOfNavalUnitToALandTile() {
         // For this test we need a different map
         Map map = getCoastTestMap(plainsType);
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean", unitTile.isLand());
@@ -153,7 +153,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testInvalidMoveThroughTileWithSettlement() {
         Map map = getTestMap(plainsType);
-        game.setMap(map);
+        game.changeMap(map);
 
         //Setup
         Tile settlementTile = map.getTile(2,1);
@@ -182,7 +182,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     public void testNavalUnitMoveToTileWithSettlement() {
         // For this test we need a different map
         Map map = getCoastTestMap(plainsType);
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean",unitTile.isLand());

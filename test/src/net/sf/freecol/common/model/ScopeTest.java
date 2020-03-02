@@ -204,7 +204,7 @@ public class ScopeTest extends FreeColTestCase {
     public void testGameObjects() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile unitTile = map.getTile(6, 8);

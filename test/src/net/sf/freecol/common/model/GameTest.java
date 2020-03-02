@@ -33,7 +33,7 @@ public class GameTest extends FreeColTestCase {
 
     public void testGame() throws FreeColException {
         Game game = getStandardGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Nation dutchNation = spec().getNation("model.nation.dutch");
         game.addPlayer(new ServerPlayer(game, false, dutchNation));

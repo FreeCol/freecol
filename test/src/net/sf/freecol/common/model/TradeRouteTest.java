@@ -40,7 +40,7 @@ public class TradeRouteTest extends FreeColTestCase {
 
     public void testTradeRoute() {
         Game game = getGame();
-        game.setMap(getTestMap(mixedForestType, true));
+        game.changeMap(getTestMap(mixedForestType, true));
 
         // Set up three colonies
         Colony colony1 = getStandardColony(4, 1, 1);

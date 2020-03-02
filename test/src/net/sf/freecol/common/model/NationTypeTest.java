@@ -139,7 +139,7 @@ public class NationTypeTest extends FreeColTestCase {
 
     public void testAdvantagesThatOnlyApplyToPersons() {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         colony.getOwner().changeNationType(spec().getNationType("model.nationType.building"));

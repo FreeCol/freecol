@@ -410,16 +410,22 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Check if this region is has been discovered.
      *
-     * Use the discoverer field to provide mutual exclusion.
-     * Called in csMove when the unit moves into a discoverable region.
+     * Reserve the ability to discover this region by setting the discoverer
+     * field.
+     * Called in csCheckDiscoverRegion when the unit moves into a
+     * discoverable region.
      *
      * @param unit The {@code Unit} that might have discovered the region.
      * @return True if the region has been discovered.
      */
     public synchronized boolean checkDiscover(Unit unit) {
-        if (this.discoverer == null) {
-            this.discoverer = unit.getId();
-            return true;
+        if (this.discoverable) {
+            if (this.discoverer == null) {
+                this.discoverer = unit.getId();
+                return true;
+            } else if (this.discoverer.equals(unit.getId())) {
+                return true; // Work around a desynch problem
+            }
         }
         return false;
     }
@@ -433,8 +439,12 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return A list of discovered {@code Region}s.
      */
     public List<Region> discover(Player player, Unit unit, Turn turn) {
+        if (unit == null || this.discoverer == null ||
+            !this.discoverer.equals(unit.getId())) {
+            // checkDiscover must have been run
+            return Collections.<Region>emptyList();
+        }
         this.discoveredBy = player;
-        assert this.discoverer.equals(unit.getId()); // Require prediscover
         this.discoveredIn = turn;
         this.discoverable = false;
         List<Region> discov = transform(getChildren(), Region::getDiscoverable);
@@ -667,7 +677,11 @@ public class Region extends FreeColGameObject implements Nameable {
             .append(' ').append((key != null) ? key : (name != null) ? name
                 : "<unnamed>")
             .append(' ').append(type);
-        if (getDiscoverable()) sb.append('!');
+        if (getDiscoverable()) {
+            sb.append('!');
+        } else {
+            sb.append("discoverer=").append(this.discoverer);
+        }
         sb.append(']');
         return sb.toString();
     }

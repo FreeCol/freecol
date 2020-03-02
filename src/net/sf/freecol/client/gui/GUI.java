@@ -162,6 +162,9 @@ public class GUI extends FreeColClientHolder {
         }
     }
 
+    /** Map height in MapGeneratorOptionsDialog. */
+    public static final int MINI_MAP_THUMBNAIL_FINAL_HEIGHT = 64;
+
     /** Warning levels. */
     private static final String levels[] = {
         "low", "normal", "high"
@@ -1201,10 +1204,11 @@ public class GUI extends FreeColClientHolder {
         g1.dispose();
 
         int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
-        BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
-            BufferedImage.TYPE_INT_ARGB);
+        BufferedImage scaledImage = new BufferedImage(scaledWidth,
+            MINI_MAP_THUMBNAIL_FINAL_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = scaledImage.createGraphics();
-        g2.drawImage(image, 0, 0, scaledWidth, 64, null);
+        g2.drawImage(image, 0, 0, scaledWidth, MINI_MAP_THUMBNAIL_FINAL_HEIGHT,
+                     null);
         g2.dispose();
         return scaledImage;
     }

@@ -2617,7 +2617,7 @@ public final class InGameController extends Controller {
         // Try to learn
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
-        unit.csVisit(serverPlayer, is, 0, cs);
+        // csVisit has already been called in askLearnSkill
         Location loc = unit.getLocation();
         switch (is.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
@@ -3458,7 +3458,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         Tile tile = is.getTile();
 
-        unit.csVisit(serverPlayer, is, -1, cs);
+        // Do not call csVisit yet, the natives might slaughter the unit first
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.add(See.only(serverPlayer), new NationSummaryMessage(owner,

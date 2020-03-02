@@ -243,7 +243,7 @@ public class TileTest extends FreeColTestCase {
 
     public void testPrimarySecondaryGoods() {
         Game game = getStandardGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
@@ -383,7 +383,7 @@ public class TileTest extends FreeColTestCase {
     public void testImprovements() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
@@ -415,7 +415,7 @@ public class TileTest extends FreeColTestCase {
 
     public void testProductionModifiers() throws Exception {
         Game game = getGame();
-        game.setMap(getTestMap(true));
+        game.changeMap(getTestMap(true));
 
         Colony colony = getStandardColony();
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
@@ -535,7 +535,7 @@ public class TileTest extends FreeColTestCase {
     public void testColonyImprovements() throws Exception {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = FreeColTestUtils.getColonyBuilder().build();
         assertTrue(colony.getTile().hasRoad());
@@ -548,7 +548,7 @@ public class TileTest extends FreeColTestCase {
     public void testSortedPotential() {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
-        game.setMap(map);
+        game.changeMap(map);
         Player dutch = game.getPlayer("model.nation.dutch");
         Market market = dutch.getMarket();
         UnitType sugarPlanter = spec().getUnitType("model.unit.masterSugarPlanter");
@@ -601,7 +601,7 @@ public class TileTest extends FreeColTestCase {
     public void testConiferForest() {
         Map map = getTestMap(coniferForest);
         Game game = getGame();
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony(1);
         final Tile tile = colony.getTile();
@@ -676,7 +676,7 @@ public class TileTest extends FreeColTestCase {
     public void testMinerals() {
         Game game = getGame();
         Map map = getTestMap(tundra);
-        game.setMap(map);
+        game.changeMap(map);
 
         Colony colony = getStandardColony();
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
@@ -754,7 +754,7 @@ public class TileTest extends FreeColTestCase {
 
     public void testCopy() {
         Game game = getStandardGame();
-        game.setMap(getTestMap(plains));
+        game.changeMap(getTestMap(plains));
 
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
@@ -779,7 +779,7 @@ public class TileTest extends FreeColTestCase {
     public void testGetBestDisembarkTile() {
         Game game = getStandardGame();
         Map map = getCoastTestMap(plains, true);
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile settlementTile = map.getTile(9, 2);

@@ -70,7 +70,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     public void testProductionSoldier() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(5, 8);
@@ -118,7 +118,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     public void testProductionPioneer() {
         Game game = getStandardGame();
         Map map = getTestMap();
-        game.setMap(map);
+        game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(5, 8);
@@ -163,7 +163,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
     public void testBellNetProduction() {
         Game game = getStandardGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         // Get a minimal colony so that the units-that-use-no-bells
         // parameter will not be relevant.
@@ -242,7 +242,7 @@ public class ColonyProductionTest extends FreeColTestCase {
      */
     public void testNoHorsesOverProduction() {
         Game game = getGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Colony colony = getStandardColony(1);
         Building pasture = colony.getBuilding(countryType);
@@ -286,7 +286,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
     public void testConsumers() {
         Game game = getGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Colony colony = getStandardColony(3);
         int units = colony.getUnitCount();
@@ -372,7 +372,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
     public void testProduction() {
         Game game = getGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Colony colony = getStandardColony(3);
         ColonyTile tile = colony.getColonyTile(colony.getTile());
@@ -492,7 +492,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
     public void testGetPotentialProduction() {
         Game game = getGame();
-        game.setMap(getTestMap());
+        game.changeMap(getTestMap());
 
         Colony colony = getStandardColony(1);
         ColonyTile colonyTile = colony.getColonyTile(colony.getTile());

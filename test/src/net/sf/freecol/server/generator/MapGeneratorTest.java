@@ -224,7 +224,11 @@ public class MapGeneratorTest extends FreeColTestCase {
         Player player = new Player(game, FreeColObject.ID_ATTRIBUTE_TAG);
         ServerUnit unit = new ServerUnit(game, null, player,
             spec().getUnitType("model.unit.caravel"));
-        pacific.discover(player, unit, new Turn(1));
+        assertTrue(pacific.checkDiscover(unit));
+        List<Region> discovered = pacific.discover(player, unit, new Turn(1));
+        // The Pacific sub-regions are not discoverable
+        assertEquals(1, discovered.size());
+        assertEquals(pacific, discovered.get(0));
 
         assertFalse(pacific.getDiscoverable());
         assertNull(pacific.getDiscoverableRegion());
