@@ -18,34 +18,26 @@
  */
 package net.sf.freecol.common.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.PosixFilePermission;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.swing.filechooser.FileSystemView;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.util.OSUtils;
+
+import javax.swing.filechooser.FileSystemView;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.OSUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.StringUtils.join;
 import static net.sf.freecol.common.util.Utils.*;
 
 
@@ -139,6 +131,8 @@ public class FreeColDirectories {
     public static final String GAME_OPTIONS_FILE_NAME = "game_options.xml";
 
     public static final String MAP_FILE_NAME = "my_map.fsg";
+
+    public static final String MAP_EDITOR_FILE_NAME = "my_map.fsm";
 
     public static final String MAP_GENERATOR_OPTIONS_FILE_NAME
         = "map_generator_options.xml";
