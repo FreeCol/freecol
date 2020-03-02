@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<freecol-specification id="courtesans">
+  <unit-types>
+    <unit-type id="model.unit.courtesan" extends="colonist"
+               skill="0" recruit-probability="20" score-value="2">
+      <modifier id="model.goods.rum"     index="30" type="additive" value="2"/>
+      <modifier id="model.goods.cigars"  index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.cloth"   index="30" type="additive" value="-1"/>
+    </unit-type>
+  </unit-types>
+</freecol-specification>
