@@ -210,6 +210,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
 
         // Add contact, but disallow empty traders
         Player.makeContact(galleon.getOwner(), settlement.getOwner());
+        ((IndianSettlement)settlement).setContacted(galleon.getOwner());
         spec().setBoolean(GameOptions.EMPTY_TRADERS, Boolean.FALSE);
         cost = base.getCost(galleon, unitTile, settlementTile, 4);
         assertEquals("Move should be invalid, no goods to trade",
