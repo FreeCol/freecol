@@ -3852,7 +3852,8 @@ public final class InGameController extends FreeColClientHolder {
         final GUI gui = getGUI();
         final IndianSettlement is = nt.getIndianSettlement();
         final Unit unit = nt.getUnit();
-        if (!getMyPlayer().owns(unit)) {
+        final Player player = getMyPlayer();
+        if (!player.owns(unit)) {
             logger.warning("We do not own the trading unit: " + unit);
             return;
         }
@@ -3873,7 +3874,7 @@ public final class InGameController extends FreeColClientHolder {
                 .template("trade.bought")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType())
                 .addStringTemplate("%nation%", is.getOwner().getNationLabel())
-                .addName("%settlement%", is.getName());
+                .addStringTemplate("%settlement%", is.getLocationLabelFor(player));
             break;
         case ACK_SELL:
             nti = null;
@@ -3882,7 +3883,7 @@ public final class InGameController extends FreeColClientHolder {
                 .template("trade.sold")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType())
                 .addStringTemplate("%nation%", is.getOwner().getNationLabel())
-                .addName("%settlement%", is.getName());
+                .addStringTemplate("%settlement%", is.getLocationLabelFor(player));
             break;
         case ACK_GIFT:
             nti = null;
@@ -3891,7 +3892,7 @@ public final class InGameController extends FreeColClientHolder {
                 .template("trade.gave")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType())
                 .addStringTemplate("%nation%", is.getOwner().getNationLabel())
-                .addName("%settlement%", is.getName());
+                .addStringTemplate("%settlement%", is.getLocationLabelFor(player));
             break;
         case ACK_BUY_HAGGLE:
             act = TradeAction.BUY;
@@ -3956,7 +3957,7 @@ public final class InGameController extends FreeColClientHolder {
         final StringTemplate base = StringTemplate
             .template("trade.welcome")
             .addStringTemplate("%nation%", is.getOwner().getNationLabel())
-            .addName("%settlement%", is.getName());
+            .addStringTemplate("%settlement%", is.getLocationLabelFor(unit.getOwner()));
         
         // Col1 only displays at most 3 types of goods for sale.
         // Maintain this for now but consider lifting in a future

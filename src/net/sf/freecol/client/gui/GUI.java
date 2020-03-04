@@ -556,7 +556,7 @@ public class GUI extends FreeColClientHolder {
             ? "confirmTribute.happy"
             : "confirmTribute.normal";
         return (confirm(is.getTile(), StringTemplate.template(messageId)
-                .addName("%settlement%", is.getName())
+                .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
                 .addStringTemplate("%nation%", other.getNationLabel()),
                 attacker, "confirmTribute.yes", "confirmTribute.no"))
             ? 1 : -1;
@@ -850,12 +850,15 @@ public class GUI extends FreeColClientHolder {
                                                 IndianSettlement is,
                                                 boolean canEstablish,
                                                 boolean canDenounce) {
-        StringTemplate template = StringTemplate.label("\n\n")
-            .addStringTemplate(is.getAlarmLevelLabel(unit.getOwner()))
-            .addStringTemplate(StringTemplate
-                .template("missionarySettlement.question")
-                .addName("%settlement%", is.getName()));
-
+        StringTemplate template;
+        if (is.hasContacted(unit.getOwner())) {
+            template = StringTemplate.label("\n\n")
+                .addStringTemplate(is.getAlarmLevelLabel(unit.getOwner()))
+                .addStringTemplate(StringTemplate.template("missionarySettlement.question")
+                    .addStringTemplate("%settlement%", is.getLocationLabelFor(unit.getOwner())));
+        } else {
+            template = StringTemplate.template("missionarySettlement.questionUncontacted");
+        }
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
         if (canEstablish) {
             choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.establish"),
@@ -943,33 +946,37 @@ public class GUI extends FreeColClientHolder {
         final Player player = getMyPlayer();
         final Player owner = is.getOwner();
 
-        StringTemplate skillPart = (is.getLearnableSkill() != null)
-            ? StringTemplate.template("scoutSettlement.skill")
-                            .addNamed("%skill%", is.getLearnableSkill())
-            : StringTemplate.name(" ");
-        StringTemplate goodsPart;
-        int present = is.getWantedGoodsCount();
-        if (present > 0) {
-            goodsPart = StringTemplate.template("scoutSettlement.trade."
-                + Integer.toString(present));
-            for (int i = 0; i < present; i++) {
-                String tradeKey = "%goods" + Integer.toString(i+1) + "%";
-                goodsPart.addNamed(tradeKey, is.getWantedGoods(i));
+        StringTemplate template;
+        if (is.hasContacted(player)) {
+            StringTemplate skillPart = (is.getLearnableSkill() != null)
+                ? StringTemplate.template("scoutSettlement.skill")
+                                .addNamed("%skill%", is.getLearnableSkill())
+                : StringTemplate.name(" ");
+            StringTemplate goodsPart;
+            int present = is.getWantedGoodsCount();
+            if (present > 0) {
+                goodsPart = StringTemplate.template("scoutSettlement.trade."
+                    + Integer.toString(present));
+                for (int i = 0; i < present; i++) {
+                    String tradeKey = "%goods" + Integer.toString(i+1) + "%";
+                    goodsPart.addNamed(tradeKey, is.getWantedGoods(i));
+                }
+            } else {
+                goodsPart = StringTemplate.name(" ");
             }
-        } else {
-            goodsPart = StringTemplate.name(" ");
-        }
-
-        StringTemplate template
-            = StringTemplate.template("scoutSettlement.greetings")
+            template = StringTemplate.template("scoutSettlement.greetings")
                 .addStringTemplate("%alarmPart%", is.getAlarmLevelLabel(player))
                 .addStringTemplate("%nation%", owner.getNationLabel())
-                .addName("%settlement%", is.getName())
+                .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
                 .addName("%number%", numberString)
                 .add("%settlementType%",
                     ((IndianNationType)owner.getNationType()).getSettlementTypeKey(true))
                 .addStringTemplate("%skillPart%", skillPart)
                 .addStringTemplate("%goodsPart%", goodsPart);
+        } else {
+            template = StringTemplate.template("scoutSettlement.greetUncontacted")
+                .addStringTemplate("%nation%", owner.getNationLabel());
+        }
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.speak"),
