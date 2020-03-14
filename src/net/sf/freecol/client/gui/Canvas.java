@@ -19,18 +19,30 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.dialog.*;
+import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.colopedia.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.report.*;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDataFile;
+import net.sf.freecol.common.metaserver.ServerInfo;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -44,141 +56,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JLayeredPane;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
-
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.panel.AboutPanel;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
-import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
-import net.sf.freecol.client.gui.panel.ChatPanel;
-import net.sf.freecol.client.gui.dialog.ChooseFoundingFatherDialog;
-import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.colopedia.ColopediaPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.report.CompactLabourReport;
-import net.sf.freecol.client.gui.dialog.ConfirmDeclarationDialog;
-import net.sf.freecol.client.gui.panel.DeclarationPanel;
-import net.sf.freecol.client.gui.dialog.DifficultyDialog;
-import net.sf.freecol.client.gui.dialog.DumpCargoDialog;
-import net.sf.freecol.client.gui.dialog.EditOptionDialog;
-import net.sf.freecol.client.gui.dialog.EditSettlementDialog;
-import net.sf.freecol.client.gui.dialog.EmigrationDialog;
-import net.sf.freecol.client.gui.dialog.EndTurnDialog;
-import net.sf.freecol.client.gui.panel.ErrorPanel;
-import net.sf.freecol.client.gui.panel.EuropePanel;
-import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.FindSettlementPanel;
-import net.sf.freecol.client.gui.dialog.FirstContactDialog;
-import net.sf.freecol.client.gui.dialog.FreeColChoiceDialog;
-import net.sf.freecol.client.gui.dialog.FreeColConfirmDialog;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.dialog.FreeColStringInputDialog;
-import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
-import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
-import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
-import net.sf.freecol.client.gui.dialog.LoadDialog;
-import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
-import net.sf.freecol.client.gui.panel.MainPanel;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
-import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
-import net.sf.freecol.client.gui.dialog.MapSizeDialog;
-import net.sf.freecol.client.gui.dialog.MonarchDialog;
-import net.sf.freecol.client.gui.dialog.NativeDemandDialog;
-import net.sf.freecol.client.gui.dialog.NegotiationDialog;
-import net.sf.freecol.client.gui.panel.NewPanel;
-import net.sf.freecol.client.gui.dialog.Parameters;
-import net.sf.freecol.client.gui.dialog.ParametersDialog;
-import net.sf.freecol.client.gui.dialog.PreCombatDialog;
-import net.sf.freecol.client.gui.panel.PurchasePanel;
-import net.sf.freecol.client.gui.panel.RecruitPanel;
-import net.sf.freecol.client.gui.panel.report.ReportCargoPanel;
-import net.sf.freecol.client.gui.panel.report.ReportClassicColonyPanel;
-import net.sf.freecol.client.gui.panel.report.ReportCompactColonyPanel;
-import net.sf.freecol.client.gui.panel.report.ReportContinentalCongressPanel;
-import net.sf.freecol.client.gui.panel.report.ReportEducationPanel;
-import net.sf.freecol.client.gui.panel.report.ReportExplorationPanel;
-import net.sf.freecol.client.gui.panel.report.ReportForeignAffairPanel;
-import net.sf.freecol.client.gui.panel.report.ReportHighScoresPanel;
-import net.sf.freecol.client.gui.panel.report.ReportHistoryPanel;
-import net.sf.freecol.client.gui.panel.report.ReportIndianPanel;
-import net.sf.freecol.client.gui.panel.report.ReportLabourDetailPanel;
-import net.sf.freecol.client.gui.panel.report.ReportLabourPanel;
-import net.sf.freecol.client.gui.panel.report.ReportMilitaryPanel;
-import net.sf.freecol.client.gui.panel.report.ReportNavalPanel;
-import net.sf.freecol.client.gui.panel.report.ReportPanel;
-import net.sf.freecol.client.gui.panel.report.ReportProductionPanel;
-import net.sf.freecol.client.gui.panel.report.ReportReligiousPanel;
-import net.sf.freecol.client.gui.panel.report.ReportRequirementsPanel;
-import net.sf.freecol.client.gui.panel.report.ReportTradePanel;
-import net.sf.freecol.client.gui.panel.report.ReportTurnPanel;
-import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
-import net.sf.freecol.client.gui.dialog.SaveDialog;
-import net.sf.freecol.client.gui.dialog.ScaleMapSizeDialog;
-import net.sf.freecol.client.gui.dialog.SelectAmountDialog;
-import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
-import net.sf.freecol.client.gui.dialog.SelectTributeAmountDialog;
-import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.StartGamePanel;
-import net.sf.freecol.client.gui.panel.StatisticsPanel;
-import net.sf.freecol.client.gui.panel.StatusPanel;
-import net.sf.freecol.client.gui.panel.TilePanel;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
-import net.sf.freecol.client.gui.panel.TradeRoutePanel;
-import net.sf.freecol.client.gui.panel.TrainPanel;
-import net.sf.freecol.client.gui.panel.Utility;
-import net.sf.freecol.client.gui.dialog.VictoryDialog;
-import net.sf.freecol.client.gui.dialog.WarehouseDialog;
-import net.sf.freecol.client.gui.panel.WorkProductionPanel;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColDataFile;
-import net.sf.freecol.common.metaserver.ServerInfo;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TypeCountMap;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.Option;
-import net.sf.freecol.common.option.OptionGroup;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
 
 
 /**
@@ -2785,5 +2664,14 @@ public final class Canvas extends JDesktopPane {
         addMouseListener(ml);
         addKeyListener(kl);
         addCentered(vp, JLayeredPane.PALETTE_LAYER);
+    }
+
+    /**
+     * Display the map details dialog.
+     *
+     * @return The response returned by the dialog.
+     */
+    public MapDetails showMapDetailsDialog() {
+        return showFreeColDialog(new MapDetailsDialog(freeColClient, frame), null);
     }
 }
