@@ -70,8 +70,8 @@ public class MoveTest extends FreeColTestCase {
 
             client.getPreGameController().startGameHandler();
             assertEquals(plain1.getNeighbourOrNull(Direction.NE), plain2);
-            client.getInGameController().moveDirection(hardyPioneer,
-                    Direction.NE, false);
+            assertTrue(client.getInGameController().moveDirection(hardyPioneer,
+                    Direction.NE, false));
         } finally {
             if (client != null) {
                 ClientTestHelper.stopClient(client);
