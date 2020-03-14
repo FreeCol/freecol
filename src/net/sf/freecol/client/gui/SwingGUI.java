@@ -19,23 +19,35 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.DisplayMode;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.animation.Animations;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.common.model.MapDetails;
+import net.sf.freecol.client.gui.dialog.Parameters;
+import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
+import net.sf.freecol.client.gui.video.VideoComponent;
+import net.sf.freecol.client.gui.video.VideoListener;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.metaserver.ServerInfo;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.LanguageOption.Language;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.Video;
+import net.sf.freecol.common.util.Introspector;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
@@ -44,72 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JWindow;
-import javax.swing.Timer;
-
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.animation.Animations;
-import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
-import net.sf.freecol.client.gui.dialog.Parameters;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.CornerMapControls;
-import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
-import net.sf.freecol.client.gui.panel.Utility;
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.video.VideoComponent;
-import net.sf.freecol.client.gui.video.VideoListener;
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.metaserver.ServerInfo;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants.IndianDemandAction;
-import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TypeCountMap;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.LanguageOption.Language;
-import net.sf.freecol.common.option.Option;
-import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.Video;
-import net.sf.freecol.common.util.Introspector;
-import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
 
 
 /**
@@ -2072,5 +2019,13 @@ public class SwingGUI extends GUI {
     @Override
     public void updateEuropeanSubpanels() {
         canvas.updateEuropeanSubpanels();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MapDetails showMapDetailsDialog() {
+        return canvas.showMapDetailsDialog();
     }
 }

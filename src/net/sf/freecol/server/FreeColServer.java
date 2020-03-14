@@ -19,31 +19,8 @@
 
 package net.sf.freecol.server;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.BindException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.function.Predicate;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.MapDetails;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -53,53 +30,50 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.metaserver.MetaServerUtils;
 import net.sf.freecol.common.metaserver.ServerInfo;
-import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Game.LogoutReason;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.*;
 import net.sf.freecol.common.networking.ChangeSet.See;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.GameStateMessage;
-import net.sf.freecol.common.networking.LogoutMessage;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.TrivialMessage;
-import net.sf.freecol.common.networking.VacantPlayersMessage;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.Utils.*;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.InGameController;
-import net.sf.freecol.server.control.PreGameController;
-import net.sf.freecol.server.control.ServerInputHandler;
-import net.sf.freecol.server.control.UserConnectionHandler;
+import net.sf.freecol.server.control.*;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
-import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.Session;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
+
+import javax.imageio.ImageIO;
+import javax.xml.stream.XMLStreamException;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Random;
+import java.util.function.Predicate;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static net.sf.freecol.common.model.Constants.IntegrityType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -136,6 +110,9 @@ public final class FreeColServer {
     public static final String PUBLIC_SERVER_TAG = "publicServer";
     public static final String SAVED_GAME_TAG = "savedGame";
     public static final String SINGLE_PLAYER_TAG = "singleplayer";
+    public static final String MAP_DETAILS_TAG = "mapDetails";
+    public static final String AUTHOR_TAG = "author";
+    public static final String DESCRIPTION_TAG = "description";
 
     /**
      * The save game format used for saving games.
@@ -789,16 +766,17 @@ public final class FreeColServer {
      *
      * @param file The file where the data will be written.
      * @param image A thumbnail image for the map.
+     * @param mapDetails Details about the map file
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
-    public void saveMapEditorGame(File file, BufferedImage image) 
+    public void saveMapEditorGame(File file, BufferedImage image, MapDetails mapDetails)
         throws IOException {
         this.setAIMain(null);
         // Mask out spec while saving map.
         Specification spec = getSpecification();
         getGame().setSpecification(null);
-        saveGame(file, MAP_EDITOR_NAME, null, null, image);
+        saveGame(file, MAP_EDITOR_NAME, null, null, image, mapDetails);
         getGame().setSpecification(spec);
     }
 
@@ -813,7 +791,7 @@ public final class FreeColServer {
      */
     public void saveGame(File file, OptionGroup options, Unit active)
         throws IOException {
-        saveGame(file, null, options, active, null);
+        saveGame(file, null, options, active, null, null);
     }
 
     /**
@@ -824,11 +802,12 @@ public final class FreeColServer {
      * @param options Optional client options to save in the game.
      * @param active An optional active {@code Unit}.
      * @param image A thumbnail {@code Image} value to save in the game.
+     * @param mapAuthorship Map details {@code MapDetails} values to save in the game.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
     private void saveGame(File file, String owner, OptionGroup options,
-                          Unit active, BufferedImage image) throws IOException {
+                          Unit active, BufferedImage image, MapDetails mapDetails) throws IOException {
         // Try to GC now before launching into the save, as a failure
         // here can lead to a corrupt saved game file (BR#3146).
         // Alas, gc is only advisory, but it is all we have got.
@@ -867,6 +846,14 @@ public final class FreeColServer {
                 xw.writeComment(FreeCol.getConfiguration().toString());
                 xw.writeCharacters("\n");
 
+                if (mapDetails != null) {
+                    xw.writeStartElement(MAP_DETAILS_TAG);
+
+                    xw.writeAttribute(AUTHOR_TAG, mapDetails.authorName);
+                    xw.writeAttribute(DESCRIPTION_TAG, mapDetails.mapDescription);
+                    xw.writeEndElement();
+                }
+
                 xw.writeStartElement(SAVED_GAME_TAG);
 
                 // Add the attributes:
@@ -896,6 +883,7 @@ public final class FreeColServer {
                 }
 
                 xw.writeEndElement();
+
                 xw.writeEndDocument();
             }
             fos.closeEntry();

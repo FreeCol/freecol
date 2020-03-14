@@ -19,36 +19,29 @@
 
 package net.sf.freecol.client.control;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.model.MapDetails;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.option.MapGeneratorOptions;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.server.model.ServerPlayer;
+
+import javax.swing.*;
+import javax.xml.stream.XMLStreamException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
-import javax.xml.stream.XMLStreamException;
-
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.option.MapGeneratorOptions;
-import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.generator.MapGenerator;
-import net.sf.freecol.server.model.ServerGame;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -191,23 +184,29 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Opens a dialog where the user should specify the filename
-     * and saves the game.
+     * Opens a dialog asking for map details and then a dialog
+     * where the user should specify the filename and saves
+     * the game.
      */
     public void saveMapEditorGame() {
         File dir = FreeColDirectories.getUserMapsDirectory();
         if (dir == null) dir = FreeColDirectories.getSaveDirectory();
-        File file = getGUI()
-            .showSaveDialog(dir, FreeColDirectories.MAP_FILE_NAME);
-        if (file != null) saveMapEditorGame(file);
+        MapDetails mapDetails = getGUI().showMapDetailsDialog();
+
+        if (mapDetails != null) {
+            File file = getGUI()
+                    .showSaveDialog(dir, FreeColDirectories.MAP_FILE_NAME);
+            if (file != null) saveMapEditorGame(file, mapDetails);
+        }
     }
 
     /**
      * Saves the game to the given file.
      *
      * @param file The {@code File}.
+     * @param mapDetails The {@code MapDetails}.
      */
-    public void saveMapEditorGame(final File file) {
+    public void saveMapEditorGame(final File file, final MapDetails mapDetails) {
         final GUI gui = getGUI();
         final Game game = getGame();
         Map map = game.getMap();
@@ -221,7 +220,7 @@ public final class MapEditorController extends FreeColClientHolder {
             public void run() {
                 try {
                     BufferedImage thumb = gui.createMiniMapThumbNail();
-                    getFreeColServer().saveMapEditorGame(file, thumb);
+                    getFreeColServer().saveMapEditorGame(file, thumb, mapDetails);
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();
                             gui.requestFocusInWindow();

@@ -19,82 +19,41 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.common.model.MapDetails;
+import net.sf.freecol.client.gui.dialog.Parameters;
+import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.DebugUtils;
+import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.metaserver.ServerInfo;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
-
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.MiniMap;
-import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
-import net.sf.freecol.client.gui.dialog.Parameters;
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.debug.DebugUtils;
-import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.metaserver.ServerInfo;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants.*; // Imports all ENUMS.
-import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.IndianNationType;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationSummary;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TypeCountMap;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.option.Option;
-import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -2586,4 +2545,13 @@ public class GUI extends FreeColClientHolder {
      * Update all panels derived from the EuropePanel.
      */
     public void updateEuropeanSubpanels() {}
+
+    /**
+     * Show the mapAuthorshipDialog dialog.
+
+     * @return The selected map authorship as a {@code MapAuthorship}.
+     */
+    public MapDetails showMapDetailsDialog() {
+        return null;
+    }
 }

@@ -19,14 +19,14 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 
 /**
@@ -59,7 +59,7 @@ public class StartMapAction extends FreeColAction {
             || freeColClient.getGame().getMap() == null) return;
         File startFile = FreeColDirectories.getStartMapFile();
         freeColClient.getMapEditorController()
-            .saveMapEditorGame(startFile);
+            .saveMapEditorGame(startFile, null);
         Game game = freeColClient.getGame();
         OptionGroup options = game.getMapGeneratorOptions();
         options.setFile(MapGeneratorOptions.IMPORT_FILE, startFile);
