@@ -28,6 +28,7 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.client.control");
         //$JUnit-BEGIN$
+        suite.addTestSuite(MapEditorTest.class);
         suite.addTestSuite(MoveTest.class);
         //$JUnit-END$
         return suite;
