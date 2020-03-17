@@ -2060,18 +2060,19 @@ public final class Canvas extends JDesktopPane {
      *
      * @param displayObject Optional object for displaying an icon.
      * @param template The {@code StringTemplate} to display.
+     * @return The {@code InformationPanel} that is displayed.
      */
-    public void showInformationMessage(FreeColObject displayObject,
-                                       StringTemplate template) {
+    public InformationPanel showInformationPanel(FreeColObject displayObject,
+                                                 StringTemplate template) {
         ImageIcon icon = null;
         Tile tile = null;
-        if(displayObject != null) {
+        if (displayObject != null) {
             icon = createObjectImageIcon(displayObject);
             tile = (displayObject instanceof Location)
                 ? ((Location)displayObject).getTile()
                 : null;
         }
-        showInformationMessage(displayObject, tile, icon, template);
+        return showInformationPanel(displayObject, tile, icon, template);
     }
 
     /**
@@ -2081,14 +2082,16 @@ public final class Canvas extends JDesktopPane {
      * @param tile The Tile the object is at.
      * @param icon The icon to display for the object.
      * @param template The {@code StringTemplate} to display.
+     * @return The {@code InformationPanel} that is displayed.
      */
-    public void showInformationMessage(FreeColObject displayObject,
-                                       Tile tile, ImageIcon icon,
-                                       StringTemplate template) {
+    public InformationPanel showInformationPanel(FreeColObject displayObject,
+                                                 Tile tile, ImageIcon icon,
+                                                 StringTemplate template) {
         String text = Messages.message(template);
-        showFreeColPanel(new InformationPanel(freeColClient, text, 
-                                              displayObject, icon),
-                         tile, true);
+        InformationPanel panel = new InformationPanel(freeColClient, text, 
+                                                      displayObject, icon);
+        showFreeColPanel(panel, tile, true);
+        return panel;
     }
 
     /**
@@ -2148,7 +2151,7 @@ public final class Canvas extends JDesktopPane {
         frame.removeMenuBar();
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
-        if (userMsg != null) gui.showInformationMessage(userMsg);
+        if (userMsg != null) gui.showInformationPanel(userMsg);
         mainPanel.requestFocus();
     }
 

@@ -305,7 +305,7 @@ public final class FreeColClient {
                 SwingUtilities.invokeLater(() -> {
                         gui.closeStatusPanel();
                         if (userMsg != null) {
-                            gui.showInformationMessage(userMsg);
+                            gui.showInformationPanel(userMsg);
                         }
                     });
             } else {

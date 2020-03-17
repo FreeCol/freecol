@@ -48,6 +48,7 @@ import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
@@ -448,7 +449,7 @@ public class GUI extends FreeColClientHolder {
         if (gold == 0) {
             t = StringTemplate.template("confirmTribute.broke")
                 .addStringTemplate("%nation%", other.getNationLabel());
-            showInformationMessage(t);
+            showInformationPanel(t);
             return -1;
         }
 
@@ -529,7 +530,7 @@ public class GUI extends FreeColClientHolder {
         Colony colony = unit.getColony();
         StringTemplate message = colony.getReducePopulationMessage();
         if (message != null) {
-            showInformationMessage(message);
+            showInformationPanel(message);
             return false;
         }
         return confirmAbandonEducation(unit, true);
@@ -892,10 +893,10 @@ public class GUI extends FreeColClientHolder {
         if (name == null) {
             // Cancelled
         } else if (name.isEmpty()) {
-            showInformationMessage("enterSomeText"); // 0-length is invalid
+            showInformationPanel("enterSomeText"); // 0-length is invalid
         } else if (player.getSettlementByName(name) != null) {
             // Must be unique
-            showInformationMessage(tile, StringTemplate
+            showInformationPanel(tile, StringTemplate
                 .template("nameColony.notUnique")
                 .addName("%name%", name));
         } else {
@@ -1071,18 +1072,20 @@ public class GUI extends FreeColClientHolder {
      * Show an information message.
      *
      * @param messageId The message key.
+     * @return The {@code InformationPanel} that is displayed.
      */
-    public final void showInformationMessage(String messageId) {
-        showInformationMessage(StringTemplate.key(messageId));
+    public final InformationPanel showInformationPanel(String messageId) {
+        return showInformationPanel(StringTemplate.key(messageId));
     }
 
     /**
      * Show an information message.
      *
      * @param template The message template.
+     * @return The {@code InformationPanel} that is displayed.
      */
-    public final void showInformationMessage(StringTemplate template) {
-        showInformationMessage(null, template);
+    public final InformationPanel showInformationPanel(StringTemplate template) {
+        return showInformationPanel(null, template);
     }
 
     /**
@@ -1090,10 +1093,11 @@ public class GUI extends FreeColClientHolder {
      *
      * @param displayObject An optional object to display as an icon.
      * @param messageId The message key.
+     * @return The {@code InformationPanel} that is displayed.
      */
-    public final void showInformationMessage(FreeColObject displayObject,
-                                             String messageId) {
-        showInformationMessage(displayObject, StringTemplate.key(messageId));
+    public final InformationPanel showInformationPanel(FreeColObject displayObject,
+                                                       String messageId) {
+        return showInformationPanel(displayObject, StringTemplate.key(messageId));
     }
 
     /**
@@ -2149,10 +2153,12 @@ public class GUI extends FreeColClientHolder {
      *
      * @param displayObject Optional object for displaying as an icon.
      * @param template The {@code StringTemplate} to display.
+     * @return The {@code InformationPanel} that is displayed.
      */
-    public void showInformationMessage(FreeColObject displayObject,
-                                       StringTemplate template) {
+    public InformationPanel showInformationPanel(FreeColObject displayObject,
+                                                 StringTemplate template) {
         alertSound();
+        return null;
     }
 
     /**

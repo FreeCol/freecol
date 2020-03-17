@@ -169,7 +169,7 @@ public class DebugUtils {
                 fails++;
             }
         }
-        gui.showInformationMessage(join(", ", results));
+        gui.showInformationPanel(join(", ", results));
         if (fails < sPlayer.getSettlementCount()) { // Brutally resynchronize
             reconnect(freeColClient);
         }
@@ -626,7 +626,7 @@ public class DebugUtils {
         if (problemDetected) {
             lb.shrink("\n");
             String err = lb.toString();
-            freeColClient.getGUI().showInformationMessage(err);
+            freeColClient.getGUI().showInformationPanel(err);
             logger.severe(err);
         }
         return problemDetected;
@@ -706,7 +706,7 @@ public class DebugUtils {
                 .addName("%colony%", colony.getName()));
         } else {
             // TODO: Missing i18n
-            freeColClient.getGUI().showInformationMessage(aiColony.planToString());
+            freeColClient.getGUI().showInformationPanel(aiColony.planToString());
         }
     }
 
@@ -777,7 +777,7 @@ public class DebugUtils {
             }
             lb.add("\n");
         }
-        freeColClient.getGUI().showInformationMessage(lb.toString());
+        freeColClient.getGUI().showInformationPanel(lb.toString());
     }
 
     /**
@@ -826,7 +826,7 @@ public class DebugUtils {
         String msg = (m == null) ? Messages.message("none")
             : (m instanceof TransportMission) ? ((TransportMission)m).toFullString()
             : m.toString();
-        freeColClient.getGUI().showInformationMessage(msg);
+        freeColClient.getGUI().showInformationPanel(msg);
     }
 
     /**
@@ -869,7 +869,7 @@ public class DebugUtils {
             lb.add(x, "\nat ", x.getLocation(), "\n");
         }
 
-        freeColClient.getGUI().showInformationMessage(lb.toString());
+        freeColClient.getGUI().showInformationPanel(lb.toString());
     }
 
     /**
@@ -1244,6 +1244,6 @@ public class DebugUtils {
         lb.add("\nConvert Progress = ", sis.getConvertProgress());
         lb.add("\nLast Tribute = ", sis.getLastTribute());
 
-        freeColClient.getGUI().showInformationMessage(lb.toString());
+        freeColClient.getGUI().showInformationPanel(lb.toString());
     }
 }

@@ -143,7 +143,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                                 igc().updateTradeRoute(selected);
                                 updateList(selected);
                             } else {
-                                getGUI().showInformationMessage(template);
+                                getGUI().showInformationPanel(template);
                             }
                         });
             });
@@ -229,7 +229,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                     } else if ((template = newRoute.verify()) != null
                         && (template = newRoute.verifyUniqueName()) != null) {
                         updateList(null);
-                        getGUI().showInformationMessage(template);
+                        getGUI().showInformationPanel(template);
                     } else {
                         igc().updateTradeRoute(newRoute);
                         if (u != null) igc().assignTradeRoute(u, newRoute);

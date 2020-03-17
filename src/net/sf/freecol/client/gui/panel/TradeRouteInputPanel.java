@@ -849,7 +849,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         StringTemplate err = this.newRoute.verify();
         if (err != null) {
-            getGUI().showInformationMessage(err);
+            getGUI().showInformationPanel(err);
             this.newRoute.setName(null); // Mark as unacceptable
             return false;
         }
