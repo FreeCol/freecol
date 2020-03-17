@@ -1890,7 +1890,10 @@ public final class ColonyPanel extends PortPanel
         private final Tile[][] tiles = new Tile[3][3];
 
         /** A currently displayed production message. */
-        private InformationPanel cached = null;
+        private InformationPanel cachedPanel = null;
+        /** The work location that would be better to produce with. */
+        private WorkLocation bestLocation = null;
+
         
         /**
          * Creates a TilesPanel.
@@ -1978,10 +1981,14 @@ public final class ColonyPanel extends PortPanel
          */
         public void showPoorProduction(WorkLocation best,
                                        StringTemplate template) {
-            if (this.cached != null) {
-                getGUI().removeComponent(this.cached);
+            // Already warned about this?  Do nothing if so.
+            if (this.bestLocation == best) return;
+            
+            if (this.cachedPanel != null) {
+                getGUI().removeComponent(this.cachedPanel);
             }
-            this.cached = getGUI().showInformationPanel(best, template);
+            this.cachedPanel = getGUI().showInformationPanel(best, template);
+            this.bestLocation = best;
         }
 
             
