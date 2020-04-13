@@ -2412,17 +2412,23 @@ public class Unit extends GoodsLocation
      * @return The appropriate {@code MoveType}.
      */
     private MoveType getTradeMoveType(Settlement settlement) {
+        final Player owner = this.getOwner();
         if (settlement instanceof Colony) {
-            return (getOwner().atWarWith(settlement.getOwner()))
+            return (owner.atWarWith(settlement.getOwner()))
                 ? MoveType.MOVE_NO_ACCESS_WAR
                 : (!hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES))
                 ? MoveType.MOVE_NO_ACCESS_TRADE
                 : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
         } else if (settlement instanceof IndianSettlement) {
-            // Do not block for war, bringing gifts is allowed
-            return (!((IndianSettlement)settlement).allowContact(this))
+            // Require contact, and settlement-level contact for naval units,
+            // but not block for war as bringing gifts is allowed
+            return (!allowContact(settlement)
+                || (this.isNaval()
+                    && ((IndianSettlement)settlement).getContactLevel(owner)
+                    == IndianSettlement.ContactLevel.UNCONTACTED))
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : (hasGoodsCargo() || getSpecification()
+                // Allow trade if cargo present or empty-traders-option
+                : (this.hasGoodsCargo() || getSpecification()
                     .getBoolean(GameOptions.EMPTY_TRADERS))
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
                 : MoveType.MOVE_NO_ACCESS_GOODS;

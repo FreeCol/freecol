@@ -350,7 +350,7 @@ public final class TilePopup extends JPopupMenu {
                     LogBuilder lb = new LogBuilder(512);
                     PathNode path = activeUnit.findPath(activeUnit.getTile(),
                         tile, activeUnit.getCarrier(), null, lb);
-                    gui.showInformationMessage(lb.toString());
+                    gui.showInformationPanel(lb.toString());
                     gui.setUnitPath(path);
                     gui.refresh();                        
                 });

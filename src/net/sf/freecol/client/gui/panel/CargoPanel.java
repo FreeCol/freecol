@@ -199,15 +199,10 @@ public class CargoPanel extends FreeColPanel
      */
     @Override
     public Component add(Component comp, boolean editState) {
-        if (carrier == null) {
-            return null;
-        } else if (editState && comp instanceof CargoLabel
+        if (carrier != null && comp instanceof CargoLabel && editState
             && ((CargoLabel)comp).addCargo(comp, carrier, this)) {
             return comp;
-        } else {
-            super.add(comp);
         }
-        logger.log(Level.FINER, "Attempted to add a component to an invalid carrier.");
         return null;
     }
 

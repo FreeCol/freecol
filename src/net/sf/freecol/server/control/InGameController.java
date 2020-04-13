@@ -2665,6 +2665,9 @@ public final class InGameController extends Controller {
      */
     public ChangeSet loadGoods(ServerPlayer serverPlayer, Location loc,
                                GoodsType goodsType, int amount, Unit carrier) {
+        if (carrier.getLoadableAmount(goodsType) < amount) {
+            return serverPlayer.clientError("Too much goods");
+        }
         if (loc instanceof Europe) {
             if (carrier.isInEurope()) {
                 return buyGoods(serverPlayer, goodsType, amount, carrier);
@@ -2679,9 +2682,6 @@ public final class InGameController extends Controller {
         GoodsLocation gl = (GoodsLocation)loc;
         if (!carrier.isAtLocation(loc)) {
             return serverPlayer.clientError("Carrier not at location: " + loc);
-        }
-        if (carrier.getLoadableAmount(goodsType) < amount) {
-            return serverPlayer.clientError("Too much goods");
         }
         if (gl.getGoodsCount(goodsType) < amount) {
             return serverPlayer.clientError("Not enough goods ("

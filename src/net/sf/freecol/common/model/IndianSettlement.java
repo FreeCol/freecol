@@ -1449,8 +1449,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Determines the value of a potential attack on a {@code IndianSettlement}
      *
      * @param value The previously calculated input value from
-     *          {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
-     *                  #scoreSettlementPath(AIUnit, PathNode, Settlement)}
+     *     {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
+     *            #scoreSettlementPath(AIUnit, PathNode, Settlement)}
      * @param unit The {@code AIUnit} to check
      * @return The calculated value
      */
@@ -1589,12 +1589,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final ContactLevel cl = getContactLevel(xw.getClientPlayer());
         final boolean full = xw.validFor(getOwner());
         
-        if (full // Name needs contact
-            || cl != ContactLevel.UNCONTACTED) {
-            if (getName() != null) { // Delegated from Settlement
-                xw.writeAttribute(NAME_TAG, getName());
-            }
-        }
+        // Delegated from Settlement
+        xw.writeAttribute(NAME_TAG, getName());
 
         if (full) { // Server internal fields only
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);

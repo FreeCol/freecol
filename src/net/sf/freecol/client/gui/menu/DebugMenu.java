@@ -337,7 +337,7 @@ public class DebugMenu extends JMenu {
         showResourceKeys.addActionListener((ActionEvent ae) -> {
                 StringBuilder sb = new StringBuilder(256);
                 ResourceManager.summarizeImageResources(sb);
-                gui.showInformationMessage(sb.toString());
+                gui.showInformationPanel(sb.toString());
             });
         showResourceKeys.setEnabled(true);
 

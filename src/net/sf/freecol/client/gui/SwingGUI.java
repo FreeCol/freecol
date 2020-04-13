@@ -64,6 +64,7 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
+import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -522,12 +523,12 @@ public class SwingGUI extends GUI {
                 Language language = (Language)e.getNewValue();
                 logger.info("Set language to: " + language);
                 if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {
-                    showInformationMessage("info.autodetectLanguageSelected");
+                    showInformationPanel("info.autodetectLanguageSelected");
                 } else {
                     Locale l = language.getLocale();
                     Messages.loadMessageBundle(l);
                     Messages.loadModMessageBundle(l);
-                    showInformationMessage(StringTemplate
+                    showInformationPanel(StringTemplate
                         .template("info.newLanguageSelected")
                         .addName("%language%", l.getDisplayName()));
                 }
@@ -1609,9 +1610,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showInformationMessage(FreeColObject displayObject,
-                                       StringTemplate template) {
-        super.showInformationMessage(displayObject, template);
+    public InformationPanel showInformationPanel(FreeColObject displayObject,
+                                                 StringTemplate template) {
+        super.showInformationPanel(displayObject, template);
         ImageIcon icon = null;
         Tile tile = null;
         if (displayObject instanceof Settlement) {
@@ -1624,7 +1625,7 @@ public class SwingGUI extends GUI {
             icon = new ImageIcon(imageLibrary.getScaledUnitImage((Unit)displayObject));
             tile = ((Unit)displayObject).getTile();
         }
-        canvas.showInformationMessage(displayObject, tile, icon, template);
+        return canvas.showInformationPanel(displayObject, tile, icon, template);
     }
 
     /**

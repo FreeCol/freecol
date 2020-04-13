@@ -1029,7 +1029,7 @@ public final class ColonyPanel extends PortPanel
             if (colony.getUnitCount() > 0) { // Ignore messages when abandoning
                 ModelMessage msg = colony.checkForGovMgtChangeMessage();
                 if (msg != null) {
-                    getGUI().showInformationMessage(colony, msg);
+                    getGUI().showInformationPanel(colony, msg);
                 }
             }
             updatePopulationPanel();
@@ -1039,7 +1039,7 @@ public final class ColonyPanel extends PortPanel
             FreeColGameObject object = (FreeColGameObject)event.getSource();
             UnitType oldType = (UnitType) event.getOldValue();
             UnitType newType = (UnitType) event.getNewValue();
-            getGUI().showInformationMessage(object, StringTemplate
+            getGUI().showInformationPanel(object, StringTemplate
                 .template("colonyPanel.unitChange")
                 .addName("%colony%", colony.getName())
                 .addNamed("%oldType%", oldType)
@@ -1814,7 +1814,7 @@ public final class ColonyPanel extends PortPanel
                 Building building = getBuilding();
                 NoAddReason reason = building.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(building, reason.getDescriptionKey());
+                    getGUI().showInformationPanel(building, reason.getDescriptionKey());
                     return false;
                 }
 
@@ -1889,7 +1889,12 @@ public final class ColonyPanel extends PortPanel
         /** The tiles around the colony. */
         private final Tile[][] tiles = new Tile[3][3];
 
+        /** A currently displayed production message. */
+        private InformationPanel cachedPanel = null;
+        /** The work location that would be better to produce with. */
+        private WorkLocation bestLocation = null;
 
+        
         /**
          * Creates a TilesPanel.
          */
@@ -1968,7 +1973,25 @@ public final class ColonyPanel extends PortPanel
             repaint();
         }
 
+        /**
+         * Display the poor production message.
+         *
+         * @param best The better work location.
+         * @param template The {@code StringTemplate} with the message.
+         */
+        public void showPoorProduction(WorkLocation best,
+                                       StringTemplate template) {
+            // Already warned about this?  Do nothing if so.
+            if (this.bestLocation == best) return;
+            
+            if (this.cachedPanel != null) {
+                getGUI().removeComponent(this.cachedPanel);
+            }
+            this.cachedPanel = getGUI().showInformationPanel(best, template);
+            this.bestLocation = best;
+        }
 
+            
         // Override JComponent
 
         /**
@@ -2157,7 +2180,7 @@ public final class ColonyPanel extends PortPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        getGUI().showInformationMessage(tile, claim.getDescriptionKey());
+                        getGUI().showInformationPanel(tile, claim.getDescriptionKey());
                         return false;
                     }
                     // Check reason again, claim should be satisfied.
@@ -2169,7 +2192,7 @@ public final class ColonyPanel extends PortPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = this.colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(this.colonyTile,
+                    getGUI().showInformationPanel(this.colonyTile,
                         StringTemplate.template(reason.getDescriptionKey()));
                     return false;
                 }
@@ -2190,7 +2213,7 @@ public final class ColonyPanel extends PortPanel
                                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
                             .addNamed("%goods%", workType)
                             .addStringTemplate("%tile%", best.getLabel());
-                        getGUI().showInformationMessage(best, template);
+                        showPoorProduction(best, template);
                     }
                 }
                 return true;

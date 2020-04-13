@@ -1009,7 +1009,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             BuildableType bt;
             while ((bt = first(buildables)) != null
                 && lockReasons.get(bt) != null) {
-                getGUI().showInformationMessage(bt,
+                getGUI().showInformationPanel(bt,
                     this.colony.getUnbuildableMessage(bt));
                 command = FAIL;
                 removeBuildable(buildables.remove(0));
