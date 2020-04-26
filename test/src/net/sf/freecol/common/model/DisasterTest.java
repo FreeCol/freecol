@@ -47,8 +47,25 @@ public class DisasterTest extends FreeColTestCase {
             assertEquals(choice.getProbability(), choice.getObject().getProbability());
         }
 
+        disaster = spec().getDisaster("model.disaster.disease");
+        assertNotNull(disaster);
+        assertFalse(disaster.getEffects().isEmpty());
+        for (RandomChoice<Effect> choice : disaster.getEffects()) {
+            assertNotNull(choice.getObject().getId());
+            assertTrue(choice.getProbability() > 0);
+            assertTrue(choice.getObject().getProbability() > 0);
+            assertEquals(choice.getProbability(), choice.getObject().getProbability());
+        }
 
+        disaster = spec().getDisaster("model.disaster.sandstorm");
+        assertNotNull(disaster);
+        assertFalse(disaster.getEffects().isEmpty());
+        for (RandomChoice<Effect> choice : disaster.getEffects()) {
+            assertNotNull(choice.getObject().getId());
+            assertTrue(choice.getProbability() > 0);
+            assertTrue(choice.getObject().getProbability() > 0);
+            assertEquals(choice.getProbability(), choice.getObject().getProbability());
+        }
     }
-
 
 }
