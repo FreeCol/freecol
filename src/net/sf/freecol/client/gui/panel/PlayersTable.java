@@ -191,10 +191,12 @@ public final class PlayersTable extends JTable {
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
-            box.setSelectedItem(value);
-            final NationState nationState = (NationState)value;
-            Utility.localizeToolTip(this, StringTemplate
-                .key(nationState.getShortDescriptionKey()));
+            if (value != null) { // FIXME: Why does this happen?
+                box.setSelectedItem(value);
+                final NationState nationState = (NationState)value;
+                Utility.localizeToolTip(box, StringTemplate
+                    .key(nationState.getShortDescriptionKey()));
+            }
             return box;
         }
     }
