@@ -3268,7 +3268,7 @@ public final class InGameController extends FreeColClientHolder {
 
         boolean ret = askServer().firstContact(player, other, tile, result);
         if (ret) {
-            updateGUI(null, false);
+            updateGUI(tile, false);
         }
         return ret;
     }

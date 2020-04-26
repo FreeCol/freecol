@@ -293,6 +293,19 @@ public class DiplomacySession extends TimedSession {
     }
 
     /**
+     * Complete first contact session.
+     *
+     * Just do nothing but superclass action as we do not want the
+     * offer accept/reject messages, and the unit already has zero moves.
+     *
+     * @param cs A {@code ChangeSet} to update.
+     * @return Whether the session was already complete.
+     */
+    public boolean completeFirstContact(ChangeSet cs) {
+        return super.complete(cs);
+    }
+
+    /**
      * Explicit completion of the session with a given result.
      *
      * Called from the controller when the player returns a definite response.
