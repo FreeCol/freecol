@@ -1590,7 +1590,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final boolean full = xw.validFor(getOwner());
         
         // Delegated from Settlement
-        xw.writeAttribute(NAME_TAG, getName());
+        String name = getName();
+        if (name != null) {
+            xw.writeAttribute(NAME_TAG, name);
+        }
 
         if (full) { // Server internal fields only
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);

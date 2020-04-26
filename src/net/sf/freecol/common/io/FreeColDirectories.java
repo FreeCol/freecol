@@ -140,6 +140,8 @@ public class FreeColDirectories {
 
     public static final String MAP_FILE_NAME = "my_map.fsg";
 
+    public static final String MAP_EDITOR_FILE_NAME = "my_map.fsm";
+
     public static final String MAP_GENERATOR_OPTIONS_FILE_NAME
         = "map_generator_options.xml";
 

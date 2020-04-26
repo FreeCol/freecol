@@ -2982,7 +2982,7 @@ public final class InGameController extends Controller {
                 Tension.TENSION_ADD_MAJOR, cs);//+til
             ((ServerPlayer)other).addMissionBan(serverPlayer);
         }
-        if (session != null) session.complete(result, cs);
+        if (session != null) session.completeFirstContact(cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }

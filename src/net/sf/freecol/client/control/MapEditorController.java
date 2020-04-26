@@ -198,7 +198,7 @@ public final class MapEditorController extends FreeColClientHolder {
         File dir = FreeColDirectories.getUserMapsDirectory();
         if (dir == null) dir = FreeColDirectories.getSaveDirectory();
         File file = getGUI()
-            .showSaveDialog(dir, FreeColDirectories.MAP_FILE_NAME);
+            .showSaveDialog(dir, FreeColDirectories.MAP_EDITOR_FILE_NAME);
         if (file != null) saveMapEditorGame(file);
     }
 
