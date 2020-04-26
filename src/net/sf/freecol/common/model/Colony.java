@@ -40,8 +40,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1357,22 +1357,28 @@ public class Colony extends Settlement implements TradeLocation {
      *      the negation of the number of units to remove.
      */
     public int getPreferredSizeChange() {
-        int i, limit, pop = getUnitCount();
-        if (productionBonus < 0) {
-            limit = pop;
-            for (i = 1; i < limit; i++) {
-                if (governmentChange(pop - i) == 1) break;
-            }
-            return -i;
-        } else {
-            limit = CHANGE_UPPER_BOUND;
-            for (i = 1; i <= limit; i++) {
-                if (governmentChange(pop + i) == -1) break;
-            }
-            return i - 1;
-        }
+        return productionBonus < 0 ? -getUnitsToRemove() : getUnitsToAdd();
     }
 
+    public int getUnitsToAdd() {
+        int pop = getUnitCount();
+        for (int i = 1; i <= CHANGE_UPPER_BOUND; i++) {
+            if (governmentChange(pop + i) == -1) {
+                return i - 1;
+            }
+        }
+        return CHANGE_UPPER_BOUND;
+    }
+
+    public int getUnitsToRemove() {
+        int pop = getUnitCount();
+        for (int i = 1; i < pop; i++) {
+            if (governmentChange(pop - i) == 1) {
+                return i;
+            }
+        }
+        return 0;
+    }
 
     // Unit manipulation and population
 
