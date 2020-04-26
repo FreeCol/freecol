@@ -157,7 +157,7 @@ public class LandMap {
      */
     public boolean hasLand() {
         for (int y = 0; y < this.height; y++) {
-            for (int x = 0; y < this.width; x++) {
+            for (int x = 0; x < this.width; x++) {
                 if (this.map[x][y]) return true;
             }
         }
