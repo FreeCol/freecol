@@ -138,6 +138,9 @@ public class Unit extends GoodsLocation
      */
     public static final int MANY_TURNS = 10000;
 
+    /** Default value of unpriced units, used in evaluate_for. */
+    public static final int DEFAULT_UNIT_VALUE = 500;
+    
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
@@ -3829,7 +3832,9 @@ public class Unit extends GoodsLocation
      */
     public int evaluateFor(Player player) {
         final Europe europe = player.getEurope();
-        return (europe == null) ? 500 : europe.getUnitPrice(getType());
+        if (europe == null) return DEFAULT_UNIT_VALUE;
+        int price = europe.getUnitPrice(getType());
+        return (price == UNDEFINED) ? DEFAULT_UNIT_VALUE : price;
     }
 
     // @compat 0.11.0

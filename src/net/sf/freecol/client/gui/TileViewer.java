@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -791,10 +792,16 @@ public final class TileViewer extends FreeColClientHolder {
         if (ti.isComplete()) {
             if (ti.isRoad()) {
                 rp.displayRoad(g, tile);
+            } else if (ti.isRiver()) {
+                TileImprovementStyle style = ti.getStyle();
+                if (style == null) { // This is all too common with broken maps
+                    logger.severe("Null river style for " + tile);
+                } else {
+                    BufferedImage im = lib.getScaledRiverImage(style);
+                    if (im != null) g.drawImage(im, 0, 0, null);
+                }
             } else {
-                BufferedImage im = (ti.isRiver())
-                    ? lib.getScaledRiverImage(ti.getStyle())
-                    : lib.getTileImprovementImage(ti.getType().getId());
+                BufferedImage im = lib.getTileImprovementImage(ti.getType().getId());
                 if (im != null) g.drawImage(im, 0, 0, null);
             }
         }

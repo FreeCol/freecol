@@ -21,6 +21,7 @@
     <property name="freecol.doc.dir" value="${basedir}/doc"/>
     <property name="freecol.javadoc.dir" value="${freecol.doc.dir}/javadoc"/>
     <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
+    <property name="freecol.main.class" value="net.sf.freecol.FreeCol"/>
     <property name="freecol.metaserver.jar.file"
               value="${basedir}/FreeCol-metaserver.jar"/>
     <property name="freecol.overview.file"
@@ -170,7 +171,7 @@
         </manifestclasspath>
         <manifest file="${basedir}/src/MANIFEST.MF">
             <attribute name="Created-By" value="FreeCol Team"/>
-            <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
+            <attribute name="Main-Class" value="${freecol.main.class}"/>
             <attribute name="Class-Path" value="${jar.classpath}"/>
             <attribute name="Product-Name" value="FreeCol"/>
             <attribute name="Package-Title" value="FreeCol"/>
@@ -526,7 +527,7 @@
                  classpath="${freecol.build.dir}/jars/jarbundler-core-3.3.0.jar"/>
         <jarbundler dir="${freecol.release.dir}"
                     name="FreeCol"
-                    mainclass="net.sf.freecol.freecol"
+                    mainclass="${freecol.main.class}"
                     version="${freecol.version}"
                     vmoptions="-Xmx1G -Dapple.awt.fakefullscreen=true"
                     jvmversion="1.8+"
