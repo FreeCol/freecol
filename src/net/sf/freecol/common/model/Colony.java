@@ -1784,7 +1784,8 @@ public class Colony extends Settlement implements TradeLocation {
      */
     public int evaluateFor(Player player) {
         if (player.isAI()
-                && player.getSettlementCount() < 5) {// FIXME: magic#
+            && player.owns(this)
+            && player.getSettlementCount() < 5) {// FIXME: magic#
             return Integer.MIN_VALUE;
         }
         int result, v;
