@@ -407,13 +407,14 @@ public class FreeColDirectories {
         File prefsDir = new File(libDir, "Preferences");
         if (!isGoodDirectory(prefsDir)) return badDir(prefsDir);
         File d = new File(prefsDir, FREECOL_DIRECTORY);
-        if (!isGoodDirectory(d)) return badConfig(d);
-        dirs[0] = d;
+        File d2 = requireDirectory(d);
+        if (d2 == null) return badConfig(d);
+        dirs[0] = d2;
 
         File appsDir = new File(libDir, "Application Support");
         if (!isGoodDirectory(appsDir)) return badDir(appsDir);
         d = new File(appsDir, FREECOL_DIRECTORY);
-        File d2 = requireDirectory(d);
+        d2 = requireDirectory(d);
         if (d2 == null) return badData(d);
         dirs[1] = dirs[2] = d2;
 
