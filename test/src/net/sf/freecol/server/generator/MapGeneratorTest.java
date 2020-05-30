@@ -183,23 +183,40 @@ public class MapGeneratorTest extends FreeColTestCase {
      * Make sure we can import all distributed maps.
      */
     public void testImportMap() {
-        Game game = getStandardGame();
-        final Specification spec = game.getSpecification();
-
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         Map importMap = null;
-        for (File importFile : FreeColDirectories.getMapFileList()) {
+        List<File> mapFiles = new ArrayList<>();
+        if (true) {
+            // We now have too many maps to test comprehensively, so
+            // we will just test the standard (old) maps for now
+            for (String name : FreeColTestCase.STANDARD_MAPS) {
+                mapFiles.add(new File(name));
+            }
+        } else {
+            // This test all the maps
+            mapFiles.addAll(FreeColDirectories.getMapFileList());
+        }
+        for (File importFile : mapFiles) {
+            Game game = getStandardGame();
+            Specification spec = game.getSpecification();
             spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
+            System.gc(); // Try to clean up before reading a big map
             try {
                 importMap = FreeColServer.readMap(importFile, spec);
             } catch (FreeColException|IOException|XMLStreamException ex) {
                 fail("Map read of " + importFile.getName() + " failed: "
                     + ex.toString());
             }
-            assertNotNull(gen.generateMap(game, importMap, new LogBuilder(-1)));
+            try {
+                assertNotNull(gen.generateMap(game, importMap,
+                                              new LogBuilder(-1)));
+            } catch (Exception ex) {
+                fail("Map generate of " + importFile.getName() + " failed: "
+                    + ex.toString());
+            }
+            // Clear import file option from a standard spec!
+            spec.setFile(MapGeneratorOptions.IMPORT_FILE, null);
         }
-        // Clear import file option
-        spec.setFile(MapGeneratorOptions.IMPORT_FILE, null);
     }
 
     public void testRegions() {

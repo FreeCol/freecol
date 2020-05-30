@@ -114,22 +114,10 @@ public class SerializationTest extends FreeColTestCase {
         ServerTestHelper.stopServerGame();
     }
 
-    public void testMapAfrica() throws Exception {
-        validateMap("data/maps/Africa.fsm");
-    }
-
-    public void testMapAustralia() throws Exception {
-        validateMap("data/maps/Australia.fsm");
-    }
-
-    public void testMapAmerica() throws Exception {
-        validateMap("data/maps/America_large.fsm");
-        validateMap("data/maps/South_America.fsm");
-    }
-
-    public void testMapCaribbean() throws Exception {
-        validateMap("data/maps/Caribbean_basin.fsm");
-        validateMap("data/maps/Caribbean_large.fsm");
+    public void testStandardMaps() throws Exception {
+        for (String name : FreeColTestCase.STANDARD_MAPS) {
+            validateMap(name);
+        }
     }
 
     public void testStringTemplate() throws Exception {
