@@ -132,6 +132,7 @@ public class ColonyTradeItem extends TradeItem {
             || (getSource() == player) != player.owns(colony))
             return INVALID_TRADE_ITEM;
         int value = colony.evaluateFor(player);
+        if (value == Integer.MIN_VALUE) return INVALID_TRADE_ITEM;
         return (player.owns(colony)) ? -value : value;
     }
     
