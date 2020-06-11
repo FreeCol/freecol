@@ -532,11 +532,13 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param x The x-coordinate in pixels.
      * @param y The y-coordinate in pixels.
-     * @return The Tile that is located at the given position on the screen.
+     * @return The {@code Tile} that is located at the given position
+     *     on the screen.
      */
-    Tile convertToMapTile(int x, int y) {
+    public Tile convertToMapTile(int x, int y) {
         final Game game = getGame();
-        if (game == null || game.getMap() == null) return null;
+        if (game == null || game.getMap() == null
+            || focus == null) return null;
 
         int leftOffset;
         if (focus.getX() < getLeftColumns()) {
