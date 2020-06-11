@@ -259,16 +259,16 @@ public final class InGameController extends FreeColClientHolder {
      *     active unit to be selected (useful for the Wait command).
      */
     private void updateGUI(Tile tile, boolean updateUnit) {
-        Unit active;
+        Unit active = getGUI().getActiveUnit();
         if (displayModelMessages(false, false)) {
             ; // If messages are displayed they probably refer to the
               // current unit, so do not update it.
-        } else if (updateUnit || (active = getGUI().getActiveUnit()) == null
-            || !active.couldMove()) {
-            // Tile is displayed if no new active unit is found,
-            // useful when the last unit might have died
-            updateActiveUnit(tile);
         } else {
+            if (updateUnit || active == null || !active.couldMove()) {
+                // Tile is displayed if no new active unit is found,
+                // useful when the last unit might have died
+                updateActiveUnit(tile);
+            }
             getGUI().updateMapControls();
             getGUI().updateMenuBar();
         }
