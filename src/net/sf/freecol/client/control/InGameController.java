@@ -707,6 +707,19 @@ public final class InGameController extends FreeColClientHolder {
         return !messages.isEmpty();
     }
 
+    /**
+     * Displays the next {@code ModelMessage}.
+     *
+     * Called from CC.reconnect, CargoPanel,
+     * ColonyPanel.closeColonyPanel, EuropePanel.exitAction,
+     * EuropePanel.MarketPanel
+     *
+     * @return True if any messages were displayed.
+     */
+    public boolean nextModelMessage() {
+        return displayModelMessages(false, false);
+    }
+
 
     // Utilities to handle the transitions between the active-unit,
     // execute-orders and end-turn states.
@@ -743,7 +756,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!messages.isEmpty()) {
             turnReportMessages.addAll(messages);
             for (ModelMessage m : messages) player.addModelMessage(m);
-            displayModelMessages(false, false);
+            nextModelMessage();
             fail = true;
         }
         if (fail) return false;
@@ -767,7 +780,7 @@ public final class InGameController extends FreeColClientHolder {
             }
         }
         // Might have LCR messages to display
-        displayModelMessages(false, false);
+        nextModelMessage();
         return !fail;
     }
 
@@ -1240,7 +1253,7 @@ public final class InGameController extends FreeColClientHolder {
             askServer().attack(unit, direction);
             // Immediately display resulting message, allowing
             // next updateGUI to select another unit.
-            displayModelMessages(false, false);
+            nextModelMessage();
         }
         // Always return false, as the unit has either attacked and lost
         // its remaining moves, or the move can not proceed because it is
@@ -1277,7 +1290,7 @@ public final class InGameController extends FreeColClientHolder {
                 }
                 // Immediately display resulting message, allowing
                 // next updateGUI to select another unit.
-                displayModelMessages(false, false);
+                nextModelMessage();
             }
             break;
 
@@ -3053,16 +3066,6 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Displays pending {@code ModelMessage}s.
-     *
-     * @param allMessages Display all messages or just the undisplayed ones.
-     * @return True if any messages were displayed.
-     */
-    public boolean displayModelMessages(boolean allMessages) {
-        return displayModelMessages(allMessages, false);
-    }
-
-    /**
      * Emigrate a unit from Europe.
      *
      * @param player The {@code Player} that owns the unit.
@@ -3482,7 +3485,7 @@ public final class InGameController extends FreeColClientHolder {
                 .addAmount("%amount%", amount)
                 .addNamed("%goods%", type);
         player.addModelMessage(m);
-        invokeLater(() -> displayModelMessages(false));
+        invokeLater(() -> nextModelMessage());
     }
 
     /**
@@ -4079,7 +4082,7 @@ public final class InGameController extends FreeColClientHolder {
             .addName("%colonyKey%", key)
             .add("%colonyMenuItem%", "buildColonyAction.name")
             .add("%ordersMenuItem%", "menuBar.orders"));
-        displayModelMessages(false);
+        nextModelMessage();
         return true;
     }
 
@@ -4230,19 +4233,6 @@ public final class InGameController extends FreeColClientHolder {
 
         updateGUI(null, false);
         return true;
-    }
-
-    /**
-     * Displays the next {@code ModelMessage}.
-     *
-     * Called from CC.reconnect, CargoPanel,
-     * ColonyPanel.closeColonyPanel, EuropePanel.exitAction,
-     * EuropePanel.MarketPanel
-     *
-     * @return True if any messages were displayed.
-     */
-    public boolean nextModelMessage() {
-        return displayModelMessages(false, false);
     }
 
     /**
