@@ -108,7 +108,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param useSkin Use the info panel skin.
      */
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
-        super(freeColClient);
+        super(freeColClient, null, null);
 
         this.endTurnInfoPanel = new EndTurnInfoPanel(freeColClient);
         this.mapEditorInfoPanel = new MapEditorInfoPanel(freeColClient);
@@ -117,7 +117,6 @@ public final class InfoPanel extends FreeColPanel {
         this.skin = (!useSkin) ? null
             : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 
-        setLayout(null);
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
         if (this.skin != null) {
