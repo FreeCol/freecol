@@ -77,15 +77,13 @@ public final class InfoPanel extends FreeColPanel {
         NONE, END, MAP, TILE, UNIT;
     }
 
-    private static final int PANEL_WIDTH = 260;
-
-    public static final int PANEL_HEIGHT = 130;
-
+    public static final Dimension PREFERRED_SIZE = new Dimension(260, 130);
+    
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
     private final EndTurnInfoPanel endTurnInfoPanel;
 
-    private final JPanel mapEditorInfoPanel;
+    private final MapEditorInfoPanel mapEditorInfoPanel;
 
     private final TileInfoPanel tileInfoPanel;
 
@@ -113,9 +111,7 @@ public final class InfoPanel extends FreeColPanel {
         super(freeColClient);
 
         this.endTurnInfoPanel = new EndTurnInfoPanel(freeColClient);
-        this.mapEditorInfoPanel = new JPanel(null);
-        this.mapEditorInfoPanel.setSize(130, 100);
-        this.mapEditorInfoPanel.setOpaque(false);
+        this.mapEditorInfoPanel = new MapEditorInfoPanel(freeColClient);
         this.tileInfoPanel = new TileInfoPanel(freeColClient);
         this.unitInfoPanel = new UnitInfoPanel(freeColClient);
         this.skin = (!useSkin) ? null
@@ -131,7 +127,7 @@ public final class InfoPanel extends FreeColPanel {
             internalPanelTop = 75;
             internalPanelHeight = 128;
         } else {
-            setSize(PANEL_WIDTH, PANEL_HEIGHT);
+            setSize(PREFERRED_SIZE);
         }
 
         add(this.endTurnInfoPanel, internalPanelTop, internalPanelHeight);
@@ -188,18 +184,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param mapTransform The current MapTransform.
      */
     public void update(MapTransform mapTransform) {
-        final JPanel p = (mapTransform == null) ? null
-            : mapTransform.getDescriptionPanel();
-        if (p != null) {
-            p.setOpaque(false);
-            final Dimension d = p.getPreferredSize();
-            p.setBounds(0, (this.mapEditorInfoPanel.getHeight() - d.height)/2,
-                this.mapEditorInfoPanel.getWidth(), d.height);
-            this.mapEditorInfoPanel.removeAll();
-            this.mapEditorInfoPanel.add(p, BorderLayout.CENTER);
-            this.mapEditorInfoPanel.revalidate();
-            this.mapEditorInfoPanel.repaint();
-        }
+        this.mapEditorInfoPanel.update(mapTransform);
         InfoPanelMode oldMode = update();
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with " + mapTransform);

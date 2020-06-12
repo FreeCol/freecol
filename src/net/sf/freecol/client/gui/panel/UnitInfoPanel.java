@@ -66,10 +66,11 @@ public final class UnitInfoPanel extends FreeColPanel
         super(freeColClient, null,
               new MigLayout("wrap 5, fill, gap 0 0", "", ""));
 
-        setSize(260, 130);
-        setBorder(null);
-        setOpaque(false);
         this.unit = null;
+
+        this.setSize(InfoPanel.PREFERRED_SIZE);
+        this.setBorder(null);
+        this.setOpaque(false);
     }
 
 
