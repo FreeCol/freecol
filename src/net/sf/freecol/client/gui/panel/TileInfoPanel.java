@@ -67,10 +67,11 @@ public final class TileInfoPanel extends FreeColPanel {
               new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1",
                             "", ""));
 
-        setSize(260, 130);
-        setBorder(null);
-        setOpaque(false);
         this.tile = null;
+
+        this.setPreferredSize(InfoPanel.PREFERRED_SIZE);
+        this.setBorder(null);
+        this.setOpaque(false);
     }
 
 
