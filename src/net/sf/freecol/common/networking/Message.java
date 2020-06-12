@@ -600,7 +600,7 @@ public abstract class Message {
             if (soundId != null || flush) {
                 invokeLater(freeColClient, () -> {
                         if (soundId != null) igc(fcc).sound(soundId);
-                        if (flush) igc(fcc).displayModelMessages(false);
+                        if (flush) igc(fcc).nextModelMessage();
                     });
             }
         }

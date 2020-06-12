@@ -69,6 +69,9 @@ public class Colony extends Settlement implements TradeLocation {
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
 
+    /** Number of colonies that a player will trade down to. */
+    public static final int TRADE_MARGIN = 5;
+
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,
@@ -1785,7 +1788,7 @@ public class Colony extends Settlement implements TradeLocation {
     public int evaluateFor(Player player) {
         if (player.isAI()
             && player.owns(this)
-            && player.getSettlementCount() < 5) {// FIXME: magic#
+            && player.getSettlementCount() < Colony.TRADE_MARGIN) {
             return Integer.MIN_VALUE;
         }
         int result, v;

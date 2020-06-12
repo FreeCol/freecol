@@ -74,8 +74,9 @@ public final class EndTurnInfoPanel extends FreeColPanel {
             .getFreeColAction(EndTurnAction.id));
         button.setFont(font);
         this.add(button);
-        setBorder(null);
-        setOpaque(false);
-        setSize(getPreferredSize());
+
+        this.setSize(InfoPanel.PREFERRED_SIZE);
+        this.setBorder(null);
+        this.setOpaque(false);
     }
 }
