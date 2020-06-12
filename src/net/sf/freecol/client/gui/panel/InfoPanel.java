@@ -162,30 +162,13 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Get the mode for this panel.
-     *
-     * @return The panel mode.
-     */
-    private InfoPanelMode getMode() {
-        return (getFreeColClient().isMapEditor())
-            ? InfoPanelMode.MAP
-            : (getGUI().getViewMode() == GUI.ViewMode.TERRAIN)
-            ? InfoPanelMode.TILE
-            : (getGUI().getViewMode() == GUI.ViewMode.MOVE_UNITS)
-            ? InfoPanelMode.UNIT
-            : (getFreeColClient().getMyPlayer() == null)
-            ? InfoPanelMode.NONE
-            : InfoPanelMode.END;
-    }
-
-    /**
      * Updates this {@code InfoPanel}.
      *
      * @param mapTransform The current MapTransform.
      */
     public void update(MapTransform mapTransform) {
         this.mapEditorInfoPanel.update(mapTransform);
-        InfoPanelMode oldMode = update();
+        InfoPanelMode oldMode = update(InfoPanelMode.UNIT);
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with " + mapTransform);
     }
@@ -197,7 +180,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(Tile tile) {
         this.tileInfoPanel.update(tile);
-        InfoPanelMode oldMode = update();
+        InfoPanelMode oldMode = update(InfoPanelMode.TILE);
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with tile " + tile);
     }
@@ -209,7 +192,8 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(Unit unit) {
         this.unitInfoPanel.update(unit);
-        InfoPanelMode oldMode = update();
+        InfoPanelMode oldMode = update((unit == null) ? InfoPanelMode.END
+            : InfoPanelMode.UNIT);
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with unit " + unit);
     }
@@ -218,11 +202,11 @@ public final class InfoPanel extends FreeColPanel {
      * Update this {@code InfoPanel} by selecting the correct internal
      * panel to display.
      *
-     * @return The old <code>InfoPanelMode</code>.
+     * @param newMode The new {@code InfoPanelMode}.
+     * @return The old {@code InfoPanelMode}.
      */
-    private InfoPanelMode update() {
+    private InfoPanelMode update(InfoPanelMode newMode) {
         InfoPanelMode oldMode = this.mode;
-        InfoPanelMode newMode = getMode();
         if (oldMode != newMode) {
             switch (this.mode = newMode) {
             case END:
