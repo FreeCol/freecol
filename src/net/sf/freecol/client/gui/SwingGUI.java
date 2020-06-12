@@ -545,6 +545,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void startMapEditorGUI() {
+        resetMapZoom(); // Reset zoom to the default
         canvas.startMapEditorGUI();
     }
 
@@ -997,7 +998,6 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void resetMenuBar() {
-        getFreeColClient().updateActions();
         canvas.resetMenuBar();
     }
 
@@ -1006,7 +1006,6 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateMenuBar() {
-        getFreeColClient().updateActions();
         canvas.updateMenuBar();
     }
 
@@ -1360,6 +1359,7 @@ public class SwingGUI extends GUI {
     @Override
     public void removeComponent(Component component) {
         canvas.remove(component);
+        if (!isShowingSubPanel()) canvas.requestFocusInWindow();
     }
 
     /**
@@ -1658,7 +1658,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showMainPanel(String userMsg) {
-        canvas.showMainPanel(userMsg);
+        canvas.showMainPanel();
+        if (userMsg != null) showInformationPanel(userMsg);
     }
 
     /**

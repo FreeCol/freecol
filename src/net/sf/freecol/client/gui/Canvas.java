@@ -328,6 +328,7 @@ public final class Canvas extends JDesktopPane {
         this.gui = gui;
         this.graphicsDevice = graphicsDevice;
         this.mapViewer = mapViewer;
+        this.greyLayer = new GrayLayer(freeColClient);
 
         // Determine if windowed mode should be used and set the window size.
         Rectangle windowBounds = null;
@@ -421,9 +422,6 @@ public final class Canvas extends JDesktopPane {
     public void startMapEditorGUI() {
         if (frame == null) return;
 
-        // We may need to reset the zoom value to the default value
-        gui.resetMapZoom();
-
         frame.setMapEditorMenuBar();
         showMapEditorTransformPanel();
 
@@ -455,6 +453,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void resetMenuBar() {
         if (frame == null) return;
+        this.freeColClient.updateActions();
         frame.resetMenuBar();
     }
 
@@ -463,6 +462,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void updateMenuBar() {
         if (frame == null) return;
+        this.freeColClient.updateActions();
         frame.updateMenuBar();
     }
 
@@ -643,7 +643,7 @@ public final class Canvas extends JDesktopPane {
         f.setSize(width, height);
         Point p = chooseLocation(comp, width, height, popupPosition);
         f.setLocation(p);
-        this.add(f, MODAL_LAYER);
+        this.addToCanvas(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);
@@ -670,6 +670,17 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Adds a component to this Canvas.
+     *
+     * @param comp The {@code Component} to add to this canvas.
+     * @param i The layer to add the component to (see JLayeredPane).
+     */
+    private void add(Component comp, Integer i) {
+        addToCanvas(comp, i);
+        updateMenuBar();
+    }
+
+    /**
+     * Adds a component to this Canvas updating the menus.
      *
      * Make sure the status panel is not present unless the component
      * *is* the status panel.
@@ -1106,29 +1117,6 @@ public final class Canvas extends JDesktopPane {
     // Public API
 
     /**
-     * Adds a component to this Canvas.
-     *
-     * @param comp The {@code Component} to add.
-     * @return The component argument.
-     */
-    @Override
-    public Component add(Component comp) {
-        this.add(comp, JLayeredPane.DEFAULT_LAYER);
-        return comp;
-    }
-
-    /**
-     * Adds a component to this Canvas.
-     *
-     * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
-     */
-    public void add(Component comp, Integer i) {
-        addToCanvas(comp, i);
-        gui.updateMenuBar();
-    }
-
-    /**
      * Closes all the menus that are currently open.
      */
     public void closeMenus() {
@@ -1330,7 +1318,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Removes the given component from this canvas.
+     * Removes the given component from this canvas without
+     * updating the menu bar.
      *
      * @param comp The {@code Component} to remove.
      */
@@ -1438,7 +1427,7 @@ public final class Canvas extends JDesktopPane {
         // we're still in the game then log an error because at this
         // point the GUI should have been informed.
         removeInGameComponents();
-        showMainPanel(null);
+        showMainPanel();
         repaint();
     }
 
@@ -1483,19 +1472,16 @@ public final class Canvas extends JDesktopPane {
         } else if (freeColClient.isInGame() && hasMap()) {
             mapViewer.displayMap(g2d);
 
-            // Grey out the map if it is not my turn (and a multiplayer game).
-            if (!freeColClient.currentPlayerIsMyPlayer()) {
-                if (greyLayer == null) {
-                    greyLayer = new GrayLayer(freeColClient);
+            // Toggle grey layer
+            if (freeColClient.currentPlayerIsMyPlayer()) {
+                if (greyLayer.getParent() != null) {
+                    removeFromCanvas(greyLayer);
                 }
-                if (greyLayer.getParent() == null) {
-                    add(greyLayer, JLayeredPane.DRAG_LAYER);
-                }
+            } else {
                 greyLayer.setBounds(0, 0, size.width, size.height);
                 greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
-            } else {
-                if (greyLayer != null && greyLayer.getParent() != null) {
-                    removeFromCanvas(greyLayer);
+                if (greyLayer.getParent() == null) {
+                    addToCanvas(greyLayer, JLayeredPane.DRAG_LAYER);
                 }
             }
 
@@ -1544,10 +1530,7 @@ public final class Canvas extends JDesktopPane {
     @Override
     public void remove(Component comp) {
         removeFromCanvas(comp);
-        gui.updateMenuBar();
-        if (comp != statusPanel && !isShowingSubPanel()) {
-            requestFocus();
-        }
+        updateMenuBar();
     }
 
 
@@ -2142,16 +2125,12 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the {@code MainPanel}.
-     *
-     * @param userMsg An option message key to show.
-     * @see MainPanel
      */
-    public void showMainPanel(String userMsg) {
+    public void showMainPanel() {
         closeMenus();
         frame.removeMenuBar();
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
-        if (userMsg != null) gui.showInformationPanel(userMsg);
         mainPanel.requestFocus();
     }
 

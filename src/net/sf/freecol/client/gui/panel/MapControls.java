@@ -137,6 +137,18 @@ public abstract class MapControls extends FreeColClientHolder {
      */
     public abstract void addToComponent(Canvas component);
 
+    /**
+     * Removes the map controls from the parent canvas component.
+     *
+     * @param canvas {@code Canvas} parent
+     */
+    public abstract void removeFromComponent(Canvas canvas);
+
+    public abstract boolean isShowing();
+
+    public abstract void repaint();
+    
+
     public boolean canZoomInMapControls() {
         return miniMap != null && miniMap.canZoomIn();
     }
@@ -145,17 +157,6 @@ public abstract class MapControls extends FreeColClientHolder {
         return miniMap != null && miniMap.canZoomOut();
     }
 
-    public abstract boolean isShowing();
-
-    /**
-     * Removes the map controls from the parent canvas component.
-     *
-     * @param canvas {@code Canvas} parent
-     */
-    public abstract void removeFromComponent(Canvas canvas);
-
-    public abstract void repaint();
-    
     public void toggleView() {
         miniMap.setToggleBordersOption(!getClientOptions()
             .getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS));
