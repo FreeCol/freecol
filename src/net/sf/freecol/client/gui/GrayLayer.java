@@ -125,7 +125,7 @@ public class GrayLayer extends Component {
 
         Dimension size = getSize();
         textBounds.x = (size.width - textBounds.width) / 2;
-        textBounds.y = size.height - (int)InfoPanel.PREFERRED_SIZE.getHeight()
+        textBounds.y = size.height - InfoPanel.PANEL_HEIGHT
             - 2 * textBounds.height;
 
         if (textBounds.intersects(clipArea)) {

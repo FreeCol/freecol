@@ -42,6 +42,7 @@ import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -76,13 +77,15 @@ public final class InfoPanel extends FreeColPanel {
         NONE, END, MAP, TILE, UNIT;
     }
 
-    public static Dimension PREFERRED_SIZE = new Dimension(260, 130);
-    
+    private static final int PANEL_WIDTH = 260;
+
+    public static final int PANEL_HEIGHT = 130;
+
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
     private final EndTurnInfoPanel endTurnInfoPanel;
 
-    private final MapEditorInfoPanel mapEditorInfoPanel;
+    private final JPanel mapEditorInfoPanel;
 
     private final TileInfoPanel tileInfoPanel;
 
@@ -107,15 +110,18 @@ public final class InfoPanel extends FreeColPanel {
      * @param useSkin Use the info panel skin.
      */
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
-        super(freeColClient, null, null);
+        super(freeColClient);
 
         this.endTurnInfoPanel = new EndTurnInfoPanel(freeColClient);
-        this.mapEditorInfoPanel = new MapEditorInfoPanel(freeColClient);
+        this.mapEditorInfoPanel = new JPanel(null);
+        this.mapEditorInfoPanel.setSize(130, 100);
+        this.mapEditorInfoPanel.setOpaque(false);
         this.tileInfoPanel = new TileInfoPanel(freeColClient);
         this.unitInfoPanel = new UnitInfoPanel(freeColClient);
         this.skin = (!useSkin) ? null
             : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 
+        setLayout(null);
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
         if (this.skin != null) {
@@ -125,8 +131,7 @@ public final class InfoPanel extends FreeColPanel {
             internalPanelTop = 75;
             internalPanelHeight = 128;
         } else {
-            setSize((int)PREFERRED_SIZE.getWidth(),
-                    (int)PREFERRED_SIZE.getHeight());
+            setSize(PANEL_WIDTH, PANEL_HEIGHT);
         }
 
         add(this.endTurnInfoPanel, internalPanelTop, internalPanelHeight);
@@ -161,13 +166,41 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
+     * Get the mode for this panel.
+     *
+     * @return The panel mode.
+     */
+    private InfoPanelMode getMode() {
+        return (getFreeColClient().isMapEditor())
+            ? InfoPanelMode.MAP
+            : (getGUI().getViewMode() == GUI.ViewMode.TERRAIN)
+            ? InfoPanelMode.TILE
+            : (getGUI().getViewMode() == GUI.ViewMode.MOVE_UNITS)
+            ? InfoPanelMode.UNIT
+            : (getFreeColClient().getMyPlayer() == null)
+            ? InfoPanelMode.NONE
+            : InfoPanelMode.END;
+    }
+
+    /**
      * Updates this {@code InfoPanel}.
      *
      * @param mapTransform The current MapTransform.
      */
     public void update(MapTransform mapTransform) {
-        this.mapEditorInfoPanel.update(mapTransform);
-        InfoPanelMode oldMode = update(InfoPanelMode.MAP);
+        final JPanel p = (mapTransform == null) ? null
+            : mapTransform.getDescriptionPanel();
+        if (p != null) {
+            p.setOpaque(false);
+            final Dimension d = p.getPreferredSize();
+            p.setBounds(0, (this.mapEditorInfoPanel.getHeight() - d.height)/2,
+                this.mapEditorInfoPanel.getWidth(), d.height);
+            this.mapEditorInfoPanel.removeAll();
+            this.mapEditorInfoPanel.add(p, BorderLayout.CENTER);
+            this.mapEditorInfoPanel.revalidate();
+            this.mapEditorInfoPanel.repaint();
+        }
+        InfoPanelMode oldMode = update();
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with " + mapTransform);
     }
@@ -179,7 +212,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(Tile tile) {
         this.tileInfoPanel.update(tile);
-        InfoPanelMode oldMode = update(InfoPanelMode.TILE);
+        InfoPanelMode oldMode = update();
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with tile " + tile);
     }
@@ -191,8 +224,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(Unit unit) {
         this.unitInfoPanel.update(unit);
-        InfoPanelMode oldMode = update((unit == null) ? InfoPanelMode.END
-            : InfoPanelMode.UNIT);
+        InfoPanelMode oldMode = update();
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with unit " + unit);
     }
@@ -201,11 +233,11 @@ public final class InfoPanel extends FreeColPanel {
      * Update this {@code InfoPanel} by selecting the correct internal
      * panel to display.
      *
-     * @param newMode The new {@code InfoPanelMode}.
-     * @return The old {@code InfoPanelMode}.
+     * @return The old <code>InfoPanelMode</code>.
      */
-    private InfoPanelMode update(InfoPanelMode newMode) {
+    private InfoPanelMode update() {
         InfoPanelMode oldMode = this.mode;
+        InfoPanelMode newMode = getMode();
         if (oldMode != newMode) {
             switch (this.mode = newMode) {
             case END:
