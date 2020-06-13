@@ -412,6 +412,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void removeInGameComponents() {
+        changeActiveUnit(null);
+        changeSelectedTile(null, false);
         canvas.removeInGameComponents();
     }
 
