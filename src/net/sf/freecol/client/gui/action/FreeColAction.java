@@ -338,8 +338,8 @@ public abstract class FreeColAction extends AbstractAction
      * {@link #shouldBeEnabled}.
      */
     public void update() {
-        boolean b = shouldBeEnabled();
-        if (isEnabled() != b) setEnabled(b);
+        boolean b = this.shouldBeEnabled();
+        if (this.isEnabled() != b) this.setEnabled(b);
     }
 
 
