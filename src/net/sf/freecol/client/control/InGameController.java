@@ -863,6 +863,9 @@ public final class InGameController extends FreeColClientHolder {
             return true;
         }
 
+        // Disable active unit display
+        getGUI().changeView();
+        
         // No active units left.  Do the goto orders.
         if (!doExecuteGotoOrders()) return true;
 
@@ -2756,7 +2759,6 @@ public final class InGameController extends FreeColClientHolder {
         if (ret) {
             sound("sound.event.cashInTreasureTrain");
             unitWas.fireChanges();
-            updateGUI(tile, false);
         }
         return ret;
     }
