@@ -1925,6 +1925,13 @@ public class GUI extends FreeColClientHolder {
     public void removeDialog(FreeColDialog<?> fcd) {}
 
     /**
+     * Remove a trade route panel and associated input.
+     *
+     * @param panel The {@code FreeColPanel} to remove.
+     */
+    public void removeTradeRoutePanel(FreeColPanel panel) {}
+            
+    /**
      * Set dialog preferred size to saved size or to the given
      * {@code Dimension} if no saved size was found.
      *
@@ -2058,6 +2065,16 @@ public class GUI extends FreeColClientHolder {
      */
     public boolean showEditOptionDialog(Option option) {
         return false;
+    }
+
+    /**
+     * Show a dialog for editing a settlmeent.
+     *
+     * @param settlement The {@code IndianSettlement} to edit.
+     * @return The settlement post-edit.
+     */
+    public IndianSettlement showEditSettlementDialog(IndianSettlement settlement) {
+        return null;
     }
 
     /**
