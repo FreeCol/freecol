@@ -135,6 +135,9 @@ import net.sf.freecol.client.gui.dialog.ScaleMapSizeDialog;
 import net.sf.freecol.client.gui.dialog.SelectAmountDialog;
 import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
 import net.sf.freecol.client.gui.dialog.SelectTributeAmountDialog;
+import net.sf.freecol.client.gui.menu.InGameMenuBar;
+import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
+import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
@@ -275,23 +278,12 @@ public final class Canvas extends JDesktopPane {
 
     /** The image library to create icons etc with. */
     private final ImageLibrary imageLibrary;
-    
+
     /** Is the canvas in windowed mode? */
     private boolean windowed;
 
     /** The parent frame, either a window or the full screen. */
     private FreeColFrame frame;
-
-    /** Cached panels.  TODO: check if we still need these */
-    private MainPanel mainPanel;
-
-    private final StartGamePanel startGamePanel;
-
-    private final StatusPanel statusPanel;
-
-    private final ChatPanel chatPanel;
-
-    private final ChatDisplay chatDisplay;
 
     private final MapViewer mapViewer;
 
@@ -304,6 +296,17 @@ public final class Canvas extends JDesktopPane {
     private boolean gotoStarted = false;
 
     private GrayLayer greyLayer;
+
+    /** Cached panels.  TODO: check if we still need these */
+    private MainPanel mainPanel;
+
+    private final StartGamePanel startGamePanel;
+
+    private final StatusPanel statusPanel;
+
+    private final ChatPanel chatPanel;
+
+    private final ChatDisplay chatDisplay;
 
     private final ServerListPanel serverListPanel;
 
@@ -375,6 +378,12 @@ public final class Canvas extends JDesktopPane {
         setDoubleBuffered(true);
         setOpaque(false);
         setLayout(null);
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+        createKeyBindings();
+
+        this.frame = createFrame(null, windowBounds);
+        updateSizes();
 
         chatDisplay = new ChatDisplay();
         chatPanel = new ChatPanel(freeColClient);
@@ -383,15 +392,12 @@ public final class Canvas extends JDesktopPane {
         startGamePanel = new StartGamePanel(freeColClient);
         statusPanel = new StatusPanel(freeColClient);
 
-        setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
-
-        createKeyBindings();
-        createFrame(null, windowBounds);
         mapViewer.startCursorBlinking();
-        logger.info("Canvas created.");
+        logger.info("Canvas created woth bounds: " + windowBounds);
     }
 
+    // Simple utilities
+    
     /**
      * Check if there is a map to display.
      *
@@ -422,85 +428,39 @@ public final class Canvas extends JDesktopPane {
     }
     
 
+    // Frame handling
+
     /**
-     * Change the windowed mode.
+     * Create a new frame with a given menu bar and bounds.
+     *
+     * @param menuBar The new frames {@code JMenuBar}.
+     * @param windowBounds The new frame bounding {@code Rectangle}.
+     * @return The new {@code FreeColFrame}.
      */
-    public void toggleWindowedMode() {
-        // Clean up the old frame
-        JMenuBar menuBar = null;
-        Rectangle windowBounds = null;
-        if (frame != null) {
-            menuBar = frame.getJMenuBar();
-            if (isWindowed()) {
-                windowBounds = frame.getBounds();
-            }
-            frame.setVisible(false);
-            frame.dispose();
-        }
-        toggleWindowed();
-
-        createFrame(menuBar, windowBounds);
-    }
-
-    private void createFrame(JMenuBar menuBar, Rectangle windowBounds) {
+    private FreeColFrame createFrame(JMenuBar menuBar, Rectangle windowBounds) {
         // FIXME: Check this:
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
-        frame = new FreeColFrame(freeColClient, graphicsDevice,
-            menuBar, this, isWindowed(), windowBounds);
-        updateSizes();
-        frame.setVisible(true);
+        FreeColFrame fcf
+            = new FreeColFrame(this.freeColClient, this.graphicsDevice,
+                               menuBar, isWindowed(), windowBounds);
+        fcf.getContentPane().add(this);
+        fcf.setVisible(true);
+        return fcf;
     }
 
     /**
-     * Start the GUI for the map editor.
+     * Destroy the current frame.
      */
-    public void startMapEditorGUI() {
-        if (frame == null) return;
-
-        frame.setMapEditorMenuBar();
-        showMapEditorTransformPanel();
-
-        CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(freeColClient, this);
-        addMouseListener(listener);
-        addMouseMotionListener(listener);
-    }
-
-    /**
-     * Quit the GUI.  All that is required is to exit the full screen.
-     */
-    public void quit() {
-        if (frame != null && !isWindowed()) {
-            frame.exitFullScreen();
+    private void destroyFrame() {
+        if (this.frame != null) {
+            this.frame.setVisible(false);
+            if (!isWindowed()) this.frame.exitFullScreen();
+            this.frame.dispose();
+            this.frame = null;
         }
     }
 
-    /**
-     * In game initializations.
-     */
-    public void initializeInGame() {
-        if (frame == null) return;
-        frame.setInGameMenuBar();
-    }
-
-    /**
-     * Reset the menu bar.
-     */
-    public void resetMenuBar() {
-        if (frame == null) return;
-        this.freeColClient.updateActions();
-        frame.resetMenuBar();
-    }
-
-    /**
-     * Update the menu bar.
-     */
-    public void updateMenuBar() {
-        if (frame == null) return;
-        this.freeColClient.updateActions();
-        frame.updateMenuBar();
-    }
 
     // Map controls
     
@@ -566,6 +526,73 @@ public final class Canvas extends JDesktopPane {
         mapControls.zoomOut();
     }
 
+
+    /**
+     * Toggle the windowed mode.
+     */
+    public void toggleWindowedMode() {
+        // Clean up the old frame
+        JMenuBar menuBar = (frame == null) ? null : frame.getJMenuBar();
+        Rectangle windowBounds = (frame == null || !this.isWindowed()) ? null
+            : frame.getBounds();
+        destroyFrame();
+        toggleWindowed();
+        this.frame = createFrame(menuBar, windowBounds);
+    }
+
+    /**
+     * Map editor initialization.
+     */
+    public void startMapEditorGUI() {
+        if (frame == null) return;
+
+        this.frame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
+                new MenuMouseMotionListener(this.freeColClient, this)));
+        showMapEditorTransformPanel();
+
+        CanvasMapEditorMouseListener listener
+            = new CanvasMapEditorMouseListener(freeColClient, this);
+        addMouseListener(listener);
+        addMouseMotionListener(listener);
+    }
+
+    /**
+     * In game initializations.
+     */
+    public void initializeInGame() {
+        if (frame == null) return;
+        this.frame.setMenuBar(new InGameMenuBar(this.freeColClient,
+                new MenuMouseMotionListener(this.freeColClient, this)));
+    }
+
+    /**
+     * Reset the menu bar.
+     */
+    public void resetMenuBar() {
+        this.freeColClient.updateActions();
+        if (frame == null) return;
+        frame.resetMenuBar();
+    }
+
+    /**
+     * Update the menu bar.
+     */
+    public void updateMenuBar() {
+        this.freeColClient.updateActions();
+        if (frame == null) return;
+        frame.updateMenuBar();
+    }
+
+    /**
+     * Quit the canvas.
+     */
+    public void quit() {
+        destroyFrame();
+    }
+
+
+    // Map viewer
+    
     /**
      * Scroll the map in the given direction.
      *
