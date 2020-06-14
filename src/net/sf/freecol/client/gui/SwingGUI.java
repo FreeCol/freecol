@@ -511,7 +511,7 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         this.mapViewer = new MapViewer(getFreeColClient());
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
-                                 mapViewer.getImageLibrary(), this,
+                                 mapViewer.getImageLibrary(),
                                  desiredWindowSize, this.mapViewer);
         this.tileViewer = new TileViewer(getFreeColClient());
 

@@ -270,9 +270,6 @@ public final class Canvas extends JDesktopPane {
     /** The game client. */
     private final FreeColClient freeColClient;
 
-    /** The parent GUI. */
-    private final GUI gui;
-
     /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
@@ -285,9 +282,9 @@ public final class Canvas extends JDesktopPane {
     /** The parent frame, either a window or the full screen. */
     private FreeColFrame frame;
 
+    /** Cached panels.  TODO: check if we still need these */
     private MainPanel mainPanel;
 
-    /** Cached panels.  TODO: check if we still need these */
     private final StartGamePanel startGamePanel;
 
     private final StatusPanel statusPanel;
@@ -359,11 +356,9 @@ public final class Canvas extends JDesktopPane {
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
                   final ImageLibrary imageLibrary,
-                  final GUI gui,
                   final Dimension desiredSize,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
         this.graphicsDevice = graphicsDevice;
         this.imageLibrary = imageLibrary;
         this.mapViewer = mapViewer;
