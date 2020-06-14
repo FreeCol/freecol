@@ -273,6 +273,9 @@ public final class Canvas extends JDesktopPane {
 
     private final GraphicsDevice graphicsDevice;
 
+    /** The image library to create icons etc with. */
+    private final ImageLibrary imageLibrary;
+    
     /** The parent frame, either a window or the full screen. */
     private FreeColFrame frame;
 
@@ -314,6 +317,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param graphicsDevice The used graphics device.
+     * @param imageLibrary The {@code ImageLibrary} to use.
      * @param gui The gui.
      * @param desiredSize The desired size of the frame.
      * @param mapViewer The object responsible of drawing the map onto
@@ -321,12 +325,14 @@ public final class Canvas extends JDesktopPane {
      */
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
+                  final ImageLibrary imageLibrary,
                   final GUI gui,
                   final Dimension desiredSize,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
         this.graphicsDevice = graphicsDevice;
+        this.imageLibrary = imageLibrary;
+        this.gui = gui;
         this.mapViewer = mapViewer;
         this.greyLayer = new GrayLayer(freeColClient);
 
@@ -1486,7 +1492,7 @@ public final class Canvas extends JDesktopPane {
             }
 
             // paint chat display
-            chatDisplay.display(g2d, mapViewer.getImageLibrary(), size);
+            chatDisplay.display(g2d, this.imageLibrary, size);
 
         } else {
             /* main menu */
@@ -2035,7 +2041,7 @@ public final class Canvas extends JDesktopPane {
      */
     private ImageIcon createObjectImageIcon(FreeColObject display) {
         return (display == null) ? null
-            : createImageIcon(gui.getImageLibrary().getObjectImage(display, 2f));
+            : createImageIcon(this.imageLibrary.getObjectImage(display, 2f));
     }
 
     /**
