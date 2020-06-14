@@ -271,15 +271,17 @@ public final class Canvas extends JDesktopPane {
     /** The parent GUI. */
     private final GUI gui;
 
+    /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
     /** The image library to create icons etc with. */
     private final ImageLibrary imageLibrary;
     
+    /** Is the canvas in windowed mode? */
+    private boolean windowed;
+
     /** The parent frame, either a window or the full screen. */
     private FreeColFrame frame;
-
-    private boolean windowed;
 
     private MainPanel mainPanel;
 
@@ -311,6 +313,32 @@ public final class Canvas extends JDesktopPane {
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
+    /**
+     * Determine whether to use full screen mode, or size of window.
+     *
+     * @param gd The {@code GraphicsDevice} to display to.
+     * @param desiredSize An optional window {@code Dimension}.
+     * @return Null if full screen is to be used, otherwise a window
+     *     bounds {@code Rectangle}
+     */
+    private static boolean checkWindowed(GraphicsDevice gd, Dimension desiredSize) {
+        boolean ret;
+        if (desiredSize == null) {
+            if (gd.isFullScreenSupported()) {
+                logger.info("Full screen mode used.");
+                ret = false;
+            } else {
+                logger.warning("Full screen mode not supported.");
+                System.err.println(Messages.message("client.fullScreen"));
+                ret = true;
+            }
+        } else {
+            logger.info("Windowed mode used.");
+            ret = true;
+        }
+        return ret;
+    }
+
 
     /**
      * The constructor to use.
@@ -337,24 +365,10 @@ public final class Canvas extends JDesktopPane {
         this.greyLayer = new GrayLayer(freeColClient);
 
         // Determine if windowed mode should be used and set the window size.
+        this.windowed = checkWindowed(graphicsDevice, desiredSize);
         Rectangle windowBounds = null;
-        if (desiredSize == null) {
-            if(graphicsDevice.isFullScreenSupported()) {
-                windowed = false;
-                logger.info("Full screen mode used.");
-            } else {
-                windowed = true;
-                logger.warning("Full screen mode not supported.");
-                System.err.println(Messages.message("client.fullScreen"));
-            }
-        } else {
-            windowed = true;
-            if(desiredSize.width > 0 && desiredSize.height > 0) {
-                windowBounds = new Rectangle(desiredSize);
-                logger.info("Windowed mode using desired window size of " + desiredSize);
-            } else {
-                logger.info("Windowed mode used.");
-            }
+        if (this.windowed && desiredSize.width > 0 && desiredSize.height > 0) {
+            windowBounds = new Rectangle(desiredSize);
         }
 
         setDoubleBuffered(true);
@@ -388,9 +402,22 @@ public final class Canvas extends JDesktopPane {
             && this.freeColClient.getGame().getMap() != null;
     }
 
+    /**
+     * Are we in windowed mode?
+     *
+     * @return True if in windowed mode.
+     */
     public boolean isWindowed() {
-        return windowed;
+        return this.windowed;
     }
+
+    /**
+     * Toggle windowed flag.
+     */
+    private void toggleWindowed() {
+        this.windowed = !this.windowed;
+    }
+    
 
     /**
      * Change the windowed mode.
@@ -401,13 +428,13 @@ public final class Canvas extends JDesktopPane {
         Rectangle windowBounds = null;
         if (frame != null) {
             menuBar = frame.getJMenuBar();
-            if (windowed) {
+            if (isWindowed()) {
                 windowBounds = frame.getBounds();
             }
             frame.setVisible(false);
             frame.dispose();
         }
-        windowed = !windowed;
+        toggleWindowed();
 
         createFrame(menuBar, windowBounds);
     }
@@ -417,7 +444,7 @@ public final class Canvas extends JDesktopPane {
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
         frame = new FreeColFrame(freeColClient, graphicsDevice,
-            menuBar, this, windowed, windowBounds);
+            menuBar, this, isWindowed(), windowBounds);
         updateSizes();
         frame.setVisible(true);
     }
@@ -441,7 +468,7 @@ public final class Canvas extends JDesktopPane {
      * Quit the GUI.  All that is required is to exit the full screen.
      */
     public void quit() {
-        if (frame != null && !windowed) {
+        if (frame != null && !isWindowed()) {
             frame.exitFullScreen();
         }
     }
