@@ -371,7 +371,8 @@ public final class Canvas extends JDesktopPane {
         // Determine if windowed mode should be used and set the window size.
         this.windowed = checkWindowed(graphicsDevice, desiredSize);
         Rectangle windowBounds = null;
-        if (this.windowed && desiredSize.width > 0 && desiredSize.height > 0) {
+        if (this.windowed && desiredSize != null
+            && desiredSize.width > 0 && desiredSize.height > 0) {
             windowBounds = new Rectangle(desiredSize);
         }
 
