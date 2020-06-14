@@ -1262,7 +1262,7 @@ public class GUI extends FreeColClientHolder {
     // Initialization and teardown
 
     /**
-     * Change the windowed mode.
+     * Change the windowed mode (really a toggle).
      */
     public void changeWindowedMode() {}
 

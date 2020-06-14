@@ -96,6 +96,7 @@ import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
 import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.dialog.MapSizeDialog;
@@ -177,6 +178,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -285,6 +287,7 @@ public final class Canvas extends JDesktopPane {
 
     private MainPanel mainPanel;
 
+    /** Cached panels.  TODO: check if we still need these */
     private final StartGamePanel startGamePanel;
 
     private final StatusPanel statusPanel;
@@ -294,6 +297,8 @@ public final class Canvas extends JDesktopPane {
     private final ChatDisplay chatDisplay;
 
     private final MapViewer mapViewer;
+
+    private MapControls mapControls;
 
     /** Where the map was drag-clicked. */
     private Point dragPoint = null;
@@ -358,10 +363,11 @@ public final class Canvas extends JDesktopPane {
                   final Dimension desiredSize,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         this.graphicsDevice = graphicsDevice;
         this.imageLibrary = imageLibrary;
-        this.gui = gui;
         this.mapViewer = mapViewer;
+        this.mapControls = null;
         this.greyLayer = new GrayLayer(freeColClient);
 
         // Determine if windowed mode should be used and set the window size.
@@ -402,6 +408,8 @@ public final class Canvas extends JDesktopPane {
             && this.freeColClient.getGame().getMap() != null;
     }
 
+    // Windowed mode?
+
     /**
      * Are we in windowed mode?
      *
@@ -422,7 +430,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Change the windowed mode.
      */
-    public void changeWindowedMode() {
+    public void toggleWindowedMode() {
         // Clean up the old frame
         JMenuBar menuBar = null;
         Rectangle windowBounds = null;
@@ -497,6 +505,70 @@ public final class Canvas extends JDesktopPane {
         if (frame == null) return;
         this.freeColClient.updateActions();
         frame.updateMenuBar();
+    }
+
+    // Map controls
+    
+    public boolean canZoomInMapControls() {
+        return mapControls != null && mapControls.canZoomInMapControls();
+    }
+
+    public boolean canZoomOutMapControls() {
+        return mapControls != null && mapControls.canZoomOutMapControls();
+    }
+
+    public void enableMapControls(boolean enable) {
+        // Always instantiate in game.
+        if (enable && mapControls == null) {
+            String className = this.freeColClient.getClientOptions()
+                .getString(ClientOptions.MAP_CONTROLS);
+            final String panelName = "net.sf.freecol.client.gui.panel."
+                + lastPart(className, ".");
+            try {
+                mapControls = (MapControls)Introspector.instantiate(panelName,
+                    new Class[] { FreeColClient.class },
+                    new Object[] { this.freeColClient });
+                mapControls.addToComponent(this);
+                mapControls.update();
+                logger.info("Instantiated " + panelName);
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Failed in make map controls for: "
+                    + panelName, ie);
+            }
+        } else if (!enable && mapControls != null) {
+            mapControls.removeFromComponent(this);
+            mapControls = null;
+        }
+    }
+
+    public void miniMapToggleViewControls() {
+        if (mapControls == null) return;
+        mapControls.toggleView();
+    }
+
+    public void miniMapToggleFogOfWarControls() {
+        if (mapControls == null) return;
+        mapControls.toggleFogOfWar();
+    }
+
+    public void updateMapControls() {
+        if (mapControls != null) mapControls.update();
+    }
+
+    public void updateMapControlsInCanvas() {
+        if (mapControls == null) return;
+        mapControls.removeFromComponent(this);
+        mapControls.addToComponent(this);
+    }
+
+    public void zoomInMapControls() {
+        if (mapControls == null) return;
+        mapControls.zoomIn();
+    }
+
+    public void zoomOutMapControls() {
+        if (mapControls == null) return;
+        mapControls.zoomOut();
     }
 
     /**
@@ -1476,7 +1548,7 @@ public final class Canvas extends JDesktopPane {
         if (oldSize == null
                 || oldSize.width != getWidth()
                 || oldSize.height != getHeight()) {
-            gui.updateMapControlsInCanvas();
+            updateMapControlsInCanvas();
             mapViewer.changeSize(getSize());
             oldSize = getSize();
         }

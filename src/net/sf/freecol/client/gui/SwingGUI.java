@@ -62,10 +62,8 @@ import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -109,7 +107,6 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
-import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -135,8 +132,6 @@ public class SwingGUI extends GUI {
 
     /** The canvas that implements much of the functionality. */
     private Canvas canvas;
-
-    private MapControls mapControls;
 
     private JWindow splash;
 
@@ -323,7 +318,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void changeWindowedMode() {
-        canvas.changeWindowedMode();
+        canvas.toggleWindowedMode();
     }
 
     /**
@@ -392,7 +387,7 @@ public class SwingGUI extends GUI {
         canvas.setupMouseListeners();
         requestFocusInWindow();
         canvas.initializeInGame();
-        enableMapControls(getClientOptions()
+        canvas.enableMapControls(getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         closeMenus();
         clearGotoPath();
@@ -886,14 +881,14 @@ public class SwingGUI extends GUI {
     }
     
     
-    // MapControls handling
+    // MapControls is delegated to Canvas
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean canZoomInMapControls() {
-        return mapControls != null && mapControls.canZoomInMapControls();
+        return canvas.canZoomInMapControls();
     }
 
     /**
@@ -901,7 +896,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomOutMapControls() {
-        return mapControls != null && mapControls.canZoomOutMapControls();
+        return canvas.canZoomOutMapControls();
     }
 
     /**
@@ -909,26 +904,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void enableMapControls(boolean enable) {
-        // Always instantiate in game.
-        if (enable && mapControls == null) {
-            String className = getClientOptions().getString(ClientOptions.MAP_CONTROLS);
-            final String panelName = "net.sf.freecol.client.gui.panel."
-                + lastPart(className, ".");
-            try {
-                mapControls = (MapControls)Introspector.instantiate(panelName,
-                    new Class[] { FreeColClient.class },
-                    new Object[] { getFreeColClient() });
-                mapControls.addToComponent(canvas);
-                mapControls.update();
-                logger.info("Instantiated " + panelName);
-            } catch (Introspector.IntrospectorException ie) {
-                logger.log(Level.WARNING, "Failed in make map controls for: "
-                    + panelName, ie);
-            }
-        } else if (!enable && mapControls != null) {
-            mapControls.removeFromComponent(canvas);
-            mapControls = null;
-        }
+        canvas.enableMapControls(enable);
     }
 
     /**
@@ -936,8 +912,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void miniMapToggleViewControls() {
-        if (mapControls == null) return;
-        mapControls.toggleView();
+        canvas.miniMapToggleViewControls();
     }
 
     /**
@@ -945,8 +920,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void miniMapToggleFogOfWarControls() {
-        if (mapControls == null) return;
-        mapControls.toggleFogOfWar();
+        canvas.miniMapToggleFogOfWarControls();
     }
 
     /**
@@ -954,7 +928,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateMapControls() {
-        if (mapControls != null) mapControls.update();
+        canvas.updateMapControls();
     }
 
     /**
@@ -962,9 +936,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateMapControlsInCanvas() {
-        if (mapControls == null) return;
-        mapControls.removeFromComponent(canvas);
-        mapControls.addToComponent(canvas);
+        canvas.updateMapControlsInCanvas();
     }
 
     /**
@@ -972,8 +944,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomInMapControls() {
-        if (mapControls == null) return;
-        mapControls.zoomIn();
+        canvas.zoomInMapControls();
     }
 
     /**
@@ -981,8 +952,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomOutMapControls() {
-        if (mapControls == null) return;
-        mapControls.zoomOut();
+        canvas.zoomOutMapControls();
     }
 
 
