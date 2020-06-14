@@ -146,6 +146,7 @@ public class SwingGUI extends GUI {
         super(freeColClient, scaleFactor);
         
         this.graphicsDevice = getGoodGraphicsDevice();
+        this.tileViewer = new TileViewer(freeColClient);
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
@@ -513,7 +514,6 @@ public class SwingGUI extends GUI {
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
                                  mapViewer.getImageLibrary(),
                                  desiredWindowSize, this.mapViewer);
-        this.tileViewer = new TileViewer(getFreeColClient());
 
         // Now that there is a canvas, prepare for language changes.
         opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)
