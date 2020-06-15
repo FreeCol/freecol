@@ -69,7 +69,7 @@ public final class DisplayTileTextAction extends SelectableAction {
               ClientOptions.DISPLAY_TILE_TEXT);
         display = type;
         setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
-                KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+                KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
         setSelected(shouldBeSelected());
     }
 

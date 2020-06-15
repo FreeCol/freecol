@@ -42,6 +42,7 @@ public class FreeColComboBoxUI extends MetalComboBoxUI {
         c.setOpaque(false);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected ListCellRenderer createRenderer() {
         return new FreeColComboBoxRenderer();
