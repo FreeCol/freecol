@@ -1008,6 +1008,7 @@ public class DebugUtils {
     /**
      * Set COMMS logging.
      *
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param log If true, enable COMMS logging.
      */
     public static void setCommsLogging(final FreeColClient freeColClient,
