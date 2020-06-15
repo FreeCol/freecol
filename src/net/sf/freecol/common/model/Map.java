@@ -271,7 +271,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * The latitude of the northern edge of the map. A negative value
      * indicates northern latitude, a positive value southern
-     * latitude. Thus, -30 equals 30°N, and 40 equals 40°S.
+     * latitude. Thus, -30 equals 30 degrees N, and 40 equals 40 degrees S.
      */
     private int minimumLatitude = -90;
 
