@@ -156,7 +156,7 @@ public final class FreeCol {
     private static final int    GUI_SCALE_STEP_PCT = 25;
     public static final float   GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
-    private static final String JAVA_VERSION_MIN = "1.8";
+    private static final String JAVA_VERSION_MIN = "11";
     private static final long   MEMORY_MIN = 512000000; // 512M
     private static final String META_SERVER_ADDRESS = "meta.freecol.org";
     private static final int    META_SERVER_PORT = 3540;
