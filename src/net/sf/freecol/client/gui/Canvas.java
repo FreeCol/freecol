@@ -160,6 +160,9 @@ public final class Canvas extends JDesktopPane {
     /** The special overlay used when it is not the player turn. */
     private GrayLayer greyLayer;
 
+    /** The chat message area. */
+    private final ChatDisplay chatDisplay;
+
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
@@ -168,7 +171,6 @@ public final class Canvas extends JDesktopPane {
     private final StartGamePanel startGamePanel;
     private final StatusPanel statusPanel;
     private final ChatPanel chatPanel;
-    private final ChatDisplay chatDisplay;
     private final ServerListPanel serverListPanel;
 
 
@@ -201,6 +203,7 @@ public final class Canvas extends JDesktopPane {
         this.mapViewer = mapViewer;
         this.mapControls = null;
         this.greyLayer = new GrayLayer(freeColClient);
+        this.chatDisplay = new ChatDisplay();
         
         setDoubleBuffered(true);
         setOpaque(false);
@@ -209,7 +212,6 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
         createKeyBindings();
 
-        chatDisplay = new ChatDisplay();
         chatPanel = new ChatPanel(freeColClient);
         serverListPanel = new ServerListPanel(freeColClient,
             freeColClient.getConnectController());
@@ -1450,7 +1452,7 @@ public final class Canvas extends JDesktopPane {
      * @param message The chat message.
      */
     public void displayChat(GUIMessage message) {
-        chatDisplay.addMessage(message);
+        this.chatDisplay.addMessage(message);
         repaint(0, 0, getWidth(), getHeight());
     }
 
@@ -1595,7 +1597,6 @@ public final class Canvas extends JDesktopPane {
             && this.freeColClient.getGame() != null
             && this.freeColClient.getGame().getMap() != null;
         Graphics2D g2d = (Graphics2D) g;
-        chatDisplay.removeOldMessages();
         Dimension size = getSize();
 
         if (freeColClient.isMapEditor()) {
@@ -1607,9 +1608,10 @@ public final class Canvas extends JDesktopPane {
             }
 
         } else if (freeColClient.isInGame() && hasMap) {
+            // draw the map
             mapViewer.displayMap(g2d);
 
-            // Toggle grey layer
+            // toggle grey layer if needed
             if (freeColClient.currentPlayerIsMyPlayer()) {
                 if (greyLayer.getParent() != null) {
                     removeFromCanvas(greyLayer);
@@ -1622,8 +1624,8 @@ public final class Canvas extends JDesktopPane {
                 }
             }
 
-            // paint chat display
-            chatDisplay.display(g2d, this.imageLibrary, size);
+            // draw the chat
+            this.chatDisplay.display(g2d, this.imageLibrary, size);
 
         } else { /* main menu */
             // Get the background without scaling, to avoid wasting
