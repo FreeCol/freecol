@@ -21,21 +21,12 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
@@ -44,19 +35,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JWindow;
-import javax.swing.Timer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.animation.Animations;
-import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
+// Special panels and dialogs
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
@@ -66,10 +52,10 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
+
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.video.VideoComponent;
-import net.sf.freecol.client.gui.video.VideoListener;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.metaserver.ServerInfo;
@@ -107,15 +93,18 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.StringUtils.*;
-
+import net.sf.freecol.common.util.Utils;
 
 /**
  * A wrapper providing functionality for the overall GUI using Java Swing.
  */
 public class SwingGUI extends GUI {
 
+    /** Number of pixels that must be moved before a goto is enabled. */
+    private static final int DRAG_THRESHOLD = 16;
+
+    /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
     /**
@@ -134,10 +123,14 @@ public class SwingGUI extends GUI {
     /** The canvas that implements much of the functionality. */
     private Canvas canvas;
 
-    /** The widgets wrapper. */
+    /** The widgets wrapper that handles specific panels and dialogs. */
     private Widgets widgets;
-    
-    private JWindow splash;
+
+    /** Where the map was drag-clicked. */
+    private Point dragPoint;
+
+    /** The splash screen. */
+    private SplashScreen splash;
 
 
     /**
@@ -148,9 +141,18 @@ public class SwingGUI extends GUI {
      */
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient, scaleFactor);
-        
-        this.graphicsDevice = getGoodGraphicsDevice();
+
+        this.graphicsDevice = Utils.getGoodGraphicsDevice();
+        if (this.graphicsDevice == null) {
+            FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
+        }
         this.tileViewer = new TileViewer(freeColClient);
+        // Defer remaining initializations, possibly to startGUI
+        this.mapViewer = null;
+        this.canvas = null;
+        this.widgets = null;
+        this.dragPoint = null;
+        this.splash = null;
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
@@ -158,24 +160,22 @@ public class SwingGUI extends GUI {
     // Internals
 
     /**
-     * Get a good screen device for starting FreeCol.
+     * Gets the point at which the map was clicked for a drag.
      *
-     * @return A screen device, or null if none available
-     *     (as in headless mode).
+     * @return The Point where the mouse was initially clicked.
      */
-    private static GraphicsDevice getGoodGraphicsDevice() {
-        try {
-            return MouseInfo.getPointerInfo().getDevice();
-        } catch (HeadlessException he) {}
+    private Point getDragPoint() {
+        return this.dragPoint;
+    }
 
-        try {
-            final GraphicsEnvironment lge
-                = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            return lge.getDefaultScreenDevice();
-        } catch (HeadlessException he) {}
-
-        FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
-        return null;
+    /**
+     * Sets the point at which the map was clicked for a drag.
+     *
+     * @param x The mouse x position.
+     * @param y The mouse y position.
+     */
+    private void setDragPoint(int x, int y) {
+        this.dragPoint = new Point(x, y);
     }
 
     /**
@@ -273,6 +273,21 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Is mouse movement differnce above the drag threshold?
+     *
+     * @param x The new mouse x position.
+     * @param y The new mouse y position.
+     * @return True if the mouse has been dragged.
+     */
+    public boolean isDrag(int x, int y) {
+        final Point drag = getDragPoint();
+        if (drag == null) return false;
+        int deltaX = Math.abs(x - drag.x);
+        int deltaY = Math.abs(y - drag.y);
+        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
+    }
+
+    /**
      * Update the current goto to a given tile.
      *
      * @param tile The new goto {@code Tile}.
@@ -281,8 +296,20 @@ public class SwingGUI extends GUI {
         final Unit unit = getActiveUnit();
         if (tile == null || unit == null) {
             clearGotoPath();
-        } else {
-            canvas.changeGoto(unit, tile);
+        } else if (canvas.isGotoStarted()) {
+            // Do nothing if the tile has not changed.
+            PathNode oldPath = mapViewer.getGotoPath();
+            Tile lastTile = (oldPath == null) ? null
+                : oldPath.getLastNode().getTile();
+            if (lastTile == tile) return;
+
+            // Do not show a path if it will be invalid, avoiding calling
+            // the expensive path finder if possible.
+            PathNode newPath = (unit.getTile() == tile
+                || !tile.isExplored()
+                || !unit.getSimpleMoveType(tile).isLegal()) ? null
+                : unit.findPath(tile);
+            mapViewer.changeGotoPath(newPath);
         }
     }
 
@@ -331,21 +358,14 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void displaySplashScreen(final InputStream splashStream) {
-        splash = null;
-        if (splashStream == null) return;
-        try {
-            BufferedImage im = ImageIO.read(splashStream);
-            splash = new JWindow(graphicsDevice.getDefaultConfiguration());
-            splash.getContentPane().add(new JLabel(new ImageIcon(im)));
-            splash.pack();
-            Point start = splash.getLocation();
-            DisplayMode dm = graphicsDevice.getDisplayMode();
-            splash.setLocation(start.x + dm.getWidth()/2 - splash.getWidth() / 2,
-                start.y + dm.getHeight()/2 - splash.getHeight() / 2);
-            splash.setVisible(true);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Splash fail", e);
-            splash = null;
+        if (splashStream != null) {
+            try {
+                this.splash = new SplashScreen(this.graphicsDevice,
+                                               splashStream);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Splash screen failure", e);
+            }
+            this.splash.setVisible(true);
         }
     }
 
@@ -354,10 +374,9 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void hideSplashScreen() {
-        if (splash != null) {
-            splash.setVisible(false);
-            splash.dispose();
-            splash = null;
+        if (this.splash != null) {
+            this.splash.setVisible(false);
+            this.splash = null;
         }
     }
 
@@ -389,7 +408,6 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void reconnect(Unit active, Tile tile) {
-        canvas.setupMouseListeners();
         requestFocusInWindow();
         canvas.initializeInGame();
         canvas.enableMapControls(getClientOptions()
@@ -422,90 +440,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showOpeningVideo(final String userMsg) {
-        canvas.closeMenus();
-        final Video video = ImageLibrary.getVideo("video.opening");
-        boolean muteAudio = !getSoundController().canPlaySound();
-        final VideoComponent vp = new VideoComponent(video, muteAudio);
-
-        final class AbortListener implements ActionListener, KeyListener,
-            MouseListener, VideoListener {
-
-            private Timer t = null;
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e1) {
-                execute();
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e2) {
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e3) {
-                execute();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e4) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e5) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e6) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e7) {
-            }
-
-            @Override
-            public void stopped() {
-                execute();
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent ae8) {
-                execute();
-            }
-
-            private void setTimer(Timer t1) {
-                this.t = t1;
-            }
-
-            private void execute() {
-                canvas.removeKeyListener(this);
-                canvas.removeMouseListener(this);
-                vp.removeMouseListener(this);
-                //vp.removeVideoListener(this);
-                vp.stop();
-                canvas.remove(vp);
-                if (t != null) {
-                    t.stop();
-                }
-                playSound("sound.intro.general");
-                showMainPanel(userMsg);
-            }
-        }
-        AbortListener l = new AbortListener();
-        vp.addMouseListener(l);
-        //vp.addVideoListener(l);
-        canvas.addVideo(vp, l, l);
-        vp.play();
-        // Cortado applet is failing to quit when finished, make sure it
-        // eventually gets kicked.  Change the magic number if we
-        // change the opening video length.
-        Timer t2 = new Timer(80000, l);
-        l.setTimer(t2);
-        t2.setRepeats(false);
-        t2.start();
+        canvas.playVideo("video.opening",
+                         !getSoundController().canPlaySound(),
+                         () -> {
+                             playSound("sound.intro.general");
+                             showMainPanel(userMsg);
+                         });
     }
 
     /**
@@ -516,7 +456,6 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         this.mapViewer = new MapViewer(getFreeColClient());
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
-                                 mapViewer.getImageLibrary(),
                                  desiredWindowSize, this.mapViewer);
         this.widgets = new Widgets(getFreeColClient(),
                                    mapViewer.getImageLibrary(), this.canvas);
@@ -540,7 +479,6 @@ public class SwingGUI extends GUI {
         // No longer doing anything special for pmoffscreen et al as
         // changing these in-game does not change the now initialized
         // graphics pipeline.
-
         logger.info("GUI started.");
     }
 
@@ -869,7 +807,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateGoto(int x, int y, boolean start) {
-        if (start && canvas.isDrag(x, y)) {
+        if (start && isDrag(x, y)) {
             canvas.startGoto();
         }
         if (canvas.isGotoStarted()) {
@@ -883,7 +821,7 @@ public class SwingGUI extends GUI {
     @Override
     public void prepareDrag(int x, int y) {
         if (canvas.isGotoStarted()) canvas.stopGoto();
-        canvas.setDragPoint(x, y);
+        setDragPoint(x, y);
         canvas.requestFocus();
     }
     
@@ -1184,7 +1122,7 @@ public class SwingGUI extends GUI {
     public void clickAt(int count, int x, int y) {
         // This could be a drag, which would have already been processed
         // in @see CanvasMouseListener#mouseReleased
-        if (count == 1 && canvas.isDrag(x, y)) return;
+        if (count == 1 && isDrag(x, y)) return;
         
         final Tile tile = canvas.convertToMapTile(x, y);
         if (tile == null) return;

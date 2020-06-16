@@ -28,10 +28,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.font.TextLayout;
@@ -42,7 +47,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -51,6 +55,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
@@ -59,11 +64,14 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
-import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
+import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.video.VideoComponent;
+import net.sf.freecol.client.gui.video.VideoListener;
+
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
@@ -76,6 +84,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -95,16 +104,10 @@ import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 
 
 /**
- * The main container for the other GUI components in FreeCol. This
- * container is where the panels, dialogs and menus are added. In
- * addition, this is the component in which the map graphics are
- * displayed.
- * <p>
- * <b>Displaying panels and a dialogs</b>
- * <p>
- * {@code Canvas} contains methods to display various panels and dialogs.
- * Most of these methods use {@link net.sf.freecol.common.i18n i18n} to get
- * localized text.  Dialogs return results, and may be modal or non-modal.
+ * The main container for the other GUI components in FreeCol.
+ * This is where lower level graphics coordination occurs.
+ * Specific panels and dialogs are over in Widgets
+ * (TODO) with a few exceptions.
  */
 public final class Canvas extends JDesktopPane {
 
@@ -119,9 +122,6 @@ public final class Canvas extends JDesktopPane {
 
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
-
-    /** Number of pixels that must be moved before a goto is enabled. */
-    private static final int DRAG_THRESHOLD = 16;
 
     /** The cursor to show for goto operations. */
     private static final java.awt.Cursor GO_CURSOR
@@ -148,79 +148,45 @@ public final class Canvas extends JDesktopPane {
     /** Remember the current size (from getSize()), check for changes. */
     private Dimension oldSize = null;
 
+    /** The component that displays the map. */
     private final MapViewer mapViewer;
 
+    /** The various sorts of map controls. */
     private MapControls mapControls;
-
-    /** Where the map was drag-clicked. */
-    private Point dragPoint = null;
 
     /** Has a goto operation started? */
     private boolean gotoStarted = false;
 
+    /** The special overlay used when it is not the player turn. */
     private GrayLayer greyLayer;
-
-    /** Cached panels.  TODO: check if we still need these */
-    private MainPanel mainPanel;
-
-    private final StartGamePanel startGamePanel;
-
-    private final StatusPanel statusPanel;
-
-    private final ChatPanel chatPanel;
-
-    private final ChatDisplay chatDisplay;
-
-    private final ServerListPanel serverListPanel;
 
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
-    /**
-     * Determine whether to use full screen mode, or size of window.
-     *
-     * @param gd The {@code GraphicsDevice} to display to.
-     * @param desiredSize An optional window {@code Dimension}.
-     * @return Null if full screen is to be used, otherwise a window
-     *     bounds {@code Rectangle}
-     */
-    private static boolean checkWindowed(GraphicsDevice gd, Dimension desiredSize) {
-        boolean ret;
-        if (desiredSize == null) {
-            if (gd.isFullScreenSupported()) {
-                logger.info("Full screen mode used.");
-                ret = false;
-            } else {
-                logger.warning("Full screen mode not supported.");
-                System.err.println(Messages.message("client.fullScreen"));
-                ret = true;
-            }
-        } else {
-            logger.info("Windowed mode used.");
-            ret = true;
-        }
-        return ret;
-    }
+    /** Cached panels.  TODO: check if we still need these */
+    private MainPanel mainPanel;
+    private final StartGamePanel startGamePanel;
+    private final StatusPanel statusPanel;
+    private final ChatPanel chatPanel;
+    private final ChatDisplay chatDisplay;
+    private final ServerListPanel serverListPanel;
 
 
     /**
      * The constructor to use.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param graphicsDevice The used graphics device.
-     * @param imageLibrary The {@code ImageLibrary} to use.
+     * @param graphicsDevice The {@code GraphicsDevice} to display on.
      * @param desiredSize The desired size of the parent frame.
-     * @param mapViewer The object responsible of drawing the map onto
-     *     this component.
+     * @param mapViewer The object responsible of drawing the map.
      */
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
-                  final ImageLibrary imageLibrary,
                   final Dimension desiredSize,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
-        this.imageLibrary = imageLibrary;
+        this.imageLibrary = mapViewer.getImageLibrary();
 
         // Determine if windowed mode should be used and set the window size.
         this.windowed = checkWindowed(graphicsDevice, desiredSize);
@@ -254,52 +220,15 @@ public final class Canvas extends JDesktopPane {
         logger.info("Canvas created woth bounds: " + windowBounds);
     }
 
-    // Simple utilities
+    // Internals
     
-    /**
-     * Check if there is a map to display.
-     *
-     * @return True if there is a map available.
-     */
-    private boolean hasMap() {
-        return this.freeColClient != null
-            && this.freeColClient.getGame() != null
-            && this.freeColClient.getGame().getMap() != null;
-    }
-
-    // Windowed mode?
-
-    /**
-     * Are we in windowed mode?
-     *
-     * @return True if in windowed mode.
-     */
-    public boolean isWindowed() {
-        return this.windowed;
-    }
-
     /**
      * Toggle windowed flag.
      */
     private void toggleWindowed() {
         this.windowed = !this.windowed;
     }
-    
 
-    // Frame handling and size handling
-
-    /**
-     * Get the parent frame.
-     *
-     * Do not use this except inside Widgets (which is really just an
-     * extension of Canvas).
-     *
-     * @return The parent {@code FreeColFrame}.
-     */
-    public FreeColFrame getParentFrame() {
-        return this.parentFrame;
-    }
-    
     /**
      * Create a new frame with a given menu bar and bounds.
      *
@@ -332,21 +261,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Toggle the frame between windowed and non-windowed modes.
-     */
-    public void toggleFrame() {
-        JMenuBar menuBar = null;
-        Rectangle windowBounds = null;
-        if (this.parentFrame != null) {
-            menuBar = this.parentFrame.getJMenuBar();
-            windowBounds = this.parentFrame.getBounds();
-        }
-        destroyFrame();
-        toggleWindowed();
-        this.parentFrame = createFrame(menuBar, windowBounds);
-    }
-
-    /**
      * Has the canvas been resized?
      *
      * @return The new {@code Dimension} for the canvas.
@@ -360,192 +274,32 @@ public final class Canvas extends JDesktopPane {
         return newSize;
     }
 
-
-    // Map controls
-    
-    public boolean canZoomInMapControls() {
-        return mapControls != null && mapControls.canZoomInMapControls();
-    }
-
-    public boolean canZoomOutMapControls() {
-        return mapControls != null && mapControls.canZoomOutMapControls();
-    }
-
-    public void enableMapControls(boolean enable) {
-        // Always instantiate in game.
-        if (enable && mapControls == null) {
-            String className = this.freeColClient.getClientOptions()
-                .getString(ClientOptions.MAP_CONTROLS);
-            final String panelName = "net.sf.freecol.client.gui.panel."
-                + lastPart(className, ".");
-            try {
-                mapControls = (MapControls)Introspector.instantiate(panelName,
-                    new Class[] { FreeColClient.class },
-                    new Object[] { this.freeColClient });
-                mapControls.addToComponent(this);
-                mapControls.update();
-                logger.info("Instantiated " + panelName);
-            } catch (Introspector.IntrospectorException ie) {
-                logger.log(Level.WARNING, "Failed in make map controls for: "
-                    + panelName, ie);
+    /**
+     * Determine whether to use full screen or windowed mode.
+     *
+     * @param gd The {@code GraphicsDevice} to display to.
+     * @param desiredSize An optional window {@code Dimension}.
+     * @return Null if full screen is to be used, otherwise a window
+     *     bounds {@code Rectangle}
+     */
+    private static boolean checkWindowed(GraphicsDevice gd,
+                                         Dimension desiredSize) {
+        boolean ret;
+        if (desiredSize == null) {
+            if (gd.isFullScreenSupported()) {
+                logger.info("Full screen mode used.");
+                ret = false;
+            } else {
+                logger.warning("Full screen mode not supported.");
+                System.err.println(Messages.message("client.fullScreen"));
+                ret = true;
             }
-        } else if (!enable && mapControls != null) {
-            mapControls.removeFromComponent(this);
-            mapControls = null;
+        } else {
+            logger.info("Windowed mode used.");
+            ret = true;
         }
-    }
-
-    public void miniMapToggleViewControls() {
-        if (mapControls == null) return;
-        mapControls.toggleView();
-    }
-
-    public void miniMapToggleFogOfWarControls() {
-        if (mapControls == null) return;
-        mapControls.toggleFogOfWar();
-    }
-
-    public void updateMapControls() {
-        if (mapControls != null) mapControls.update();
-    }
-
-    public void updateMapControlsInCanvas() {
-        if (mapControls == null) return;
-        mapControls.removeFromComponent(this);
-        mapControls.addToComponent(this);
-    }
-
-    public void zoomInMapControls() {
-        if (mapControls == null) return;
-        mapControls.zoomIn();
-    }
-
-    public void zoomOutMapControls() {
-        if (mapControls == null) return;
-        mapControls.zoomOut();
-    }
-
-
-    // Map viewer
-    
-    /**
-     * Scroll the map in the given direction.
-     *
-     * @param direction The {@code Direction} to scroll in.
-     * @return True if scrolling occurred.
-     */
-    public boolean scrollMap(Direction direction) {
-        return mapViewer.scrollMap(direction);
-    }
-
-    /**
-     * Converts the given screen coordinates to Map coordinates.
-     * It checks to see to which Tile the given pixel 'belongs'.
-     *
-     * @param x The x-coordinate in pixels.
-     * @param y The y-coordinate in pixels.
-     * @return The Tile that is located at the given position on the screen.
-     */
-    public Tile convertToMapTile(int x, int y) {
-        return mapViewer.convertToMapTile(x, y);
-    }
-
-
-    // Drag and goto
-    
-    /**
-     * Gets the point at which the map was clicked for a drag.
-     *
-     * @return The Point where the mouse was initially clicked.
-     */
-    public Point getDragPoint() {
-        return this.dragPoint;
-    }
-
-    /**
-     * Sets the point at which the map was clicked for a drag.
-     *
-     * @param x The mouse x position.
-     * @param y The mouse y position.
-     */
-    public void setDragPoint(int x, int y) {
-        this.dragPoint = new Point(x, y);
-    }
-
-    /**
-     * Is mouse movement differnce above the drag threshold?
-     *
-     * @param x The new mouse x position.
-     * @param y The new mouse y position.
-     * @return True if the mouse has been dragged.
-     */
-    public boolean isDrag(int x, int y) {
-        final Point drag = getDragPoint();
-        if (drag == null) return false;
-        int deltaX = Math.abs(x - drag.x);
-        int deltaY = Math.abs(y - drag.y);
-        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
-    }
-
-    /**
-     * Checks if there is currently a goto operation on the mapboard.
-     *
-     * @return True if a goto operation is in progress.
-     */
-    public boolean isGotoStarted() {
-        return this.gotoStarted;
-    }
-
-    /**
-     * Starts a goto operation.
-     */
-    public void startGoto() {
-        this.gotoStarted = true;
-        setCursor(GO_CURSOR);
-        mapViewer.changeGotoPath(null);
-        refresh();
-    }
-
-    /**
-     * Stops any ongoing goto operation.
-     *
-     * @return The old goto path if any.
-     */
-    public PathNode stopGoto() {
-        PathNode ret = (this.gotoStarted) ? mapViewer.getGotoPath() : null;
-        this.gotoStarted = false;
-        setCursor(null);
-        mapViewer.changeGotoPath(null);
-        refresh();
         return ret;
     }
-
-    /**
-     * Change the goto path for a unit to a new tile.
-     *
-     * @param unit The {@code Unit} that is travelling.
-     * @param tile The new {@code Tile} to go to.
-     */       
-    public void changeGoto(Unit unit, Tile tile) {
-        if (!isGotoStarted()) return;
-
-        // Do nothing if the tile has not changed.
-        PathNode oldPath = mapViewer.getGotoPath();
-        Tile lastTile = (oldPath == null) ? null
-            : oldPath.getLastNode().getTile();
-        if (lastTile == tile) return;
-
-        // Do not show a path if it will be invalid, avoiding calling
-        // the expensive path finder if possible.
-        PathNode newPath = (unit.getTile() == tile
-            || !tile.isExplored()
-            || !unit.getSimpleMoveType(tile).isLegal()) ? null
-            : unit.findPath(tile);
-        mapViewer.changeGotoPath(newPath);
-    }
-
-
-    // Internals
 
     /**
      * Adds a component on this Canvas inside a frame.
@@ -982,7 +736,6 @@ public final class Canvas extends JDesktopPane {
         mapViewer.stopCursorBlinking();
     }
 
-
     // Dialog display, only public for Widgets
     
     /**
@@ -1144,10 +897,266 @@ public final class Canvas extends JDesktopPane {
         freeColDialog.setVisible(true);
     }
 
-    
-    // Public API
 
+    // Frames and windowing
+
+    /**
+     * Are we in windowed mode?
+     *
+     * @return True if in windowed mode.
+     */
+    public boolean isWindowed() {
+        return this.windowed;
+    }
+
+    /**
+     * Get the parent frame.
+     *
+     * Do not use this except inside Widgets (which is really just an
+     * extension of Canvas).
+     *
+     * @return The parent {@code FreeColFrame}.
+     */
+    public FreeColFrame getParentFrame() {
+        return this.parentFrame;
+    }
     
+    /**
+     * Toggle the frame between windowed and non-windowed modes.
+     */
+    public void toggleFrame() {
+        JMenuBar menuBar = null;
+        Rectangle windowBounds = null;
+        if (this.parentFrame != null) {
+            menuBar = this.parentFrame.getJMenuBar();
+            windowBounds = this.parentFrame.getBounds();
+        }
+        destroyFrame();
+        toggleWindowed();
+        this.parentFrame = createFrame(menuBar, windowBounds);
+    }
+
+    // Map controls
+    
+    public boolean canZoomInMapControls() {
+        return mapControls != null && mapControls.canZoomInMapControls();
+    }
+
+    public boolean canZoomOutMapControls() {
+        return mapControls != null && mapControls.canZoomOutMapControls();
+    }
+
+    public void enableMapControls(boolean enable) {
+        // Always instantiate in game.
+        if (enable && mapControls == null) {
+            String className = this.freeColClient.getClientOptions()
+                .getString(ClientOptions.MAP_CONTROLS);
+            final String panelName = "net.sf.freecol.client.gui.panel."
+                + lastPart(className, ".");
+            try {
+                mapControls = (MapControls)Introspector.instantiate(panelName,
+                    new Class[] { FreeColClient.class },
+                    new Object[] { this.freeColClient });
+                mapControls.addToComponent(this);
+                mapControls.update();
+                logger.info("Instantiated " + panelName);
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Failed in make map controls for: "
+                    + panelName, ie);
+            }
+        } else if (!enable && mapControls != null) {
+            mapControls.removeFromComponent(this);
+            mapControls = null;
+        }
+    }
+
+    public void miniMapToggleViewControls() {
+        if (mapControls == null) return;
+        mapControls.toggleView();
+    }
+
+    public void miniMapToggleFogOfWarControls() {
+        if (mapControls == null) return;
+        mapControls.toggleFogOfWar();
+    }
+
+    public void updateMapControls() {
+        if (mapControls != null) mapControls.update();
+    }
+
+    public void updateMapControlsInCanvas() {
+        if (mapControls == null) return;
+        mapControls.removeFromComponent(this);
+        mapControls.addToComponent(this);
+    }
+
+    public void zoomInMapControls() {
+        if (mapControls == null) return;
+        mapControls.zoomIn();
+    }
+
+    public void zoomOutMapControls() {
+        if (mapControls == null) return;
+        mapControls.zoomOut();
+    }
+
+    // Map viewer
+    
+    /**
+     * Scroll the map in the given direction.
+     *
+     * Called from ScrollThread.
+     *
+     * @param direction The {@code Direction} to scroll in.
+     * @return True if scrolling occurred.
+     */
+    public boolean scrollMap(Direction direction) {
+        return mapViewer.scrollMap(direction);
+    }
+
+    /**
+     * Converts the given screen coordinates to Map coordinates.
+     * It checks to see to which Tile the given pixel 'belongs'.
+     *
+     * @param x The x-coordinate in pixels.
+     * @param y The y-coordinate in pixels.
+     * @return The Tile that is located at the given position on the screen.
+     */
+    public Tile convertToMapTile(int x, int y) {
+        return mapViewer.convertToMapTile(x, y);
+    }
+
+    // Gotos
+    
+    /**
+     * Checks if there is currently a goto operation on the mapboard.
+     *
+     * @return True if a goto operation is in progress.
+     */
+    public boolean isGotoStarted() {
+        return this.gotoStarted;
+    }
+
+    /**
+     * Starts a goto operation.
+     */
+    public void startGoto() {
+        this.gotoStarted = true;
+        setCursor(GO_CURSOR);
+        mapViewer.changeGotoPath(null);
+        refresh();
+    }
+
+    /**
+     * Stops any ongoing goto operation.
+     *
+     * @return The old goto path if any.
+     */
+    public PathNode stopGoto() {
+        PathNode ret = (this.gotoStarted) ? mapViewer.getGotoPath() : null;
+        this.gotoStarted = false;
+        setCursor(null);
+        mapViewer.changeGotoPath(null);
+        refresh();
+        return ret;
+    }
+
+    // Startup
+
+    /**
+     * Play the opening video.
+     *
+     * @param videoId An identifier for the video content.
+     * @param muteAudio Mute if true.
+     * @param runnable A {@code Runnable} to run on completion.
+     */
+    public void playVideo(String videoId, boolean muteAudio,
+                          final Runnable runnable) {
+        final Video video = ImageLibrary.getVideo(videoId);        
+        final VideoComponent vc = new VideoComponent(video, muteAudio);
+
+        final class AbortListener implements ActionListener, KeyListener,
+            MouseListener, VideoListener {
+
+            private Timer t = null;
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e1) {
+                execute();
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e2) {
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e3) {
+                execute();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e4) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e5) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e6) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e7) {
+            }
+
+            @Override
+            public void stopped() {
+                execute();
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent ae) { // from timer
+                execute();
+            }
+
+            public void startTimer(int tim) {
+                this.t = new Timer(tim, this);
+                this.t.setRepeats(false);
+                this.t.start();
+            }
+
+            private void execute() {
+                removeKeyListener(this);
+                removeMouseListener(this);
+                vc.removeMouseListener(this);
+                vc.stop();
+                remove(vc);
+                if (t != null) {
+                    t.stop();
+                }
+                runnable.run();
+            }
+        }
+
+        closeMenus();
+        AbortListener l = new AbortListener();
+        addMouseListener(l);
+        addKeyListener(l);
+        // The Cortado applet is failing to quit when finished, make
+        // sure it eventually gets kicked.
+        // Change the magic number if we change the opening video length.
+        l.startTimer(80000);
+
+        // Add video and play
+        addCentered(vc, JLayeredPane.PALETTE_LAYER);
+        vc.play();
+    }
+
     /**
      * Map editor initialization.
      */
@@ -1166,6 +1175,8 @@ public final class Canvas extends JDesktopPane {
     public void initializeInGame() {
         this.parentFrame.setMenuBar(new InGameMenuBar(this.freeColClient,
                 new MenuMouseMotionListener(this.freeColClient, this)));
+        addMouseListener(new CanvasMouseListener(this.freeColClient));
+        addMouseMotionListener(new CanvasMouseMotionListener(this.freeColClient, this));
     }
 
     /**
@@ -1189,21 +1200,6 @@ public final class Canvas extends JDesktopPane {
      */
     public void quit() {
         destroyFrame();
-    }
-
-    /**
-     * Shows the given video Component.
-     *
-     * @param vp The video Component.
-     * @param ml A MouseListener for stopping the video.
-     * @param kl A KeyListener for stopping the video.
-     */
-    public void addVideo(final Component vp,
-                         final MouseListener ml,
-                         final KeyListener kl) {
-        addMouseListener(ml);
-        addKeyListener(kl);
-        addCentered(vp, JLayeredPane.PALETTE_LAYER);
     }
 
     /**
@@ -1249,37 +1245,6 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         }        
-    }
-
-    /**
-     * Closes the {@link MainPanel}.
-     */
-    public void closeMainPanel() {
-       if (mainPanel != null) {
-          remove(mainPanel);
-          mainPanel = null;
-       }
-    }
-
-    /**
-     * Closes the {@code StatusPanel}.
-     *
-     * @see #showStatusPanel
-     */
-    public void closeStatusPanel() {
-        if (statusPanel.isVisible()) {
-            remove(statusPanel);
-        }
-    }
-
-    /**
-     * Tells that a chat message was received.
-     *
-     * @param message The chat message.
-     */
-    public void displayChat(GUIMessage message) {
-        chatDisplay.addMessage(message);
-        repaint(0, 0, getWidth(), getHeight());
     }
 
     /**
@@ -1456,11 +1421,39 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    public void setupMouseListeners() {
-        addMouseListener(new CanvasMouseListener(freeColClient));
-        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, this));
-    }
+    // Special dialogs and panels
     
+    /**
+     * Closes the {@link MainPanel}.
+     */
+    public void closeMainPanel() {
+       if (mainPanel != null) {
+          remove(mainPanel);
+          mainPanel = null;
+       }
+    }
+
+    /**
+     * Closes the {@code StatusPanel}.
+     *
+     * @see #showStatusPanel
+     */
+    public void closeStatusPanel() {
+        if (statusPanel.isVisible()) {
+            remove(statusPanel);
+        }
+    }
+
+    /**
+     * Tells that a chat message was received.
+     *
+     * @param message The chat message.
+     */
+    public void displayChat(GUIMessage message) {
+        chatDisplay.addMessage(message);
+        repaint(0, 0, getWidth(), getHeight());
+    }
+
     /**
      * Closes all panels, changes the background and shows the main menu.
      */
@@ -1598,20 +1591,22 @@ public final class Canvas extends JDesktopPane {
             updateMapControlsInCanvas();
             mapViewer.changeSize(newSize);
         }
-
+        boolean hasMap = this.freeColClient != null
+            && this.freeColClient.getGame() != null
+            && this.freeColClient.getGame().getMap() != null;
         Graphics2D g2d = (Graphics2D) g;
         chatDisplay.removeOldMessages();
         Dimension size = getSize();
 
         if (freeColClient.isMapEditor()) {
-            if (hasMap()) {
+            if (hasMap) {
                 mapViewer.displayMap(g2d);
             } else {
                 g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, 0, size.width, size.height);
             }
 
-        } else if (freeColClient.isInGame() && hasMap()) {
+        } else if (freeColClient.isInGame() && hasMap) {
             mapViewer.displayMap(g2d);
 
             // Toggle grey layer
@@ -1630,15 +1625,12 @@ public final class Canvas extends JDesktopPane {
             // paint chat display
             chatDisplay.display(g2d, this.imageLibrary, size);
 
-        } else {
-            /* main menu */
-            // TODO: Check if its right to sometimes have an unfocused map
-            //       ingame and end up here after clicking outside map.
+        } else { /* main menu */
+            // Get the background without scaling, to avoid wasting
+            // memory needlessly keeping an unbounded number of rescaled
+            // versions of the largest image in FreeCol, forever.
             final Image bgImage = ImageLibrary.getCanvasBackgroundImage();
             if (bgImage != null) {
-                // Get the background without scaling, to avoid wasting
-                // memory needlessly keeping an unbounded number of rescaled
-                // versions of the largest image in FreeCol, forever.
                 // Draw background image with scaling.
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                     RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -1657,8 +1649,9 @@ public final class Canvas extends JDesktopPane {
                 g2d.setFont(oldFont);
                 g2d.setColor(oldColor);
             } else {
-                g2d.setColor(Color.BLACK);
+                g2d.setColor(Color.WHITE);
                 g2d.fillRect(0, 0, size.width, size.height);
+                logger.warning("Unable to load the canvas background");
             }
         }
     }
