@@ -850,6 +850,7 @@ public class SwingGUI extends GUI {
     @Override
     public void enableMapControls(boolean enable) {
         canvas.enableMapControls(enable);
+        updateMapControls();
     }
 
     /**
@@ -873,7 +874,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateMapControls() {
-        canvas.updateMapControls();
+        canvas.updateMapControls(getActiveUnit());
     }
 
     /**

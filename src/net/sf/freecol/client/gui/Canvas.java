@@ -960,7 +960,6 @@ public final class Canvas extends JDesktopPane {
                     new Class[] { FreeColClient.class },
                     new Object[] { this.freeColClient });
                 mapControls.addToComponent(this);
-                mapControls.update();
                 logger.info("Instantiated " + panelName);
             } catch (Introspector.IntrospectorException ie) {
                 logger.log(Level.WARNING, "Failed in make map controls for: "
@@ -982,8 +981,9 @@ public final class Canvas extends JDesktopPane {
         mapControls.toggleFogOfWar();
     }
 
-    public void updateMapControls() {
-        if (mapControls != null) mapControls.update();
+    public void updateMapControls(Unit unit) {
+        if (mapControls == null) return;
+        mapControls.update(unit);
     }
 
     public void updateMapControlsInCanvas() {

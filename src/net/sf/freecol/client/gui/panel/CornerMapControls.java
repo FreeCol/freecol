@@ -107,7 +107,6 @@ public final class CornerMapControls extends MapControls {
 
         miniMapPanel = new MiniMapPanel();
         miniMapPanel.setFocusable(false);
-        
         /**
          * In order to make the setLocation setup work, we need to set
          * the layout to null first, then set the size of the minimap,
