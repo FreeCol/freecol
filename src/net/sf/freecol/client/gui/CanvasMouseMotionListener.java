@@ -69,8 +69,8 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     @Override
     public void mouseDragged(MouseEvent me) {
         // getButton does not work here, TODO: find out why
-        if ((me.getModifiers() & MouseEvent.BUTTON1_MASK)
-            != MouseEvent.BUTTON1_MASK) return;
+        if ((me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK)
+            != MouseEvent.BUTTON1_DOWN_MASK) return;
         performDragScrollIfActive(me);
 
         getGUI().updateGoto(me.getX(), me.getY(), true);

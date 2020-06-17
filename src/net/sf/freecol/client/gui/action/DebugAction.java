@@ -45,7 +45,7 @@ public class DebugAction extends FreeColAction {
         super(freeColClient, id);
 
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
-                KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK));
+                KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK));
     }
 
 

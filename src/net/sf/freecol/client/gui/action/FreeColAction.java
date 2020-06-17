@@ -86,8 +86,9 @@ public abstract class FreeColAction extends AbstractAction
         public void menuKeyPressed(MenuKeyEvent e) {
 
             if (e.getKeyCode() == mnemonic) {
-                ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), (String) getValue(Action.NAME),
-                                                 e.getModifiers());
+                ActionEvent ae = new ActionEvent(e.getSource(), e.getID(),
+                                                 (String) getValue(Action.NAME),
+                                                 e.getModifiersEx());
                 actionPerformed(ae);
 
                 e.consume();
@@ -338,8 +339,8 @@ public abstract class FreeColAction extends AbstractAction
      * {@link #shouldBeEnabled}.
      */
     public void update() {
-        boolean b = shouldBeEnabled();
-        if (isEnabled() != b) setEnabled(b);
+        boolean b = this.shouldBeEnabled();
+        if (this.isEnabled() != b) this.setEnabled(b);
     }
 
 

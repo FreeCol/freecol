@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -37,13 +38,24 @@ public class ChatDisplay {
     /** The number of messages getting remembered. */
     private static final int MESSAGE_COUNT = 3;
 
+    /** Left margin for the text. */
+    private static final int LEFT_MARGIN = 40;
+
+    /** Top margin for the text. */
+    private static final int TOP_MARGIN = 300;
+
     /** The amount of time before a message gets deleted (in milliseconds). */
     private static final int MESSAGE_AGE = 30000;
 
-    private final ArrayList<GUIMessage> messages;
+    /** The messages to display. */
+    private final List<GUIMessage> messages;
 
-    ChatDisplay() {
-        messages = new ArrayList<>(MESSAGE_COUNT);
+
+    /**
+     * Create the chat display/ container.
+     */
+    public ChatDisplay() {
+        this.messages = new ArrayList<>(MESSAGE_COUNT);
     }
 
     /**
@@ -53,34 +65,33 @@ public class ChatDisplay {
      * @param message The message to add.
      */
     public synchronized void addMessage(GUIMessage message) {
-        if (getMessageCount() == MESSAGE_COUNT) {
-            messages.remove(0);
+        if (this.messages.size() >= MESSAGE_COUNT) {
+            this.messages.remove(0);
         }
-        messages.add(message);
+        this.messages.add(message);
     }
 
     /**
-     * Gets the message at position 'index'. The message at position 0
-     * is the oldest message and is most likely to be removed during
-     * the next call of removeOldMessages().  The higher the index of
-     * a message, the more recently it was added.
+     * Removes all the message that are older than MESSAGE_AGE.
      *
-     * @param index The index of the message to return.
-     * @return The message at position 'index'.
+     * This can be useful to see if it is necessary to refresh the screen.
+     *
+     * @return True if all messages are gone.
      */
-    private GUIMessage getMessage(int index) {
-        return messages.get(index);
-    }
+    private boolean removeOldMessages() {
+        long currentTime = new Date().getTime();
+        boolean result = false;
 
-    /**
-     * Gets the amount of message that are currently being displayed
-     * on this GUI.
-     *
-     * @return The amount of message that are currently being
-     *     displayed on this GUI.
-     */
-    private int getMessageCount() {
-        return messages.size();
+        int i = 0;
+        while (i < this.messages.size()) {
+            long creationTime = this.messages.get(i).getCreationTime();
+            if ((currentTime - creationTime) >= MESSAGE_AGE) {
+                this.messages.remove(i);
+            } else {
+                i++;
+            }
+        }
+        return this.messages.isEmpty();
     }
 
     /**
@@ -90,63 +101,38 @@ public class ChatDisplay {
      * @param lib The imageLibrary to use.
      * @param size The size of the space for displaying in.
      */
-    public synchronized void display(Graphics2D g, ImageLibrary lib, Dimension size) {
-        if (getMessageCount() > 0) {
-            // Don't edit the list of messages while I'm drawing them.
-            Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScaleFactor());
-            GUIMessage message = getMessage(0);
-            Image si = lib.getStringImage(g, message.getMessage(),
-                                          message.getColor(), font);
-            int yy = size.height - 300 - getMessageCount() * si.getHeight(null);
-            int xx = 40;
-
-            for (int i = 0; i < getMessageCount(); i++) {
-                message = getMessage(i);
-                g.drawImage(lib.getStringImage(g, message.getMessage(),
-                                               message.getColor(), font),
-                    xx, yy, null);
-                yy += si.getHeight(null);
+    public synchronized void display(Graphics2D g, ImageLibrary lib,
+                                     Dimension size) {
+        // Return quickly if there are no messages, which is always
+        // true in single player games.
+        if (this.messages.isEmpty() || removeOldMessages()) return;
+        
+        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScaleFactor());
+        int yy = -1;
+        final int xx = LEFT_MARGIN;
+        for (GUIMessage m : this.messages) {
+            Image si = lib.getStringImage(g, m.getMessage(),
+                                          m.getColor(), font);
+            if (yy < 0) {
+                yy = size.height - TOP_MARGIN
+                    - this.messages.size() * si.getHeight(null);
             }
-            Image decoration = ImageLibrary
-                .getUnscaledImage("image.menuborder.shadow.s");
-            int width = decoration.getWidth(null);
-            for (int index = 0; index < size.width; index += width) {
-                g.drawImage(decoration, index, 0, null);
-            }
-            decoration = ImageLibrary
-                .getUnscaledImage("image.menuborder.shadow.sw");
-            g.drawImage(decoration, 0, 0, null);
-            decoration = ImageLibrary
-                .getUnscaledImage("image.menuborder.shadow.se");
-            g.drawImage(decoration, size.width - decoration.getWidth(null),
-                        0, null);
+            g.drawImage(si, xx, yy, null);
+            yy += si.getHeight(null);
         }
-    }
-
-    /**
-     * Removes all the message that are older than MESSAGE_AGE.
-     *
-     * This can be useful to see if it is necessary to refresh the
-     * screen.
-     *
-     * @return True if at least one message has been removed,
-     */
-    public synchronized boolean removeOldMessages() {
-        long currentTime = new Date().getTime();
-        boolean result = false;
-
-        int i = 0;
-        while (i < getMessageCount()) {
-            long creationTime = getMessage(i).getCreationTime();
-            if ((currentTime - creationTime) >= MESSAGE_AGE) {
-                result = true;
-                messages.remove(i);
-            } else {
-                i++;
-            }
+        Image decoration = ImageLibrary
+            .getUnscaledImage("image.menuborder.shadow.s");
+        int width = decoration.getWidth(null);
+        for (int index = 0; index < size.width; index += width) {
+            g.drawImage(decoration, index, 0, null);
         }
-        return result;
+        decoration = ImageLibrary
+            .getUnscaledImage("image.menuborder.shadow.sw");
+        g.drawImage(decoration, 0, 0, null);
+        decoration = ImageLibrary
+            .getUnscaledImage("image.menuborder.shadow.se");
+        g.drawImage(decoration, size.width - decoration.getWidth(null),
+            0, null);
     }
-
 }

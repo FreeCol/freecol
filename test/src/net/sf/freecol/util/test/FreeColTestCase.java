@@ -64,6 +64,14 @@ import net.sf.freecol.server.model.ServerUnit;
  */
 public class FreeColTestCase extends TestCase {
 
+    /** We now have lots of maps, restrict testing to just the old ones. */
+    public static String[] STANDARD_MAPS = {
+        "data/maps/M_Africa_Gilolat.fsm",
+        "data/maps/S_AustraliaOceania_Gilolat.fsm",
+        "data/maps/L_America_JsTheDude.fsm",
+        "data/maps/S_Caribbean_Phil.fsm"
+    };
+        
     private static java.util.Map<String, Specification> specifications
         = new HashMap<>();
 

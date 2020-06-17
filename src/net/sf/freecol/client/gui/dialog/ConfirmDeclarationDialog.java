@@ -128,7 +128,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
     // based on the flag of Brazil, particularly the Provisional
     // Flag of Republic of the United States of Brazil (November
-    // 15–19, 1889)
+    // 15-19, 1889)
     public static final Flag PORTUGUESE_FLAG
         = new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
         .setUnionColor(new Color(62, 64, 149))

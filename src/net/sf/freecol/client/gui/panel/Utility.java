@@ -631,8 +631,9 @@ public final class Utility {
     /**
      * Get a panel with a localized message and icon.
      *
-     * @param icon An <code>ImageIcon</code> to use.
-     * @param template The <code>StringTemplate</code> to use.
+     * @param template The {@code StringTemplate} to use.
+     * @param icon An {@code ImageIcon} to use.
+     * @return The resulting {@code JPanel}.
      */
     public static JPanel localizedTextPanel(StringTemplate template,
                                             ImageIcon icon) {

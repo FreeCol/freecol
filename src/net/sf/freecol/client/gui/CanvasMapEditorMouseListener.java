@@ -145,7 +145,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                 Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.getIndianSettlement() != null) {
-                        canvas.showEditSettlementDialog(tile.getIndianSettlement());
+                        getGUI().showEditSettlementDialog(tile.getIndianSettlement());
                     }
                 }
             }
