@@ -263,16 +263,20 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Has the canvas been resized?
+     * If the canvas been resized, resize the map and reposition the
+     * map controls.
      *
-     * @return The new {@code Dimension} for the canvas.
+     * @return The {@code Dimension} for the canvas.
      */
     private Dimension checkResize() {
         Dimension newSize = getSize();
-        if (this.oldSize.width == newSize.width
-            && this.oldSize.height == newSize.height) return null;
-        
-        this.oldSize = newSize;
+        if (this.oldSize.width != newSize.width
+            || this.oldSize.height != newSize.height) {
+            this.oldSize = newSize;
+            updateMapControlsInCanvas();
+            mapViewer.changeSize(newSize);
+            logger.info("Canvas resized to " + newSize);
+        }
         return newSize;
     }
 
@@ -1588,16 +1592,11 @@ public final class Canvas extends JDesktopPane {
      */
     @Override
     public void paintComponent(Graphics g) {
-        Dimension newSize = checkResize();
-        if (newSize != null) {
-            updateMapControlsInCanvas();
-            mapViewer.changeSize(newSize);
-        }
+        Dimension size = checkResize();
         boolean hasMap = this.freeColClient != null
             && this.freeColClient.getGame() != null
             && this.freeColClient.getGame().getMap() != null;
         Graphics2D g2d = (Graphics2D) g;
-        Dimension size = getSize();
 
         if (freeColClient.isMapEditor()) {
             if (hasMap) {
