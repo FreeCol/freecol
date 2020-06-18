@@ -881,14 +881,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void updateMapControlsInCanvas() {
-        canvas.updateMapControlsInCanvas();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void zoomInMapControls() {
         canvas.zoomInMapControls();
     }
