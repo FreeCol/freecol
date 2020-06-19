@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,18 +72,19 @@ public abstract class MapControls extends FreeColClientHolder {
     protected MapControls(final FreeColClient freeColClient, boolean useSkin) {
         super(freeColClient);
 
-        infoPanel = new InfoPanel(freeColClient, useSkin);
-        infoPanel.setFocusable(false);
-        miniMap = new MiniMap(freeColClient);
+        this.infoPanel = new InfoPanel(freeColClient, useSkin);
+        this.infoPanel.setFocusable(false);
+
+        this.miniMap = new MiniMap(freeColClient);
 
         final ActionManager am = freeColClient.getActionManager();
-        assert am != null;
         List<UnitButton> miniButtons = am.makeMiniMapButtons();
         for (UnitButton ub : miniButtons) ub.setFocusable(false);
-        miniMapToggleBorders = miniButtons.remove(0);
-        miniMapToggleFogOfWarButton = miniButtons.remove(0);
-        miniMapZoomOutButton = miniButtons.remove(0);
-        miniMapZoomInButton = miniButtons.remove(0);
+        // Pop off the first four special cases
+        this.miniMapToggleBorders = miniButtons.remove(0);
+        this.miniMapToggleFogOfWarButton = miniButtons.remove(0);
+        this.miniMapZoomOutButton = miniButtons.remove(0);
+        this.miniMapZoomInButton = miniButtons.remove(0);
     }
 
 
@@ -91,14 +93,22 @@ public abstract class MapControls extends FreeColClientHolder {
      *
      * Initialization is deferred until we are confident we are in-game.
      */
-    private void initializeUnitButtons() {
-        if (this.unitButtons.isEmpty()) {
-            final ActionManager am = getFreeColClient().getActionManager();
-            final Specification spec = getGame().getSpecification();
-            this.unitButtons.addAll(am.makeUnitActionButtons(spec));
-        }
+    protected boolean initializeUnitButtons() {
+        if (this.unitButtons.isEmpty()) return false;
+        final ActionManager am = getFreeColClient().getActionManager();
+        this.unitButtons.addAll(am.makeUnitActionButtons(getSpecification()));
+        return true;
     }
-            
+
+    // Abstract API
+
+    /**
+     * Get the components of the map controls.
+     *
+     * @return A list of {@code Component}s.
+     */
+    public abstract List<Component> getComponents();
+
     /**
      * Adds the map controls to the given component.
      *
@@ -113,16 +123,28 @@ public abstract class MapControls extends FreeColClientHolder {
      */
     public abstract void removeFromComponent(Canvas canvas);
 
+    /**
+     * Are the map controls currently showing?
+     *
+     * @return True if visible.
+     */
     public abstract boolean isShowing();
 
-    public abstract void repaint();
 
+    // Simple public routines
+    
     public boolean canZoomInMapControls() {
         return miniMap.canZoomIn();
     }
 
     public boolean canZoomOutMapControls() {
         return miniMap.canZoomOut();
+    }
+
+    public void repaint() {
+        for (Component c : getComponents()) {
+            c.repaint();
+        }
     }
 
     public void toggleView() {
