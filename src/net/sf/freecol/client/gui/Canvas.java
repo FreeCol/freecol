@@ -146,13 +146,10 @@ public final class Canvas extends JDesktopPane {
     private FreeColFrame parentFrame;
 
     /** Remember the current size (from getSize()), check for changes. */
-    private Dimension oldSize = null;
+    private Dimension oldSize;
 
     /** The component that displays the map. */
     private final MapViewer mapViewer;
-
-    /** The various sorts of map controls. */
-    private MapControls mapControls;
 
     /** Has a goto operation started? */
     private boolean gotoStarted = false;
@@ -162,6 +159,9 @@ public final class Canvas extends JDesktopPane {
 
     /** The chat message area. */
     private final ChatDisplay chatDisplay;
+
+    /** The various sorts of map controls. */
+    private MapControls mapControls;
 
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
@@ -201,10 +201,23 @@ public final class Canvas extends JDesktopPane {
         this.parentFrame = createFrame(null, windowBounds);
         this.oldSize = getSize();
         this.mapViewer = mapViewer;
-        this.mapControls = null;
         this.greyLayer = new GrayLayer(freeColClient);
         this.chatDisplay = new ChatDisplay();
         
+        final String className = this.freeColClient.getClientOptions()
+            .getString(ClientOptions.MAP_CONTROLS);
+        final String panelName = "net.sf.freecol.client.gui.panel."
+            + lastPart(className, ".");
+        try {
+            this.mapControls = (MapControls)Introspector.instantiate(panelName,
+                new Class[] { FreeColClient.class },
+                new Object[] { this.freeColClient });
+            logger.info("Instantiated " + panelName);
+        } catch (Introspector.IntrospectorException ie) {
+            logger.log(Level.WARNING, "Failed in make map controls for: "
+                + panelName, ie);
+        }
+
         setDoubleBuffered(true);
         setOpaque(false);
         setLayout(null);
@@ -218,6 +231,7 @@ public final class Canvas extends JDesktopPane {
         startGamePanel = new StartGamePanel(freeColClient);
         statusPanel = new StatusPanel(freeColClient);
 
+        enableMapControls(true);
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
     }
@@ -945,65 +959,57 @@ public final class Canvas extends JDesktopPane {
     // Map controls
     
     public boolean canZoomInMapControls() {
-        return mapControls != null && mapControls.canZoomInMapControls();
+        if (this.mapControls == null) return false;
+        return this.mapControls.canZoomInMapControls();
     }
 
     public boolean canZoomOutMapControls() {
-        return mapControls != null && mapControls.canZoomOutMapControls();
+        if (this.mapControls == null) return false;
+        return this.mapControls.canZoomOutMapControls();
     }
 
     public void enableMapControls(boolean enable) {
-        // Always instantiate in game.
-        if (enable && mapControls == null) {
-            String className = this.freeColClient.getClientOptions()
-                .getString(ClientOptions.MAP_CONTROLS);
-            final String panelName = "net.sf.freecol.client.gui.panel."
-                + lastPart(className, ".");
-            try {
-                mapControls = (MapControls)Introspector.instantiate(panelName,
-                    new Class[] { FreeColClient.class },
-                    new Object[] { this.freeColClient });
-                mapControls.addToComponent(this);
-                logger.info("Instantiated " + panelName);
-            } catch (Introspector.IntrospectorException ie) {
-                logger.log(Level.WARNING, "Failed in make map controls for: "
-                    + panelName, ie);
+        if (this.mapControls == null) return;
+        if (enable) {
+            if (!this.mapControls.isShowing()) {
+                this.mapControls.addToComponent(this);
             }
-        } else if (!enable && mapControls != null) {
-            mapControls.removeFromComponent(this);
-            mapControls = null;
+        } else {
+            if (this.mapControls.isShowing()) {
+                this.mapControls.removeFromComponent(this);
+            }
         }
     }
 
     public void miniMapToggleViewControls() {
-        if (mapControls == null) return;
-        mapControls.toggleView();
+        if (this.mapControls == null) return;
+        this.mapControls.toggleView();
     }
 
     public void miniMapToggleFogOfWarControls() {
-        if (mapControls == null) return;
-        mapControls.toggleFogOfWar();
+        if (this.mapControls == null) return;
+        this.mapControls.toggleFogOfWar();
     }
 
     public void updateMapControls(Unit unit) {
-        if (mapControls == null) return;
-        mapControls.update(unit);
+        if (this.mapControls == null) return;
+        this.mapControls.update(unit);
     }
 
     public void updateMapControlsInCanvas() {
-        if (mapControls == null) return;
-        mapControls.removeFromComponent(this);
-        mapControls.addToComponent(this);
+        if (this.mapControls == null) return;
+        this.mapControls.removeFromComponent(this);
+        this.mapControls.addToComponent(this);
     }
 
     public void zoomInMapControls() {
-        if (mapControls == null) return;
-        mapControls.zoomIn();
+        if (this.mapControls == null) return;
+        this.mapControls.zoomIn();
     }
 
     public void zoomOutMapControls() {
-        if (mapControls == null) return;
-        mapControls.zoomOut();
+        if (this.mapControls == null) return;
+        this.mapControls.zoomOut();
     }
 
     // Map viewer
