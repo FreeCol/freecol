@@ -167,7 +167,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update(MapTransform mapTransform) {
         this.mapEditorInfoPanel.update(mapTransform);
-        InfoPanelMode oldMode = update(InfoPanelMode.UNIT);
+        InfoPanelMode oldMode = update(InfoPanelMode.MAP);
         logger.info("InfoPanel " + oldMode + " -> " + this.mode
             + " with " + mapTransform);
     }
