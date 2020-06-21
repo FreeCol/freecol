@@ -252,18 +252,4 @@ public final class CornerMapControls extends MapControls {
     public boolean isShowing() {
         return infoPanel.getParent() != null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeFromComponent(Canvas canvas) {
-        canvas.removeFromCanvas(infoPanel);
-        canvas.removeFromCanvas(miniMapPanel);
-        canvas.removeFromCanvas(compassRose);
-
-        for (UnitButton button : unitButtons) {
-            canvas.removeFromCanvas(button);
-        }
-    }
 }

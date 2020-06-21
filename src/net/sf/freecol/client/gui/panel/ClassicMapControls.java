@@ -148,12 +148,4 @@ public final class ClassicMapControls extends MapControls {
     public boolean isShowing() {
         return panel.getParent() != null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeFromComponent(Canvas canvas) {
-        canvas.removeFromCanvas(panel);
-    }
 }
