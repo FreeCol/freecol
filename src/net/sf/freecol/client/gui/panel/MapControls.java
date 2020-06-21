@@ -184,7 +184,7 @@ public abstract class MapControls extends FreeColClientHolder {
                 .getMapTransform());
             break;
         case END_TURN:
-            infoPanel.update((Unit)null);
+            infoPanel.update();
             break;
         default:
             break;
