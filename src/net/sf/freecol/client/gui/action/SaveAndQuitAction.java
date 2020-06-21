@@ -42,6 +42,21 @@ public class SaveAndQuitAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean shouldBeEnabled() {
+        if (freeColClient.isMapEditor()) return true;
+
+        // In game
+        if (!freeColClient.canSaveCurrentGame()) return false;
+        return !getGUI().isShowingSubPanel();
+    }
+
+
     // Interface ActionListener
 
     /**
