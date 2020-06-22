@@ -166,7 +166,14 @@ public final class CornerMapControls extends MapControls {
      * @param component The component to add.
      */
     private void addToCanvas(Canvas canvas, Component component) {
-        canvas.add(component, CONTROLS_LAYER);
+        try {
+            canvas.add(component, CONTROLS_LAYER);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error adding " + component
+                + " of size " + component.getWidth() + "x" + component.getHeight()
+                + " at " + component.getLocation()
+                + " in " + canvas.getSize(), e);
+        }
     }
 
 
@@ -232,15 +239,8 @@ public final class CornerMapControls extends MapControls {
         if (this.compassRose != null) addToCanvas(canvas, this.compassRose);
         if (!getFreeColClient().isMapEditor()) {
             for (UnitButton button : this.unitButtons) {
-                try {
-                    addToCanvas(canvas, button);
-                    button.refreshAction();
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Error adding button " + button
-                        + " of size " + button.getSize()
-                        + " at " + button.getLocation()
-                        + " in " + canvas.getSize(), e);
-                }
+                addToCanvas(canvas, button);
+                button.refreshAction();
             }
         }
     }
