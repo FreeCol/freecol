@@ -117,16 +117,18 @@ public abstract class MapControls extends FreeColClientHolder {
      */
     public abstract void addToComponent(Canvas component);
 
+    // Simple public routines
+    
     /**
      * Are the map controls currently showing?
      *
      * @return True if visible.
      */
-    public abstract boolean isShowing();
+    public boolean isShowing() {
+        Component c = getComponents().get(0);
+        return c.isShowing();
+    }
 
-
-    // Simple public routines
-    
     public boolean canZoomInMapControls() {
         return miniMap.canZoomIn();
     }

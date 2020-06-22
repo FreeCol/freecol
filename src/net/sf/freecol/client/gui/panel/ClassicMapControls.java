@@ -140,12 +140,4 @@ public final class ClassicMapControls extends MapControls {
         panel.setLocation(component.getWidth() - width, 0);
         component.add(panel, CONTROLS_LAYER);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isShowing() {
-        return panel.getParent() != null;
-    }
 }

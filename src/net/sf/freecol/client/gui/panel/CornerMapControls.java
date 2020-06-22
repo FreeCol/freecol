@@ -244,12 +244,4 @@ public final class CornerMapControls extends MapControls {
             }
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isShowing() {
-        return infoPanel.getParent() != null;
-    }
 }
