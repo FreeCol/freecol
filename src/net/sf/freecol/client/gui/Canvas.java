@@ -958,7 +958,13 @@ public final class Canvas extends JDesktopPane {
     }
 
     // Map controls
-    
+
+    private void removeMapControls() {
+        for (Component c : this.mapControls.getComponents()) {
+            removeFromCanvas(c);
+        }
+    }
+        
     public boolean canZoomInMapControls() {
         if (this.mapControls == null) return false;
         return this.mapControls.canZoomInMapControls();
@@ -977,7 +983,7 @@ public final class Canvas extends JDesktopPane {
             }
         } else {
             if (this.mapControls.isShowing()) {
-                this.mapControls.removeFromComponent(this);
+                removeMapControls();
             }
         }
     }
@@ -999,7 +1005,7 @@ public final class Canvas extends JDesktopPane {
 
     public void updateMapControlsInCanvas() {
         if (this.mapControls == null) return;
-        this.mapControls.removeFromComponent(this);
+        removeMapControls();
         this.mapControls.addToComponent(this);
     }
 

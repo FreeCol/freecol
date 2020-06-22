@@ -101,17 +101,6 @@ public abstract class MapControls extends FreeColClientHolder {
     }
 
 
-    /**
-     * Removes the map controls from the parent canvas component.
-     *
-     * @param canvas {@code Canvas} parent
-     */
-    public void removeFromComponent(Canvas canvas) {
-        for (Component c : getComponents()) {
-            canvas.removeFromCanvas(c);
-        }
-    }
-
     // Abstract API
 
     /**
