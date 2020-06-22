@@ -286,10 +286,11 @@ public final class Canvas extends JDesktopPane {
         Dimension newSize = getSize();
         if (this.oldSize.width != newSize.width
             || this.oldSize.height != newSize.height) {
+            logger.info("Canvas resized from " + this.oldSize
+                + " to " + newSize);
             this.oldSize = newSize;
             updateMapControlsInCanvas();
             mapViewer.changeSize(newSize);
-            logger.info("Canvas resized to " + newSize);
         }
         return newSize;
     }
