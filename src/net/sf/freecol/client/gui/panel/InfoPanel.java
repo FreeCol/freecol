@@ -411,7 +411,7 @@ public final class InfoPanel extends FreeColPanel
             fillEndPanel();
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "")
+        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode);
     }
         
@@ -427,7 +427,7 @@ public final class InfoPanel extends FreeColPanel
             this.mapTransform = fillMapPanel(mapTransform);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "")
+        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with " + mapTransform);
     }
 
@@ -443,7 +443,7 @@ public final class InfoPanel extends FreeColPanel
             this.tile = fillTilePanel(tile);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "")
+        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with tile " + tile);
     }
 
@@ -468,8 +468,35 @@ public final class InfoPanel extends FreeColPanel
             this.unit = fillUnitPanel(unit);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "")
+        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with unit " + unit);
+    }
+
+    /**
+     * Refresh this panel.
+     *
+     * Apparently this is necessary when adding the info panel back into the
+     * canvas with the skinned corner, otherwise the unit does not get
+     * displayed.
+     * TODO: Explain why, or fix so we do not need this.
+     */
+    public void refresh() {
+        switch (this.mode) {
+        case END:
+            fillEndPanel();
+            break;
+        case MAP:
+            fillMapPanel(this.mapTransform);
+            break;
+        case TILE:
+            fillTilePanel(this.tile);
+            break;
+        case UNIT:
+            fillUnitPanel(this.unit);
+            break;
+        default:
+            break;
+        }
     }
 
 

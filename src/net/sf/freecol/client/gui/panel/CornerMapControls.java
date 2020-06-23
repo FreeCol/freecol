@@ -234,7 +234,9 @@ public final class CornerMapControls extends MapControls {
         //
         // Add the GUI Objects to the container
         //
+        this.infoPanel.refresh();
         addToCanvas(canvas, this.infoPanel);
+net.sf.freecol.FreeCol.trace(logger, "INFO PANEL BACK " + this.infoPanel);
         addToCanvas(canvas, this.miniMapPanel);
         if (this.compassRose != null) addToCanvas(canvas, this.compassRose);
         if (!getFreeColClient().isMapEditor()) {
