@@ -83,7 +83,7 @@ public class FreeColFrame extends JFrame {
         setMinimumSize(new Dimension(656 + insets.left + insets.right,
                                      480 + insets.top + insets.bottom));
 
-        if(!windowed || bounds==null || bounds.width<=0 || bounds.height<=0) {
+        if (!windowed || bounds==null || bounds.width<=0 || bounds.height<=0) {
             bounds = gd.getDefaultConfiguration().getBounds();
             if (windowed) {
                 Insets screenInsets = Toolkit.getDefaultToolkit()
@@ -97,6 +97,7 @@ public class FreeColFrame extends JFrame {
         }
         setBounds(bounds);
         logger.info("Frame created in size " + bounds.width + "x" + bounds.height);
+        /* TODO: this should do something useful!
         if (windowed) {
             addComponentListener(new ComponentAdapter() {
                 @Override
@@ -105,6 +106,7 @@ public class FreeColFrame extends JFrame {
                 }
             });
         }
+        */
     }
 
     public void exitFullScreen() {
@@ -144,5 +146,5 @@ public class FreeColFrame extends JFrame {
      */
     private static String getFrameName() {
         return "FreeCol " + FreeCol.getVersion();
-    } 
+    }
 }

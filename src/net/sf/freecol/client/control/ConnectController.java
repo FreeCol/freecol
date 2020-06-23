@@ -19,6 +19,13 @@
 
 package net.sf.freecol.client.control;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -37,17 +44,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
-import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
-import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

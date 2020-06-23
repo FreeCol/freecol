@@ -235,15 +235,6 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib = lib;
     }
 
-    /** Currently unused
-     * Get the map size.
-     *
-     * @return The size.
-    private Dimension getSize() {
-        return this.size;
-    }
-     */
-    
     /**
      * Get the displayed map width.
      *
@@ -260,15 +251,6 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private int getScreenHeight() {
         return this.size.height;
-    }
-    
-    /**
-     * Set the map size.
-     *
-     * @param size The new map size.
-     */
-    private void setSize(Dimension size) {
-        this.size = size;
     }
     
     /**
@@ -474,7 +456,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param size The new map size.
      */
     public void changeSize(Dimension size) {
-        setSize(size);
+        this.size = size;
         updateMapDisplayVariables();
         forceReposition();
     }

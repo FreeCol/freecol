@@ -1674,12 +1674,6 @@ public class GUI extends FreeColClientHolder {
     public void updateMapControls() {}
 
     /**
-     * Map control update by removing and re-adding.
-     * TODO: does this overlap with the preceding?
-     */
-    public void updateMapControlsInCanvas() {}
-
-    /**
      * Zoom in the map controls.
      */
     public void zoomInMapControls() {}

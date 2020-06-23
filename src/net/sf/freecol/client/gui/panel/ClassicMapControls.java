@@ -19,8 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.Font;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -44,9 +46,9 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ClassicMapControls extends MapControls {
 
-    private final JPanel panel;
     private final Font arrowFont;
-    private final ActionManager am;
+    private final JPanel panel;
+    private final List<Component> componentList = new ArrayList<>();
 
 
     /**
@@ -57,81 +59,29 @@ public final class ClassicMapControls extends MapControls {
     public ClassicMapControls(final FreeColClient freeColClient) {
         super(freeColClient, false);
 
-        am = freeColClient.getActionManager();
-        arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+        this.arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.SMALL, Font.BOLD);
 
-        panel = new MigPanel(new MigLayout("wrap 3"));
-        panel.add(miniMap, "span, width " + MAP_WIDTH
-                           + ", height " + MAP_HEIGHT);
+        this.panel = new MigPanel(new MigLayout("wrap 3"));
+        this.panel.add(this.miniMap, "span, width " + MAP_WIDTH
+                                     + ", height " + MAP_HEIGHT);
+        this.panel.add(this.miniMapZoomInButton, "newline 10");
+        this.panel.add(this.miniMapZoomOutButton, "skip");
 
-        panel.add(miniMapZoomInButton, "newline 10");
-        panel.add(miniMapZoomOutButton, "skip");
-
-        panel.add(makeButton("NW", ResourceManager.getString("arrow.NW")),
-                  "newline 20");
-        panel.add(makeButton("N",  ResourceManager.getString("arrow.N")));
-        panel.add(makeButton("NE", ResourceManager.getString("arrow.NE")));
-        panel.add(makeButton("W",  ResourceManager.getString("arrow.W")));
-        panel.add(makeButton("E",  ResourceManager.getString("arrow.E")),
-                  "skip");
-        panel.add(makeButton("SW", ResourceManager.getString("arrow.SW")));
-        panel.add(makeButton("S",  ResourceManager.getString("arrow.S")));
-        panel.add(makeButton("SE", ResourceManager.getString("arrow.SE")),
-                  "wrap 20");
-
-        for (UnitButton button : unitButtons) {
-            panel.add(button);
-        }
-
-        panel.add(infoPanel, "newline push, span, width "
-            + infoPanel.getWidth() + ", height " + infoPanel.getHeight());
-    }
-
-    /**
-     * Adds the map controls to the given component.
-     * @param component The component to add the map controls to.
-     */
-    @Override
-    public void addToComponent(Canvas component) {
-        if (getGame() == null || getGame().getMap() == null) return;
-        int width = (int) panel.getPreferredSize().getWidth();
-        panel.setSize(width, component.getHeight());
-        panel.setLocation(component.getWidth() - width, 0);
-        component.add(panel, CONTROLS_LAYER);
-    }
-
-    /**
-     * A simple boolean value of whether the class
-     * has a parent class or not.
-     *
-     * @return <b>true</b> if the given instance of
-     *         the ClassicMapControls has a parent,
-     *         <b>false</b> if no parent exists
-     *
-     * @since 0.10.6
-     */
-    @Override
-    public boolean isShowing() {
-        return panel.getParent() != null;
-    }
-
-    /**
-     * Removes the map controls from the parent canvas component.
-     *
-     * @param canvas {@code Canvas} parent
-     */
-    @Override
-    public void removeFromComponent(Canvas canvas) {
-        canvas.removeFromCanvas(panel);
-    }
-
-    /**
-     * Repaint
-     */
-    @Override
-    public void repaint() {
-        panel.repaint();
+        this.panel.add(makeButton("NW", ResourceManager.getString("arrow.NW")),
+                       "newline 20");
+        this.panel.add(makeButton("N",  ResourceManager.getString("arrow.N")));
+        this.panel.add(makeButton("NE", ResourceManager.getString("arrow.NE")));
+        this.panel.add(makeButton("W",  ResourceManager.getString("arrow.W")));
+        this.panel.add(makeButton("E",  ResourceManager.getString("arrow.E")),
+                       "skip");
+        this.panel.add(makeButton("SW", ResourceManager.getString("arrow.SW")));
+        this.panel.add(makeButton("S",  ResourceManager.getString("arrow.S")));
+        this.panel.add(makeButton("SE", ResourceManager.getString("arrow.SE")),
+                       "wrap 20");
+        // initialization completes in initializeUnitButtons
+        
+        this.componentList.add(this.panel);
     }
 
     /**
@@ -147,10 +97,47 @@ public final class ClassicMapControls extends MapControls {
      * @since 0.10.6
      */
     private JButton makeButton(String direction, String arrow) {
+        final ActionManager am = getFreeColClient().getActionManager();
         JButton button
             = new JButton(am.getFreeColAction("moveAction." + direction));
         button.setFont(arrowFont);
         button.setText(arrow);
         return button;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean initializeUnitButtons() {
+        if (!super.initializeUnitButtons()) return false;
+
+        for (UnitButton ub : this.unitButtons) this.panel.add(ub);
+        this.panel.add(this.infoPanel, "newline push, span, width "
+            + this.infoPanel.getWidth() + ", height "
+            + this.infoPanel.getHeight());
+        return true;
+    }
+
+    // Implement MapControls
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Component> getComponents() {
+        return this.componentList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addToComponent(Canvas component) {
+        if (getGame() == null || getGame().getMap() == null) return;
+        int width = (int) panel.getPreferredSize().getWidth();
+        panel.setSize(width, component.getHeight());
+        panel.setLocation(component.getWidth() - width, 0);
+        component.add(panel, CONTROLS_LAYER);
     }
 }
