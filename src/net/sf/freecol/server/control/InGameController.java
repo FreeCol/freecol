@@ -3624,7 +3624,7 @@ public final class InGameController extends Controller {
         colony.setBuildQueue(queue);
         if (getGame().getSpecification()
             .getBoolean(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH)
-            && current != colony.getCurrentlyBuilding()) {
+            && current != null && current != colony.getCurrentlyBuilding()) {
             for (AbstractGoods ag : transform(current.getRequiredGoods(),
                     g -> !g.getType().isStorable())) {
                 colony.removeGoods(ag.getType());
