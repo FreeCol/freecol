@@ -1116,7 +1116,7 @@ public class SwingGUI extends GUI {
         // This could be a drag, which would have already been processed
         // in @see CanvasMouseListener#mouseReleased
         if (count == 1 && isDrag(x, y)) return;
-        
+
         final Tile tile = canvas.convertToMapTile(x, y);
         if (tile == null) return;
         Unit other = null;
@@ -1125,6 +1125,7 @@ public class SwingGUI extends GUI {
             changeView(tile);
         } else if (tile.hasSettlement()) { // Pop up settlements if any
             showTileSettlement(tile);
+            changeView(tile);
         } else if ((other = this.mapViewer.findUnitInFront(tile)) != null) {
             if (getMyPlayer().owns(other)) {
                 // If there is one of the player units present, select it,
