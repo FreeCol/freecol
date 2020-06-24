@@ -277,11 +277,12 @@ public final class Canvas extends JDesktopPane {
         Dimension newSize = getSize();
         if (this.oldSize.width != newSize.width
             || this.oldSize.height != newSize.height) {
-            logger.info("Canvas resized from " + this.oldSize
+            logger.info("Canvas resize from " + this.oldSize
                 + " to " + newSize);
             this.oldSize = newSize;
-            updateMapControlsInCanvas();
+            boolean add = removeMapControls();
             mapViewer.changeSize(newSize);
+            if (add) addMapControls();
         }
         return newSize;
     }
@@ -1012,10 +1013,6 @@ public final class Canvas extends JDesktopPane {
     public void updateMapControls(Unit unit) {
         if (this.mapControls == null) return;
         this.mapControls.update(unit);
-    }
-
-    public void updateMapControlsInCanvas() {
-        if (removeMapControls()) addMapControls();
     }
 
     public void zoomInMapControls() {
