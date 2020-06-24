@@ -20,8 +20,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -29,25 +31,26 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * A collection of panels and buttons that are used to provide
- * the user with a more detailed view of certain elements on the
- * map and also to provide a means of input in case the user
- * can't use the keyboard.
- *
- * The MapControls are useless by themselves, this object needs to
- * be placed on a JComponent in order to be usable.
+ * A collection of panels and buttons that are used to provide the
+ * user with a more detailed view of certain elements on the map and
+ * also to provide a means of input in case the user can't use the
+ * keyboard.
  */
 public final class ClassicMapControls extends MapControls {
 
+    /** A font for the buttons. */
     private final Font arrowFont;
+
+    /** The main panel. */
     private final JPanel panel;
+
+    /** Helper container for the abstract API functions. */
     private final List<Component> componentList = new ArrayList<>();
 
 
@@ -63,8 +66,8 @@ public final class ClassicMapControls extends MapControls {
             FontLibrary.FontSize.SMALL, Font.BOLD);
 
         this.panel = new MigPanel(new MigLayout("wrap 3"));
-        this.panel.add(this.miniMap, "span, width " + MAP_WIDTH
-                                     + ", height " + MAP_HEIGHT);
+        this.panel.add(this.miniMap, "span, width " + MINI_MAP_WIDTH
+                                     + ", height " + MINI_MAP_HEIGHT);
         this.panel.add(this.miniMapZoomInButton, "newline 10");
         this.panel.add(this.miniMapZoomOutButton, "skip");
 
@@ -125,7 +128,13 @@ public final class ClassicMapControls extends MapControls {
      * {@inheritDoc}
      */
     @Override
-    public List<Component> getComponents() {
+    public List<Component> getComponentsToAdd(Dimension newSize) {
+        if (getGame() == null || this.panel.isShowing()) {
+            return Collections.<Component>emptyList();
+        }
+        int width = (int)this.panel.getPreferredSize().getWidth();
+        this.panel.setSize(width, newSize.height);
+        this.panel.setLocation(newSize.width - width, 0);
         return this.componentList;
     }
 
@@ -133,11 +142,8 @@ public final class ClassicMapControls extends MapControls {
      * {@inheritDoc}
      */
     @Override
-    public void addToComponent(Canvas component) {
-        if (getGame() == null || getGame().getMap() == null) return;
-        int width = (int) panel.getPreferredSize().getWidth();
-        panel.setSize(width, component.getHeight());
-        panel.setLocation(component.getWidth() - width, 0);
-        component.add(panel, CONTROLS_LAYER);
+    public List<Component> getComponentsToRemove() {
+        return (this.panel.isShowing()) ? this.componentList
+            : Collections.<Component>emptyList();
     }
 }

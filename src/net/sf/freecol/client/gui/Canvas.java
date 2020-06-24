@@ -231,7 +231,6 @@ public final class Canvas extends JDesktopPane {
         startGamePanel = new StartGamePanel(freeColClient);
         statusPanel = new StatusPanel(freeColClient);
 
-        enableMapControls(true);
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
     }
@@ -959,10 +958,34 @@ public final class Canvas extends JDesktopPane {
 
     // Map controls
 
-    private void removeMapControls() {
-        for (Component c : this.mapControls.getComponents()) {
+    /**
+     * Add the map controls.
+     *
+     * @return True if any were added.
+     */
+    private boolean addMapControls() {
+        if (this.mapControls == null) return false;
+        List<Component> components
+            = this.mapControls.getComponentsToAdd(this.oldSize);
+        for (Component c : components) {
+            addToCanvas(c, JLayeredPane.MODAL_LAYER);
+        }
+        return !components.isEmpty();
+    }
+
+    /**
+     * Remove the map controls.
+     *
+     * @return True if any were removed.
+     */
+    private boolean removeMapControls() {
+        if (this.mapControls == null) return false;
+        List<Component> components
+            = this.mapControls.getComponentsToRemove();
+        for (Component c : this.mapControls.getComponentsToRemove()) {
             removeFromCanvas(c);
         }
+        return !components.isEmpty();
     }
         
     public boolean canZoomInMapControls() {
@@ -978,13 +1001,9 @@ public final class Canvas extends JDesktopPane {
     public void enableMapControls(boolean enable) {
         if (this.mapControls == null) return;
         if (enable) {
-            if (!this.mapControls.isShowing()) {
-                this.mapControls.addToComponent(this);
-            }
+            addMapControls();
         } else {
-            if (this.mapControls.isShowing()) {
-                removeMapControls();
-            }
+            removeMapControls();
         }
     }
 
@@ -1004,9 +1023,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void updateMapControlsInCanvas() {
-        if (this.mapControls == null) return;
-        removeMapControls();
-        this.mapControls.addToComponent(this);
+        if (removeMapControls()) addMapControls();
     }
 
     public void zoomInMapControls() {
