@@ -648,7 +648,7 @@ public final class MapViewer extends FreeColClientHolder {
                     unitLabel.getHeight(),
                     calculateTilePosition(sourceTile, false)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
-            getGUI().getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
+            getGUI().animationLabel(unitLabel, true);
             i = 1;
         } else {
             i++;
@@ -664,7 +664,8 @@ public final class MapViewer extends FreeColClientHolder {
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
-            getGUI().getCanvas().removeFromCanvas(unitsOutForAnimationLabels.remove(unit));
+            getGUI().animationLabel(unitsOutForAnimationLabels.remove(unit),
+                                    false);
         } else {
             i--;
             unitsOutForAnimation.put(unit, i);

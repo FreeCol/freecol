@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -495,6 +496,14 @@ public class SwingGUI extends GUI {
 
     // Animation handling
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void animationLabel(JLabel label, boolean add) {
+        canvas.animationLabel(label, add);
+    }
+    
     /**
      * {@inheritDoc}
      */

@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -1458,7 +1459,21 @@ public final class Canvas extends JDesktopPane {
     }
 
     // Special dialogs and panels
-    
+
+    /**
+     * Add and remove animation labels.
+     *
+     * @param label A {@code JLabel} for an animation.
+     * @param add If true, add the label, else remove it.
+     */
+    public void animationLabel(JLabel label, boolean add) {
+        if (add) {
+            addToCanvas(label, JLayeredPane.DEFAULT_LAYER);
+        } else {
+            removeFromCanvas(label);
+        }
+    }
+
     /**
      * Closes the {@link MainPanel}.
      */

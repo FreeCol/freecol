@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -1328,6 +1329,14 @@ public class GUI extends FreeColClientHolder {
 
 
     // Animation handling
+
+    /**
+     * Control animation labels.
+     *
+     * @param label A {@code JLabel} for an animation.
+     * @param add If true, add the label, else remove it.
+     */
+    public void animationLabel(JLabel label, boolean add) {}
 
     /**
      * Animate a unit attack.
