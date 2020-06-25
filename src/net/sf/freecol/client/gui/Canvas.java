@@ -167,8 +167,14 @@ public final class Canvas extends JDesktopPane {
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
-    /** Cached panels.  TODO: check if we still need these */
+    /**
+     * The main panel.  Remember this because getExistingFreeColPanel
+     * gets confused across switches between the game and the map editor
+     * which makes it hard to remove.
+     */
     private MainPanel mainPanel;
+
+    /** Cached panels.  TODO: check if we still need these */
     private final StartGamePanel startGamePanel;
     private final StatusPanel statusPanel;
     private final ChatPanel chatPanel;
@@ -1478,10 +1484,10 @@ public final class Canvas extends JDesktopPane {
      * Closes the {@link MainPanel}.
      */
     public void closeMainPanel() {
-       if (mainPanel != null) {
-          remove(mainPanel);
-          mainPanel = null;
-       }
+        if (this.mainPanel != null) {
+            remove(this.mainPanel);
+            this.mainPanel = null;
+        }
     }
 
     /**
@@ -1543,9 +1549,9 @@ public final class Canvas extends JDesktopPane {
     public void showMainPanel() {
         closeMenus();
         this.parentFrame.removeMenuBar();
-        mainPanel = new MainPanel(freeColClient);
-        addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
-        mainPanel.requestFocus();
+        this.mainPanel = new MainPanel(freeColClient);
+        addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
+        this.mainPanel.requestFocus();
     }
 
     /**
