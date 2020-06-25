@@ -721,7 +721,7 @@ public final class ColonyPanel extends PortPanel
             subMenu = new JMenuItem(menuTitle, unitIcon);
             subMenu.addActionListener((ActionEvent ae) -> {
                     unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
-                    unitMenu.show(getGUI().getCanvas(), 0, 0);
+                    getGUI().showPopupMenu(unitMenu, 0, 0);
                 });
             unitNumber++;
             colonyUnitsMenu.add(subMenu);
@@ -735,7 +735,7 @@ public final class ColonyPanel extends PortPanel
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener((ActionEvent ae) -> {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
-                        unitMenu.show(getGUI().getCanvas(), 0, 0);
+                        getGUI().showPopupMenu(unitMenu, 0, 0);
                     });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
@@ -747,7 +747,7 @@ public final class ColonyPanel extends PortPanel
                     subMenu = new JMenuItem(menuTitle, unitIcon);
                     subMenu.addActionListener((ActionEvent ae) -> {
                             unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
-                            unitMenu.show(getGUI().getCanvas(), 0, 0);
+                            getGUI().showPopupMenu(unitMenu, 0, 0);
                         });
                     unitNumber++;
                     colonyUnitsMenu.add(subMenu);
@@ -759,7 +759,7 @@ public final class ColonyPanel extends PortPanel
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener((ActionEvent ae) -> {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
-                        unitMenu.show(getGUI().getCanvas(), 0, 0);
+                        getGUI().showPopupMenu(unitMenu, 0, 0);
                     });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
@@ -773,7 +773,7 @@ public final class ColonyPanel extends PortPanel
                 colonyUnitsMenu.remove(lastIndex);
             }
         }
-        colonyUnitsMenu.show(getGUI().getCanvas(), 0, 0);
+        getGUI().showPopupMenu(colonyUnitsMenu, 0, 0);
     }
 
     /**

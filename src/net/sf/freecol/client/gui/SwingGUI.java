@@ -36,6 +36,8 @@ import java.util.Locale;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -499,6 +501,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public void animationLabel(JLabel label, boolean add) {
+        canvas.animationLabel(label, add);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
@@ -918,6 +928,14 @@ public class SwingGUI extends GUI {
     @Override
     public void updateMenuBar() {
         canvas.updateMenuBar();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void showPopupMenu(JPopupMenu menu, int x, int y) {
+        menu.show(canvas, x, y);
     }
 
 

@@ -37,6 +37,8 @@ import java.util.logging.Logger;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -1330,6 +1332,14 @@ public class GUI extends FreeColClientHolder {
     // Animation handling
 
     /**
+     * Control animation labels.
+     *
+     * @param label A {@code JLabel} for an animation.
+     * @param add If true, add the label, else remove it.
+     */
+    public void animationLabel(JLabel label, boolean add) {}
+
+    /**
      * Animate a unit attack.
      *
      * @param attacker The attacking {@code Unit}.
@@ -1700,6 +1710,15 @@ public class GUI extends FreeColClientHolder {
      * Update the menu bar.
      */
     public void updateMenuBar() {}
+
+    /**
+     * Display a popup menu.
+     *
+     * @param menu The {@code JPopupMenu} to display.
+     * @param x The menu x coordinate.
+     * @param y The menu y coordinate.
+     */
+    public void showPopupMenu(JPopupMenu menu, int x, int y) {}
 
 
     // Tile image manipulation

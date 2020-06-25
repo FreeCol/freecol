@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -86,8 +87,6 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.Introspector;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
 import net.sf.freecol.client.gui.panel.ChatPanel;
@@ -166,8 +165,14 @@ public final class Canvas extends JDesktopPane {
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
-    /** Cached panels.  TODO: check if we still need these */
+    /**
+     * The main panel.  Remember this because getExistingFreeColPanel
+     * gets confused across switches between the game and the map editor
+     * which makes it hard to remove.
+     */
     private MainPanel mainPanel;
+
+    /** Cached panels.  TODO: check if we still need these */
     private final StartGamePanel startGamePanel;
     private final StatusPanel statusPanel;
     private final ChatPanel chatPanel;
@@ -203,20 +208,7 @@ public final class Canvas extends JDesktopPane {
         this.mapViewer = mapViewer;
         this.greyLayer = new GrayLayer(freeColClient);
         this.chatDisplay = new ChatDisplay();
-        
-        final String className = this.freeColClient.getClientOptions()
-            .getString(ClientOptions.MAP_CONTROLS);
-        final String panelName = "net.sf.freecol.client.gui.panel."
-            + lastPart(className, ".");
-        try {
-            this.mapControls = (MapControls)Introspector.instantiate(panelName,
-                new Class[] { FreeColClient.class },
-                new Object[] { this.freeColClient });
-            logger.info("Instantiated " + panelName);
-        } catch (Introspector.IntrospectorException ie) {
-            logger.log(Level.WARNING, "Failed in make map controls for: "
-                + panelName, ie);
-        }
+        this.mapControls = MapControls.newInstance(freeColClient);
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -231,7 +223,6 @@ public final class Canvas extends JDesktopPane {
         startGamePanel = new StartGamePanel(freeColClient);
         statusPanel = new StatusPanel(freeColClient);
 
-        enableMapControls(true);
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
     }
@@ -286,11 +277,12 @@ public final class Canvas extends JDesktopPane {
         Dimension newSize = getSize();
         if (this.oldSize.width != newSize.width
             || this.oldSize.height != newSize.height) {
-            logger.info("Canvas resized from " + this.oldSize
+            logger.info("Canvas resize from " + this.oldSize
                 + " to " + newSize);
             this.oldSize = newSize;
-            updateMapControlsInCanvas();
+            boolean add = removeMapControls();
             mapViewer.changeSize(newSize);
+            if (add) addMapControls();
         }
         return newSize;
     }
@@ -959,10 +951,34 @@ public final class Canvas extends JDesktopPane {
 
     // Map controls
 
-    private void removeMapControls() {
-        for (Component c : this.mapControls.getComponents()) {
+    /**
+     * Add the map controls.
+     *
+     * @return True if any were added.
+     */
+    private boolean addMapControls() {
+        if (this.mapControls == null) return false;
+        List<Component> components
+            = this.mapControls.getComponentsToAdd(this.oldSize);
+        for (Component c : components) {
+            addToCanvas(c, JLayeredPane.MODAL_LAYER);
+        }
+        return !components.isEmpty();
+    }
+
+    /**
+     * Remove the map controls.
+     *
+     * @return True if any were removed.
+     */
+    private boolean removeMapControls() {
+        if (this.mapControls == null) return false;
+        List<Component> components
+            = this.mapControls.getComponentsToRemove();
+        for (Component c : this.mapControls.getComponentsToRemove()) {
             removeFromCanvas(c);
         }
+        return !components.isEmpty();
     }
         
     public boolean canZoomInMapControls() {
@@ -978,13 +994,9 @@ public final class Canvas extends JDesktopPane {
     public void enableMapControls(boolean enable) {
         if (this.mapControls == null) return;
         if (enable) {
-            if (!this.mapControls.isShowing()) {
-                this.mapControls.addToComponent(this);
-            }
+            addMapControls();
         } else {
-            if (this.mapControls.isShowing()) {
-                removeMapControls();
-            }
+            removeMapControls();
         }
     }
 
@@ -1001,12 +1013,6 @@ public final class Canvas extends JDesktopPane {
     public void updateMapControls(Unit unit) {
         if (this.mapControls == null) return;
         this.mapControls.update(unit);
-    }
-
-    public void updateMapControlsInCanvas() {
-        if (this.mapControls == null) return;
-        removeMapControls();
-        this.mapControls.addToComponent(this);
     }
 
     public void zoomInMapControls() {
@@ -1441,15 +1447,29 @@ public final class Canvas extends JDesktopPane {
     }
 
     // Special dialogs and panels
-    
+
+    /**
+     * Add and remove animation labels.
+     *
+     * @param label A {@code JLabel} for an animation.
+     * @param add If true, add the label, else remove it.
+     */
+    public void animationLabel(JLabel label, boolean add) {
+        if (add) {
+            addToCanvas(label, JLayeredPane.DEFAULT_LAYER);
+        } else {
+            removeFromCanvas(label);
+        }
+    }
+
     /**
      * Closes the {@link MainPanel}.
      */
     public void closeMainPanel() {
-       if (mainPanel != null) {
-          remove(mainPanel);
-          mainPanel = null;
-       }
+        if (this.mainPanel != null) {
+            remove(this.mainPanel);
+            this.mainPanel = null;
+        }
     }
 
     /**
@@ -1511,9 +1531,9 @@ public final class Canvas extends JDesktopPane {
     public void showMainPanel() {
         closeMenus();
         this.parentFrame.removeMenuBar();
-        mainPanel = new MainPanel(freeColClient);
-        addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
-        mainPanel.requestFocus();
+        this.mainPanel = new MainPanel(freeColClient);
+        addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
+        this.mainPanel.requestFocus();
     }
 
     /**
