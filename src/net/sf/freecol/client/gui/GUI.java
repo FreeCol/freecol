@@ -38,6 +38,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -1709,6 +1710,15 @@ public class GUI extends FreeColClientHolder {
      * Update the menu bar.
      */
     public void updateMenuBar() {}
+
+    /**
+     * Display a popup menu.
+     *
+     * @param menu The {@code JPopupMenu} to display.
+     * @param x The menu x coordinate.
+     * @param y The menu y coordinate.
+     */
+    public void showPopupMenu(JPopupMenu menu, int x, int y) {}
 
 
     // Tile image manipulation

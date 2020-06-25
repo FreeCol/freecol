@@ -123,7 +123,7 @@ public final class DragListener extends MouseAdapter {
             final GUI gui = this.freeColClient.getGUI();
             if ((gui.isWindowed() && windows)
                 || (small && !gui.isWindowed())) {
-                menu.show(gui.getCanvas(), menu.getLocation().x, 0);
+                gui.showPopupMenu(menu, menu.getLocation().x, 0);
             } else {
                 menu.show(comp, e.getX(), e.getY());
             }
