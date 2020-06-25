@@ -87,8 +87,6 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.Introspector;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
 import net.sf.freecol.client.gui.panel.ChatPanel;
@@ -210,20 +208,7 @@ public final class Canvas extends JDesktopPane {
         this.mapViewer = mapViewer;
         this.greyLayer = new GrayLayer(freeColClient);
         this.chatDisplay = new ChatDisplay();
-        
-        final String className = this.freeColClient.getClientOptions()
-            .getString(ClientOptions.MAP_CONTROLS);
-        final String panelName = "net.sf.freecol.client.gui.panel."
-            + lastPart(className, ".");
-        try {
-            this.mapControls = (MapControls)Introspector.instantiate(panelName,
-                new Class[] { FreeColClient.class },
-                new Object[] { this.freeColClient });
-            logger.info("Instantiated " + panelName);
-        } catch (Introspector.IntrospectorException ie) {
-            logger.log(Level.WARNING, "Failed in make map controls for: "
-                + panelName, ie);
-        }
+        this.mapControls = MapControls.newInstance(freeColClient);
 
         setDoubleBuffered(true);
         setOpaque(false);

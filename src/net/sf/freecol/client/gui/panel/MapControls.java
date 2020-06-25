@@ -23,6 +23,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -31,6 +33,8 @@ import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Introspector;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -38,12 +42,10 @@ import net.sf.freecol.common.model.Unit;
  * user with a more detailed view of certain elements on the map and
  * also to provide a means of input in case the user can't use the
  * keyboard.
- *
- * The MapControls are useless by themselves, this object needs to be
- * placed on a JComponent in order to be usable.
  */
 public abstract class MapControls extends FreeColClientHolder {
 
+    private static final Logger logger = Logger.getLogger(MapControls.class.getName());
     public static final int MINI_MAP_WIDTH = 220;
     public static final int MINI_MAP_HEIGHT = 128;
     public static final int GAP = 4;
@@ -187,4 +189,26 @@ public abstract class MapControls extends FreeColClientHolder {
         this.miniMap.zoomOut();
         repaint();
     }
+
+    /**
+     * Create a new map controls instance for a FreeColClient.
+     *
+     * @param freeColClient The {@code FreeColClient} to query.
+     * @return A new {@code MapControls} or null on error.
+     */
+    public static MapControls newInstance(final FreeColClient freeColClient) {
+        final String className = freeColClient.getClientOptions()
+            .getString(ClientOptions.MAP_CONTROLS);
+        final String panelName = "net.sf.freecol.client.gui.panel."
+            + lastPart(className, ".");
+        try {
+            return (MapControls)Introspector.instantiate(panelName,
+                new Class[] { FreeColClient.class },
+                new Object[] { freeColClient });
+        } catch (Introspector.IntrospectorException ie) {
+            logger.log(Level.WARNING, "Failed in make map controls for: "
+                + panelName, ie);
+        }
+        return null;
+    } 
 }
