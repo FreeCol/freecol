@@ -52,17 +52,14 @@ public final class ChatPanel extends FreeColPanel {
         super(freeColClient, null, new BorderLayout(10, 10));
 
         JLabel label = Utility.localizedLabel("chatPanel.message");
-
-        field = new JTextField("", 40);
-        field.setActionCommand(String.valueOf(CHAT));
-        field.addActionListener(this);
-
-        add(label);
-        add(field);
-
-        //setFocusable(false);
+        add(label, BorderLayout.PAGE_START);
         label.setFocusable(false);
-        field.setFocusable(true);
+
+        this.field = new JTextField("", 40);
+        this.field.setActionCommand(String.valueOf(CHAT));
+        this.field.addActionListener(this);
+        add(this.field, BorderLayout.CENTER);
+        this.field.setFocusable(true);
 
         setSize(getPreferredSize());
     }
@@ -73,7 +70,7 @@ public final class ChatPanel extends FreeColPanel {
      */
     @Override
     public void requestFocus() {
-        field.requestFocus();
+        this.field.requestFocus();
     }
 
     /**
@@ -83,8 +80,8 @@ public final class ChatPanel extends FreeColPanel {
      * @return The chat message.
      */
     public String getChatText() {
-        String message = field.getText();
-        field.setText("");
+        String message = this.field.getText();
+        this.field.setText("");
         return message;
     }
 

@@ -411,6 +411,16 @@ public final class Widgets {
     }
 
     /**
+     * Displays the {@code ChatPanel}.
+     */
+    public void showChatPanel() {
+        ChatPanel panel
+            = new ChatPanel(freeColClient);
+        canvas.showSubPanel(panel, true);
+        panel.requestFocus();
+    }
+
+    /**
      * Displays the {@code ChooseFoundingFatherDialog}.
      *
      * @param ffs The {@code FoundingFather}s to choose from.

@@ -88,7 +88,6 @@ import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
-import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
@@ -172,7 +171,6 @@ public final class Canvas extends JDesktopPane {
     /** Cached panels.  TODO: check if we still need these */
     private final StartGamePanel startGamePanel;
     private final StatusPanel statusPanel;
-    private final ChatPanel chatPanel;
     private final ServerListPanel serverListPanel;
 
 
@@ -215,7 +213,6 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
         createKeyBindings();
 
-        chatPanel = new ChatPanel(freeColClient);
         serverListPanel = new ServerListPanel(freeColClient,
             freeColClient.getConnectController());
         startGamePanel = new StartGamePanel(freeColClient);
@@ -1457,17 +1454,6 @@ public final class Canvas extends JDesktopPane {
      */
     public void refreshPlayersTable() {
         startGamePanel.refreshPlayersTable();
-    }
-
-    /**
-     * Displays the {@code ChatPanel}.
-     *
-     * @see ChatPanel
-     */
-    public void showChatPanel() {
-        // FIXME: does it have state, or can we create a new one?
-        if (freeColClient.getSinglePlayer()) return; // chat with who?
-        showSubPanel(chatPanel, true);
     }
 
     /**

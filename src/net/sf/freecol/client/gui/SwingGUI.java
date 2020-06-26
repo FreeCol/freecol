@@ -1351,7 +1351,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showChatPanel() {
-        canvas.showChatPanel();
+        if (getFreeColClient().getSinglePlayer()) return; // chat with who?
+        widgets.showChatPanel();
     }
 
     /**
