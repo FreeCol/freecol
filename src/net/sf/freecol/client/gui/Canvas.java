@@ -80,7 +80,6 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
@@ -98,7 +97,6 @@ import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 
 
 /**
@@ -1552,18 +1550,6 @@ public final class Canvas extends JDesktopPane {
         return false;
     }
 
-    /**
-     * Display the trade route input panel for a given trade route.
-     *
-     * @param newRoute The {@code TradeRoute} to display.
-     * @return The {@code TradeRouteInputPanel}.
-     */
-    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
-        TradeRouteInputPanel panel
-            = new TradeRouteInputPanel(freeColClient, newRoute);
-        showSubPanel(panel, null, true);
-        return panel;
-    }
 
     // Override JComponent
 
