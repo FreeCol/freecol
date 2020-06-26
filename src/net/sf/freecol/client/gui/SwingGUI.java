@@ -51,6 +51,7 @@ import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
@@ -122,6 +123,9 @@ public class SwingGUI extends GUI {
      */
     private MapViewer mapViewer;
 
+    /** The various sorts of map controls. */
+    private MapControls mapControls;
+
     /** The canvas that implements much of the functionality. */
     private Canvas canvas;
 
@@ -151,6 +155,7 @@ public class SwingGUI extends GUI {
         this.tileViewer = new TileViewer(freeColClient);
         // Defer remaining initializations, possibly to startGUI
         this.mapViewer = null;
+        this.mapControls = null;
         this.canvas = null;
         this.widgets = null;
         this.dragPoint = null;
@@ -412,7 +417,7 @@ public class SwingGUI extends GUI {
     public void reconnect(Unit active, Tile tile) {
         requestFocusInWindow();
         canvas.initializeInGame();
-        canvas.enableMapControls(getClientOptions()
+        enableMapControls(getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         closeMenus();
         clearGotoPath();
@@ -455,12 +460,15 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void startGUI(final Dimension desiredWindowSize) {
+        final FreeColClient fcc = getFreeColClient();
         final ClientOptions opts = getClientOptions();
-        this.mapViewer = new MapViewer(getFreeColClient());
+        this.mapViewer = new MapViewer(fcc);
+        this.mapControls = MapControls.newInstance(fcc);
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
-                                 desiredWindowSize, this.mapViewer);
-        this.widgets = new Widgets(getFreeColClient(),
-                                   mapViewer.getImageLibrary(), this.canvas);
+                                 desiredWindowSize, this.mapViewer,
+                                 this.mapControls);
+        this.widgets = new Widgets(fcc, mapViewer.getImageLibrary(),
+                                   this.canvas);
 
         // Now that there is a canvas, prepare for language changes.
         opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)
@@ -836,14 +844,15 @@ public class SwingGUI extends GUI {
     }
     
     
-    // MapControls is delegated to Canvas
+    // MapControls
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean canZoomInMapControls() {
-        return canvas.canZoomInMapControls();
+        if (this.mapControls == null) return false;
+        return this.mapControls.canZoomInMapControls();
     }
 
     /**
@@ -851,7 +860,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomOutMapControls() {
-        return canvas.canZoomOutMapControls();
+        if (this.mapControls == null) return false;
+        return this.mapControls.canZoomOutMapControls();
     }
 
     /**
@@ -859,7 +869,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void enableMapControls(boolean enable) {
-        canvas.enableMapControls(enable);
+        if (this.mapControls == null) return;
+        if (enable) {
+            this.canvas.addMapControls();
+        } else {
+            this.canvas.removeMapControls();
+        }
         updateMapControls();
     }
 
@@ -868,7 +883,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void miniMapToggleViewControls() {
-        canvas.miniMapToggleViewControls();
+        if (this.mapControls == null) return;
+        this.mapControls.toggleView();
     }
 
     /**
@@ -876,7 +892,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void miniMapToggleFogOfWarControls() {
-        canvas.miniMapToggleFogOfWarControls();
+        if (this.mapControls == null) return;
+        this.mapControls.toggleFogOfWar();
     }
 
     /**
@@ -884,7 +901,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateMapControls() {
-        canvas.updateMapControls(getActiveUnit());
+        if (this.mapControls == null) return;
+        this.mapControls.update(getActiveUnit());
     }
 
     /**
@@ -892,7 +910,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomInMapControls() {
-        canvas.zoomInMapControls();
+        if (this.mapControls == null) return;
+        this.mapControls.zoomIn();
     }
 
     /**
@@ -900,7 +919,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomOutMapControls() {
-        canvas.zoomOutMapControls();
+        if (this.mapControls == null) return;
+        this.mapControls.zoomOut();
     }
 
 

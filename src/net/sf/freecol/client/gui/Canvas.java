@@ -150,6 +150,9 @@ public final class Canvas extends JDesktopPane {
     /** The component that displays the map. */
     private final MapViewer mapViewer;
 
+    /** The various sorts of map controls. */
+    private MapControls mapControls;
+
     /** Has a goto operation started? */
     private boolean gotoStarted = false;
 
@@ -158,9 +161,6 @@ public final class Canvas extends JDesktopPane {
 
     /** The chat message area. */
     private final ChatDisplay chatDisplay;
-
-    /** The various sorts of map controls. */
-    private MapControls mapControls;
 
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
@@ -190,7 +190,8 @@ public final class Canvas extends JDesktopPane {
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
                   final Dimension desiredSize,
-                  MapViewer mapViewer) {
+                  MapViewer mapViewer,
+                  MapControls mapControls) {
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
         this.imageLibrary = mapViewer.getImageLibrary();
@@ -206,9 +207,9 @@ public final class Canvas extends JDesktopPane {
         this.parentFrame = createFrame(null, windowBounds);
         this.oldSize = getSize();
         this.mapViewer = mapViewer;
+        this.mapControls = mapControls;
         this.greyLayer = new GrayLayer(freeColClient);
         this.chatDisplay = new ChatDisplay();
-        this.mapControls = MapControls.newInstance(freeColClient);
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -949,14 +950,15 @@ public final class Canvas extends JDesktopPane {
         this.parentFrame = createFrame(menuBar, windowBounds);
     }
 
-    // Map controls
+
+    // Map controls, called out of paintComponent via checkResize
 
     /**
      * Add the map controls.
      *
      * @return True if any were added.
      */
-    private boolean addMapControls() {
+    public boolean addMapControls() {
         if (this.mapControls == null) return false;
         List<Component> components
             = this.mapControls.getComponentsToAdd(this.oldSize);
@@ -971,59 +973,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @return True if any were removed.
      */
-    private boolean removeMapControls() {
+    public boolean removeMapControls() {
         if (this.mapControls == null) return false;
         List<Component> components
             = this.mapControls.getComponentsToRemove();
+        boolean ret = false;
         for (Component c : this.mapControls.getComponentsToRemove()) {
             removeFromCanvas(c);
+            ret = true;
         }
-        return !components.isEmpty();
-    }
-        
-    public boolean canZoomInMapControls() {
-        if (this.mapControls == null) return false;
-        return this.mapControls.canZoomInMapControls();
+        return ret;
     }
 
-    public boolean canZoomOutMapControls() {
-        if (this.mapControls == null) return false;
-        return this.mapControls.canZoomOutMapControls();
-    }
-
-    public void enableMapControls(boolean enable) {
-        if (this.mapControls == null) return;
-        if (enable) {
-            addMapControls();
-        } else {
-            removeMapControls();
-        }
-    }
-
-    public void miniMapToggleViewControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.toggleView();
-    }
-
-    public void miniMapToggleFogOfWarControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.toggleFogOfWar();
-    }
-
-    public void updateMapControls(Unit unit) {
-        if (this.mapControls == null) return;
-        this.mapControls.update(unit);
-    }
-
-    public void zoomInMapControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.zoomIn();
-    }
-
-    public void zoomOutMapControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.zoomOut();
-    }
 
     // Map viewer
     
