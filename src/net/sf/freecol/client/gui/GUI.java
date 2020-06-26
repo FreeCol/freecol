@@ -1234,15 +1234,6 @@ public class GUI extends FreeColClientHolder {
     // Simple accessors
 
     /**
-     * Get the canvas.
-     *
-     * @return Null here, real implementations will override.
-     */
-    public Canvas getCanvas() {
-        return null;
-    }
-
-    /**
      * Get the tile image library.
      *
      * @return Null here, real implementations will override.

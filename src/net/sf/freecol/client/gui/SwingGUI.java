@@ -329,14 +329,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public Canvas getCanvas() {
-        return this.canvas;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ImageLibrary getTileImageLibrary() {
         return tileViewer.getImageLibrary();
     }
