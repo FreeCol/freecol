@@ -1291,14 +1291,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean onClosingErrorPanel(Runnable callback) {
-        return canvas != null && canvas.onClosingErrorPanel(callback);
-    }
-        
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }

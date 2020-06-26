@@ -1909,16 +1909,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Attach a closing callback to any current error panel.
-     *
-     * @param callback The {@code Runnable} to attach.
-     * @return True if an error panel was present.
-     */
-    public boolean onClosingErrorPanel(Runnable callback) {
-        return false;
-    }
-
-    /**
      * Refresh the players table in the StartGamePanel.
      */
     public void refreshPlayersTable() {}

@@ -91,7 +91,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 // Special case panels, TODO: can we move these to Widgets?
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
@@ -1269,19 +1268,6 @@ public final class Canvas extends JDesktopPane {
             }
         }
         return null;
-    }
-
-    /**
-     * Attach a closing callback to any current error panel.
-     *
-     * @param callback The {@code Runnable} to attach.
-     * @return True if an error panel was present.
-     */
-    public boolean onClosingErrorPanel(Runnable callback) {
-        ErrorPanel ep = getExistingFreeColPanel(ErrorPanel.class);
-        if (ep == null) return false;
-        ep.addClosingCallback(callback);
-        return true;
     }
 
     /**
