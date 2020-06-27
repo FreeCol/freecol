@@ -80,7 +80,6 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
@@ -91,7 +90,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 // Special case panels, TODO: can we move these to Widgets?
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
@@ -99,7 +97,6 @@ import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 
 
 /**
@@ -150,6 +147,9 @@ public final class Canvas extends JDesktopPane {
     /** The component that displays the map. */
     private final MapViewer mapViewer;
 
+    /** The various sorts of map controls. */
+    private MapControls mapControls;
+
     /** Has a goto operation started? */
     private boolean gotoStarted = false;
 
@@ -158,9 +158,6 @@ public final class Canvas extends JDesktopPane {
 
     /** The chat message area. */
     private final ChatDisplay chatDisplay;
-
-    /** The various sorts of map controls. */
-    private MapControls mapControls;
 
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
@@ -190,7 +187,8 @@ public final class Canvas extends JDesktopPane {
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
                   final Dimension desiredSize,
-                  MapViewer mapViewer) {
+                  MapViewer mapViewer,
+                  MapControls mapControls) {
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
         this.imageLibrary = mapViewer.getImageLibrary();
@@ -206,9 +204,9 @@ public final class Canvas extends JDesktopPane {
         this.parentFrame = createFrame(null, windowBounds);
         this.oldSize = getSize();
         this.mapViewer = mapViewer;
+        this.mapControls = mapControls;
         this.greyLayer = new GrayLayer(freeColClient);
         this.chatDisplay = new ChatDisplay();
-        this.mapControls = MapControls.newInstance(freeColClient);
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -949,14 +947,15 @@ public final class Canvas extends JDesktopPane {
         this.parentFrame = createFrame(menuBar, windowBounds);
     }
 
-    // Map controls
+
+    // Map controls, called out of paintComponent via checkResize
 
     /**
      * Add the map controls.
      *
      * @return True if any were added.
      */
-    private boolean addMapControls() {
+    public boolean addMapControls() {
         if (this.mapControls == null) return false;
         List<Component> components
             = this.mapControls.getComponentsToAdd(this.oldSize);
@@ -971,59 +970,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @return True if any were removed.
      */
-    private boolean removeMapControls() {
+    public boolean removeMapControls() {
         if (this.mapControls == null) return false;
         List<Component> components
             = this.mapControls.getComponentsToRemove();
+        boolean ret = false;
         for (Component c : this.mapControls.getComponentsToRemove()) {
             removeFromCanvas(c);
+            ret = true;
         }
-        return !components.isEmpty();
-    }
-        
-    public boolean canZoomInMapControls() {
-        if (this.mapControls == null) return false;
-        return this.mapControls.canZoomInMapControls();
+        return ret;
     }
 
-    public boolean canZoomOutMapControls() {
-        if (this.mapControls == null) return false;
-        return this.mapControls.canZoomOutMapControls();
-    }
-
-    public void enableMapControls(boolean enable) {
-        if (this.mapControls == null) return;
-        if (enable) {
-            addMapControls();
-        } else {
-            removeMapControls();
-        }
-    }
-
-    public void miniMapToggleViewControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.toggleView();
-    }
-
-    public void miniMapToggleFogOfWarControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.toggleFogOfWar();
-    }
-
-    public void updateMapControls(Unit unit) {
-        if (this.mapControls == null) return;
-        this.mapControls.update(unit);
-    }
-
-    public void zoomInMapControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.zoomIn();
-    }
-
-    public void zoomOutMapControls() {
-        if (this.mapControls == null) return;
-        this.mapControls.zoomOut();
-    }
 
     // Map viewer
     
@@ -1311,19 +1269,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Attach a closing callback to any current error panel.
-     *
-     * @param callback The {@code Runnable} to attach.
-     * @return True if an error panel was present.
-     */
-    public boolean onClosingErrorPanel(Runnable callback) {
-        ErrorPanel ep = getExistingFreeColPanel(ErrorPanel.class);
-        if (ep == null) return false;
-        ep.addClosingCallback(callback);
-        return true;
-    }
-
-    /**
      * Checks if this {@code Canvas} displaying another panel.
      * <p>
      * Note that the previous implementation could throw exceptions
@@ -1605,18 +1550,6 @@ public final class Canvas extends JDesktopPane {
         return false;
     }
 
-    /**
-     * Display the trade route input panel for a given trade route.
-     *
-     * @param newRoute The {@code TradeRoute} to display.
-     * @return The {@code TradeRouteInputPanel}.
-     */
-    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
-        TradeRouteInputPanel panel
-            = new TradeRouteInputPanel(freeColClient, newRoute);
-        showSubPanel(panel, null, true);
-        return panel;
-    }
 
     // Override JComponent
 

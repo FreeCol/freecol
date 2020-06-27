@@ -1234,15 +1234,6 @@ public class GUI extends FreeColClientHolder {
     // Simple accessors
 
     /**
-     * Get the canvas.
-     *
-     * @return Null here, real implementations will override.
-     */
-    public Canvas getCanvas() {
-        return null;
-    }
-
-    /**
      * Get the tile image library.
      *
      * @return Null here, real implementations will override.
@@ -1905,16 +1896,6 @@ public class GUI extends FreeColClientHolder {
      * @return True if there is another panel present.
      */
     public boolean isShowingSubPanel() {
-        return false;
-    }
-
-    /**
-     * Attach a closing callback to any current error panel.
-     *
-     * @param callback The {@code Runnable} to attach.
-     * @return True if an error panel was present.
-     */
-    public boolean onClosingErrorPanel(Runnable callback) {
         return false;
     }
 
