@@ -370,6 +370,17 @@ public final class Widgets {
     }
 
     /**
+     * Refresh the player's table.
+     *
+     * Called when a new player is added from PreGameInputHandler.addPlayer.
+     */
+    public void refreshPlayersTable() {
+        StartGamePanel panel
+            = canvas.getExistingFreeColPanel(StartGamePanel.class);
+        panel.refreshPlayersTable();
+    }
+
+    /**
      * Display the AboutPanel.
      */
     public void showAboutPanel() {
@@ -1139,6 +1150,22 @@ public final class Widgets {
                                             question, maximum);
         Integer result = canvas.showFreeColDialog(dialog, null);
         return (result == null) ? -1 : result;
+    }
+
+    /**
+     * Displays the start game panel.
+     *
+     * @param singlePlayerMode True to start a single player game.
+     */
+    public void showStartGamePanel(boolean singlePlayerMode) {
+        canvas.closeMenus();
+        StartGamePanel panel
+            = canvas.getExistingFreeColPanel(StartGamePanel.class);
+        if (panel == null) {
+            panel = new StartGamePanel(freeColClient);
+        }
+        panel.initialize(singlePlayerMode);
+        canvas.showSubPanel(panel, false);
     }
 
     /**

@@ -93,7 +93,6 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 
@@ -169,7 +168,6 @@ public final class Canvas extends JDesktopPane {
     private MainPanel mainPanel;
 
     /** Cached panels.  TODO: check if we still need these */
-    private final StartGamePanel startGamePanel;
     private final StatusPanel statusPanel;
     private final ServerListPanel serverListPanel;
 
@@ -215,7 +213,6 @@ public final class Canvas extends JDesktopPane {
 
         serverListPanel = new ServerListPanel(freeColClient,
             freeColClient.getConnectController());
-        startGamePanel = new StartGamePanel(freeColClient);
         statusPanel = new StatusPanel(freeColClient);
 
         mapViewer.startCursorBlinking();
@@ -1449,14 +1446,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Refresh the player's table (called when a new player is added
-     * from PreGameInputHandler.addPlayer).
-     */
-    public void refreshPlayersTable() {
-        startGamePanel.refreshPlayersTable();
-    }
-
-    /**
      * Shows the {@code MainPanel}.
      */
     public void showMainPanel() {
@@ -1490,18 +1479,6 @@ public final class Canvas extends JDesktopPane {
         closeMenus();
         serverListPanel.initialize(serverList);
         showSubPanel(serverListPanel, true);
-    }
-
-    /**
-     * Displays the {@code StartGamePanel}.
-     *
-     * @param singlePlayerMode True to start a single player game.
-     * @see StartGamePanel
-     */
-    public void showStartGamePanel(boolean singlePlayerMode) {
-        closeMenus();
-        startGamePanel.initialize(singlePlayerMode);
-        showSubPanel(startGamePanel, false);
     }
 
     /**

@@ -1284,7 +1284,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void refreshPlayersTable() {
-        canvas.refreshPlayersTable();
+        widgets.refreshPlayersTable();
     }
 
     /**
@@ -1939,7 +1939,7 @@ public class SwingGUI extends GUI {
         } else if (player == null) {
             logger.warning("StartGamePanel requires player != null.");
         } else {
-            canvas.showStartGamePanel(singlePlayerMode);
+            widgets.showStartGamePanel(singlePlayerMode);
         }
     }
 
