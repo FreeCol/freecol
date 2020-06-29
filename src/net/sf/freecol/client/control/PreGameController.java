@@ -86,8 +86,7 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void sendChat(String message) {
         final Player player = getMyPlayer();
-
-        getGUI().displayStartChat(player, message, false);
+        // Do not call displayStartChat, the panel has already echoed it
         askServer().chat(player, message);
     }
 
