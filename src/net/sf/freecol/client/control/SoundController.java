@@ -99,17 +99,19 @@ public class SoundController {
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
-        if (!canPlaySound() || sound == null) return;
-
-        File file = ResourceManager.getAudio(sound);
-        if (file == null) {
-            logger.finest("Cound not load sound: " + sound);
-        } else {
+        if (sound == null) {
             soundPlayer.stop();
-            boolean playing = soundPlayer.playOnce(file);
-            logger.finest(((playing) ? "Queued" : "Fail on")
-                + " sound: " + sound);
-        }
+        } else if (canPlaySound()) {
+            File file = ResourceManager.getAudio(sound);
+            if (file == null) {
+                logger.finest("Cound not load sound: " + sound);
+            } else {
+                soundPlayer.stop();
+                boolean playing = soundPlayer.playOnce(file);
+                logger.finest(((playing) ? "Queued" : "Fail on")
+                    + " sound: " + sound);
+            }
+        } // else can not play anything
     }
 
     /**
