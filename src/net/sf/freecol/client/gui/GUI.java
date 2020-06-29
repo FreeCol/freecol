@@ -1501,16 +1501,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Require the given tile to be in the onScreen()-area.
-     *
-     * @param tile The {@code Tile} to check.
-     * @return True if the focus was set.
-     */
-    public boolean requireFocus(Tile tile) {
-        return false;
-    }
-
-    /**
      * Set the current focus tile.
      *
      * @param tileToFocus The new focus {@code Tile}.

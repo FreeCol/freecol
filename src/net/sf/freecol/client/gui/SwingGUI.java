@@ -240,21 +240,11 @@ public class SwingGUI extends GUI {
             && (oldFocus == null || refocus
                 || !this.mapViewer.onScreen(newTile));
         if (refocus) setFocus(newTile);
-
-        // System.err.println("CST " + newTile + " " + (newTile != oldTile) + " " + refocus);
-
         if (newTile == oldTile) return false;
         this.mapViewer.setSelectedTile(newTile);
         if (oldTile != null) refreshTile(oldTile);
         if (newTile != null) refreshTile(newTile);
         return true;
-    }
-
-    // TODO
-    private void setFocusImmediately(Tile tileToFocus) {
-        this.mapViewer.changeFocus(tileToFocus);
-        Dimension size = canvas.getSize();
-        canvas.paintImmediately(0, 0, size.width, size.height);
     }
 
     /**
@@ -498,6 +488,22 @@ public class SwingGUI extends GUI {
     // Animation handling
 
     /**
+     * Make sure a tile is visible and focused in preparation for an animation.
+     *
+     * @param tile The {@code Tile} to prepare.
+     */
+    private void prepareForAnimation(Tile tile) {
+        // Account for the ALWAYS_CENTER client option.
+        final boolean required = getClientOptions()
+            .getBoolean(ClientOptions.ALWAYS_CENTER);
+        if ((required && tile != getFocus())
+            || !this.mapViewer.onScreen(tile)) {
+            this.mapViewer.changeFocus(tile);
+            paintImmediately();
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -548,8 +554,7 @@ public class SwingGUI extends GUI {
     public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
                                                OutForAnimationCallback r) {
         invokeNowOrWait(() -> {
-                requireFocus(sourceTile);
-                paintImmediately();
+                prepareForAnimation(sourceTile);
                 this.mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
             });
     }
@@ -652,22 +657,6 @@ public class SwingGUI extends GUI {
     @Override
     public boolean requestFocusInWindow() {
         return canvas.requestFocusInWindow();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean requireFocus(Tile tile) {
-        // Account for the ALWAYS_CENTER client option.
-        final boolean required = getClientOptions()
-            .getBoolean(ClientOptions.ALWAYS_CENTER);
-        if ((required && tile != getFocus())
-            || !this.mapViewer.onScreen(tile)) {
-            setFocusImmediately(tile);
-            return true;
-        }
-        return false;
     }
 
     /**
