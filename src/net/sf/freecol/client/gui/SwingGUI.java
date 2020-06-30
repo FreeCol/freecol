@@ -1183,7 +1183,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void closeStatusPanel() {
-        canvas.closeStatusPanel();
+        widgets.closeStatusPanel();
     }
 
     /**
@@ -1933,7 +1933,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showStatusPanel(String message) {
-        canvas.showStatusPanel(message);
+        widgets.showStatusPanel(message);
     }
 
     /**

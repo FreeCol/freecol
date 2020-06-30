@@ -93,8 +93,6 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.StatisticsPanel;
-import net.sf.freecol.client.gui.panel.StatusPanel;
 
 
 /**
@@ -168,7 +166,6 @@ public final class Canvas extends JDesktopPane {
     private MainPanel mainPanel;
 
     /** Cached panels.  TODO: check if we still need these */
-    private final StatusPanel statusPanel;
     private final ServerListPanel serverListPanel;
 
 
@@ -213,7 +210,6 @@ public final class Canvas extends JDesktopPane {
 
         serverListPanel = new ServerListPanel(freeColClient,
             freeColClient.getConnectController());
-        statusPanel = new StatusPanel(freeColClient);
 
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
@@ -406,19 +402,10 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component to this Canvas updating the menus.
      *
-     * Make sure the status panel is not present unless the component
-     * *is* the status panel.
-     *
      * @param comp The {@code Component} to add to this canvas.
      * @param layer The layer to add the component to (see JLayeredPane).
      */
     private void addToCanvas(Component comp, Integer layer) {
-        assert layer != null;
-        if (statusPanel.isVisible()) {
-            if (comp == statusPanel) return;
-            if (!(comp instanceof JMenuItem)) removeFromCanvas(statusPanel);
-        }
-
         try {
             add(comp, layer);
         } catch (Exception e) {
@@ -1412,17 +1399,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Closes the {@code StatusPanel}.
-     *
-     * @see #showStatusPanel
-     */
-    public void closeStatusPanel() {
-        if (statusPanel.isVisible()) {
-            remove(statusPanel);
-        }
-    }
-
-    /**
      * Tells that a chat message was received.
      *
      * @param message The chat message.
@@ -1479,21 +1455,6 @@ public final class Canvas extends JDesktopPane {
         closeMenus();
         serverListPanel.initialize(serverList);
         showSubPanel(serverListPanel, true);
-    }
-
-    /**
-     * Shows a status message that cannot be dismissed.  The panel
-     * will be removed when another component is added to this
-     * {@code Canvas}.  This includes all the
-     * {@code showXXX}-methods. In addition,
-     * {@link #closeStatusPanel()} also removes this panel.
-     *
-     * @param message The text message to display on the status panel.
-     * @see StatusPanel
-     */
-    public void showStatusPanel(String message) {
-        statusPanel.setStatusMessage(message);
-        addCentered(statusPanel, JLayeredPane.POPUP_LAYER);
     }
 
     /**

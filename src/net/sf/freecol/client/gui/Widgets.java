@@ -345,6 +345,17 @@ public final class Widgets {
     }
 
     /**
+     * Close the status panel if present.
+     */
+    public void closeStatusPanel() {
+        StatusPanel panel
+            = canvas.getExistingFreeColPanel(StatusPanel.class);
+        if (panel != null) {
+            canvas.removeFromCanvas(panel);
+        }
+    }
+
+    /**
      * Tells that a chat message was received.
      *
      * @param senderName The sender.
@@ -1178,6 +1189,23 @@ public final class Widgets {
                                     Map<String, String> clientStats) {
         StatisticsPanel panel
             = new StatisticsPanel(freeColClient, serverStats, clientStats);
+        canvas.showSubPanel(panel, true);
+    }
+
+    /**
+     * Shows a status message.
+     *
+     * Explictly removed by @see closeStatusPanel.
+     *
+     * @param message The text message to display on the status panel.
+     */
+    public void showStatusPanel(String message) {
+        StatusPanel panel
+            = canvas.getExistingFreeColPanel(StatusPanel.class);
+        if (panel == null) {
+            panel = new StatusPanel(freeColClient);
+        }
+        panel.setStatusMessage(message);
         canvas.showSubPanel(panel, true);
     }
 
