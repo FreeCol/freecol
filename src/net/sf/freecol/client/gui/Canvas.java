@@ -384,22 +384,22 @@ public final class Canvas extends JDesktopPane {
      * Adds a component centered on this Canvas.
      *
      * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param layer The layer to add the component to (see JLayeredPane).
      */
-    private void addCentered(Component comp, Integer i) {
-        comp.setLocation((getWidth() - comp.getWidth()) / 2,
-                         (getHeight() - comp.getHeight()) / 2);
-        this.add(comp, i);
+    private void addCentered(Component comp, Integer layer) {
+        comp.setLocation((this.oldSize.width - comp.getWidth()) / 2,
+                         (this.oldSize.height - comp.getHeight()) / 2);
+        addToLayer(comp, layer);
     }
 
     /**
      * Adds a component to this Canvas.
      *
      * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param layer The layer to add the component to (see JLayeredPane).
      */
-    private void add(Component comp, Integer i) {
-        addToCanvas(comp, i);
+    private void addToLayer(Component comp, Integer layer) {
+        addToCanvas(comp, layer);
         updateMenuBar();
     }
 
@@ -410,19 +410,19 @@ public final class Canvas extends JDesktopPane {
      * *is* the status panel.
      *
      * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param layer The layer to add the component to (see JLayeredPane).
      */
-    private void addToCanvas(Component comp, Integer i) {
+    private void addToCanvas(Component comp, Integer layer) {
+        assert layer != null;
         if (statusPanel.isVisible()) {
             if (comp == statusPanel) return;
             if (!(comp instanceof JMenuItem)) removeFromCanvas(statusPanel);
         }
 
-        if (i == null) i = JLayeredPane.DEFAULT_LAYER;
         try {
-            super.add(comp, i);
+            add(comp, layer);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
+            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + layer
                 + ") failed.", e);
         }
     }
