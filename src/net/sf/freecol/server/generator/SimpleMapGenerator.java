@@ -1054,8 +1054,10 @@ public class SimpleMapGenerator implements MapGenerator {
     @Override
     public Map generateEmptyMap(Game game, int width, int height,
                                 LogBuilder lb) {
+        RandomIntCache cache = new RandomIntCache(logger, "emptyMap", random,
+                                                  1 << 16, 512);
         return new TerrainGenerator(random)
-            .generateMap(game, null, new LandMap(width, height), lb);
+            .generateMap(game, null, new LandMap(width, height, cache), lb);
     }
 
     /**
@@ -1063,9 +1065,12 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     @Override
     public Map generateMap(Game game, Map importMap, LogBuilder lb) {
+        RandomIntCache cache = new RandomIntCache(logger,
+            (importMap == null) ? "generatedMap" : "importedMap",
+            random, 1 << 16, 512);
         // Create land map.
-        LandMap landMap = (importMap != null) ? new LandMap(importMap)
-            : new LandMap(game.getMapGeneratorOptions(), random);
+        LandMap landMap = (importMap != null) ? new LandMap(importMap, cache)
+            : new LandMap(game.getMapGeneratorOptions(), cache);
 
         // Create terrain.
         Map map = new TerrainGenerator(random)
