@@ -46,6 +46,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
@@ -1361,7 +1362,7 @@ public class GUI extends FreeColClientHolder {
      * @param r A callback for the end of animation.
      */
     public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
-                                               OutForAnimationCallback r) {}
+                                               Animation r) {}
 
     /**
      * Get the animation position.

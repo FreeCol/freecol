@@ -55,6 +55,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -618,35 +619,30 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Run some code with the given unit made invisible.  You can nest
-     * several of these method calls in order to hide multiple
-     * units.  There are no problems related to nested calls with the
-     * same unit.
+     * Execute an animation.
      *
-     * @param unit The {@code Unit} to be hidden.
-     * @param sourceTile The source {@code Tile}.
-     * @param r The code to be executed.
+     * @param a The {@code Animation} to execute.
      */
-    void executeWithUnitOutForAnimation(final Unit unit,
-                                        final Tile sourceTile,
-                                        final OutForAnimationCallback r) {
-        final JLabel unitLabel = enterUnitOutForAnimation(unit, sourceTile);
+    public void executeAnimation(Animation a) {
+        final Unit unit = a.getUnit();
+        final Tile tile = a.getTile();
+        final JLabel unitLabel = enterUnitOutForAnimation(unit, tile);
         try {
-            r.executeWithUnitOutForAnimation(unitLabel);
+            a.executeWithUnitOutForAnimation(unitLabel);
         } finally {
             releaseUnitOutForAnimation(unit);
         }
     }
-
+    
     private JLabel enterUnitOutForAnimation(final Unit unit,
-                                            final Tile sourceTile) {
+                                            final Tile tile) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
             final JLabel unitLabel = createUnitLabel(unit);
             unitLabel.setLocation(
                 calculateUnitLabelPositionInTile(unitLabel.getWidth(),
                     unitLabel.getHeight(),
-                    calculateTilePosition(sourceTile, false)));
+                    calculateTilePosition(tile, false)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
             getGUI().animationLabel(unitLabel, true);
             i = 1;

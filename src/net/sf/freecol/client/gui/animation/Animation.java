@@ -17,16 +17,37 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.animation;
 
 import javax.swing.JLabel;
 
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+
 
 /**
- * A callback interface for
- * {@link MapViewer#executeWithUnitOutForAnimation(net.sf.freecol.common.model.Unit, net.sf.freecol.common.model.Tile, OutForAnimationCallback)}.
+ * A callback interface for animations.
+ *
+ * Note: we used to focus the map on the unit even when animation is
+ * off as long as the center-active-unit option was set.  However
+ * IR#115 requested that if animation is off that we display nothing
+ * so as to speed up the other player moves as much as possible.
  */
-public interface OutForAnimationCallback {
+public interface Animation {
+
+    /**
+     * Get the unit to animate.
+     *
+     * @return The {@code Unit}.
+     */
+    public Unit getUnit();
+
+    /**
+     * Get the tile where the animation occurs.
+     *
+     * @return The {@code Tile}.
+     */
+    public Tile getTile();
 
     /**
      * The code to be executed when a unit is out for animation.
@@ -34,5 +55,5 @@ public interface OutForAnimationCallback {
      * @param unitLabel A {@code JLabel} with an image of
      *      the unit to animate.
      */
-    void executeWithUnitOutForAnimation(JLabel unitLabel);
+    public void executeWithUnitOutForAnimation(JLabel unitLabel);
 }

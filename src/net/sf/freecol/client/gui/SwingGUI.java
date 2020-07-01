@@ -43,6 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special panels and dialogs
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
@@ -165,6 +166,37 @@ public class SwingGUI extends GUI {
 
 
     // Internals
+
+    /**
+     * Perform some animations.
+     *
+     * @param animations The {@code Animation}s to perform.
+     */
+    private void animate(final List<Animation> animations) {
+        if (animations.isEmpty()) return;
+
+        // Special case for first animation, which should respect the
+        // ALWAYS_CENTER option
+        final boolean center = getClientOptions()
+            .getBoolean(ClientOptions.ALWAYS_CENTER);
+        Tile tile = animations.get(0).getTile();
+        if (!this.mapViewer.onScreen(tile)
+            || (center && tile != getFocus())) {
+            this.mapViewer.changeFocus(tile);
+            paintImmediately();
+        }
+           
+        invokeNowOrWait(() -> {
+                for (Animation a : animations) {
+                    Tile t = a.getTile();
+                    if (!this.mapViewer.onScreen(t)) {
+                        this.mapViewer.changeFocus(t);
+                        paintImmediately();
+                    }
+                    this.mapViewer.executeAnimation(a);
+                }
+            });
+    }
 
     /**
      * Gets the point at which the map was clicked for a drag.
@@ -488,22 +520,6 @@ public class SwingGUI extends GUI {
     // Animation handling
 
     /**
-     * Make sure a tile is visible and focused in preparation for an animation.
-     *
-     * @param tile The {@code Tile} to prepare.
-     */
-    private void prepareForAnimation(Tile tile) {
-        // Account for the ALWAYS_CENTER client option.
-        final boolean required = getClientOptions()
-            .getBoolean(ClientOptions.ALWAYS_CENTER);
-        if ((required && tile != getFocus())
-            || !this.mapViewer.onScreen(tile)) {
-            this.mapViewer.changeFocus(tile);
-            paintImmediately();
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -518,17 +534,8 @@ public class SwingGUI extends GUI {
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        final FreeColClient fcc = getFreeColClient();
-        if (fcc.getAnimationSpeed(attacker.getOwner()) <= 0
-            && fcc.getAnimationSpeed(defender.getOwner()) <= 0) return;
-
-        Animations.unitAttack(fcc, attacker, defender,
-                              attackerTile, defenderTile, success);
+        animate(Animations.unitAttack(getFreeColClient(), attacker, defender,
+                                      attackerTile, defenderTile, success));
     }
 
     /**
@@ -536,27 +543,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        final FreeColClient fcc = getFreeColClient();
-        if (fcc.getAnimationSpeed(unit.getOwner()) <= 0) return;
-
-        Animations.unitMove(fcc, unit, srcTile, dstTile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
-                                               OutForAnimationCallback r) {
-        invokeNowOrWait(() -> {
-                prepareForAnimation(sourceTile);
-                this.mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
-            });
+        animate(Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile));
     }
 
     /**
