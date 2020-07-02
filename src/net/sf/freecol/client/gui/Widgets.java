@@ -121,6 +121,7 @@ import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
+import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
@@ -1144,6 +1145,19 @@ public final class Widgets {
             = new SelectDestinationDialog(freeColClient, getFrame(),
                                           unit);
         return canvas.showFreeColDialog(dialog, unit.getTile());
+    }
+
+    /**
+     * Displays the {@code ServerListPanel}.
+     *
+     * @param serverList The list containing the servers retrieved from the
+     *     metaserver.
+     */
+    public void showServerListPanel(List<ServerInfo> serverList) {
+        ServerListPanel panel = new ServerListPanel(freeColClient,
+            freeColClient.getConnectController());
+        panel.initialize(serverList);
+        canvas.showSubPanel(panel, true);
     }
 
     /**

@@ -68,17 +68,12 @@ import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -91,7 +86,11 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import net.sf.freecol.client.gui.panel.ServerListPanel;
+// Special case panels, TODO: can we move these to Widgets?
+import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 
 
 /**
@@ -164,9 +163,6 @@ public final class Canvas extends JDesktopPane {
      */
     private MainPanel mainPanel;
 
-    /** Cached panels.  TODO: check if we still need these */
-    private final ServerListPanel serverListPanel;
-
 
     /**
      * The constructor to use.
@@ -206,9 +202,6 @@ public final class Canvas extends JDesktopPane {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         createKeyBindings();
-
-        serverListPanel = new ServerListPanel(freeColClient,
-            freeColClient.getConnectController());
 
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
@@ -1441,19 +1434,6 @@ public final class Canvas extends JDesktopPane {
                                       false);
         f.setLocation(f.getX(), 50);
         repaint();
-    }
-
-    /**
-     * Displays the {@code ServerListPanel}.
-     *
-     * @param serverList The list containing the servers retrieved from the
-     *     metaserver.
-     * @see ServerListPanel
-     */
-    public void showServerListPanel(List<ServerInfo> serverList) {
-        closeMenus();
-        serverListPanel.initialize(serverList);
-        showSubPanel(serverListPanel, true);
     }
 
     /**

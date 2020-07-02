@@ -1901,7 +1901,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showServerListPanel(List<ServerInfo> serverList) {
-        canvas.showServerListPanel(serverList);
+        canvas.closeMenus();
+        widgets.showServerListPanel(serverList);
     }
 
     /**
