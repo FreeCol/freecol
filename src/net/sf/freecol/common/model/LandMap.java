@@ -47,14 +47,15 @@ public class LandMap {
     /** The map height. */
     private final int height;
 
+    /** A cached random integer source. */
+    private final RandomIntCache cache;
+
     /** The land map.  True means land. */
     private boolean[][] map;
 
     /** Number of land tiles on the map. */
     private int numberOfLandTiles;
 
-    /** A cached random integer source. */
-    private final RandomIntCache cache;
 
     /**
      * Create a new land map with specified dimensions.
