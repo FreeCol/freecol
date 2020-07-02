@@ -418,7 +418,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void quit() {
+    public void quitGUI() {
         if (canvas != null) {
             canvas.quit();
         }
@@ -428,8 +428,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void reconnect(Unit active, Tile tile) {
-        requestFocusInWindow();
+    public void reconnectGUI(Unit active, Tile tile) {
+        canvas.requestFocusInWindow();
         canvas.initializeInGame();
         enableMapControls(getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));

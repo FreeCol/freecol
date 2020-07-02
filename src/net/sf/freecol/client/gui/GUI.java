@@ -1282,17 +1282,21 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Quit the GUI.  All that is required is to exit the full screen.
+     *
+     * Used by: FreeColClient.quit
      */
-    public void quit() {}
+    public void quitGUI() {}
 
     /**
      * Reset the GUI on reconnect.
+     *
+     * Used by: FreeColClient.restoreGUI
      *
      * @param active An optional active {@code Unit}.
      * @param tile An optional {@code Tile} to focus on if there is no
      *     active unit.
      */
-    public void reconnect(Unit active, Tile tile) {}
+    public void reconnectGUI(Unit active, Tile tile) {}
 
     /**
      * Remove all in-game components (i.e. all the Listeners).
