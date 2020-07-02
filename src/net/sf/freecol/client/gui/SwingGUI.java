@@ -1190,14 +1190,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public List<String> confirmDeclaration() {
-        return widgets.showConfirmDeclarationDialog();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void displayChat(Player player, String message,
                             boolean privateChat) {
         canvas.displayChat(new GUIMessage(
@@ -1403,6 +1395,14 @@ public class SwingGUI extends GUI {
     @Override
     public void showCompactLabourReport(UnitData unitData) {
         widgets.showCompactLabourReport(unitData);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> showConfirmDeclarationDialog() {
+        return widgets.showConfirmDeclarationDialog();
     }
 
     /**

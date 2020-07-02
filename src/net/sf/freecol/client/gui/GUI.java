@@ -1826,15 +1826,6 @@ public class GUI extends FreeColClientHolder {
     public void closeStatusPanel() {}
 
     /**
-     * Confirm declaration of independence.
-     *
-     * @return A list of new nation and country names.
-     */
-    public List<String> confirmDeclaration() {
-        return Collections.<String>emptyList();
-    }
-
-    /**
      * Update with a new chat message.
      *
      * @param player The player who sent the chat message.
@@ -2002,6 +1993,15 @@ public class GUI extends FreeColClientHolder {
      */
     public void showCompactLabourReport(UnitData unitData) {}
     
+    /**
+     * Confirm declaration of independence.
+     *
+     * @return A list of new nation and country names.
+     */
+    public List<String> showConfirmDeclarationDialog() {
+        return Collections.<String>emptyList();
+    }
+
     /**
      * Show the declaration panel with the declaration of independence and
      * an animated signature.

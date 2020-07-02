@@ -2949,7 +2949,7 @@ public final class InGameController extends FreeColClientHolder {
         }
 
         // Confirm intention, and collect nation+country names.
-        List<String> names = getGUI().confirmDeclaration();
+        List<String> names = getGUI().showConfirmDeclarationDialog();
         if (names == null
             || names.get(0) == null || names.get(0).isEmpty()
             || names.get(1) == null || names.get(1).isEmpty()) {
