@@ -1299,6 +1299,9 @@ public final class FreeCol {
      * @return The host name.
      */
     public static String getServerHost() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {}
         return InetAddress.getLoopbackAddress().getHostAddress();
     }
 
