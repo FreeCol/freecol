@@ -353,6 +353,7 @@ public final class Widgets {
             = canvas.getExistingFreeColPanel(StatusPanel.class);
         if (panel != null) {
             canvas.removeFromCanvas(panel);
+            canvas.requestFocusInWindow();
         }
     }
 

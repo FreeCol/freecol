@@ -642,14 +642,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean requestFocusInWindow() {
-        return canvas.requestFocusInWindow();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setFocus(Tile tileToFocus) {
         this.mapViewer.changeFocus(tileToFocus);
         canvas.refresh();

@@ -1497,15 +1497,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Request the Java-level focus to the main window.
-     *
-     * @return False if the focus request can not succeed.
-     */
-    public boolean requestFocusInWindow() {
-        return false;
-    }
-
-    /**
      * Set the current focus tile.
      *
      * @param tileToFocus The new focus {@code Tile}.
