@@ -1508,17 +1508,6 @@ public class GUI extends FreeColClientHolder {
      */
     public void setFocus(Tile tileToFocus) {}
 
-    /**
-     * Focus on the active unit.
-     */
-    public void focusActiveUnit() {
-        final Unit active = getActiveUnit();
-        if (active == null) return;
-        Tile tile = active.getTile();
-        if (tile == null) return;
-        setFocus(tile);
-    }
-
 
     // General GUI manipulation
 
