@@ -134,6 +134,9 @@ public class SimpleMapGenerator implements MapGenerator {
     /** The random number source. */
     private final Random random;
 
+    /** A cached random integer source. */
+    private final RandomIntCache cache;
+
 
     /**
      * Creates a {@code MapGenerator}
@@ -143,6 +146,8 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     public SimpleMapGenerator(Random random) {
         this.random = random;
+        this.cache = new RandomIntCache(logger, "simpleMap", random,
+                                        1 << 16, 512);
     }
 
 
@@ -1054,8 +1059,9 @@ public class SimpleMapGenerator implements MapGenerator {
     @Override
     public Map generateEmptyMap(Game game, int width, int height,
                                 LogBuilder lb) {
-        return new TerrainGenerator(random)
-            .generateMap(game, null, new LandMap(width, height), lb);
+        return new TerrainGenerator(this.random)
+            .generateMap(game, null,
+                         new LandMap(width, height, this.cache), lb);
     }
 
     /**
@@ -1064,11 +1070,12 @@ public class SimpleMapGenerator implements MapGenerator {
     @Override
     public Map generateMap(Game game, Map importMap, LogBuilder lb) {
         // Create land map.
-        LandMap landMap = (importMap != null) ? new LandMap(importMap)
-            : new LandMap(game.getMapGeneratorOptions(), random);
+        LandMap landMap = (importMap != null)
+            ? new LandMap(importMap, this.cache)
+            : new LandMap(game.getMapGeneratorOptions(), this.cache);
 
         // Create terrain.
-        Map map = new TerrainGenerator(random)
+        Map map = new TerrainGenerator(this.random)
             .generateMap(game, importMap, landMap, lb);
 
         // Decorate the map.

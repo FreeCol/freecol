@@ -121,6 +121,7 @@ import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
+import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
@@ -345,6 +346,18 @@ public final class Widgets {
     }
 
     /**
+     * Close the status panel if present.
+     */
+    public void closeStatusPanel() {
+        StatusPanel panel
+            = canvas.getExistingFreeColPanel(StatusPanel.class);
+        if (panel != null) {
+            canvas.removeFromCanvas(panel);
+            canvas.requestFocusInWindow();
+        }
+    }
+
+    /**
      * Tells that a chat message was received.
      *
      * @param senderName The sender.
@@ -367,6 +380,17 @@ public final class Widgets {
      */
     public boolean isClientOptionsDialogShowing() {
         return canvas.getExistingFreeColDialog(ClientOptionsDialog.class) != null;
+    }
+
+    /**
+     * Refresh the player's table.
+     *
+     * Called when a new player is added from PreGameInputHandler.addPlayer.
+     */
+    public void refreshPlayersTable() {
+        StartGamePanel panel
+            = canvas.getExistingFreeColPanel(StartGamePanel.class);
+        panel.refreshPlayersTable();
     }
 
     /**
@@ -408,6 +432,16 @@ public final class Widgets {
                                      unit, gl);
         SwingUtilities.invokeLater(
             new DialogCallback<>(dialog, null, handler));
+    }
+
+    /**
+     * Displays the {@code ChatPanel}.
+     */
+    public void showChatPanel() {
+        ChatPanel panel
+            = new ChatPanel(freeColClient);
+        canvas.showSubPanel(panel, true);
+        panel.requestFocus();
     }
 
     /**
@@ -1115,6 +1149,19 @@ public final class Widgets {
     }
 
     /**
+     * Displays the {@code ServerListPanel}.
+     *
+     * @param serverList The list containing the servers retrieved from the
+     *     metaserver.
+     */
+    public void showServerListPanel(List<ServerInfo> serverList) {
+        ServerListPanel panel = new ServerListPanel(freeColClient,
+            freeColClient.getConnectController());
+        panel.initialize(serverList);
+        canvas.showSubPanel(panel, true);
+    }
+
+    /**
      * Display the select-tribute-amount dialog.
      *
      * @param question a {@code stringtemplate} describing the
@@ -1132,6 +1179,22 @@ public final class Widgets {
     }
 
     /**
+     * Displays the start game panel.
+     *
+     * @param singlePlayerMode True to start a single player game.
+     */
+    public void showStartGamePanel(boolean singlePlayerMode) {
+        canvas.closeMenus();
+        StartGamePanel panel
+            = canvas.getExistingFreeColPanel(StartGamePanel.class);
+        if (panel == null) {
+            panel = new StartGamePanel(freeColClient);
+        }
+        panel.initialize(singlePlayerMode);
+        canvas.showSubPanel(panel, false);
+    }
+
+    /**
      * Display the statistics panel.
      *
      * @param serverStats A map of server statistics key,value pairs.
@@ -1141,6 +1204,23 @@ public final class Widgets {
                                     Map<String, String> clientStats) {
         StatisticsPanel panel
             = new StatisticsPanel(freeColClient, serverStats, clientStats);
+        canvas.showSubPanel(panel, true);
+    }
+
+    /**
+     * Shows a status message.
+     *
+     * Explictly removed by @see closeStatusPanel.
+     *
+     * @param message The text message to display on the status panel.
+     */
+    public void showStatusPanel(String message) {
+        StatusPanel panel
+            = canvas.getExistingFreeColPanel(StatusPanel.class);
+        if (panel == null) {
+            panel = new StatusPanel(freeColClient);
+        }
+        panel.setStatusMessage(message);
         canvas.showSubPanel(panel, true);
     }
 

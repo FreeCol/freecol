@@ -199,9 +199,9 @@ public final class Server extends Thread {
      *
      * @param log If true, enable logging.
      */
-    public void setLogging(boolean log) {
+    public void setCommsLogging(boolean log) {
         for (Connection conn : connections.values()) {
-            conn.setLogging(log);
+            conn.setCommsLogging(log);
         }
     }
 

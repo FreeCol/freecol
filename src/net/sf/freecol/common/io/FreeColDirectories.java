@@ -979,7 +979,8 @@ public class FreeColDirectories {
     public static Writer getLogCommsWriter() throws FreeColException {
         Writer writer = commsWriter.get();
         if (writer == null) {
-            File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
+            File file = new File(getUserCacheDirectory(),
+                FreeCol.getName() + "-" + LOG_COMMS_FILE_NAME);
             if (file.exists()) deleteFile(file);
             writer = getFileUTF8AppendWriter(file);
             if (writer == null) {

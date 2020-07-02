@@ -46,6 +46,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
@@ -1281,17 +1282,21 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Quit the GUI.  All that is required is to exit the full screen.
+     *
+     * Used by: FreeColClient.quit
      */
-    public void quit() {}
+    public void quitGUI() {}
 
     /**
      * Reset the GUI on reconnect.
+     *
+     * Used by: FreeColClient.restoreGUI
      *
      * @param active An optional active {@code Unit}.
      * @param tile An optional {@code Tile} to focus on if there is no
      *     active unit.
      */
-    public void reconnect(Unit active, Tile tile) {}
+    public void reconnectGUI(Unit active, Tile tile) {}
 
     /**
      * Remove all in-game components (i.e. all the Listeners).
@@ -1361,7 +1366,7 @@ public class GUI extends FreeColClientHolder {
      * @param r A callback for the end of animation.
      */
     public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
-                                               OutForAnimationCallback r) {}
+                                               Animation r) {}
 
     /**
      * Get the animation position.
@@ -1492,41 +1497,11 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Request the Java-level focus to the main window.
-     *
-     * @return False if the focus request can not succeed.
-     */
-    public boolean requestFocusInWindow() {
-        return false;
-    }
-
-    /**
-     * Require the given tile to be in the onScreen()-area.
-     *
-     * @param tile The {@code Tile} to check.
-     * @return True if the focus was set.
-     */
-    public boolean requireFocus(Tile tile) {
-        return false;
-    }
-
-    /**
      * Set the current focus tile.
      *
      * @param tileToFocus The new focus {@code Tile}.
      */
     public void setFocus(Tile tileToFocus) {}
-
-    /**
-     * Focus on the active unit.
-     */
-    public void focusActiveUnit() {
-        final Unit active = getActiveUnit();
-        if (active == null) return;
-        Tile tile = active.getTile();
-        if (tile == null) return;
-        setFocus(tile);
-    }
 
 
     // General GUI manipulation
@@ -1846,15 +1821,6 @@ public class GUI extends FreeColClientHolder {
     public void closeStatusPanel() {}
 
     /**
-     * Confirm declaration of independence.
-     *
-     * @return A list of new nation and country names.
-     */
-    public List<String> confirmDeclaration() {
-        return Collections.<String>emptyList();
-    }
-
-    /**
      * Update with a new chat message.
      *
      * @param player The player who sent the chat message.
@@ -2022,6 +1988,15 @@ public class GUI extends FreeColClientHolder {
      */
     public void showCompactLabourReport(UnitData unitData) {}
     
+    /**
+     * Confirm declaration of independence.
+     *
+     * @return A list of new nation and country names.
+     */
+    public List<String> showConfirmDeclarationDialog() {
+        return Collections.<String>emptyList();
+    }
+
     /**
      * Show the declaration panel with the declaration of independence and
      * an animated signature.

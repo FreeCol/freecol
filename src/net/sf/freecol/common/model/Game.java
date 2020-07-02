@@ -995,21 +995,21 @@ public class Game extends FreeColGameObject {
      * being both present and not present.
      *
      * @param players The list of {@code players} to add.
-     * @return The players that were successfully copied in.
      */
-    public List<Player> addPlayers(List<Player> players) {
+    public void addPlayers(List<Player> players) {
         List<Player> valid = new ArrayList<>();
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {
                 if ((fcgo = update(p, Player.class, true)) != null) {
                     addPlayer((Player)fcgo);
+                    logger.finest("addPlayers added new: " + fcgo);
                 } else {
                     logger.warning("addPlayers create new fail: " + p);
                 }                
             } else if (fcgo instanceof Player) {
                 if (fcgo.copyIn(p)) {
-                    valid.add(p);
+                    logger.finest("addPlayers copied in: " + fcgo);
                 } else {
                     logger.warning("addPlayers copyIn existing fail: " + p);
                 }
@@ -1017,7 +1017,6 @@ public class Game extends FreeColGameObject {
                 logger.warning("addPlayers onto non-player: " + fcgo);
             }
         }
-        return valid;
     }
 
     /**
@@ -1579,15 +1578,15 @@ public class Game extends FreeColGameObject {
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
 
-        // Players before map, so the tile owners work efficiently
-        this.setPlayers(addPlayers(o.players));
+        // Players before map, so the tile owners work
+        addPlayers(o.players);
 
         // Allow creation, might be first sight of the map.
         // Do map early, so map references work
         changeMap(update(o.getMap(), Map.class, true));
 
-        this.unknownEnemy = update(o.getUnknownEnemy(), false);
         setNationOptions(o.getNationOptions());
+        this.unknownEnemy = update(o.getUnknownEnemy(), false);
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();
         this.spanishSuccession = o.getSpanishSuccession();

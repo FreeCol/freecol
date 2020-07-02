@@ -74,7 +74,6 @@ import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -88,15 +87,10 @@ import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
-import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
-import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.StartGamePanel;
-import net.sf.freecol.client.gui.panel.StatisticsPanel;
-import net.sf.freecol.client.gui.panel.StatusPanel;
 
 
 /**
@@ -169,12 +163,6 @@ public final class Canvas extends JDesktopPane {
      */
     private MainPanel mainPanel;
 
-    /** Cached panels.  TODO: check if we still need these */
-    private final StartGamePanel startGamePanel;
-    private final StatusPanel statusPanel;
-    private final ChatPanel chatPanel;
-    private final ServerListPanel serverListPanel;
-
 
     /**
      * The constructor to use.
@@ -214,12 +202,6 @@ public final class Canvas extends JDesktopPane {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         createKeyBindings();
-
-        chatPanel = new ChatPanel(freeColClient);
-        serverListPanel = new ServerListPanel(freeColClient,
-            freeColClient.getConnectController());
-        startGamePanel = new StartGamePanel(freeColClient);
-        statusPanel = new StatusPanel(freeColClient);
 
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
@@ -390,45 +372,36 @@ public final class Canvas extends JDesktopPane {
      * Adds a component centered on this Canvas.
      *
      * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param layer The layer to add the component to (see JLayeredPane).
      */
-    private void addCentered(Component comp, Integer i) {
-        comp.setLocation((getWidth() - comp.getWidth()) / 2,
-                         (getHeight() - comp.getHeight()) / 2);
-        this.add(comp, i);
+    private void addCentered(Component comp, Integer layer) {
+        comp.setLocation((this.oldSize.width - comp.getWidth()) / 2,
+                         (this.oldSize.height - comp.getHeight()) / 2);
+        addToLayer(comp, layer);
     }
 
     /**
      * Adds a component to this Canvas.
      *
      * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param layer The layer to add the component to (see JLayeredPane).
      */
-    private void add(Component comp, Integer i) {
-        addToCanvas(comp, i);
+    private void addToLayer(Component comp, Integer layer) {
+        addToCanvas(comp, layer);
         updateMenuBar();
     }
 
     /**
      * Adds a component to this Canvas updating the menus.
      *
-     * Make sure the status panel is not present unless the component
-     * *is* the status panel.
-     *
      * @param comp The {@code Component} to add to this canvas.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param layer The layer to add the component to (see JLayeredPane).
      */
-    private void addToCanvas(Component comp, Integer i) {
-        if (statusPanel.isVisible()) {
-            if (comp == statusPanel) return;
-            if (!(comp instanceof JMenuItem)) removeFromCanvas(statusPanel);
-        }
-
-        if (i == null) i = JLayeredPane.DEFAULT_LAYER;
+    private void addToCanvas(Component comp, Integer layer) {
         try {
-            super.add(comp, i);
+            add(comp, layer);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
+            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + layer
                 + ") failed.", e);
         }
     }
@@ -1418,17 +1391,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Closes the {@code StatusPanel}.
-     *
-     * @see #showStatusPanel
-     */
-    public void closeStatusPanel() {
-        if (statusPanel.isVisible()) {
-            remove(statusPanel);
-        }
-    }
-
-    /**
      * Tells that a chat message was received.
      *
      * @param message The chat message.
@@ -1452,25 +1414,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Refresh the player's table (called when a new player is added
-     * from PreGameInputHandler.addPlayer).
-     */
-    public void refreshPlayersTable() {
-        startGamePanel.refreshPlayersTable();
-    }
-
-    /**
-     * Displays the {@code ChatPanel}.
-     *
-     * @see ChatPanel
-     */
-    public void showChatPanel() {
-        // FIXME: does it have state, or can we create a new one?
-        if (freeColClient.getSinglePlayer()) return; // chat with who?
-        showSubPanel(chatPanel, true);
-    }
-
-    /**
      * Shows the {@code MainPanel}.
      */
     public void showMainPanel() {
@@ -1491,46 +1434,6 @@ public final class Canvas extends JDesktopPane {
                                       false);
         f.setLocation(f.getX(), 50);
         repaint();
-    }
-
-    /**
-     * Displays the {@code ServerListPanel}.
-     *
-     * @param serverList The list containing the servers retrieved from the
-     *     metaserver.
-     * @see ServerListPanel
-     */
-    public void showServerListPanel(List<ServerInfo> serverList) {
-        closeMenus();
-        serverListPanel.initialize(serverList);
-        showSubPanel(serverListPanel, true);
-    }
-
-    /**
-     * Displays the {@code StartGamePanel}.
-     *
-     * @param singlePlayerMode True to start a single player game.
-     * @see StartGamePanel
-     */
-    public void showStartGamePanel(boolean singlePlayerMode) {
-        closeMenus();
-        startGamePanel.initialize(singlePlayerMode);
-        showSubPanel(startGamePanel, false);
-    }
-
-    /**
-     * Shows a status message that cannot be dismissed.  The panel
-     * will be removed when another component is added to this
-     * {@code Canvas}.  This includes all the
-     * {@code showXXX}-methods. In addition,
-     * {@link #closeStatusPanel()} also removes this panel.
-     *
-     * @param message The text message to display on the status panel.
-     * @see StatusPanel
-     */
-    public void showStatusPanel(String message) {
-        statusPanel.setStatusMessage(message);
-        addCentered(statusPanel, JLayeredPane.POPUP_LAYER);
     }
 
     /**

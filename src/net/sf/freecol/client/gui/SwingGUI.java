@@ -43,6 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special panels and dialogs
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
@@ -167,6 +168,37 @@ public class SwingGUI extends GUI {
     // Internals
 
     /**
+     * Perform some animations.
+     *
+     * @param animations The {@code Animation}s to perform.
+     */
+    private void animate(final List<Animation> animations) {
+        if (animations.isEmpty()) return;
+
+        // Special case for first animation, which should respect the
+        // ALWAYS_CENTER option
+        final boolean center = getClientOptions()
+            .getBoolean(ClientOptions.ALWAYS_CENTER);
+        Tile tile = animations.get(0).getTile();
+        if (!this.mapViewer.onScreen(tile)
+            || (center && tile != getFocus())) {
+            this.mapViewer.changeFocus(tile);
+            paintImmediately();
+        }
+           
+        invokeNowOrWait(() -> {
+                for (Animation a : animations) {
+                    Tile t = a.getTile();
+                    if (!this.mapViewer.onScreen(t)) {
+                        this.mapViewer.changeFocus(t);
+                        paintImmediately();
+                    }
+                    this.mapViewer.executeAnimation(a);
+                }
+            });
+    }
+
+    /**
      * Gets the point at which the map was clicked for a drag.
      *
      * @return The Point where the mouse was initially clicked.
@@ -240,21 +272,11 @@ public class SwingGUI extends GUI {
             && (oldFocus == null || refocus
                 || !this.mapViewer.onScreen(newTile));
         if (refocus) setFocus(newTile);
-
-        // System.err.println("CST " + newTile + " " + (newTile != oldTile) + " " + refocus);
-
         if (newTile == oldTile) return false;
         this.mapViewer.setSelectedTile(newTile);
         if (oldTile != null) refreshTile(oldTile);
         if (newTile != null) refreshTile(newTile);
         return true;
-    }
-
-    // TODO
-    private void setFocusImmediately(Tile tileToFocus) {
-        this.mapViewer.changeFocus(tileToFocus);
-        Dimension size = canvas.getSize();
-        canvas.paintImmediately(0, 0, size.width, size.height);
     }
 
     /**
@@ -396,7 +418,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void quit() {
+    public void quitGUI() {
         if (canvas != null) {
             canvas.quit();
         }
@@ -406,8 +428,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void reconnect(Unit active, Tile tile) {
-        requestFocusInWindow();
+    public void reconnectGUI(Unit active, Tile tile) {
+        canvas.requestFocusInWindow();
         canvas.initializeInGame();
         enableMapControls(getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
@@ -512,17 +534,8 @@ public class SwingGUI extends GUI {
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        final FreeColClient fcc = getFreeColClient();
-        if (fcc.getAnimationSpeed(attacker.getOwner()) <= 0
-            && fcc.getAnimationSpeed(defender.getOwner()) <= 0) return;
-
-        Animations.unitAttack(fcc, attacker, defender,
-                              attackerTile, defenderTile, success);
+        animate(Animations.unitAttack(getFreeColClient(), attacker, defender,
+                                      attackerTile, defenderTile, success));
     }
 
     /**
@@ -530,28 +543,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        final FreeColClient fcc = getFreeColClient();
-        if (fcc.getAnimationSpeed(unit.getOwner()) <= 0) return;
-
-        Animations.unitMove(fcc, unit, srcTile, dstTile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
-                                               OutForAnimationCallback r) {
-        invokeNowOrWait(() -> {
-                requireFocus(sourceTile);
-                paintImmediately();
-                this.mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
-            });
+        animate(Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile));
     }
 
     /**
@@ -644,30 +636,6 @@ public class SwingGUI extends GUI {
     @Override
     public boolean requestFocusForSubPanel() {
         return canvas.getShowingSubPanel().requestFocusInWindow();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean requestFocusInWindow() {
-        return canvas.requestFocusInWindow();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean requireFocus(Tile tile) {
-        // Account for the ALWAYS_CENTER client option.
-        final boolean required = getClientOptions()
-            .getBoolean(ClientOptions.ALWAYS_CENTER);
-        if ((required && tile != getFocus())
-            || !this.mapViewer.onScreen(tile)) {
-            setFocusImmediately(tile);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1207,15 +1175,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void closeStatusPanel() {
-        canvas.closeStatusPanel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> confirmDeclaration() {
-        return widgets.showConfirmDeclarationDialog();
+        widgets.closeStatusPanel();
     }
 
     /**
@@ -1284,7 +1244,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void refreshPlayersTable() {
-        canvas.refreshPlayersTable();
+        widgets.refreshPlayersTable();
     }
 
     /**
@@ -1351,7 +1311,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showChatPanel() {
-        canvas.showChatPanel();
+        if (getFreeColClient().getSinglePlayer()) return; // chat with who?
+        widgets.showChatPanel();
     }
 
     /**
@@ -1426,6 +1387,14 @@ public class SwingGUI extends GUI {
     @Override
     public void showCompactLabourReport(UnitData unitData) {
         widgets.showCompactLabourReport(unitData);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> showConfirmDeclarationDialog() {
+        return widgets.showConfirmDeclarationDialog();
     }
 
     /**
@@ -1924,7 +1893,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showServerListPanel(List<ServerInfo> serverList) {
-        canvas.showServerListPanel(serverList);
+        canvas.closeMenus();
+        widgets.showServerListPanel(serverList);
     }
 
     /**
@@ -1938,7 +1908,7 @@ public class SwingGUI extends GUI {
         } else if (player == null) {
             logger.warning("StartGamePanel requires player != null.");
         } else {
-            canvas.showStartGamePanel(singlePlayerMode);
+            widgets.showStartGamePanel(singlePlayerMode);
         }
     }
 
@@ -1956,7 +1926,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showStatusPanel(String message) {
-        canvas.showStatusPanel(message);
+        widgets.showStatusPanel(message);
     }
 
     /**

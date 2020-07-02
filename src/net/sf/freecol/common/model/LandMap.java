@@ -47,6 +47,9 @@ public class LandMap {
     /** The map height. */
     private final int height;
 
+    /** A cached random integer source. */
+    private final RandomIntCache cache;
+
     /** The land map.  True means land. */
     private boolean[][] map;
 
@@ -59,10 +62,12 @@ public class LandMap {
      *
      * @param width The map width.
      * @param height The map height.
+     * @param cache A pseudo random number source.
      */
-    public LandMap(int width, int height) {
+    public LandMap(int width, int height, RandomIntCache cache) {
         this.width = width;
         this.height = height;
+        this.cache = cache;
         this.map = new boolean[this.width][this.height];
         this.numberOfLandTiles = 0;
     }
@@ -71,9 +76,10 @@ public class LandMap {
      * Create a land map by importing it from a given map.
      *
      * @param map The {@code Map} to get the land map from.
+     * @param cache A pseudo random number source.
      */
-    public LandMap(Map map) {
-        this(map.getWidth(), map.getHeight());
+    public LandMap(Map map, RandomIntCache cache) {
+        this(map.getWidth(), map.getHeight(), cache);
 
         for (int y = 0; y < this.height; y++) {
             for (int x = 0; x < this.width; x++) {
@@ -90,11 +96,12 @@ public class LandMap {
      * generator options option group.
      *
      * @param mgo The map generator {@code OptionGroup} to use.
-     * @param random A pseudo random number source.
+     * @param cache A pseudo random number source.
      */
-    public LandMap(OptionGroup mgo, Random random) {
+    public LandMap(OptionGroup mgo, RandomIntCache cache) {
         this(mgo.getInteger(MapGeneratorOptions.MAP_WIDTH),
-             mgo.getInteger(MapGeneratorOptions.MAP_HEIGHT));
+             mgo.getInteger(MapGeneratorOptions.MAP_HEIGHT),
+             cache);
 
         int distanceToEdge
             = mgo.getInteger(MapGeneratorOptions.PREFERRED_DISTANCE_TO_EDGE);
@@ -106,7 +113,7 @@ public class LandMap {
             + " to make " + width + "x" + height + " map"
             + " with distance-to-edge=" + distanceToEdge
             + " and min-tile#=" + minNumberOfTiles);
-        generate(gen, distanceToEdge, minNumberOfTiles, random);
+        generate(gen, distanceToEdge, minNumberOfTiles);
     }
 
 
@@ -187,17 +194,15 @@ public class LandMap {
      * @param x The x coordinate of the new land.
      * @param y The y coordinate of the new land.
      * @param distanceToEdge The preferred distance to the map edge.
-     * @param random A pseudo random number source.
      */
-    private void setLand(int x, int y, int distanceToEdge,
-                         Random random) {
+    private void setLand(int x, int y, int distanceToEdge) {
         if (!setLand(x, y)) return;
 
         Position p = new Position(x, y);
         for (Direction direction : Direction.longSides) {
             Position n = new Position(p, direction);
             if (n.isValid(getWidth(), getHeight())) {
-                growLand(n.getX(), n.getY(), distanceToEdge, random);
+                growLand(n.getX(), n.getY(), distanceToEdge);
             }
         }
     }
@@ -211,24 +216,23 @@ public class LandMap {
      * @param type The generator type.
      * @param minNumberOfTiles The minimum land tiles to generate.
      * @param distanceToEdge The preferred distance to the map edge.
-     * @param random A pseudo random number source.
      */
     private final void generate(int type, int distanceToEdge,
-                                int minNumberOfTiles, Random random) {
+                                int minNumberOfTiles) {
         switch (type) {
         case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
-            createClassicLandMap(distanceToEdge, minNumberOfTiles, random);
+            createClassicLandMap(distanceToEdge, minNumberOfTiles);
             break;
         case MapGeneratorOptions.LAND_GENERATOR_CONTINENT:
             // Create one landmass of 75%, start it somewhere near the
             // center, then fill up with small islands.
             addPolarRegions();
             int contsize = (minNumberOfTiles * 75) / 100;
-            addLandMass(contsize, contsize, getWidth()/2, getHeight()/4
-                        + randomInt(logger, "Landmass", random, getHeight()/2),
-                        distanceToEdge, random);
+            int height = getHeight()/4 + this.cache.nextInt(getHeight()/2);
+            addLandMass(contsize, contsize, getWidth()/2, height,
+                        distanceToEdge);
             while (this.numberOfLandTiles < minNumberOfTiles) {
-                addLandMass(15, 25, -1, -1, distanceToEdge, random);
+                addLandMass(15, 25, -1, -1, distanceToEdge);
             }
             break;
         case MapGeneratorOptions.LAND_GENERATOR_ARCHIPELAGO:
@@ -238,15 +242,15 @@ public class LandMap {
             int archsize = (minNumberOfTiles * 10) / 100;
             for (int i = 0; i < 5; i++) {
                 addLandMass(archsize - 5, archsize + 5, -1, -1,
-                            distanceToEdge, random);
+                            distanceToEdge);
             }
             // Fall through
         case MapGeneratorOptions.LAND_GENERATOR_ISLANDS:
             // Create islands of 25..75 tiles.
             addPolarRegions();
             while (this.numberOfLandTiles < minNumberOfTiles) {
-                int s = randomInt(logger, "Island", random, 50) + 25;
-                addLandMass(25, s, -1, -1, distanceToEdge, random);
+                addLandMass(25, 25 + this.cache.nextInt(50),
+                            -1, -1, distanceToEdge);
             }
             break;
         }
@@ -258,10 +262,8 @@ public class LandMap {
      *
      * @param distanceToEdge The nominal edge clearance.
      * @param minNumberOfTiles Lower bound for the tiles to create.
-     * @param random A pseudo-random number source.
      */
-    private void createClassicLandMap(int distanceToEdge, int minNumberOfTiles,
-                                      Random random) {
+    private void createClassicLandMap(int distanceToEdge, int minNumberOfTiles) {
         final int edg = distanceToEdge * 2;
         final int wid = getWidth() - edg * 2;
         final int hgt = getHeight() - edg * 2;
@@ -269,8 +271,8 @@ public class LandMap {
         while (this.numberOfLandTiles < minNumberOfTiles) {
             int failCounter = 0;
             do {
-                x = edg + randomInt(logger, "ClassicW", random, wid);
-                y = edg + randomInt(logger, "ClassicH", random, hgt);
+                x = edg + this.cache.nextInt(wid);
+                y = edg + this.cache.nextInt(hgt);
                 failCounter++;
                 // If landmass% is set too high, this loop may fail to
                 // find a free tile.  Decrease necessary minimum over
@@ -281,7 +283,7 @@ public class LandMap {
                     break;
                 }
             } while (isLand(x, y));
-            setLand(x, y, distanceToEdge, random);
+            setLand(x, y, distanceToEdge);
         }
         addPolarRegions();
     }
@@ -361,9 +363,8 @@ public class LandMap {
      * @param x The x coordinate to grow land at.
      * @param y The y coordinate to grow land at.
      * @param distanceToEdge The preferred distance to the map edge.
-     * @param random A pseudo random number source.
      */
-    private void growLand(int x, int y, int distanceToEdge, Random random) {
+    private void growLand(int x, int y, int distanceToEdge) {
         if (isLand(x, y)) return; // Already land
 
         // Generate a comparison value:
@@ -372,10 +373,9 @@ public class LandMap {
         // This value is part random, part based on position, that is:
         // -1 in the center of the map, and growing to
         // distanceToEdge (*2 for pole ends) at the maps edges.
-        int r = randomInt(logger, "Grow", random, 8)
-            + Math.max(-1,
-                (1 + Math.max(distanceToEdge - Math.min(x, getWidth()-x),
-                    2 * distanceToEdge - Math.min(y, getHeight()-y))));
+        int r = this.cache.nextInt(8) + Math.max(-1,
+            (1 + Math.max(distanceToEdge - Math.min(x, getWidth()-x),
+                2 * distanceToEdge - Math.min(y, getHeight()-y))));
 
         final Position p = new Position(x, y);
         final Predicate<Direction> landPred = d -> {
@@ -383,7 +383,7 @@ public class LandMap {
             return isLand(n.getX(), n.getY());
         };
         if (count(Direction.values(), landPred) > r) {
-            setLand(x, y, distanceToEdge, random);
+            setLand(x, y, distanceToEdge);
         }
     }
 
@@ -397,11 +397,10 @@ public class LandMap {
      * @param x Optional starting x coordinate (chosen randomly if negative).
      * @param y Optional starting y coordinate (chosen randomly if negative).
      * @param distanceToEdge The preferred distance to the map edge.
-     * @param random A pseudo random number source.
      * @return The number of tiles added.
      */
     private int addLandMass(int minSize, int maxSize, int x, int y,
-                            int distanceToEdge, Random random) {
+                            int distanceToEdge) {
         int size = 0;
         boolean[][] newLand = new boolean[getWidth()][getHeight()];
 
@@ -410,8 +409,8 @@ public class LandMap {
             final int wid = getWidth() - distanceToEdge * 2;
             final int hgt = getHeight() - distanceToEdge * 2;
             do {
-                x = distanceToEdge + randomInt(logger, "LandW", random, wid);
-                y = distanceToEdge + randomInt(logger, "LandH", random, hgt);
+                x = distanceToEdge + this.cache.nextInt(wid);
+                y = distanceToEdge + this.cache.nextInt(hgt);
             } while (isLand(x, y) || hasAdjacentLand(x, y));
         }
 
@@ -425,10 +424,9 @@ public class LandMap {
         // Get a random position from the list,
         // set it to land,
         // add its valid neighbours to the list
-        int enough = minSize + randomInt(logger, "LandSize", random,
-                                         maxSize - minSize + 1);
+        int enough = minSize + this.cache.nextInt(maxSize - minSize + 1);
         while (size < enough && !l.isEmpty()) {
-            int i = randomInt(logger, "Lsiz", random, l.size());
+            int i = this.cache.nextInt(l.size());
             p = l.remove(i);
 
             if (!newLand[p.getX()][p.getY()]) {

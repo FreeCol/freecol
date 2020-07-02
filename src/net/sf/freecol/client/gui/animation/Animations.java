@@ -19,7 +19,12 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -29,23 +34,50 @@ import net.sf.freecol.common.model.Unit;
  */
 public class Animations {
 
+    private static final Logger logger = Logger.getLogger(Animations.class.getName());
+
     /**
-     * Animates a unit move.
+     * Collect animations for a unit move.
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
      * @param unit The {@code Unit} to be animated.
      * @param source The source {@code Tile} for the unit.
      * @param destination The destination {@code Tile} for the unit.
-     * @return False if there was a problem.
+     * @return A list of {@code Animation}s.
      */
-    public static boolean unitMove(FreeColClient freeColClient, Unit unit,
-                                   Tile source, Tile destination) {
-        return new UnitMoveAnimation(freeColClient, unit, source, destination)
-            .animate();
+    public static List<Animation> unitMove(FreeColClient freeColClient,
+                                           Unit unit,
+                                           Tile source, Tile destination) {
+        List<Animation> ret = new ArrayList<>();
+        int speed = freeColClient.getAnimationSpeed(unit.getOwner());
+        if (speed > 0) {
+            UnitMoveAnimation a
+                = new UnitMoveAnimation(freeColClient, unit,
+                                        source, destination, speed);
+            if (a == null) {
+                logger.warning("No move animation for: " + unit);
+            } else {
+                ret.add(a);
+            }
+        }
+        return ret;
     }
     
     /**
-     * Animates a unit attack.
+     * Get the base resource identifier for an attack animation.
+     *
+     * @param unit The attacking {@code Unit}.
+     * @return The resource base exclusive of direction.
+     */
+    private static String getAttackAnimationBase(Unit unit) {
+        String roleStr = (unit.hasDefaultRole()) ? ""
+            : "." + unit.getRoleSuffix();
+        return "animation.unit." + unit.getType().getId() + roleStr
+            + ".attack.";
+    }
+        
+    /**
+     * Collection animations for a unit attack.
      * 
      * @param freeColClient The enclosing {@code FreeColClient}.
      * @param attacker The {@code Unit} that is attacking.
@@ -53,14 +85,48 @@ public class Animations {
      * @param attackerTile The {@code Tile} the attack comes from.
      * @param defenderTile The {@code Tile} the attack goes to.
      * @param success Did the attack succeed?
-     * @return False if there was a problem.
+     * @return A list of {@code Animation}s.
      */
-    public static boolean unitAttack(FreeColClient freeColClient,
-                                     Unit attacker, Unit defender,
-                                     Tile attackerTile, Tile defenderTile,
-                                     boolean success) {
-        return new UnitAttackAnimation(freeColClient, attacker, defender,
-                                       attackerTile, defenderTile, success)
-            .animate();
+    public static List<Animation> unitAttack(FreeColClient freeColClient,
+                                             Unit attacker, Unit defender,
+                                             Tile attackerTile, Tile defenderTile,
+                                             boolean success) {
+        List<Animation> ret = new ArrayList<>();
+        Direction dirn = attackerTile.getDirection(defenderTile);
+        if (dirn == null) {
+            logger.warning("Attack animation null direction: " + attacker
+                + " v " + defender);
+            return ret; // Fail fast
+        }
+
+        final float scale = freeColClient.getGUI().getAnimationScale();
+
+        if (freeColClient.getAnimationSpeed(attacker.getOwner()) > 0) {
+            UnitImageAnimation a = UnitImageAnimation.build(freeColClient,
+                attacker, attackerTile, dirn,
+                getAttackAnimationBase(attacker), scale);
+            if (a == null) {
+                logger.warning("No attack animation for: "
+                    + attacker + " (" + dirn + ")");
+            } else {
+                ret.add(a);
+            }
+        }
+
+        if (!success
+            && freeColClient.getAnimationSpeed(defender.getOwner()) > 0) {
+            Direction revd = dirn.getReverseDirection();
+            UnitImageAnimation a = UnitImageAnimation.build(freeColClient,
+                defender, defenderTile, revd,
+                getAttackAnimationBase(defender), scale);
+            if (a == null) {
+                logger.warning("No attack animation for: "
+                    + defender + " (" + revd + ")");
+            } else {
+                ret.add(a);
+            }
+        }
+
+        return ret;
     }
 }

@@ -1014,7 +1014,7 @@ public class DebugUtils {
     public static void setCommsLogging(final FreeColClient freeColClient,
                                        boolean log) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        if (server != null) server.getServer().setLogging(log);
+        if (server != null) server.getServer().setCommsLogging(log);
     }
     
     /**

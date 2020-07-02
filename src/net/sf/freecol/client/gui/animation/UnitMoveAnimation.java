@@ -30,7 +30,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.Utils.*;
@@ -40,9 +39,9 @@ import static net.sf.freecol.common.util.Utils.*;
  * Class for the animation of units movement.
  */
 final class UnitMoveAnimation extends FreeColClientHolder
-    implements OutForAnimationCallback {
+    implements Animation {
 
-    private static final Logger logger = Logger.getLogger(UnitAttackAnimation.class.getName());
+    private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
 
     /**
      * Display delay between one frame and another, in milliseconds.
@@ -63,38 +62,35 @@ final class UnitMoveAnimation extends FreeColClientHolder
      * @param unit The {@code Unit} to be animated.
      * @param sourceTile The {@code Tile} the unit is moving from.
      * @param destinationTile The {@code Tile} the unit is moving to.
+     * @param speed The animation speed.
      */
     public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
-                             Tile sourceTile, Tile destinationTile) {
+                             Tile sourceTile, Tile destinationTile,
+                             int speed) {
         super(freeColClient);
 
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
-        this.speed = freeColClient.getAnimationSpeed(unit.getOwner());
+        this.speed = speed;
     }
     
 
-    /**
-     * Do the animation.
-     *
-     * @return True if the required animations were found and launched,
-     *     false on error.
-     */
-    public boolean animate() {
-        if (this.speed <= 0) {
-            logger.warning("Failed move animation with zero speed: "
-                + this.unit);
-            return false;
-        }
+    // Interface Animation
 
-        getGUI().executeWithUnitOutForAnimation(this.unit, this.sourceTile,
-                                                this);
-        return true;
+    /**
+     * {@inheritDoc}
+     */
+    public Tile getTile() {
+        return this.sourceTile;
     }
 
-
-    // Interface OutForAnimationCallback
+    /**
+     * {@inheritDoc}
+     */
+    public Unit getUnit() {
+        return this.unit;
+    }
 
     /**
      * {@inheritDoc}

@@ -744,8 +744,8 @@ public final class FreeColClient {
      */
     public void restoreGUI(Player player) {
         Unit u = player.restoreActiveUnit();
-        getGUI().reconnect((u != null && player.owns(u)) ? u : null,
-                           player.getFallbackTile());
+        getGUI().reconnectGUI((u != null && player.owns(u)) ? u : null,
+                              player.getFallbackTile());
     }
 
 
@@ -988,7 +988,7 @@ public final class FreeColClient {
 
         // Exit
         try {
-            gui.quit();
+            gui.quitGUI();
         } catch (Exception e) {
             FreeCol.fatal(logger, "Failed to shutdown gui: " + e);
         }

@@ -34,6 +34,46 @@ import java.util.stream.Stream;
  */
 public class RandomUtils {
 
+    public static class RandomIntCache {
+
+        private final Logger logger;
+        private final String logMe;
+        private final Random random;
+        private final int range;
+        private final int size;
+        private int generation;
+        private int[] cache;
+        private int index;
+
+        public RandomIntCache(Logger logger, String logMe, Random random,
+                              int range, int size) {
+            this.logger = logger;
+            this.logMe = logMe;
+            this.random = random;
+            this.range = range;
+            this.size = size;
+            this.generation = 0;
+            refill();
+        }
+
+        private void refill() {
+            this.cache = this.random.ints(this.size, 0, this.range).toArray();
+            this.index = 0;
+            RandomUtils.logArray(logger,
+                logMe + "/" + String.valueOf(generation), this.cache);
+            this.generation++;
+        }
+
+        public int nextInt() {
+            if (this.index >= this.size) refill();
+            return this.cache[this.index++];
+        }
+
+        public int nextInt(int tighterRange) {
+            return nextInt() % tighterRange;
+        }
+    }
+    
     /**
      * Convenience to aid logging uses of Randoms.
      *
@@ -53,6 +93,23 @@ public class RandomUtils {
     }
 
     /**
+     * Log an array of ints at Level.FINEST.
+     *
+     * @param logger The {@code Logger} to log to.
+     * @param logMe A string to log with the result.
+     * @param arr The array of ints to log.
+     */
+    public static void logArray(Logger logger, String logMe, int[] arr) {
+        if (logger != null && logger.isLoggable(Level.FINEST)) {
+            StringBuilder sb = new StringBuilder(64);
+            sb.append(logMe).append(" random").append(" = [");
+            for (int i = 0; i < arr.length; i++) sb.append(' ').append(arr[i]);
+            sb.append(" ]");
+            logger.finest(sb.toString());
+        }
+    }
+
+    /**
      * Convenience to aid logging uses of Randoms.
      *
      * @param logger The {@code Logger} to log to.
@@ -64,15 +121,8 @@ public class RandomUtils {
      */
     public static int[] randomInts(Logger logger, String logMe, Random random,
                                    int range, int n) {
-        int[] ret = new int[n];
-        for (int i = 0; i < n; i++) ret[i] = random.nextInt(range);
-        if (logger != null && logger.isLoggable(Level.FINEST)) {
-            StringBuilder sb = new StringBuilder(64);
-            sb.append(logMe).append(" random(").append(range).append(") = [");
-            for (int i = 0; i < n; i++) sb.append(' ').append(ret[i]);
-            sb.append(" ]");
-            logger.finest(sb.toString());
-        }
+        int[] ret = random.ints(n, 0, range).toArray();
+        logArray(logger, logMe, ret);
         return ret;
     }
 

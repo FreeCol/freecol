@@ -63,14 +63,11 @@ public class TerrainGenerator {
     public static final int LAND_REGION_MIN_SCORE = 5;
     public static final int LAND_REGION_MAX_SIZE = 75;
 
-    /**
-     * The pseudo-random number source to use.
-     *
-     * Uses of the PRNG are usually logged in FreeCol, but the use is
-     * so intense here and this code is called pre-game, so we
-     * intentionally skip the logging here.
-     */
+    /** The pseudo random number generator. */
     private final Random random;
+
+    /** A cached random integer source. */
+    private final RandomIntCache cache;
 
     /** The cached land and ocean tile types. */
     private List<TileType> landTileTypes = null;
@@ -80,11 +77,13 @@ public class TerrainGenerator {
     /**
      * Creates a new {@code TerrainGenerator}.
      *
-     * @param random A {@code Random} number source.
+     * @param cache A {@code RandomIntCache} number source.
      * @see #generateMap
      */
     public TerrainGenerator(Random random) {
         this.random = random;
+        this.cache = new RandomIntCache(logger, "terrain", random,
+                                        1 << 16, 512);
     }
 
 
@@ -200,16 +199,14 @@ public class TerrainGenerator {
         int localeTemperature = poleTemperature + (90 - Math.abs(latitude))
             * temperatureRange/90;
         int temperatureDeviation = 7; // +/- 7 degrees randomization
-        localeTemperature += randomInt(logger, "Temperature", random,
-                                       temperatureDeviation * 2)
+        localeTemperature += this.cache.nextInt(temperatureDeviation * 2)
             - temperatureDeviation;
         localeTemperature = limitToRange(localeTemperature, -20, 40);
 
         // humidity calculation
         int localeHumidity = spec.getRange(MapGeneratorOptions.HUMIDITY);
         int humidityDeviation = 20; // +/- 20% randomization
-        localeHumidity += randomInt(logger, "Humidity", random,
-                                    humidityDeviation * 2)
+        localeHumidity += this.cache.nextInt(humidityDeviation * 2)
             - humidityDeviation;
         localeHumidity = limitToRange(localeHumidity, 0, 100);
 
@@ -262,7 +259,7 @@ public class TerrainGenerator {
         }
 
         // Filter the candidates by forest presence.
-        boolean forested = randomInt(logger, "Forest", random, 100) < forestChance;
+        boolean forested = this.cache.nextInt(100) < forestChance;
         i = 0;
         while (i < candidateTileTypes.size()) {
             TileType type = candidateTileTypes.get(i);
@@ -281,8 +278,7 @@ public class TerrainGenerator {
         case 1:
             return first(candidateTileTypes);
         default:
-            return candidateTileTypes.get(randomInt(logger, "Forest tile",
-                                                    random, i));
+            return candidateTileTypes.get(this.cache.nextInt(i));
         }
     }
 
@@ -472,7 +468,7 @@ public class TerrainGenerator {
         List<Tile> tiles = new ArrayList<>();
         map.forEachTile(t -> t.isGoodMountainTile(mountains),
                         t -> tiles.add(t));
-        randomShuffle(logger, "Randomize mountain tiles", tiles, random);
+        randomShuffle(logger, "Randomize mountain tiles", tiles, this.random);
 
         int counter = 0;
         for (Tile startTile : tiles) {
@@ -482,9 +478,8 @@ public class TerrainGenerator {
             ServerRegion mountainRegion
                 = new ServerRegion(game, RegionType.MOUNTAIN);
             Direction direction = Direction.getRandomDirection("getLand",
-                logger, random);
-            int length = maximumLength
-                - randomInt(logger, "MLen", random, maximumLength/2);
+                logger, this.random);
+            int length = maximumLength - this.cache.nextInt(maximumLength/2);
             Tile tile = startTile;
             for (int index = 0; index < length; index++) {
                 // Raise current tile up as mountain
@@ -499,7 +494,7 @@ public class TerrainGenerator {
                 for (Tile t : tile.getSurroundingTiles(1)) {
                     if (!t.isGoodHillTile()
                         || t.getType() == mountains) continue;
-                    int r = randomInt(logger, "MSiz", random, 8);
+                    int r = this.cache.nextInt(8);
                     if (r < 2) {
                         t.setType(mountains);
                         mountainRegion.addTile(t);
@@ -526,14 +521,14 @@ public class TerrainGenerator {
         // and sprinkle a few random hills/mountains here and there
         tiles.clear();
         map.forEachTile(Tile::isGoodHillTile, t -> tiles.add(t));
-        randomShuffle(logger, "Randomize hill tiles", tiles, random);
+        randomShuffle(logger, "Randomize hill tiles", tiles, this.random);
 
         number = (int) (getApproximateLandCount(game) * randomHillsRatio)
             / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER);
         counter = 0;
         for (Tile t : tiles) {
             // 25% mountains, 75% hills
-            boolean m = randomInt(logger, "MorH", random, 4) == 0;
+            boolean m = this.cache.nextInt(4) == 0;
             t.setType((m) ? mountains : hills);
             if (++counter >= number) break;
         }
@@ -564,7 +559,7 @@ public class TerrainGenerator {
         List<Tile> tiles = new ArrayList<>();
         map.forEachTile(t -> t.isGoodRiverTile(riverType),
                         t -> tiles.add(t));
-        randomShuffle(logger, "Randomize river tiles", tiles, random);
+        randomShuffle(logger, "Randomize river tiles", tiles, this.random);
         
         int counter = 0;
         for (Tile tile : tiles) {
@@ -573,7 +568,7 @@ public class TerrainGenerator {
                 continue;
 
             ServerRegion riverRegion = new ServerRegion(game, RegionType.RIVER);
-            River river = new River(map, riverMap, riverRegion, random);
+            River river = new River(map, riverMap, riverRegion, this.random);
             if (river.flowFromSource(tile)) {
                 lb.add("Created new river with length ",
                     river.getLength(), "\n");
@@ -687,8 +682,7 @@ public class TerrainGenerator {
         final int bonusNumber
             = mapOptions.getRange(MapGeneratorOptions.BONUS_NUMBER);
         if (t.isLand()) {
-            if (generateBonus
-                && randomInt(logger, "Land Resource", random, 100) < bonusNumber) {
+            if (generateBonus && this.cache.nextInt(100) < bonusNumber) {
                 // Create random Bonus Resource
                 t.addResource(createResource(t));
             }
@@ -721,12 +715,11 @@ public class TerrainGenerator {
 
             if (t.getType().isHighSeasConnected()) {
                 if (generateBonus && adjacentLand > 1
-                    && randomInt(logger, "Sea resource", random,
-                                 10 - adjacentLand) == 0) {
+                    && this.cache.nextInt(10 - adjacentLand) == 0) {
                     t.addResource(createResource(t));
                 }
             } else {
-                if (randomInt(logger, "Water resource", random, 100) < bonusNumber) {
+                if (this.cache.nextInt(100) < bonusNumber) {
                     // Create random Bonus Resource
                     t.addResource(createResource(t));
                 }
@@ -743,13 +736,12 @@ public class TerrainGenerator {
     private Resource createResource(Tile tile) {
         if (tile == null) return null;
         ResourceType resourceType = RandomChoice.getWeightedRandom(null, null,
-            tile.getType().getResourceTypes(), random);
+            tile.getType().getResourceTypes(), this.random);
         if (resourceType == null) return null;
         int minValue = resourceType.getMinValue();
         int maxValue = resourceType.getMaxValue();
         int quantity = (minValue == maxValue) ? maxValue
-            : (minValue + randomInt(logger, "Rsiz", random, 
-                                    maxValue - minValue + 1));
+            : (minValue + this.cache.nextInt(maxValue - minValue + 1));
         return new Resource(tile.getGame(), tile, resourceType, quantity);
     }
 

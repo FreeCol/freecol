@@ -224,7 +224,6 @@ public final class MapEditorController extends FreeColClientHolder {
                     getFreeColServer().saveMapEditorGame(file, thumb);
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();
-                            gui.requestFocusInWindow();
                         });
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(() -> {
