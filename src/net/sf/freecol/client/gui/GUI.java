@@ -1316,17 +1316,6 @@ public class GUI extends FreeColClientHolder {
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {}
 
     /**
-     * Update the GUI to warn that a unit is executing an animation and
-     * should be ignored for its duration.
-     *
-     * @param unit The {@code} Unit that is animating.
-     * @param sourceTile A {@code Tile} where the animation is occuring.
-     * @param r A callback for the end of animation.
-     */
-    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
-                                               Animation r) {}
-
-    /**
      * Get the animation position.
      *
      * @param labelWidth The width of the label.
