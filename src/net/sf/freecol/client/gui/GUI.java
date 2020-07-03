@@ -1177,7 +1177,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the label text for the sound player mixer.
      *
-     * Needed by the audio mixer option UI.
+     * Used by: AudioMixerOptionUI
      *
      * @return The text.
      */
@@ -1195,6 +1195,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the tile image library.
      *
+     * Used by: ColonyPanel, ConstructionPanel, InfoPanel, certain UnitLabels.
+     *
      * @return Null here, real implementations will override.
      */
     public ImageLibrary getTileImageLibrary() {
@@ -1203,6 +1205,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Is this GUI in windowed mode?
+     *
+     * Used by: DragListener for a nasty workaround that should go away
      *
      * @return True by default, real implementations will override.
      */
@@ -1215,11 +1219,15 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Change the windowed mode (really a toggle).
+     *
+     * Used by: ChangeWindowedModeAction
      */
     public void changeWindowedMode() {}
 
     /**
      * Display the splash screen.
+     *
+     * Used by: FreeColClient
      *
      * @param splashStream A stream to find the image in.
      */
@@ -1227,11 +1235,15 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Hide the splash screen.
+     *
+     * Used by: FreeColClient
      */
     public void hideSplashScreen() {}
 
     /** 
      * Swing system and look-and-feel initialization.
+     * 
+     * Used by: FreeColClient
      * 
      * @param fontName An optional font name to be used.
      * @exception FreeColException if the LAF is incompatible with the GUI.
@@ -1240,7 +1252,7 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Quit the GUI.  All that is required is to exit the full screen.
-     *
+     * 
      * Used by: FreeColClient.quit
      */
     public void quitGUI() {}
@@ -1249,7 +1261,7 @@ public class GUI extends FreeColClientHolder {
      * Reset the GUI on reconnect.
      *
      * Used by: FreeColClient.restoreGUI
-     *
+     * 
      * @param active An optional active {@code Unit}.
      * @param tile An optional {@code Tile} to focus on if there is no
      *     active unit.
@@ -1258,12 +1270,17 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Remove all in-game components (i.e. all the Listeners).
+     *
+     * Used by: ContinueAction, ConnectController.{mainTitle,newGame}
+     *     InGameController.loadGame, MapEditorController.newMap, StartMapAction
      */    
     public void removeInGameComponents() {}
 
     /**
      * Shows the {@code VideoPanel}.
      *
+     * Used by: FreeColClient
+     * 
      * @param userMsg An optional user message.
      */
     public void showOpeningVideo(final String userMsg) {}
@@ -1271,6 +1288,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      *
+     * Used by: FreeColClient
+     * 
      * @param desiredWindowSize The desired size of the GUI window.
      */
     public void startGUI(final Dimension desiredWindowSize) {
@@ -1279,6 +1298,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Start the GUI for the map editor.
+     *
+     * Used by: NewPanel
      */
     public void startMapEditorGUI() {}
 
@@ -1296,6 +1317,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Animate a unit attack.
      *
+     * Used by: client InGameController
+     *
      * @param attacker The attacking {@code Unit}.
      * @param defender The defending {@code Unit}.
      * @param attackerTile The {@code Tile} to show the attacker on.
@@ -1309,6 +1332,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Animate a unit move.
      *
+     * Used by: client InGameController
+     *
      * @param unit The {@code Unit} that is moving.
      * @param srcTile The {@code Tile} the unit starts at.
      * @param dstTile The {@code Tile} the unit moves to.
@@ -1317,6 +1342,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Get the animation position.
+     *
+     * Used by: UnitMoveAnimation
      *
      * @param labelWidth The width of the label.
      * @param labelHeight The height of the label.
@@ -1340,6 +1367,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the bounds for a tile.
      *
+     * Used by: *Animation
+     *
      * @param tile The {@code Tile} to check.
      * @return The tile bounds.
      */
@@ -1349,6 +1378,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Get the map position for a tile.
+     *
+     * Used by: *Animation
      *
      * @param tile The {@code Tile} to check.
      * @return The tile position.
@@ -1428,6 +1459,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the current focus tile.
      *
+     * Used by: CanvasMapEditorMouseListener, MiniMap.paintMap
+     *
      * @return The focus {@code Tile}.
      */
     public Tile getFocus() {
@@ -1437,20 +1470,28 @@ public class GUI extends FreeColClientHolder {
     /**
      * Set the current focus tile.
      *
-     * @param tileToFocus The new focus {@code Tile}.
+     * Used by: CanvasMapEditorMouseListener, CenterAction,
+     *   FindSettlementPanel, InfoPanel, MiniMap.focus, MapEditorController,
+     *   SelectDestinationDialog.recenter
+     *
+     * @param tile The new focus {@code Tile}.
      */
-    public void setFocus(Tile tileToFocus) {}
+    public void setFocus(Tile tile) {}
 
 
     // General GUI manipulation
 
     /**
      * Repaint the canvas now.
+     *
+     * Used by: InGameController.moveTile with UNIT_LAST_MOVE_DELAY
      */
     public void paintImmediately() {}
 
     /**
      * Repaint a part of the canvas now.
+     *
+     * Used by: *Animation
      *
      * @param rectangle The area to repaint.
      */
@@ -1458,11 +1499,19 @@ public class GUI extends FreeColClientHolder {
     
     /**
      * Refresh the whole GUI.
+     *
+     * Used by: *Animation, CanvasMapEditorMouseListener,
+     *   DebugUtils.addUnitToTil,changeOwnership,resetMoves,buildDebugMenu}
+     *   Display{Borders,Grid,TileTest}Action, {NewEmptyMap,ScaleMap}Action
+     *   DebugMenu, MapEditorController, TilePopup
+     *   InGameController.removeHandler
      */
     public void refresh() {}
 
     /**
      * Refresh a particular tile.
+     *
+     * Used by: EditSettlementDialog
      *
      * @param tile The {@code Tile} to refresh.
      */
@@ -1474,33 +1523,30 @@ public class GUI extends FreeColClientHolder {
     /**
      * Set the path for the active unit.
      *
+     * Used by: TilePopup
+     *
      * @param path The new unit path.
      */
     public void setUnitPath(PathNode path) {}
 
     /**
      * Start/stop the goto path display.
+     *
+     * Used by: GotoTileAction
      */
     public void activateGotoPath() {}
 
     /**
      * Stop the goto path display.
+     *
+     * Used by: client InGameController.askClearGotoOrders
      */
     public void clearGotoPath() {}
 
     /**
-     * Perform an immediate goto to a tile with the active unit.
-     *
-     * Called from {@link TilePopup}.
-     *
-     * @param tile The {@code Tile} to go to.
-     */
-    public void performGoto(Tile tile) {}
-
-    /**
      * Check if the user has  GoTo mode enabled.
      *
-     * Called from {@link CanvasMouseListener}.
+     * Used by: CanvasMouseListener
      *
      * @return True if the user has toggled GoTo mode.
      */
@@ -1509,9 +1555,18 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
+     * Perform an immediate goto to a tile with the active unit.
+     *
+     * Used by: TilePopup
+     *
+     * @param tile The {@code Tile} to go to.
+     */
+    public void performGoto(Tile tile) {}
+
+    /**
      * Perform an immediate goto to a point on the map.
      *
-     * Called from {@link CanvasMouseListener}.
+     * Used by: CanvasMouseListener
      *
      * @param x The x coordinate of the goto destination (pixels).
      * @param y The x coordinate of the goto destination (pixels).
@@ -1520,11 +1575,15 @@ public class GUI extends FreeColClientHolder {
     
     /**
      * Send the active unit along the current goto path as far as possible.
+     *
+     * Used by: CanvasMouseListener
      */
     public void traverseGotoPath() {}
 
     /**
      * Update the goto path to a new position on the map.
+     *
+     * Used by: CanvasMouseMotionListener
      *
      * @param x The x coordinate for the new goto path destination (pixels).
      * @param y The y coordinate for the new goto path destination (pixels).
@@ -1535,6 +1594,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Prepare a drag from the given coordinates.  This may turn into
      * a goto if further drag motion is detected.
+     *
+     * Used by: CanvasMouseListener
      *
      * @param x Drag x coordinate (pixels).
      * @param y Drag x coordinate (pixels).
@@ -1547,6 +1608,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Is the map able to zoom in further?
      *
+     * Used by: MiniMapZoomInAction
+     *
      * @return True if the map can zoom in.
      */
     public boolean canZoomInMapControls() {
@@ -1555,6 +1618,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Is the map able to zoom out further?
+     *
+     * Used by: MiniMapZoomOutAction
      *
      * @return True if the map can zoom out.
      */
@@ -1565,7 +1630,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Enable the map controls.
      *
-     * Called from the MapControlsAction.
+     * Used by: MapControlsAction.
      *
      * @param enable If true then enable.
      */
@@ -1573,27 +1638,38 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Toggle the fog of war control.
+     *
+     * Used by: MiniMapToggleFogOfWarAction
      */
     public void miniMapToggleFogOfWarControls() {}
 
     /**
      * Toggle the view control.
+     *
+     * Used by: MiniMapToggleFogOfWarAction
      */
     public void miniMapToggleViewControls() {}
 
     /**
      * Update the map controls, including the InfoPanel according to
      * the view mode.
+     *
+     * Used by: ColonyPanel, client InGameController.updateGUI,
+     *   MapEditorController
      */
     public void updateMapControls() {}
 
     /**
      * Zoom in the map controls.
+     *
+     * Used by: MiniMapZoomInAction
      */
     public void zoomInMapControls() {}
 
     /**
      * Zoom out the map controls.
+     *
+     * Used by: MiniMapZoomOutAction
      */
     public void zoomOutMapControls() {}
 
@@ -1602,21 +1678,32 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Close any open menus.
+     *
+     * Used by: FreeColClient.skipTurns,
+     *   client InGameController.{endTurn,setCurrentPlayer}
+     *   MapEditorController, PreGameController
      */
     public void closeMenus() {}
 
     /**
      * Reset the menu bar.
+     *
+     * Used by: DebugUtils
      */
     public void resetMenuBar() {}
 
     /**
      * Update the menu bar.
+     *
+     * Used by: InGameController.updateGUI, MapEditorController,
+     *   NewEmptyMapAction
      */
     public void updateMenuBar() {}
 
     /**
      * Display a popup menu.
+     *
+     * Used by: ColonyPanel, DragListener
      *
      * @param menu The {@code JPopupMenu} to display.
      * @param x The menu x coordinate.
@@ -1656,6 +1743,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the current view mode.
      *
+     * Used by: MoveAction
+     *
      * @return One of the view mode constants, or negative on error.
      */
     public ViewMode getViewMode() {
@@ -1664,6 +1753,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Get the active unit.
+     *
+     * Used by: many
      *
      * @return The current active {@code Unit}.
      */
@@ -1674,6 +1765,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the selected tile.
      *
+     * Used by: InGameController.moveTileCursor
+     *
      * @return The selected {@code Tile}.
      */
     public Tile getSelectedTile() {
@@ -1683,12 +1776,19 @@ public class GUI extends FreeColClientHolder {
     /**
      * Change to terrain mode and select a tile.
      *
+     * Used by: CanvasMapEditorMouseListener,
+     *   client InGameController.{updateActiveUnit,moveTileCursor}
+     *
      * @param tile The {@code Tile} to select.
      */
     public void changeView(Tile tile) {}
 
     /**
      * Change to move units mode, and select a unit.
+     *
+     * Used by: ChangeAction, DebugUtils, EndTurnDialog,
+     *   client InGameController (several)
+     *   MapEditorController, TilePopup, QuickActionMenu, UnitLabel
      *
      * @param unit The {@code Unit} to select.
      */
@@ -1697,39 +1797,69 @@ public class GUI extends FreeColClientHolder {
     /**
      * Change to map transform mode, and select a transform.
      *
+     * Used by: MapEditorController
+     *
      * @param transform The {@code MapTransform} to select.
      */
     public void changeView(MapTransform transform) {}
     
     /**
      * Change to end turn mode.
+     *
+     * Used by: client InGameController.updateActiveUnit
      */
     public void changeView() {}
 
 
     // Zoom controls
 
+    /**
+     * Can the map be zoomed in?
+     *
+     * Used by: ZoomInAction
+     *
+     * @return True if the map can zoom in.
+     */
     public boolean canZoomInMap() {
         return false;
     }
 
+    /**
+     * Can the map be zoomed out?
+     *
+     * Used by: ZoomOutAction
+     *
+     * @return True if the map can zoom out.
+     */
     public boolean canZoomOutMap() {
         return false;
     }
 
+    /**
+     * Zoom the map in.
+     *
+     * Used by: ZoomInAction
+     */
     public void zoomInMap() {
         ResourceManager.clearImageCache();
     }
 
+    /**
+     * Zoom the map out.
+     *
+     * Used by: ZoomOutAction
+     */
     public void zoomOutMap() {
         ResourceManager.clearImageCache();
     }
 
 
-    // High level panel manipulation
+    // Miscellaneous gui manipulation
 
     /**
      * Handle a click on the canvas.
+     *
+     * Used by: CanvasMouseListener
      *
      * @param count The click count.
      * @param x The x coordinate of the click.
@@ -1740,22 +1870,31 @@ public class GUI extends FreeColClientHolder {
     /**
      * Close a panel.
      *
+     * Used by: client InGameController.closehandler
+     *
      * @param panel The identifier for the panel to close.
      */
     public void closePanel(String panel) {}
 
     /**
      * Close the main panel if present.
+     *
+     * Used by: MapEditorController, PreGameController
      */
     public void closeMainPanel() {}
 
     /**
      * Close the status panel if present.
+     *
+     * Used by: FreeColClient, MapEditorController, client InGameController, 
+     *   PreGameController
      */
     public void closeStatusPanel() {}
 
     /**
      * Update with a new chat message.
+     *
+     * Used by: client InGameController.{chat,chatHandler}
      *
      * @param player The player who sent the chat message.
      * @param message The chat message.
@@ -1774,6 +1913,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * A chat message was received during the pre-game setup.
      *
+     * Used by: PreGameController.chatHandler
+     *
      * @param player The player who sent the chat message.
      * @param message The chat message.
      * @param privateChat True if the message is private.
@@ -1784,6 +1925,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Checks if a client options dialog is present.
      *
+     * Used by: FreeColAction.shouldBeEnabled
+     *
      * @return True if the client options are showing.
      */
     public boolean isClientOptionsDialogShowing() {
@@ -1793,6 +1936,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Is another panel being displayed.
      *
+     * Used by: many Actions
+     *
      * @return True if there is another panel present.
      */
     public boolean isShowingSubPanel() {
@@ -1801,11 +1946,15 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Refresh the players table in the StartGamePanel.
+     *
+     * Used by: SetNationMessage.clientHandler
      */
     public void refreshPlayersTable() {}
 
     /**
      * Remove a component from the GUI.
+     *
+     * Used by: Many panels to close themselves. TODO: is this right?
      *
      * @param component The {@code Component} to remove.
      */
@@ -1814,12 +1963,17 @@ public class GUI extends FreeColClientHolder {
     /**
      * Remove a dialog from the GUI.
      *
+     * Used by: FreeColDialog.removeNotify
+     *
      * @param fcd The {@code FreeColDialog} to remove.
      */
     public void removeDialog(FreeColDialog<?> fcd) {}
 
     /**
-     * Remove a trade route panel and associated input.
+     * Remove a trade route panel and associated input on an associated
+     * TradeRouteInputPanel.
+     *
+     * Used by: TradeRoutePanel
      *
      * @param panel The {@code FreeColPanel} to remove.
      */
@@ -1832,10 +1986,22 @@ public class GUI extends FreeColClientHolder {
      * Call this method in the constructor of a FreeColPanel in order
      * to remember its size and position.
      *
+     * Used by: *Panel
+     *
      * @param comp The {@code Component} to use.
      * @param d The {@code Dimension} to use as default.
      */
     public void restoreSavedSize(Component comp, Dimension d) {}
+
+    /**
+     * Update all panels derived from the EuropePanel.
+     *
+     * Used by: NewUnitPanel, RecruitUnitPanel
+     */
+    public void updateEuropeanSubpanels() {}
+
+
+    // Panel display, usually used just by the associated action
 
     /**
      * Show the AboutPanel.
@@ -2514,9 +2680,4 @@ public class GUI extends FreeColClientHolder {
      * @param unit The {@code Unit} to display.
      */
     public void showWorkProductionPanel(Unit unit) {}
-
-    /**
-     * Update all panels derived from the EuropePanel.
-     */
-    public void updateEuropeanSubpanels() {}
 }
