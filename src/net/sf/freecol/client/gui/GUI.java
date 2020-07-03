@@ -28,7 +28,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -292,7 +291,7 @@ public class GUI extends FreeColClientHolder {
         } else {
             try {
                 SwingUtilities.invokeAndWait(runnable);
-            } catch (InterruptedException | InvocationTargetException ex) {
+            } catch (Exception ex) {
                 logger.log(Level.WARNING, "Client GUI interaction", ex);
             }
         }
