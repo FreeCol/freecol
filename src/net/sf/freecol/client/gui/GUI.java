@@ -1356,15 +1356,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Get the scale for animations.
-     *
-     * @return A scale factor for animations.
-     */
-    public float getAnimationScale() {
-        return 1.0f;
-    }
-
-    /**
      * Get the bounds for a tile.
      *
      * Used by: *Animation

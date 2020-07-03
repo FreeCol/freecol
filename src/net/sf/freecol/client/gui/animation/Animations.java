@@ -43,17 +43,19 @@ public class Animations {
      * @param unit The {@code Unit} to be animated.
      * @param source The source {@code Tile} for the unit.
      * @param destination The destination {@code Tile} for the unit.
+     * @param scale The scale factor for the unit image.
      * @return A list of {@code Animation}s.
      */
     public static List<Animation> unitMove(FreeColClient freeColClient,
                                            Unit unit,
-                                           Tile source, Tile destination) {
+                                           Tile source, Tile destination,
+                                           float scale) {
         List<Animation> ret = new ArrayList<>();
         int speed = freeColClient.getAnimationSpeed(unit.getOwner());
         if (speed > 0) {
             UnitMoveAnimation a
                 = new UnitMoveAnimation(freeColClient, unit,
-                                        source, destination, speed);
+                                        source, destination, speed, scale);
             if (a == null) {
                 logger.warning("No move animation for: " + unit);
             } else {
@@ -85,12 +87,13 @@ public class Animations {
      * @param attackerTile The {@code Tile} the attack comes from.
      * @param defenderTile The {@code Tile} the attack goes to.
      * @param success Did the attack succeed?
+     * @param scale The scale factor for the unit image.
      * @return A list of {@code Animation}s.
      */
     public static List<Animation> unitAttack(FreeColClient freeColClient,
                                              Unit attacker, Unit defender,
                                              Tile attackerTile, Tile defenderTile,
-                                             boolean success) {
+                                             boolean success, float scale) {
         List<Animation> ret = new ArrayList<>();
         Direction dirn = attackerTile.getDirection(defenderTile);
         if (dirn == null) {
@@ -98,8 +101,6 @@ public class Animations {
                 + " v " + defender);
             return ret; // Fail fast
         }
-
-        final float scale = freeColClient.getGUI().getAnimationScale();
 
         if (freeColClient.getAnimationSpeed(attacker.getOwner()) > 0) {
             UnitImageAnimation a = UnitImageAnimation.build(freeColClient,

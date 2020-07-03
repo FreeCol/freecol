@@ -53,7 +53,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
     private final Tile sourceTile;
     private final Tile destinationTile;
     private final int speed;
-
+    private final float scale;
 
     /**
      * Constructor
@@ -63,16 +63,18 @@ final class UnitMoveAnimation extends FreeColClientHolder
      * @param sourceTile The {@code Tile} the unit is moving from.
      * @param destinationTile The {@code Tile} the unit is moving to.
      * @param speed The animation speed.
+     * @param scale The scale factor for the unit image.
      */
     public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile,
-                             int speed) {
+                             int speed, float scale) {
         super(freeColClient);
 
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
         this.speed = speed;
+        this.scale = scale;
     }
     
 
@@ -98,8 +100,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
     @Override
     public void executeWithUnitOutForAnimation(JLabel unitLabel) {
         final GUI gui = getGUI();
-        final float scale = gui.getAnimationScale();
-        final int movementRatio = (int)(Math.pow(2, this.speed + 1) * scale);
+        final int movementRatio = (int)(Math.pow(2, this.speed + 1) * this.scale);
         final Rectangle r1 = gui.getAnimationTileBounds(this.sourceTile);
         final Rectangle r2 = gui.getAnimationTileBounds(this.destinationTile);
         final Rectangle bounds = r1.union(r2);

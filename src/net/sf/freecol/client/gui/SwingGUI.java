@@ -547,7 +547,8 @@ public class SwingGUI extends GUI {
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
         animate(Animations.unitAttack(getFreeColClient(), attacker, defender,
-                                      attackerTile, defenderTile, success));
+                                      attackerTile, defenderTile, success,
+                                      this.mapViewer.getScale()));
     }
 
     /**
@@ -555,7 +556,9 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        animate(Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile));
+        animate(Animations.unitMove(getFreeColClient(), unit,
+                                    srcTile, dstTile,
+                                    this.mapViewer.getScale()));
     }
 
     /**
@@ -565,14 +568,6 @@ public class SwingGUI extends GUI {
     public Point getAnimationPosition(int labelWidth,int labelHeight,
                                       Point tileP) {
         return this.mapViewer.calculateUnitLabelPositionInTile(labelWidth, labelHeight, tileP);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public float getAnimationScale() {
-        return this.mapViewer.getImageLibrary().getScaleFactor();
     }
 
     /**

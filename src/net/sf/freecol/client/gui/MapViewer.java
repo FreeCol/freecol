@@ -237,6 +237,15 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
+     * Get the scale factor for the image library.
+     *
+     * @return The scale factor.
+     */
+    public float getScale() {
+        return this.lib.getScaleFactor();
+    }
+
+    /**
      * Get the displayed map width.
      *
      * @return The width.
@@ -400,7 +409,7 @@ public final class MapViewer extends FreeColClientHolder {
                          new Point2D.Float(dx + ddx, this.halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(lib.getScaleFactor());
+        gridStroke = new BasicStroke(getScale());
     }
 
     /**
@@ -771,7 +780,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (tileP == null) return null;
         int labelX = tileP.x + tileWidth / 2 - labelWidth / 2;
         int labelY = tileP.y + tileHeight / 2 - labelHeight / 2
-            - (int) (UNIT_OFFSET * lib.getScaleFactor());
+            - (int) (UNIT_OFFSET * getScale());
         return new Point(labelX, labelY);
     }
 
@@ -1153,15 +1162,15 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     boolean isAtMaxMapScale() {
-        return lib.getScaleFactor() >= MAP_SCALE_MAX;
+        return getScale() >= MAP_SCALE_MAX;
     }
 
     boolean isAtMinMapScale() {
-        return lib.getScaleFactor() <= MAP_SCALE_MIN;
+        return getScale() <= MAP_SCALE_MIN;
     }
 
     void increaseMapScale() {
-        float newScale = lib.getScaleFactor() + MAP_SCALE_STEP;
+        float newScale = getScale() + MAP_SCALE_STEP;
         if (newScale >= MAP_SCALE_MAX)
             newScale = MAP_SCALE_MAX;
         this.changeImageLibrary(new ImageLibrary(newScale));
@@ -1169,7 +1178,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     void decreaseMapScale() {
-        float newScale = lib.getScaleFactor() - MAP_SCALE_STEP;
+        float newScale = getScale() - MAP_SCALE_STEP;
         if (newScale <= MAP_SCALE_MIN)
             newScale = MAP_SCALE_MIN;
         this.changeImageLibrary(new ImageLibrary(newScale));
@@ -1489,7 +1498,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
+            FontLibrary fontLibrary = new FontLibrary(getScale());
             Font font = fontLibrary.createScaledFont(
                 FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
                 Font.BOLD);
@@ -1624,28 +1633,22 @@ public final class MapViewer extends FreeColClientHolder {
                 }
             }
             
-            int width = (int)((nameImage.getWidth()
-                    * lib.getScaleFactor())
+            int width = (int)((nameImage.getWidth() * getScale())
                 + ((leftImage != null)
-                    ? (leftImage.getWidth()
-                        * lib.getScaleFactor()) + spacing
+                    ? (leftImage.getWidth() * getScale()) + spacing
                     : 0)
                 + ((rightImage != null)
-                    ? (rightImage.getWidth()
-                        * lib.getScaleFactor()) + spacing
+                    ? (rightImage.getWidth() * getScale()) + spacing
                     : 0));
             int labelOffset = (tileWidth - width)/2;
-            yOffset -= (nameImage.getHeight()
-                * lib.getScaleFactor())/2;
+            yOffset -= (nameImage.getHeight() * getScale())/2;
             if (leftImage != null) {
                 g.drawImage(leftImage, rop, labelOffset, yOffset);
-                labelOffset += (leftImage.getWidth()
-                    * lib.getScaleFactor()) + spacing;
+                labelOffset += (leftImage.getWidth() * getScale()) + spacing;
             }
             g.drawImage(nameImage, rop, labelOffset, yOffset);
             if (rightImage != null) {
-                labelOffset += (nameImage.getWidth()
-                    * lib.getScaleFactor()) + spacing;
+                labelOffset += (nameImage.getWidth() * getScale()) + spacing;
                 g.drawImage(rightImage, rop, labelOffset, yOffset);
             }
             break;
@@ -1829,7 +1832,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void displayPath(Graphics2D g, PathNode path) {
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor());
+            FontLibrary.FontSize.TINY, getScale());
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1896,7 +1899,7 @@ public final class MapViewer extends FreeColClientHolder {
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
-                    (int)(TileViewer.STATE_OFFSET_X * lib.getScaleFactor()), 0,
+                    (int)(TileViewer.STATE_OFFSET_X * getScale()), 0,
                     null);
 
         // Draw one small line for each additional unit (like in civ3).
@@ -1912,9 +1915,9 @@ public final class MapViewer extends FreeColClientHolder {
             g.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
             int x1 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
-                * lib.getScaleFactor());
+                * getScale());
             int x2 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
-                    + OTHER_UNITS_WIDTH) * lib.getScaleFactor());
+                    + OTHER_UNITS_WIDTH) * getScale());
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                 g.drawLine(x1, unitLinesY, x2, unitLinesY);
                 unitLinesY += 2;
@@ -1951,7 +1954,7 @@ public final class MapViewer extends FreeColClientHolder {
     private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
         int unitX = (tileWidth - unitImage.getWidth()) / 2;
         int unitY = (tileHeight - unitImage.getHeight()) / 2 -
-                    (int) (UNIT_OFFSET * lib.getScaleFactor());
+                    (int) (UNIT_OFFSET * getScale());
 
         return new Point(unitX, unitY);
     }
