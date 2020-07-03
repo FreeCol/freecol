@@ -342,7 +342,12 @@ public class SwingGUI extends GUI {
         }
     }
 
-
+    private void resetMapZoom() {
+        //super.resetMapZoom();
+        this.mapViewer.resetMapScale();
+        refresh();
+    }
+   
     // Implement GUI
 
     // Simple accessors
@@ -1072,16 +1077,6 @@ public class SwingGUI extends GUI {
     @Override
     public boolean canZoomOutMap() {
         return !this.mapViewer.isAtMinMapScale();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void resetMapZoom() {
-        super.resetMapZoom();
-        this.mapViewer.resetMapScale();
-        refresh();
     }
 
     /**

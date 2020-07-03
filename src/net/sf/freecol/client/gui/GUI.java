@@ -1770,10 +1770,6 @@ public class GUI extends FreeColClientHolder {
         return false;
     }
 
-    protected void resetMapZoom() {
-        ResourceManager.clearImageCache();
-    }
-
     public void zoomInMap() {
         ResourceManager.clearImageCache();
     }
