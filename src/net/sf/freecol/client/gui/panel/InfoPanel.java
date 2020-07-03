@@ -519,6 +519,6 @@ public final class InfoPanel extends FreeColPanel
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        fillUnitPanel(this.unit);
+        refresh();
     }
 }
