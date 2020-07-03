@@ -48,14 +48,12 @@ import net.sf.freecol.client.gui.animation.Animations;
 // Special panels and dialogs
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -1289,7 +1287,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public BuildQueuePanel showBuildQueuePanel(Colony colony) {
+    public FreeColPanel showBuildQueuePanel(Colony colony) {
         return widgets.showBuildQueuePanel(colony);
     }
 
@@ -1949,7 +1947,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
+    public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         return widgets.showTradeRouteInputPanel(newRoute);
     }
 

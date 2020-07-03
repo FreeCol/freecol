@@ -47,7 +47,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.animation.Animation;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
@@ -1899,9 +1898,9 @@ public class GUI extends FreeColClientHolder {
      * Show the build queue for a colony.
      *
      * @param colony The {@code Colony} to show a panel for.
-     * @return The {@code BuildQueuePanel} showing.
+     * @return The build queue panel.
      */
-    public BuildQueuePanel showBuildQueuePanel(Colony colony) {
+    public FreeColPanel showBuildQueuePanel(Colony colony) {
         return null;
     }
 
@@ -2524,9 +2523,9 @@ public class GUI extends FreeColClientHolder {
      * Show the trade route input panel for a given trade route.
      *
      * @param tr The {@code TradeRoute} to display.
-     * @return The {@code TradeRouteInputPanel}.
+     * @return The trade route input panel.
      */
-    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute tr) {
+    public FreeColPanel showTradeRouteInputPanel(TradeRoute tr) {
         return null;
     }
 
