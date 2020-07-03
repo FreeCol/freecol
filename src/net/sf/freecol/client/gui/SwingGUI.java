@@ -437,13 +437,22 @@ public class SwingGUI extends GUI {
         clearGotoPath();
         resetMenuBar();
         resetMapZoom(); // This should refresh the map
+        // Update the view, somehow.  Try really hard to find a tile
+        // to focus on
         if (active != null) {
             changeView(active);
+            if (tile == null) {
+                tile = active.getTile();
+                if (tile == null) {
+                    tile = active.getOwner().getFallbackTile();
+                }
+            }
         } else if (tile != null) {
             changeView(tile);
         } else {
             changeView((Unit)null);
         }
+        this.mapViewer.changeFocus(tile);
     }
         
     /**
