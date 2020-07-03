@@ -173,7 +173,6 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void setAvailableHandler(Nation nation, NationState nationState) {
         getGame().getNationOptions().setNationState(nation, nationState);
-        getGUI().refreshPlayersTable();
     }
     
     /**
@@ -196,7 +195,6 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void setColorHandler(Nation nation, Color color) {
         nation.setColor(color);
-        getGUI().refreshPlayersTable();
     }
         
     /**
@@ -228,7 +226,6 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void setNationTypeHandler(NationType nationType) {
         getMyPlayer().changeNationType(nationType);
-        getGUI().refreshPlayersTable();
     }
 
     /**
