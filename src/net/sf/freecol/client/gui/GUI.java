@@ -51,7 +51,6 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
@@ -164,9 +163,6 @@ public class GUI extends FreeColClientHolder {
             return Messages.message(this.template);
         }
     }
-
-    /** Map height in MapGeneratorOptionsDialog. */
-    public static final int MINI_MAP_THUMBNAIL_FINAL_HEIGHT = 64;
 
     /** Warning levels. */
     private static final String levels[] = {
@@ -1188,42 +1184,6 @@ public class GUI extends FreeColClientHolder {
      */
     public String getSoundMixerLabelText() {
         return getSoundController().getSoundMixerLabelText();
-    }
-
-
-    // Miscellaneous higher level utilities
-
-    /**
-     * Create a thumbnail for the minimap.
-     * 
-     * FIXME: Delete all code inside this method and replace it with
-     *        sensible code directly drawing in necessary size,
-     *        without creating a throwaway GUI panel, drawing in wrong
-     *        size and immediately resizing.
-     * @return The created {@code BufferedImage}.
-     */
-    public BufferedImage createMiniMapThumbNail() {
-        MiniMap miniMap = new MiniMap(getFreeColClient());
-        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        Game game = getGame();
-        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
-            + MiniMap.MAX_TILE_SIZE / 2;
-        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
-        miniMap.setSize(width, height);
-        BufferedImage image = new BufferedImage(
-            width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g1 = image.createGraphics();
-        miniMap.paintMap(g1);
-        g1.dispose();
-
-        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
-        BufferedImage scaledImage = new BufferedImage(scaledWidth,
-            MINI_MAP_THUMBNAIL_FINAL_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = scaledImage.createGraphics();
-        g2.drawImage(image, 0, 0, scaledWidth, MINI_MAP_THUMBNAIL_FINAL_HEIGHT,
-                     null);
-        g2.dispose();
-        return scaledImage;
     }
 
 
