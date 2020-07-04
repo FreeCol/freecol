@@ -166,15 +166,47 @@ public class SwingGUI extends GUI {
     // Internals
 
     /**
+     * Perform a single animation.
+     *
+     * @param a The {@code Animation} to perform.
+     */
+    private void animate(Animation a) {
+        // The tile must be visible
+        final Tile tile = a.getTile();
+        if (!this.mapViewer.onScreen(tile)) {
+            this.mapViewer.changeFocus(tile);
+            paintImmediately();
+        }
+
+        // Get the unit label, add to canvas if not already there
+        final Unit unit = a.getUnit();
+        boolean newLabel = !this.mapViewer.isOutForAnimation(unit);
+        JLabel unitLabel = this.mapViewer.enterUnitOutForAnimation(unit, tile);
+        if (newLabel) this.canvas.animationLabel(unitLabel, true);
+
+       try { // Delegate to the animation
+            a.executeWithUnitOutForAnimation(unitLabel);
+
+       } finally { // Make sure we release the label again
+           this.mapViewer.releaseUnitOutForAnimation(unit);
+
+           if (!this.mapViewer.isOutForAnimation(unit)) {
+               this.canvas.animationLabel(unitLabel, false);
+           }
+        }
+    }
+    
+    /**
      * Perform some animations.
      *
      * @param animations The {@code Animation}s to perform.
      */
-    private void animate(final List<Animation> animations) {
+    private void animations(final List<Animation> animations) {
         if (animations.isEmpty()) return;
 
         // Special case for first animation, which should respect the
-        // ALWAYS_CENTER option
+        // ALWAYS_CENTER option.  We assume the others remain sufficiently
+        // visible because calling paintImmediately every time would be slow
         final boolean center = getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
         Tile tile = animations.get(0).getTile();
@@ -185,14 +217,7 @@ public class SwingGUI extends GUI {
         }
            
         invokeNowOrWait(() -> {
-                for (Animation a : animations) {
-                    Tile t = a.getTile();
-                    if (!this.mapViewer.onScreen(t)) {
-                        this.mapViewer.changeFocus(t);
-                        paintImmediately();
-                    }
-                    this.mapViewer.executeAnimation(a);
-                }
+                for (Animation a : animations) animate(a);
             });
     }
 
@@ -535,20 +560,13 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void animationLabel(JLabel label, boolean add) {
-        canvas.animationLabel(label, add);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        animate(Animations.unitAttack(getFreeColClient(), attacker, defender,
-                                      attackerTile, defenderTile, success,
-                                      this.mapViewer.getScale()));
+        animations(Animations.unitAttack(getFreeColClient(),
+                                         attacker, defender,
+                                         attackerTile, defenderTile, success,
+                                         this.mapViewer.getScale()));
     }
 
     /**
@@ -556,9 +574,9 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        animate(Animations.unitMove(getFreeColClient(), unit,
-                                    srcTile, dstTile,
-                                    this.mapViewer.getScale()));
+        animations(Animations.unitMove(getFreeColClient(), unit,
+                                       srcTile, dstTile,
+                                       this.mapViewer.getScale()));
     }
 
     /**

@@ -1307,14 +1307,6 @@ public class GUI extends FreeColClientHolder {
     // Animation handling
 
     /**
-     * Control animation labels.
-     *
-     * @param label A {@code JLabel} for an animation.
-     * @param add If true, add the label, else remove it.
-     */
-    public void animationLabel(JLabel label, boolean add) {}
-
-    /**
      * Animate a unit attack.
      *
      * Used by: client InGameController

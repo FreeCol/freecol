@@ -36,7 +36,7 @@ public class Animations {
 
     private static final Logger logger = Logger.getLogger(Animations.class.getName());
 
-    /**
+     /**
      * Collect animations for a unit move.
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
