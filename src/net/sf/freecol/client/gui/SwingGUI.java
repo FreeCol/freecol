@@ -95,6 +95,7 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -171,28 +172,38 @@ public class SwingGUI extends GUI {
      * @param a The {@code Animation} to perform.
      */
     private void animate(Animation a) {
-        // The tile must be visible
-        List<Tile> tiles = a.getTiles();
-        final Tile tile = tiles.get(0);
-        if (!this.mapViewer.onScreen(tile)) {
-            this.mapViewer.changeFocus(tile);
-            paintImmediately();
+        // The tiles must be visible
+        final List<Tile> tiles = a.getTiles();
+        boolean changed = false;
+        for (Tile t : tiles) {
+            if (!this.mapViewer.onScreen(t)) {
+                this.mapViewer.changeFocus(t);
+                changed = true;
+            }
         }
+        if (changed) paintImmediately();
 
         // Calculate the union of the bounds for all the tiles in the
         // animation, this is the area that will need to be repainted
         // as the animation progresses 
-        Rectangle bounds = this.mapViewer.calculateTileBounds(tile);
-        for (Tile t : tiles.subList(1, tiles.size())) {
-            bounds = bounds.union(this.mapViewer.calculateTileBounds(t));
+        Rectangle bounds = null;
+        for (Tile t : tiles) {
+            Rectangle r = this.mapViewer.calculateTileBounds(t);
+            bounds = (bounds == null) ? r : bounds.union(r);
         }
         
-        // Get the unit label, add to canvas if not already there
+        // Get the unit label, add to canvas if not already there, and
+        // update the animation with the locations for the label for each
+        // of the animation's tiles
         final Unit unit = a.getUnit();
         boolean newLabel = !this.mapViewer.isOutForAnimation(unit);
-        JLabel unitLabel = this.mapViewer.enterUnitOutForAnimation(unit, tile);
+        JLabel unitLabel = this.mapViewer.enterUnitOutForAnimation(unit);
+        List<Point> points = transform(tiles, alwaysTrue(),
+            (t) -> this.mapViewer.getAnimationPosition(unitLabel, t));
+        a.setPoints(points);
+        unitLabel.setLocation(points.get(0)); // set location before adding
         if (newLabel) this.canvas.animationLabel(unitLabel, true);
-
+            
         // Define a callback to wrap Canvas.paintImmediately(Rectangle)
         final Canvas can = this.canvas;
         final Rectangle aBounds = bounds;
@@ -596,14 +607,6 @@ public class SwingGUI extends GUI {
         animations(Animations.unitMove(getFreeColClient(),
                                        unit, srcTile, dstTile,
                                        this.mapViewer.getScale()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Point getAnimationPosition(JLabel unitLabel, Tile tile) {
-        return this.mapViewer.getAnimationPosition(unitLabel, tile);
     }
 
 

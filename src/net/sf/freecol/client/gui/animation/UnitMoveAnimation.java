@@ -52,6 +52,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
 
     private final Unit unit;
     private final List<Tile> tiles;
+    private List<Point> points;
     private final int speed;
     private final float scale;
 
@@ -74,6 +75,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
         this.tiles = new ArrayList<>();
         this.tiles.add(sourceTile);
         this.tiles.add(destinationTile);
+        this.points = null;
         this.speed = speed;
         this.scale = scale;
     }
@@ -98,6 +100,13 @@ final class UnitMoveAnimation extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
+    public void setPoints(List<Point> points) {
+        this.points = points;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void executeWithLabel(JLabel unitLabel,
                                  Animations.Procedure paintCallback) {
@@ -105,11 +114,8 @@ final class UnitMoveAnimation extends FreeColClientHolder
             * this.scale);
         final double xratio = ImageLibrary.TILE_SIZE.width
             / (double)ImageLibrary.TILE_SIZE.height;
-        final Point srcPoint = unitLabel.getLocation();
-        // FIXME: This is the last place in the animations where there is
-        // a cyclic call back out to the GUI.  It is awkward to remove alas
-        // but if we did we could also remove FreeColClientHolder
-        final Point dstPoint = getGUI().getAnimationPosition(unitLabel, this.tiles.get(1));
+        final Point srcPoint = this.points.get(0);
+        final Point dstPoint = this.points.get(1);
         final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
         final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
 

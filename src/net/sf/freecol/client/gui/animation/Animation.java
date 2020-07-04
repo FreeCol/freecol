@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.awt.Point;
 import javax.swing.JLabel;
 import java.util.List;
 
@@ -50,6 +51,13 @@ public interface Animation {
      */
     public List<Tile> getTiles();
 
+    /**
+     * Set the points for each tile.
+     *
+     * @param points A list of {@code Point}s to position the animation label.
+     */
+    public void setPoints(List<Point> points);
+    
     /**
      * The code to be executed when a unit is out for animation.
      *

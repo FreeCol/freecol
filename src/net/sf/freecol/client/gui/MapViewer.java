@@ -360,17 +360,15 @@ public final class MapViewer extends FreeColClientHolder {
     // Animation support
 
     /**
-     * Make an animation label for the unit at a tile, and reference count it.
+     * Make an animation label for the unit, and reference count it.
      *
      * @param unit The {@code Unit} to animate.
-     * @param tile The {@code Tile} to start at.
      * @return A {@code JLabel} for the animation.
      */
-    public JLabel enterUnitOutForAnimation(final Unit unit, final Tile tile) {
+    public JLabel enterUnitOutForAnimation(final Unit unit) {
         Integer i = this.unitsOutForAnimation.get(unit);
         if (i == null) {
             final JLabel unitLabel = createUnitAnimationLabel(unit);
-            unitLabel.setLocation(getAnimationPosition(unitLabel, tile));
             this.unitsOutForAnimationLabels.put(unit, unitLabel);
             i = 1;
         } else {

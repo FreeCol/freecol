@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.animation;
 
 import java.awt.Image;
+import java.awt.Point;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -57,6 +58,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
 
     private final Unit unit;
     private final List<Tile> tiles;
+    private List<Point> points;
     private final SimpleZippedAnimation animation;
     private boolean mirror;
 
@@ -76,6 +78,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
         this.unit = unit;
         this.tiles = new ArrayList<>();
         this.tiles.add(tile);
+        this.points = null;
         this.animation = animation;
         this.mirror = false;
     }
@@ -190,10 +193,19 @@ public final class UnitImageAnimation extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
+    public void setPoints(List<Point> points) {
+        this.points = points;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public void executeWithLabel(JLabel unitLabel,
                                  Animations.Procedure paintCallback) {
         final GUI gui = getGUI();
         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
+
+        // Step through the animation, chaning the image
         for (AnimationEvent event : animation) {
             long time = System.nanoTime();
             if (event instanceof ImageAnimationEvent) {
@@ -205,6 +217,8 @@ public final class UnitImageAnimation extends FreeColClientHolder
                 }
                 icon.setImage(image);
                 paintCallback.execute(); // paint now
+
+                // Time accounting
                 time = ievent.getDurationInMs()
                     - (System.nanoTime() - time) / 1000000;
                 if (time > 0) Utils.delay(time, "Animation delayed.");
