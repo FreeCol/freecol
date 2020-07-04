@@ -216,6 +216,5 @@ public final class UnitImageAnimation extends FreeColClientHolder
                 if (time > 0) Utils.delay(time, "Animation delayed.");
             }
         }
-        gui.refresh();
     }
 }

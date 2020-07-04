@@ -158,6 +158,5 @@ final class UnitMoveAnimation extends FreeColClientHolder
                 dropFrames--;
             }
         }
-        gui.refresh();
     }
 }

@@ -218,6 +218,7 @@ public class SwingGUI extends GUI {
            
         invokeNowOrWait(() -> {
                 for (Animation a : animations) animate(a);
+                refresh();
             });
     }
 
