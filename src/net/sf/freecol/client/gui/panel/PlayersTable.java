@@ -606,6 +606,7 @@ public final class PlayersTable extends JTable {
                 switch (column) {
                 case ADVANTAGE_COLUMN:
                     preGameController.setNationType((NationType)value);
+                    update();
                     break;
                 case AVAILABILITY_COLUMN:
                     preGameController.setAvailable(nations.get(row),
@@ -614,6 +615,7 @@ public final class PlayersTable extends JTable {
                     break;
                 case COLOR_COLUMN:
                     preGameController.setColor(nation, (Color)value);
+                    update();
                     break;
                 case PLAYER_COLUMN:
                     if (nationOptions.getNationState(nation)

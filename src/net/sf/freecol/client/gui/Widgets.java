@@ -406,9 +406,9 @@ public final class Widgets {
      * Show the BuildQueuePanel for a given colony.
      *
      * @param colony The {@code Colony} to show the build queue of.
-     * @return The {@code BuildQueuePanel}.
+     * @return The panel.
      */
-    public BuildQueuePanel showBuildQueuePanel(Colony colony) {
+    public FreeColPanel showBuildQueuePanel(Colony colony) {
         BuildQueuePanel panel
             = canvas.getExistingFreeColPanel(BuildQueuePanel.class);
         if (panel == null || panel.getColony() != colony) {
@@ -1239,9 +1239,9 @@ public final class Widgets {
      * Display the trade route input panel for a given trade route.
      *
      * @param newRoute The {@code TradeRoute} to display.
-     * @return The {@code TradeRouteInputPanel}.
+     * @return The panel.
      */
-    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
+    public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         TradeRouteInputPanel panel
             = new TradeRouteInputPanel(freeColClient, newRoute);
         canvas.showSubPanel(panel, null, true);

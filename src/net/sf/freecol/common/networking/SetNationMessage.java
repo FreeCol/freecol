@@ -86,7 +86,6 @@ public class SetNationMessage extends AttributeMessage {
 
         if (player != null && nation != null) {
             player.setNation(nation);
-            freeColClient.getGUI().refreshPlayersTable();
         }
     }
 

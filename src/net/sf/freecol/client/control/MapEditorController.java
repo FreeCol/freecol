@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.control;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.MiniMap; // FIXME: should go away
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -59,6 +61,9 @@ public final class MapEditorController extends FreeColClientHolder {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorController.class.getName());
 
+    /** Map height in MapGeneratorOptionsDialog. */
+    private static final int MINI_MAP_THUMBNAIL_FINAL_HEIGHT = 64;
+
     /**
      * The transform that should be applied to a {@code Tile}
      * that is clicked on the map.
@@ -76,6 +81,42 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
 
+    /**
+     * Create a thumbnail for the minimap.
+     * 
+     * FIXME: Delete all code inside this method and replace it with
+     *        sensible code directly drawing in necessary size,
+     *        without creating a throwaway GUI panel, drawing in wrong
+     *        size and immediately resizing.
+     *        Consider moving to ImageLibrary in due course, but not
+     *        until the MiniMap dependency is gone.
+     *
+     * @return The created {@code BufferedImage}.
+     */
+    private BufferedImage createMiniMapThumbNail() {
+        MiniMap miniMap = new MiniMap(getFreeColClient());
+        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
+        Game game = getGame();
+        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
+            + MiniMap.MAX_TILE_SIZE / 2;
+        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
+        miniMap.setSize(width, height);
+        BufferedImage image = new BufferedImage(
+            width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g1 = image.createGraphics();
+        miniMap.paintMap(g1);
+        g1.dispose();
+
+        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
+        BufferedImage scaledImage = new BufferedImage(scaledWidth,
+            MINI_MAP_THUMBNAIL_FINAL_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = scaledImage.createGraphics();
+        g2.drawImage(image, 0, 0, scaledWidth, MINI_MAP_THUMBNAIL_FINAL_HEIGHT,
+                     null);
+        g2.dispose();
+        return scaledImage;
+    }
+    
     /**
      * Require all native nation players to be present in a game.
      *
@@ -220,7 +261,7 @@ public final class MapEditorController extends FreeColClientHolder {
             @Override
             public void run() {
                 try {
-                    BufferedImage thumb = gui.createMiniMapThumbNail();
+                    BufferedImage thumb = createMiniMapThumbNail();
                     getFreeColServer().saveMapEditorGame(file, thumb);
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();

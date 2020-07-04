@@ -48,14 +48,12 @@ import net.sf.freecol.client.gui.animation.Animations;
 // Special panels and dialogs
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -97,6 +95,7 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -168,33 +167,87 @@ public class SwingGUI extends GUI {
     // Internals
 
     /**
+     * Perform a single animation.
+     *
+     * @param a The {@code Animation} to perform.
+     */
+    private void animate(Animation a) {
+        // The tiles must be visible
+        final List<Tile> tiles = a.getTiles();
+        boolean changed = false;
+        for (Tile t : tiles) {
+            if (!this.mapViewer.onScreen(t)) {
+                this.mapViewer.changeFocus(t);
+                changed = true;
+            }
+        }
+        if (changed) paintImmediately();
+
+        // Calculate the union of the bounds for all the tiles in the
+        // animation, this is the area that will need to be repainted
+        // as the animation progresses 
+        Rectangle bounds = null;
+        for (Tile t : tiles) {
+            Rectangle r = this.mapViewer.calculateTileBounds(t);
+            bounds = (bounds == null) ? r : bounds.union(r);
+        }
+        
+        // Get the unit label, add to canvas if not already there, and
+        // update the animation with the locations for the label for each
+        // of the animation's tiles
+        final Unit unit = a.getUnit();
+        boolean newLabel = !this.mapViewer.isOutForAnimation(unit);
+        JLabel unitLabel = this.mapViewer.enterUnitOutForAnimation(unit);
+        List<Point> points = transform(tiles, alwaysTrue(),
+            (t) -> this.mapViewer.getAnimationPosition(unitLabel, t));
+        a.setPoints(points);
+        unitLabel.setLocation(points.get(0)); // set location before adding
+        if (newLabel) this.canvas.animationLabel(unitLabel, true);
+            
+        // Define a callback to wrap Canvas.paintImmediately(Rectangle)
+        final Canvas can = this.canvas;
+        final Rectangle aBounds = bounds;
+        final Animations.Procedure painter = new Animations.Procedure() {
+                public void execute() {
+                    can.paintImmediately(aBounds);
+                }
+            };
+
+        try { // Delegate to the animation
+            a.executeWithLabel(unitLabel, painter);
+            
+        } finally { // Make sure we release the label again
+            this.mapViewer.releaseUnitOutForAnimation(unit);
+            
+            if (!this.mapViewer.isOutForAnimation(unit)) {
+                this.canvas.animationLabel(unitLabel, false);
+            }
+        }
+    }
+    
+    /**
      * Perform some animations.
      *
      * @param animations The {@code Animation}s to perform.
      */
-    private void animate(final List<Animation> animations) {
+    private void animations(final List<Animation> animations) {
         if (animations.isEmpty()) return;
 
         // Special case for first animation, which should respect the
-        // ALWAYS_CENTER option
+        // ALWAYS_CENTER option.  We assume the others remain sufficiently
+        // visible because calling paintImmediately every time would be slow
         final boolean center = getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
-        Tile tile = animations.get(0).getTile();
-        if (!this.mapViewer.onScreen(tile)
-            || (center && tile != getFocus())) {
-            this.mapViewer.changeFocus(tile);
+        Tile first = animations.get(0).getTiles().get(0);
+        if (!this.mapViewer.onScreen(first)
+            || (center && first != getFocus())) {
+            this.mapViewer.changeFocus(first);
             paintImmediately();
         }
            
         invokeNowOrWait(() -> {
-                for (Animation a : animations) {
-                    Tile t = a.getTile();
-                    if (!this.mapViewer.onScreen(t)) {
-                        this.mapViewer.changeFocus(t);
-                        paintImmediately();
-                    }
-                    this.mapViewer.executeAnimation(a);
-                }
+                for (Animation a : animations) animate(a);
+                refresh();
             });
     }
 
@@ -342,7 +395,12 @@ public class SwingGUI extends GUI {
         }
     }
 
-
+    private void resetMapZoom() {
+        //super.resetMapZoom();
+        this.mapViewer.resetMapScale();
+        refresh();
+    }
+   
     // Implement GUI
 
     // Simple accessors
@@ -437,13 +495,22 @@ public class SwingGUI extends GUI {
         clearGotoPath();
         resetMenuBar();
         resetMapZoom(); // This should refresh the map
+        // Update the view, somehow.  Try really hard to find a tile
+        // to focus on
         if (active != null) {
             changeView(active);
+            if (tile == null) {
+                tile = active.getTile();
+                if (tile == null) {
+                    tile = active.getOwner().getFallbackTile();
+                }
+            }
         } else if (tile != null) {
             changeView(tile);
         } else {
             changeView((Unit)null);
         }
+        this.mapViewer.changeFocus(tile);
     }
         
     /**
@@ -523,19 +590,13 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void animationLabel(JLabel label, boolean add) {
-        canvas.animationLabel(label, add);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        animate(Animations.unitAttack(getFreeColClient(), attacker, defender,
-                                      attackerTile, defenderTile, success));
+        animations(Animations.unitAttack(getFreeColClient(),
+                                         attacker, defender,
+                                         attackerTile, defenderTile,
+                                         success, this.mapViewer.getScale()));
     }
 
     /**
@@ -543,40 +604,9 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        animate(Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Point getAnimationPosition(int labelWidth,int labelHeight,
-                                      Point tileP) {
-        return this.mapViewer.calculateUnitLabelPositionInTile(labelWidth, labelHeight, tileP);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public float getAnimationScale() {
-        return this.mapViewer.getImageLibrary().getScaleFactor();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Rectangle getAnimationTileBounds(Tile tile) {
-        return this.mapViewer.calculateTileBounds(tile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Point getAnimationTilePosition(Tile tile) {
-        return this.mapViewer.calculateTilePosition(tile, false);
+        animations(Animations.unitMove(getFreeColClient(),
+                                       unit, srcTile, dstTile,
+                                       this.mapViewer.getScale()));
     }
 
 
@@ -634,14 +664,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean requestFocusForSubPanel() {
-        return canvas.getShowingSubPanel().requestFocusInWindow();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setFocus(Tile tileToFocus) {
         this.mapViewer.changeFocus(tileToFocus);
         canvas.refresh();
@@ -655,15 +677,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void paintImmediately() {
-        paintImmediately(canvas.getBounds());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void paintImmediately(Rectangle rectangle) {
-        canvas.paintImmediately(rectangle);
+        canvas.paintImmediately(canvas.getBounds());
     }
 
     /**
@@ -1077,16 +1091,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    protected void resetMapZoom() {
-        super.resetMapZoom();
-        this.mapViewer.resetMapScale();
-        refresh();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void zoomInMap() {
         super.zoomInMap();
         this.mapViewer.increaseMapScale();
@@ -1293,7 +1297,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public BuildQueuePanel showBuildQueuePanel(Colony colony) {
+    public FreeColPanel showBuildQueuePanel(Colony colony) {
         return widgets.showBuildQueuePanel(colony);
     }
 
@@ -1953,7 +1957,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
+    public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         return widgets.showTradeRouteInputPanel(newRoute);
     }
 

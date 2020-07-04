@@ -146,6 +146,13 @@ public final class MapViewer extends FreeColClientHolder {
     /** A path for a current goto order. */
     private PathNode gotoPath = null;
 
+    /** The units that are being animated and an associated reference count. */
+    private final java.util.Map<Unit, Integer> unitsOutForAnimation
+        = new HashMap<>();
+    /** The labels being used in animation for a unit. */
+    private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels
+        = new HashMap<>();
+
     /** Fog of war area. */
     private final GeneralPath fog = new GeneralPath();
 
@@ -181,10 +188,6 @@ public final class MapViewer extends FreeColClientHolder {
     private boolean alignedTop = false, alignedBottom = false,
         alignedLeft = false, alignedRight = false;
 
-    private final java.util.Map<Unit, Integer> unitsOutForAnimation
-        = new HashMap<>();
-    private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels
-        = new HashMap<>();
 
     // borders
     private final EnumMap<Direction, Point2D.Float> borderPoints =
@@ -234,6 +237,15 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void setImageLibrary(ImageLibrary lib) {
         this.lib = lib;
+    }
+
+    /**
+     * Get the scale factor for the image library.
+     *
+     * @return The scale factor.
+     */
+    public float getScale() {
+        return this.lib.getScaleFactor();
     }
 
     /**
@@ -345,6 +357,97 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
 
+    // Animation support
+
+    /**
+     * Make an animation label for the unit, and reference count it.
+     *
+     * @param unit The {@code Unit} to animate.
+     * @return A {@code JLabel} for the animation.
+     */
+    public JLabel enterUnitOutForAnimation(final Unit unit) {
+        Integer i = this.unitsOutForAnimation.get(unit);
+        if (i == null) {
+            final JLabel unitLabel = createUnitAnimationLabel(unit);
+            this.unitsOutForAnimationLabels.put(unit, unitLabel);
+            i = 1;
+        } else {
+            i++;
+        }
+        this.unitsOutForAnimation.put(unit, i);
+        return this.unitsOutForAnimationLabels.get(unit);
+    }
+
+    /**
+     * Release an animation label for a unit, maintain the reference count.
+     *
+     * @param unit The {@code Unit} to animate.
+     */
+    public void releaseUnitOutForAnimation(final Unit unit) {
+        Integer i = this.unitsOutForAnimation.get(unit);
+        if (i == null) {
+            throw new RuntimeException("Unit not out for animation: " + unit);
+        }
+        if (i == 1) {
+            this.unitsOutForAnimation.remove(unit);
+        } else {
+            i--;
+            this.unitsOutForAnimation.put(unit, i);
+        }
+    }
+
+    /**
+     * Is a given unit being animated?
+     *
+     * @param unit The {@code Unit} to check.
+     * @return True if the unit is being animated.
+     */
+    public boolean isOutForAnimation(final Unit unit) {
+        return this.unitsOutForAnimation.containsKey(unit);
+    }
+
+    /**
+     * Get the position a unit label should be positioned in a tile.
+     *
+     * @param unitLabel The unit {@code JLabel}.
+     * @param tile The {@code Tile} to position in.
+     * @return The {@code Point} to position the label.
+     */
+    public Point getAnimationPosition(JLabel unitLabel, Tile tile) {
+        return calculateUnitLabelPositionInTile(unitLabel,
+            calculateTilePosition(tile, false));
+    }
+
+    /**
+     * Create a label to use for animating a unit.
+     *
+     * @param unit The {@code Unit} to animate.
+     * @return A {@code JLabel} to use in animation.
+     */
+    private JLabel createUnitAnimationLabel(Unit unit) {
+        final BufferedImage unitImg = this.lib.getScaledUnitImage(unit);
+        final int width = this.halfWidth + unitImg.getWidth()/2;
+        final int height = unitImg.getHeight();
+
+        BufferedImage img = new BufferedImage(width, height,
+                                              BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+
+        final int unitX = (width - unitImg.getWidth()) / 2;
+        g.drawImage(unitImg, unitX, 0, null);
+
+        final Player player = getMyPlayer();
+        String text = Messages.message(unit.getOccupationLabel(player, false));
+        g.drawImage(this.lib.getOccupationIndicatorChip(g, unit, text),
+                    0, 0, null);
+
+        final JLabel label = new JLabel(new ImageIcon(img));
+        label.setSize(width, height);
+        g.dispose();
+        return label;
+    }
+
+
     // Internal calculations
 
     /**
@@ -400,7 +503,7 @@ public final class MapViewer extends FreeColClientHolder {
                          new Point2D.Float(dx + ddx, this.halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(lib.getScaleFactor());
+        gridStroke = new BasicStroke(getScale());
     }
 
     /**
@@ -619,95 +722,6 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Execute an animation.
-     *
-     * @param a The {@code Animation} to execute.
-     */
-    public void executeAnimation(Animation a) {
-        final Unit unit = a.getUnit();
-        final Tile tile = a.getTile();
-        final JLabel unitLabel = enterUnitOutForAnimation(unit, tile);
-        try {
-            a.executeWithUnitOutForAnimation(unitLabel);
-        } finally {
-            releaseUnitOutForAnimation(unit);
-        }
-    }
-    
-    private JLabel enterUnitOutForAnimation(final Unit unit,
-                                            final Tile tile) {
-        Integer i = unitsOutForAnimation.get(unit);
-        if (i == null) {
-            final JLabel unitLabel = createUnitLabel(unit);
-            unitLabel.setLocation(
-                calculateUnitLabelPositionInTile(unitLabel.getWidth(),
-                    unitLabel.getHeight(),
-                    calculateTilePosition(tile, false)));
-            unitsOutForAnimationLabels.put(unit, unitLabel);
-            getGUI().animationLabel(unitLabel, true);
-            i = 1;
-        } else {
-            i++;
-        }
-        unitsOutForAnimation.put(unit, i);
-        return unitsOutForAnimationLabels.get(unit);
-    }
-
-    private void releaseUnitOutForAnimation(final Unit unit) {
-        Integer i = unitsOutForAnimation.get(unit);
-        if (i == null) {
-            throw new RuntimeException("Unit not out for animation: " + unit);
-        }
-        if (i == 1) {
-            unitsOutForAnimation.remove(unit);
-            getGUI().animationLabel(unitsOutForAnimationLabels.remove(unit),
-                                    false);
-        } else {
-            i--;
-            unitsOutForAnimation.put(unit, i);
-        }
-    }
-
-    /**
-     * Returns true if the given Unit is being animated.
-     *
-     * @param unit an {@code Unit}
-     * @return a {@code boolean}
-     */
-    private boolean isOutForAnimation(final Unit unit) {
-        return unitsOutForAnimation.containsKey(unit);
-    }
-
-    /**
-     * Draw the unit's image and occupation indicator in one JLabel object.
-     *
-     * @param unit The unit to be drawn
-     * @return A JLabel object with the unit's image.
-     */
-    private JLabel createUnitLabel(Unit unit) {
-        final BufferedImage unitImg = lib.getScaledUnitImage(unit);
-        final int width = halfWidth + unitImg.getWidth()/2;
-        final int height = unitImg.getHeight();
-
-        BufferedImage img = new BufferedImage(width, height,
-                                              BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = img.createGraphics();
-
-        final int unitX = (width - unitImg.getWidth()) / 2;
-        g.drawImage(unitImg, unitX, 0, null);
-
-        Player player = getMyPlayer();
-        String text = Messages.message(unit.getOccupationLabel(player, false));
-        g.drawImage(lib.getOccupationIndicatorChip(g, unit, text), 0, 0, null);
-
-        final JLabel label = new JLabel(new ImageIcon(img));
-        label.setSize(width, height);
-
-        g.dispose();
-        return label;
-    }
-
-    /**
      * Calculate the bounds of the rectangle containing a Tile on the
      * screen, and return it.  If the Tile is not on-screen a maximal
      * rectangle is returned.  The bounds includes a one-tile padding
@@ -765,13 +779,12 @@ public final class MapViewer extends FreeColClientHolder {
      * @param tileP The position of the {@code Tile} on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
-    public Point calculateUnitLabelPositionInTile(int labelWidth,
-                                                  int labelHeight,
+    public Point calculateUnitLabelPositionInTile(JLabel unitLabel,
                                                   Point tileP) {
         if (tileP == null) return null;
-        int labelX = tileP.x + tileWidth / 2 - labelWidth / 2;
-        int labelY = tileP.y + tileHeight / 2 - labelHeight / 2
-            - (int) (UNIT_OFFSET * lib.getScaleFactor());
+        int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
+        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2
+            - (int) (UNIT_OFFSET * getScale());
         return new Point(labelX, labelY);
     }
 
@@ -1153,15 +1166,15 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     boolean isAtMaxMapScale() {
-        return lib.getScaleFactor() >= MAP_SCALE_MAX;
+        return getScale() >= MAP_SCALE_MAX;
     }
 
     boolean isAtMinMapScale() {
-        return lib.getScaleFactor() <= MAP_SCALE_MIN;
+        return getScale() <= MAP_SCALE_MIN;
     }
 
     void increaseMapScale() {
-        float newScale = lib.getScaleFactor() + MAP_SCALE_STEP;
+        float newScale = getScale() + MAP_SCALE_STEP;
         if (newScale >= MAP_SCALE_MAX)
             newScale = MAP_SCALE_MAX;
         this.changeImageLibrary(new ImageLibrary(newScale));
@@ -1169,7 +1182,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     void decreaseMapScale() {
-        float newScale = lib.getScaleFactor() - MAP_SCALE_STEP;
+        float newScale = getScale() - MAP_SCALE_STEP;
         if (newScale <= MAP_SCALE_MIN)
             newScale = MAP_SCALE_MIN;
         this.changeImageLibrary(new ImageLibrary(newScale));
@@ -1489,7 +1502,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
+            FontLibrary fontLibrary = new FontLibrary(getScale());
             Font font = fontLibrary.createScaledFont(
                 FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
                 Font.BOLD);
@@ -1624,28 +1637,22 @@ public final class MapViewer extends FreeColClientHolder {
                 }
             }
             
-            int width = (int)((nameImage.getWidth()
-                    * lib.getScaleFactor())
+            int width = (int)((nameImage.getWidth() * getScale())
                 + ((leftImage != null)
-                    ? (leftImage.getWidth()
-                        * lib.getScaleFactor()) + spacing
+                    ? (leftImage.getWidth() * getScale()) + spacing
                     : 0)
                 + ((rightImage != null)
-                    ? (rightImage.getWidth()
-                        * lib.getScaleFactor()) + spacing
+                    ? (rightImage.getWidth() * getScale()) + spacing
                     : 0));
             int labelOffset = (tileWidth - width)/2;
-            yOffset -= (nameImage.getHeight()
-                * lib.getScaleFactor())/2;
+            yOffset -= (nameImage.getHeight() * getScale())/2;
             if (leftImage != null) {
                 g.drawImage(leftImage, rop, labelOffset, yOffset);
-                labelOffset += (leftImage.getWidth()
-                    * lib.getScaleFactor()) + spacing;
+                labelOffset += (leftImage.getWidth() * getScale()) + spacing;
             }
             g.drawImage(nameImage, rop, labelOffset, yOffset);
             if (rightImage != null) {
-                labelOffset += (nameImage.getWidth()
-                    * lib.getScaleFactor()) + spacing;
+                labelOffset += (nameImage.getWidth() * getScale()) + spacing;
                 g.drawImage(rightImage, rop, labelOffset, yOffset);
             }
             break;
@@ -1829,7 +1836,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void displayPath(Graphics2D g, PathNode path) {
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor());
+            FontLibrary.FontSize.TINY, getScale());
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1896,7 +1903,7 @@ public final class MapViewer extends FreeColClientHolder {
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
-                    (int)(TileViewer.STATE_OFFSET_X * lib.getScaleFactor()), 0,
+                    (int)(TileViewer.STATE_OFFSET_X * getScale()), 0,
                     null);
 
         // Draw one small line for each additional unit (like in civ3).
@@ -1912,9 +1919,9 @@ public final class MapViewer extends FreeColClientHolder {
             g.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
             int x1 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
-                * lib.getScaleFactor());
+                * getScale());
             int x2 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
-                    + OTHER_UNITS_WIDTH) * lib.getScaleFactor());
+                    + OTHER_UNITS_WIDTH) * getScale());
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                 g.drawLine(x1, unitLinesY, x2, unitLinesY);
                 unitLinesY += 2;
@@ -1951,7 +1958,7 @@ public final class MapViewer extends FreeColClientHolder {
     private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
         int unitX = (tileWidth - unitImage.getWidth()) / 2;
         int unitY = (tileHeight - unitImage.getHeight()) / 2 -
-                    (int) (UNIT_OFFSET * lib.getScaleFactor());
+                    (int) (UNIT_OFFSET * getScale());
 
         return new Point(unitX, unitY);
     }
