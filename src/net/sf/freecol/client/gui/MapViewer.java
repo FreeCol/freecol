@@ -372,8 +372,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (i == null) {
             final JLabel unitLabel = createUnitAnimationLabel(unit);
             unitLabel.setLocation(
-                calculateUnitLabelPositionInTile(unitLabel.getWidth(),
-                    unitLabel.getHeight(),
+                calculateUnitLabelPositionInTile(unitLabel,
                     calculateTilePosition(tile, false)));
             this.unitsOutForAnimationLabels.put(unit, unitLabel);
             i = 1;
@@ -773,12 +772,11 @@ public final class MapViewer extends FreeColClientHolder {
      * @param tileP The position of the {@code Tile} on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
-    public Point calculateUnitLabelPositionInTile(int labelWidth,
-                                                  int labelHeight,
+    public Point calculateUnitLabelPositionInTile(JLabel unitLabel,
                                                   Point tileP) {
         if (tileP == null) return null;
-        int labelX = tileP.x + tileWidth / 2 - labelWidth / 2;
-        int labelY = tileP.y + tileHeight / 2 - labelHeight / 2
+        int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
+        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2
             - (int) (UNIT_OFFSET * getScale());
         return new Point(labelX, labelY);
     }

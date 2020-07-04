@@ -1337,26 +1337,12 @@ public class GUI extends FreeColClientHolder {
      *
      * Used by: UnitMoveAnimation
      *
-     * @param labelWidth The width of the label.
-     * @param labelHeight The height of the label.
+     * @param unitLabel The {@code JLabel} that is being animated..
      * @param tileP The position of the {@code Tile} on the screen.
      * @return A point on the map to place a unit for movement.
      */
-    public Point getAnimationPosition(int labelWidth, int labelHeight,
-                                      Point tileP) {
+    public Point getAnimationPosition(JLabel unitLabel, Point tileP) {
         return tileP;
-    }
-
-    /**
-     * Get the bounds for a tile.
-     *
-     * Used by: *Animation
-     *
-     * @param tile The {@code Tile} to check.
-     * @return The tile bounds.
-     */
-    public Rectangle getAnimationTileBounds(Tile tile) {
-        return null;
     }
 
     /**

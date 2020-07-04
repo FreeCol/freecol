@@ -52,6 +52,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
     private final Unit unit;
     private final Tile sourceTile;
     private final Tile destinationTile;
+    private final Rectangle bounds;
     private final int speed;
     private final float scale;
 
@@ -62,17 +63,20 @@ final class UnitMoveAnimation extends FreeColClientHolder
      * @param unit The {@code Unit} to be animated.
      * @param sourceTile The {@code Tile} the unit is moving from.
      * @param destinationTile The {@code Tile} the unit is moving to.
+     * @param bounds A {@code Rectangle} containing the move.
      * @param speed The animation speed.
      * @param scale The scale factor for the unit image.
      */
     public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile,
+                             Rectangle bounds,
                              int speed, float scale) {
         super(freeColClient);
 
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
+        this.bounds = bounds;
         this.speed = speed;
         this.scale = scale;
     }
@@ -101,9 +105,6 @@ final class UnitMoveAnimation extends FreeColClientHolder
     public void executeWithUnitOutForAnimation(JLabel unitLabel) {
         final GUI gui = getGUI();
         final int movementRatio = (int)(Math.pow(2, this.speed + 1) * this.scale);
-        final Rectangle r1 = gui.getAnimationTileBounds(this.sourceTile);
-        final Rectangle r2 = gui.getAnimationTileBounds(this.destinationTile);
-        final Rectangle bounds = r1.union(r2);
         final double xratio = ImageLibrary.TILE_SIZE.width
             / (double)ImageLibrary.TILE_SIZE.height;
 
@@ -123,8 +124,8 @@ final class UnitMoveAnimation extends FreeColClientHolder
             
         final int labelWidth = unitLabel.getWidth();
         final int labelHeight = unitLabel.getHeight();
-        final Point srcPoint = gui.getAnimationPosition(labelWidth, labelHeight, srcP);
-        final Point dstPoint = gui.getAnimationPosition(labelWidth, labelHeight, dstP);
+        final Point srcPoint = gui.getAnimationPosition(unitLabel, srcP);
+        final Point dstPoint = gui.getAnimationPosition(unitLabel, dstP);
         final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
         final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
 
@@ -143,7 +144,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
             }
             if (dropFrames <= 0) {
                 unitLabel.setLocation(point);
-                gui.paintImmediately(bounds);
+                gui.paintImmediately(this.bounds);
                 long newTime = now();
                 long timeTaken = newTime - time;
                 time = newTime;

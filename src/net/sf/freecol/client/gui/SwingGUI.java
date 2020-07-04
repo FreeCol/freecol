@@ -564,10 +564,12 @@ public class SwingGUI extends GUI {
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
+        final Rectangle ra = this.mapViewer.calculateTileBounds(attackerTile);
+        final Rectangle rd = this.mapViewer.calculateTileBounds(defenderTile);
         animations(Animations.unitAttack(getFreeColClient(),
                                          attacker, defender,
-                                         attackerTile, defenderTile, success,
-                                         this.mapViewer.getScale()));
+                                         attackerTile, defenderTile, ra, rd,
+                                         success, this.mapViewer.getScale()));
     }
 
     /**
@@ -575,8 +577,10 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        animations(Animations.unitMove(getFreeColClient(), unit,
-                                       srcTile, dstTile,
+        final Rectangle rs = this.mapViewer.calculateTileBounds(srcTile);
+        final Rectangle rd = this.mapViewer.calculateTileBounds(dstTile);
+        animations(Animations.unitMove(getFreeColClient(),
+                                       unit, srcTile, dstTile, rs.union(rd),
                                        this.mapViewer.getScale()));
     }
 
@@ -584,17 +588,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public Point getAnimationPosition(int labelWidth,int labelHeight,
-                                      Point tileP) {
-        return this.mapViewer.calculateUnitLabelPositionInTile(labelWidth, labelHeight, tileP);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Rectangle getAnimationTileBounds(Tile tile) {
-        return this.mapViewer.calculateTileBounds(tile);
+    public Point getAnimationPosition(JLabel unitLabel, Point tileP) {
+        return this.mapViewer.calculateUnitLabelPositionInTile(unitLabel, tileP);
     }
 
     /**

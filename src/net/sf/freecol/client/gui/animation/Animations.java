@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -43,19 +44,21 @@ public class Animations {
      * @param unit The {@code Unit} to be animated.
      * @param source The source {@code Tile} for the unit.
      * @param destination The destination {@code Tile} for the unit.
+     * @param bounds A {@code Rectangle} bounding the move image.
      * @param scale The scale factor for the unit image.
      * @return A list of {@code Animation}s.
      */
     public static List<Animation> unitMove(FreeColClient freeColClient,
                                            Unit unit,
                                            Tile source, Tile destination,
+                                           Rectangle bounds,
                                            float scale) {
         List<Animation> ret = new ArrayList<>();
         int speed = freeColClient.getAnimationSpeed(unit.getOwner());
         if (speed > 0) {
             UnitMoveAnimation a
                 = new UnitMoveAnimation(freeColClient, unit,
-                                        source, destination, speed, scale);
+                    source, destination, bounds, speed, scale);
             if (a == null) {
                 logger.warning("No move animation for: " + unit);
             } else {
@@ -86,14 +89,17 @@ public class Animations {
      * @param defender The {@code Unit} that is defending.
      * @param attackerTile The {@code Tile} the attack comes from.
      * @param defenderTile The {@code Tile} the attack goes to.
+     * @param attackerBounds A {@code Rectangle} bounding the attacker image.
+     * @param defenderBounds A {@code Rectangle} bounding the defender image.
      * @param success Did the attack succeed?
      * @param scale The scale factor for the unit image.
      * @return A list of {@code Animation}s.
      */
     public static List<Animation> unitAttack(FreeColClient freeColClient,
-                                             Unit attacker, Unit defender,
-                                             Tile attackerTile, Tile defenderTile,
-                                             boolean success, float scale) {
+        Unit attacker, Unit defender,
+        Tile attackerTile, Tile defenderTile,
+        Rectangle attackerBounds, Rectangle defenderBounds,
+        boolean success, float scale) {
         List<Animation> ret = new ArrayList<>();
         Direction dirn = attackerTile.getDirection(defenderTile);
         if (dirn == null) {
@@ -104,7 +110,7 @@ public class Animations {
 
         if (freeColClient.getAnimationSpeed(attacker.getOwner()) > 0) {
             UnitImageAnimation a = UnitImageAnimation.build(freeColClient,
-                attacker, attackerTile, dirn,
+                attacker, attackerTile, attackerBounds, dirn,
                 getAttackAnimationBase(attacker), scale);
             if (a == null) {
                 logger.warning("No attack animation for: "
@@ -118,7 +124,7 @@ public class Animations {
             && freeColClient.getAnimationSpeed(defender.getOwner()) > 0) {
             Direction revd = dirn.getReverseDirection();
             UnitImageAnimation a = UnitImageAnimation.build(freeColClient,
-                defender, defenderTile, revd,
+                defender, defenderTile, defenderBounds, revd,
                 getAttackAnimationBase(defender), scale);
             if (a == null) {
                 logger.warning("No attack animation for: "
