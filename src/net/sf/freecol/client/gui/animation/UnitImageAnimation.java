@@ -20,8 +20,6 @@
 package net.sf.freecol.client.gui.animation;
 
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -58,8 +56,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
         = new HashMap<>();
 
     private final Unit unit;
-    private final Tile tile;
-    private final Rectangle bounds;
+    private final List<Tile> tiles;
     private final SimpleZippedAnimation animation;
     private boolean mirror;
 
@@ -69,17 +66,16 @@ public final class UnitImageAnimation extends FreeColClientHolder
      * @param freeColClient The enclosing {@code FreeColClient}.
      * @param unit The {@code Unit} to be animated.
      * @param tile The {@code Tile} where the animation occurs.
-     * @param bounds A {@code Rectangle} containing the animation.
      * @param animation The {@code SimpleZippedAnimation} to show.
      */
     public UnitImageAnimation(FreeColClient freeColClient, Unit unit,
-                              Tile tile, Rectangle bounds,
+                              Tile tile,
                               SimpleZippedAnimation animation) {
         super(freeColClient);
 
         this.unit = unit;
-        this.tile = tile;
-        this.bounds = bounds;
+        this.tiles = new ArrayList<>();
+        this.tiles.add(tile);
         this.animation = animation;
         this.mirror = false;
     }
@@ -140,7 +136,6 @@ public final class UnitImageAnimation extends FreeColClientHolder
      * @param freeColClient The enclosing {@code FreeColClient}.
      * @param unit The {@code Unit} to be animated.
      * @param tile The {@code Tile} where the animation occurs.
-     * @param bounds A {@code Rectangle} containing the animation.
      * @param dirn The {@code Direction} of the attack.
      * @param base The base prefix for the animation resource.
      * @param scale The gui scale.
@@ -148,19 +143,19 @@ public final class UnitImageAnimation extends FreeColClientHolder
      */
     public static UnitImageAnimation build(FreeColClient freeColClient,
                                            Unit unit, Tile tile,
-                                           Rectangle bounds, Direction dirn,
+                                           Direction dirn,
                                            String base, float scale) {
         String szaId = base + downCase(dirn.toString());
         SimpleZippedAnimation sza = ImageLibrary.getSZA(szaId, scale);
         if (sza != null) { // Found it first try
-            return new UnitImageAnimation(freeColClient, unit, tile, bounds, sza);
+            return new UnitImageAnimation(freeColClient, unit, tile, sza);
         }
         // Try the mirrored case on the preferred direction only
         String mirrorId = base + downCase(dirn.getEWMirroredDirection().toString());
         sza = ImageLibrary.getSZA(mirrorId, scale);
         if (sza != null) {
             UnitImageAnimation ret
-                = new UnitImageAnimation(freeColClient, unit, tile, bounds, sza);
+                = new UnitImageAnimation(freeColClient, unit, tile, sza);
             ret.setMirrored(true);
             return ret;
         }
@@ -169,7 +164,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
             szaId = base + downCase(d.toString());
             sza = ImageLibrary.getSZA(szaId, scale);
             if (sza != null) {
-                return new UnitImageAnimation(freeColClient, unit, tile, bounds, sza);
+                return new UnitImageAnimation(freeColClient, unit, tile, sza);
             }
         }
         return null;
@@ -181,8 +176,8 @@ public final class UnitImageAnimation extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Tile getTile() {
-        return this.tile;
+    public List<Tile> getTiles() {
+        return this.tiles;
     }
 
     /**
@@ -196,7 +191,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
      * {@inheritDoc}
      */
     public void executeWithLabel(JLabel unitLabel,
-                                 Consumer<Rectangle> paintCallback) {
+                                 Animations.Procedure paintCallback) {
         final GUI gui = getGUI();
         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
         for (AnimationEvent event : animation) {
@@ -209,7 +204,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
                     image = ImageLibrary.createMirroredImage(image);
                 }
                 icon.setImage(image);
-                paintCallback.accept(this.bounds);
+                paintCallback.execute(); // paint now
                 time = ievent.getDurationInMs()
                     - (System.nanoTime() - time) / 1000000;
                 if (time > 0) Utils.delay(time, "Animation delayed.");

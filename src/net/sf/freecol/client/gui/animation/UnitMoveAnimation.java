@@ -20,9 +20,9 @@
 package net.sf.freecol.client.gui.animation;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.lang.Math;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -51,9 +51,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
     private static final long ANIMATION_DELAY = 33L;
 
     private final Unit unit;
-    private final Tile sourceTile;
-    private final Tile destinationTile;
-    private final Rectangle bounds;
+    private final List<Tile> tiles;
     private final int speed;
     private final float scale;
 
@@ -64,20 +62,18 @@ final class UnitMoveAnimation extends FreeColClientHolder
      * @param unit The {@code Unit} to be animated.
      * @param sourceTile The {@code Tile} the unit is moving from.
      * @param destinationTile The {@code Tile} the unit is moving to.
-     * @param bounds A {@code Rectangle} containing the move.
      * @param speed The animation speed.
      * @param scale The scale factor for the unit image.
      */
     public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile,
-                             Rectangle bounds,
                              int speed, float scale) {
         super(freeColClient);
 
         this.unit = unit;
-        this.sourceTile = sourceTile;
-        this.destinationTile = destinationTile;
-        this.bounds = bounds;
+        this.tiles = new ArrayList<>();
+        this.tiles.add(sourceTile);
+        this.tiles.add(destinationTile);
         this.speed = speed;
         this.scale = scale;
     }
@@ -88,8 +84,8 @@ final class UnitMoveAnimation extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Tile getTile() {
-        return this.sourceTile;
+    public List<Tile> getTiles() {
+        return this.tiles;
     }
 
     /**
@@ -104,7 +100,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
      */
     @Override
     public void executeWithLabel(JLabel unitLabel,
-                                 Consumer<Rectangle> paintCallback) {
+                                 Animations.Procedure paintCallback) {
         final int movementRatio = (int)(Math.pow(2, this.speed + 1)
             * this.scale);
         final double xratio = ImageLibrary.TILE_SIZE.width
@@ -112,7 +108,8 @@ final class UnitMoveAnimation extends FreeColClientHolder
         final Point srcPoint = unitLabel.getLocation();
         // FIXME: This is the last place in the animations where there is
         // a cyclic call back out to the GUI.  It is awkward to remove alas
-        final Point dstPoint = getGUI().getAnimationPosition(unitLabel, this.destinationTile);
+        // but if we did we could also remove FreeColClientHolder
+        final Point dstPoint = getGUI().getAnimationPosition(unitLabel, this.tiles.get(1));
         final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
         final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
 
@@ -131,7 +128,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
             }
             if (dropFrames <= 0) {
                 unitLabel.setLocation(point);
-                paintCallback.accept(this.bounds);
+                paintCallback.execute(); // repaint now
                 long newTime = now();
                 long timeTaken = newTime - time;
                 time = newTime;

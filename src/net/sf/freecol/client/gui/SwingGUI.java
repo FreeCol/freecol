@@ -31,7 +31,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.InputStream;
-import java.util.function.Consumer;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -173,12 +172,21 @@ public class SwingGUI extends GUI {
      */
     private void animate(Animation a) {
         // The tile must be visible
-        final Tile tile = a.getTile();
+        List<Tile> tiles = a.getTiles();
+        final Tile tile = tiles.get(0);
         if (!this.mapViewer.onScreen(tile)) {
             this.mapViewer.changeFocus(tile);
             paintImmediately();
         }
 
+        // Calculate the union of the bounds for all the tiles in the
+        // animation, this is the area that will need to be repainted
+        // as the animation progresses 
+        Rectangle bounds = this.mapViewer.calculateTileBounds(tile);
+        for (Tile t : tiles.subList(1, tiles.size())) {
+            bounds = bounds.union(this.mapViewer.calculateTileBounds(t));
+        }
+        
         // Get the unit label, add to canvas if not already there
         final Unit unit = a.getUnit();
         boolean newLabel = !this.mapViewer.isOutForAnimation(unit);
@@ -187,12 +195,10 @@ public class SwingGUI extends GUI {
 
         // Define a callback to wrap Canvas.paintImmediately(Rectangle)
         final Canvas can = this.canvas;
-        final Consumer<Rectangle> painter = new Consumer<Rectangle>() {
-                /**
-                 * {@inheritDoc}
-                 */
-                public void accept(Rectangle r) {
-                    can.paintImmediately(r);
+        final Rectangle aBounds = bounds;
+        final Animations.Procedure painter = new Animations.Procedure() {
+                public void execute() {
+                    can.paintImmediately(aBounds);
                 }
             };
 
@@ -221,10 +227,10 @@ public class SwingGUI extends GUI {
         // visible because calling paintImmediately every time would be slow
         final boolean center = getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
-        Tile tile = animations.get(0).getTile();
-        if (!this.mapViewer.onScreen(tile)
-            || (center && tile != getFocus())) {
-            this.mapViewer.changeFocus(tile);
+        Tile first = animations.get(0).getTiles().get(0);
+        if (!this.mapViewer.onScreen(first)
+            || (center && first != getFocus())) {
+            this.mapViewer.changeFocus(first);
             paintImmediately();
         }
            
@@ -576,11 +582,9 @@ public class SwingGUI extends GUI {
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        final Rectangle ra = this.mapViewer.calculateTileBounds(attackerTile);
-        final Rectangle rd = this.mapViewer.calculateTileBounds(defenderTile);
         animations(Animations.unitAttack(getFreeColClient(),
                                          attacker, defender,
-                                         attackerTile, defenderTile, ra, rd,
+                                         attackerTile, defenderTile,
                                          success, this.mapViewer.getScale()));
     }
 
@@ -589,10 +593,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        final Rectangle rs = this.mapViewer.calculateTileBounds(srcTile);
-        final Rectangle rd = this.mapViewer.calculateTileBounds(dstTile);
         animations(Animations.unitMove(getFreeColClient(),
-                                       unit, srcTile, dstTile, rs.union(rd),
+                                       unit, srcTile, dstTile,
                                        this.mapViewer.getScale()));
     }
 
