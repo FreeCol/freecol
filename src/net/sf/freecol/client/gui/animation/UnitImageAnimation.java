@@ -30,17 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -48,37 +46,35 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Class for in-place animation of units.
  */
-public final class UnitImageAnimation extends FreeColClientHolder
-    implements Animation {
+public final class UnitImageAnimation extends Animation {
     
     private static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
 
+    /**
+       Alternate directions to check when a directional animation is
+       not found.
+    */
     public static final Map<Direction, List<Direction>> alternatives
         = new HashMap<>();
 
-    private final Unit unit;
-    private final List<Tile> tiles;
-    private List<Point> points;
+    /** The animation image series. */
     private final SimpleZippedAnimation animation;
+
+    /** Reflect the images? */
     private boolean mirror;
 
+
     /**
-     * Constructor
+     * Build a new image animation.
      *
-     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param unit The {@code Unit} to be animated.
      * @param tile The {@code Tile} where the animation occurs.
      * @param animation The {@code SimpleZippedAnimation} to show.
      */
-    public UnitImageAnimation(FreeColClient freeColClient, Unit unit,
-                              Tile tile,
+    public UnitImageAnimation(Unit unit, Tile tile,
                               SimpleZippedAnimation animation) {
-        super(freeColClient);
-
-        this.unit = unit;
-        this.tiles = new ArrayList<>();
-        this.tiles.add(tile);
-        this.points = null;
+        super(unit, makeUnmodifiableList(tile));
+        
         this.animation = animation;
         this.mirror = false;
     }
@@ -101,7 +97,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
      * @param direction The preferred {@code Direction}.
      * @return A list of {@code Direction}s.
      */
-    private static List<Direction> alternativeDirections(Direction direction) {
+    private synchronized static List<Direction> alternativeDirections(Direction direction) {
         if (alternatives.isEmpty()) { // Populate first time
             List<Direction> a = new ArrayList<>();
             // Favour the closest E-W cases
@@ -136,7 +132,6 @@ public final class UnitImageAnimation extends FreeColClientHolder
     /**
      * Static quasi-constructor that can fail harmlessly.
      *
-     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param unit The {@code Unit} to be animated.
      * @param tile The {@code Tile} where the animation occurs.
      * @param dirn The {@code Direction} of the attack.
@@ -144,21 +139,20 @@ public final class UnitImageAnimation extends FreeColClientHolder
      * @param scale The gui scale.
      * @return The animation found or null if none present.
      */
-    public static UnitImageAnimation build(FreeColClient freeColClient,
-                                           Unit unit, Tile tile,
+    public static UnitImageAnimation build(Unit unit, Tile tile,
                                            Direction dirn,
                                            String base, float scale) {
         String szaId = base + downCase(dirn.toString());
         SimpleZippedAnimation sza = ImageLibrary.getSZA(szaId, scale);
         if (sza != null) { // Found it first try
-            return new UnitImageAnimation(freeColClient, unit, tile, sza);
+            return new UnitImageAnimation(unit, tile, sza);
         }
         // Try the mirrored case on the preferred direction only
         String mirrorId = base + downCase(dirn.getEWMirroredDirection().toString());
         sza = ImageLibrary.getSZA(mirrorId, scale);
         if (sza != null) {
             UnitImageAnimation ret
-                = new UnitImageAnimation(freeColClient, unit, tile, sza);
+                = new UnitImageAnimation(unit, tile, sza);
             ret.setMirrored(true);
             return ret;
         }
@@ -167,42 +161,20 @@ public final class UnitImageAnimation extends FreeColClientHolder
             szaId = base + downCase(d.toString());
             sza = ImageLibrary.getSZA(szaId, scale);
             if (sza != null) {
-                return new UnitImageAnimation(freeColClient, unit, tile, sza);
+                return new UnitImageAnimation(unit, tile, sza);
             }
         }
         return null;
     }
 
 
-    // Interface Animation
+    // Implement Animation
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<Tile> getTiles() {
-        return this.tiles;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Unit getUnit() {
-        return this.unit;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setPoints(List<Point> points) {
-        this.points = points;
-    }
-    
     /**
      * {@inheritDoc}
      */
     public void executeWithLabel(JLabel unitLabel,
                                  Animations.Procedure paintCallback) {
-        final GUI gui = getGUI();
         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
 
         // Step through the animation, chaning the image

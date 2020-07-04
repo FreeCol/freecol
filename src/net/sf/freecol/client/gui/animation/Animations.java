@@ -62,7 +62,7 @@ public class Animations {
         int speed = freeColClient.getAnimationSpeed(unit.getOwner());
         if (speed > 0) {
             UnitMoveAnimation a
-                = new UnitMoveAnimation(freeColClient, unit,
+                = new UnitMoveAnimation(unit,
                     source, destination, speed, scale);
             if (a == null) {
                 logger.warning("No move animation for: " + unit);
@@ -111,9 +111,9 @@ public class Animations {
         }
 
         if (freeColClient.getAnimationSpeed(attacker.getOwner()) > 0) {
-            UnitImageAnimation a = UnitImageAnimation.build(freeColClient,
-                attacker, attackerTile, dirn,
-                getAttackAnimationBase(attacker), scale);
+            UnitImageAnimation a
+                = UnitImageAnimation.build(attacker, attackerTile, dirn,
+                    getAttackAnimationBase(attacker), scale);
             if (a == null) {
                 logger.warning("No attack animation for: "
                     + attacker + " (" + dirn + ")");
@@ -125,9 +125,9 @@ public class Animations {
         if (!success
             && freeColClient.getAnimationSpeed(defender.getOwner()) > 0) {
             Direction revd = dirn.getReverseDirection();
-            UnitImageAnimation a = UnitImageAnimation.build(freeColClient,
-                defender, defenderTile, revd,
-                getAttackAnimationBase(defender), scale);
+            UnitImageAnimation a
+                = UnitImageAnimation.build(defender, defenderTile, revd,
+                    getAttackAnimationBase(defender), scale);
             if (a == null) {
                 logger.warning("No attack animation for: "
                     + defender + " (" + revd + ")");

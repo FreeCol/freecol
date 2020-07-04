@@ -27,20 +27,17 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
  * Class for the animation of units movement.
  */
-final class UnitMoveAnimation extends FreeColClientHolder
-    implements Animation {
+final class UnitMoveAnimation extends Animation {
 
     private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
 
@@ -50,59 +47,33 @@ final class UnitMoveAnimation extends FreeColClientHolder
      */
     private static final long ANIMATION_DELAY = 33L;
 
-    private final Unit unit;
-    private final List<Tile> tiles;
-    private List<Point> points;
+    /** The animation speed client option. */
     private final int speed;
+
+    /** The image scale. */
     private final float scale;
 
+
     /**
-     * Constructor
+     * Build a new movement animation.
      *
-     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param unit The {@code Unit} to be animated.
      * @param sourceTile The {@code Tile} the unit is moving from.
      * @param destinationTile The {@code Tile} the unit is moving to.
      * @param speed The animation speed.
      * @param scale The scale factor for the unit image.
      */
-    public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
+    public UnitMoveAnimation(Unit unit,
                              Tile sourceTile, Tile destinationTile,
                              int speed, float scale) {
-        super(freeColClient);
+        super(unit, makeUnmodifiableList(sourceTile, destinationTile));
 
-        this.unit = unit;
-        this.tiles = new ArrayList<>();
-        this.tiles.add(sourceTile);
-        this.tiles.add(destinationTile);
-        this.points = null;
         this.speed = speed;
         this.scale = scale;
     }
     
 
-    // Interface Animation
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Tile> getTiles() {
-        return this.tiles;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Unit getUnit() {
-        return this.unit;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setPoints(List<Point> points) {
-        this.points = points;
-    }
+    // Implement Animation
 
     /**
      * {@inheritDoc}
