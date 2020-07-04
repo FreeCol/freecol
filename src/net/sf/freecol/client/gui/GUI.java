@@ -1338,23 +1338,11 @@ public class GUI extends FreeColClientHolder {
      * Used by: UnitMoveAnimation
      *
      * @param unitLabel The {@code JLabel} that is being animated..
-     * @param tileP The position of the {@code Tile} on the screen.
+     * @param tile The destination {@code Tile}.
      * @return A point on the map to place a unit for movement.
      */
-    public Point getAnimationPosition(JLabel unitLabel, Point tileP) {
-        return tileP;
-    }
-
-    /**
-     * Get the map position for a tile.
-     *
-     * Used by: *Animation
-     *
-     * @param tile The {@code Tile} to check.
-     * @return The tile position.
-     */
-    public Point getAnimationTilePosition(Tile tile) {
-        return null;
+    public Point getAnimationPosition(JLabel unitLabel, Tile tile) {
+        return new Point(0, 0);
     }
 
 

@@ -104,28 +104,12 @@ final class UnitMoveAnimation extends FreeColClientHolder
     @Override
     public void executeWithUnitOutForAnimation(JLabel unitLabel) {
         final GUI gui = getGUI();
-        final int movementRatio = (int)(Math.pow(2, this.speed + 1) * this.scale);
+        final int movementRatio = (int)(Math.pow(2, this.speed + 1)
+            * this.scale);
         final double xratio = ImageLibrary.TILE_SIZE.width
             / (double)ImageLibrary.TILE_SIZE.height;
-
-        // Tile positions should be valid at this point.
-        final Point srcP = gui.getAnimationTilePosition(this.sourceTile);
-        if (srcP == null) {
-            logger.warning("Failed move animation for " + this.unit
-                + " at source tile: " + this.sourceTile);
-            return;
-        }
-        final Point dstP = gui.getAnimationTilePosition(this.destinationTile);
-        if (dstP == null) {
-            logger.warning("Failed move animation for " + this.unit
-                + " at destination tile: " + this.destinationTile);
-            return;
-        }
-            
-        final int labelWidth = unitLabel.getWidth();
-        final int labelHeight = unitLabel.getHeight();
-        final Point srcPoint = gui.getAnimationPosition(unitLabel, srcP);
-        final Point dstPoint = gui.getAnimationPosition(unitLabel, dstP);
+        final Point srcPoint = unitLabel.getLocation();
+        final Point dstPoint = gui.getAnimationPosition(unitLabel, this.destinationTile);
         final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
         final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
 

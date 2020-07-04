@@ -588,16 +588,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public Point getAnimationPosition(JLabel unitLabel, Point tileP) {
-        return this.mapViewer.calculateUnitLabelPositionInTile(unitLabel, tileP);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Point getAnimationTilePosition(Tile tile) {
-        return this.mapViewer.calculateTilePosition(tile, false);
+    public Point getAnimationPosition(JLabel unitLabel, Tile tile) {
+        return this.mapViewer.getAnimationPosition(unitLabel, tile);
     }
 
 

@@ -366,14 +366,11 @@ public final class MapViewer extends FreeColClientHolder {
      * @param tile The {@code Tile} to start at.
      * @return A {@code JLabel} for the animation.
      */
-    public JLabel enterUnitOutForAnimation(final Unit unit,
-                                            final Tile tile) {
+    public JLabel enterUnitOutForAnimation(final Unit unit, final Tile tile) {
         Integer i = this.unitsOutForAnimation.get(unit);
         if (i == null) {
             final JLabel unitLabel = createUnitAnimationLabel(unit);
-            unitLabel.setLocation(
-                calculateUnitLabelPositionInTile(unitLabel,
-                    calculateTilePosition(tile, false)));
+            unitLabel.setLocation(getAnimationPosition(unitLabel, tile));
             this.unitsOutForAnimationLabels.put(unit, unitLabel);
             i = 1;
         } else {
@@ -409,6 +406,18 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public boolean isOutForAnimation(final Unit unit) {
         return this.unitsOutForAnimation.containsKey(unit);
+    }
+
+    /**
+     * Get the position a unit label should be positioned in a tile.
+     *
+     * @param unitLabel The unit {@code JLabel}.
+     * @param tile The {@code Tile} to position in.
+     * @return The {@code Point} to position the label.
+     */
+    public Point getAnimationPosition(JLabel unitLabel, Tile tile) {
+        return calculateUnitLabelPositionInTile(unitLabel,
+            calculateTilePosition(tile, false));
     }
 
     /**
