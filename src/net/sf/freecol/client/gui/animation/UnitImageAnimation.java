@@ -196,14 +196,6 @@ public final class UnitImageAnimation extends FreeColClientHolder
      */
     public void executeWithUnitOutForAnimation(JLabel unitLabel) {
         final GUI gui = getGUI();
-
-        // Tile position should now be valid.
-        if (gui.getAnimationTilePosition(this.tile) == null) {
-            logger.warning("Failed attack animation for " + this.unit
-                + " at tile: " + this.tile);
-            return;
-        }
-
         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
         for (AnimationEvent event : animation) {
             long time = System.nanoTime();
