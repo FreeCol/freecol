@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.animation;
 
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -194,7 +195,8 @@ public final class UnitImageAnimation extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public void executeWithUnitOutForAnimation(JLabel unitLabel) {
+    public void executeWithLabel(JLabel unitLabel,
+                                 Consumer<Rectangle> paintCallback) {
         final GUI gui = getGUI();
         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
         for (AnimationEvent event : animation) {
@@ -207,7 +209,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
                     image = ImageLibrary.createMirroredImage(image);
                 }
                 icon.setImage(image);
-                gui.paintImmediately(this.bounds);
+                paintCallback.accept(this.bounds);
                 time = ievent.getDurationInMs()
                     - (System.nanoTime() - time) / 1000000;
                 if (time > 0) Utils.delay(time, "Animation delayed.");

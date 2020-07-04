@@ -1446,15 +1446,6 @@ public class GUI extends FreeColClientHolder {
     public void paintImmediately() {}
 
     /**
-     * Repaint a part of the canvas now.
-     *
-     * Used by: *Animation
-     *
-     * @param rectangle The area to repaint.
-     */
-    public void paintImmediately(Rectangle rectangle) {}
-    
-    /**
      * Refresh the whole GUI.
      *
      * Used by: *Animation, CanvasMapEditorMouseListener,

@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.animation;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.lang.Math;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -102,14 +103,16 @@ final class UnitMoveAnimation extends FreeColClientHolder
      * {@inheritDoc}
      */
     @Override
-    public void executeWithUnitOutForAnimation(JLabel unitLabel) {
-        final GUI gui = getGUI();
+    public void executeWithLabel(JLabel unitLabel,
+                                 Consumer<Rectangle> paintCallback) {
         final int movementRatio = (int)(Math.pow(2, this.speed + 1)
             * this.scale);
         final double xratio = ImageLibrary.TILE_SIZE.width
             / (double)ImageLibrary.TILE_SIZE.height;
         final Point srcPoint = unitLabel.getLocation();
-        final Point dstPoint = gui.getAnimationPosition(unitLabel, this.destinationTile);
+        // FIXME: This is the last place in the animations where there is
+        // a cyclic call back out to the GUI.  It is awkward to remove alas
+        final Point dstPoint = getGUI().getAnimationPosition(unitLabel, this.destinationTile);
         final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
         final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
 
@@ -128,7 +131,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
             }
             if (dropFrames <= 0) {
                 unitLabel.setLocation(point);
-                gui.paintImmediately(this.bounds);
+                paintCallback.accept(this.bounds);
                 long newTime = now();
                 long timeTaken = newTime - time;
                 time = newTime;

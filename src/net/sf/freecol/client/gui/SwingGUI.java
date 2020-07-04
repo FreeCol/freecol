@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.InputStream;
+import java.util.function.Consumer;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -184,15 +185,26 @@ public class SwingGUI extends GUI {
         JLabel unitLabel = this.mapViewer.enterUnitOutForAnimation(unit, tile);
         if (newLabel) this.canvas.animationLabel(unitLabel, true);
 
-       try { // Delegate to the animation
-            a.executeWithUnitOutForAnimation(unitLabel);
+        // Define a callback to wrap Canvas.paintImmediately(Rectangle)
+        final Canvas can = this.canvas;
+        final Consumer<Rectangle> painter = new Consumer<Rectangle>() {
+                /**
+                 * {@inheritDoc}
+                 */
+                public void accept(Rectangle r) {
+                    can.paintImmediately(r);
+                }
+            };
 
-       } finally { // Make sure we release the label again
-           this.mapViewer.releaseUnitOutForAnimation(unit);
-
-           if (!this.mapViewer.isOutForAnimation(unit)) {
-               this.canvas.animationLabel(unitLabel, false);
-           }
+        try { // Delegate to the animation
+            a.executeWithLabel(unitLabel, painter);
+            
+        } finally { // Make sure we release the label again
+            this.mapViewer.releaseUnitOutForAnimation(unit);
+            
+            if (!this.mapViewer.isOutForAnimation(unit)) {
+                this.canvas.animationLabel(unitLabel, false);
+            }
         }
     }
     
@@ -660,15 +672,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void paintImmediately() {
-        paintImmediately(canvas.getBounds());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void paintImmediately(Rectangle rectangle) {
-        canvas.paintImmediately(rectangle);
+        canvas.paintImmediately(canvas.getBounds());
     }
 
     /**

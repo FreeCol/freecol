@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.awt.Rectangle;
+import java.util.function.Consumer;
 import javax.swing.JLabel;
 
 import net.sf.freecol.common.model.Tile;
@@ -52,8 +54,10 @@ public interface Animation {
     /**
      * The code to be executed when a unit is out for animation.
      *
-     * @param unitLabel A {@code JLabel} with an image of
-     *      the unit to animate.
+     * @param unitLabel A {@code JLabel} with an image of the unit to animate.
+     * @param paintCallback A {@code Consumer} for a bounded portion of the
+     *     canvas that needs to be painted as defined by a {@code Rectangle}.
      */
-    public void executeWithUnitOutForAnimation(JLabel unitLabel);
+    public void executeWithLabel(JLabel unitLabel,
+                                 Consumer<Rectangle> paintCallback);
 }
