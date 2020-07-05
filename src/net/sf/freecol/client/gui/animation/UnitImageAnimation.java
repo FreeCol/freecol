@@ -90,18 +90,19 @@ public final class UnitImageAnimation extends Animation {
     
 
     /**
-     * Get a list of alternative directions to try when looking for a
+     * Get a list of directions to try when looking for a
      * direction-keyed animation given a preferred direction which has
      * failed.
      *
      * @param direction The preferred {@code Direction}.
      * @return A list of {@code Direction}s.
      */
-    private synchronized static List<Direction> alternativeDirections(Direction direction) {
+    private synchronized static List<Direction> trialDirections(Direction direction) {
         if (alternatives.isEmpty()) { // Populate first time
-            List<Direction> a = new ArrayList<>();
             // Favour the closest E-W cases
             for (Direction d : Direction.allDirections) {
+                List<Direction> a = new ArrayList<>();
+                a.add(d);
                 switch (d) {
                 case N: case S:
                     a.add(Direction.E); a.add(Direction.W);
@@ -142,26 +143,19 @@ public final class UnitImageAnimation extends Animation {
     public static UnitImageAnimation build(Unit unit, Tile tile,
                                            Direction dirn,
                                            String base, float scale) {
-        String szaId = base + downCase(dirn.toString());
-        SimpleZippedAnimation sza = ImageLibrary.getSZA(szaId, scale);
-        if (sza != null) { // Found it first try
-            return new UnitImageAnimation(unit, tile, sza);
-        }
-        // Try the mirrored case on the preferred direction only
-        String mirrorId = base + downCase(dirn.getEWMirroredDirection().toString());
-        sza = ImageLibrary.getSZA(mirrorId, scale);
-        if (sza != null) {
-            UnitImageAnimation ret
-                = new UnitImageAnimation(unit, tile, sza);
-            ret.setMirrored(true);
-            return ret;
-        }
-        // Try alternate directions
-        for (Direction d: alternativeDirections(dirn)) {
-            szaId = base + downCase(d.toString());
-            sza = ImageLibrary.getSZA(szaId, scale);
+        for (Direction d : trialDirections(dirn)) {
+            String szaId = base + downCase(d.toString());
+            SimpleZippedAnimation sza = ImageLibrary.getSZA(szaId, scale);
             if (sza != null) {
                 return new UnitImageAnimation(unit, tile, sza);
+            }
+            // Try the mirrored case
+            szaId = base + downCase(d.getEWMirroredDirection().toString());
+            sza = ImageLibrary.getSZA(szaId, scale);
+            if (sza != null) {
+                UnitImageAnimation ret = new UnitImageAnimation(unit, tile, sza);
+                ret.setMirrored(true);
+                return ret;
             }
         }
         return null;
