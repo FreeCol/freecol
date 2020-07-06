@@ -4869,7 +4869,11 @@ public class Unit extends GoodsLocation
             sb.append(" uninitialized");
         } else if (isDisposed()) {
             sb.append(" disposed");
-        } else {
+        } else if (owner == null) {
+            sb.append(" unowned");
+        } else if (getType() == null) {
+            sb.append(" untyped");
+        } else {            
             sb.append(' ').append(lastPart(owner.getNationId(), "."))
                 .append(' ').append(getType().getSuffix());
             if (!hasDefaultRole()) {
