@@ -1348,11 +1348,15 @@ public final class InGameController extends FreeColClientHolder {
                                   DiplomaticTrade dt) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement instanceof Colony) {
+            final Player player = unit.getOwner();
             final Colony colony = (Colony)settlement;
+            final Player other = colony.getOwner();
             // Can not negotiate with the REF!
-            if (colony.getOwner()
-                == unit.getOwner().getREFPlayer()) return false;
+            if (other == player.getREFPlayer()) return false;
             askServer().diplomacy(unit, colony, dt);
+            // invalidate nation summaries in case colonies changed hands
+            player.clearNationSummary(player);
+            player.clearNationSummary(other);
         }
         return false;
     }

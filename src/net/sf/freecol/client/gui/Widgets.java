@@ -985,10 +985,10 @@ public final class Widgets {
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        NegotiationDialog dtd
+        NegotiationDialog dialog
             = new NegotiationDialog(freeColClient, getFrame(),
                                     our, other, agreement, comment);
-        return canvas.showFreeColDialog(dtd, ((Location)our).getTile());
+        return canvas.showFreeColDialog(dialog, ((Location)our).getTile());
     }
 
     /**
