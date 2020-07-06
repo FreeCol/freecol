@@ -4739,7 +4739,6 @@ public class Unit extends GoodsLocation
         Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
-        if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
 
         this.type = xr.getType(spec, UNIT_TYPE_TAG,
                                UnitType.class, (UnitType)null);
@@ -4801,6 +4800,9 @@ public class Unit extends GoodsLocation
         // Fix changes to production
         WorkLocation wl = getWorkLocation();
         if (wl != null && wl != oldWorkLocation) wl.updateProductionType();
+
+        // Check ownership as late as possible
+        if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
     }
 
     /**
