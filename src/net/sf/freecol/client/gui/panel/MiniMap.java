@@ -60,7 +60,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     private final FreeColClient freeColClient;
 
-    private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
+    /**
+     * tileSize is the size (in pixels) that each tile will take up on
+     * the mini map
+     */
+    private int tileSize;
 
     /**
      * The top left tile on the mini map represents the tile.
@@ -85,7 +89,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         setLayout(null);
 
-        tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM));
+        tileSize = 4 * freeColClient.getClientOptions()
+            .getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM);
 
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -208,7 +213,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      *                 to draw this component.
      */
     public void paintMap(Graphics graphics) {
-
         int width = getWidth();
         int height = getHeight();
         final Graphics2D g = (Graphics2D) graphics;
@@ -251,7 +255,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         } else if (firstRow + ySize + 1> map.getHeight()) {
             firstRow = map.getHeight() - ySize - 1;
         }
-
 
         if (map.getWidth() <= xSize) {
             firstColumn = 0;

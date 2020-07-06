@@ -45,7 +45,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
@@ -1403,7 +1402,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the current focus tile.
      *
-     * Used by: CanvasMapEditorMouseListener, MiniMap.paintMap
+     * Used by: MiniMap.paintMap
      *
      * @return The focus {@code Tile}.
      */
@@ -1435,7 +1434,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Refresh the whole GUI.
      *
-     * Used by: *Animation, CanvasMapEditorMouseListener,
+     * Used by: CanvasMapEditorMouseListener,
      *   DebugUtils.addUnitToTil,changeOwnership,resetMoves,buildDebugMenu}
      *   Display{Borders,Grid,TileTest}Action, {NewEmptyMap,ScaleMap}Action
      *   DebugMenu, MapEditorController, TilePopup

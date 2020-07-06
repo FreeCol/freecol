@@ -159,9 +159,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (getMap() == null
-            || e.getButton() == MouseEvent.BUTTON1
-            || getGUI().getFocus() == null) return;
+        if (getMap() == null || e.getButton() == MouseEvent.BUTTON1) return;
         final JComponent component = (JComponent)e.getSource();
         final MapEditorController controller
             = getFreeColClient().getMapEditorController();
@@ -174,12 +172,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         Tile end = (startPoint == endPoint) ? start
             : canvas.convertToMapTile(endPoint.x, endPoint.y);
 
-        // edit 2 more conditions in if statement.  we need to
-        // check for coordinator of X and Y if (x,y) outside of
-        // map then dont focus to that else setfocus to that
-        // position no option selected, just center map
-        if (!isTransformActive && end.getX() >= 0 && end.getY() >= 0) {
-            getGUI().setFocus(end);
+        if (!isTransformActive) {
+            if (end.getX() >= 0 && end.getY() >= 0) getGUI().setFocus(end);
             return;
         }
 
