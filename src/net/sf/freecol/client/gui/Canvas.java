@@ -203,6 +203,7 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
         createKeyBindings();
 
+        this.parentFrame.setVisible(true);
         mapViewer.startCursorBlinking();
         logger.info("Canvas created woth bounds: " + windowBounds);
     }
@@ -231,7 +232,6 @@ public final class Canvas extends JDesktopPane {
             = new FreeColFrame(this.freeColClient, this.graphicsDevice,
                                menuBar, isWindowed(), windowBounds);
         fcf.getContentPane().add(this);
-        fcf.setVisible(true);
         return fcf;
     }
 
