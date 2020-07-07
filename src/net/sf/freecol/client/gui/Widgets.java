@@ -120,7 +120,6 @@ import net.sf.freecol.client.gui.dialog.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -765,24 +764,14 @@ public final class Widgets {
      * Displays a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
-     * @param extension An extension to select with.
+     * @param filters {@code FileFilter}s for suitable files.
      * @return The selected {@code File}.
      */
-    public File showLoadDialog(File directory, String extension) {
-        FileFilter[] filters = new FileFilter[] {
-            FreeColDataFile.getFileFilter(extension)
-        };
-        File file = null;
-        LoadDialog dialog;
-        for (;;) {
-            dialog = new LoadDialog(freeColClient, getFrame(),
-                                    directory, filters);
-            file = canvas.showFreeColDialog(dialog, null);
-            if (file == null || file.isFile()) break;
-            showErrorPanel(Messages.message(FreeCol.badFile("error.noSuchFile", file)), null);
-        }
-        return file;
-    }
+    public File showLoadDialog(File directory, FileFilter[] filters) {
+        LoadDialog dialog
+            = new LoadDialog(freeColClient, getFrame(), directory, filters);
+        return canvas.showFreeColDialog(dialog, null);
+    }        
 
     /**
      * Displays a dialog for setting options when loading a savegame.  The
@@ -1013,14 +1002,12 @@ public final class Widgets {
      *
      * @param directory The directory containing the files in which
      *     the user may overwrite.
+     * @param filters {@code FileFilter}s for acceptable file names.
      * @param defaultName Default filename for the savegame.
      * @return The selected {@code File}.
      */
-    public File showSaveDialog(File directory, String defaultName) {
-        String extension = lastPart(defaultName, ".");
-        FileFilter[] filters = new FileFilter[] {
-            FreeColDataFile.getFileFilter(extension)
-        };
+    public File showSaveDialog(File directory, FileFilter[] filters,
+                               String defaultName) {
         SaveDialog dialog
             = new SaveDialog(freeColClient, getFrame(),
                              directory, filters, defaultName);

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
+import javax.swing.filechooser.FileFilter;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -64,6 +65,7 @@ import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
@@ -1595,7 +1597,18 @@ public class SwingGUI extends GUI {
      */
     @Override
     public File showLoadDialog(File directory, String extension) {
-        return widgets.showLoadDialog(directory, extension);
+        FileFilter[] filters = new FileFilter[] {
+            FreeColDataFile.getFileFilter(extension)
+        };
+        File file = null;
+        for (;;) {
+            file = widgets.showLoadDialog(directory, filters);
+            if (file == null || file.isFile()) break;
+            String err = Messages.message(FreeCol.badFile("error.noSuchFile",
+                                                          file));
+            showErrorPanel(err, null);
+        }
+        return file;
     }
 
     /**
@@ -1910,7 +1923,11 @@ public class SwingGUI extends GUI {
      */
     @Override
     public File showSaveDialog(File directory, String defaultName) {
-        return widgets.showSaveDialog(directory, defaultName);
+        String extension = lastPart(defaultName, ".");
+        FileFilter[] filters = new FileFilter[] {
+            FreeColDataFile.getFileFilter(extension)
+        };
+        return widgets.showSaveDialog(directory, filters, defaultName);
     }
 
     /**
