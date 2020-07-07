@@ -616,15 +616,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return widgets.showConfirmDialog(null, StringTemplate.key(textKey),
-                                        null, okKey, cancelKey);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey) {
         return widgets.showConfirmDialog(tile, tmpl, icon, okKey, cancelKey);

@@ -300,6 +300,20 @@ public class GUI extends FreeColClientHolder {
     // High level dialogs, usually using the dialog primitives
 
     /**
+     * Simple modal confirmation dialog.
+     *
+     * @param textKey A string to use as the message key.
+     * @param okKey A key for the message on the "ok" button.
+     * @param cancelKey A key for the message on the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public final boolean confirm(String textKey,
+                                 String okKey, String cancelKey) {
+        return confirm(null, StringTemplate.key(textKey), (ImageIcon)null,
+                       okKey, cancelKey);
+    }
+
+    /**
      * Primitive modal confirmation dialog.
      *
      * @param template The {@code StringTemplate} explaining the choice.
@@ -345,8 +359,8 @@ public class GUI extends FreeColClientHolder {
                                  Settlement settlement,
                                  String okKey, String cancelKey) {
         return confirm(tile, template,
-            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
-            okKey, cancelKey);
+                       new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
+                       okKey, cancelKey);
     }
 
     /**
@@ -362,8 +376,8 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
                                  String okKey, String cancelKey) {
         return confirm(tile, template,
-            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
-            okKey, cancelKey);
+                       new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
+                       okKey, cancelKey);
     }
 
     /**
@@ -1323,18 +1337,6 @@ public class GUI extends FreeColClientHolder {
 
 
     // Dialog primitives
-
-    /**
-     * Simple modal confirmation dialog.
-     *
-     * @param textKey A string to use as the message key.
-     * @param okKey A key for the message on the "ok" button.
-     * @param cancelKey A key for the message on the "cancel" button.
-     * @return True if the "ok" button was selected.
-     */
-    public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return false;
-    }
 
     /**
      * General modal confirmation dialog.
