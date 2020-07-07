@@ -59,6 +59,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
@@ -1117,7 +1118,17 @@ public class SwingGUI extends GUI {
         if (!tile.isExplored()) { // Select unexplored tiles
             changeView(tile);
         } else if (tile.hasSettlement()) { // Pop up settlements if any
-            showTileSettlement(tile);
+            Settlement settlement = tile.getSettlement();
+            if (settlement instanceof Colony) {
+                if (getMyPlayer().owns(settlement)) {
+                    showColonyPanel((Colony)settlement, null);
+                } else {
+                    DebugUtils.showForeignColony(getFreeColClient(),
+                                                 (Colony)settlement);
+                }
+            } else if (settlement instanceof IndianSettlement) {
+                showIndianSettlementPanel((IndianSettlement)settlement);
+            }
             changeView(tile);
         } else if ((other = this.mapViewer.findUnitInFront(tile)) != null) {
             if (getMyPlayer().owns(other)) {
@@ -1190,11 +1201,11 @@ public class SwingGUI extends GUI {
     public void displayObject(FreeColObject fco) {
         // TODO: Improve OO.
         if (fco instanceof Colony) {
-            widgets.showColonyPanel((Colony)fco, null);
+            showColonyPanel((Colony)fco, null);
         } else if (fco instanceof Europe) {
-            widgets.showEuropePanel();
+            showEuropePanel();
         } else if (fco instanceof IndianSettlement) {
-            widgets.showIndianSettlementPanel((IndianSettlement)fco);
+            showIndianSettlementPanel((IndianSettlement)fco);
         } else if (fco instanceof Tile) {
             setFocus((Tile)fco);
         } else if (fco instanceof Unit) {
@@ -1205,7 +1216,7 @@ public class SwingGUI extends GUI {
                 displayObject((FreeColObject)loc);
             }
         } else if (fco instanceof WorkLocation) {
-            widgets.showColonyPanel(((WorkLocation)fco).getColony(), null);
+            showColonyPanel(((WorkLocation)fco).getColony(), null);
         }
     }
 
@@ -1517,7 +1528,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showIndianSettlement(IndianSettlement indianSettlement) {
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         widgets.showIndianSettlementPanel(indianSettlement);
     }
 

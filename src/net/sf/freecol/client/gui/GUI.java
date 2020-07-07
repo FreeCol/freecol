@@ -54,7 +54,6 @@ import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -1133,37 +1132,6 @@ public class GUI extends FreeColClientHolder {
         showNewPanel(null);
     }
 
-    /**
-     * Show a settlement.
-     *
-     * @param settlement The {@code Settlement} to display.
-     */
-    private final void showSettlement(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            if (getMyPlayer().owns(settlement)) {
-                showColonyPanel((Colony)settlement, null);
-            } else {
-                DebugUtils.showForeignColony(getFreeColClient(),
-                                             (Colony)settlement);
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            showIndianSettlement((IndianSettlement)settlement);
-        }
-    }
-        
-    /**
-     * Display the appropriate panel for any settlement on a tile, as visible
-     * to a given player.
-     *
-     * @param tile The {@code Tile} to check for settlements.
-     */
-    public final void showTileSettlement(Tile tile) {
-        if (tile == null) return;
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) return;
-        showSettlement(settlement);
-    }
-
 
     // Sound routines, delegated to the SoundController, only useful
     // for GUI classes in need of sound
@@ -2158,7 +2126,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param indianSettlement The {@code IndianSettlement} to display.
      */
-    public void showIndianSettlement(IndianSettlement indianSettlement) {}
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {}
 
     /**
      * Show an information message.
