@@ -146,7 +146,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -651,20 +650,15 @@ public final class Widgets {
     /**
      * Displays the {@code EuropePanel}.
      *
-     * @see EuropePanel
+     * @param callback An optional closing callback to add.
      */
-    public void showEuropePanel() {
+    public void showEuropePanel(Runnable callback) {
         if (freeColClient.getGame() == null) return;
         EuropePanel panel
             = canvas.getExistingFreeColPanel(EuropePanel.class);
         if (panel == null) {
             panel = new EuropePanel(freeColClient, (canvas.getHeight() > 780));
-            panel.addClosingCallback(() -> {
-                    for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
-                        FreeColPanel p = canvas.getExistingFreeColPanel(c);
-                        if (p != null) canvas.remove(p);
-                    }
-                });
+            if (callback != null) panel.addClosingCallback(callback);
             canvas.showSubPanel(panel, true);
         }
     }
@@ -1238,22 +1232,6 @@ public final class Widgets {
         canvas.showSubPanel(panel, true);
     }
 
-    /**
-     * Update all panels derived from the EuropePanel.
-     */
-    public void updateEuropeanSubpanels() {
-        for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
-            FreeColPanel p = canvas.getExistingFreeColPanel(c);
-            if (p != null) {
-                // TODO: remember how to write generic code, avoid introspection
-                try {
-                    Introspector.invokeVoidMethod(p, "update");
-                } catch (Exception e) {
-                    ; // "can not happen"
-                }
-            }
-        }
-    }
     
     // Singleton specialist reports
 

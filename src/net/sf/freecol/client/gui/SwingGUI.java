@@ -54,6 +54,9 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
+import net.sf.freecol.client.gui.panel.PurchasePanel;
+import net.sf.freecol.client.gui.panel.RecruitPanel;
+import net.sf.freecol.client.gui.panel.TrainPanel;
 
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -97,13 +100,21 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
+
 
 /**
  * A wrapper providing functionality for the overall GUI using Java Swing.
  */
 public class SwingGUI extends GUI {
+
+    /** European subpanel classes. */
+    private static final List<Class<? extends FreeColPanel>> EUROPE_CLASSES
+        = makeUnmodifiableList(RecruitPanel.class,
+                               PurchasePanel.class,
+                               TrainPanel.class);
 
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
@@ -1291,6 +1302,28 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public void updateEuropeanSubpanels() {
+        for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
+            FreeColPanel p = canvas.getExistingFreeColPanel(c);
+            if (p != null) {
+                // TODO: remember how to write generic code, avoid
+                // introspection
+                try {
+                    Introspector.invokeVoidMethod(p, "update");
+                } catch (Exception e) {
+                    ; // "can not happen"
+                }
+            }
+        }
+    }
+
+
+    // Panel display, usually used just by the associated action
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void showAboutPanel() {
         widgets.showAboutPanel();
     }
@@ -1478,7 +1511,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showEuropePanel() {
-        widgets.showEuropePanel();
+        widgets.showEuropePanel(() -> {
+                for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
+                    FreeColPanel p = canvas.getExistingFreeColPanel(c);
+                    if (p != null) canvas.remove(p);
+                }
+            });
     }
 
     /**
@@ -2017,13 +2055,5 @@ public class SwingGUI extends GUI {
     @Override
     public void showWorkProductionPanel(Unit unit) {
         widgets.showWorkProductionPanel(unit);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateEuropeanSubpanels() {
-        widgets.updateEuropeanSubpanels();
     }
 }
