@@ -815,10 +815,11 @@ public final class Canvas extends JDesktopPane {
      * @param panel The panel to be displayed
      * @param tile A {@code Tile} to make visible (not under the panel!)
      * @param resizable Should the panel be resizable?
+     * @return The panel.
      */
-    public void showFreeColPanel(FreeColPanel panel, Tile tile,
-                                 boolean resizable) {
-        showSubPanel(panel, setOffsetFocus(tile), resizable);
+    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
+                                         boolean resizable) {
+        return showSubPanel(panel, setOffsetFocus(tile), resizable);
     }
 
     /**
@@ -826,9 +827,10 @@ public final class Canvas extends JDesktopPane {
      *
      * @param panel {@code FreeColPanel}, panel to show
      * @param resizable Should the panel be resizable?
+     * @return The panel.
      */
-    public void showSubPanel(FreeColPanel panel, boolean resizable) {
-        showSubPanel(panel, PopupPosition.CENTERED, resizable);
+    public FreeColPanel showSubPanel(FreeColPanel panel, boolean resizable) {
+        return showSubPanel(panel, PopupPosition.CENTERED, resizable);
     }
 
     /**
@@ -838,12 +840,15 @@ public final class Canvas extends JDesktopPane {
      * @param popupPosition {@code PopupPosition} The generalized
      *     position to place the panel.
      * @param resizable Should the panel be resizable?
+     * @return The panel.
      */
-    public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition,
-                             boolean resizable) {
+    public FreeColPanel showSubPanel(FreeColPanel panel,
+                                     PopupPosition popupPosition,
+                                     boolean resizable) {
         repaint();
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();
+        return panel;
     }
 
     /**
@@ -1415,13 +1420,16 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the {@code MainPanel}.
+     *
+     * @return The main panel.
      */
-    public void showMainPanel() {
+    public FreeColPanel showMainPanel() {
         closeMenus();
         this.parentFrame.removeMenuBar();
         this.mainPanel = new MainPanel(freeColClient);
         addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
         this.mainPanel.requestFocus();
+        return this.mainPanel;
     }
 
     /**
