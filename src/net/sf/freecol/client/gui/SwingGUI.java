@@ -409,6 +409,10 @@ public class SwingGUI extends GUI {
         }
     }
 
+    public void paintImmediately() {
+        canvas.paintImmediately(canvas.getBounds());
+    }
+
     private void resetMapZoom() {
         //super.resetMapZoom();
         this.mapViewer.resetMapScale();
@@ -676,14 +680,6 @@ public class SwingGUI extends GUI {
 
 
     // General GUI manipulation
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void paintImmediately() {
-        canvas.paintImmediately(canvas.getBounds());
-    }
 
     /**
      * {@inheritDoc}

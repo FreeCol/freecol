@@ -1385,13 +1385,6 @@ public class GUI extends FreeColClientHolder {
     // General GUI manipulation
 
     /**
-     * Repaint the canvas now.
-     *
-     * Used by: InGameController.moveTile with UNIT_LAST_MOVE_DELAY
-     */
-    public void paintImmediately() {}
-
-    /**
      * Refresh the whole GUI.
      *
      * Used by: CanvasMapEditorMouseListener,
