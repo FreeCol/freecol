@@ -153,7 +153,7 @@ public class GUI extends FreeColClientHolder {
         @Override
         public void run() {
             GUI.this.closeMenus();
-            GUI.this.showErrorMessage(this.template, null, this.runnable);
+            GUI.this.showErrorPanel(this.template, null, this.runnable);
         }
 
         @Override
@@ -1031,8 +1031,8 @@ public class GUI extends FreeColClientHolder {
      *
      * @param template The {@code StringTemplate} containing the message.
      */
-    public final void showErrorMessage(StringTemplate template) {
-        showErrorMessage(template, null);
+    public final void showErrorPanel(StringTemplate template) {
+        showErrorPanel(template, null);
     }
 
     /**
@@ -1042,9 +1042,9 @@ public class GUI extends FreeColClientHolder {
      * @param template The {@code StringTemplate} containing the message.
      * @param message Optional extra debug information.
      */
-    public final void showErrorMessage(StringTemplate template,
+    public final void showErrorPanel(StringTemplate template,
                                        String message) {
-        showErrorMessage(template, message, null);
+        showErrorPanel(template, message, null);
     }
     
     /**
@@ -1055,13 +1055,13 @@ public class GUI extends FreeColClientHolder {
      * @param message Optional extra debug information.
      * @param callback Optional routine to run when the error panel is closed.
      */
-    public final void showErrorMessage(StringTemplate template, String message,
+    public final void showErrorPanel(StringTemplate template, String message,
                                        Runnable callback) {
         String display = Messages.message(template);
         if (message != null && FreeColDebugger.isInDebugMode()) {
             display += "/" + message + "/";
         }
-        showErrorMessage(display, callback);
+        showErrorPanel(display, callback);
     }
 
     /**
@@ -1106,7 +1106,7 @@ public class GUI extends FreeColClientHolder {
     public final File showLoadSaveFileDialog(File root, String extension) {
         File file = showLoadDialog(root, extension);
         if (file != null && !file.isFile()) {
-            showErrorMessage(FreeCol.badFile("error.noSuchFile", file));
+            showErrorPanel(FreeCol.badFile("error.noSuchFile", file));
             file = null;
         }
         return file;
@@ -2107,7 +2107,7 @@ public class GUI extends FreeColClientHolder {
      * @param message The actual final error message.
      * @param callback Optional routine to run when the error panel is closed.
      */
-    protected void showErrorMessage(String message, Runnable callback) {}
+    protected void showErrorPanel(String message, Runnable callback) {}
 
     /**
      * Show the Europe panel.

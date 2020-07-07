@@ -1467,8 +1467,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    protected void showErrorMessage(String message, Runnable callback) {
-        widgets.showErrorMessage(message, callback);
+    protected void showErrorPanel(String message, Runnable callback) {
+        widgets.showErrorPanel(message, callback);
     }
 
     /**

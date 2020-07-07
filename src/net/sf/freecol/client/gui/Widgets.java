@@ -663,7 +663,7 @@ public final class Widgets {
      * @param message The message to display.
      * @param callback Optional routine to run when the error panel is closed.
      */
-    public void showErrorMessage(String message, Runnable callback) {
+    public void showErrorPanel(String message, Runnable callback) {
         if (message != null) {
             ErrorPanel errorPanel = new ErrorPanel(freeColClient, message);
             if (callback != null) errorPanel.addClosingCallback(callback);
@@ -828,7 +828,7 @@ public final class Widgets {
                                     directory, filters);
             file = canvas.showFreeColDialog(dialog, null);
             if (file == null || file.isFile()) break;
-            showErrorMessage(Messages.message(FreeCol.badFile("error.noSuchFile", file)), null);
+            showErrorPanel(Messages.message(FreeCol.badFile("error.noSuchFile", file)), null);
         }
         return file;
     }

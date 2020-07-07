@@ -595,7 +595,7 @@ public final class InGameController extends FreeColClientHolder {
                 server.saveGame(file, getClientOptions(), getGUI().getActiveUnit());
                 result = true;
             } catch (IOException ioe) {
-                getGUI().showErrorMessage(FreeCol.badFile("error.couldNotSave",
+                getGUI().showErrorPanel(FreeCol.badFile("error.couldNotSave",
                                                           file));
                 logger.log(Level.WARNING, "Save fail", ioe);
             } finally {
@@ -3181,7 +3181,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param message An extra non-i18n message to display if debugging.
      */
     private void error(StringTemplate template, String message) {
-        getGUI().showErrorMessage(template, message);
+        getGUI().showErrorPanel(template, message);
     }
 
     /**

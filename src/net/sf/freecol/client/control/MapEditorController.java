@@ -159,7 +159,7 @@ public final class MapEditorController extends FreeColClientHolder {
             getGUI().changeView((Tile)null);
             getGUI().startMapEditorGUI();
         } catch (IOException e) {
-            getGUI().showErrorMessage(StringTemplate
+            getGUI().showErrorPanel(StringTemplate
                 .template("server.initialize"));
             return;
         }
@@ -269,7 +269,7 @@ public final class MapEditorController extends FreeColClientHolder {
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();
-                            gui.showErrorMessage(FreeCol.badFile("error.couldNotSave", file),
+                            gui.showErrorPanel(FreeCol.badFile("error.couldNotSave", file),
                                 (e == null) ? null : e.getMessage());
                         });
                 }

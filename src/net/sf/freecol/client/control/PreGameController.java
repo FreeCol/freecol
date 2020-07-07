@@ -108,7 +108,7 @@ public final class PreGameController extends FreeColClientHolder {
      * @param message A backup string describing the error.
      */
     public void errorHandler(StringTemplate template, String message) {
-        getGUI().showErrorMessage(template, message);
+        getGUI().showErrorPanel(template, message);
     }            
 
     /**
@@ -148,7 +148,7 @@ public final class PreGameController extends FreeColClientHolder {
             askServer().requestLaunch();
 
         } else {
-            getGUI().showErrorMessage(StringTemplate
+            getGUI().showErrorPanel(StringTemplate
                 .template("server.notAllReady"));
         }
     }

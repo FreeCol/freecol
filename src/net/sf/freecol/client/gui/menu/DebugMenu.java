@@ -273,7 +273,7 @@ public class DebugMenu extends JMenu {
 
         final JMenuItem errorMessage = Utility.localizedMenuItem("menuBar.debug.displayErrorMessage");
         errorMessage.addActionListener((ActionEvent ae) -> {
-                gui.showErrorMessage(StringTemplate.name(ERROR_MESSAGE));
+                gui.showErrorPanel(StringTemplate.name(ERROR_MESSAGE));
             });
         panelMenu.add(errorMessage);
 

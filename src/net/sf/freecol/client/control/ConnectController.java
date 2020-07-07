@@ -219,7 +219,7 @@ public final class ConnectController extends FreeColClientHolder {
             }
             err = StringTemplate.template("server.couldNotLogin");
         }
-        getGUI().showErrorMessage(err);
+        getGUI().showErrorPanel(err);
         return false;
     }
 
@@ -259,7 +259,7 @@ public final class ConnectController extends FreeColClientHolder {
         if (player == null) {
             StringTemplate err = StringTemplate.template("server.noSuchPlayer")
                 .addName("%player%", user);
-            getGUI().showErrorMessage(err);
+            getGUI().showErrorPanel(err);
             logger.warning(Messages.message(err));
             return;
         }
@@ -480,7 +480,7 @@ public final class ConnectController extends FreeColClientHolder {
         String name = FreeCol.getName();
         StringTemplate err = connect(name, host, port);
         if (err != null) {
-            getGUI().showErrorMessage(err);
+            getGUI().showErrorPanel(err);
             return false;
         }
         while (fcc.getServerState() == null) Utils.delay(1000, null);
@@ -495,7 +495,7 @@ public final class ConnectController extends FreeColClientHolder {
             /*
             // Disable this check if you need to debug a multiplayer client.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                getGUI().showErrorMessage(StringTemplate
+                getGUI().showErrorPanel(StringTemplate
                     .template("client.debugConnect"));
                 return false;
             }
@@ -515,7 +515,7 @@ public final class ConnectController extends FreeColClientHolder {
             break;
 
         case END_GAME: default:
-            getGUI().showErrorMessage(StringTemplate.template("client.ending"));
+            getGUI().showErrorPanel(StringTemplate.template("client.ending"));
             return false;
         }
         return requestLogin(name, host, port);

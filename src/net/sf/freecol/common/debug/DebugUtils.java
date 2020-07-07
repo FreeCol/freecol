@@ -450,7 +450,7 @@ public class DebugUtils {
             = transform(colony.getDisasterChoices(), alwaysTrue(), mapper,
                         Comparator.naturalOrder());
         if (disasters.isEmpty()) {
-            gui.showErrorMessage(StringTemplate
+            gui.showErrorPanel(StringTemplate
                 .template("error.disasterNotAvailable")
                 .addName("%colony%", colony.getName()));
             return;
@@ -467,7 +467,7 @@ public class DebugUtils {
             .getDisaster(disaster.getId());
         if (server.getInGameController().debugApplyDisaster(sColony, sDisaster)
             <= 0) {
-            gui.showErrorMessage(StringTemplate
+            gui.showErrorPanel(StringTemplate
                 .template("error.disasterAvoided")
                 .addName("%colony%", colony.getName())
                 .addNamed("%disaster%", disaster));
@@ -701,7 +701,7 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
         final AIColony aiColony = aiMain.getAIColony(colony);
         if (aiColony == null) {
-            freeColClient.getGUI().showErrorMessage(StringTemplate
+            freeColClient.getGUI().showErrorPanel(StringTemplate
                 .template("error.notAIColony")
                 .addName("%colony%", colony.getName()));
         } else {
