@@ -774,6 +774,18 @@ public final class ImageLibrary {
     }
 
     /**
+     * Get an ImageIcon for a FreeColObject.
+     *
+     * @param display The {@code FreeColObject} to find an icon for.
+     * @return The {@code ImageIcon} found.
+     */
+    public ImageIcon getObjectImageIcon(FreeColObject display) {
+        if (display == null) return null;
+        BufferedImage image = getObjectImage(display, 2f);
+        return (image == null) ? null : new ImageIcon(image);
+    }
+
+    /**
      * Get the generic placeholder image.
      *
      * @return The placeholder {@code BufferedImage}.

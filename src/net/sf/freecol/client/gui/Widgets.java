@@ -236,33 +236,10 @@ public final class Widgets {
     }
 
 
-    // Simple utilities
-
     private FreeColFrame getFrame() {
         return this.canvas.getParentFrame();
     }
     
-    /**
-     * Make image icon from an image.
-     * Use only if you know having null is possible!
-     *
-     * @param image The {@code Image} to create an icon for.
-     * @return The {@code ImageIcon}.
-     */
-    private static ImageIcon createImageIcon(Image image) {
-        return (image==null) ? null : new ImageIcon(image);
-    }
-
-    /**
-     * Make image icon from an object.
-     *
-     * @param display The FreeColObject to find an icon for.
-     * @return The {@code ImageIcon} found.
-     */
-    private ImageIcon createObjectImageIcon(FreeColObject display) {
-        return (display == null) ? null
-            : createImageIcon(this.imageLibrary.getObjectImage(display, 2f));
-    }
 
     // Generic dialogs
 
@@ -774,26 +751,6 @@ public final class Widgets {
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param displayObject Optional object for displaying an icon.
-     * @param tmpl The {@code StringTemplate} to display.
-     * @return The {@code InformationPanel} that is displayed.
-     */
-    public InformationPanel showInformationPanel(FreeColObject displayObject,
-                                                 StringTemplate tmpl) {
-        ImageIcon icon = null;
-        Tile tile = null;
-        if (displayObject != null) {
-            icon = createObjectImageIcon(displayObject);
-            tile = (displayObject instanceof Location)
-                ? ((Location)displayObject).getTile()
-                : null;
-        }
-        return showInformationPanel(displayObject, tile, icon, tmpl);
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
      * @param displayObject Optional object for displaying.
      * @param tile The Tile the object is at.
      * @param icon The icon to display for the object.
@@ -880,34 +837,6 @@ public final class Widgets {
     public Dimension showMapSizeDialog() {
         MapSizeDialog dialog = new MapSizeDialog(freeColClient, getFrame());
         return canvas.showFreeColDialog(dialog, null);
-    }
-
-    /**
-     * Displays a number of ModelMessages.
-     *
-     * @param messages The {@code ModelMessage}s to display.
-     */
-    public void showModelMessages(List<ModelMessage> messages) {
-        if (messages.isEmpty()) return;
-        final Game game = freeColClient.getGame();
-        int n = messages.size();
-        String[] texts = new String[n];
-        FreeColObject[] fcos = new FreeColObject[n];
-        ImageIcon[] icons = new ImageIcon[n];
-        Tile tile = null;
-        for (int i = 0; i < n; i++) {
-            ModelMessage m = messages.get(i);
-            texts[i] = Messages.message(m);
-            fcos[i] = game.getMessageSource(m);
-            icons[i] = createObjectImageIcon(game.getMessageDisplay(m));
-            if (tile == null && fcos[i] instanceof Location) {
-                tile = ((Location)fcos[i]).getTile();
-            }
-        }
-
-        InformationPanel panel
-            = new InformationPanel(freeColClient, texts, fcos, icons);
-        canvas.showFreeColPanel(panel, tile, true);
     }
 
     /**

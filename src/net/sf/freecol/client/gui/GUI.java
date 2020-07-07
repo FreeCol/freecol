@@ -1164,16 +1164,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Plays an alert sound for an information message if the
-     * option for it is turned on.
-     */
-    private void alertSound() {
-        if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            playSound("sound.event.alertSound");
-        }
-    }
-
-    /**
      * Get the label text for the sound player mixer.
      *
      * Used by: AudioMixerOptionUI
@@ -2177,7 +2167,6 @@ public class GUI extends FreeColClientHolder {
      */
     public InformationPanel showInformationPanel(FreeColObject displayObject,
                                                  StringTemplate template) {
-        alertSound();
         return null;
     }
 

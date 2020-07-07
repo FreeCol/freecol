@@ -1536,18 +1536,16 @@ public class SwingGUI extends GUI {
     @Override
     public InformationPanel showInformationPanel(FreeColObject displayObject,
                                                  StringTemplate template) {
-        super.showInformationPanel(displayObject, template);
         ImageIcon icon = null;
         Tile tile = null;
-        if (displayObject instanceof Settlement) {
-            icon = new ImageIcon(imageLibrary.getScaledSettlementImage((Settlement)displayObject));
-            tile = ((Settlement)displayObject).getTile();
-        } else if (displayObject instanceof Tile) {
-            icon = null;
-            tile = (Tile)displayObject;
-        } else if (displayObject instanceof Unit) {
-            icon = new ImageIcon(imageLibrary.getScaledUnitImage((Unit)displayObject));
-            tile = ((Unit)displayObject).getTile();
+        if (displayObject != null) {
+            icon = this.imageLibrary.getObjectImageIcon(displayObject);
+            tile = (displayObject instanceof Location)
+                ? ((Location)displayObject).getTile()
+                : null;
+        }
+        if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
+            playSound("sound.event.alertSound");
         }
         return widgets.showInformationPanel(displayObject, tile, icon, template);
     }
@@ -1616,7 +1614,25 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showModelMessages(List<ModelMessage> modelMessages) {
-        widgets.showModelMessages(modelMessages);
+        if (modelMessages.isEmpty()) return;
+        final Game game = getGame();
+        int n = modelMessages.size();
+        String[] texts = new String[n];
+        FreeColObject[] fcos = new FreeColObject[n];
+        ImageIcon[] icons = new ImageIcon[n];
+        Tile tile = null;
+        for (int i = 0; i < n; i++) {
+            ModelMessage m = modelMessages.get(i);
+            texts[i] = Messages.message(m);
+            fcos[i] = game.getMessageSource(m);
+            icons[i] = this.imageLibrary.getObjectImageIcon(game.getMessageDisplay(m));
+            if (tile == null && fcos[i] instanceof Location) {
+                tile = ((Location)fcos[i]).getTile();
+            }
+        }
+        InformationPanel panel
+            = new InformationPanel(getFreeColClient(), texts, fcos, icons);
+        canvas.showFreeColPanel(panel, tile, true);
     }
 
     /**
