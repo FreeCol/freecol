@@ -1226,24 +1226,20 @@ public final class Widgets {
         }
     }
 
-    public void showReportColonyPanel() {
-        boolean compact;
-        try {
-            compact = freeColClient.getClientOptions()
-                .getInteger(ClientOptions.COLONY_REPORT)
-                == ClientOptions.COLONY_REPORT_COMPACT;
-        } catch (Exception e) {
-            compact = false;
+    public void showReportColonyPanel(boolean compact) {
+        FreeColPanel panel;
+        if (compact) {
+            if ((panel = canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class)) == null) {
+                panel = new ReportCompactColonyPanel(freeColClient);
+                canvas.showSubPanel(panel, true);
+            }
+        } else {
+            if ((panel = canvas.getExistingFreeColPanel(ReportClassicColonyPanel.class)) == null) {
+                panel = new ReportClassicColonyPanel(freeColClient);
+                canvas.showSubPanel(panel, true);
+            }
         }
-        ReportPanel panel = (compact)
-            ? canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class)
-            : canvas.getExistingFreeColPanel(ReportClassicColonyPanel.class);
-        if (panel == null) {
-            panel = (compact)
-                ? new ReportCompactColonyPanel(freeColClient)
-                : new ReportClassicColonyPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
-        }
+        return panel;
     }
 
     public void showReportContinentalCongressPanel() {

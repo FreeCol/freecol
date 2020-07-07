@@ -1779,7 +1779,15 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showReportColonyPanel() {
-        widgets.showReportColonyPanel();
+        boolean compact;
+        try {
+            compact = getFreeColClient().getClientOptions()
+                .getInteger(ClientOptions.COLONY_REPORT)
+                == ClientOptions.COLONY_REPORT_COMPACT;
+        } catch (Exception e) {
+            compact = false;
+        }
+        widgets.showReportColonyPanel(compact);
     }
 
     /**
