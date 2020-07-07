@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui;
 
 import java.awt.event.ActionListener;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -165,9 +164,6 @@ public final class Widgets {
     /** The game client. */
     private final FreeColClient freeColClient;
 
-    /** The image library to create icons etc with. */
-    private final ImageLibrary imageLibrary;
-
     /** The canvas to write to. */
     private final Canvas canvas;
 
@@ -224,12 +220,11 @@ public final class Widgets {
     /**
      * Create this wrapper class.
      *
+     * @param freeColClient The client.
      * @param canvas The {@code Canvas} to call out to.
      */
-    public Widgets(FreeColClient freeColClient, ImageLibrary imageLibrary,
-                   Canvas canvas) {
+    public Widgets(FreeColClient freeColClient, Canvas canvas) {
         this.freeColClient = freeColClient;
-        this.imageLibrary = imageLibrary;
         this.canvas = canvas;
     }
 
@@ -247,7 +242,7 @@ public final class Widgets {
      * @param <T> The type to be returned from the dialog.
      * @param tile An optional {@code Tile} to make visible (not
      *     under the dialog!)
-     * @param obj An object that explains the choice for the user.
+     * @param tmpl A SringTemplate that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices The {@code List} containing the ChoiceItems to

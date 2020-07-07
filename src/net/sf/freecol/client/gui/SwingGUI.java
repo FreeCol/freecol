@@ -566,8 +566,7 @@ public class SwingGUI extends GUI {
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
                                  this.mapControls);
-        this.widgets = new Widgets(fcc, mapViewer.getImageLibrary(),
-                                   this.canvas);
+        this.widgets = new Widgets(fcc, this.canvas);
 
         // Now that there is a canvas, prepare for language changes.
         opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)

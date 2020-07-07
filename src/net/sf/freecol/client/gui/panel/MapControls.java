@@ -93,6 +93,7 @@ public abstract class MapControls extends FreeColClientHolder {
      * Initialize the unit buttons.
      *
      * Initialization is deferred until we are confident we are in-game.
+     * @return true if successful.
      */
     protected boolean initializeUnitButtons() {
         if (this.unitButtons.isEmpty()) return false;

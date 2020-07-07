@@ -2298,6 +2298,7 @@ public final class ColonyPanel extends PortPanel
              *
              * @param px The x coordinate to check.
              * @param py The y coordinate to check.
+             * @return true if the coordinate is inside.
              */
             @Override
             public boolean contains(int px, int py) {

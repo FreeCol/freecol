@@ -76,6 +76,8 @@ public class TerrainGenerator {
 
     /**
      * Creates a new {@code TerrainGenerator}.
+     * 
+     * FIXME: cache or randomizer???
      *
      * @param cache A {@code RandomIntCache} number source.
      * @see #generateMap

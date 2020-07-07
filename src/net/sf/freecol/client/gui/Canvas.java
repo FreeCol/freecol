@@ -28,7 +28,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -43,7 +42,6 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +51,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.Timer;
@@ -79,7 +76,6 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -171,6 +167,7 @@ public final class Canvas extends JDesktopPane {
      * @param graphicsDevice The {@code GraphicsDevice} to display on.
      * @param desiredSize The desired size of the parent frame.
      * @param mapViewer The object responsible of drawing the map.
+     * @param mapControls The controls on the map.
      */
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
@@ -205,7 +202,7 @@ public final class Canvas extends JDesktopPane {
 
         this.parentFrame.setVisible(true);
         mapViewer.startCursorBlinking();
-        logger.info("Canvas created woth bounds: " + windowBounds);
+        logger.info("Canvas created with bounds: " + windowBounds);
     }
 
     // Internals

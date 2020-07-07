@@ -41,6 +41,7 @@ public final class SplashScreen extends JWindow {
      *
      * @param gd The {@code GraphicsDevice} to display on.
      * @param splashStream An {@code InputStream} to read content from.
+     * @throws java.io.IOException
      */
     public SplashScreen(GraphicsDevice gd, InputStream splashStream)
         throws IOException {
