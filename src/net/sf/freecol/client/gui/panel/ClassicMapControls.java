@@ -142,7 +142,7 @@ public final class ClassicMapControls extends MapControls {
      * {@inheritDoc}
      */
     @Override
-    public List<Component> getComponentsToRemove() {
+    public List<Component> getComponentsPresent() {
         return (this.panel.isShowing()) ? this.componentList
             : Collections.<Component>emptyList();
     }

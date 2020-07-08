@@ -74,12 +74,15 @@ public class TerrainDetailPanel
             = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
                                          getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            Image tile = getGUI().createTileImageWithOverlayAndForest(t,
-                new Dimension(-1, ImageLibrary.ICON_SIZE.height));
-            BufferedImage image = new BufferedImage(tile.getWidth(null),
+            BufferedImage tileImage
+                = ImageLibrary.getTileImageWithOverlayAndForest(t,
+                    new Dimension(-1, ImageLibrary.ICON_SIZE.height));
+            BufferedImage image = new BufferedImage(tileImage.getWidth(null),
                 ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
-            g.drawImage(tile, 0, (ImageLibrary.ICON_SIZE.height - tile.getHeight(null)) / 2, null);
+            g.drawImage(tileImage, 0,
+                (ImageLibrary.ICON_SIZE.height - tileImage.getHeight(null)) / 2,
+                null);
             g.dispose();
             ImageIcon icon = new ImageIcon(image);
             node.add(buildItem(t, icon));
@@ -108,8 +111,9 @@ public class TerrainDetailPanel
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = getGUI().createTileImageWithOverlayAndForest(
-            tileType, ImageLibrary.TILE_OVERLAY_SIZE);
+        Image terrainImage = ImageLibrary
+            .getTileImageWithOverlayAndForest(tileType,
+                ImageLibrary.TILE_OVERLAY_SIZE);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypeValues();

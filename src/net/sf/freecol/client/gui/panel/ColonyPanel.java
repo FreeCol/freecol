@@ -957,20 +957,9 @@ public final class ColonyPanel extends PortPanel
         }
 
         cleanup();
-
         getGUI().removeComponent(this);
-        getGUI().updateMapControls();
-
-        // Talk to the controller last, allow all the cleanup to happen first.
-        if (abandon) igc().abandonColony(colony);
-        if (getFreeColClient().currentPlayerIsMyPlayer()) {
-            igc().nextModelMessage();
-            Unit activeUnit = getGUI().getActiveUnit();
-            if (activeUnit == null || !activeUnit.hasTile()
-                || (!activeUnit.isOnTile() && !activeUnit.isOnCarrier())) {
-                igc().nextActiveUnit();
-            }
-        }
+        // Abandon colony and active unit handling is in IGC
+        igc().closeColony(colony, abandon);
     }
 
 
@@ -2298,6 +2287,7 @@ public final class ColonyPanel extends PortPanel
              *
              * @param px The x coordinate to check.
              * @param py The y coordinate to check.
+             * @return true if the coordinate is inside.
              */
             @Override
             public boolean contains(int px, int py) {

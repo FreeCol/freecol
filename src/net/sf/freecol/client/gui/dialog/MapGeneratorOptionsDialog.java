@@ -232,7 +232,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             if (width >= 4 * edge) {
                 ok = true;
             } else {
-                getGUI().showErrorMessage(StringTemplate
+                getGUI().showErrorPanel(StringTemplate
                     .template("mapGeneratorOptionsDialog.badWidth")
                     .addAmount("%width%", width)
                     .addAmount("%edge%", edge));
@@ -243,7 +243,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             logger.log(Level.WARNING, "Options in disarray", ex);
         }           
         if (!ok) {
-            getGUI().showErrorMessage(FreeCol.badFile("error.couldNotSave", file));
+            getGUI().showErrorPanel(FreeCol.badFile("error.couldNotSave", file));
             return false;
         }
         return super.save(file);

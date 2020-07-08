@@ -933,7 +933,8 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public Player getOwner() {
-        return getColony().getOwner();
+        final Colony colony = getColony(); // Defend against init-time NPE
+        return (colony == null) ? null : colony.getOwner();
     }
 
     /**

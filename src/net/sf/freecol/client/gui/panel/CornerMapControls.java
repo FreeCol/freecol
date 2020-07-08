@@ -211,7 +211,7 @@ public final class CornerMapControls extends MapControls {
      * {@inheritDoc}
      */
     @Override
-    public List<Component> getComponentsToRemove() {
+    public List<Component> getComponentsPresent() {
         List<Component> ret = new ArrayList<>();
         if (this.infoPanel.isShowing()) ret.add(this.infoPanel);
         if (this.miniMapPanel.isShowing()) ret.add(this.miniMapPanel);

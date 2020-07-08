@@ -468,7 +468,7 @@ public final class TilePopup extends JPopupMenu {
             FontLibrary.FontSize.TINY, Font.BOLD,
             gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener((ActionEvent ae) -> {
-                gui.showIndianSettlement(is);
+                gui.showIndianSettlementPanel(is);
             });
         add(menuItem);
         hasAnItem = true;

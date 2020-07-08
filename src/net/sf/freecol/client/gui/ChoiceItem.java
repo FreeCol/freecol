@@ -32,6 +32,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Can be used as a single choice for the
  * {@link FreeColChoiceDialog}.
+ * @param <T> The type of the contained item.
  */
 public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 

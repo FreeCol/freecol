@@ -24,8 +24,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,29 +34,23 @@ import java.util.logging.Logger;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
@@ -148,13 +140,13 @@ public class GUI extends FreeColClientHolder {
         }
 
         public void invokeLater() {
-            SwingUtilities.invokeLater(this);
+            GUI.this.invokeNowOrLater(this);
         }
 
         @Override
         public void run() {
             GUI.this.closeMenus();
-            GUI.this.showErrorMessage(this.template, null, this.runnable);
+            GUI.this.showErrorPanel(this.template, null, this.runnable);
         }
 
         @Override
@@ -261,44 +253,22 @@ public class GUI extends FreeColClientHolder {
     public ErrorJob errorJob(StringTemplate template) {
         return new ErrorJob(template);
     }
-    
-    
-    // Invocation methods
-
-    /**
-     * Wrapper for SwingUtilities.invokeLater that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A {@code Runnable} to run.
-     */
-    public void invokeNowOrLater(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
-    }
-
-    /**
-     * Wrapper for SwingUtilities.invokeAndWait that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A {@code Runnable} to run.
-     */
-    public void invokeNowOrWait(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, "Client GUI interaction", ex);
-            }
-        }
-    }
-
 
     // High level dialogs, usually using the dialog primitives
+
+    /**
+     * Simple modal confirmation dialog.
+     *
+     * @param textKey A string to use as the message key.
+     * @param okKey A key for the message on the "ok" button.
+     * @param cancelKey A key for the message on the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public final boolean confirm(String textKey,
+                                 String okKey, String cancelKey) {
+        return confirm(null, StringTemplate.key(textKey), (ImageIcon)null,
+                       okKey, cancelKey);
+    }
 
     /**
      * Primitive modal confirmation dialog.
@@ -346,8 +316,8 @@ public class GUI extends FreeColClientHolder {
                                  Settlement settlement,
                                  String okKey, String cancelKey) {
         return confirm(tile, template,
-            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
-            okKey, cancelKey);
+                       new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
+                       okKey, cancelKey);
     }
 
     /**
@@ -363,8 +333,8 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
                                  String okKey, String cancelKey) {
         return confirm(tile, template,
-            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
-            okKey, cancelKey);
+                       new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
+                       okKey, cancelKey);
     }
 
     /**
@@ -1032,8 +1002,8 @@ public class GUI extends FreeColClientHolder {
      *
      * @param template The {@code StringTemplate} containing the message.
      */
-    public final void showErrorMessage(StringTemplate template) {
-        showErrorMessage(template, null);
+    public final void showErrorPanel(StringTemplate template) {
+        showErrorPanel(template, null);
     }
 
     /**
@@ -1043,9 +1013,9 @@ public class GUI extends FreeColClientHolder {
      * @param template The {@code StringTemplate} containing the message.
      * @param message Optional extra debug information.
      */
-    public final void showErrorMessage(StringTemplate template,
+    public final void showErrorPanel(StringTemplate template,
                                        String message) {
-        showErrorMessage(template, message, null);
+        showErrorPanel(template, message, null);
     }
     
     /**
@@ -1056,13 +1026,13 @@ public class GUI extends FreeColClientHolder {
      * @param message Optional extra debug information.
      * @param callback Optional routine to run when the error panel is closed.
      */
-    public final void showErrorMessage(StringTemplate template, String message,
+    public final void showErrorPanel(StringTemplate template, String message,
                                        Runnable callback) {
         String display = Messages.message(template);
         if (message != null && FreeColDebugger.isInDebugMode()) {
             display += "/" + message + "/";
         }
-        showErrorMessage(display, callback);
+        showErrorPanel(display, callback);
     }
 
     /**
@@ -1107,7 +1077,7 @@ public class GUI extends FreeColClientHolder {
     public final File showLoadSaveFileDialog(File root, String extension) {
         File file = showLoadDialog(root, extension);
         if (file != null && !file.isFile()) {
-            showErrorMessage(FreeCol.badFile("error.noSuchFile", file));
+            showErrorPanel(FreeCol.badFile("error.noSuchFile", file));
             file = null;
         }
         return file;
@@ -1118,37 +1088,6 @@ public class GUI extends FreeColClientHolder {
      */
     public final void showNewPanel() {
         showNewPanel(null);
-    }
-
-    /**
-     * Show a settlement.
-     *
-     * @param settlement The {@code Settlement} to display.
-     */
-    private final void showSettlement(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            if (getMyPlayer().owns(settlement)) {
-                showColonyPanel((Colony)settlement, null);
-            } else {
-                DebugUtils.showForeignColony(getFreeColClient(),
-                                             (Colony)settlement);
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            showIndianSettlement((IndianSettlement)settlement);
-        }
-    }
-        
-    /**
-     * Display the appropriate panel for any settlement on a tile, as visible
-     * to a given player.
-     *
-     * @param tile The {@code Tile} to check for settlements.
-     */
-    public final void showTileSettlement(Tile tile) {
-        if (tile == null) return;
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) return;
-        showSettlement(settlement);
     }
 
 
@@ -1162,16 +1101,6 @@ public class GUI extends FreeColClientHolder {
      */
     public void playSound(String sound) {
         getSoundController().playSound(sound);
-    }
-
-    /**
-     * Plays an alert sound for an information message if the
-     * option for it is turned on.
-     */
-    private void alertSound() {
-        if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            playSound("sound.event.alertSound");
-        }
     }
 
     /**
@@ -1213,6 +1142,25 @@ public class GUI extends FreeColClientHolder {
     public boolean isWindowed() {
         return true;
     }
+
+
+    // Invocation
+
+    /**
+     * Run immediately if in the EDT else delegate to
+     * SwingUtilities.invokeLater.
+     *
+     * @param runnable A {@code Runnable} to run.
+     */
+    public void invokeNowOrLater(Runnable runnable) {}
+    
+    /**
+     * Run immediately if in the EDT else delegate to
+     * SwingUtilities.invokeAndWait.
+     *
+     * @param runnable A {@code Runnable} to run.
+     */
+    public void invokeNowOrWait(Runnable runnable) {}
 
 
     // Initialization and teardown
@@ -1336,18 +1284,6 @@ public class GUI extends FreeColClientHolder {
     // Dialog primitives
 
     /**
-     * Simple modal confirmation dialog.
-     *
-     * @param textKey A string to use as the message key.
-     * @param okKey A key for the message on the "ok" button.
-     * @param cancelKey A key for the message on the "cancel" button.
-     * @return True if the "ok" button was selected.
-     */
-    public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return false;
-    }
-
-    /**
      * General modal confirmation dialog.
      *
      * @param tile An optional {@code Tile} to expose.
@@ -1403,7 +1339,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the current focus tile.
      *
-     * Used by: CanvasMapEditorMouseListener, MiniMap.paintMap
+     * Used by: MiniMap.paintMap
      *
      * @return The focus {@code Tile}.
      */
@@ -1426,16 +1362,9 @@ public class GUI extends FreeColClientHolder {
     // General GUI manipulation
 
     /**
-     * Repaint the canvas now.
-     *
-     * Used by: InGameController.moveTile with UNIT_LAST_MOVE_DELAY
-     */
-    public void paintImmediately() {}
-
-    /**
      * Refresh the whole GUI.
      *
-     * Used by: *Animation, CanvasMapEditorMouseListener,
+     * Used by: CanvasMapEditorMouseListener,
      *   DebugUtils.addUnitToTil,changeOwnership,resetMoves,buildDebugMenu}
      *   Display{Borders,Grid,TileTest}Action, {NewEmptyMap,ScaleMap}Action
      *   DebugMenu, MapEditorController, TilePopup
@@ -1621,13 +1550,6 @@ public class GUI extends FreeColClientHolder {
     public void closeMenus() {}
 
     /**
-     * Reset the menu bar.
-     *
-     * Used by: DebugUtils
-     */
-    public void resetMenuBar() {}
-
-    /**
      * Update the menu bar.
      *
      * Used by: InGameController.updateGUI, MapEditorController,
@@ -1648,11 +1570,6 @@ public class GUI extends FreeColClientHolder {
 
 
     // Tile image manipulation
-
-    public BufferedImage createTileImageWithOverlayAndForest(TileType type,
-                                                             Dimension size) {
-        return null;
-    }
 
     public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         return null;
@@ -1875,7 +1792,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @return True if there is another panel present.
      */
-    public boolean isShowingSubPanel() {
+    public boolean isPanelShowing() {
         return false;
     }
 
@@ -2108,7 +2025,7 @@ public class GUI extends FreeColClientHolder {
      * @param message The actual final error message.
      * @param callback Optional routine to run when the error panel is closed.
      */
-    protected void showErrorMessage(String message, Runnable callback) {}
+    protected void showErrorPanel(String message, Runnable callback) {}
 
     /**
      * Show the Europe panel.
@@ -2167,7 +2084,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param indianSettlement The {@code IndianSettlement} to display.
      */
-    public void showIndianSettlement(IndianSettlement indianSettlement) {}
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {}
 
     /**
      * Show an information message.
@@ -2178,7 +2095,6 @@ public class GUI extends FreeColClientHolder {
      */
     public InformationPanel showInformationPanel(FreeColObject displayObject,
                                                  StringTemplate template) {
-        alertSound();
         return null;
     }
 

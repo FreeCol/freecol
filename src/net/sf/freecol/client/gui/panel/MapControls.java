@@ -31,7 +31,9 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -93,6 +95,7 @@ public abstract class MapControls extends FreeColClientHolder {
      * Initialize the unit buttons.
      *
      * Initialization is deferred until we are confident we are in-game.
+     * @return true if successful.
      */
     protected boolean initializeUnitButtons() {
         if (this.unitButtons.isEmpty()) return false;
@@ -119,7 +122,7 @@ public abstract class MapControls extends FreeColClientHolder {
      *
      * @return A list of {@code Component}s to remove from the canvas.
      */
-    public abstract List<Component> getComponentsToRemove();
+    public abstract List<Component> getComponentsPresent();
     
 
     // Simple public routines
@@ -133,7 +136,7 @@ public abstract class MapControls extends FreeColClientHolder {
     }
 
     public void repaint() {
-        for (Component c : getComponentsToRemove()) {
+        for (Component c : getComponentsPresent()) {
             c.repaint();
         }
     }
@@ -153,20 +156,22 @@ public abstract class MapControls extends FreeColClientHolder {
     /**
      * Updates this {@code MapControls}.
      *
+     * @param viewMode The gui {@code ViewMode}.
      * @param active The active {@code Unit} if any.
+     * @param tile The selected {@code Tile} if any.
      */
-    public void update(Unit active) {
+    public void update(GUI.ViewMode viewMode, Unit active, Tile tile) {
         if (active != null) initializeUnitButtons();
         for (UnitButton ub : this.unitButtons) {
             ub.setVisible(active != null);
         }
         
-        switch (getGUI().getViewMode()) {
+        switch (viewMode) {
         case MOVE_UNITS:
             this.infoPanel.update(active);
             break;
         case TERRAIN:
-            this.infoPanel.update(getGUI().getSelectedTile());
+            this.infoPanel.update(tile);
             break;
         case MAP_TRANSFORM:
             this.infoPanel.update(getFreeColClient().getMapEditorController()

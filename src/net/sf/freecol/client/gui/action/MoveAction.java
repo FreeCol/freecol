@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Tile;
 
 
 /**
@@ -69,13 +70,18 @@ public class MoveAction extends MapboardAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent ae) { 
-        switch (getGUI().getViewMode()) {
+    public void actionPerformed(ActionEvent ae) {
+        final GUI gui = getGUI();
+        switch (gui.getViewMode()) {
         case MOVE_UNITS:
-            igc().moveUnit(getGUI().getActiveUnit(), direction);
+            igc().moveUnit(gui.getActiveUnit(), direction);
             break;
         case TERRAIN:
-            igc().moveTileCursor(direction);
+            final Tile tile = gui.getSelectedTile();
+            if (tile != null) {
+                final Tile newTile = tile.getNeighbourOrNull(direction);
+                if (newTile != null) gui.changeView(newTile);
+            }
             break;
         default:
             break;

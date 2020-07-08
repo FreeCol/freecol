@@ -53,7 +53,7 @@ public class SaveAndQuitAction extends FreeColAction {
 
         // In game
         if (!freeColClient.canSaveCurrentGame()) return false;
-        return !getGUI().isShowingSubPanel();
+        return !getGUI().isPanelShowing();
     }
 
 

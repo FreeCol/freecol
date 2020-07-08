@@ -28,7 +28,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -43,7 +42,6 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +51,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.Timer;
@@ -79,7 +76,6 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -171,6 +167,7 @@ public final class Canvas extends JDesktopPane {
      * @param graphicsDevice The {@code GraphicsDevice} to display on.
      * @param desiredSize The desired size of the parent frame.
      * @param mapViewer The object responsible of drawing the map.
+     * @param mapControls The controls on the map.
      */
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
@@ -203,8 +200,9 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
         createKeyBindings();
 
+        this.parentFrame.setVisible(true);
         mapViewer.startCursorBlinking();
-        logger.info("Canvas created woth bounds: " + windowBounds);
+        logger.info("Canvas created with bounds: " + windowBounds);
     }
 
     // Internals
@@ -231,7 +229,6 @@ public final class Canvas extends JDesktopPane {
             = new FreeColFrame(this.freeColClient, this.graphicsDevice,
                                menuBar, isWindowed(), windowBounds);
         fcf.getContentPane().add(this);
-        fcf.setVisible(true);
         return fcf;
     }
 
@@ -815,10 +812,11 @@ public final class Canvas extends JDesktopPane {
      * @param panel The panel to be displayed
      * @param tile A {@code Tile} to make visible (not under the panel!)
      * @param resizable Should the panel be resizable?
+     * @return The panel.
      */
-    public void showFreeColPanel(FreeColPanel panel, Tile tile,
-                                 boolean resizable) {
-        showSubPanel(panel, setOffsetFocus(tile), resizable);
+    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
+                                         boolean resizable) {
+        return showSubPanel(panel, setOffsetFocus(tile), resizable);
     }
 
     /**
@@ -826,9 +824,10 @@ public final class Canvas extends JDesktopPane {
      *
      * @param panel {@code FreeColPanel}, panel to show
      * @param resizable Should the panel be resizable?
+     * @return The panel.
      */
-    public void showSubPanel(FreeColPanel panel, boolean resizable) {
-        showSubPanel(panel, PopupPosition.CENTERED, resizable);
+    public FreeColPanel showSubPanel(FreeColPanel panel, boolean resizable) {
+        return showSubPanel(panel, PopupPosition.CENTERED, resizable);
     }
 
     /**
@@ -838,12 +837,15 @@ public final class Canvas extends JDesktopPane {
      * @param popupPosition {@code PopupPosition} The generalized
      *     position to place the panel.
      * @param resizable Should the panel be resizable?
+     * @return The panel.
      */
-    public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition,
-                             boolean resizable) {
+    public FreeColPanel showSubPanel(FreeColPanel panel,
+                                     PopupPosition popupPosition,
+                                     boolean resizable) {
         repaint();
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();
+        return panel;
     }
 
     /**
@@ -946,9 +948,9 @@ public final class Canvas extends JDesktopPane {
     public boolean removeMapControls() {
         if (this.mapControls == null) return false;
         List<Component> components
-            = this.mapControls.getComponentsToRemove();
+            = this.mapControls.getComponentsPresent();
         boolean ret = false;
-        for (Component c : this.mapControls.getComponentsToRemove()) {
+        for (Component c : this.mapControls.getComponentsPresent()) {
             removeFromCanvas(c);
             ret = true;
         }
@@ -1250,7 +1252,7 @@ public final class Canvas extends JDesktopPane {
      * @return {@code true} if the {@code Canvas} is displaying an
      *         internal frame.
      */
-    private boolean isShowingSubPanel() {
+    private boolean isPanelShowing() {
         return getShowingSubPanel() != null;
     }
 
@@ -1415,13 +1417,16 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the {@code MainPanel}.
+     *
+     * @return The main panel.
      */
-    public void showMainPanel() {
+    public FreeColPanel showMainPanel() {
         closeMenus();
         this.parentFrame.removeMenuBar();
         this.mainPanel = new MainPanel(freeColClient);
         addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
         this.mainPanel.requestFocus();
+        return this.mainPanel;
     }
 
     /**

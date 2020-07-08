@@ -262,7 +262,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             for (Unit unit : tile.getUnitList()) unit.dispose();
             is.exciseSettlement();
         }
-        for (Tile t : tiles) gui.refreshTile(t);
         return ret;
     }
 }
