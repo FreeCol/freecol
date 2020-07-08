@@ -52,7 +52,7 @@ public class GotoAction extends UnitAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && !getGUI().isShowingSubPanel();
+        return super.shouldBeEnabled() && !getGUI().isPanelShowing();
     }
 
 

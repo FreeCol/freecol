@@ -1294,7 +1294,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean isShowingSubPanel() {
+    public boolean isPanelShowing() {
         return this.canvas != null && this.canvas.getShowingSubPanel() != null;
     }
 
@@ -1314,7 +1314,7 @@ public class SwingGUI extends GUI {
     @Override
     public void removeComponent(Component component) {
         this.canvas.remove(component);
-        if (!isShowingSubPanel()) this.canvas.requestFocusInWindow();
+        if (!isPanelShowing()) this.canvas.requestFocusInWindow();
     }
 
     /**

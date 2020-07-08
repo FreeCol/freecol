@@ -1252,7 +1252,7 @@ public final class Canvas extends JDesktopPane {
      * @return {@code true} if the {@code Canvas} is displaying an
      *         internal frame.
      */
-    private boolean isShowingSubPanel() {
+    private boolean isPanelShowing() {
         return getShowingSubPanel() != null;
     }
 

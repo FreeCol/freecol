@@ -1804,7 +1804,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @return True if there is another panel present.
      */
-    public boolean isShowingSubPanel() {
+    public boolean isPanelShowing() {
         return false;
     }
 

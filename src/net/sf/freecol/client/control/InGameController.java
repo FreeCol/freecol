@@ -776,7 +776,7 @@ public final class InGameController extends FreeColClientHolder {
      *     reached their destination and are free to move again.
      */
     private boolean doExecuteGotoOrders() {
-        if (getGUI().isShowingSubPanel()) return false; // Clear the panel first
+        if (getGUI().isPanelShowing()) return false; // Clear the panel first
 
         final Player player = getMyPlayer();
         final Unit active = getGUI().getActiveUnit();
@@ -807,7 +807,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!ret) return false;
 
         // Wait for user to close outstanding panels.
-        if (getGUI().isShowingSubPanel()) return false;
+        if (getGUI().isPanelShowing()) return false;
 
         // The active unit might also be a going-to unit.  Make sure it
         // gets processed first.  setNextGoingToUnit will fail harmlessly
@@ -2893,8 +2893,7 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
-        final Tile tile = (getGUI().isShowingSubPanel()) ? null
-            : unit.getTile();
+        final Tile tile = (getGUI().isPanelShowing()) ? null : unit.getTile();
         if (!getGUI().confirm(tile, StringTemplate
                 .template("clearSpeciality.areYouSure")
                 .addStringTemplate("%oldUnit%",
@@ -3062,8 +3061,7 @@ public final class InGameController extends FreeColClientHolder {
 
         if (unit.getColony() != null
             && !getGUI().confirmLeaveColony(unit)) return false;
-        final Tile tile = (getGUI().isShowingSubPanel()) ? null
-            : unit.getTile();
+        final Tile tile = (getGUI().isPanelShowing()) ? null : unit.getTile();
         if (!getGUI().confirm(tile, StringTemplate.key("disbandUnit.text"),
                               unit, "disbandUnit.yes", "cancel"))
             return false;
