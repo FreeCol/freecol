@@ -39,6 +39,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -423,6 +424,7 @@ public class SwingGUI extends GUI {
         refresh();
     }
    
+
     // Implement GUI
 
     // Simple accessors
@@ -441,6 +443,37 @@ public class SwingGUI extends GUI {
     @Override
     public boolean isWindowed() {
         return this.canvas.isWindowed();
+    }
+
+
+    // Invocation methods
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void invokeNowOrLater(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void invokeNowOrWait(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Client GUI interaction", ex);
+            }
+        }
     }
 
 

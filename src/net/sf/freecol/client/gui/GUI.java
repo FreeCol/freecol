@@ -35,7 +35,6 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -141,7 +140,7 @@ public class GUI extends FreeColClientHolder {
         }
 
         public void invokeLater() {
-            SwingUtilities.invokeLater(this);
+            GUI.this.invokeNowOrLater(this);
         }
 
         @Override
@@ -254,42 +253,6 @@ public class GUI extends FreeColClientHolder {
     public ErrorJob errorJob(StringTemplate template) {
         return new ErrorJob(template);
     }
-    
-    
-    // Invocation methods
-
-    /**
-     * Wrapper for SwingUtilities.invokeLater that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A {@code Runnable} to run.
-     */
-    public void invokeNowOrLater(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
-    }
-
-    /**
-     * Wrapper for SwingUtilities.invokeAndWait that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A {@code Runnable} to run.
-     */
-    public void invokeNowOrWait(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, "Client GUI interaction", ex);
-            }
-        }
-    }
-
 
     // High level dialogs, usually using the dialog primitives
 
@@ -1179,6 +1142,25 @@ public class GUI extends FreeColClientHolder {
     public boolean isWindowed() {
         return true;
     }
+
+
+    // Invocation
+
+    /**
+     * Run immediately if in the EDT else delegate to
+     * SwingUtilities.invokeLater.
+     *
+     * @param runnable A {@code Runnable} to run.
+     */
+    public void invokeNowOrLater(Runnable runnable) {}
+    
+    /**
+     * Run immediately if in the EDT else delegate to
+     * SwingUtilities.invokeAndWait.
+     *
+     * @param runnable A {@code Runnable} to run.
+     */
+    public void invokeNowOrWait(Runnable runnable) {}
 
 
     // Initialization and teardown
