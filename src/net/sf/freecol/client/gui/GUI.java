@@ -1550,13 +1550,6 @@ public class GUI extends FreeColClientHolder {
     public void closeMenus() {}
 
     /**
-     * Reset the menu bar.
-     *
-     * Used by: DebugUtils
-     */
-    public void resetMenuBar() {}
-
-    /**
      * Update the menu bar.
      *
      * Used by: InGameController.updateGUI, MapEditorController,

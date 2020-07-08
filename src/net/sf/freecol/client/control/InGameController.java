@@ -309,7 +309,8 @@ public final class InGameController extends FreeColClientHolder {
             ; // If messages are displayed they probably refer to the
               // current unit, so do not update it.
         } else {
-            if (updateUnit || active == null || !active.couldMove()) {
+            if (updateUnit || active == null || !active.couldMove()
+                || !getMyPlayer().owns(active)) {
                 // Tile is displayed if no new active unit is found,
                 // useful when the last unit might have died
                 updateActiveUnit(tile);

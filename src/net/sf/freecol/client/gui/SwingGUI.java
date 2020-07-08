@@ -548,7 +548,7 @@ public class SwingGUI extends GUI {
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         closeMenus();
         clearGotoPath();
-        resetMenuBar();
+        this.canvas.resetMenuBar();
         resetMapZoom(); // This should refresh the map
         // Update the view, somehow.  Try really hard to find a tile
         // to focus on
@@ -942,14 +942,6 @@ public class SwingGUI extends GUI {
     @Override
     public void closeMenus() {
         this.canvas.closeMenus();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void resetMenuBar() {
-        this.canvas.resetMenuBar();
     }
 
     /**
@@ -1422,7 +1414,7 @@ public class SwingGUI extends GUI {
                 = new ClientOptionsDialog(fcc, this.canvas.getParentFrame());
             group = this.canvas.showFreeColDialog(dialog, null);
         } finally {
-            resetMenuBar();
+            this.canvas.resetMenuBar();
             if (group != null) {
                 // Immediately redraw the minimap if that was updated.
                 updateMapControls();
