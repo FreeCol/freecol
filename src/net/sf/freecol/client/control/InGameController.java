@@ -3785,27 +3785,6 @@ public final class InGameController extends FreeColClientHolder {
         return ret;
     }
 
-   /**
-     * Move the tile cursor.
-     *
-     * Called from MoveAction in terrain mode.
-     *
-     * @param direction The {@code Direction} to move the tile cursor.
-     * @return True if the tile cursor is moved.
-     */
-    public boolean moveTileCursor(Direction direction) {
-        if (direction == null) return false;
-
-        final Tile tile = getGUI().getSelectedTile();
-        if (tile == null) return false;
-
-        final Tile newTile = tile.getNeighbourOrNull(direction);
-        if (newTile == null) return false;
-
-        getGUI().changeView(newTile);
-        return true;
-    } 
-
     /**
      * The player names a new region.
      *
