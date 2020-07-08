@@ -1457,7 +1457,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public ColorChooserPanel showColorChooserPanel(ActionListener al) {
-        return widgets.showColorChooserPanel(al);
+        return (ColorChooserPanel)widgets.showColorChooserPanel(al);
     }
 
     /**
@@ -1637,7 +1637,7 @@ public class SwingGUI extends GUI {
         if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
             playSound("sound.event.alertSound");
         }
-        return widgets.showInformationPanel(displayObject, tile, icon, template);
+        return (InformationPanel)widgets.showInformationPanel(displayObject, tile, icon, template);
     }
 
     /**

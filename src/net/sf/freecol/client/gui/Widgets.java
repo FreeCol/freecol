@@ -294,25 +294,27 @@ public final class Widgets {
 
     /**
      * Show the AboutPanel.
+     *
+     * @return The panel shown.
      */
-    public void showAboutPanel() {
+    public FreeColPanel showAboutPanel() {
         AboutPanel panel
             = new AboutPanel(this.freeColClient);
-        this.canvas.showSubPanel(panel, false);
+        return this.canvas.showSubPanel(panel, false);
     }
 
     /**
      * Show the BuildQueuePanel for a given colony.
      *
      * @param colony The {@code Colony} to show the build queue of.
-     * @return The panel.
+     * @return The panel shown.
      */
     public FreeColPanel showBuildQueuePanel(Colony colony) {
         BuildQueuePanel panel
             = this.canvas.getExistingFreeColPanel(BuildQueuePanel.class);
         if (panel == null || panel.getColony() != colony) {
             panel = new BuildQueuePanel(this.freeColClient, colony);
-            this.canvas.showSubPanel(panel, true);
+            return this.canvas.showSubPanel(panel, true);
         }
         return panel;
     }
@@ -334,12 +336,15 @@ public final class Widgets {
 
     /**
      * Show the chat panel.
+     *
+     * @return The panel shown.
      */
-    public void showChatPanel() {
+    public FreeColPanel showChatPanel() {
         ChatPanel panel
             = new ChatPanel(this.freeColClient);
         this.canvas.showSubPanel(panel, true);
         panel.requestFocus();
+        return panel;
     }
 
     /**
@@ -360,11 +365,12 @@ public final class Widgets {
      * Show the colopedia entry for a given node.
      *
      * @param nodeId The node identifier to display.
+     * @return The panel shown.
      */
-    public void showColopediaPanel(String nodeId) {
+    public FreeColPanel showColopediaPanel(String nodeId) {
         ColopediaPanel panel
             = new ColopediaPanel(this.freeColClient, nodeId);
-        this.canvas.showSubPanel(panel, true);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**
@@ -372,23 +378,24 @@ public final class Widgets {
      *
      * @param al An {@code ActionListener} to handle panel button
      *     presses.
-     * @return The {@code ColorChooserPanel} created.
+     * @return The panel shown.
      */
-    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
-        ColorChooserPanel panel
+    public FreeColPanel showColorChooserPanel(ActionListener al) {
+        FreeColPanel panel
             = new ColorChooserPanel(this.freeColClient, al);
-        this.canvas.showFreeColPanel(panel, null, false);
-        return panel;
+        return this.canvas.showFreeColPanel(panel, null, false);
     }
 
     /**
      * Show the compact labour report.
+     *
+     * @return The panel shown.
      */
-    public void showCompactLabourReport() {
+    public FreeColPanel showCompactLabourReport() {
         CompactLabourReport panel
             = new CompactLabourReport(this.freeColClient);
         panel.initialize();
-        this.canvas.showSubPanel(panel, false);
+        return this.canvas.showSubPanel(panel, false);
 
     }
 
@@ -396,12 +403,13 @@ public final class Widgets {
      * Show the compact labour report for the specified unit data.
      *
      * @param unitData The {@code UnitData} to display.
+     * @return The panel shown.
      */
-    public void showCompactLabourReport(UnitData unitData) {
+    public FreeColPanel showCompactLabourReport(UnitData unitData) {
         CompactLabourReport panel
             = new CompactLabourReport(this.freeColClient, unitData);
         panel.initialize();
-        this.canvas.showSubPanel(panel, false);
+        return this.canvas.showSubPanel(panel, false);
     }
 
     /**
@@ -418,11 +426,14 @@ public final class Widgets {
     /**
      * Show a panel showing the declaration of independence with
      * animated signature.
+     *
+     * @return The panel shown.
      */
-    public void showDeclarationPanel() {
+    public FreeColPanel showDeclarationPanel() {
         DeclarationPanel panel
             = new DeclarationPanel(this.freeColClient);
-        this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, false);
+        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED,
+                                        false);
     }
 
     /**
@@ -517,21 +528,23 @@ public final class Widgets {
      *
      * @param message The message to display.
      * @param callback Optional routine to run when the error panel is closed.
+     * @return The panel shown.
      */
-    public void showErrorPanel(String message, Runnable callback) {
-        if (message == null) return;
+    public FreeColPanel showErrorPanel(String message, Runnable callback) {
+        if (message == null) return null;
         ErrorPanel errorPanel = new ErrorPanel(this.freeColClient, message);
         if (callback != null) errorPanel.addClosingCallback(callback);
-        this.canvas.showSubPanel(errorPanel, true);
+        return this.canvas.showSubPanel(errorPanel, true);
     }
 
     /**
      * Show the {@code EuropePanel}.
      *
      * @param callback An optional closing callback to add.
+     * @return The panel shown.
      */
-    public void showEuropePanel(Runnable callback) {
-        if (this.freeColClient.getGame() == null) return;
+    public FreeColPanel showEuropePanel(Runnable callback) {
+        if (this.freeColClient.getGame() == null) return null;
         EuropePanel panel
             = this.canvas.getExistingFreeColPanel(EuropePanel.class);
         if (panel == null) {
@@ -540,6 +553,7 @@ public final class Widgets {
             if (callback != null) panel.addClosingCallback(callback);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
     /**
@@ -548,25 +562,31 @@ public final class Widgets {
      * @param header The title.
      * @param image A resource key for the image to display.
      * @param footer Optional footer text.
+     * @return The panel shown.
      */
-    public void showEventPanel(String header, String image, String footer) {
+    public FreeColPanel showEventPanel(String header, String image,
+                                       String footer) {
         EventPanel panel
             = new EventPanel(this.freeColClient, header, image, footer);
-        this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, false);
+        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED,
+                                        false);
     }
 
     /**
      * Show the FindSettlementPanel.
+     *
+     * @return The panel shown.
      */
-    public void showFindSettlementPanel() {
+    public FreeColPanel showFindSettlementPanel() {
         FindSettlementPanel panel
             = new FindSettlementPanel(this.freeColClient);
-        this.canvas.showSubPanel(panel, Canvas.PopupPosition.ORIGIN, true);
+        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.ORIGIN,
+                                        true);
     }
 
     /**
-     * Show the first contact dialog (which is really just a
-     * non-modal confirm dialog).
+     * Show the first contact dialog (which is really just a non-modal
+     * confirm dialog).
      *
      * @param player The {@code Player} making contact.
      * @param other The {@code Player} to contact.
@@ -602,22 +622,25 @@ public final class Widgets {
      *
      * @param messageId An optional message to add to the high scores panel.
      * @param scores The list of {@code HighScore}s to display.
+     * @return The panel shown.
      */
-    public void showHighScoresPanel(String messageId, List<HighScore> scores) {
+    public FreeColPanel showHighScoresPanel(String messageId,
+                                            List<HighScore> scores) {
         ReportHighScoresPanel panel
             = new ReportHighScoresPanel(this.freeColClient, messageId, scores);
-        this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, true);
+        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, true);
     }
 
     /**
      * Show the panel of the given native settlement.
      *
      * @param is The {@code IndianSettlement} to display.
+     * @return The panel shown.
      */
-    public void showIndianSettlementPanel(IndianSettlement is) {
+    public FreeColPanel showIndianSettlementPanel(IndianSettlement is) {
         IndianSettlementPanel panel
             = new IndianSettlementPanel(this.freeColClient, is);
-        this.canvas.showFreeColPanel(panel, is.getTile(), true);
+        return this.canvas.showFreeColPanel(panel, is.getTile(), true);
     }
 
     /**
@@ -627,16 +650,16 @@ public final class Widgets {
      * @param tile The Tile the object is at.
      * @param icon The icon to display for the object.
      * @param tmpl The {@code StringTemplate} to display.
-     * @return The {@code InformationPanel} that is displayed.
+     * @return The panel shown.
      */
-    public InformationPanel showInformationPanel(FreeColObject displayObject,
-                                                 Tile tile, ImageIcon icon,
-                                                 StringTemplate tmpl) {
+    public FreeColPanel showInformationPanel(FreeColObject displayObject,
+                                             Tile tile, ImageIcon icon,
+                                             StringTemplate tmpl) {
         String text = Messages.message(tmpl);
-        InformationPanel panel = new InformationPanel(this.freeColClient, text, 
-                                                      displayObject, icon);
-        this.canvas.showFreeColPanel(panel, tile, true);
-        return panel;
+        InformationPanel panel
+            = new InformationPanel(this.freeColClient, text,
+                                   displayObject, icon);
+        return this.canvas.showFreeColPanel(panel, tile, true);
     }
 
     /**
@@ -673,10 +696,13 @@ public final class Widgets {
 
     /**
      * Show a panel containing the log file.
+     *
+     * @return The panel shown.
      */
-    public void showLogFilePanel() {
-        this.canvas.showSubPanel(new ErrorPanel(this.freeColClient), true);
-
+    public FreeColPanel showLogFilePanel() {
+        ErrorPanel panel
+            = new ErrorPanel(this.freeColClient);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**
@@ -782,11 +808,12 @@ public final class Widgets {
      * Show the NewPanel for a given optional specification.
      *
      * @param specification The {@code Specification} to use.
+     * @return The panel shown.
      */
-    public void showNewPanel(Specification specification) {
+    public FreeColPanel showNewPanel(Specification specification) {
         NewPanel panel
             = new NewPanel(this.freeColClient, specification);
-        this.canvas.showSubPanel(panel, false);
+        return this.canvas.showSubPanel(panel, false);
     }
 
     /**
@@ -819,8 +846,10 @@ public final class Widgets {
 
     /**
      * Show the purchase panel.
+     *
+     * @return The panel shown.
      */
-    public void showPurchasePanel() {
+    public FreeColPanel showPurchasePanel() {
         PurchasePanel panel
             = this.canvas.getExistingFreeColPanel(PurchasePanel.class);
         if (panel == null) {
@@ -828,18 +857,22 @@ public final class Widgets {
             panel.update();
             this.canvas.showFreeColPanel(panel, null, false);
         }
+        return panel;
     }
 
     /**
      * Show the recruit panel.
+     *
+     * @return The panel shown.
      */
-    public void showRecruitPanel() {
+    public FreeColPanel showRecruitPanel() {
         RecruitPanel panel
             = this.canvas.getExistingFreeColPanel(RecruitPanel.class);
         if (panel == null) {
             panel = new RecruitPanel(this.freeColClient);
             this.canvas.showFreeColPanel(panel, null, false);
         }
+        return panel;
     }
 
     /**
@@ -849,15 +882,16 @@ public final class Widgets {
      * @param data The labour data.
      * @param unitCount A map of unit distribution.
      * @param colonies The list of player {@code Colony}s.
+     * @return The panel shown.
      */
-    public void showReportLabourDetailPanel(UnitType unitType,
+    public FreeColPanel showReportLabourDetailPanel(UnitType unitType,
         Map<UnitType, Map<Location, Integer>> data,
         TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
         ReportLabourDetailPanel panel
             = new ReportLabourDetailPanel(this.freeColClient, unitType, data,
                                           unitCount, colonies);
         panel.initialize();
-        this.canvas.showSubPanel(panel, true);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**
@@ -938,13 +972,14 @@ public final class Widgets {
      *
      * @param serverList The list containing the servers retrieved from the
      *     metaserver.
+     * @return The panel shown.
      */
-    public void showServerListPanel(List<ServerInfo> serverList) {
+    public FreeColPanel showServerListPanel(List<ServerInfo> serverList) {
         ServerListPanel panel
             = new ServerListPanel(this.freeColClient,
                                   this.freeColClient.getConnectController());
         panel.initialize(serverList);
-        this.canvas.showSubPanel(panel, true);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**
@@ -969,12 +1004,13 @@ public final class Widgets {
      *
      * @param serverStats A map of server statistics key,value pairs.
      * @param clientStats A map of client statistics key,value pairs.
+     * @return The panel shown.
      */
-    public void showStatisticsPanel(Map<String, String> serverStats,
-                                    Map<String, String> clientStats) {
+    public FreeColPanel showStatisticsPanel(Map<String, String> serverStats,
+                                            Map<String, String> clientStats) {
         StatisticsPanel panel
             = new StatisticsPanel(this.freeColClient, serverStats, clientStats);
-        this.canvas.showSubPanel(panel, true);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**
@@ -983,8 +1019,9 @@ public final class Widgets {
      * Explictly removed by @see closeStatusPanel.
      *
      * @param message The text message to display on the status panel.
+     * @return The panel shown.
      */
-    public void showStatusPanel(String message) {
+    public FreeColPanel showStatusPanel(String message) {
         StatusPanel panel
             = this.canvas.getExistingFreeColPanel(StatusPanel.class);
         if (panel == null) {
@@ -992,25 +1029,27 @@ public final class Widgets {
             this.canvas.showSubPanel(panel, true);
         }
         panel.setStatusMessage(message);
+        return panel;
     }
 
     /**
      * Show the tile panel for a given tile.
      *
      * @param tile The {@code Tile} to display.
+     * @return The panel shown.
      */
-    public void showTilePanel(Tile tile) {
-        if (tile == null || !tile.isExplored()) return;
+    public FreeColPanel showTilePanel(Tile tile) {
+        if (tile == null || !tile.isExplored()) return null;
         TilePanel panel
             = new TilePanel(this.freeColClient, tile);
-        this.canvas.showSubPanel(panel, false);
+        return this.canvas.showSubPanel(panel, false);
     }
 
     /**
      * Show the trade route input panel for a given trade route.
      *
      * @param newRoute The {@code TradeRoute} to display.
-     * @return The panel.
+     * @return The panel shown.
      */
     public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         TradeRouteInputPanel panel
@@ -1022,19 +1061,21 @@ public final class Widgets {
      * Show a panel to select a trade route for a unit.
      *
      * @param unit An optional {@code Unit} to select a trade route for.
+     * @return The panel shown.
      */
-    public void showTradeRoutePanel(Unit unit) {
+    public FreeColPanel showTradeRoutePanel(Unit unit) {
         TradeRoutePanel panel
             = new TradeRoutePanel(this.freeColClient, unit);
-        this.canvas.showFreeColPanel(panel,
-                                     (unit == null) ? null : unit.getTile(),
-                                     true);
+        return this.canvas.showFreeColPanel(panel, (unit == null) ? null
+            : unit.getTile(), true);
     }
 
     /**
      * Show the training panel.
+     *
+     * @return The panel shown.
      */
-    public void showTrainPanel() {
+    public FreeColPanel showTrainPanel() {
         TrainPanel panel
             = this.canvas.getExistingFreeColPanel(TrainPanel.class);
         if (panel == null) {
@@ -1042,6 +1083,7 @@ public final class Widgets {
             panel.update();
             this.canvas.showFreeColPanel(panel, null, false);
         }
+        return panel;
     }
 
     /**
@@ -1073,26 +1115,28 @@ public final class Widgets {
      * Show the production of a unit.
      *
      * @param unit The {@code Unit} to display.
+     * @return The panel shown.
      */
-    public void showWorkProductionPanel(Unit unit) {
+    public FreeColPanel showWorkProductionPanel(Unit unit) {
         WorkProductionPanel panel
             = new WorkProductionPanel(this.freeColClient, unit);
-        this.canvas.showSubPanel(panel, true);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     
     // Singleton specialist reports
 
-    public void showReportCargoPanel() {
+    public FreeColPanel showReportCargoPanel() {
         ReportCargoPanel panel
             = this.canvas.getExistingFreeColPanel(ReportCargoPanel.class);
         if (panel == null) {
             panel = new ReportCargoPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportColonyPanel(boolean compact) {
+    public FreeColPanel showReportColonyPanel(boolean compact) {
         FreeColPanel panel;
         if (compact) {
             panel = this.canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class);
@@ -1107,123 +1151,137 @@ public final class Widgets {
                 this.canvas.showSubPanel(panel, true);
             }
         }
+        return panel;
     }
 
-    public void showReportContinentalCongressPanel() {
+    public FreeColPanel showReportContinentalCongressPanel() {
         ReportContinentalCongressPanel panel
             = this.canvas.getExistingFreeColPanel(ReportContinentalCongressPanel.class);
         if (panel == null) {
             panel = new ReportContinentalCongressPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportEducationPanel() {
+    public FreeColPanel showReportEducationPanel() {
         ReportEducationPanel panel
             = this.canvas.getExistingFreeColPanel(ReportEducationPanel.class);
         if (panel == null) {
             panel = new ReportEducationPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportExplorationPanel() {
+    public FreeColPanel showReportExplorationPanel() {
         ReportExplorationPanel panel
             = this.canvas.getExistingFreeColPanel(ReportExplorationPanel.class);
         if (panel == null) {
             panel = new ReportExplorationPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportForeignAffairPanel() {
+    public FreeColPanel showReportForeignAffairPanel() {
         ReportForeignAffairPanel panel
             = this.canvas.getExistingFreeColPanel(ReportForeignAffairPanel.class);
         if (panel == null) {
             panel = new ReportForeignAffairPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportHistoryPanel() {
+    public FreeColPanel showReportHistoryPanel() {
         ReportHistoryPanel panel
             = this.canvas.getExistingFreeColPanel(ReportHistoryPanel.class);
         if (panel == null) {
             panel = new ReportHistoryPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportIndianPanel() {
+    public FreeColPanel showReportIndianPanel() {
         ReportIndianPanel panel
             = this.canvas.getExistingFreeColPanel(ReportIndianPanel.class);
         if (panel == null) {
             panel = new ReportIndianPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportLabourPanel() {
+    public FreeColPanel showReportLabourPanel() {
         ReportLabourPanel panel
             = this.canvas.getExistingFreeColPanel(ReportLabourPanel.class);
         if (panel == null) {
             panel = new ReportLabourPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportMilitaryPanel() {
+    public FreeColPanel showReportMilitaryPanel() {
         ReportMilitaryPanel panel
             = this.canvas.getExistingFreeColPanel(ReportMilitaryPanel.class);
         if (panel == null) {
             panel = new ReportMilitaryPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportNavalPanel() {
+    public FreeColPanel showReportNavalPanel() {
         ReportNavalPanel panel
             = this.canvas.getExistingFreeColPanel(ReportNavalPanel.class);
         if (panel == null) {
             panel = new ReportNavalPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportProductionPanel() {
+    public FreeColPanel showReportProductionPanel() {
         ReportProductionPanel panel
             = this.canvas.getExistingFreeColPanel(ReportProductionPanel.class);
         if (panel == null) {
             panel = new ReportProductionPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportReligiousPanel() {
+    public FreeColPanel showReportReligiousPanel() {
         ReportReligiousPanel panel
             = this.canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
         if (panel == null) {
             panel = new ReportReligiousPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportRequirementsPanel() {
+    public FreeColPanel showReportRequirementsPanel() {
         ReportRequirementsPanel panel
             = this.canvas.getExistingFreeColPanel(ReportRequirementsPanel.class);
         if (panel == null) {
             panel = new ReportRequirementsPanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
-    public void showReportTradePanel() {
+    public FreeColPanel showReportTradePanel() {
         ReportTradePanel panel
             = this.canvas.getExistingFreeColPanel(ReportTradePanel.class);
         if (panel == null) {
             panel = new ReportTradePanel(this.freeColClient);
             this.canvas.showSubPanel(panel, true);
         }
+        return panel;
     }
 
     /**
@@ -1231,7 +1289,7 @@ public final class Widgets {
      *
      * @param messages The {@code ModelMessage}s to show.
      */
-    public void showReportTurnPanel(List<ModelMessage> messages) {
+    public FreeColPanel showReportTurnPanel(List<ModelMessage> messages) {
         ReportTurnPanel panel
             = this.canvas.getExistingFreeColPanel(ReportTurnPanel.class);
         if (panel == null) {
@@ -1240,5 +1298,6 @@ public final class Widgets {
         } else {
             panel.setMessages(messages);
         }
+        return panel;
     }
 }
