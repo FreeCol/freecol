@@ -1879,7 +1879,7 @@ public final class ColonyPanel extends PortPanel
         private final Tile[][] tiles = new Tile[3][3];
 
         /** A currently displayed production message. */
-        private InformationPanel cachedPanel = null;
+        private FreeColPanel cachedPanel = null;
         /** The work location that would be better to produce with. */
         private WorkLocation bestLocation = null;
 

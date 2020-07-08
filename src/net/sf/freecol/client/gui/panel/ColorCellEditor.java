@@ -60,7 +60,7 @@ public final class ColorCellEditor extends AbstractCellEditor
 
         this.colorEditButton = new JButton();
         this.colorEditButton.addActionListener(ae ->
-            this.colorChooserPanel = freeColClient.getGUI()
+            this.colorChooserPanel = (ColorChooserPanel)freeColClient.getGUI()
                 .showColorChooserPanel(this));
         this.colorEditButton.setBorderPainted(false);
     }

@@ -49,6 +49,6 @@ public class TilePopupAction extends MapboardAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getGUI().showTilePopup();
+        getGUI().showTilePopup(getGUI().getSelectedTile());
     }
 }

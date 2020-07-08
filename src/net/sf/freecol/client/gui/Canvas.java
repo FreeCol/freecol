@@ -1448,6 +1448,7 @@ public final class Canvas extends JDesktopPane {
      * @return True if the popup was shown.
      */
     public boolean showTilePopup(Tile tile) {
+        if (tile == null || !tile.isExplored()) return false;
         TilePopup tp = new TilePopup(freeColClient, this, tile);
         if (tp.hasItem()) {
             Point point = mapViewer.calculateTilePosition(tile, true);

@@ -1332,6 +1332,22 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public void showTilePopup(Tile tile) {
+        this.canvas.showTilePopup(tile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void showTilePopup(int x, int y) {
+        this.canvas.showTilePopup(this.canvas.convertToMapTile(x, y));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void updateEuropeanSubpanels() {
         for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
             FreeColPanel p = this.canvas.getExistingFreeColPanel(c);
@@ -1355,8 +1371,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showAboutPanel() {
-        widgets.showAboutPanel();
+    public FreeColPanel showAboutPanel() {
+        return widgets.showAboutPanel();
     }
 
     /**
@@ -1380,9 +1396,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showChatPanel() {
-        if (getFreeColClient().getSinglePlayer()) return; // chat with who?
-        widgets.showChatPanel();
+    public FreeColPanel showChatPanel() {
+        return (getFreeColClient().getSinglePlayer()) ? null
+            : widgets.showChatPanel();
     }
 
     /**
@@ -1390,7 +1406,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
-                DialogHandler<FoundingFather> handler) {
+                                               DialogHandler<FoundingFather> handler) {
         widgets.showChooseFoundingFatherDialog(ffs, handler);
     }
 
@@ -1425,7 +1441,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
+    public FreeColPanel showColonyPanel(Colony colony, Unit unit) {
         if (colony == null) return null;
         ColonyPanel panel = this.canvas.getColonyPanel(colony);
         if (panel == null) {
@@ -1448,32 +1464,32 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showColopediaPanel(String nodeId) {
-        widgets.showColopediaPanel(nodeId);
+    public FreeColPanel showColopediaPanel(String nodeId) {
+        return widgets.showColopediaPanel(nodeId);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
-        return (ColorChooserPanel)widgets.showColorChooserPanel(al);
+    public FreeColPanel showColorChooserPanel(ActionListener al) {
+        return widgets.showColorChooserPanel(al);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showCompactLabourReport() {
-        widgets.showCompactLabourReport();
+    public FreeColPanel showCompactLabourReport() {
+        return widgets.showCompactLabourReport();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showCompactLabourReport(UnitData unitData) {
-        widgets.showCompactLabourReport(unitData);
+    public FreeColPanel showCompactLabourReport(UnitData unitData) {
+        return widgets.showCompactLabourReport(unitData);
     }
 
     /**
@@ -1488,8 +1504,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showDeclarationPanel() {
-        widgets.showDeclarationPanel();
+    public FreeColPanel showDeclarationPanel() {
+        return widgets.showDeclarationPanel();
     }
 
     /**
@@ -1525,8 +1541,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public IndianSettlement showEditSettlementDialog(IndianSettlement settlement) {
-        return widgets.showEditSettlementDialog(settlement);
+    public IndianSettlement showEditSettlementDialog(IndianSettlement is) {
+        return widgets.showEditSettlementDialog(is);
     }
 
     /**
@@ -1552,16 +1568,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    protected void showErrorPanel(String message, Runnable callback) {
-        widgets.showErrorPanel(message, callback);
+    protected FreeColPanel showErrorPanel(String message, Runnable callback) {
+        return widgets.showErrorPanel(message, callback);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showEuropePanel() {
-        widgets.showEuropePanel(() -> {
+    public FreeColPanel showEuropePanel() {
+        return widgets.showEuropePanel(() -> {
                 for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
                     FreeColPanel p = this.canvas.getExistingFreeColPanel(c);
                     if (p != null) this.canvas.remove(p);
@@ -1573,16 +1589,17 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showEventPanel(String header, String image, String footer) {
-        widgets.showEventPanel(header, image, footer);
+    public FreeColPanel showEventPanel(String header, String image,
+                                       String footer) {
+        return widgets.showEventPanel(header, image, footer);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showFindSettlementPanel() {
-        widgets.showFindSettlementPanel();
+    public FreeColPanel showFindSettlementPanel() {
+        return widgets.showFindSettlementPanel();
     }
 
     /**
@@ -1608,24 +1625,25 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showHighScoresPanel(String messageId, List<HighScore> scores) {
-        widgets.showHighScoresPanel(messageId, scores);
+    public FreeColPanel showHighScoresPanel(String messageId,
+                                            List<HighScore> scores) {
+        return widgets.showHighScoresPanel(messageId, scores);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
-        widgets.showIndianSettlementPanel(indianSettlement);
+    public FreeColPanel showIndianSettlementPanel(IndianSettlement is) {
+        return widgets.showIndianSettlementPanel(is);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public InformationPanel showInformationPanel(FreeColObject displayObject,
-                                                 StringTemplate template) {
+    public FreeColPanel showInformationPanel(FreeColObject displayObject,
+                                             StringTemplate template) {
         ImageIcon icon = null;
         Tile tile = null;
         if (displayObject != null) {
@@ -1637,7 +1655,8 @@ public class SwingGUI extends GUI {
         if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
             playSound("sound.event.alertSound");
         }
-        return (InformationPanel)widgets.showInformationPanel(displayObject, tile, icon, template);
+        return widgets.showInformationPanel(displayObject, tile,
+                                            icon, template);
     }
 
     /**
@@ -1672,17 +1691,18 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showLogFilePanel() {
-        widgets.showLogFilePanel();
+    public FreeColPanel showLogFilePanel() {
+        return widgets.showLogFilePanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showMainPanel(String userMsg) {
-        this.canvas.showMainPanel();
+    public FreeColPanel showMainPanel(String userMsg) {
+        FreeColPanel panel = this.canvas.showMainPanel();
         if (userMsg != null) showInformationPanel(userMsg);
+        return panel;
     }
 
     /**
@@ -1714,8 +1734,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showModelMessages(List<ModelMessage> modelMessages) {
-        if (modelMessages.isEmpty()) return;
+    public FreeColPanel showModelMessages(List<ModelMessage> modelMessages) {
+        if (modelMessages.isEmpty()) return null;
         final Game game = getGame();
         int n = modelMessages.size();
         String[] texts = new String[n];
@@ -1733,7 +1753,7 @@ public class SwingGUI extends GUI {
         }
         InformationPanel panel
             = new InformationPanel(getFreeColClient(), texts, fcos, icons);
-        this.canvas.showFreeColPanel(panel, tile, true);
+        return this.canvas.showFreeColPanel(panel, tile, true);
     }
 
     /**
@@ -1787,8 +1807,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showNewPanel(Specification spec) {
-        widgets.showNewPanel(spec);
+    public FreeColPanel showNewPanel(Specification spec) {
+        return widgets.showNewPanel(spec);
     }
 
     /**
@@ -1812,31 +1832,31 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showPurchasePanel() {
-        widgets.showPurchasePanel();
+    public FreeColPanel showPurchasePanel() {
+        return widgets.showPurchasePanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showRecruitPanel() {
-        widgets.showRecruitPanel();
+    public FreeColPanel showRecruitPanel() {
+        return widgets.showRecruitPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportCargoPanel() {
-        widgets.showReportCargoPanel();
+    public FreeColPanel showReportCargoPanel() {
+        return widgets.showReportCargoPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportColonyPanel() {
+    public FreeColPanel showReportColonyPanel() {
         boolean compact;
         try {
             compact = getFreeColClient().getClientOptions()
@@ -1845,130 +1865,130 @@ public class SwingGUI extends GUI {
         } catch (Exception e) {
             compact = false;
         }
-        widgets.showReportColonyPanel(compact);
+        return widgets.showReportColonyPanel(compact);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportContinentalCongressPanel() {
-        widgets.showReportContinentalCongressPanel();
+    public FreeColPanel showReportContinentalCongressPanel() {
+        return widgets.showReportContinentalCongressPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportEducationPanel() {
-        widgets.showReportEducationPanel();
+    public FreeColPanel showReportEducationPanel() {
+        return widgets.showReportEducationPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportExplorationPanel() {
-        widgets.showReportExplorationPanel();
+    public FreeColPanel showReportExplorationPanel() {
+        return widgets.showReportExplorationPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportForeignAffairPanel() {
-        widgets.showReportForeignAffairPanel();
+    public FreeColPanel showReportForeignAffairPanel() {
+        return widgets.showReportForeignAffairPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportHistoryPanel() {
-        widgets.showReportHistoryPanel();
+    public FreeColPanel showReportHistoryPanel() {
+        return widgets.showReportHistoryPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportIndianPanel() {
-        widgets.showReportIndianPanel();
+    public FreeColPanel showReportIndianPanel() {
+        return widgets.showReportIndianPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportLabourPanel() {
-        widgets.showReportLabourPanel();
+    public FreeColPanel showReportLabourPanel() {
+        return widgets.showReportLabourPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportLabourDetailPanel(UnitType unitType,
+    public FreeColPanel showReportLabourDetailPanel(UnitType unitType,
             java.util.Map<UnitType, java.util.Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
-        widgets.showReportLabourDetailPanel(unitType, data, unitCount,
-                                            colonies);
+        return widgets.showReportLabourDetailPanel(unitType, data, unitCount,
+                                                   colonies);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportMilitaryPanel() {
-        widgets.showReportMilitaryPanel();
+    public FreeColPanel showReportMilitaryPanel() {
+        return widgets.showReportMilitaryPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportNavalPanel() {
-        widgets.showReportNavalPanel();
+    public FreeColPanel showReportNavalPanel() {
+        return widgets.showReportNavalPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportProductionPanel() {
-        widgets.showReportProductionPanel();
+    public FreeColPanel showReportProductionPanel() {
+        return widgets.showReportProductionPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportReligiousPanel() {
-        widgets.showReportReligiousPanel();
+    public FreeColPanel showReportReligiousPanel() {
+        return widgets.showReportReligiousPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportRequirementsPanel() {
-        widgets.showReportRequirementsPanel();
+    public FreeColPanel showReportRequirementsPanel() {
+        return widgets.showReportRequirementsPanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportTradePanel() {
-        widgets.showReportTradePanel();
+    public FreeColPanel showReportTradePanel() {
+        return widgets.showReportTradePanel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showReportTurnPanel(List<ModelMessage> messages) {
-        widgets.showReportTurnPanel(messages);
+    public FreeColPanel showReportTurnPanel(List<ModelMessage> messages) {
+        return widgets.showReportTurnPanel(messages);
     }
 
     /**
@@ -2006,7 +2026,7 @@ public class SwingGUI extends GUI {
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
         return widgets.showSelectAmountDialog(goodsType, available,
-                                             defaultAmount, needToPay);
+                                              defaultAmount, needToPay);
     }
 
     /**
@@ -2030,17 +2050,17 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showServerListPanel(List<ServerInfo> serverList) {
+    public FreeColPanel showServerListPanel(List<ServerInfo> serverList) {
         this.canvas.closeMenus();
-        widgets.showServerListPanel(serverList);
+        return widgets.showServerListPanel(serverList);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showStartGamePanel(Game game, Player player,
-                                   boolean singlePlayerMode) {
+    public FreeColPanel showStartGamePanel(Game game, Player player,
+                                           boolean singlePlayerMode) {
         if (game == null) {
             logger.warning("StartGamePanel requires game != null.");
         } else if (player == null) {
@@ -2053,45 +2073,34 @@ public class SwingGUI extends GUI {
                 panel = new StartGamePanel(getFreeColClient());
             }
             panel.initialize(singlePlayerMode);
-            this.canvas.showSubPanel(panel, false);
+            return this.canvas.showSubPanel(panel, false);
         }
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showStatisticsPanel(java.util.Map<String, String> serverStats,
-                                    java.util.Map<String, String> clientStats) {
-        widgets.showStatisticsPanel(serverStats, clientStats);
+    public FreeColPanel showStatisticsPanel(java.util.Map<String, String> serverStats,
+                                            java.util.Map<String, String> clientStats) {
+        return widgets.showStatisticsPanel(serverStats, clientStats);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showStatusPanel(String message) {
-        widgets.showStatusPanel(message);
+    public FreeColPanel showStatusPanel(String message) {
+        return widgets.showStatusPanel(message);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showTilePanel(Tile tile) {
-        widgets.showTilePanel(tile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void showTilePopup(int x, int y) {
-        final Tile tile = this.canvas.convertToMapTile(x, y);
-        if (tile == null) return;
-        if (!this.canvas.showTilePopup(tile) && tile.isExplored()) {
-            widgets.showTilePanel(tile);
-        }
+    public FreeColPanel showTilePanel(Tile tile) {
+        return widgets.showTilePanel(tile);
     }
 
     /**
@@ -2106,16 +2115,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showTradeRoutePanel(Unit unit) {
-        widgets.showTradeRoutePanel(unit);
+    public FreeColPanel showTradeRoutePanel(Unit unit) {
+        return widgets.showTradeRoutePanel(unit);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showTrainPanel() {
-        widgets.showTrainPanel();
+    public FreeColPanel showTrainPanel() {
+        return widgets.showTrainPanel();
     }
 
     /**
@@ -2138,7 +2147,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showWorkProductionPanel(Unit unit) {
-        widgets.showWorkProductionPanel(unit);
+    public FreeColPanel showWorkProductionPanel(Unit unit) {
+        return widgets.showWorkProductionPanel(unit);
     }
 }

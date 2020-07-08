@@ -1025,23 +1025,25 @@ public class GUI extends FreeColClientHolder {
      * @param template The {@code StringTemplate} containing the message.
      * @param message Optional extra debug information.
      * @param callback Optional routine to run when the error panel is closed.
+     * @return The panel shown.
      */
-    public final void showErrorPanel(StringTemplate template, String message,
-                                       Runnable callback) {
+    public final FreeColPanel showErrorPanel(StringTemplate template,
+                                             String message,
+                                             Runnable callback) {
         String display = Messages.message(template);
         if (message != null && FreeColDebugger.isInDebugMode()) {
             display += "/" + message + "/";
         }
-        showErrorPanel(display, callback);
+        return showErrorPanel(display, callback);
     }
 
     /**
      * Show an information message.
      *
      * @param messageId The message key.
-     * @return The {@code InformationPanel} that is displayed.
+     * @return The panel shown.
      */
-    public final InformationPanel showInformationPanel(String messageId) {
+    public final FreeColPanel showInformationPanel(String messageId) {
         return showInformationPanel(StringTemplate.key(messageId));
     }
 
@@ -1049,9 +1051,9 @@ public class GUI extends FreeColClientHolder {
      * Show an information message.
      *
      * @param template The message template.
-     * @return The {@code InformationPanel} that is displayed.
+     * @return The panel shown.
      */
-    public final InformationPanel showInformationPanel(StringTemplate template) {
+    public final FreeColPanel showInformationPanel(StringTemplate template) {
         return showInformationPanel(null, template);
     }
 
@@ -1060,10 +1062,10 @@ public class GUI extends FreeColClientHolder {
      *
      * @param displayObject An optional object to display as an icon.
      * @param messageId The message key.
-     * @return The {@code InformationPanel} that is displayed.
+     * @return The panel shown.
      */
-    public final InformationPanel showInformationPanel(FreeColObject displayObject,
-                                                       String messageId) {
+    public final FreeColPanel showInformationPanel(FreeColObject displayObject,
+                                                   String messageId) {
         return showInformationPanel(displayObject, StringTemplate.key(messageId));
     }
 
@@ -1846,6 +1848,21 @@ public class GUI extends FreeColClientHolder {
     public void restoreSavedSize(Component comp, Dimension d) {}
 
     /**
+     * Shows a tile popup for a given tile.
+     *
+     * @param tile The {@code Tile} where the popup occurred.
+     */
+    public void showTilePopup(Tile tile) {}
+
+    /**
+     * Shows a tile popup for the tile at a given coordinate.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     */
+    public void showTilePopup(int x, int y) {}
+
+    /**
      * Update all panels derived from the EuropePanel.
      *
      * Used by: NewUnitPanel, RecruitUnitPanel
@@ -1857,8 +1874,10 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the AboutPanel.
+     *
+     * @return The panel shown.
      */
-    public void showAboutPanel() {}
+    public FreeColPanel showAboutPanel() { return null; }
 
     /**
      * Show the build queue for a colony.
@@ -1866,9 +1885,7 @@ public class GUI extends FreeColClientHolder {
      * @param colony The {@code Colony} to show a panel for.
      * @return The build queue panel.
      */
-    public FreeColPanel showBuildQueuePanel(Colony colony) {
-        return null;
-    }
+    public FreeColPanel showBuildQueuePanel(Colony colony) { return null; }
 
     /**
      * Show the dialog to select captured goods.
@@ -1882,8 +1899,10 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the chat panel.
+     *
+     * @return The panel shown.
      */
-    public void showChatPanel() {}
+    public FreeColPanel showChatPanel() { return null; }
 
     /**
      * Show the founding father choice panel.
@@ -1892,8 +1911,7 @@ public class GUI extends FreeColClientHolder {
      * @param handler The callback to pass the choice to.
      */
     public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
-            DialogHandler<FoundingFather> handler) {
-    }
+                                               DialogHandler<FoundingFather> handler) {}
 
     /**
      * Show the client options dialog.
@@ -1905,55 +1923,55 @@ public class GUI extends FreeColClientHolder {
      *
      * @param colony The {@code Colony} to display.
      * @param unit An optional {@code Unit} to select within the panel.
-     * @return The {@code ColonyPanel} that is showing.
+     * @return The panel shown.
      */
-    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
-        return null;
-    }
+    public FreeColPanel showColonyPanel(Colony colony, Unit unit) { return null; }
 
     /**
      * Show a colopedia panel.
      *
      * @param nodeId The identifier for the colopedia node to show.
+     * @return The panel shown.
      */
-    public void showColopediaPanel(String nodeId) {}
+    public FreeColPanel showColopediaPanel(String nodeId) { return null; }
 
     /**
      * Show a color chooser panel.
      *
      * @param al An {@code ActionListener} to handle panel button presses.
-     * @return The {@code ColorChooserPanel} created.
+     * @return The panel shown.
      */
-    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
-        return null;
-    }
+    public FreeColPanel showColorChooserPanel(ActionListener al) { return null; }
 
     /**
      * Show the compact labour report panel.
+     *
+     * @return The panel shown.
      */
-    public void showCompactLabourReport() {}
+    public FreeColPanel showCompactLabourReport() { return null; }
 
     /**
      * Show the compact labour report for the specified unit data.
      *
      * @param unitData The {@code UnitData} to display.
+     * @return The panel shown.
      */
-    public void showCompactLabourReport(UnitData unitData) {}
+    public FreeColPanel showCompactLabourReport(UnitData unitData) { return null; }
     
     /**
      * Confirm declaration of independence.
      *
      * @return A list of new nation and country names.
      */
-    public List<String> showConfirmDeclarationDialog() {
-        return Collections.<String>emptyList();
-    }
+    public List<String> showConfirmDeclarationDialog() { return Collections.<String>emptyList(); }
 
     /**
      * Show the declaration panel with the declaration of independence and
-     * an animated signature.
+     * an animated signature. * * @return The panel shown.
+     *
+     * @return The panel shown.
      */
-    public void showDeclarationPanel() {}
+    public FreeColPanel showDeclarationPanel() { return null; }
 
     /**
      * Show a dialog for a difficulty option group.
@@ -1965,9 +1983,7 @@ public class GUI extends FreeColClientHolder {
      */
     public OptionGroup showDifficultyDialog(Specification spec,
                                             OptionGroup group,
-                                            boolean editable) {
-        return null;
-    }
+                                            boolean editable) { return null; }
 
     /**
      * Show a dialog to choose what goods to dump.
@@ -1984,19 +2000,15 @@ public class GUI extends FreeColClientHolder {
      * @param option The {@code Option} to edit.
      * @return True if the option edit was accepted.
      */
-    public boolean showEditOptionDialog(Option option) {
-        return false;
-    }
+    public boolean showEditOptionDialog(Option option) { return false; }
 
     /**
      * Show a dialog for editing a settlmeent.
      *
-     * @param settlement The {@code IndianSettlement} to edit.
+     * @param is The {@code IndianSettlement} to edit.
      * @return The settlement post-edit.
      */
-    public IndianSettlement showEditSettlementDialog(IndianSettlement settlement) {
-        return null;
-    }
+    public IndianSettlement showEditSettlementDialog(IndianSettlement is) { return null; }
 
     /**
      * Show a dialog to handle emigration.
@@ -2024,13 +2036,16 @@ public class GUI extends FreeColClientHolder {
      *
      * @param message The actual final error message.
      * @param callback Optional routine to run when the error panel is closed.
+     * @return The panel shown.
      */
-    protected void showErrorPanel(String message, Runnable callback) {}
+    protected FreeColPanel showErrorPanel(String message, Runnable callback) { return null; }
 
     /**
      * Show the Europe panel.
+     *
+     * @return The panel shown.
      */
-    public void showEuropePanel() {}
+    public FreeColPanel showEuropePanel() { return null; }
 
     /**
      * Show an event panel.
@@ -2038,13 +2053,17 @@ public class GUI extends FreeColClientHolder {
      * @param header The title.
      * @param image A resource key for the image to display.
      * @param footer Optional footer text.
+     * @return The panel shown.
      */
-    public void showEventPanel(String header, String image, String footer) {}
+    public FreeColPanel showEventPanel(String header, String image,
+                                       String footer) { return null; }
 
     /**
      * Show the FindSettlement panel.
+     *
+     * @return The panel shown.
      */
-    public void showFindSettlementPanel() {}
+    public FreeColPanel showFindSettlementPanel() { return null; }
 
     /**
      * Show a first contact dialog.
@@ -2066,37 +2085,35 @@ public class GUI extends FreeColClientHolder {
      * @param editable True if the options can be edited.
      * @return The game options {@code OptionGroup}.
      */
-    public OptionGroup showGameOptionsDialog(boolean editable) {
-        return null;
-    }
+    public OptionGroup showGameOptionsDialog(boolean editable) { return null; }
 
     /**
      * Show the high scores panel.
      *
      * @param messageId The message identifier.
      * @param scores The {@code HighScore}s to display.
+     * @return The panel shown.
      */
-    public void showHighScoresPanel(String messageId,
-                                    List<HighScore> scores) {}
+    public FreeColPanel showHighScoresPanel(String messageId,
+                                            List<HighScore> scores) { return null; }
 
     /**
      * Show a panel for a native settlement.
      *
      * @param indianSettlement The {@code IndianSettlement} to display.
+     * @return The panel shown.
      */
-    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {}
+    public FreeColPanel showIndianSettlementPanel(IndianSettlement is) { return null; }
 
     /**
      * Show an information message.
      *
      * @param displayObject Optional object for displaying as an icon.
      * @param template The {@code StringTemplate} to display.
-     * @return The {@code InformationPanel} that is displayed.
+     * @return The panel shown.
      */
-    public InformationPanel showInformationPanel(FreeColObject displayObject,
-                                                 StringTemplate template) {
-        return null;
-    }
+    public FreeColPanel showInformationPanel(FreeColObject displayObject,
+                                             StringTemplate template) { return null; }
 
     /**
      * Show a dialog where the user may choose a file.
@@ -2105,9 +2122,7 @@ public class GUI extends FreeColClientHolder {
      * @param extension An extension to select with.
      * @return The selected {@code File}.
      */
-    public File showLoadDialog(File directory, String extension) {
-        return null;
-    }
+    public File showLoadDialog(File directory, String extension) { return null; }
 
     /**
      * Show the LoadingSavegameDialog.
@@ -2117,21 +2132,22 @@ public class GUI extends FreeColClientHolder {
      * @return The {@code LoadingSavegameInfo} from the dialog.
      */
     public LoadingSavegameInfo showLoadingSavegameDialog(boolean publicServer,
-                                                         boolean singlePlayer) {
-        return null;
-    }
+                                                         boolean singlePlayer) { return null; }
 
     /**
      * Show the log file panel.
+     *
+     * @return The panel shown.
      */
-    public void showLogFilePanel() {}
+    public FreeColPanel showLogFilePanel() { return null; }
 
     /**
      * Show the main panel.
      *
      * @param userMsg An optional user message to display.
+     * @return The panel shown.
      */
-    public void showMainPanel(String userMsg) {}
+    public FreeColPanel showMainPanel(String userMsg) { return null; }
 
     /**
      * Complete reset back to the main panel.
@@ -2144,25 +2160,22 @@ public class GUI extends FreeColClientHolder {
      * @param editable If true, allow edits.
      * @return The map generator {@code OptionGroup}.
      */
-    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
-        return null;
-    }
+    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) { return null; }
 
     /**
      * Show the map size dialog.
      *
      * @return The selected map size as a {@code Dimension}.
      */
-    public Dimension showMapSizeDialog() {
-        return null;
-    }
+    public Dimension showMapSizeDialog() { return null; }
 
     /**
      * Show model messages.
      *
      * @param modelMessages A list of {@code ModelMessage}s to display.
+     * @return The panel shown.
      */
-    public void showModelMessages(List<ModelMessage> modelMessages) {}
+    public FreeColPanel showModelMessages(List<ModelMessage> modelMessages) { return null; }
 
     /**
      * Show the monarch dialog.
@@ -2216,25 +2229,22 @@ public class GUI extends FreeColClientHolder {
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
                                                  FreeColGameObject other,
                                                  DiplomaticTrade agreement,
-                                                 StringTemplate comment) {
-        return null;
-    }
+                                                 StringTemplate comment) { return null; }
 
     /**
      * Show the NewPanel.
      *
      * @param spec The {@code Specification} to use.
+     * @return The panel shown.
      */
-    public void showNewPanel(Specification spec) {}
+    public FreeColPanel showNewPanel(Specification spec) { return null; }
 
     /**
      * Show the parameter choice dialog.
      *
      * @return The chosen parameters.
      */
-    public Parameters showParametersDialog() {
-        return null;
-    }
+    public Parameters showParametersDialog() { return null; }
 
     /**
      * Show the pre-combat dialog.
@@ -2245,64 +2255,85 @@ public class GUI extends FreeColClientHolder {
      * @return True if the player decided to attack.
      */
     public boolean showPreCombatDialog(Unit attacker,
-                                       FreeColGameObject defender, Tile tile) {
-        return false;
-    }
+                                       FreeColGameObject defender,
+                                       Tile tile) { return false; }
 
     /**
      * Displays the purchase panel.
+     *
+     * @return The panel shown.
      */
-    public void showPurchasePanel() {}
+    public FreeColPanel showPurchasePanel() { return null; }
 
     /**
      * Displays the recruit panel.
+     *
+     * @return The panel shown.
      */
-    public void showRecruitPanel() {}
+    public FreeColPanel showRecruitPanel() { return null; }
 
     /**
      * Show the Cargo Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportCargoPanel() {}
+    public FreeColPanel showReportCargoPanel() { return null; }
 
     /**
      * Show the Colony Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportColonyPanel() {}
+    public FreeColPanel showReportColonyPanel() { return null; }
 
     /**
      * Show the Continental Congress Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportContinentalCongressPanel() {}
+    public FreeColPanel showReportContinentalCongressPanel() { return null; }
 
     /**
      * Show the Education Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportEducationPanel() {}
+    public FreeColPanel showReportEducationPanel() { return null; }
 
     /**
      * Show the Exploration Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportExplorationPanel() {}
+    public FreeColPanel showReportExplorationPanel() { return null; }
 
     /**
      * Show the Foreign Affairs Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportForeignAffairPanel() {}
+    public FreeColPanel showReportForeignAffairPanel() { return null; }
 
     /**
      * Show the History Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportHistoryPanel() {}
+    public FreeColPanel showReportHistoryPanel() { return null; }
 
     /**
      * Show the Native Affairs Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportIndianPanel() {}
+    public FreeColPanel showReportIndianPanel() { return null; }
 
     /**
      * Show the Labour Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportLabourPanel() {}
+    public FreeColPanel showReportLabourPanel() { return null; }
 
     /**
      * Display the labour detail panel.
@@ -2311,47 +2342,61 @@ public class GUI extends FreeColClientHolder {
      * @param data The labour data.
      * @param unitCount A map of unit distribution.
      * @param colonies The list of player {@code Colony}s.
+     * @return The panel shown.
      */
-    public void showReportLabourDetailPanel(UnitType unitType,
+    public FreeColPanel showReportLabourDetailPanel(UnitType unitType,
         Map<UnitType, Map<Location, Integer>> data,
-        TypeCountMap<UnitType> unitCount, List<Colony> colonies) {}
+        TypeCountMap<UnitType> unitCount, List<Colony> colonies) { return null; }
 
     /**
      * Show the Military Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportMilitaryPanel() {}
+    public FreeColPanel showReportMilitaryPanel() { return null; }
 
     /**
      * Show the Naval Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportNavalPanel() {}
+    public FreeColPanel showReportNavalPanel() { return null; }
 
     /**
      * Show the Production Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportProductionPanel() {}
+    public FreeColPanel showReportProductionPanel() { return null; }
 
     /**
      * Show the Religion Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportReligiousPanel() {}
+    public FreeColPanel showReportReligiousPanel() { return null; }
 
     /**
      * Show the Requirements Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportRequirementsPanel() {}
+    public FreeColPanel showReportRequirementsPanel() { return null; }
 
     /**
      * Show the Trade Report.
+     *
+     * @return The panel shown.
      */
-    public void showReportTradePanel() {}
+    public FreeColPanel showReportTradePanel() { return null; }
 
     /**
      * Show the Turn Report.
      *
      * @param messages The {@code ModelMessage}s that make up the report.
+     * @return The panel shown.
      */
-    public void showReportTurnPanel(List<ModelMessage> messages) {}
+    public FreeColPanel showReportTurnPanel(List<ModelMessage> messages) { return null; }
 
     /**
      * Show the river style dialog.
@@ -2359,9 +2404,7 @@ public class GUI extends FreeColClientHolder {
      * @param styles The river styles a choice is made from.
      * @return The response returned by the dialog.
      */
-    public String showRiverStyleDialog(List<String> styles) {
-        return null;
-    }
+    public String showRiverStyleDialog(List<String> styles) { return null; }
 
     /**
      * Show the save dialog.
@@ -2370,18 +2413,14 @@ public class GUI extends FreeColClientHolder {
      * @param defaultName The default game to save.
      * @return The selected file.
      */
-    public File showSaveDialog(File directory, String defaultName) {
-        return null;
-    }
+    public File showSaveDialog(File directory, String defaultName) { return null; }
 
     /**
      * Show the map scale dialog.
      *
      * @return The map scale as a {@code Dimension}.
      */
-    public Dimension showScaleMapSizeDialog() {
-        return null;
-    }
+    public Dimension showScaleMapSizeDialog() { return null; }
 
     /**
      * Show a dialog allowing selecting an amount of goods.
@@ -2393,9 +2432,8 @@ public class GUI extends FreeColClientHolder {
      * @return The amount selected.
      */
     public int showSelectAmountDialog(GoodsType goodsType, int available,
-                                      int defaultAmount, boolean needToPay) {
-        return -1;
-    }
+                                      int defaultAmount,
+                                      boolean needToPay) { return -1; }
 
     /**
      * Show a dialog allowing the user to select a destination for
@@ -2404,9 +2442,7 @@ public class GUI extends FreeColClientHolder {
      * @param unit The {@code Unit} to select a destination for.
      * @return A destination for the unit, or null.
      */
-    public Location showSelectDestinationDialog(Unit unit) {
-        return null;
-    }
+    public Location showSelectDestinationDialog(Unit unit) { return null; }
 
     /**
      * Show the select-tribute-amount dialog.
@@ -2417,17 +2453,16 @@ public class GUI extends FreeColClientHolder {
      * @return The amount selected.
      */
     public int showSelectTributeAmountDialog(StringTemplate question,
-                                             int maximum) {
-        return -1;
-    }
+                                             int maximum) { return -1; }
 
     /**
      * Show the {@code ServerListPanel}.
      *
      * @param serverList The list containing the servers retrieved from the
      *     metaserver.
+     * @return The panel shown.
      */
-    public void showServerListPanel(List<ServerInfo> serverList) {}
+    public FreeColPanel showServerListPanel(List<ServerInfo> serverList) { return null; }
 
     /**
      * Show the StartGamePanel.
@@ -2435,76 +2470,59 @@ public class GUI extends FreeColClientHolder {
      * @param game The {@code Game} that is about to start.
      * @param player The {@code Player} using this client.
      * @param singlePlayerMode True to start a single player game.
+     * @return The panel shown.
      */
-    public void showStartGamePanel(Game game, Player player,
-                                   boolean singlePlayerMode) {}
+    public FreeColPanel showStartGamePanel(Game game, Player player,
+                                           boolean singlePlayerMode) { return null; }
 
     /**
      * Show the statistics panel.
      *
      * @param serverStats A map of server statistics key,value pairs.
      * @param clientStats A map of client statistics key,value pairs.
+     * @return The panel shown.
      */
-    public void showStatisticsPanel(Map<String, String> serverStats,
-                                    Map<String, String> clientStats) {}
+    public FreeColPanel showStatisticsPanel(Map<String, String> serverStats,
+                                            Map<String, String> clientStats) { return null; }
 
     /**
      * Shows a status message which goes away when a new component is added.
      *
      * @param message The text message to display on the status panel.
+     * @return The panel shown.
      */
-    public void showStatusPanel(String message) {}
+    public FreeColPanel showStatusPanel(String message) { return null; }
 
     /**
      * Show the tile panel for a given tile.
      *
      * @param tile The {@code Tile} to display.
+     * @return The panel shown.
      */
-    public void showTilePanel(Tile tile) {}
-
-    /**
-     * Show the tile popup for the current selected tile.
-     */
-    public void showTilePopup() {
-        showTilePopup(getSelectedTile());
-    }
-
-    /**
-     * Shows a tile popup for a given tile.
-     *
-     * @param tile The {@code Tile} where the popup occurred.
-     */
-    public void showTilePopup(Tile tile) {}
-
-    /**
-     * Shows a tile popup at a given coordinate.
-     *
-     * @param x The x coordinate.
-     * @param y The y coordinate.
-     */
-    public void showTilePopup(int x, int y) {}
+    public FreeColPanel showTilePanel(Tile tile) { return null; }
 
     /**
      * Show the trade route input panel for a given trade route.
      *
      * @param tr The {@code TradeRoute} to display.
-     * @return The trade route input panel.
+     * @return The panel shown.
      */
-    public FreeColPanel showTradeRouteInputPanel(TradeRoute tr) {
-        return null;
-    }
+    public FreeColPanel showTradeRouteInputPanel(TradeRoute tr) { return null; }
 
     /**
      * Show a panel to select a trade route for a unit.
      *
      * @param unit An optional {@code Unit} to select a trade route for.
+     * @return The panel shown.
      */
-    public void showTradeRoutePanel(Unit unit) {}
+    public FreeColPanel showTradeRoutePanel(Unit unit) { return null; }
 
     /**
      * Show the training panel.
+     *
+     * @return The panel shown.
      */
-    public void showTrainPanel() {}
+    public FreeColPanel showTrainPanel() { return null; }
 
     /**
      * Show the victory dialog.
@@ -2521,14 +2539,13 @@ public class GUI extends FreeColClientHolder {
      * @param colony The {@code Colony} to display.
      * @return The response returned by the dialog.
      */
-    public boolean showWarehouseDialog(Colony colony) {
-        return false;
-    }
+    public boolean showWarehouseDialog(Colony colony) { return false; }
 
     /**
      * Show the production of a unit.
      *
      * @param unit The {@code Unit} to display.
+     * @return The panel shown.
      */
-    public void showWorkProductionPanel(Unit unit) {}
+    public FreeColPanel showWorkProductionPanel(Unit unit) { return null; }
 }
