@@ -4454,7 +4454,6 @@ public final class InGameController extends FreeColClientHolder {
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
         if (updateUnit) updateGUI(null, true);
-        getGUI().refresh();
     }
         
     /**
