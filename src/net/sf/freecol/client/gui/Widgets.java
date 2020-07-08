@@ -39,7 +39,6 @@ import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.dialog.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.colopedia.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.report.CompactLabourReport;
@@ -67,8 +66,6 @@ import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
 import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
-import net.sf.freecol.client.gui.panel.MainPanel;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.dialog.MapSizeDialog;
 import net.sf.freecol.client.gui.dialog.MonarchDialog;
@@ -94,7 +91,6 @@ import net.sf.freecol.client.gui.panel.report.ReportLabourDetailPanel;
 import net.sf.freecol.client.gui.panel.report.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.report.ReportMilitaryPanel;
 import net.sf.freecol.client.gui.panel.report.ReportNavalPanel;
-import net.sf.freecol.client.gui.panel.report.ReportPanel;
 import net.sf.freecol.client.gui.panel.report.ReportProductionPanel;
 import net.sf.freecol.client.gui.panel.report.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.report.ReportRequirementsPanel;
@@ -107,7 +103,6 @@ import net.sf.freecol.client.gui.dialog.SelectAmountDialog;
 import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
 import net.sf.freecol.client.gui.dialog.SelectTributeAmountDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
@@ -156,11 +151,6 @@ public final class Widgets {
 
     private static final Logger logger = Logger.getLogger(Widgets.class.getName());
 
-    private static final List<Class<? extends FreeColPanel>> EUROPE_CLASSES
-        = makeUnmodifiableList(RecruitPanel.class,
-            PurchasePanel.class,
-            TrainPanel.class);
-
     /** The game client. */
     private final FreeColClient freeColClient;
 
@@ -195,12 +185,11 @@ public final class Widgets {
             this.handler = handler;
         }
 
-
-        // Implement Runnable
-
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void run() {
-            // Display the dialog...
             canvas.viewFreeColDialog(fcd, tile);
             // ...and use another thread to wait for a dialog response...
             new Thread(fcd.toString()) {
@@ -220,7 +209,7 @@ public final class Widgets {
     /**
      * Create this wrapper class.
      *
-     * @param freeColClient The client.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param canvas The {@code Canvas} to call out to.
      */
     public Widgets(FreeColClient freeColClient, Canvas canvas) {
@@ -237,7 +226,26 @@ public final class Widgets {
     // Generic dialogs
 
     /**
-     * Displays a modal dialog with text and a choice of options.
+     * Show a modal dialog with a text and a ok/cancel option.
+     *
+     * @param tile An optional {@code Tile} to make visible (not
+     *     under the dialog!)
+     * @param tmpl A {@code StringTemplate} to explain the choice.
+     * @param icon An optional icon to display.
+     * @param okKey The text displayed on the "ok"-button.
+     * @param cancelKey The text displayed on the "cancel"-button.
+     * @return True if the user clicked the "ok"-button.
+     */
+    public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
+                           String okKey, String cancelKey) {
+        FreeColConfirmDialog dialog
+            = new FreeColConfirmDialog(this.freeColClient, getFrame(), true,
+                                       tmpl, icon, okKey, cancelKey);
+        return this.canvas.showFreeColDialog(dialog, tile);
+    }
+
+    /**
+     * Show a modal dialog with text and a choice of options.
      *
      * @param <T> The type to be returned from the dialog.
      * @param tile An optional {@code Tile} to make visible (not
@@ -250,38 +258,18 @@ public final class Widgets {
      * @return The corresponding member of the values array to the selected
      *     option, or null if no choices available.
      */
-    public <T> T showChoiceDialog(Tile tile, StringTemplate tmpl,
-                                  ImageIcon icon, String cancelKey,
-                                  List<ChoiceItem<T>> choices) {
+    public <T> T getChoice(Tile tile, StringTemplate tmpl,
+                           ImageIcon icon, String cancelKey,
+                           List<ChoiceItem<T>> choices) {
         if (choices.isEmpty()) return null;
         FreeColChoiceDialog<T> dialog
-            = new FreeColChoiceDialog<>(freeColClient, getFrame(), true,
+            = new FreeColChoiceDialog<>(this.freeColClient, getFrame(), true,
                                         tmpl, icon, cancelKey, choices);
-        return canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, tile);
     }
 
     /**
-     * Displays a modal dialog with a text and a ok/cancel option.
-     *
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
-     * @param tmpl A {@code StringTemplate} to explain the choice.
-     * @param icon An optional icon to display.
-     * @param okKey The text displayed on the "ok"-button.
-     * @param cancelKey The text displayed on the "cancel"-button.
-     * @return True if the user clicked the "ok"-button.
-     */
-    public boolean showConfirmDialog(Tile tile, StringTemplate tmpl,
-                                     ImageIcon icon,
-                                     String okKey, String cancelKey) {
-        FreeColConfirmDialog dialog
-            = new FreeColConfirmDialog(freeColClient, getFrame(), true,
-                                       tmpl, icon, okKey, cancelKey);
-        return canvas.showFreeColDialog(dialog, tile);
-    }
-
-    /**
-     * Displays a modal dialog with a text field and a ok/cancel option.
+     * Show a modal dialog with a text field and a ok/cancel option.
      *
      * @param tile An optional tile to make visible (not under the dialog).
      * @param tmpl A {@code StringTemplate} that explains the
@@ -291,85 +279,26 @@ public final class Widgets {
      * @param cancelKey A key displayed on the optional "cancel"-button.
      * @return The text the user entered, or null if cancelled.
      */
-    public String showInputDialog(Tile tile, StringTemplate tmpl,
-                                  String defaultValue,
-                                  String okKey, String cancelKey) {
+    public String getInput(Tile tile, StringTemplate tmpl,
+                           String defaultValue,
+                           String okKey, String cancelKey) {
         FreeColStringInputDialog dialog
-            = new FreeColStringInputDialog(freeColClient, getFrame(), true,
+            = new FreeColStringInputDialog(this.freeColClient, getFrame(), true,
                                            tmpl, defaultValue,
                                            okKey, cancelKey);
-        return canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, tile);
     }
 
 
     // Simple front ends to display specific dialogs and panels
 
     /**
-     * Cancel the current trade route in a TradeRouteInputPanel.
-     */
-    public void cancelTradeRouteInput() {
-        TradeRouteInputPanel panel
-            = canvas.getExistingFreeColPanel(TradeRouteInputPanel.class);
-        if (panel != null) {
-            panel.cancelTradeRoute();
-        }
-    }
-
-    /**
-     * Close the status panel if present.
-     */
-    public void closeStatusPanel() {
-        StatusPanel panel
-            = canvas.getExistingFreeColPanel(StatusPanel.class);
-        if (panel != null) {
-            canvas.removeFromCanvas(panel);
-            canvas.requestFocusInWindow();
-        }
-    }
-
-    /**
-     * Tells that a chat message was received.
-     *
-     * @param senderName The sender.
-     * @param message The chat message.
-     * @param privateChat True if this is a private message.
-     */
-    public void displayStartChat(String senderName, String message,
-                                 boolean privateChat) {
-        StartGamePanel panel
-            = canvas.getExistingFreeColPanel(StartGamePanel.class);
-        if (panel != null) {
-            panel.displayChat(senderName, message, privateChat);
-        }
-    }
-
-    /**
-     * Is the client options dialog present?
-     *
-     * @return True if the client options dialog is found.
-     */
-    public boolean isClientOptionsDialogShowing() {
-        return canvas.getExistingFreeColDialog(ClientOptionsDialog.class) != null;
-    }
-
-    /**
-     * Refresh the player's table.
-     *
-     * Called when a new player is added from PreGameInputHandler.addPlayer.
-     */
-    public void refreshPlayersTable() {
-        StartGamePanel panel
-            = canvas.getExistingFreeColPanel(StartGamePanel.class);
-        panel.refreshPlayersTable();
-    }
-
-    /**
-     * Display the AboutPanel.
+     * Show the AboutPanel.
      */
     public void showAboutPanel() {
         AboutPanel panel
-            = new AboutPanel(freeColClient);
-        canvas.showSubPanel(panel, false);
+            = new AboutPanel(this.freeColClient);
+        this.canvas.showSubPanel(panel, false);
     }
 
     /**
@@ -380,16 +309,16 @@ public final class Widgets {
      */
     public FreeColPanel showBuildQueuePanel(Colony colony) {
         BuildQueuePanel panel
-            = canvas.getExistingFreeColPanel(BuildQueuePanel.class);
+            = this.canvas.getExistingFreeColPanel(BuildQueuePanel.class);
         if (panel == null || panel.getColony() != colony) {
-            panel = new BuildQueuePanel(freeColClient, colony);
-            canvas.showSubPanel(panel, true);
+            panel = new BuildQueuePanel(this.freeColClient, colony);
+            this.canvas.showSubPanel(panel, true);
         }
         return panel;
     }
 
     /**
-     * Display the {@code CaptureGoodsDialog}.
+     * Show the {@code CaptureGoodsDialog}.
      *
      * @param unit The {@code Unit} capturing goods.
      * @param gl The list of {@code Goods} to choose from.
@@ -398,24 +327,23 @@ public final class Widgets {
     public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
                                        DialogHandler<List<Goods>> handler) {
         CaptureGoodsDialog dialog
-            = new CaptureGoodsDialog(freeColClient, getFrame(),
+            = new CaptureGoodsDialog(this.freeColClient, getFrame(),
                                      unit, gl);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, null, handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
     }
 
     /**
-     * Displays the {@code ChatPanel}.
+     * Show the chat panel.
      */
     public void showChatPanel() {
         ChatPanel panel
-            = new ChatPanel(freeColClient);
-        canvas.showSubPanel(panel, true);
+            = new ChatPanel(this.freeColClient);
+        this.canvas.showSubPanel(panel, true);
         panel.requestFocus();
     }
 
     /**
-     * Displays the {@code ChooseFoundingFatherDialog}.
+     * Show the {@code ChooseFoundingFatherDialog}.
      *
      * @param ffs The {@code FoundingFather}s to choose from.
      * @param handler A {@code DialogHandler} for the dialog response.
@@ -423,50 +351,9 @@ public final class Widgets {
     public void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
                                                DialogHandler<FoundingFather> handler) {
         ChooseFoundingFatherDialog dialog
-            = new ChooseFoundingFatherDialog(freeColClient, getFrame(),
+            = new ChooseFoundingFatherDialog(this.freeColClient, getFrame(),
                                              ffs);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, null, handler));
-    }
-
-    /**
-     * Displays a dialog for setting client options.
-     *
-     * @return The modified {@code OptionGroup}, or null if not modified.
-     */
-    public OptionGroup showClientOptionsDialog() {
-        ClientOptionsDialog dialog
-            = new ClientOptionsDialog(freeColClient, getFrame());
-        return canvas.showFreeColDialog(dialog, null);
-    }
-
-    /**
-     * Displays the colony panel of the given {@code Colony}.
-     * Defends against duplicates as this can duplicate messages
-     * generated by multiple property change listeners registered
-     * against the same colony.
-     *
-     * @param colony The colony whose panel needs to be displayed.
-     * @param unit An optional {@code Unit} to select within the panel.
-     * @return The {@code ColonyPanel}.
-     */
-    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
-        if (colony == null) return null;
-        ColonyPanel panel = canvas.getColonyPanel(colony);
-        if (panel == null) {
-            try {
-                panel = new ColonyPanel(freeColClient, colony);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception in ColonyPanel for "
-                    + colony.getId(), e);
-                return null;
-            }
-            canvas.showFreeColPanel(panel, colony.getTile(), true);
-        } else {
-            panel.requestFocus();
-        }
-        if (unit != null) panel.setSelectedUnit(unit);
-        return panel;
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
     }
 
     /**
@@ -476,8 +363,8 @@ public final class Widgets {
      */
     public void showColopediaPanel(String nodeId) {
         ColopediaPanel panel
-            = new ColopediaPanel(freeColClient, nodeId);
-        canvas.showSubPanel(panel, true);
+            = new ColopediaPanel(this.freeColClient, nodeId);
+        this.canvas.showSubPanel(panel, true);
     }
 
     /**
@@ -489,8 +376,8 @@ public final class Widgets {
      */
     public ColorChooserPanel showColorChooserPanel(ActionListener al) {
         ColorChooserPanel panel
-            = new ColorChooserPanel(freeColClient, al);
-        canvas.showFreeColPanel(panel, null, false);
+            = new ColorChooserPanel(this.freeColClient, al);
+        this.canvas.showFreeColPanel(panel, null, false);
         return panel;
     }
 
@@ -499,9 +386,9 @@ public final class Widgets {
      */
     public void showCompactLabourReport() {
         CompactLabourReport panel
-            = new CompactLabourReport(freeColClient);
+            = new CompactLabourReport(this.freeColClient);
         panel.initialize();
-        canvas.showSubPanel(panel, false);
+        this.canvas.showSubPanel(panel, false);
 
     }
 
@@ -512,34 +399,34 @@ public final class Widgets {
      */
     public void showCompactLabourReport(UnitData unitData) {
         CompactLabourReport panel
-            = new CompactLabourReport(freeColClient, unitData);
+            = new CompactLabourReport(this.freeColClient, unitData);
         panel.initialize();
-        canvas.showSubPanel(panel, false);
+        this.canvas.showSubPanel(panel, false);
     }
 
     /**
-     * Display a dialog to confirm a declaration of independence.
+     * Show a dialog to confirm a declaration of independence.
      *
      * @return A list of names for a new nation.
      */
     public List<String> showConfirmDeclarationDialog() {
         ConfirmDeclarationDialog dialog
-            = new ConfirmDeclarationDialog(freeColClient, getFrame());
-        return canvas.showFreeColDialog(dialog, null);
+            = new ConfirmDeclarationDialog(this.freeColClient, getFrame());
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display a panel showing the declaration of independence with
+     * Show a panel showing the declaration of independence with
      * animated signature.
      */
     public void showDeclarationPanel() {
         DeclarationPanel panel
-            = new DeclarationPanel(freeColClient);
-        canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, false);
+            = new DeclarationPanel(this.freeColClient);
+        this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, false);
     }
 
     /**
-     * Display the difficulty dialog for a given group.
+     * Show the difficulty dialog for a given group.
      *
      * @param spec The enclosing {@code Specification}.
      * @param group The {@code OptionGroup} containing the difficulty.
@@ -547,30 +434,30 @@ public final class Widgets {
      * @return The resulting {@code OptionGroup}.
      */
     public OptionGroup showDifficultyDialog(Specification spec,
-                                            OptionGroup group, boolean editable) {
+                                            OptionGroup group,
+                                            boolean editable) {
         DifficultyDialog dialog
-            = new DifficultyDialog(freeColClient, getFrame(),
+            = new DifficultyDialog(this.freeColClient, getFrame(),
                                    spec, group, editable);
-        OptionGroup ret = canvas.showFreeColDialog(dialog, null);
-        if (ret != null) FreeCol.setDifficulty(ret);
-        return ret;
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Displays the {@code DumpCargoDialog}.
+     * Show the {@code DumpCargoDialog}.
      *
      * @param unit The {@code Unit} that is dumping.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
-    public void showDumpCargoDialog(Unit unit, DialogHandler<List<Goods>> handler) {
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {
         DumpCargoDialog dialog
-            = new DumpCargoDialog(freeColClient, getFrame(), unit);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, unit.getTile(), handler));
+            = new DumpCargoDialog(this.freeColClient, getFrame(), unit);
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, unit.getTile(),
+                                                        handler));
     }
 
     /**
-     * Display the EditOptionDialog.
+     * Show the EditOptionDialog.
      *
      * @param op The {@code Option} to edit.
      * @return The response returned by the dialog.
@@ -578,25 +465,25 @@ public final class Widgets {
     public boolean showEditOptionDialog(Option op) {
         if (op == null) return false;
         EditOptionDialog dialog
-            = new EditOptionDialog(freeColClient, getFrame(), op);
-        return canvas.showFreeColDialog(dialog, null);
+            = new EditOptionDialog(this.freeColClient, getFrame(), op);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display the EditSettlementDialog.
+     * Show the EditSettlementDialog.
      *
      * @param is The {@code IndianSettlement} to edit.
      * @return The response returned by the dialog.
      */
     public IndianSettlement showEditSettlementDialog(IndianSettlement is) {
         EditSettlementDialog dialog
-            = new EditSettlementDialog(freeColClient, getFrame(), is);
-        return canvas.showFreeColDialog(dialog, null);
+            = new EditSettlementDialog(this.freeColClient, getFrame(), is);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Shows the panel that allows the user to choose which unit will emigrate
-     * from Europe.
+     * Show the panel that allows the user to choose which unit will
+     * emigrate from Europe.
      *
      * @param player The {@code Player} whose unit is emigrating.
      * @param fountainOfYouth Is this dialog displayed as a result of a
@@ -606,14 +493,13 @@ public final class Widgets {
     public void showEmigrationDialog(Player player, boolean fountainOfYouth,
                                      DialogHandler<Integer> handler) {
         EmigrationDialog dialog
-            = new EmigrationDialog(freeColClient, getFrame(),
+            = new EmigrationDialog(this.freeColClient, getFrame(),
                                    player.getEurope(), fountainOfYouth);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, null, handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
     }
 
     /**
-     * Display the EndTurnDialog with given units that could still move.
+     * Show the EndTurnDialog with given units that could still move.
      *
      * @param units A list of {@code Unit}s that could still move.
      * @param handler A {@code DialogHandler} for the dialog response.
@@ -621,44 +507,43 @@ public final class Widgets {
     public void showEndTurnDialog(List<Unit> units,
                                   DialogHandler<Boolean> handler) {
         EndTurnDialog dialog
-            = new EndTurnDialog(freeColClient, getFrame(),
+            = new EndTurnDialog(this.freeColClient, getFrame(),
                                 units);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, null, handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
     }
 
     /**
-     * Displays an error message.
+     * Show an error message.
      *
      * @param message The message to display.
      * @param callback Optional routine to run when the error panel is closed.
      */
     public void showErrorPanel(String message, Runnable callback) {
-        if (message != null) {
-            ErrorPanel errorPanel = new ErrorPanel(freeColClient, message);
-            if (callback != null) errorPanel.addClosingCallback(callback);
-            canvas.showSubPanel(errorPanel, true);
-        }
+        if (message == null) return;
+        ErrorPanel errorPanel = new ErrorPanel(this.freeColClient, message);
+        if (callback != null) errorPanel.addClosingCallback(callback);
+        this.canvas.showSubPanel(errorPanel, true);
     }
 
     /**
-     * Displays the {@code EuropePanel}.
+     * Show the {@code EuropePanel}.
      *
      * @param callback An optional closing callback to add.
      */
     public void showEuropePanel(Runnable callback) {
-        if (freeColClient.getGame() == null) return;
+        if (this.freeColClient.getGame() == null) return;
         EuropePanel panel
-            = canvas.getExistingFreeColPanel(EuropePanel.class);
+            = this.canvas.getExistingFreeColPanel(EuropePanel.class);
         if (panel == null) {
-            panel = new EuropePanel(freeColClient, (canvas.getHeight() > 780));
+            panel = new EuropePanel(this.freeColClient,
+                                    (this.canvas.getHeight() > 780));
             if (callback != null) panel.addClosingCallback(callback);
-            canvas.showSubPanel(panel, true);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     /**
-     * Display an event panel.
+     * Show an event panel.
      *
      * @param header The title.
      * @param image A resource key for the image to display.
@@ -666,21 +551,21 @@ public final class Widgets {
      */
     public void showEventPanel(String header, String image, String footer) {
         EventPanel panel
-            = new EventPanel(freeColClient, header, image, footer);
-        canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, false);
+            = new EventPanel(this.freeColClient, header, image, footer);
+        this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, false);
     }
 
     /**
-     * Display the FindSettlementPanel.
+     * Show the FindSettlementPanel.
      */
     public void showFindSettlementPanel() {
         FindSettlementPanel panel
-            = new FindSettlementPanel(freeColClient);
-        canvas.showSubPanel(panel, Canvas.PopupPosition.ORIGIN, true);
+            = new FindSettlementPanel(this.freeColClient);
+        this.canvas.showSubPanel(panel, Canvas.PopupPosition.ORIGIN, true);
     }
 
     /**
-     * Display the first contact dialog (which is really just a
+     * Show the first contact dialog (which is really just a
      * non-modal confirm dialog).
      *
      * @param player The {@code Player} making contact.
@@ -695,49 +580,48 @@ public final class Widgets {
                                        Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
         FirstContactDialog dialog
-            = new FirstContactDialog(freeColClient, getFrame(),
+            = new FirstContactDialog(this.freeColClient, getFrame(),
                                      player, other, tile, settlementCount);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, tile, handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, tile, handler));
     }
 
     /**
-     * Display the GameOptionsDialog.
+     * Show the GameOptionsDialog.
      *
      * @param editable Should the game options be editable?
      * @return The {@code OptionGroup} selected.
      */
     public OptionGroup showGameOptionsDialog(boolean editable) {
         GameOptionsDialog dialog
-            = new GameOptionsDialog(freeColClient, getFrame(), editable);
-        return canvas.showFreeColDialog(dialog, null);
+            = new GameOptionsDialog(this.freeColClient, getFrame(), editable);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Displays the high scores panel.
+     * Show the high scores panel.
      *
      * @param messageId An optional message to add to the high scores panel.
      * @param scores The list of {@code HighScore}s to display.
      */
     public void showHighScoresPanel(String messageId, List<HighScore> scores) {
         ReportHighScoresPanel panel
-            = new ReportHighScoresPanel(freeColClient, messageId, scores);
-        canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, true);
+            = new ReportHighScoresPanel(this.freeColClient, messageId, scores);
+        this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, true);
     }
 
     /**
-     * Displays the panel of the given native settlement.
+     * Show the panel of the given native settlement.
      *
      * @param is The {@code IndianSettlement} to display.
      */
     public void showIndianSettlementPanel(IndianSettlement is) {
         IndianSettlementPanel panel
-            = new IndianSettlementPanel(freeColClient, is);
-        canvas.showFreeColPanel(panel, is.getTile(), true);
+            = new IndianSettlementPanel(this.freeColClient, is);
+        this.canvas.showFreeColPanel(panel, is.getTile(), true);
     }
 
     /**
-     * Shows a message with some information and an "OK"-button.
+     * Show a message with some information and an "OK"-button.
      *
      * @param displayObject Optional object for displaying.
      * @param tile The Tile the object is at.
@@ -749,14 +633,14 @@ public final class Widgets {
                                                  Tile tile, ImageIcon icon,
                                                  StringTemplate tmpl) {
         String text = Messages.message(tmpl);
-        InformationPanel panel = new InformationPanel(freeColClient, text, 
+        InformationPanel panel = new InformationPanel(this.freeColClient, text, 
                                                       displayObject, icon);
-        canvas.showFreeColPanel(panel, tile, true);
+        this.canvas.showFreeColPanel(panel, tile, true);
         return panel;
     }
 
     /**
-     * Displays a dialog where the user may choose a file.
+     * Show a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
      * @param filters {@code FileFilter}s for suitable files.
@@ -764,14 +648,15 @@ public final class Widgets {
      */
     public File showLoadDialog(File directory, FileFilter[] filters) {
         LoadDialog dialog
-            = new LoadDialog(freeColClient, getFrame(), directory, filters);
-        return canvas.showFreeColDialog(dialog, null);
+            = new LoadDialog(this.freeColClient, getFrame(), directory, filters);
+        return this.canvas.showFreeColDialog(dialog, null);
     }        
 
     /**
-     * Displays a dialog for setting options when loading a savegame.  The
-     * settings can be retrieved directly from {@link LoadingSavegameDialog}
-     * after calling this method.
+     * Show a dialog for setting options when loading a savegame.
+     *
+     * The settings can be retrieved directly from
+     * {@link LoadingSavegameDialog} after calling this method.
      *
      * @param pubSer Default value.
      * @param single Default value.
@@ -781,8 +666,8 @@ public final class Widgets {
     public LoadingSavegameInfo showLoadingSavegameDialog(boolean pubSer,
                                                          boolean single) {
         LoadingSavegameDialog dialog
-            = new LoadingSavegameDialog(freeColClient, getFrame());
-        return (canvas.showFreeColDialog(dialog, null)) ? dialog.getInfo()
+            = new LoadingSavegameDialog(this.freeColClient, getFrame());
+        return (this.canvas.showFreeColDialog(dialog, null)) ? dialog.getInfo()
             : null;
     }
 
@@ -790,35 +675,36 @@ public final class Widgets {
      * Show a panel containing the log file.
      */
     public void showLogFilePanel() {
-        canvas.showSubPanel(new ErrorPanel(freeColClient), true);
+        this.canvas.showSubPanel(new ErrorPanel(this.freeColClient), true);
 
     }
 
     /**
-     * Display the map generator options dialog.
+     * Show the map generator options dialog.
      *
      * @param editable Should these options be editable.
      * @return The {@code OptionGroup} as edited.
      */
     public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
         MapGeneratorOptionsDialog dialog
-            = new MapGeneratorOptionsDialog(freeColClient, getFrame(),
+            = new MapGeneratorOptionsDialog(this.freeColClient, getFrame(),
                                             editable);
-        return canvas.showFreeColDialog(dialog, null);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display the map size dialog.
+     * Show the map size dialog.
      * 
      * @return The response returned by the dialog.
      */
     public Dimension showMapSizeDialog() {
-        MapSizeDialog dialog = new MapSizeDialog(freeColClient, getFrame());
-        return canvas.showFreeColDialog(dialog, null);
+        MapSizeDialog dialog
+            = new MapSizeDialog(this.freeColClient, getFrame());
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display the monarch dialog.
+     * Show the monarch dialog.
      *
      * @param action The {@code MonarchAction} underway.
      * @param tmpl The {@code StringTemplate} describing the
@@ -830,14 +716,13 @@ public final class Widgets {
                                   StringTemplate tmpl, String monarchKey,
                                   DialogHandler<Boolean> handler) {
         MonarchDialog dialog
-            = new MonarchDialog(freeColClient, getFrame(),
+            = new MonarchDialog(this.freeColClient, getFrame(),
                                 action, tmpl, monarchKey);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, null, handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
     }
 
     /**
-     * Display a dialog to set a new name for something.
+     * Show a dialog to set a new name for something.
      *
      * @param tmpl A {@code StringTemplate} for the message
      *     to explain the dialog.
@@ -848,14 +733,14 @@ public final class Widgets {
     public void showNamingDialog(StringTemplate tmpl, String defaultName,
                                  Unit unit, DialogHandler<String> handler) {
         FreeColStringInputDialog dialog
-            = new FreeColStringInputDialog(freeColClient, getFrame(), false,
+            = new FreeColStringInputDialog(this.freeColClient, getFrame(), false,
                                            tmpl, defaultName, "ok", null);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, unit.getTile(), handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, unit.getTile(),
+                                                        handler));
     }
 
     /**
-     * Display a dialog to handle a native demand to a colony.
+     * Show a dialog to handle a native demand to a colony.
      *
      * @param unit The demanding {@code Unit}.
      * @param colony The {@code Colony} being demanded of.
@@ -867,14 +752,14 @@ public final class Widgets {
                                        GoodsType type, int amount,
                                        DialogHandler<Boolean> handler) {
         NativeDemandDialog dialog
-            = new NativeDemandDialog(freeColClient, getFrame(),
+            = new NativeDemandDialog(this.freeColClient, getFrame(),
                                      unit, colony, type, amount);
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, unit.getTile(), handler));
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, unit.getTile(),
+                                                        handler));
     }
 
     /**
-     * Displays the {@code NegotiationDialog}.
+     * Show the {@code NegotiationDialog}.
      *
      * @param our Our {@code FreeColGameObject} that is negotiating.
      * @param other The other {@code FreeColGameObject}.
@@ -887,41 +772,36 @@ public final class Widgets {
                                                  FreeColGameObject other,
                                                  DiplomaticTrade agreement,
                                                  StringTemplate comment) {
-        if ((!(our instanceof Unit) && !(our instanceof Colony))
-            || (!(other instanceof Unit) && !(other instanceof Colony))
-            || (our instanceof Colony && other instanceof Colony)) {
-            throw new RuntimeException("Bad DTD args: " + our + ", " + other);
-        }
         NegotiationDialog dialog
-            = new NegotiationDialog(freeColClient, getFrame(),
+            = new NegotiationDialog(this.freeColClient, getFrame(),
                                     our, other, agreement, comment);
-        return canvas.showFreeColDialog(dialog, ((Location)our).getTile());
+        return this.canvas.showFreeColDialog(dialog, ((Location)our).getTile());
     }
 
     /**
-     * Display the NewPanel for a given optional specification.
+     * Show the NewPanel for a given optional specification.
      *
      * @param specification The {@code Specification} to use.
      */
     public void showNewPanel(Specification specification) {
         NewPanel panel
-            = new NewPanel(freeColClient, specification);
-        canvas.showSubPanel(panel, false);
+            = new NewPanel(this.freeColClient, specification);
+        this.canvas.showSubPanel(panel, false);
     }
 
     /**
-     * Display the parameters dialog.
+     * Show the parameters dialog.
      * 
      * @return The response returned by the dialog.
      */
     public Parameters showParametersDialog() {
         ParametersDialog dialog
-            = new ParametersDialog(freeColClient, getFrame());
-        return canvas.showFreeColDialog(dialog, null);
+            = new ParametersDialog(this.freeColClient, getFrame());
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display a dialog to confirm a combat.
+     * Show a dialog to confirm a combat.
      *
      * @param attacker The attacker {@code Unit}.
      * @param defender The defender.
@@ -932,38 +812,38 @@ public final class Widgets {
                                        FreeColGameObject defender,
                                        Tile tile) {
         PreCombatDialog dialog
-            = new PreCombatDialog(freeColClient, getFrame(),
+            = new PreCombatDialog(this.freeColClient, getFrame(),
                                   attacker, defender);
-        return canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, tile);
     }
 
     /**
-     * Displays the purchase panel.
+     * Show the purchase panel.
      */
     public void showPurchasePanel() {
         PurchasePanel panel
-            = canvas.getExistingFreeColPanel(PurchasePanel.class);
+            = this.canvas.getExistingFreeColPanel(PurchasePanel.class);
         if (panel == null) {
-            panel = new PurchasePanel(freeColClient);
+            panel = new PurchasePanel(this.freeColClient);
             panel.update();
-            canvas.showFreeColPanel(panel, null, false);
+            this.canvas.showFreeColPanel(panel, null, false);
         }
     }
 
     /**
-     * Displays the recruit panel.
+     * Show the recruit panel.
      */
     public void showRecruitPanel() {
         RecruitPanel panel
-            = canvas.getExistingFreeColPanel(RecruitPanel.class);
+            = this.canvas.getExistingFreeColPanel(RecruitPanel.class);
         if (panel == null) {
-            panel = new RecruitPanel(freeColClient);
-            canvas.showFreeColPanel(panel, null, false);
+            panel = new RecruitPanel(this.freeColClient);
+            this.canvas.showFreeColPanel(panel, null, false);
         }
     }
 
     /**
-     * Display the labour detail panel.
+     * Show the labour detail panel.
      *
      * @param unitType The {@code UnitType} to display.
      * @param data The labour data.
@@ -974,26 +854,26 @@ public final class Widgets {
         Map<UnitType, Map<Location, Integer>> data,
         TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
         ReportLabourDetailPanel panel
-            = new ReportLabourDetailPanel(freeColClient, unitType, data,
+            = new ReportLabourDetailPanel(this.freeColClient, unitType, data,
                                           unitCount, colonies);
         panel.initialize();
-        canvas.showSubPanel(panel, true);
+        this.canvas.showSubPanel(panel, true);
     }
 
     /**
-     * Display the river style dialog.
+     * Show the river style dialog.
      *
      * @param styles The river styles a choice is made from.
      * @return The response returned by the dialog.
      */
     public String showRiverStyleDialog(List<String> styles) {
         RiverStyleDialog dialog
-            = new RiverStyleDialog(freeColClient, getFrame(), styles);
-        return canvas.showFreeColDialog(dialog, null);
+            = new RiverStyleDialog(this.freeColClient, getFrame(), styles);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Displays a dialog where the user may choose a filename.
+     * Show a dialog where the user may choose a filename.
      *
      * @param directory The directory containing the files in which
      *     the user may overwrite.
@@ -1004,24 +884,24 @@ public final class Widgets {
     public File showSaveDialog(File directory, FileFilter[] filters,
                                String defaultName) {
         SaveDialog dialog
-            = new SaveDialog(freeColClient, getFrame(),
+            = new SaveDialog(this.freeColClient, getFrame(),
                              directory, filters, defaultName);
-        return canvas.showFreeColDialog(dialog, null);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display the scale map size dialog.
+     * Show the scale map size dialog.
      * 
      * @return The response returned by the dialog.
      */
     public Dimension showScaleMapSizeDialog() {
         ScaleMapSizeDialog dialog
-            = new ScaleMapSizeDialog(freeColClient, getFrame());
-        return canvas.showFreeColDialog(dialog, null);
+            = new ScaleMapSizeDialog(this.freeColClient, getFrame());
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display the select-amount dialog.
+     * Show the select-amount dialog.
      *
      * @param goodsType The {@code GoodsType} to select an amount of.
      * @param available The amount of goods available.
@@ -1032,15 +912,15 @@ public final class Widgets {
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
         FreeColDialog<Integer> dialog
-            = new SelectAmountDialog(freeColClient, getFrame(),
+            = new SelectAmountDialog(this.freeColClient, getFrame(),
                                      goodsType, available,
                                      defaultAmount, needToPay);
-        Integer result = canvas.showFreeColDialog(dialog, null);
+        Integer result = this.canvas.showFreeColDialog(dialog, null);
         return (result == null) ? -1 : result;
     }
 
     /**
-     * Display a dialog allowing the user to select a destination for
+     * Show a dialog allowing the user to select a destination for
      * a given unit.
      *
      * @param unit The {@code Unit} to select a destination for.
@@ -1048,26 +928,27 @@ public final class Widgets {
      */
     public Location showSelectDestinationDialog(Unit unit) {
         SelectDestinationDialog dialog
-            = new SelectDestinationDialog(freeColClient, getFrame(),
+            = new SelectDestinationDialog(this.freeColClient, getFrame(),
                                           unit);
-        return canvas.showFreeColDialog(dialog, unit.getTile());
+        return this.canvas.showFreeColDialog(dialog, unit.getTile());
     }
 
     /**
-     * Displays the {@code ServerListPanel}.
+     * Show the {@code ServerListPanel}.
      *
      * @param serverList The list containing the servers retrieved from the
      *     metaserver.
      */
     public void showServerListPanel(List<ServerInfo> serverList) {
-        ServerListPanel panel = new ServerListPanel(freeColClient,
-            freeColClient.getConnectController());
+        ServerListPanel panel
+            = new ServerListPanel(this.freeColClient,
+                                  this.freeColClient.getConnectController());
         panel.initialize(serverList);
-        canvas.showSubPanel(panel, true);
+        this.canvas.showSubPanel(panel, true);
     }
 
     /**
-     * Display the select-tribute-amount dialog.
+     * Show the select-tribute-amount dialog.
      *
      * @param question a {@code stringtemplate} describing the
      *     amount of tribute to demand.
@@ -1077,30 +958,14 @@ public final class Widgets {
     public int showSelectTributeAmountDialog(StringTemplate question,
                                              int maximum) {
         FreeColDialog<Integer> dialog
-            = new SelectTributeAmountDialog(freeColClient, getFrame(),
+            = new SelectTributeAmountDialog(this.freeColClient, getFrame(),
                                             question, maximum);
-        Integer result = canvas.showFreeColDialog(dialog, null);
+        Integer result = this.canvas.showFreeColDialog(dialog, null);
         return (result == null) ? -1 : result;
     }
 
     /**
-     * Displays the start game panel.
-     *
-     * @param singlePlayerMode True to start a single player game.
-     */
-    public void showStartGamePanel(boolean singlePlayerMode) {
-        canvas.closeMenus();
-        StartGamePanel panel
-            = canvas.getExistingFreeColPanel(StartGamePanel.class);
-        if (panel == null) {
-            panel = new StartGamePanel(freeColClient);
-        }
-        panel.initialize(singlePlayerMode);
-        canvas.showSubPanel(panel, false);
-    }
-
-    /**
-     * Display the statistics panel.
+     * Show the statistics panel.
      *
      * @param serverStats A map of server statistics key,value pairs.
      * @param clientStats A map of client statistics key,value pairs.
@@ -1108,12 +973,12 @@ public final class Widgets {
     public void showStatisticsPanel(Map<String, String> serverStats,
                                     Map<String, String> clientStats) {
         StatisticsPanel panel
-            = new StatisticsPanel(freeColClient, serverStats, clientStats);
-        canvas.showSubPanel(panel, true);
+            = new StatisticsPanel(this.freeColClient, serverStats, clientStats);
+        this.canvas.showSubPanel(panel, true);
     }
 
     /**
-     * Shows a status message.
+     * Show a status message.
      *
      * Explictly removed by @see closeStatusPanel.
      *
@@ -1121,75 +986,77 @@ public final class Widgets {
      */
     public void showStatusPanel(String message) {
         StatusPanel panel
-            = canvas.getExistingFreeColPanel(StatusPanel.class);
+            = this.canvas.getExistingFreeColPanel(StatusPanel.class);
         if (panel == null) {
-            panel = new StatusPanel(freeColClient);
+            panel = new StatusPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
         panel.setStatusMessage(message);
-        canvas.showSubPanel(panel, true);
     }
 
     /**
-     * Display the tile panel for a given tile.
+     * Show the tile panel for a given tile.
      *
      * @param tile The {@code Tile} to display.
      */
     public void showTilePanel(Tile tile) {
         if (tile == null || !tile.isExplored()) return;
-        TilePanel panel = new TilePanel(freeColClient, tile);
-        canvas.showSubPanel(panel, false);
+        TilePanel panel
+            = new TilePanel(this.freeColClient, tile);
+        this.canvas.showSubPanel(panel, false);
     }
 
     /**
-     * Display the trade route input panel for a given trade route.
+     * Show the trade route input panel for a given trade route.
      *
      * @param newRoute The {@code TradeRoute} to display.
      * @return The panel.
      */
     public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         TradeRouteInputPanel panel
-            = new TradeRouteInputPanel(freeColClient, newRoute);
-        canvas.showSubPanel(panel, null, true);
-        return panel;
+            = new TradeRouteInputPanel(this.freeColClient, newRoute);
+        return this.canvas.showSubPanel(panel, null, true);
     }
 
     /**
-     * Display a panel to select a trade route for a unit.
+     * Show a panel to select a trade route for a unit.
      *
      * @param unit An optional {@code Unit} to select a trade route for.
      */
     public void showTradeRoutePanel(Unit unit) {
-        TradeRoutePanel panel = new TradeRoutePanel(freeColClient, unit);
-        canvas.showFreeColPanel(panel, (unit == null) ? null : unit.getTile(), true);
+        TradeRoutePanel panel
+            = new TradeRoutePanel(this.freeColClient, unit);
+        this.canvas.showFreeColPanel(panel,
+                                     (unit == null) ? null : unit.getTile(),
+                                     true);
     }
 
     /**
-     * Displays the training panel.
+     * Show the training panel.
      */
     public void showTrainPanel() {
         TrainPanel panel
-            = canvas.getExistingFreeColPanel(TrainPanel.class);
+            = this.canvas.getExistingFreeColPanel(TrainPanel.class);
         if (panel == null) {
-            panel = new TrainPanel(freeColClient);
+            panel = new TrainPanel(this.freeColClient);
             panel.update();
-            canvas.showFreeColPanel(panel, null, false);
+            this.canvas.showFreeColPanel(panel, null, false);
         }
     }
 
     /**
-     * Display the victory dialog.
+     * Show the victory dialog.
      *
      * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showVictoryDialog(DialogHandler<Boolean> handler) {
         VictoryDialog dialog
-            = new VictoryDialog(freeColClient, getFrame());
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(dialog, null, handler));
+            = new VictoryDialog(this.freeColClient, getFrame());
+        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
     }
 
     /**
-     * Display the warehouse dialog for a colony.
+     * Show the warehouse dialog for a colony.
      *
      * Run out of ColonyPanel, so the tile is already displayed.
      *
@@ -1198,20 +1065,19 @@ public final class Widgets {
      */
     public boolean showWarehouseDialog(Colony colony) {
         WarehouseDialog dialog
-            = new WarehouseDialog(freeColClient, getFrame(),
-                                  colony);
-        return canvas.showFreeColDialog(dialog, null);
+            = new WarehouseDialog(this.freeColClient, getFrame(), colony);
+        return this.canvas.showFreeColDialog(dialog, null);
     }
 
     /**
-     * Display the production of a unit.
+     * Show the production of a unit.
      *
      * @param unit The {@code Unit} to display.
      */
     public void showWorkProductionPanel(Unit unit) {
         WorkProductionPanel panel
-            = new WorkProductionPanel(freeColClient, unit);
-        canvas.showSubPanel(panel, true);
+            = new WorkProductionPanel(this.freeColClient, unit);
+        this.canvas.showSubPanel(panel, true);
     }
 
     
@@ -1219,143 +1085,144 @@ public final class Widgets {
 
     public void showReportCargoPanel() {
         ReportCargoPanel panel
-            = canvas.getExistingFreeColPanel(ReportCargoPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportCargoPanel.class);
         if (panel == null) {
-            panel = new ReportCargoPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportCargoPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportColonyPanel(boolean compact) {
         FreeColPanel panel;
         if (compact) {
-            if ((panel = canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class)) == null) {
-                panel = new ReportCompactColonyPanel(freeColClient);
-                canvas.showSubPanel(panel, true);
+            panel = this.canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class);
+            if (panel == null) {
+                panel = new ReportCompactColonyPanel(this.freeColClient);
+                this.canvas.showSubPanel(panel, true);
             }
         } else {
-            if ((panel = canvas.getExistingFreeColPanel(ReportClassicColonyPanel.class)) == null) {
-                panel = new ReportClassicColonyPanel(freeColClient);
-                canvas.showSubPanel(panel, true);
+            panel = this.canvas.getExistingFreeColPanel(ReportClassicColonyPanel.class);
+            if (panel == null) {
+                panel = new ReportClassicColonyPanel(this.freeColClient);
+                this.canvas.showSubPanel(panel, true);
             }
         }
-        return panel;
     }
 
     public void showReportContinentalCongressPanel() {
         ReportContinentalCongressPanel panel
-            = canvas.getExistingFreeColPanel(ReportContinentalCongressPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportContinentalCongressPanel.class);
         if (panel == null) {
-            panel = new ReportContinentalCongressPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportContinentalCongressPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportEducationPanel() {
         ReportEducationPanel panel
-            = canvas.getExistingFreeColPanel(ReportEducationPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportEducationPanel.class);
         if (panel == null) {
-            panel = new ReportEducationPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportEducationPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportExplorationPanel() {
         ReportExplorationPanel panel
-            = canvas.getExistingFreeColPanel(ReportExplorationPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportExplorationPanel.class);
         if (panel == null) {
-            panel = new ReportExplorationPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportExplorationPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportForeignAffairPanel() {
         ReportForeignAffairPanel panel
-            = canvas.getExistingFreeColPanel(ReportForeignAffairPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportForeignAffairPanel.class);
         if (panel == null) {
-            panel = new ReportForeignAffairPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportForeignAffairPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportHistoryPanel() {
         ReportHistoryPanel panel
-            = canvas.getExistingFreeColPanel(ReportHistoryPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportHistoryPanel.class);
         if (panel == null) {
-            panel = new ReportHistoryPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportHistoryPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportIndianPanel() {
         ReportIndianPanel panel
-            = canvas.getExistingFreeColPanel(ReportIndianPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportIndianPanel.class);
         if (panel == null) {
-            panel = new ReportIndianPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportIndianPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportLabourPanel() {
         ReportLabourPanel panel
-            = canvas.getExistingFreeColPanel(ReportLabourPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportLabourPanel.class);
         if (panel == null) {
-            panel = new ReportLabourPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportLabourPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportMilitaryPanel() {
         ReportMilitaryPanel panel
-            = canvas.getExistingFreeColPanel(ReportMilitaryPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportMilitaryPanel.class);
         if (panel == null) {
-            panel = new ReportMilitaryPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportMilitaryPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportNavalPanel() {
         ReportNavalPanel panel
-            = canvas.getExistingFreeColPanel(ReportNavalPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportNavalPanel.class);
         if (panel == null) {
-            panel = new ReportNavalPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportNavalPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportProductionPanel() {
         ReportProductionPanel panel
-            = canvas.getExistingFreeColPanel(ReportProductionPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportProductionPanel.class);
         if (panel == null) {
-            panel = new ReportProductionPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportProductionPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportReligiousPanel() {
         ReportReligiousPanel panel
-            = canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
         if (panel == null) {
-            panel = new ReportReligiousPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportReligiousPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportRequirementsPanel() {
         ReportRequirementsPanel panel
-            = canvas.getExistingFreeColPanel(ReportRequirementsPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportRequirementsPanel.class);
         if (panel == null) {
-            panel = new ReportRequirementsPanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportRequirementsPanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
     public void showReportTradePanel() {
         ReportTradePanel panel
-            = canvas.getExistingFreeColPanel(ReportTradePanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportTradePanel.class);
         if (panel == null) {
-            panel = new ReportTradePanel(freeColClient);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportTradePanel(this.freeColClient);
+            this.canvas.showSubPanel(panel, true);
         }
     }
 
@@ -1366,10 +1233,10 @@ public final class Widgets {
      */
     public void showReportTurnPanel(List<ModelMessage> messages) {
         ReportTurnPanel panel
-            = canvas.getExistingFreeColPanel(ReportTurnPanel.class);
+            = this.canvas.getExistingFreeColPanel(ReportTurnPanel.class);
         if (panel == null) {
-            panel = new ReportTurnPanel(freeColClient, messages);
-            canvas.showSubPanel(panel, true);
+            panel = new ReportTurnPanel(this.freeColClient, messages);
+            this.canvas.showSubPanel(panel, true);
         } else {
             panel.setMessages(messages);
         }
