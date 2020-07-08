@@ -1373,6 +1373,50 @@ public final class ImageLibrary {
             : getSizedImageInternal(key, this.tileSize, false);
     }
 
+    /**
+     * Get a scaled terrain-image for a terrain type (and position 0, 0).
+     *
+     * Called from MapeEditorTransformPanel.buildList
+     *
+     * @param type The type of the terrain-image to return.
+     * @param size The maximum size of the terrain image to return.
+     * @return The terrain-image
+     */
+    public static BufferedImage getTileImageWithOverlayAndForest(TileType type,
+                                                                 Dimension size) {
+        int width = (size.width > 0) ? size.width
+            : ((2 * TILE_SIZE.width * size.height
+                    + (TILE_OVERLAY_SIZE.height+1))
+                / (2 * ImageLibrary.TILE_OVERLAY_SIZE.height));
+        Dimension size2 = new Dimension(width, -1);
+        BufferedImage terrainImage = getTerrainImage(type, 0, 0, size2);
+        BufferedImage overlayImage = getOverlayImage(type, size2);
+        BufferedImage forestImage = (type.isForested())
+            ? getForestImage(type, size2)
+            : null;
+        if (overlayImage == null && forestImage == null) return terrainImage;
+
+        width = terrainImage.getWidth();
+        int height = terrainImage.getHeight();
+        if (overlayImage != null) {
+            height = Math.max(height, overlayImage.getHeight());
+        }
+        if (forestImage != null) {
+            height = Math.max(height, forestImage.getHeight());
+        }
+        BufferedImage compositeImage
+            = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = compositeImage.createGraphics();
+        g.drawImage(terrainImage, 0, height - terrainImage.getHeight(), null);
+        if (overlayImage != null) {
+            g.drawImage(overlayImage, 0, height - overlayImage.getHeight(), null);
+        }
+        if (forestImage != null) {
+            g.drawImage(forestImage, 0, height - forestImage.getHeight(), null);
+        }
+        g.dispose();
+        return compositeImage;
+    }
 
     // Unit image handling
     

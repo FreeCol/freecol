@@ -1571,11 +1571,6 @@ public class GUI extends FreeColClientHolder {
 
     // Tile image manipulation
 
-    public BufferedImage createTileImageWithOverlayAndForest(TileType type,
-                                                             Dimension size) {
-        return null;
-    }
-
     public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         return null;
     }

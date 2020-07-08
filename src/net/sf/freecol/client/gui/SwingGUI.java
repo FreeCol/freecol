@@ -968,15 +968,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage createTileImageWithOverlayAndForest(TileType type,
-                                                             Dimension size) {
-        return tileViewer.createTileImageWithOverlayAndForest(type, size);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         return tileViewer.createTileImageWithBeachBorderAndItems(tile);
     }
