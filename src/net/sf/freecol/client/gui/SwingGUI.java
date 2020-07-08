@@ -912,7 +912,8 @@ public class SwingGUI extends GUI {
     @Override
     public void updateMapControls() {
         if (this.mapControls == null) return;
-        this.mapControls.update(getActiveUnit());
+        this.mapControls.update(getViewMode(), getActiveUnit(),
+                                getSelectedTile());
     }
 
     /**
