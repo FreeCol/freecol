@@ -1573,20 +1573,17 @@ public class GUI extends FreeColClientHolder {
 
     // Tile image manipulation
 
-    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
-        return null;
-    }
+    // Used by: InfoPanel
+    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) { return null; }
 
-    public BufferedImage createTileImage(Tile tile, Player player) {
-        return null;
-    }
+    // Used by: TilePanel
+    public BufferedImage createTileImage(Tile tile, Player player) { return null; }
 
-    public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
-        return null;
-    }
+    // Used by: WorkProductionPanel
+    public BufferedImage createColonyTileImage(Tile tile, Colony colony) { return null; }
 
-    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
-    }
+    // Used by: ColonyPanel.TilesPanel
+    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {}
 
 
     // View mode handling, including accessors for the active unit for
