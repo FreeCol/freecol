@@ -1154,8 +1154,9 @@ public class GUI extends FreeColClientHolder {
      * Used by: FreeColClient
      * 
      * @param userMsg An optional user message.
+     * @param callback A {@code Runnable} to run when the video completes.
      */
-    public void showOpeningVideo(final String userMsg) {}
+    public void showOpeningVideo(final String userMsg, Runnable callback) {}
 
     /**
      * Starts the GUI by creating and displaying the GUI-objects.

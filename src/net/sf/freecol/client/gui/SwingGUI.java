@@ -580,13 +580,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showOpeningVideo(final String userMsg) {
+    public void showOpeningVideo(final String userMsg, Runnable callback) {
         this.canvas.playVideo("video.opening",
-                              !getSoundController().canPlaySound(),
-                              () -> {
-                                  playSound("sound.intro.general");
-                                  showMainPanel(userMsg);
-                              });
+                              !getSoundController().canPlaySound(), callback);
     }
 
     /**

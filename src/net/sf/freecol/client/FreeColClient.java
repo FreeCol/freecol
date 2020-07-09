@@ -301,9 +301,8 @@ public final class FreeColClient {
                     }
                 });
         } else if (showOpeningVideo) { // Video first
-            SwingUtilities.invokeLater(() -> {
-                    gui.showOpeningVideo(userMsg);
-                });
+            gui.showOpeningVideo(userMsg,
+                () -> gui.showMainPanel(userMsg));
         } else { // Start main panel
             soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
