@@ -527,14 +527,13 @@ public final class Widgets {
      * Show an error message.
      *
      * @param message The message to display.
-     * @param callback Optional routine to run when the error panel is closed.
      * @return The panel shown.
      */
-    public FreeColPanel showErrorPanel(String message, Runnable callback) {
+    public FreeColPanel showErrorPanel(String message) {
         if (message == null) return null;
-        ErrorPanel errorPanel = new ErrorPanel(this.freeColClient, message);
-        if (callback != null) errorPanel.addClosingCallback(callback);
-        return this.canvas.showSubPanel(errorPanel, true);
+        ErrorPanel panel
+            = new ErrorPanel(this.freeColClient, message);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**

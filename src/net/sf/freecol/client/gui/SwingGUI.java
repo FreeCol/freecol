@@ -1569,7 +1569,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     protected FreeColPanel showErrorPanel(String message, Runnable callback) {
-        return widgets.showErrorPanel(message, callback);
+        return widgets.showErrorPanel(message).addClosingCallback(callback);
     }
 
     /**
