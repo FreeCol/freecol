@@ -183,6 +183,7 @@ public final class Widgets {
             this.fcd = fcd;
             this.tile = tile;
             this.handler = handler;
+            SwingUtilities.invokeLater(this);
         }
 
         /**
@@ -328,10 +329,9 @@ public final class Widgets {
      */
     public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
                                        DialogHandler<List<Goods>> handler) {
-        CaptureGoodsDialog dialog
-            = new CaptureGoodsDialog(this.freeColClient, getFrame(),
-                                     unit, gl);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
+        new DialogCallback<>(new CaptureGoodsDialog(this.freeColClient,
+                                                    getFrame(), unit, gl),
+                             null, handler);
     }
 
     /**
@@ -355,10 +355,9 @@ public final class Widgets {
      */
     public void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
                                                DialogHandler<FoundingFather> handler) {
-        ChooseFoundingFatherDialog dialog
-            = new ChooseFoundingFatherDialog(this.freeColClient, getFrame(),
-                                             ffs);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
+        new DialogCallback<>(new ChooseFoundingFatherDialog(this.freeColClient,
+                                                            getFrame(), ffs),
+                             null, handler);
     }
 
     /**
@@ -461,10 +460,9 @@ public final class Widgets {
      */
     public void showDumpCargoDialog(Unit unit,
                                     DialogHandler<List<Goods>> handler) {
-        DumpCargoDialog dialog
-            = new DumpCargoDialog(this.freeColClient, getFrame(), unit);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, unit.getTile(),
-                                                        handler));
+        new DialogCallback<>(new DumpCargoDialog(this.freeColClient,
+                                                 getFrame(), unit),
+                             unit.getTile(), handler);
     }
 
     /**
@@ -503,10 +501,11 @@ public final class Widgets {
      */
     public void showEmigrationDialog(Player player, boolean fountainOfYouth,
                                      DialogHandler<Integer> handler) {
-        EmigrationDialog dialog
-            = new EmigrationDialog(this.freeColClient, getFrame(),
-                                   player.getEurope(), fountainOfYouth);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
+        new DialogCallback<>(new EmigrationDialog(this.freeColClient,
+                                                  getFrame(),
+                                                  player.getEurope(),
+                                                  fountainOfYouth),
+                             null, handler);
     }
 
     /**
@@ -517,10 +516,9 @@ public final class Widgets {
      */
     public void showEndTurnDialog(List<Unit> units,
                                   DialogHandler<Boolean> handler) {
-        EndTurnDialog dialog
-            = new EndTurnDialog(this.freeColClient, getFrame(),
-                                units);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
+        new DialogCallback<>(new EndTurnDialog(this.freeColClient,
+                                               getFrame(), units),
+                             null, handler);
     }
 
     /**
@@ -598,10 +596,10 @@ public final class Widgets {
     public void showFirstContactDialog(Player player, Player other,
                                        Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
-        FirstContactDialog dialog
-            = new FirstContactDialog(this.freeColClient, getFrame(),
-                                     player, other, tile, settlementCount);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, tile, handler));
+        new DialogCallback<>(new FirstContactDialog(this.freeColClient,
+                                                    getFrame(), player, other,
+                                                    tile, settlementCount),
+                             tile, handler);
     }
 
     /**
@@ -740,10 +738,10 @@ public final class Widgets {
     public void showMonarchDialog(MonarchAction action,
                                   StringTemplate tmpl, String monarchKey,
                                   DialogHandler<Boolean> handler) {
-        MonarchDialog dialog
-            = new MonarchDialog(this.freeColClient, getFrame(),
-                                action, tmpl, monarchKey);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
+        new DialogCallback<>(new MonarchDialog(this.freeColClient,
+                                               getFrame(), action,
+                                               tmpl, monarchKey),
+                             null, handler);
     }
 
     /**
@@ -757,11 +755,11 @@ public final class Widgets {
      */
     public void showNamingDialog(StringTemplate tmpl, String defaultName,
                                  Unit unit, DialogHandler<String> handler) {
-        FreeColStringInputDialog dialog
-            = new FreeColStringInputDialog(this.freeColClient, getFrame(), false,
-                                           tmpl, defaultName, "ok", null);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, unit.getTile(),
-                                                        handler));
+        new DialogCallback<>(new FreeColStringInputDialog(this.freeColClient,
+                                                          getFrame(), false,
+                                                          tmpl, defaultName,
+                                                          "ok", null),
+                             unit.getTile(), handler);
     }
 
     /**
@@ -776,11 +774,10 @@ public final class Widgets {
     public void showNativeDemandDialog(Unit unit, Colony colony,
                                        GoodsType type, int amount,
                                        DialogHandler<Boolean> handler) {
-        NativeDemandDialog dialog
-            = new NativeDemandDialog(this.freeColClient, getFrame(),
-                                     unit, colony, type, amount);
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, unit.getTile(),
-                                                        handler));
+        new DialogCallback<>(new NativeDemandDialog(this.freeColClient,
+                                                    getFrame(), unit, colony,
+                                                    type, amount),
+                             unit.getTile(), handler);
     }
 
     /**
@@ -1072,9 +1069,8 @@ public final class Widgets {
      * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showVictoryDialog(DialogHandler<Boolean> handler) {
-        VictoryDialog dialog
-            = new VictoryDialog(this.freeColClient, getFrame());
-        SwingUtilities.invokeLater(new DialogCallback<>(dialog, null, handler));
+        new DialogCallback<>(new VictoryDialog(this.freeColClient, getFrame()),
+                             null, handler);
     }
 
     /**
