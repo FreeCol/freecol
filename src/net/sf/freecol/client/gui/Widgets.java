@@ -1013,25 +1013,6 @@ public final class Widgets {
     }
 
     /**
-     * Show a status message.
-     *
-     * Explictly removed by @see closeStatusPanel.
-     *
-     * @param message The text message to display on the status panel.
-     * @return The panel shown.
-     */
-    public FreeColPanel showStatusPanel(String message) {
-        StatusPanel panel
-            = this.canvas.getExistingFreeColPanel(StatusPanel.class);
-        if (panel == null) {
-            panel = new StatusPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
-        }
-        panel.setStatusMessage(message);
-        return panel;
-    }
-
-    /**
      * Show the tile panel for a given tile.
      *
      * @param tile The {@code Tile} to display.

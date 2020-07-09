@@ -2090,7 +2090,15 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showStatusPanel(String message) {
-        return widgets.showStatusPanel(message);
+        StatusPanel panel
+            = this.canvas.getExistingFreeColPanel(StatusPanel.class);
+        if (panel == null) {
+            panel = new StatusPanel(getFreeColClient());
+        } else {
+            this.canvas.removeFromCanvas(panel);
+        }
+        panel.setStatusMessage(message);
+        return this.canvas.showSubPanel(panel, true);
     }
 
     /**
