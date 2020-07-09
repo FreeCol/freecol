@@ -788,22 +788,20 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Checks if the Tile/Units at the given coordinates are displayed
-     * on the screen (or, if the map is already displayed and the focus
-     * has been changed, whether they will be displayed on the screen
-     * the next time it'll be redrawn).
+     * Checks if a tile is displayed on the screen (or, if the map is
+     * already displayed and the focus has been changed, whether they
+     * will be displayed on the screen the next time it will be redrawn).
      *
-     * @param tileToCheck The position of the Tile in question.
-     * @return <i>true</i> if the Tile will be drawn on the screen,
-     *     <i>false</i> otherwise.
+     * @param tile The {@code Tile} to check.
+     * @return True if the tile is on screen.
      */
-    boolean onScreen(Tile tileToCheck) {
-        if (tileToCheck == null) return false;
+    public boolean onScreen(Tile tile) {
+        if (tile == null) return false;
         repositionMapIfNeeded();
-        return (tileToCheck.getY() - 2 > topRow || alignedTop)
-            && (tileToCheck.getY() + 4 < bottomRow || alignedBottom)
-            && (tileToCheck.getX() - 1 > leftColumn || alignedLeft)
-            && (tileToCheck.getX() + 2 < rightColumn || alignedRight);
+        return (tile.getY() - 2 > topRow || alignedTop)
+            && (tile.getY() + 4 < bottomRow || alignedBottom)
+            && (tile.getX() - 1 > leftColumn || alignedLeft)
+            && (tile.getX() + 2 < rightColumn || alignedRight);
     }
 
     /**
