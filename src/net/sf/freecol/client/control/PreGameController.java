@@ -24,8 +24,6 @@ import java.awt.Color;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -250,20 +248,20 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void startGameHandler() {
         final FreeColClient fcc = getFreeColClient();
+        final GUI gui = getGUI();
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
                     logger.info("Client starting game");
                     for (int tries = 50; tries >= 0; tries--) {
                         if (fcc.isReadyToStart()) {
-                            SwingUtilities.invokeLater(() -> {
+                            gui.invokeNowOrLater(() -> {
                                     startGameInternal();
                                 });
                             return;
                         }
                         Utils.delay(200, "StartGame has been interupted.");
                     }
-                    final GUI gui = getGUI();
                     String err = (getGame() == null) ? "client.noGame"
                         : "client.noMap";
                     gui.closeMainPanel();
