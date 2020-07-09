@@ -221,18 +221,25 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * Triggered by Canvas.notifyClose.
      *
      * @param runnable Some code to run on close.
+     * @return This panel.
      */
-    public void addClosingCallback(final Runnable runnable) {
-        addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    if ("closing".equals(e.getPropertyName())) {
-                        runnable.run();
-                        // Lambda unsuitable due to use of "this"
-                        FreeColPanel.this.removePropertyChangeListener(this);
+    public FreeColPanel addClosingCallback(final Runnable runnable) {
+        if (runnable != null) {
+            addPropertyChangeListener(new PropertyChangeListener() {
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void propertyChange(PropertyChangeEvent e) {
+                        if ("closing".equals(e.getPropertyName())) {
+                            runnable.run();
+                            // Lambda unsuitable due to use of "this"
+                            FreeColPanel.this.removePropertyChangeListener(this);
+                        }
                     }
-                }
-            });
+                });
+        }
+        return this;
     }
 
     /**
