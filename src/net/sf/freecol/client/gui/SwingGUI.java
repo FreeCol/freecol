@@ -191,16 +191,18 @@ public class SwingGUI extends GUI {
      * @param a The {@code Animation} to perform.
      */
     private void animate(Animation a) {
-        // The tiles must be visible
+        // Insist that tiles are visible (assume changeFocus centers
+        // sufficiently well that if one is good the rest will be)
         final List<Tile> tiles = a.getTiles();
-        boolean changed = false;
         for (Tile t : tiles) {
             if (!this.mapViewer.onScreen(t)) {
                 this.mapViewer.changeFocus(t);
-                changed = true;
+                break;
             }
         }
-        if (changed) paintImmediately();
+        // Always completely update the screen before starting the animation
+        // as focus may have changed either here or in animations()
+        paintImmediately();
 
         // Calculate the union of the bounds for all the tiles in the
         // animation, this is the area that will need to be repainted
@@ -210,7 +212,6 @@ public class SwingGUI extends GUI {
             Rectangle r = this.mapViewer.calculateTileBounds(t);
             bounds = (bounds == null) ? r : bounds.union(r);
         }
-        
         // Get the unit label, add to canvas if not already there, and
         // update the animation with the locations for the label for each
         // of the animation's tiles
@@ -258,15 +259,12 @@ public class SwingGUI extends GUI {
         final boolean center = getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
         Tile first = animations.get(0).getTiles().get(0);
-        if (!this.mapViewer.onScreen(first)
-            || (center && first != getFocus())) {
+        if (center && first != getFocus()) {
             this.mapViewer.changeFocus(first);
-            paintImmediately();
         }
            
         invokeNowOrWait(() -> {
                 for (Animation a : animations) animate(a);
-                refresh();
             });
     }
 
