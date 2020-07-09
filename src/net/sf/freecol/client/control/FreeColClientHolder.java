@@ -133,15 +133,6 @@ public class FreeColClientHolder {
     }
 
     /**
-     * Gets the controller for the sound.
-     *
-     * @return The sound controller, if any.
-     */
-    public SoundController getSoundController() {
-        return this.freeColClient.getSoundController();
-    }
-
-    /**
      * Get the specification.
      *
      * @return The {@code Specification} held by the game.

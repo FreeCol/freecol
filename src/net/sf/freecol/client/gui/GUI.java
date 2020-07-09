@@ -1024,7 +1024,7 @@ public class GUI extends FreeColClientHolder {
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
-        getSoundController().playSound(sound);
+        getFreeColClient().getSoundController().playSound(sound);
     }
 
     /**
@@ -1035,7 +1035,7 @@ public class GUI extends FreeColClientHolder {
      * @return The text.
      */
     public String getSoundMixerLabelText() {
-        return getSoundController().getSoundMixerLabelText();
+        return getFreeColClient().getSoundController().getSoundMixerLabelText();
     }
 
 

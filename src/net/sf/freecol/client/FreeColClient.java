@@ -280,7 +280,7 @@ public final class FreeColClient {
         //     NewPanel to a call to the connect controller to start a game)
         //
         if (savedGame != null) { // Restore from saved
-            soundController.playSound("sound.intro.general");
+            gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() ->
                 getGUI().showStatusPanel(Messages.message("status.loadingGame")));
             if (connectController.startSavedGame(savedGame)) {
@@ -294,7 +294,7 @@ public final class FreeColClient {
                 SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
             }
         } else if (spec != null) { // Debug or fast start
-            soundController.playSound("sound.intro.general");
+            gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() -> {
                     if (!connectController.startSinglePlayerGame(spec)) {
                         gui.showMainPanel(userMsg);
@@ -304,7 +304,7 @@ public final class FreeColClient {
             gui.showOpeningVideo(userMsg,
                 () -> gui.showMainPanel(userMsg));
         } else { // Start main panel
-            soundController.playSound("sound.intro.general");
+            gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
         }
 

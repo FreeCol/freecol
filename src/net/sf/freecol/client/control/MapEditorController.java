@@ -141,6 +141,7 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void startMapEditor() {
         final FreeColClient fcc = getFreeColClient();
+        final GUI gui = getGUI();
         try {
             Specification specification = getDefaultSpecification();
             fcc.setMapEditor(true);
@@ -151,15 +152,14 @@ public final class MapEditorController extends FreeColClientHolder {
             requireNativeNations(serverGame);
             fcc.setGame(serverGame);
             fcc.setMyPlayer(null);
-            getSoundController().playSound(null);
-
-            getGUI().closeMainPanel();
-            getGUI().closeMenus();
+            gui.playSound(null);
+            gui.closeMainPanel();
+            gui.closeMenus();
             //fcc.changeClientState(true);
-            getGUI().changeView((Tile)null);
-            getGUI().startMapEditorGUI();
+            gui.changeView((Tile)null);
+            gui.startMapEditorGUI();
         } catch (IOException e) {
-            getGUI().showErrorPanel(StringTemplate
+            gui.showErrorPanel(StringTemplate
                 .template("server.initialize"));
             return;
         }

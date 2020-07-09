@@ -290,8 +290,8 @@ public final class PreGameController extends FreeColClientHolder {
         gui.closeStatusPanel();
         
         // Stop the long introduction sound and play the player intro
-        getSoundController().playSound(null);
-        getSoundController().playSound("sound.intro." + player.getNationId());
+        gui.playSound(null);
+        gui.playSound("sound.intro." + player.getNationId());
         
         // Switch to InGame mode
         fcc.changeClientState(true);

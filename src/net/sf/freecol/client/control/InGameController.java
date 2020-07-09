@@ -186,7 +186,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param soundKey The sound resource key.
      */
     public void sound(String soundKey) {
-        getSoundController().playSound(soundKey);
+        getGUI().playSound(soundKey);
     }
     
     /**
