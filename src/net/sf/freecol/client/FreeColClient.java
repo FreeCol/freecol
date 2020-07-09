@@ -227,24 +227,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Handy utility to create a runnable to restart the main panel.
-     *
-     * Called in a few places to recover from assorted failure.
-     * The indirection through invokeLater is necessary if this is
-     * called in the closing callback of another panel --- if called
-     * directly it loops when Canvas.showMainPanel tries to close all
-     * existing panels.     
-     *
-     * @param userMsg A message to the user.
-     * @return A {@code Runnable} for the main panel.
-     */
-    public Runnable invokeMainPanel(final String userMsg) {
-        return () -> SwingUtilities.invokeLater(() -> {
-                gui.showMainPanel(userMsg);
-            });
-    }
-
-    /**
      * Starts the new {@code FreeColClient}, including the GUI.
      *
      * @param size An optional window size.
@@ -309,7 +291,7 @@ public final class FreeColClient {
                         }
                     });
             } else {
-                invokeMainPanel(userMsg).run();
+                SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
             }
         } else if (spec != null) { // Debug or fast start
             soundController.playSound("sound.intro.general");
@@ -324,7 +306,7 @@ public final class FreeColClient {
                 });
         } else { // Start main panel
             soundController.playSound("sound.intro.general");
-            invokeMainPanel(userMsg).run();
+            SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
         }
 
         String quit = FreeCol.CLIENT_THREAD + "Quit Game";
@@ -760,13 +742,14 @@ public final class FreeColClient {
      * @return Null.
      */
     private FreeColServer failToMain(Exception ex, StringTemplate template) {
-        GUI.ErrorJob ej = gui.errorJob(ex, template);
-        logger.log(Level.WARNING, Messages.message(template), ex);
         if (FreeCol.getHeadless() // If this is a debug run, fail hard.
             || FreeColDebugger.getDebugRunTurns() >= 0) {
-            FreeCol.fatal(logger, ej.toString());
+            final StringTemplate t = FreeCol.errorFromException(ex, template);
+            final String msg = Messages.message(t);
+            FreeCol.fatal(null, msg);
+        } else {
+            getGUI().showErrorPanel(ex, template);
         }
-        ej.setRunnable(invokeMainPanel(null)).invokeLater();
         return null;
     }
 

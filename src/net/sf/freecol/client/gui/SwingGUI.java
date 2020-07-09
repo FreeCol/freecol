@@ -1566,7 +1566,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    protected FreeColPanel showErrorPanel(String message, Runnable callback) {
+    public FreeColPanel showErrorPanel(String message, Runnable callback) {
         return widgets.showErrorPanel(message).addClosingCallback(callback);
     }
 

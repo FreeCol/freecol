@@ -105,56 +105,6 @@ public class GUI extends FreeColClientHolder {
         END_TURN
     };
 
-    /**
-     * Error handler class to display a message with this GUI.
-     */
-    public class ErrorJob implements Runnable {
-
-        private final StringTemplate template;
-        private Runnable runnable;
-
-        
-        public ErrorJob(Exception ex, String key) {
-            this.template = FreeCol.errorFromException(ex, key);
-            this.runnable = null;
-        }
-
-        public ErrorJob(Exception ex, StringTemplate tmpl) {
-            this.template = FreeCol.errorFromException(ex, tmpl);
-            this.runnable = null;
-        }
-
-        public ErrorJob(String key) {
-            this.template = StringTemplate.template(key);
-            this.runnable = null;
-        }
-
-        public ErrorJob(StringTemplate template) {
-            this.template = template;
-            this.runnable = null;
-        }
-
-        public ErrorJob setRunnable(Runnable runnable) {
-            this.runnable = runnable;
-            return this;
-        }
-
-        public void invokeLater() {
-            GUI.this.invokeNowOrLater(this);
-        }
-
-        @Override
-        public void run() {
-            GUI.this.closeMenus();
-            GUI.this.showErrorPanel(this.template, null, this.runnable);
-        }
-
-        @Override
-        public String toString() {
-            return Messages.message(this.template);
-        }
-    }
-
     /** Warning levels. */
     private static final String levels[] = {
         "low", "normal", "high"
@@ -210,50 +160,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     
-    // Error handling
-
-    /**
-     * Create a new error job from a given exception and message key.
-     *
-     * @param ex The {@code Exception} to use.
-     * @param key The message key.
-     * @return An {@code ErrorJob} to display the error using this GUI.
-     */
-    public ErrorJob errorJob(Exception ex, String key) {
-        return new ErrorJob(ex, key);
-    }
-
-    /**
-     * Create a new error job from a given exception and template.
-     *
-     * @param ex The {@code Exception} to use.
-     * @param template The {@code StringTemplate}.
-     * @return An {@code ErrorJob} to display the error using this GUI.
-     */
-    public ErrorJob errorJob(Exception ex, StringTemplate template) {
-        return new ErrorJob(ex, template);
-    }
-    
-    /**
-     * Create a new error job from a given message key.
-     *
-     * @param key The message key.
-     * @return An {@code ErrorJob} to display the error using this GUI.
-     */
-    public ErrorJob errorJob(String key) {
-        return new ErrorJob(key);
-    }
-
-    /**
-     * Create a new error job from a given template.
-     *
-     * @param template The {@code StringTemplate}.
-     * @return An {@code ErrorJob} to display the error using this GUI.
-     */
-    public ErrorJob errorJob(StringTemplate template) {
-        return new ErrorJob(template);
-    }
-
     // High level dialogs, usually using the dialog primitives
 
     /**
@@ -1037,6 +943,22 @@ public class GUI extends FreeColClientHolder {
         return showErrorPanel(display, callback);
     }
 
+    /**
+     * Show a serious error message with an exception and return
+     * to the main panel when done.
+     *
+     * @param ex An optional {@code Exception} to display.
+     * @param tmpl A {@code StringTemplate} for the message.
+     */
+    public final void showErrorPanel(Exception ex, StringTemplate template) {
+        final StringTemplate t = (ex == null) ? template
+            : FreeCol.errorFromException(ex, template);
+        invokeNowOrLater(() -> showErrorPanel(t, null, () -> {
+                    closeMenus();
+                    showMainPanel(null);
+                }));
+    }
+                
     /**
      * Show an information message.
      *
@@ -2028,14 +1950,13 @@ public class GUI extends FreeColClientHolder {
                                   DialogHandler<Boolean> handler) {}
 
     /**
-     * Show an error message.  The error message should be fully formatted
-     * by now.
+     * Show an error panel.
      *
-     * @param message The actual final error message.
-     * @param callback Optional routine to run when the error panel is closed.
+     * @param message The error message to display.
+     * @param callback An optional {@code Runnable} to run on close.
      * @return The panel shown.
      */
-    protected FreeColPanel showErrorPanel(String message, Runnable callback) { return null; }
+    public FreeColPanel showErrorPanel(String message, Runnable callback) { return null; }
 
     /**
      * Show the Europe panel.

@@ -305,7 +305,6 @@ public final class MapEditorController extends FreeColClientHolder {
             @Override
             public void run() {
                 final FreeColServer freeColServer = getFreeColServer();
-                GUI.ErrorJob ej = null;
                 try {
                     Specification spec = getDefaultSpecification();
                     Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
@@ -319,18 +318,17 @@ public final class MapEditorController extends FreeColClientHolder {
                             gui.refresh();
                         });
                 } catch (FileNotFoundException fnfe) {
-                    ej = gui.errorJob(fnfe,
+                    gui.showErrorPanel(fnfe,
                         FreeCol.badFile("error.couldNotFind", theFile));
                 } catch (IOException ioe) {
-                    ej = gui.errorJob(ioe, "server.initialize");
+                    gui.showErrorPanel(ioe,
+                        StringTemplate.key("server.initialize"));
                 } catch (XMLStreamException xse) {
-                    ej = gui.errorJob(xse,
+                    gui.showErrorPanel(xse,
                         FreeCol.badFile("error.couldNotLoad", theFile));
                 } catch (FreeColException ex) {
-                    ej = gui.errorJob(ex, "server.initialize");
-                }
-                if (ej != null) {
-                    ej.setRunnable(fcc.invokeMainPanel(null)).invokeLater();
+                    gui.showErrorPanel(ex,
+                        StringTemplate.key("server.initialize"));
                 }
             }
         }.start();
