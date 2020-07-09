@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
@@ -281,22 +280,27 @@ public final class FreeColClient {
         //
         if (savedGame != null) { // Restore from saved
             gui.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() ->
-                getGUI().showStatusPanel(Messages.message("status.loadingGame")));
+            gui.invokeNowOrWait(() ->
+                gui.showStatusPanel(Messages.message("status.loadingGame")));
             if (connectController.startSavedGame(savedGame)) {
-                SwingUtilities.invokeLater(() -> {
+                gui.invokeNowOrLater(() -> {
                         gui.closeStatusPanel();
                         if (userMsg != null) {
                             gui.showInformationPanel(userMsg);
                         }
                     });
             } else {
-                SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
+                gui.invokeNowOrLater(() -> {
+                        gui.closeStatusPanel();
+                        gui.showMainPanel(userMsg);
+                    });
             }
         } else if (spec != null) { // Debug or fast start
             gui.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() -> {
-                    if (!connectController.startSinglePlayerGame(spec)) {
+            gui.invokeNowOrLater(() -> {
+                    if (connectController.startSinglePlayerGame(spec)) {
+                        ; // all is well
+                    } else {
                         gui.showMainPanel(userMsg);
                     }
                 });
@@ -305,11 +309,11 @@ public final class FreeColClient {
                 () -> gui.showMainPanel(userMsg));
         } else { // Start main panel
             gui.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() -> gui.showMainPanel(userMsg));
+            gui.invokeNowOrLater(() -> gui.showMainPanel(userMsg));
         }
 
-        String quit = FreeCol.CLIENT_THREAD + "Quit Game";
-        Runtime.getRuntime().addShutdownHook(new Thread(quit) {
+        String quitName = FreeCol.CLIENT_THREAD + "Quit Game";
+        Runtime.getRuntime().addShutdownHook(new Thread(quitName) {
                 @Override
                 public void run() {
                     stopServer();
