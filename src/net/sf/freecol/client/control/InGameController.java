@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.control;
 
+import java.awt.Color;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -2608,20 +2610,23 @@ public final class InGameController extends FreeColClientHolder {
         if (chat == null) return false;
 
         final Player player = getMyPlayer();
-        getGUI().displayChat(player, chat, false);
+        getGUI().displayChat(player.getName(), chat, player.getNationColor(),
+                             false);
         return askServer().chat(player, chat);
     }
 
     /**
      * Chat with another player.
      *
-     * @param player The {@code Player} to chat with.
+     * @param sender The sender of the chat message.
      * @param message What to say.
+     * @param color The message color.
      * @param pri If true, the message is private.
      */
-    public void chatHandler(Player player, String message, boolean pri) {
+    public void chatHandler(String sender, String message, Color color,
+                            boolean pri) {
         invokeLater(() ->
-            getGUI().displayChat(player, message, pri));
+            getGUI().displayChat(sender, message, color, pri));
     }
 
     /**

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -1645,11 +1646,12 @@ public class GUI extends FreeColClientHolder {
      *
      * Used by: client InGameController.{chat,chatHandler}
      *
-     * @param player The player who sent the chat message.
+     * @param sender The message sender.
      * @param message The chat message.
+     * @param color The message color.
      * @param privateChat True if the message is private.
      */
-    public void displayChat(Player player, String message,
+    public void displayChat(String sender, String message, Color color,
                             boolean privateChat) {}
 
     /**
@@ -1664,11 +1666,11 @@ public class GUI extends FreeColClientHolder {
      *
      * Used by: PreGameController.chatHandler
      *
-     * @param player The player who sent the chat message.
+     * @param sender The player who sent the chat message.
      * @param message The chat message.
      * @param privateChat True if the message is private.
      */
-    public void displayStartChat(Player player, String message,
+    public void displayStartChat(String sender, String message,
                                  boolean privateChat) {}
 
     /**

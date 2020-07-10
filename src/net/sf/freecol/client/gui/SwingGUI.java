@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -1203,10 +1204,10 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void displayChat(Player player, String message,
+    public void displayChat(String sender, String message, Color color,
                             boolean privateChat) {
-        this.canvas.displayChat(new GUIMessage(
-            player.getName() + ": " + message, player.getNationColor()));
+        this.canvas.displayChat(new GUIMessage(sender + ": " + message,
+                                               color));
     }
 
     /**
@@ -1239,12 +1240,12 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void displayStartChat(Player player, String message,
+    public void displayStartChat(String sender, String message,
                                  boolean privateChat) {
         StartGamePanel panel
             = this.canvas.getExistingFreeColPanel(StartGamePanel.class);
         if (panel != null) {
-            panel.displayChat(player.getName(), message, privateChat);
+            panel.displayChat(sender, message, privateChat);
         }
     }
 

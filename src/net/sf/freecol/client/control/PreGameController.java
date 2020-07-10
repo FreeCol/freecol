@@ -91,12 +91,15 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Display a chat message.
      *
-     * @param player The {@code Player} to chat with.
+     * @param sender The sender of the chat message.
      * @param message What to say.
+     * @param color The message color.
      * @param pri If true, the message is private.
      */
-    public void chatHandler(Player player, String message, boolean pri) {
-        getGUI().displayStartChat(player, message, pri);
+    public void chatHandler(String sender, String message, Color color,
+                            boolean pri) {
+        // Ignoring color as it is not fixed yet
+        getGUI().displayStartChat(sender, message, pri);
     }
 
     /**
