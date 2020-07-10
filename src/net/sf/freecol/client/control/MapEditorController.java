@@ -183,8 +183,7 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
-        if (mt != null) getGUI().changeView(mt);
-        getGUI().updateMapControls();
+        getGUI().changeView(mt);
     }
 
     /**

@@ -1427,8 +1427,7 @@ public class GUI extends FreeColClientHolder {
      * Update the map controls, including the InfoPanel according to
      * the view mode.
      *
-     * Used by: ColonyPanel, client InGameController.updateGUI,
-     *   MapEditorController
+     * Used by: client InGameController.updateGUI, MapEditorController
      */
     public void updateMapControls() {}
 
