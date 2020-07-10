@@ -2068,7 +2068,7 @@ public class SwingGUI extends GUI {
                 panel = new StartGamePanel(getFreeColClient());
             }
             panel.initialize(singlePlayerMode);
-            return this.canvas.showSubPanel(panel, false);
+            return this.canvas.showFreeColPanel(panel, false);
         }
         return null;
     }
@@ -2095,7 +2095,7 @@ public class SwingGUI extends GUI {
             this.canvas.removeFromCanvas(panel);
         }
         panel.setStatusMessage(message);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**

@@ -807,48 +807,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A {@code Tile} to make visible (not under the panel!)
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
-                                         boolean resizable) {
-        return showSubPanel(panel, setOffsetFocus(tile), resizable);
-    }
-
-    /**
-     * Displays a {@code FreeColPanel}.
-     *
-     * @param panel {@code FreeColPanel}, panel to show
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showSubPanel(FreeColPanel panel, boolean resizable) {
-        return showSubPanel(panel, PopupPosition.CENTERED, resizable);
-    }
-
-    /**
-     * Displays a {@code FreeColPanel} at a generalized position.
-     *
-     * @param panel {@code FreeColPanel}, panel to show
-     * @param popupPosition {@code PopupPosition} The generalized
-     *     position to place the panel.
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showSubPanel(FreeColPanel panel,
-                                     PopupPosition popupPosition,
-                                     boolean resizable) {
-        repaint();
-        addAsFrame(panel, false, popupPosition, resizable);
-        panel.requestFocus();
-        return panel;
-    }
-
-    /**
      * Displays the given dialog, optionally making sure a tile is visible.
      *
      * @param <T> The type to be returned from the dialog.
@@ -881,6 +839,49 @@ public final class Canvas extends JDesktopPane {
         if (freeColDialog.isModal()) stopBlinking();
         freeColDialog.requestFocus();
         freeColDialog.setVisible(true);
+    }
+
+    /**
+     * Displays a {@code FreeColPanel}.
+     *
+     * @param panel {@code FreeColPanel}, panel to show
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel,
+                                         boolean resizable) {
+        return showFreeColPanel(panel, PopupPosition.CENTERED, resizable);
+    }
+
+    /**
+     * Displays the given panel, making sure a tile is visible.
+     *
+     * @param panel The panel to be displayed
+     * @param tile A {@code Tile} to make visible (not under the panel!)
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
+                                         boolean resizable) {
+        return showFreeColPanel(panel, setOffsetFocus(tile), resizable);
+    }
+
+    /**
+     * Displays a {@code FreeColPanel} at a generalized position.
+     *
+     * @param panel {@code FreeColPanel}, panel to show
+     * @param popupPosition {@code PopupPosition} The generalized
+     *     position to place the panel.
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel,
+                                         PopupPosition popupPosition,
+                                         boolean resizable) {
+        repaint();
+        addAsFrame(panel, false, popupPosition, resizable);
+        panel.requestFocus();
+        return panel;
     }
 
 

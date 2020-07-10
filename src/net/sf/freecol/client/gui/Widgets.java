@@ -301,7 +301,7 @@ public final class Widgets {
     public FreeColPanel showAboutPanel() {
         AboutPanel panel
             = new AboutPanel(this.freeColClient);
-        return this.canvas.showSubPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -315,7 +315,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(BuildQueuePanel.class);
         if (panel == null || panel.getColony() != colony) {
             panel = new BuildQueuePanel(this.freeColClient, colony);
-            return this.canvas.showSubPanel(panel, true);
+            return this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -342,7 +342,7 @@ public final class Widgets {
     public FreeColPanel showChatPanel() {
         ChatPanel panel
             = new ChatPanel(this.freeColClient);
-        this.canvas.showSubPanel(panel, true);
+        this.canvas.showFreeColPanel(panel, true);
         panel.requestFocus();
         return panel;
     }
@@ -369,7 +369,7 @@ public final class Widgets {
     public FreeColPanel showColopediaPanel(String nodeId) {
         ColopediaPanel panel
             = new ColopediaPanel(this.freeColClient, nodeId);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -382,7 +382,7 @@ public final class Widgets {
     public FreeColPanel showColorChooserPanel(ActionListener al) {
         FreeColPanel panel
             = new ColorChooserPanel(this.freeColClient, al);
-        return this.canvas.showFreeColPanel(panel, null, false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -394,7 +394,7 @@ public final class Widgets {
         CompactLabourReport panel
             = new CompactLabourReport(this.freeColClient);
         panel.initialize();
-        return this.canvas.showSubPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, false);
 
     }
 
@@ -408,7 +408,7 @@ public final class Widgets {
         CompactLabourReport panel
             = new CompactLabourReport(this.freeColClient, unitData);
         panel.initialize();
-        return this.canvas.showSubPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -431,7 +431,7 @@ public final class Widgets {
     public FreeColPanel showDeclarationPanel() {
         DeclarationPanel panel
             = new DeclarationPanel(this.freeColClient);
-        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED,
+        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED,
                                         false);
     }
 
@@ -531,7 +531,7 @@ public final class Widgets {
         if (message == null) return null;
         ErrorPanel panel
             = new ErrorPanel(this.freeColClient, message);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -548,7 +548,7 @@ public final class Widgets {
             panel = new EuropePanel(this.freeColClient,
                                     (this.canvas.getHeight() > 780));
             if (callback != null) panel.addClosingCallback(callback);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -565,7 +565,7 @@ public final class Widgets {
                                        String footer) {
         EventPanel panel
             = new EventPanel(this.freeColClient, header, image, footer);
-        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED,
+        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED,
                                         false);
     }
 
@@ -577,7 +577,7 @@ public final class Widgets {
     public FreeColPanel showFindSettlementPanel() {
         FindSettlementPanel panel
             = new FindSettlementPanel(this.freeColClient);
-        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.ORIGIN,
+        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.ORIGIN,
                                         true);
     }
 
@@ -625,7 +625,7 @@ public final class Widgets {
                                             List<HighScore> scores) {
         ReportHighScoresPanel panel
             = new ReportHighScoresPanel(this.freeColClient, messageId, scores);
-        return this.canvas.showSubPanel(panel, Canvas.PopupPosition.CENTERED, true);
+        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED, true);
     }
 
     /**
@@ -699,7 +699,7 @@ public final class Widgets {
     public FreeColPanel showLogFilePanel() {
         ErrorPanel panel
             = new ErrorPanel(this.freeColClient);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -809,7 +809,7 @@ public final class Widgets {
     public FreeColPanel showNewPanel(Specification specification) {
         NewPanel panel
             = new NewPanel(this.freeColClient, specification);
-        return this.canvas.showSubPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -851,7 +851,7 @@ public final class Widgets {
         if (panel == null) {
             panel = new PurchasePanel(this.freeColClient);
             panel.update();
-            this.canvas.showFreeColPanel(panel, null, false);
+            this.canvas.showFreeColPanel(panel, false);
         }
         return panel;
     }
@@ -866,7 +866,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(RecruitPanel.class);
         if (panel == null) {
             panel = new RecruitPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, null, false);
+            this.canvas.showFreeColPanel(panel, false);
         }
         return panel;
     }
@@ -887,7 +887,7 @@ public final class Widgets {
             = new ReportLabourDetailPanel(this.freeColClient, unitType, data,
                                           unitCount, colonies);
         panel.initialize();
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -975,7 +975,7 @@ public final class Widgets {
             = new ServerListPanel(this.freeColClient,
                                   this.freeColClient.getConnectController());
         panel.initialize(serverList);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -1006,7 +1006,7 @@ public final class Widgets {
                                             Map<String, String> clientStats) {
         StatisticsPanel panel
             = new StatisticsPanel(this.freeColClient, serverStats, clientStats);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -1019,7 +1019,7 @@ public final class Widgets {
         if (tile == null || !tile.isExplored()) return null;
         TilePanel panel
             = new TilePanel(this.freeColClient, tile);
-        return this.canvas.showSubPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -1031,7 +1031,7 @@ public final class Widgets {
     public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         TradeRouteInputPanel panel
             = new TradeRouteInputPanel(this.freeColClient, newRoute);
-        return this.canvas.showSubPanel(panel, null, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**
@@ -1058,7 +1058,7 @@ public final class Widgets {
         if (panel == null) {
             panel = new TrainPanel(this.freeColClient);
             panel.update();
-            this.canvas.showFreeColPanel(panel, null, false);
+            this.canvas.showFreeColPanel(panel, false);
         }
         return panel;
     }
@@ -1096,7 +1096,7 @@ public final class Widgets {
     public FreeColPanel showWorkProductionPanel(Unit unit) {
         WorkProductionPanel panel
             = new WorkProductionPanel(this.freeColClient, unit);
-        return this.canvas.showSubPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     
@@ -1107,7 +1107,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportCargoPanel.class);
         if (panel == null) {
             panel = new ReportCargoPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1118,13 +1118,13 @@ public final class Widgets {
             panel = this.canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class);
             if (panel == null) {
                 panel = new ReportCompactColonyPanel(this.freeColClient);
-                this.canvas.showSubPanel(panel, true);
+                this.canvas.showFreeColPanel(panel, true);
             }
         } else {
             panel = this.canvas.getExistingFreeColPanel(ReportClassicColonyPanel.class);
             if (panel == null) {
                 panel = new ReportClassicColonyPanel(this.freeColClient);
-                this.canvas.showSubPanel(panel, true);
+                this.canvas.showFreeColPanel(panel, true);
             }
         }
         return panel;
@@ -1135,7 +1135,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportContinentalCongressPanel.class);
         if (panel == null) {
             panel = new ReportContinentalCongressPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1145,7 +1145,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportEducationPanel.class);
         if (panel == null) {
             panel = new ReportEducationPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1155,7 +1155,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportExplorationPanel.class);
         if (panel == null) {
             panel = new ReportExplorationPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1165,7 +1165,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportForeignAffairPanel.class);
         if (panel == null) {
             panel = new ReportForeignAffairPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1175,7 +1175,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportHistoryPanel.class);
         if (panel == null) {
             panel = new ReportHistoryPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1185,7 +1185,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportIndianPanel.class);
         if (panel == null) {
             panel = new ReportIndianPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1195,7 +1195,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportLabourPanel.class);
         if (panel == null) {
             panel = new ReportLabourPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1205,7 +1205,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportMilitaryPanel.class);
         if (panel == null) {
             panel = new ReportMilitaryPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1215,7 +1215,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportNavalPanel.class);
         if (panel == null) {
             panel = new ReportNavalPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1225,7 +1225,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportProductionPanel.class);
         if (panel == null) {
             panel = new ReportProductionPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1235,7 +1235,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
         if (panel == null) {
             panel = new ReportReligiousPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1245,7 +1245,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportRequirementsPanel.class);
         if (panel == null) {
             panel = new ReportRequirementsPanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1255,7 +1255,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportTradePanel.class);
         if (panel == null) {
             panel = new ReportTradePanel(this.freeColClient);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         }
         return panel;
     }
@@ -1270,7 +1270,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportTurnPanel.class);
         if (panel == null) {
             panel = new ReportTurnPanel(this.freeColClient, messages);
-            this.canvas.showSubPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, true);
         } else {
             panel.setMessages(messages);
         }
