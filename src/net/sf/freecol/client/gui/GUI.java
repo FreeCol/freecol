@@ -131,24 +131,6 @@ public class GUI extends FreeColClientHolder {
     // Useful utilities provided in addition to the implementable interface
 
     /**
-     * Toggle the current view mode.
-     *
-     * Only really toggles between terrain and units modes.
-     */
-    public void toggleViewMode() {
-        ViewMode vm = getViewMode();
-        switch (vm) {
-        case MOVE_UNITS:
-            changeView(getSelectedTile());
-            break;
-        case TERRAIN:
-            changeView(getActiveUnit());
-            break;
-        default:
-            break;
-        }
-    }
-
     
     // High level dialogs, usually using the dialog primitives
 

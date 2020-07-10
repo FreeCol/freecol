@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -50,6 +51,18 @@ public class ToggleViewModeAction extends MapboardAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getGUI().toggleViewMode();
+        // Only really toggles between terrain and units modes.
+        final GUI gui = getGUI();
+        GUI.ViewMode vm = gui.getViewMode();
+        switch (vm) {
+        case MOVE_UNITS:
+            gui.changeView(gui.getSelectedTile());
+            break;
+        case TERRAIN:
+            gui.changeView(gui.getActiveUnit());
+            break;
+        default:
+            break;
+        }
     }
 }
