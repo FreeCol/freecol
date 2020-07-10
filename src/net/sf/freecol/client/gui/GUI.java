@@ -131,15 +131,6 @@ public class GUI extends FreeColClientHolder {
     // Useful utilities provided in addition to the implementable interface
 
     /**
-     * Get the image library.
-     *
-     * @return The base image library at the current scale.
-     */
-    public ImageLibrary getImageLibrary() {
-        return this.imageLibrary;
-    }
-
-    /**
      * Toggle the current view mode.
      *
      * Only really toggles between terrain and units modes.
@@ -896,6 +887,11 @@ public class GUI extends FreeColClientHolder {
                          goods.getType(), "cancel", choices);
     }
 
+    /**
+     * Get the option group that defines a difficulty level.
+     *
+     * @return The {@code OptionGroup} selected.
+     */
     public final OptionGroup showDifficultyDialog() {
         final Specification spec = getSpecification();
         return showDifficultyDialog(spec, spec.getDifficultyOptionGroup(),
@@ -906,9 +902,10 @@ public class GUI extends FreeColClientHolder {
      * Show an i18n compliant error message derived from a template.
      *
      * @param template The {@code StringTemplate} containing the message.
+     * @return The panel shown.
      */
-    public final void showErrorPanel(StringTemplate template) {
-        showErrorPanel(template, null);
+    public final FreeColPanel showErrorPanel(StringTemplate template) {
+        return showErrorPanel(template, null);
     }
 
     /**
@@ -917,10 +914,11 @@ public class GUI extends FreeColClientHolder {
      *
      * @param template The {@code StringTemplate} containing the message.
      * @param message Optional extra debug information.
+     * @return The panel shown.
      */
-    public final void showErrorPanel(StringTemplate template,
-                                       String message) {
-        showErrorPanel(template, message, null);
+    public final FreeColPanel showErrorPanel(StringTemplate template,
+                                            String message) {
+        return showErrorPanel(template, message, null);
     }
     
     /**
@@ -944,7 +942,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show a serious error message with an exception and return
-     * to the main panel when done.
+     * to the main panel when done.  This time, do not return the panel
+     * as we have already defined a callback.
      *
      * @param ex An optional {@code Exception} to display.
      * @param tmpl A {@code StringTemplate} for the message.
@@ -1043,6 +1042,15 @@ public class GUI extends FreeColClientHolder {
 
     
     // Simple accessors
+
+    /**
+     * Get the image library.
+     *
+     * @return The base image library at the current scale.
+     */
+    public ImageLibrary getImageLibrary() {
+        return this.imageLibrary;
+    }
 
     /**
      * Get the tile image library.
@@ -1493,7 +1501,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the current view mode.
      *
-     * Used by: MoveAction
+     * Used by: MoveAction, ToggleViewModeAction
      *
      * @return One of the view mode constants, or negative on error.
      */
@@ -1515,7 +1523,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the selected tile.
      *
-     * Used by: InGameController.moveTileCursor
+     * Used by: MoveAction, TilePopupAction, ToggleViewModeAction
      *
      * @return The selected {@code Tile}.
      */
