@@ -129,8 +129,6 @@ public class GUI extends FreeColClientHolder {
 
     // Useful utilities provided in addition to the implementable interface
 
-    // Miscellaneous
-
     /**
      * Get the image library.
      *
@@ -1284,29 +1282,6 @@ public class GUI extends FreeColClientHolder {
     public void setFocus(Tile tile) {}
 
 
-    // General GUI manipulation
-
-    /**
-     * Refresh the whole GUI.
-     *
-     * Used by: CanvasMapEditorMouseListener,
-     *   DebugUtils.addUnitToTil,changeOwnership,resetMoves,buildDebugMenu}
-     *   Display{Borders,Grid,TileTest}Action, {NewEmptyMap,ScaleMap}Action
-     *   DebugMenu, MapEditorController, TilePopup
-     *   InGameController.removeHandler
-     */
-    public void refresh() {}
-
-    /**
-     * Refresh a particular tile.
-     *
-     * Used by: EditSettlementDialog
-     *
-     * @param tile The {@code Tile} to refresh.
-     */
-    public void refreshTile(Tile tile) {}
-    
-
     // Path handling
 
     /**
@@ -1717,6 +1692,17 @@ public class GUI extends FreeColClientHolder {
     public boolean isPanelShowing() {
         return false;
     }
+
+    /**
+     * Refresh the whole GUI.
+     *
+     * Used by: CanvasMapEditorMouseListener,
+     *   DebugUtils.addUnitToTil,changeOwnership,resetMoves,buildDebugMenu}
+     *   Display{Borders,Grid,TileTest}Action, {NewEmptyMap,ScaleMap}Action
+     *   DebugMenu, MapEditorController, TilePopup
+     *   InGameController.removeHandler
+     */
+    public void refresh() {}
 
     /**
      * Refresh the players table in the StartGamePanel.

@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -416,6 +417,12 @@ public class SwingGUI extends GUI {
         this.canvas.paintImmediately(this.canvas.getBounds());
     }
 
+    private void refreshTile(Tile tile) {
+        if (tile != null) {
+            this.canvas.repaint(this.mapViewer.calculateTileBounds(tile));
+        }
+    }
+
     private void resetMapZoom() {
         //super.resetMapZoom();
         this.mapViewer.resetMapScale();
@@ -593,7 +600,9 @@ public class SwingGUI extends GUI {
     public void startGUI(final Dimension desiredWindowSize) {
         final FreeColClient fcc = getFreeColClient();
         final ClientOptions opts = getClientOptions();
-        this.mapViewer = new MapViewer(fcc);
+        final ActionListener al = (ActionEvent ae) ->
+            this.refreshTile(this.mapViewer.getActiveTile());
+        this.mapViewer = new MapViewer(fcc, al);
         this.mapControls = MapControls.newInstance(fcc);
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
@@ -708,28 +717,6 @@ public class SwingGUI extends GUI {
         this.canvas.refresh();
     }
 
-
-    // General GUI manipulation
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void refresh() {
-        this.mapViewer.forceReposition();
-        this.canvas.refresh();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void refreshTile(Tile tile) {
-        if (tile.getX() >= 0 && tile.getY() >= 0) {
-            this.canvas.repaint(this.mapViewer.calculateTileBounds(tile));
-        }
-    }
-    
 
     // Path handling
 
@@ -1275,6 +1262,15 @@ public class SwingGUI extends GUI {
     @Override
     public boolean isPanelShowing() {
         return this.canvas != null && this.canvas.getShowingSubPanel() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void refresh() {
+        this.mapViewer.forceReposition();
+        this.canvas.refresh();
     }
 
     /**

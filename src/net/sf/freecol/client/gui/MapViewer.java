@@ -31,6 +31,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -205,21 +206,92 @@ public final class MapViewer extends FreeColClientHolder {
      * The constructor to use.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
+     * @param al An {@code ActionListener} for the cursor.
      */
-    public MapViewer(FreeColClient freeColClient) {
+    public MapViewer(FreeColClient freeColClient, ActionListener al) {
         super(freeColClient);
         
         this.tv = new TileViewer(freeColClient);
         changeImageLibrary(new ImageLibrary());
         this.cursor = new TerrainCursor();
-        this.cursor.addActionListener((ActionEvent ae) -> {
-                final Tile tile = getCursorTile(false);
-                if (isTileVisible(tile)) getGUI().refreshTile(tile);
-            });
+        this.cursor.addActionListener(al);
     }
 
+   
+    // Critical internals
+    
+    /**
+     * Change the internal image libraries.
+     *
+     * Update several internal variables that depend directly on the
+     * tile size in the image library.
+     *
+     * @param lib The new {@code ImageLibrary} to use.
+     */
+    private void changeImageLibrary(ImageLibrary lib) {
+        this.lib = lib;
+        this.tv.changeImageLibrary(lib);
 
-    // Primitives
+        // ATTENTION: we assume that all base tiles have the same size
+        final Dimension tileSize = lib.tileSize;
+        this.tileHeight = tileSize.height;
+        this.tileWidth = tileSize.width;
+        this.halfHeight = this.tileHeight/2;
+        this.halfWidth = this.tileWidth/2;
+
+        this.fog.reset();
+        this.fog.moveTo(this.halfWidth, 0);
+        this.fog.lineTo(this.tileWidth, this.halfHeight);
+        this.fog.lineTo(this.halfWidth, this.tileHeight);
+        this.fog.lineTo(0, this.halfHeight);
+        this.fog.closePath();
+        
+        final int dx = this.tileWidth/16;
+        final int dy = this.tileHeight/16;
+        final int ddx = dx + dx/2;
+        final int ddy = dy + dy/2;
+
+        // small corners
+        controlPoints.put(Direction.N,
+                          new Point2D.Float(this.halfWidth, dy));
+        controlPoints.put(Direction.E,
+                          new Point2D.Float(this.tileWidth - dx, this.halfHeight));
+        controlPoints.put(Direction.S,
+                          new Point2D.Float(this.halfWidth, this.tileHeight - dy));
+        controlPoints.put(Direction.W,
+                          new Point2D.Float(dx, this.halfHeight));
+        // big corners
+        controlPoints.put(Direction.SE,
+                          new Point2D.Float(this.halfWidth, this.tileHeight));
+        controlPoints.put(Direction.NE,
+                          new Point2D.Float(this.tileWidth, this.halfHeight));
+        controlPoints.put(Direction.SW,
+                          new Point2D.Float(0, this.halfHeight));
+        controlPoints.put(Direction.NW,
+                          new Point2D.Float(this.halfWidth, 0));
+        // small corners
+        borderPoints.put(Direction.NW,
+                         new Point2D.Float(dx + ddx, this.halfHeight - ddy));
+        borderPoints.put(Direction.N,
+                         new Point2D.Float(this.halfWidth - ddx, dy + ddy));
+        borderPoints.put(Direction.NE,
+                         new Point2D.Float(this.halfWidth + ddx, dy + ddy));
+        borderPoints.put(Direction.E,
+                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight - ddy));
+        borderPoints.put(Direction.SE,
+                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight + ddy));
+        borderPoints.put(Direction.S,
+                         new Point2D.Float(this.halfWidth + ddx, this.tileHeight - dy - ddy));
+        borderPoints.put(Direction.SW,
+                         new Point2D.Float(this.halfWidth - ddx, this.tileHeight - dy - ddy));
+        borderPoints.put(Direction.W,
+                         new Point2D.Float(dx + ddx, this.halfHeight + ddy));
+
+        borderStroke = new BasicStroke(dy);
+        gridStroke = new BasicStroke(getScale());
+    }
+
+    // Accessors
 
     /**
      * Gets the contained {@code ImageLibrary}.
@@ -228,15 +300,6 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public ImageLibrary getImageLibrary() {
         return this.lib;
-    }
-
-    /**
-     * Sets the contained {@code ImageLibrary}.
-     *
-     * @param lib The new image library;
-     */
-    private void setImageLibrary(ImageLibrary lib) {
-        this.lib = lib;
     }
 
     /**
@@ -336,6 +399,30 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void setSelectedTile(Tile tile) {
         this.selectedTile = tile;
+    }
+
+    /**
+     * Get either the tile with the active unit or the selected tile,
+     * but only if it is visible.
+     *
+     * Used to determine where to display the cursor.
+     *
+     * @return The {@code Tile} found or null.
+     */
+    public Tile getActiveTile() {
+        Tile ret = null;
+        switch (getViewMode()) {
+        case MOVE_UNITS:
+            final Unit unit = getActiveUnit();
+            if (unit != null) ret = unit.getTile();
+            break;
+        case TERRAIN:
+            ret = getSelectedTile();
+            break;
+        default:
+            break;
+        }
+        return (isTileVisible(ret)) ? ret : null;
     }
 
     /**
@@ -448,111 +535,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
 
-    // Internal calculations
-
-    /**
-     * Reset the ImageLibrary and update various items that depend on
-     * tile size.
-     *
-     * @param lib The new {@code ImageLibrary} to use.
-     */
-    private void changeImageLibrary(ImageLibrary lib) {
-        setImageLibrary(lib);
-        this.tv.changeImageLibrary(lib);
-        updateTileSizes();
-        
-        final int dx = this.tileWidth/16;
-        final int dy = this.tileHeight/16;
-        final int ddx = dx + dx/2;
-        final int ddy = dy + dy/2;
-
-        // small corners
-        controlPoints.put(Direction.N,
-                          new Point2D.Float(this.halfWidth, dy));
-        controlPoints.put(Direction.E,
-                          new Point2D.Float(this.tileWidth - dx, this.halfHeight));
-        controlPoints.put(Direction.S,
-                          new Point2D.Float(this.halfWidth, this.tileHeight - dy));
-        controlPoints.put(Direction.W,
-                          new Point2D.Float(dx, this.halfHeight));
-        // big corners
-        controlPoints.put(Direction.SE,
-                          new Point2D.Float(this.halfWidth, this.tileHeight));
-        controlPoints.put(Direction.NE,
-                          new Point2D.Float(this.tileWidth, this.halfHeight));
-        controlPoints.put(Direction.SW,
-                          new Point2D.Float(0, this.halfHeight));
-        controlPoints.put(Direction.NW,
-                          new Point2D.Float(this.halfWidth, 0));
-        // small corners
-        borderPoints.put(Direction.NW,
-                         new Point2D.Float(dx + ddx, this.halfHeight - ddy));
-        borderPoints.put(Direction.N,
-                         new Point2D.Float(this.halfWidth - ddx, dy + ddy));
-        borderPoints.put(Direction.NE,
-                         new Point2D.Float(this.halfWidth + ddx, dy + ddy));
-        borderPoints.put(Direction.E,
-                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight - ddy));
-        borderPoints.put(Direction.SE,
-                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight + ddy));
-        borderPoints.put(Direction.S,
-                         new Point2D.Float(this.halfWidth + ddx, this.tileHeight - dy - ddy));
-        borderPoints.put(Direction.SW,
-                         new Point2D.Float(this.halfWidth - ddx, this.tileHeight - dy - ddy));
-        borderPoints.put(Direction.W,
-                         new Point2D.Float(dx + ddx, this.halfHeight + ddy));
-
-        borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(getScale());
-    }
-
-    /**
-     * Update tile size variables and dependencies.
-     */
-    private void updateTileSizes() {
-        // ATTENTION: we assume that all base tiles have the same size
-        final Dimension tileSize = lib.tileSize;
-        this.tileHeight = tileSize.height;
-        this.tileWidth = tileSize.width;
-        this.halfHeight = this.tileHeight/2;
-        this.halfWidth = this.tileWidth/2;
-
-        this.fog.reset();
-        this.fog.moveTo(this.halfWidth, 0);
-        this.fog.lineTo(this.tileWidth, this.halfHeight);
-        this.fog.lineTo(this.halfWidth, this.tileHeight);
-        this.fog.lineTo(0, this.halfHeight);
-        this.fog.closePath();
-    }
-
-    /**
-     * Get the tile to display the cursor on.
-     *
-     * @param active If true, require the cursor to be active.
-     * @return The cursor {@code Tile}, or null if no cursor should be shown.
-     */
-    private Tile getCursorTile(boolean active) {
-        Tile ret = null;
-        switch (getViewMode()) {
-        case MOVE_UNITS:
-            final Unit unit = getActiveUnit();
-            if (unit != null
-                && (!active || this.cursor.isActive()
-                    || unit.getMovesLeft() <= 0)) {
-                ret = unit.getTile();
-            }
-            break;
-        case TERRAIN:
-            ret = getSelectedTile();
-            break;
-        default:
-            break;
-        }
-        return ret;
-    }
-
-
-    // Higher level public routines
+   // Higher level public routines
 
     /**
      * Change the displayed map size.
@@ -731,8 +714,9 @@ public final class MapViewer extends FreeColClientHolder {
      * @param tile The {@code Tile} on the screen.
      * @return The bounds {@code Rectangle}.
      */
-    Rectangle calculateTileBounds(Tile tile) {
-        Rectangle result = new Rectangle(0, 0, getScreenWidth(), getScreenHeight());
+    public Rectangle calculateTileBounds(Tile tile) {
+        Rectangle result
+            = new Rectangle(0, 0, getScreenWidth(), getScreenHeight());
         if (isTileVisible(tile)) {
             result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
             result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
@@ -757,7 +741,6 @@ public final class MapViewer extends FreeColClientHolder {
      *     the mapboard.
      */
     public Point calculateTilePosition(Tile t, boolean rhs) {
-        repositionMapIfNeeded();
         if (!isTileVisible(t)) return null;
 
         int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
@@ -788,20 +771,32 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Checks if a tile is displayed on the screen (or, if the map is
-     * already displayed and the focus has been changed, whether they
-     * will be displayed on the screen the next time it will be redrawn).
+     * Checks if a tile is displayed on the screen but not too close
+     * to the edges.  The intent appears to be to have a two tile thick
+     * boundary.
      *
      * @param tile The {@code Tile} to check.
-     * @return True if the tile is on screen.
+     * @return True if the tile is roughly on screen.
      */
     public boolean onScreen(Tile tile) {
-        if (tile == null) return false;
         repositionMapIfNeeded();
         return (tile.getY() - 2 > topRow || alignedTop)
             && (tile.getY() + 4 < bottomRow || alignedBottom)
             && (tile.getX() - 1 > leftColumn || alignedLeft)
             && (tile.getX() + 2 < rightColumn || alignedRight);
+    }
+
+    /**
+     * Strict check for tile visibility (unlike onScreen).
+     *
+     * @param tile The {@code Tile} to check.
+     * @return True if the tile is visible.
+     */
+    private boolean isTileVisible(Tile tile) {
+        repositionMapIfNeeded();
+        return tile != null
+            && tile.getY() >= topRow     && tile.getY() <= bottomRow
+            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
     }
 
     /**
@@ -1106,12 +1101,6 @@ public final class MapViewer extends FreeColClientHolder {
         return y < topRows;
     }
 
-    private boolean isTileVisible(Tile tile) {
-        if (tile == null) return false;
-        return tile.getY() >= topRow && tile.getY() <= bottomRow
-            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
-    }
-
     /**
      * Gets the unit that should be displayed on the given tile.
      *
@@ -1186,9 +1175,12 @@ public final class MapViewer extends FreeColClientHolder {
         updateMapDisplayVariables();
     }
 
+    /**
+     * Update the *Space variables.
+     */
     private void updateMapDisplayVariables() {
-        // Calculate the amount of rows that will be drawn above the
-        // central Tile
+        // Calculate the number of rows that will be drawn above the
+        // central tile
         topSpace = (getScreenHeight() - tileHeight) / 2;
         if ((topSpace % (halfHeight)) != 0) {
             topRows = topSpace / (halfHeight) + 2;
@@ -1440,8 +1432,8 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display cursor for selected tile or active unit
-        final Tile cursorTile = getCursorTile(true);
-        if (cursorTile != null) {
+        final Tile cursorTile = getActiveTile();
+        if (cursorTile != null && this.cursor.isActive()) {
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
             if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
@@ -1950,7 +1942,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Gets the coordinates to draw a unit in a given tile.
      *
      * @param unitImage The unit's image
-     * @return The coordinates where the unit should be drawn onscreen
+     * @return The coordinates where the unit should be drawn on screen
      */
     private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
         int unitX = (tileWidth - unitImage.getWidth()) / 2;
