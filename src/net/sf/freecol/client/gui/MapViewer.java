@@ -781,7 +781,7 @@ public final class MapViewer extends FreeColClientHolder {
     public boolean onScreen(Tile tile) {
         repositionMapIfNeeded();
         return (tile.getY() - 2 > topRow || alignedTop)
-            && (tile.getY() + 4 < bottomRow || alignedBottom)
+            && (tile.getY() + 3 < bottomRow || alignedBottom)
             && (tile.getX() - 1 > leftColumn || alignedLeft)
             && (tile.getX() + 2 < rightColumn || alignedRight);
     }
