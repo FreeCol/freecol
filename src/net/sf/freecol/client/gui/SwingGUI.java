@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
+import java.util.Map;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.ImageIcon;
@@ -87,7 +88,6 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
@@ -367,7 +367,7 @@ public class SwingGUI extends GUI {
         PathNode path = null;
         if (destination != null
             && !((FreeColGameObject)destination).isDisposed()
-            && !Map.isSameLocation(active.getLocation(), destination)) {
+            && !active.isAtLocation(destination)) {
             try {
                 path = active.findPath(destination);
             } catch (Exception e) {
@@ -404,7 +404,7 @@ public class SwingGUI extends GUI {
             clearGotoPath();
         } else if (this.canvas.isGotoStarted()) {
             // Do nothing if the tile has not changed.
-            PathNode oldPath = mapViewer.getGotoPath();
+            PathNode oldPath = this.mapViewer.getGotoPath();
             Tile lastTile = (oldPath == null) ? null
                 : oldPath.getLastNode().getTile();
             if (lastTile == tile) return;
@@ -415,22 +415,32 @@ public class SwingGUI extends GUI {
                 || !tile.isExplored()
                 || !unit.getSimpleMoveType(tile).isLegal()) ? null
                 : unit.findPath(tile);
-            mapViewer.changeGotoPath(newPath);
+            this.mapViewer.changeGotoPath(newPath);
         }
     }
 
+    /**
+     * Paint the whole canvas now.
+     */
     public void paintImmediately() {
         this.canvas.paintImmediately(this.canvas.getBounds());
     }
 
+    /**
+     * Schedule a tile to be repainted.
+     *
+     * @param tile The {@code tile} to paint.
+     */
     private void refreshTile(Tile tile) {
         if (tile != null) {
             this.canvas.repaint(this.mapViewer.calculateTileBounds(tile));
         }
     }
 
+    /**
+     * Reset the map zoom and refresh the canvas.
+     */
     private void resetMapZoom() {
-        //super.resetMapZoom();
         this.mapViewer.resetMapScale();
         refresh();
     }
@@ -453,7 +463,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public ImageLibrary getTileImageLibrary() {
-        return tileViewer.getImageLibrary();
+        return this.tileViewer.getImageLibrary();
     }
 
     /**
@@ -540,8 +550,8 @@ public class SwingGUI extends GUI {
     public void installLookAndFeel(String fontName) throws FreeColException {
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
-        Font font = FontLibrary.createMainFont(
-            fontName, imageLibrary.getScaleFactor());
+        Font font = FontLibrary.createMainFont(fontName,
+            this.imageLibrary.getScaleFactor());
         FreeColLookAndFeel.installFont(font);
         Utility.initStyleContext(font);
     }
@@ -618,7 +628,7 @@ public class SwingGUI extends GUI {
             this.refreshTile(this.mapViewer.getActiveTile());
         this.mapViewer = new MapViewer(fcc, al);
         this.mapControls = MapControls.newInstance(fcc);
-        this.canvas = new Canvas(getFreeColClient(), graphicsDevice,
+        this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
                                  this.mapControls);
         this.widgets = new Widgets(fcc, this.canvas);
@@ -690,7 +700,7 @@ public class SwingGUI extends GUI {
     @Override
     public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey) {
-        return widgets.confirm(tile, tmpl, icon, okKey, cancelKey);
+        return this.widgets.confirm(tile, tmpl, icon, okKey, cancelKey);
     }
 
     /**
@@ -699,7 +709,7 @@ public class SwingGUI extends GUI {
     @Override
     protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
                               String cancelKey, List<ChoiceItem<T>> choices) {
-        return widgets.getChoice(tile, tmpl, icon, cancelKey, choices);
+        return this.widgets.getChoice(tile, tmpl, icon, cancelKey, choices);
     }
 
     /**
@@ -708,7 +718,7 @@ public class SwingGUI extends GUI {
     @Override
     public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
                            String okKey, String cancelKey) {
-        return widgets.getInput(tile, tmpl, defaultValue, okKey, cancelKey);
+        return this.widgets.getInput(tile, tmpl, defaultValue, okKey, cancelKey);
     }
 
 
@@ -1377,7 +1387,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showAboutPanel() {
-        return widgets.showAboutPanel();
+        return this.widgets.showAboutPanel();
     }
 
     /**
@@ -1385,7 +1395,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showBuildQueuePanel(Colony colony) {
-        return widgets.showBuildQueuePanel(colony);
+        return this.widgets.showBuildQueuePanel(colony);
     }
 
     /**
@@ -1394,7 +1404,7 @@ public class SwingGUI extends GUI {
     @Override
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
                                        DialogHandler<List<Goods>> handler) {
-        widgets.showCaptureGoodsDialog(unit, gl, handler);
+        this.widgets.showCaptureGoodsDialog(unit, gl, handler);
     }
 
     /**
@@ -1403,7 +1413,7 @@ public class SwingGUI extends GUI {
     @Override
     public FreeColPanel showChatPanel() {
         return (getFreeColClient().getSinglePlayer()) ? null
-            : widgets.showChatPanel();
+            : this.widgets.showChatPanel();
     }
 
     /**
@@ -1412,7 +1422,7 @@ public class SwingGUI extends GUI {
     @Override
     public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
                                                DialogHandler<FoundingFather> handler) {
-        widgets.showChooseFoundingFatherDialog(ffs, handler);
+        this.widgets.showChooseFoundingFatherDialog(ffs, handler);
     }
 
     /**
@@ -1470,7 +1480,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showColopediaPanel(String nodeId) {
-        return widgets.showColopediaPanel(nodeId);
+        return this.widgets.showColopediaPanel(nodeId);
     }
 
     /**
@@ -1478,7 +1488,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showColorChooserPanel(ActionListener al) {
-        return widgets.showColorChooserPanel(al);
+        return this.widgets.showColorChooserPanel(al);
     }
 
     /**
@@ -1486,7 +1496,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showCompactLabourReport() {
-        return widgets.showCompactLabourReport();
+        return this.widgets.showCompactLabourReport();
     }
 
     /**
@@ -1494,7 +1504,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showCompactLabourReport(UnitData unitData) {
-        return widgets.showCompactLabourReport(unitData);
+        return this.widgets.showCompactLabourReport(unitData);
     }
 
     /**
@@ -1502,7 +1512,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public List<String> showConfirmDeclarationDialog() {
-        return widgets.showConfirmDeclarationDialog();
+        return this.widgets.showConfirmDeclarationDialog();
     }
 
     /**
@@ -1510,7 +1520,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showDeclarationPanel() {
-        return widgets.showDeclarationPanel();
+        return this.widgets.showDeclarationPanel();
     }
 
     /**
@@ -1520,7 +1530,8 @@ public class SwingGUI extends GUI {
     public OptionGroup showDifficultyDialog(Specification spec,
                                             OptionGroup group,
                                             boolean editable) {
-        OptionGroup ret = widgets.showDifficultyDialog(spec, group, editable);
+        OptionGroup ret
+            = this.widgets.showDifficultyDialog(spec, group, editable);
         if (ret != null) FreeCol.setDifficulty(ret);
         return ret;
     }
@@ -1531,7 +1542,7 @@ public class SwingGUI extends GUI {
     @Override
     public void showDumpCargoDialog(Unit unit,
                                     DialogHandler<List<Goods>> handler) {
-        widgets.showDumpCargoDialog(unit, handler);
+        this.widgets.showDumpCargoDialog(unit, handler);
     }
 
     /**
@@ -1539,7 +1550,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean showEditOptionDialog(Option option) {
-        return widgets.showEditOptionDialog(option);
+        return this.widgets.showEditOptionDialog(option);
     }
 
     /**
@@ -1547,7 +1558,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public IndianSettlement showEditSettlementDialog(IndianSettlement is) {
-        return widgets.showEditSettlementDialog(is);
+        return this.widgets.showEditSettlementDialog(is);
     }
 
     /**
@@ -1557,7 +1568,7 @@ public class SwingGUI extends GUI {
     public void showEmigrationDialog(final Player player,
                                      final boolean fountainOfYouth,
                                      DialogHandler<Integer> handler) {
-        widgets.showEmigrationDialog(player, fountainOfYouth, handler);
+        this.widgets.showEmigrationDialog(player, fountainOfYouth, handler);
     }
 
     /**
@@ -1566,7 +1577,7 @@ public class SwingGUI extends GUI {
     @Override
     public void showEndTurnDialog(final List<Unit> units,
                                   DialogHandler<Boolean> handler) {
-        widgets.showEndTurnDialog(units, handler);
+        this.widgets.showEndTurnDialog(units, handler);
     }
 
     /**
@@ -1574,7 +1585,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showErrorPanel(String message, Runnable callback) {
-        return widgets.showErrorPanel(message).addClosingCallback(callback);
+        return this.widgets.showErrorPanel(message)
+            .addClosingCallback(callback);
     }
 
     /**
@@ -1582,7 +1594,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showEuropePanel() {
-        return widgets.showEuropePanel(() -> {
+        return this.widgets.showEuropePanel(() -> {
                 for (Class<? extends FreeColPanel> c: EUROPE_CLASSES) {
                     FreeColPanel p = this.canvas.getExistingFreeColPanel(c);
                     if (p != null) this.canvas.remove(p);
@@ -1596,7 +1608,7 @@ public class SwingGUI extends GUI {
     @Override
     public FreeColPanel showEventPanel(String header, String image,
                                        String footer) {
-        return widgets.showEventPanel(header, image, footer);
+        return this.widgets.showEventPanel(header, image, footer);
     }
 
     /**
@@ -1604,7 +1616,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showFindSettlementPanel() {
-        return widgets.showFindSettlementPanel();
+        return this.widgets.showFindSettlementPanel();
     }
 
     /**
@@ -1614,8 +1626,8 @@ public class SwingGUI extends GUI {
     public void showFirstContactDialog(final Player player, final Player other,
                                        final Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
-        widgets.showFirstContactDialog(player, other, tile, settlementCount,
-                                       handler);
+        this.widgets.showFirstContactDialog(player, other, tile,
+                                            settlementCount, handler);
     }
 
     /**
@@ -1623,7 +1635,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public OptionGroup showGameOptionsDialog(boolean editable) {
-        return widgets.showGameOptionsDialog(editable);
+        return this.widgets.showGameOptionsDialog(editable);
     }
 
     /**
@@ -1632,7 +1644,7 @@ public class SwingGUI extends GUI {
     @Override
     public FreeColPanel showHighScoresPanel(String messageId,
                                             List<HighScore> scores) {
-        return widgets.showHighScoresPanel(messageId, scores);
+        return this.widgets.showHighScoresPanel(messageId, scores);
     }
 
     /**
@@ -1640,7 +1652,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showIndianSettlementPanel(IndianSettlement is) {
-        return widgets.showIndianSettlementPanel(is);
+        return this.widgets.showIndianSettlementPanel(is);
     }
 
     /**
@@ -1660,8 +1672,8 @@ public class SwingGUI extends GUI {
         if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
             playSound("sound.event.alertSound");
         }
-        return widgets.showInformationPanel(displayObject, tile,
-                                            icon, template);
+        return this.widgets.showInformationPanel(displayObject, tile,
+                                                 icon, template);
     }
 
     /**
@@ -1674,7 +1686,7 @@ public class SwingGUI extends GUI {
         };
         File file = null;
         for (;;) {
-            file = widgets.showLoadDialog(directory, filters);
+            file = this.widgets.showLoadDialog(directory, filters);
             if (file == null || file.isFile()) break;
             String err = Messages.message(FreeCol.badFile("error.noSuchFile",
                                                           file));
@@ -1689,7 +1701,8 @@ public class SwingGUI extends GUI {
     @Override
     public LoadingSavegameInfo showLoadingSavegameDialog(boolean publicServer,
                                                          boolean singlePlayer) {
-        return widgets.showLoadingSavegameDialog(publicServer, singlePlayer);
+        return this.widgets.showLoadingSavegameDialog(publicServer,
+                                                      singlePlayer);
     }
 
     /**
@@ -1697,7 +1710,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showLogFilePanel() {
-        return widgets.showLogFilePanel();
+        return this.widgets.showLogFilePanel();
     }
 
     /**
@@ -1724,7 +1737,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
-        return widgets.showMapGeneratorOptionsDialog(editable);
+        return this.widgets.showMapGeneratorOptionsDialog(editable);
     }
 
     /**
@@ -1732,7 +1745,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Dimension showMapSizeDialog() {
-        return widgets.showMapSizeDialog();
+        return this.widgets.showMapSizeDialog();
     }
 
     /**
@@ -1751,7 +1764,8 @@ public class SwingGUI extends GUI {
             ModelMessage m = modelMessages.get(i);
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
-            icons[i] = this.imageLibrary.getObjectImageIcon(game.getMessageDisplay(m));
+            icons[i] = this.imageLibrary
+                .getObjectImageIcon(game.getMessageDisplay(m));
             if (tile == null && fcos[i] instanceof Location) {
                 tile = ((Location)fcos[i]).getTile();
             }
@@ -1768,7 +1782,7 @@ public class SwingGUI extends GUI {
     public void showMonarchDialog(final MonarchAction action,
                                   StringTemplate template, String monarchKey,
                                   DialogHandler<Boolean> handler) {
-        widgets.showMonarchDialog(action, template, monarchKey, handler);
+        this.widgets.showMonarchDialog(action, template, monarchKey, handler);
     }
 
     /**
@@ -1779,7 +1793,7 @@ public class SwingGUI extends GUI {
                                       final String defaultName,
                                       final Unit unit,
                                       DialogHandler<String> handler) {
-        widgets.showNamingDialog(template, defaultName, unit, handler);
+        this.widgets.showNamingDialog(template, defaultName, unit, handler);
     }
 
     /**
@@ -1789,7 +1803,7 @@ public class SwingGUI extends GUI {
     public void showNativeDemandDialog(Unit unit, Colony colony,
                                        GoodsType type, int amount,
                                        DialogHandler<Boolean> handler) {
-        widgets.showNativeDemandDialog(unit, colony, type, amount, handler);
+        this.widgets.showNativeDemandDialog(unit, colony, type, amount, handler);
     }
 
     /**
@@ -1805,7 +1819,7 @@ public class SwingGUI extends GUI {
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        return widgets.showNegotiationDialog(our, other, agreement, comment);
+        return this.widgets.showNegotiationDialog(our, other, agreement, comment);
     }
 
     /**
@@ -1813,7 +1827,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showNewPanel(Specification spec) {
-        return widgets.showNewPanel(spec);
+        return this.widgets.showNewPanel(spec);
     }
 
     /**
@@ -1821,7 +1835,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Parameters showParametersDialog() {
-        return widgets.showParametersDialog();
+        return this.widgets.showParametersDialog();
     }
 
     /**
@@ -1830,7 +1844,7 @@ public class SwingGUI extends GUI {
     @Override
     public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender, Tile tile) {
-        return widgets.showPreCombatDialog(attacker, defender, tile);
+        return this.widgets.showPreCombatDialog(attacker, defender, tile);
     }
 
     /**
@@ -1838,7 +1852,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showPurchasePanel() {
-        return widgets.showPurchasePanel();
+        return this.widgets.showPurchasePanel();
     }
 
     /**
@@ -1846,7 +1860,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showRecruitPanel() {
-        return widgets.showRecruitPanel();
+        return this.widgets.showRecruitPanel();
     }
 
     /**
@@ -1854,7 +1868,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportCargoPanel() {
-        return widgets.showReportCargoPanel();
+        return this.widgets.showReportCargoPanel();
     }
 
     /**
@@ -1870,7 +1884,7 @@ public class SwingGUI extends GUI {
         } catch (Exception e) {
             compact = false;
         }
-        return widgets.showReportColonyPanel(compact);
+        return this.widgets.showReportColonyPanel(compact);
     }
 
     /**
@@ -1878,7 +1892,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportContinentalCongressPanel() {
-        return widgets.showReportContinentalCongressPanel();
+        return this.widgets.showReportContinentalCongressPanel();
     }
 
     /**
@@ -1886,7 +1900,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportEducationPanel() {
-        return widgets.showReportEducationPanel();
+        return this.widgets.showReportEducationPanel();
     }
 
     /**
@@ -1894,7 +1908,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportExplorationPanel() {
-        return widgets.showReportExplorationPanel();
+        return this.widgets.showReportExplorationPanel();
     }
 
     /**
@@ -1902,7 +1916,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportForeignAffairPanel() {
-        return widgets.showReportForeignAffairPanel();
+        return this.widgets.showReportForeignAffairPanel();
     }
 
     /**
@@ -1910,7 +1924,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportHistoryPanel() {
-        return widgets.showReportHistoryPanel();
+        return this.widgets.showReportHistoryPanel();
     }
 
     /**
@@ -1918,7 +1932,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportIndianPanel() {
-        return widgets.showReportIndianPanel();
+        return this.widgets.showReportIndianPanel();
     }
 
     /**
@@ -1926,7 +1940,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportLabourPanel() {
-        return widgets.showReportLabourPanel();
+        return this.widgets.showReportLabourPanel();
     }
 
     /**
@@ -1934,10 +1948,10 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportLabourDetailPanel(UnitType unitType,
-            java.util.Map<UnitType, java.util.Map<Location, Integer>> data,
+            Map<UnitType, java.util.Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
-        return widgets.showReportLabourDetailPanel(unitType, data, unitCount,
-                                                   colonies);
+        return this.widgets.showReportLabourDetailPanel(unitType, data,
+                                                        unitCount, colonies);
     }
 
     /**
@@ -1945,7 +1959,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportMilitaryPanel() {
-        return widgets.showReportMilitaryPanel();
+        return this.widgets.showReportMilitaryPanel();
     }
 
     /**
@@ -1953,7 +1967,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportNavalPanel() {
-        return widgets.showReportNavalPanel();
+        return this.widgets.showReportNavalPanel();
     }
 
     /**
@@ -1961,7 +1975,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportProductionPanel() {
-        return widgets.showReportProductionPanel();
+        return this.widgets.showReportProductionPanel();
     }
 
     /**
@@ -1969,7 +1983,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportReligiousPanel() {
-        return widgets.showReportReligiousPanel();
+        return this.widgets.showReportReligiousPanel();
     }
 
     /**
@@ -1977,7 +1991,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportRequirementsPanel() {
-        return widgets.showReportRequirementsPanel();
+        return this.widgets.showReportRequirementsPanel();
     }
 
     /**
@@ -1985,7 +1999,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportTradePanel() {
-        return widgets.showReportTradePanel();
+        return this.widgets.showReportTradePanel();
     }
 
     /**
@@ -1993,7 +2007,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showReportTurnPanel(List<ModelMessage> messages) {
-        return widgets.showReportTurnPanel(messages);
+        return this.widgets.showReportTurnPanel(messages);
     }
 
     /**
@@ -2001,7 +2015,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public String showRiverStyleDialog(List<String> styles) {
-        return widgets.showRiverStyleDialog(styles);
+        return this.widgets.showRiverStyleDialog(styles);
     }
 
     /**
@@ -2013,7 +2027,7 @@ public class SwingGUI extends GUI {
         FileFilter[] filters = new FileFilter[] {
             FreeColDataFile.getFileFilter(extension)
         };
-        return widgets.showSaveDialog(directory, filters, defaultName);
+        return this.widgets.showSaveDialog(directory, filters, defaultName);
     }
 
     /**
@@ -2021,7 +2035,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Dimension showScaleMapSizeDialog() {
-        return widgets.showScaleMapSizeDialog();
+        return this.widgets.showScaleMapSizeDialog();
     }
 
     /**
@@ -2030,8 +2044,8 @@ public class SwingGUI extends GUI {
     @Override
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
-        return widgets.showSelectAmountDialog(goodsType, available,
-                                              defaultAmount, needToPay);
+        return this.widgets.showSelectAmountDialog(goodsType, available,
+                                                   defaultAmount, needToPay);
     }
 
     /**
@@ -2039,7 +2053,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Location showSelectDestinationDialog(Unit unit) {
-        return widgets.showSelectDestinationDialog(unit);
+        return this.widgets.showSelectDestinationDialog(unit);
     }
 
     /**
@@ -2048,7 +2062,7 @@ public class SwingGUI extends GUI {
     @Override
     public int showSelectTributeAmountDialog(StringTemplate question,
                                              int maximum) {
-        return widgets.showSelectTributeAmountDialog(question, maximum);
+        return this.widgets.showSelectTributeAmountDialog(question, maximum);
     }
 
     /**
@@ -2057,7 +2071,7 @@ public class SwingGUI extends GUI {
     @Override
     public FreeColPanel showServerListPanel(List<ServerInfo> serverList) {
         this.canvas.closeMenus();
-        return widgets.showServerListPanel(serverList);
+        return this.widgets.showServerListPanel(serverList);
     }
 
     /**
@@ -2087,9 +2101,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public FreeColPanel showStatisticsPanel(java.util.Map<String, String> serverStats,
-                                            java.util.Map<String, String> clientStats) {
-        return widgets.showStatisticsPanel(serverStats, clientStats);
+    public FreeColPanel showStatisticsPanel(Map<String, String> serverStats,
+                                            Map<String, String> clientStats) {
+        return this.widgets.showStatisticsPanel(serverStats, clientStats);
     }
 
     /**
@@ -2113,7 +2127,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showTilePanel(Tile tile) {
-        return widgets.showTilePanel(tile);
+        return this.widgets.showTilePanel(tile);
     }
 
     /**
@@ -2121,7 +2135,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
-        return widgets.showTradeRouteInputPanel(newRoute);
+        return this.widgets.showTradeRouteInputPanel(newRoute);
     }
 
     /**
@@ -2129,7 +2143,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showTradeRoutePanel(Unit unit) {
-        return widgets.showTradeRoutePanel(unit);
+        return this.widgets.showTradeRoutePanel(unit);
     }
 
     /**
@@ -2137,7 +2151,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showTrainPanel() {
-        return widgets.showTrainPanel();
+        return this.widgets.showTrainPanel();
     }
 
     /**
@@ -2145,7 +2159,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showVictoryDialog(DialogHandler<Boolean> handler) {
-        widgets.showVictoryDialog(handler);
+        this.widgets.showVictoryDialog(handler);
     }
 
     /**
@@ -2153,7 +2167,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean showWarehouseDialog(Colony colony) {
-        return widgets.showWarehouseDialog(colony);
+        return this.widgets.showWarehouseDialog(colony);
     }
 
     /**
@@ -2161,6 +2175,6 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showWorkProductionPanel(Unit unit) {
-        return widgets.showWorkProductionPanel(unit);
+        return this.widgets.showWorkProductionPanel(unit);
     }
 }
