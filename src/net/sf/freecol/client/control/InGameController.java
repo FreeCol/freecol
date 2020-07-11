@@ -1385,8 +1385,7 @@ public final class InGameController extends FreeColClientHolder {
         if (disembarkable.isEmpty()) return false; // Fail, did not find one
         for (Unit u : disembarkable) changeState(u, UnitState.ACTIVE);
         if (disembarkable.size() == 1) {
-            if (getGUI().confirm(tile,
-                                 StringTemplate.key("disembark.text"),
+            if (getGUI().confirm(tile, StringTemplate.key("disembark.text"),
                                  disembarkable.get(0), "ok", "cancel")) {
                 moveDirection(disembarkable.get(0), direction, false);
             }

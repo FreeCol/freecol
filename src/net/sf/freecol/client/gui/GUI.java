@@ -88,7 +88,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -106,13 +105,8 @@ public class GUI extends FreeColClientHolder {
         END_TURN
     };
 
-    /** Warning levels. */
-    private static final String levels[] = {
-        "low", "normal", "high"
-    };
-
-    /** An image library to use. */
-    protected final ImageLibrary imageLibrary;
+    /** Levels (danger, finance) for confirmEuropeanTribute(). */
+    private static final String levels[] = { "low", "normal", "high" };
 
 
     /**
@@ -123,16 +117,10 @@ public class GUI extends FreeColClientHolder {
      */
     public GUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient);
-
-        this.imageLibrary = new ImageLibrary(scaleFactor);
     }
 
 
-    // Useful utilities provided in addition to the implementable interface
-
-    /**
-    
-    // High level dialogs, usually using the dialog primitives
+    // Implementations of high level dialogs, using the dialog primitives
 
     /**
      * Simple modal confirmation dialog.
@@ -175,9 +163,9 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template,
                                  GoodsType goodsType,
                                  String okKey, String cancelKey) {
-        return confirm(tile, template,
-            new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
-            okKey, cancelKey);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledGoodsTypeImage(goodsType));
+        return confirm(tile, template, icon, okKey, cancelKey);
     }
 
     /**
@@ -193,9 +181,9 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template,
                                  Settlement settlement,
                                  String okKey, String cancelKey) {
-        return confirm(tile, template,
-                       new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
-                       okKey, cancelKey);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledSettlementImage(settlement));
+        return confirm(tile, template, icon, okKey, cancelKey);
     }
 
     /**
@@ -210,9 +198,9 @@ public class GUI extends FreeColClientHolder {
      */
     public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
                                  String okKey, String cancelKey) {
-        return confirm(tile, template,
-                       new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
-                       okKey, cancelKey);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledUnitImage(unit));
+        return confirm(tile, template, icon, okKey, cancelKey);
     }
 
     /**
@@ -357,10 +345,10 @@ public class GUI extends FreeColClientHolder {
             messageId = "confirmHostile.peace";
             break;
         }
-        return confirm(attacker.getTile(), StringTemplate
-            .template(messageId)
-            .addStringTemplate("%nation%", enemy.getNationLabel()),
-            attacker, "confirmHostile.yes", "cancel");
+        StringTemplate t = StringTemplate.template(messageId)
+            .addStringTemplate("%nation%", enemy.getNationLabel());
+        return confirm(attacker.getTile(), t, attacker,
+                       "confirmHostile.yes", "cancel");
     }
 
     /**
@@ -401,11 +389,11 @@ public class GUI extends FreeColClientHolder {
             : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
             ? "confirmTribute.happy"
             : "confirmTribute.normal";
-        return (confirm(is.getTile(), StringTemplate.template(messageId)
-                .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
-                .addStringTemplate("%nation%", other.getNationLabel()),
-                attacker, "confirmTribute.yes", "confirmTribute.no"))
-            ? 1 : -1;
+        StringTemplate t = StringTemplate.template(messageId)
+            .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
+            .addStringTemplate("%nation%", other.getNationLabel());
+        return (confirm(is.getTile(), t, attacker,
+                        "confirmTribute.yes", "confirmTribute.no")) ? 1 : -1;
     }
 
     /**
@@ -444,18 +432,21 @@ public class GUI extends FreeColClientHolder {
      * @param settlement The {@code Settlement} to consider.
      * @return The chosen action, tribute, attack or cancel.
      */
-    public ArmedUnitSettlementAction getArmedUnitSettlementChoice(Settlement settlement) {
+    public ArmedUnitSettlementAction
+        getArmedUnitSettlementChoice(Settlement settlement) {
         final Player player = getMyPlayer();
 
         List<ChoiceItem<ArmedUnitSettlementAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.tribute"),
+        String msg = Messages.message("armedUnitSettlement.tribute");
+        choices.add(new ChoiceItem<>(msg,
                 ArmedUnitSettlementAction.SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.attack"),
+        msg = Messages.message("armedUnitSettlement.attack");
+        choices.add(new ChoiceItem<>(msg,
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return getChoice(settlement.getTile(),
-            settlement.getAlarmLevelLabel(player),
-            settlement, "cancel", choices);
+                         settlement.getAlarmLevelLabel(player),
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -463,8 +454,7 @@ public class GUI extends FreeColClientHolder {
      * goods or to dump them instead.
      *
      * @param goods The {@code Goods} to possibly dump.
-     * @param europe The player {@code Europe} where the boycott
-     *     is in force.
+     * @param europe The player {@code Europe} where the boycott is in force.
      * @return The chosen {@code BoycottAction}.
      */
     public BoycottAction getBoycottChoice(Goods goods, Europe europe) {
@@ -497,11 +487,12 @@ public class GUI extends FreeColClientHolder {
      */
     public TradeBuyAction getBuyChoice(Unit unit, Settlement settlement,
                                        Goods goods, int gold, boolean canBuy) {
-        //Get Buy price on Europe Market for comparison
+        // Get Buy price on Europe Market for comparison
         int euroPrice = unit.getOwner().getMarket()
             .getBidPrice(goods.getType(), goods.getAmount());
+        StringTemplate nation = settlement.getOwner().getNationLabel();
         StringTemplate template = StringTemplate.template("buy.text")
-            .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
+            .addStringTemplate("%nation%", nation)
             .addStringTemplate("%goods%", goods.getLabel(true))
             .addAmount("%gold%", gold)
             .addAmount("%euprice%", euroPrice);
@@ -528,9 +519,9 @@ public class GUI extends FreeColClientHolder {
      */
     public final <T> T getChoice(StringTemplate explain, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        return getChoice(null, explain,
-            new ImageIcon(ImageLibrary.getPlaceholderImage()),
-            cancelKey, choices);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getPlaceholderImage());
+        return getChoice(null, explain, icon, cancelKey, choices);
     }
 
     /**
@@ -548,9 +539,9 @@ public class GUI extends FreeColClientHolder {
     private final <T> T getChoice(Tile tile, StringTemplate template,
                                   GoodsType goodsType, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
-        return getChoice(tile, template,
-            new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
-            cancelKey, choices);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledGoodsTypeImage(goodsType));
+        return getChoice(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -568,9 +559,9 @@ public class GUI extends FreeColClientHolder {
     private final <T> T getChoice(Tile tile, StringTemplate template,
                                   Nation nation, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
-        return getChoice(tile, template,
-            new ImageIcon(imageLibrary.getScaledNationImage(nation)),
-            cancelKey, choices);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledNationImage(nation));
+        return getChoice(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -588,9 +579,9 @@ public class GUI extends FreeColClientHolder {
     public final <T> T getChoice(Tile tile, StringTemplate template,
                                  Settlement settlement, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        return getChoice(tile, template,
-            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
-            cancelKey, choices);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledSettlementImage(settlement));
+        return getChoice(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -608,9 +599,9 @@ public class GUI extends FreeColClientHolder {
     public final <T> T getChoice(Tile tile, StringTemplate template,
                                  Unit unit, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        return getChoice(tile, template,
-            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
-            cancelKey, choices);
+        ImageIcon icon = new ImageIcon(getImageLibrary()
+            .getScaledUnitImage(unit));
+        return getChoice(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -637,12 +628,11 @@ public class GUI extends FreeColClientHolder {
         } else {
             template = StringTemplate.template("indianLand.unknown");
         }
-
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
                                      ClaimAction.CLAIM_STEAL));
 
-        return getChoice(tile, template,
-                         owner.getNation(), "indianLand.cancel", choices);
+        return getChoice(tile, template, owner.getNation(),
+                         "indianLand.cancel", choices);
     }
 
     /**
@@ -661,19 +651,19 @@ public class GUI extends FreeColClientHolder {
                                                       boolean canBuy,
                                                       boolean canSell,
                                                       boolean canGift) {
-
+        String msg;
         ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
         if (canBuy) {
-            choices.add(new ChoiceItem<>(Messages.message("tradeProposition.toBuy"),
-                                         TradeAction.BUY, canBuy));
+            msg = Messages.message("tradeProposition.toBuy");
+            choices.add(new ChoiceItem<>(msg, TradeAction.BUY, canBuy));
         }
         if (canSell) {
-            choices.add(new ChoiceItem<>(Messages.message("tradeProposition.toSell"),
-                                         TradeAction.SELL, canSell));
+            msg = Messages.message("tradeProposition.toSell");
+            choices.add(new ChoiceItem<>(msg, TradeAction.SELL, canSell));
         }
         if (canGift) {
-            choices.add(new ChoiceItem<>(Messages.message("tradeProposition.toGift"),
-                                         TradeAction.GIFT, canGift));
+            msg = Messages.message("tradeProposition.toGift");
+            choices.add(new ChoiceItem<>(msg, TradeAction.GIFT, canGift));
         }
         if (choices.isEmpty()) return null;
 
@@ -698,25 +688,33 @@ public class GUI extends FreeColClientHolder {
                                                 boolean canDenounce) {
         StringTemplate template;
         if (is.hasContacted(unit.getOwner())) {
+            StringTemplate q = StringTemplate
+                .template("missionarySettlement.question")
+                .addStringTemplate("%settlement%",
+                    is.getLocationLabelFor(unit.getOwner()));
             template = StringTemplate.label("\n\n")
                 .addStringTemplate(is.getAlarmLevelLabel(unit.getOwner()))
-                .addStringTemplate(StringTemplate.template("missionarySettlement.question")
-                    .addStringTemplate("%settlement%", is.getLocationLabelFor(unit.getOwner())));
+                .addStringTemplate(q);
         } else {
-            template = StringTemplate.template("missionarySettlement.questionUncontacted");
+            template = StringTemplate
+                .template("missionarySettlement.questionUncontacted");
         }
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
+        String msg;
         if (canEstablish) {
-            choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.establish"),
+            msg = Messages.message("missionarySettlement.establish");
+            choices.add(new ChoiceItem<>(msg,
                     MissionaryAction.MISSIONARY_ESTABLISH_MISSION,
                     canEstablish));
         }
         if (canDenounce) {
-            choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.heresy"),
+            msg = Messages.message("missionarySettlement.heresy");
+            choices.add(new ChoiceItem<>(msg,
                     MissionaryAction.MISSIONARY_DENOUNCE_HERESY,
                     canDenounce));
         }
-        choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
+        msg = Messages.message("missionarySettlement.incite");
+        choices.add(new ChoiceItem<>(msg,
                 MissionaryAction.MISSIONARY_INCITE_INDIANS));
 
         return getChoice(unit.getTile(), template,
@@ -732,18 +730,17 @@ public class GUI extends FreeColClientHolder {
      */
     public String getNewColonyName(Player player, Tile tile) {
         String suggested = player.getSettlementName(null);
-        String name = getInput(tile, StringTemplate
-            .template("nameColony.text"), suggested,
-            "accept", "cancel");
+        StringTemplate t = StringTemplate.template("nameColony.text");
+        String name = getInput(tile, t, suggested, "accept", "cancel");
         if (name == null) {
             // Cancelled
         } else if (name.isEmpty()) {
             showInformationPanel("enterSomeText"); // 0-length is invalid
         } else if (player.getSettlementByName(name) != null) {
             // Must be unique
-            showInformationPanel(tile, StringTemplate
-                .template("nameColony.notUnique")
-                .addName("%name%", name));
+            showInformationPanel(tile,
+                StringTemplate.template("nameColony.notUnique")
+                    .addName("%name%", name));
         } else {
             return name;
         }
@@ -762,8 +759,9 @@ public class GUI extends FreeColClientHolder {
     public ScoutColonyAction getScoutForeignColonyChoice(Colony colony,
                                                          Unit unit,
                                                          boolean neg) {
+        StringTemplate u = unit.getLabel(Unit.UnitLabelType.NATIONAL);
         StringTemplate template = StringTemplate.template("scoutColony.text")
-            .addStringTemplate("%unit%", unit.getLabel(Unit.UnitLabelType.NATIONAL))
+            .addStringTemplate("%unit%", u)
             .addName("%colony%", colony.getName());
 
         List<ChoiceItem<ScoutColonyAction>> choices = new ArrayList<>();
@@ -787,8 +785,9 @@ public class GUI extends FreeColClientHolder {
      *     owner nation.
      * @return The chosen action, speak, tribute, attack or cancel.
      */
-    public ScoutIndianSettlementAction getScoutIndianSettlementChoice(IndianSettlement is,
-        String numberString) {
+    public ScoutIndianSettlementAction
+        getScoutIndianSettlementChoice(IndianSettlement is,
+                                       String numberString) {
         final Player player = getMyPlayer();
         final Player owner = is.getOwner();
 
@@ -810,17 +809,19 @@ public class GUI extends FreeColClientHolder {
             } else {
                 goodsPart = StringTemplate.name(" ");
             }
+            IndianNationType nt = (IndianNationType)owner.getNationType();
+            StringTemplate l = is.getLocationLabelFor(player);
             template = StringTemplate.template("scoutSettlement.greetings")
                 .addStringTemplate("%alarmPart%", is.getAlarmLevelLabel(player))
                 .addStringTemplate("%nation%", owner.getNationLabel())
-                .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
+                .addStringTemplate("%settlement%", l)
                 .addName("%number%", numberString)
-                .add("%settlementType%",
-                    ((IndianNationType)owner.getNationType()).getSettlementTypeKey(true))
+                .add("%settlementType%", nt.getSettlementTypeKey(true))
                 .addStringTemplate("%skillPart%", skillPart)
                 .addStringTemplate("%goodsPart%", goodsPart);
         } else {
-            template = StringTemplate.template("scoutSettlement.greetUncontacted")
+            template = StringTemplate
+                .template("scoutSettlement.greetUncontacted")
                 .addStringTemplate("%nation%", owner.getNationLabel());
         }
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
@@ -847,10 +848,12 @@ public class GUI extends FreeColClientHolder {
     public TradeSellAction getSellChoice(Unit unit, Settlement settlement,
                                          Goods goods, int gold) {
         //Get Sale price on Europe Market for comparison
-        int euroPrice = unit.getOwner().getMarket().getSalePrice(goods.getType(), goods.getAmount());
+        int euroPrice = unit.getOwner().getMarket()
+            .getSalePrice(goods.getType(), goods.getAmount());
         StringTemplate goodsTemplate = goods.getLabel(true);
+        StringTemplate nation = settlement.getOwner().getNationLabel();
         StringTemplate template = StringTemplate.template("sell.text")
-            .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
+            .addStringTemplate("%nation%", nation)
             .addStringTemplate("%goods%", goodsTemplate)
             .addAmount("%gold%", gold)
             .addAmount("%euprice%", euroPrice);
@@ -899,7 +902,7 @@ public class GUI extends FreeColClientHolder {
      * @return The panel shown.
      */
     public final FreeColPanel showErrorPanel(StringTemplate template,
-                                            String message) {
+                                             String message) {
         return showErrorPanel(template, message, null);
     }
     
@@ -968,7 +971,8 @@ public class GUI extends FreeColClientHolder {
      */
     public final FreeColPanel showInformationPanel(FreeColObject displayObject,
                                                    String messageId) {
-        return showInformationPanel(displayObject, StringTemplate.key(messageId));
+        return showInformationPanel(displayObject,
+                                    StringTemplate.key(messageId));
     }
 
     /**
@@ -1028,11 +1032,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the image library.
      *
-     * @return The base image library at the current scale.
+     * @return Null here, real implementations will override.
      */
-    public ImageLibrary getImageLibrary() {
-        return this.imageLibrary;
-    }
+    public ImageLibrary getImageLibrary() { return null; }
 
     /**
      * Get the tile image library.
@@ -1041,9 +1043,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @return Null here, real implementations will override.
      */
-    public ImageLibrary getTileImageLibrary() {
-        return null;
-    }
+    public ImageLibrary getTileImageLibrary() { return null; }
 
     /**
      * Is this GUI in windowed mode?
@@ -1052,24 +1052,20 @@ public class GUI extends FreeColClientHolder {
      *
      * @return True by default, real implementations will override.
      */
-    public boolean isWindowed() {
-        return true;
-    }
+    public boolean isWindowed() { return true; }
 
 
     // Invocation
 
     /**
-     * Run immediately if in the EDT else delegate to
-     * SwingUtilities.invokeLater.
+     * Run in the EDT, either immediately if in it or later when it wakes up.
      *
      * @param runnable A {@code Runnable} to run.
      */
     public void invokeNowOrLater(Runnable runnable) {}
     
     /**
-     * Run immediately if in the EDT else delegate to
-     * SwingUtilities.invokeAndWait.
+     * Run in the EDT, either immediately or wait for it.
      *
      * @param runnable A {@code Runnable} to run.
      */
@@ -1579,18 +1575,14 @@ public class GUI extends FreeColClientHolder {
      *
      * Used by: ZoomInAction
      */
-    public void zoomInMap() {
-        ResourceManager.clearImageCache();
-    }
+    public void zoomInMap() {}
 
     /**
      * Zoom the map out.
      *
      * Used by: ZoomOutAction
      */
-    public void zoomOutMap() {
-        ResourceManager.clearImageCache();
-    }
+    public void zoomOutMap() {}
 
 
     // Miscellaneous gui manipulation

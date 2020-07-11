@@ -108,6 +108,7 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -128,6 +129,9 @@ public class SwingGUI extends GUI {
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
+    /** The generally use scaled image library. */
+    private ImageLibrary imageLibrary;
+    
     /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
@@ -169,6 +173,7 @@ public class SwingGUI extends GUI {
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient, scaleFactor);
 
+        this.imageLibrary = new ImageLibrary(scaleFactor);
         this.graphicsDevice = Utils.getGoodGraphicsDevice();
         if (this.graphicsDevice == null) {
             FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
@@ -434,6 +439,14 @@ public class SwingGUI extends GUI {
     // Implement GUI
 
     // Simple accessors
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImageLibrary getImageLibrary() {
+        return this.imageLibrary;
+    }
 
     /**
      * {@inheritDoc}
@@ -1095,7 +1108,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomInMap() {
-        super.zoomInMap();
+        ResourceManager.clearImageCache();
         this.mapViewer.increaseMapScale();
         refresh();
     }
@@ -1105,7 +1118,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomOutMap() {
-        super.zoomOutMap();
+        ResourceManager.clearImageCache();
         this.mapViewer.decreaseMapScale();
         refresh();
     }
