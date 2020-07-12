@@ -551,10 +551,10 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Change the focus tile.
      *
-     * @param focus The new focus {@code Tile}.
+     * @param tile The new focus {@code Tile}.
      */
-    public void changeFocus(Tile focus) {
-        setFocus(focus);
+    public void changeFocus(Tile tile) {
+        setFocus(tile);
         forceReposition();
     }
 
@@ -607,40 +607,49 @@ public final class MapViewer extends FreeColClientHolder {
     public Tile convertToMapTile(int x, int y) {
         final Game game = getGame();
         if (game == null || game.getMap() == null
-            || focus == null) return null;
+            || this.focus == null) return null;
 
+        final int fx = this.focus.getX(), fy = this.focus.getY();
         int leftOffset;
-        if (focus.getX() < getLeftColumns()) {
+        if (fx < getLeftColumns()) {
             // we are at the left side of the map
-            if ((focus.getY() & 1) == 0) {
-                leftOffset = tileWidth * focus.getX() + halfWidth;
+            if ((fy & 1) == 0) {
+                leftOffset = tileWidth * fx + halfWidth;
             } else {
-                leftOffset = tileWidth * (focus.getX() + 1);
-            }
-        } else if (focus.getX() >= (game.getMap().getWidth() - getRightColumns())) {
-            // we are at the right side of the map
-            if ((focus.getY() & 1) == 0) {
-                leftOffset = getScreenWidth() - (game.getMap().getWidth() - focus.getX()) * tileWidth;
-            } else {
-                leftOffset = getScreenWidth() - (game.getMap().getWidth() - focus.getX() - 1) * tileWidth - halfWidth;
+                leftOffset = tileWidth * (fx + 1);
             }
         } else {
-            if ((focus.getY() & 1) == 0) {
-                leftOffset = (getScreenWidth() / 2);
+            final int mapWidth = game.getMap().getWidth();
+            if (fx >= mapWidth - getRightColumns()) {
+                // we are at the right side of the map
+                if ((fy & 1) == 0) {
+                    leftOffset = getScreenWidth()
+                        - tileWidth * (mapWidth - fx);
+                } else {
+                    leftOffset = getScreenWidth() - halfWidth
+                        - tileWidth * (mapWidth - fx - 1);
+                }
             } else {
-                leftOffset = (getScreenWidth() / 2) + halfWidth;
+                if ((fy & 1) == 0) {
+                    leftOffset = (getScreenWidth() / 2);
+                } else {
+                    leftOffset = (getScreenWidth() / 2) + halfWidth;
+                }
             }
         }
 
         int topOffset;
-        if (focus.getY() < topRows) {
+        if (fy < topRows) {
             // we are at the top of the map
-            topOffset = (focus.getY() + 1) * (halfHeight);
-        } else if (focus.getY() >= (game.getMap().getHeight() - bottomRows)) {
-            // we are at the bottom of the map
-            topOffset = getScreenHeight() - (game.getMap().getHeight() - focus.getY()) * (halfHeight);
+            topOffset = (fy + 1) * halfHeight;
         } else {
-            topOffset = (getScreenHeight() / 2);
+            final int mapHeight = game.getMap().getHeight();
+            if (fy >= mapHeight - bottomRows) {
+                // we are at the bottom of the map
+                topOffset = getScreenHeight() - halfHeight * (mapHeight - fy);
+            } else {
+                topOffset = getScreenHeight() / 2;
+            }
         }
 
         // At this point (leftOffset, topOffset) is the center pixel
@@ -657,8 +666,8 @@ public final class MapViewer extends FreeColClientHolder {
         int px = leftOffset + dcol * tileWidth;
         int py = topOffset + drow * tileHeight;
         // Since rows are shifted, we need to correct.
-        int newCol = focus.getX() + dcol;
-        int newRow = focus.getY() + drow * 2;
+        int newCol = fx + dcol;
+        int newRow = fy + drow * 2;
         // Now, we check whether the central diamond of the calculated
         // rectangle was clicked, and adjust rows and columns
         // accordingly. See Direction.
@@ -700,7 +709,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         logger.finest("Direction is " + direction
                       + ", new focus is " + col + ", " + row);
-        return getGame().getMap().getTile(col, row);
+        return game.getMap().getTile(col, row);
 
     }
 
@@ -850,7 +859,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     private void repositionMapIfNeeded() {
-        if (bottomRow < 0 && focus != null) positionMap(focus);
+        if (bottomRow < 0 && this.focus != null) positionMap(this.focus);
     }
 
     /**
@@ -958,7 +967,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return True if scrolling occurred.
      */
     boolean scrollMap(Direction direction) {
-        Tile t = focus;
+        Tile t = getFocus();
         if (t == null) return false;
         int fx = t.getX(), fy = t.getY();
         if ((t = t.getNeighbourOrNull(direction)) == null) return false;
@@ -1029,7 +1038,7 @@ public final class MapViewer extends FreeColClientHolder {
      *     that is displayed in the center of the Map.
      */
     private int getLeftColumns() {
-        return getLeftColumns(focus.getY());
+        return getLeftColumns(getFocus().getY());
     }
 
     /**
@@ -1064,7 +1073,7 @@ public final class MapViewer extends FreeColClientHolder {
      *     that is displayed in the center of the Map.
      */
     private int getRightColumns() {
-        return getRightColumns(focus.getY());
+        return getRightColumns(getFocus().getY());
     }
 
     /**
