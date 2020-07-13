@@ -259,6 +259,7 @@ public final class ColonyPanel extends PortPanel
                           + "[growprio 150,shrinkprio 50]"
                           + "[growprio 150,shrinkprio 50][]"));
 
+        final float mapScale = getGUI().getMapScale();
         final Player player = getMyPlayer();
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
@@ -330,7 +331,7 @@ public final class ColonyPanel extends PortPanel
 
         // Make the colony label
         Font nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL, getImageLibrary().getScaleFactor());
+            FontLibrary.FontSize.SMALL, mapScale);
         boolean incompatibleFont = false;
         if (editable) {
             for (Colony c : player.getColonyList()) {
@@ -347,8 +348,7 @@ public final class ColonyPanel extends PortPanel
         }
         if(incompatibleFont) {
             nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.SMALL,
-                getImageLibrary().getScaleFactor());
+                FontLibrary.FontSize.SMALL, mapScale);
         }
         this.nameBox.setFont(nameBoxFont);
         this.nameBox.setSelectedItem(colony);
@@ -410,9 +410,9 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
         initialize(colony);
-        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this,
-            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
+            new Dimension(200 + (int)(mapScale * 850),
+                          200 + (int)(mapScale * 525)));
     }
 
 
@@ -487,8 +487,7 @@ public final class ColonyPanel extends PortPanel
         warehousePanel.initialize();
 
         add(this.nameBox, "height 42:, grow");
-        int tmp = (int)(ImageLibrary.ICON_SIZE.height
-            * gui.getImageLibrary().getScaleFactor());
+        int tmp = (int)(ImageLibrary.ICON_SIZE.height * gui.getMapScale());
         add(netProductionPanel,
             "grow, height " + (tmp+10) + ":" + (2*tmp+10) + ":" + (2*tmp+10));
         add(tilesScroll, "width 390!, height 200!, top");

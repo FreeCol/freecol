@@ -389,8 +389,7 @@ public final class TilePopup extends JPopupMenu {
             + " (" + Messages.message(occ) + ')';
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScaleFactor()));
+            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale()));
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.changeView(unit);
             });
@@ -436,8 +435,7 @@ public final class TilePopup extends JPopupMenu {
             = colony.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScaleFactor()));
+            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale()));
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.showColonyPanel(colony, null);
             });
@@ -465,8 +463,7 @@ public final class TilePopup extends JPopupMenu {
             = is.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScaleFactor()));
+            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale()));
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.showIndianSettlementPanel(is);
             });

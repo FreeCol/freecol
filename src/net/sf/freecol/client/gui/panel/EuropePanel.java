@@ -742,7 +742,7 @@ public final class EuropePanel extends PortPanel {
         Unit u = europe.getLastUnit();
         if (u == null) setSelectedUnitLabel(null); else setSelectedUnit(u);
 
-        float scale = getImageLibrary().getScaleFactor();
+        final float scale = getGUI().getMapScale();
         getGUI().restoreSavedSize(this,
             new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
     }
