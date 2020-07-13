@@ -900,7 +900,8 @@ public final class QuickActionMenu extends JPopupMenu {
      */
     private void addTileItem(final Tile tile) {
         if (tile != null) {
-            JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
+            String msg = Messages.message(tile.getLabel());
+            JMenuItem menuItem = new JMenuItem(msg);
             menuItem.addActionListener((ActionEvent ae) -> {
                     gui.showTilePanel(tile);
             });

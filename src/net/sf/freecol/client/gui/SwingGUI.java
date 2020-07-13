@@ -1356,7 +1356,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showTilePopup(int x, int y) {
-        this.canvas.showTilePopup(this.canvas.convertToMapTile(x, y));
+        showTilePopup(this.canvas.convertToMapTile(x, y));
     }
 
     /**
