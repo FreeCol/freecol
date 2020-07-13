@@ -1261,8 +1261,8 @@ public final class MapViewer extends FreeColClientHolder {
             g.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
-            tv.displayTileWithBeachAndBorder(g, t);
-            tv.displayUnknownTileBorder(g, t);
+            this.tv.displayTileWithBeachAndBorder(g, t);
+            this.tv.displayUnknownTileBorder(g, t);
         }
         g.translate(-xt0, -yt0);
 
@@ -1383,10 +1383,10 @@ public final class MapViewer extends FreeColClientHolder {
             BufferedImage overlayImage
                 = lib.getScaledOverlayImage(t, overlayCache);
             RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
-            tv.displayTileItems(g, t, rop, overlayImage);
-            tv.displaySettlementWithChipsOrPopulationNumber(g, t, withNumbers,
-                rop);
-            tv.displayOptionalTileText(g, t);
+            this.tv.displayTileItems(g, t, rop, overlayImage);
+            this.tv.displaySettlementWithChipsOrPopulationNumber(g, t,
+                withNumbers, rop);
+            this.tv.displayOptionalTileText(g, t);
         }
         g.translate(-xt0, -yt0);
         
@@ -1486,7 +1486,7 @@ public final class MapViewer extends FreeColClientHolder {
                 xt0 = xt; yt0 = yt;
 
                 if (unit.isUndead()) {
-                    tv.displayCenteredImage(g, darkness);
+                    this.tv.displayCenteredImage(g, darkness);
                 }
                 displayUnit(g, unit);
             }
@@ -1865,9 +1865,9 @@ public final class MapViewer extends FreeColClientHolder {
                 g.setColor(Color.BLACK);
                 g.drawOval(halfWidth, halfHeight, 10, 10);
             } else {
-                tv.displayCenteredImage(g, image);
+                this.tv.displayCenteredImage(g, image);
                 if (turns != null) {
-                    tv.displayCenteredImage(g, turns);
+                    this.tv.displayCenteredImage(g, turns);
                 }
             }
             g.translate(-point.x, -point.y);
