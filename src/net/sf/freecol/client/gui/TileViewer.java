@@ -115,7 +115,8 @@ public final class TileViewer extends FreeColClientHolder {
     static final int STATE_OFFSET_X = 25,
                      STATE_OFFSET_Y = 10;
 
-    private ImageLibrary lib;
+    /** The image library derived from the parent map viewer. */
+    private final ImageLibrary lib;
 
     private RoadPainter rp;
 
@@ -134,10 +135,17 @@ public final class TileViewer extends FreeColClientHolder {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      */
-    public TileViewer(FreeColClient freeColClient) {
+    public TileViewer(FreeColClient freeColClient, ImageLibrary lib) {
         super(freeColClient);
 
-        changeImageLibrary(new ImageLibrary());
+        this.lib = lib;
+        // ATTENTION: we assume that all base tiles have the same size
+        Dimension tileSize = lib.tileSize;
+        rp = new RoadPainter(tileSize);
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
+        halfHeight = tileHeight/2;
+        halfWidth = tileWidth/2;
     }
 
 
@@ -152,34 +160,6 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public ImageLibrary getImageLibrary() {
         return this.lib;
-    }
-
-    /**
-     * Set the {@code ImageLibrary}.
-     * 
-     * @param lib The new {@code ImageLibrary}.
-     */
-    private void setImageLibrary(ImageLibrary lib) {
-        this.lib = lib;
-    }
-
-    
-    /**
-     * Sets the ImageLibrary and calculates various items that depend
-     * on tile size.
-     *
-     * @param lib an {@code ImageLibrary} value
-     */
-    public void changeImageLibrary(ImageLibrary lib) {
-        setImageLibrary(lib);
-
-        // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.tileSize;
-        rp = new RoadPainter(tileSize);
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
     }
 
 

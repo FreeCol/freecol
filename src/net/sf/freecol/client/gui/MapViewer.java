@@ -120,7 +120,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /** The internal tile viewer to use. */
-    private final TileViewer tv;
+    private TileViewer tv;
 
     /** Scaled ImageLibrary only used for map painting. */
     private ImageLibrary lib;
@@ -211,7 +211,6 @@ public final class MapViewer extends FreeColClientHolder {
     public MapViewer(FreeColClient freeColClient, ActionListener al) {
         super(freeColClient);
         
-        this.tv = new TileViewer(freeColClient);
         changeImageLibrary(new ImageLibrary());
         this.cursor = new TerrainCursor();
         this.cursor.addActionListener(al);
@@ -230,7 +229,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void changeImageLibrary(ImageLibrary lib) {
         this.lib = lib;
-        this.tv.changeImageLibrary(lib);
+        this.tv = new TileViewer(getFreeColClient(), this.lib);
 
         // ATTENTION: we assume that all base tiles have the same size
         final Dimension tileSize = lib.tileSize;

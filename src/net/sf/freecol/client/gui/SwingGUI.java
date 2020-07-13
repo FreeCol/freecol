@@ -178,7 +178,7 @@ public class SwingGUI extends GUI {
         if (this.graphicsDevice == null) {
             FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         }
-        this.tileViewer = new TileViewer(freeColClient);
+        this.tileViewer = new TileViewer(freeColClient, new ImageLibrary());
         // Defer remaining initializations, possibly to startGUI
         this.mapViewer = null;
         this.mapControls = null;
