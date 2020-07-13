@@ -759,10 +759,6 @@ public final class MapViewer extends FreeColClientHolder {
         return new Point(x, y);
     }
 
-    int getTileWidth() {
-        return tileWidth;
-    }
-
     /**
      * Gets the position where a unitLabel located at tile should be drawn.
      *
