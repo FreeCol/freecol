@@ -1117,15 +1117,17 @@ public final class MapViewer extends FreeColClientHolder {
         if (unitTile == null || unitTile.isEmpty()) {
             result = null;
 
-        } else if (activeUnit != null && activeUnit.getTile() == unitTile
-            && !isOutForAnimation(activeUnit)) {
-            result = activeUnit;
+        } else if (this.activeUnit != null
+            && this.activeUnit.getTile() == unitTile
+            && !isOutForAnimation(this.activeUnit)) {
+            result = this.activeUnit;
 
         } else if (unitTile.hasSettlement()) {
             result = null;
 
-        } else if (activeUnit != null && activeUnit.isOffensiveUnit()) {
-            result = unitTile.getDefendingUnit(activeUnit);
+        } else if (this.activeUnit != null
+            && this.activeUnit.isOffensiveUnit()) {
+            result = unitTile.getDefendingUnit(this.activeUnit);
 
         } else {
             // Find the unit with the most moves left, preferring active units.
@@ -1841,8 +1843,8 @@ public final class MapViewer extends FreeColClientHolder {
 
             BufferedImage image = (p.isOnCarrier())
                 ? ImageLibrary.getPathImage(ImageLibrary.PathType.NAVAL)
-                : (activeUnit != null)
-                ? ImageLibrary.getPathImage(activeUnit)
+                : (this.activeUnit != null)
+                ? ImageLibrary.getPathImage(this.activeUnit)
                 : null;
 
             BufferedImage turns = (p.getTurns() <= 0) ? null
@@ -1851,8 +1853,8 @@ public final class MapViewer extends FreeColClientHolder {
             g.setColor((turns == null) ? Color.GREEN : Color.RED);
 
             if (debug) { // More detailed display
-                if (activeUnit != null) {
-                    image = ImageLibrary.getPathNextTurnImage(activeUnit);
+                if (this.activeUnit != null) {
+                    image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
                 }
                 turns = lib.getStringImage(g, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
