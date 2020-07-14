@@ -62,9 +62,10 @@ public final class ReportReligiousPanel extends ReportPanel {
             JLabel crosses = Utility.localizedLabel(gt);
             crosses.setFont(font);
             reportPanel.add(crosses, SPAN_SPLIT_2);
-            FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
-                player.getImmigrationRequired(), player.getImmigration(),
-                player.getTotalImmigrationProduction());
+            FreeColProgressBar progressBar
+                = new FreeColProgressBar(freeColClient, gt, 0,
+                    player.getImmigrationRequired(), player.getImmigration(),
+                    player.getTotalImmigrationProduction());
             reportPanel.add(progressBar, "span");
 
             for (Colony colony : player.getColonyList()) {

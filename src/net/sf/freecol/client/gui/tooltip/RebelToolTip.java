@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.tooltip;
 
 import java.awt.Dimension;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
@@ -57,6 +58,7 @@ public class RebelToolTip extends JToolTip {
      */
     public RebelToolTip(FreeColClient freeColClient, Colony colony) {
         final Specification spec = colony.getSpecification();
+        final List<GoodsType> libertyGoods = spec.getLibertyGoodsTypeList();
         final int population = colony.getUnitCount();
         final int solPercent = colony.getSoL();
         final int rebels = Colony.calculateRebels(population, solPercent);
@@ -83,19 +85,21 @@ public class RebelToolTip extends JToolTip {
         add(new JLabel(colony.getTory() + "%"));
 
         int libertyProduction = 0;
-        for (GoodsType goodsType : spec.getLibertyGoodsTypeList()) {
+        for (GoodsType goodsType : libertyGoods) {
             add(new JLabel(Messages.getName(goodsType)));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
             add(new ProductionLabel(freeColClient,
-                            new AbstractGoods(goodsType, production)), "span 2");
+                    new AbstractGoods(goodsType, production)), "span 2");
         }
         libertyProduction = (int) FeatureContainer
                 .applyModifiers((float) libertyProduction, turn,
                         colony.getOwner().getModifiers(Modifier.LIBERTY));
         forEach(colony.getOwner().getModifiers(Modifier.LIBERTY), m -> {
-            for (JLabel j : ModifierFormat.getModifierLabels(m, null, turn)) add(j);
-        });
+                for (JLabel j : ModifierFormat.getModifierLabels(m, null, turn)) {
+                    add(j);
+                }
+            });
 
         boolean capped = spec.getBoolean(GameOptions.BELL_ACCUMULATION_CAPPED)
                 && colony.getSoL() >= 100;
@@ -103,9 +107,9 @@ public class RebelToolTip extends JToolTip {
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
         final int progressWidth = 400;
         FreeColProgressBar progress
-                = new FreeColProgressBar(null, 0,
-                Colony.LIBERTY_PER_REBEL, modulo,
-                ((capped) ? 0 : libertyProduction));
+            = new FreeColProgressBar(freeColClient, libertyGoods.get(0), 0,
+                                     Colony.LIBERTY_PER_REBEL, modulo,
+                                     ((capped) ? 0 : libertyProduction));
         progress.setPreferredSize(new Dimension(progressWidth, 20));
         add(progress, "span 3, alignx center");
 
