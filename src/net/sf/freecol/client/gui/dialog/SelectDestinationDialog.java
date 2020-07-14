@@ -299,7 +299,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         @Override
         public void setLabelValues(JLabel label, Destination value) {
             label.setText(value.text);
-            label.setIcon(value.location.getLocationImage(CELL_HEIGHT, this.lib));
+            String key = value.location.getLocationImageKey();
+            label.setIcon(new ImageIcon(this.lib.getSizedImage(key,
+                        new Dimension(-1, CELL_HEIGHT), false)));
         }
     }
 

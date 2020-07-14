@@ -2630,8 +2630,8 @@ ok:     while (!openMap.isEmpty()) {
      * {@inheritDoc}
      */
     @Override
-    public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
-        return new ImageIcon(library.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
+    public String getLocationImageKey() {
+        return ImageLibrary.LOST_CITY_RUMOUR;
     }
 
 
