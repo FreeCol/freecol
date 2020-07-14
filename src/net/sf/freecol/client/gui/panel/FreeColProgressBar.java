@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -61,6 +62,8 @@ public class FreeColProgressBar extends JPanel {
      */
     private GoodsType goodsType = null;
 
+    /** The font to use in the progress bar. */
+    private Font font;
 
     /**
      * Creates a new {@code FreeColProgressBar} instance.
@@ -98,9 +101,12 @@ public class FreeColProgressBar extends JPanel {
         this.value = value;
         this.step = step;
         this.goodsType = goodsType;
+        this.font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                                           FontLibrary.FontSize.TINY);
 
         setBorder(Utility.PROGRESS_BORDER);
         setPreferredSize(new Dimension(200, 20));
+        
     }
 
 
@@ -154,8 +160,7 @@ public class FreeColProgressBar extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D)g.create();
-        g2d.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                           FontLibrary.FontSize.TINY));
+        g2d.setFont(this.font);
         int width = getWidth() - getInsets().left - getInsets().right;
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
@@ -192,7 +197,8 @@ public class FreeColProgressBar extends JPanel {
 
         String stepSignal = (step < 0) ? "-" : "+";
         StringBuilder progress = new StringBuilder(32);
-        progress.append(String.valueOf(value)).append(stepSignal).append(Math.abs(step)).append('/').append(max);
+        progress.append(String.valueOf(value)).append(stepSignal)
+            .append(Math.abs(step)).append('/').append(max);
         String turnsString;
         if (max <= value) { // Already complete
             turnsString = "0";
@@ -205,10 +211,10 @@ public class FreeColProgressBar extends JPanel {
         } else { // No progress
             turnsString = Messages.message("notApplicable");
         }
-        progress.append(' ')
-                .append(Messages.message(StringTemplate.template("freeColProgressBar.turnsToComplete")
-                                                       .addName("%number%", turnsString))
-                       );
+        StringTemplate t = StringTemplate
+            .template("freeColProgressBar.turnsToComplete")
+            .addName("%number%", turnsString);
+        progress.append(' ').append(Messages.message(t));
 
         int stringWidth = g2d.getFontMetrics().stringWidth(progress.toString());
         int stringHeight = g2d.getFontMetrics().getAscent()
@@ -220,8 +226,8 @@ public class FreeColProgressBar extends JPanel {
         if (goodsType != null && (image = getImage()) != null) {
             iconWidth = image.getWidth(this);
             g2d.drawImage(image, restWidth / 2,
-                (getHeight() - ImageLibrary.ICON_SIZE.height / 2) / 2,
-                null);
+                          (getHeight() - ImageLibrary.ICON_SIZE.height/2) / 2,
+                          null);
         }
 
         g2d.setColor(Color.BLACK);
