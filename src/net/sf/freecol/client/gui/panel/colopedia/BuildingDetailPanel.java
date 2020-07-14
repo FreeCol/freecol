@@ -94,7 +94,7 @@ public class BuildingDetailPanel
                 DefaultMutableTreeNode item =
                     new DefaultMutableTreeNode(new ColopediaTreeItem(
                         this, buildingType.getId(), name,
-                        new ImageIcon(ImageLibrary
+                        new ImageIcon(getImageLibrary()
                             .getBuildingTypeImage(buildingType,
                                 new Dimension(-1, ImageLibrary.ICON_SIZE.height)))));
                 buildingHash.put(buildingType, item);
@@ -114,7 +114,7 @@ public class BuildingDetailPanel
                     DefaultMutableTreeNode item =
                         new DefaultMutableTreeNode(new ColopediaTreeItem(
                             this, buildingType.getId(), name,
-                            new ImageIcon(ImageLibrary
+                            new ImageIcon(getImageLibrary()
                                 .getBuildingTypeImage(buildingType,
                                     new Dimension(-1, ImageLibrary.ICON_SIZE.height)))));
                     node.add(item);

@@ -88,7 +88,7 @@ public class FatherDetailPanel
         for (FoundingFather foundingFather : spec.getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
-        ImageIcon icon = new ImageIcon(ImageLibrary.getLibertyImage());
+        ImageIcon icon = new ImageIcon(getImageLibrary().getLibertyImage());
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = fatherType.getTypeKey();
             String typeName = Messages.message(id);
@@ -132,7 +132,7 @@ public class FatherDetailPanel
         header.setFont(FontLibrary.createCompatibleFont(text,
             FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
 
-        Image image = ImageLibrary.getFoundingFatherImage(father, false);
+        Image image = getImageLibrary().getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));
 
         StringTemplate template = StringTemplate.label("")

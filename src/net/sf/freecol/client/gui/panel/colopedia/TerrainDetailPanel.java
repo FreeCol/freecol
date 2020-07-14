@@ -75,7 +75,7 @@ public class TerrainDetailPanel
                                          getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
             BufferedImage tileImage
-                = ImageLibrary.getTileImageWithOverlayAndForest(t,
+                = getImageLibrary().getTileImageWithOverlayAndForest(t,
                     new Dimension(-1, ImageLibrary.ICON_SIZE.height));
             BufferedImage image = new BufferedImage(tileImage.getWidth(null),
                 ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
@@ -111,7 +111,7 @@ public class TerrainDetailPanel
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = ImageLibrary
+        Image terrainImage = getImageLibrary()
             .getTileImageWithOverlayAndForest(tileType,
                 ImageLibrary.TILE_OVERLAY_SIZE);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");

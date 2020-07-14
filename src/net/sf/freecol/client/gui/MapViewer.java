@@ -222,6 +222,7 @@ public final class MapViewer extends FreeColClientHolder {
         
         this.lib = lib;
         this.tv = new TileViewer(freeColClient, lib);
+        this.size = new Dimension(0, 0); // Start empty, update is coming
         this.cursor = new TerrainCursor();
         this.cursor.addActionListener(al);
         this.chatDisplay = new ChatDisplay();
@@ -607,15 +608,6 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Tells that a chat message was received.
-     *
-     * @param message The chat message.
-     */
-    public void displayChat(GUIMessage message) {
-        this.chatDisplay.addMessage(message);
-    }
-
-    /**
      * Force the next screen repaint to reposition the tiles on the window.
      */
     public void forceReposition() {
@@ -634,6 +626,15 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void stopCursorBlinking() {
         this.cursor.stopBlinking();
+    }
+
+    /**
+     * Tells that a chat message was received.
+     *
+     * @param message The chat message.
+     */
+    public void displayChat(GUIMessage message) {
+        this.chatDisplay.addMessage(message);
     }
 
 
@@ -1192,6 +1193,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         return result;
     }
+
 
     /**
      * Displays the Map.

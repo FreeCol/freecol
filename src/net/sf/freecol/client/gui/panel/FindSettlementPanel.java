@@ -63,9 +63,15 @@ public final class FindSettlementPanel extends FreeColPanel
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FindSettlementPanel.class.getName());
 
-    private static class SettlementRenderer
+    private class SettlementRenderer
         extends FreeColComboBoxRenderer<Settlement> {
 
+        private final ImageLibrary lib;
+        
+        public SettlementRenderer(ImageLibrary lib) {
+            this.lib = lib;
+        }
+        
         /**
          * {@inheritDoc}
          */
@@ -78,8 +84,8 @@ public final class FindSettlementPanel extends FreeColPanel
                 .addStringTemplate("%nation%",
                     value.getOwner().getNationLabel());
             label.setText(Messages.message(template));
-            label.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(value,
-                    new Dimension(64, -1))));
+            label.setIcon(new ImageIcon(lib.getSettlementImage(value,
+                        new Dimension(64, -1))));
         }
     }
 
@@ -105,7 +111,7 @@ public final class FindSettlementPanel extends FreeColPanel
         super(freeColClient, null,
               new MigLayout("wrap 1", "[align center]", "[]30[]30[]"));
         this.settlementList = new JList<>();
-        this.settlementList.setCellRenderer(new SettlementRenderer());
+        this.settlementList.setCellRenderer(new SettlementRenderer(getImageLibrary()));
         this.settlementList.setFixedCellHeight(48);
         this.settlementList.addListSelectionListener(this);
         this.settlementList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

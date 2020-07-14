@@ -471,7 +471,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
             }
 
-            JLabel imageLabel = new JLabel(new ImageIcon(ImageLibrary
+            JLabel imageLabel = new JLabel(new ImageIcon(getImageLibrary()
                     .getBuildableTypeImage(value, buildingDimension)));
             JLabel nameLabel = new JLabel(Messages.getName(value));
             String reason = lockReasons.get(value);

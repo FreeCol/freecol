@@ -301,7 +301,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             label.setText(value.text);
             String key = value.location.getLocationImageKey();
             label.setIcon(new ImageIcon(this.lib.getSizedImage(key,
-                        new Dimension(-1, CELL_HEIGHT), false)));
+                        new Dimension(-1, CELL_HEIGHT))));
         }
     }
 

@@ -186,11 +186,12 @@ public final class TileViewer extends FreeColClientHolder {
                                    (ImageLibrary.TILE_OVERLAY_SIZE.height+1)) /
                                (2*ImageLibrary.TILE_OVERLAY_SIZE.height),
             -1);
-        BufferedImage terrainImage = ImageLibrary.getTerrainImage(
-            type, 0, 0, size2);
-        BufferedImage overlayImage = ImageLibrary.getOverlayImage(type, size2);
+        BufferedImage terrainImage = getImageLibrary()
+            .getTerrainImage(type, 0, 0, size2);
+        BufferedImage overlayImage = getImageLibrary()
+            .getOverlayImage(type, size2);
         BufferedImage forestImage = type.isForested()
-            ? ImageLibrary.getForestImage(type, size2)
+            ? getImageLibrary().getForestImage(type, size2)
             : null;
         if (overlayImage == null && forestImage == null) {
             return terrainImage;

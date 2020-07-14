@@ -108,6 +108,7 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ImageCache;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -128,14 +129,17 @@ public class SwingGUI extends GUI {
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
-    /** The scaled image library used by the map. */
-    private ImageLibrary scaledImageLibrary;
+    /** The graphics device to display to. */
+    private final GraphicsDevice graphicsDevice;
+
+    /** A persistent image cache. */
+    private final ImageCache imageCache;
 
     /** The fixed/unscaled image library used by panels et al. */
     private ImageLibrary fixedImageLibrary;
     
-    /** The graphics device to display to. */
-    private final GraphicsDevice graphicsDevice;
+   /** The scaled image library used by the map. */
+    private ImageLibrary scaledImageLibrary;
 
     /**
      * This is the TileViewer instance used for tiles in panels.
@@ -178,8 +182,9 @@ public class SwingGUI extends GUI {
         if (this.graphicsDevice == null) {
             FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         }
-        this.scaledImageLibrary = new ImageLibrary(scaleFactor);
-        this.fixedImageLibrary = new ImageLibrary(scaleFactor);
+        this.imageCache = new ImageCache();
+        this.scaledImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
+        this.fixedImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
         this.tileViewer = new TileViewer(freeColClient, fixedImageLibrary);
         // Defer remaining initializations, possibly to startGUI
         this.mapViewer = null;
@@ -649,10 +654,10 @@ public class SwingGUI extends GUI {
     public void startGUI(final Dimension desiredWindowSize) {
         final FreeColClient fcc = getFreeColClient();
         final ClientOptions opts = getClientOptions();
+        this.mapControls = MapControls.newInstance(fcc);
         final ActionListener al = (ActionEvent ae) ->
             this.refreshTile(this.mapViewer.getActiveTile());
         this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
-        this.mapControls = MapControls.newInstance(fcc);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
                                  this.mapControls);
