@@ -606,7 +606,12 @@ public final class ImageLibrary {
      */
     public static BufferedImage getScaledImage(String key, float scale,
                                                boolean grayscale) {
-        return ResourceManager.getImage(key, scale, grayscale);
+        final ImageResource ir = ResourceManager.getImageResource(key);
+        final BufferedImage image = ir.getImage();
+        if (image == null) return null;
+
+        Dimension d = new Dimension(image.getWidth(), image.getHeight());
+        return getSizedImage(key, scaleDimension(d, scale), grayscale);
     }
 
 

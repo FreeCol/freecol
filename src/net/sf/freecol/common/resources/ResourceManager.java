@@ -64,9 +64,6 @@ public class ResourceManager {
     /** The thread that handles preloading of resources. */
     private static volatile Thread preloadThread = null;
 
-    /** A cache of scaled (and possibly greyed) images. */
-    private static Map<Long, BufferedImage> imageCache = new HashMap<>();
-
 
     /**
      * Sets the mappings specified in the date/base-directory.
@@ -83,24 +80,6 @@ public class ResourceManager {
         // TODO: This should wait for the thread to exit, if one
         // was running.
         startBackgroundPreloading();
-    }
-
-    /**
-     * Clean up easily replaced modified copies in caches.
-     */
-    public static void clearImageCache() {
-        synchronized (imageCache) {
-            imageCache.clear();
-        }
-    }
-
-    /**
-     * Get the image cache.
-     *
-     * @return The image cache.
-     */
-    public static Map<Long, BufferedImage> getImageCache() {
-        return imageCache;
     }
 
     /**
@@ -183,91 +162,11 @@ public class ResourceManager {
         return r;
     }
 
-    private static synchronized ImageResource getImageResource(final String key) {
+    public static synchronized ImageResource getImageResource(final String key) {
+        // Public for ImageCache
         ImageResource r = mergedContainer.getImageResource(key);
-        if (r == null) {
-            logger.warning("getImageResource(" + key + ") failed");
-            r = mergedContainer.getImageResource(REPLACEMENT_IMAGE);
-            if (r == null) {
-                FreeCol.fatal(logger, "Failed getting replacement image.");
-            }
-        }
+        if (r == null) logger.warning("getImageResource(" + key + ") failed");
         return r;
-    }
-
-    /**
-     * Hash function for images.
-     *
-     * We accept the standard 32-bit int hashCode of the key, and
-     * or it with 15 bits of the width and height, and one more bit for the
-     * grayscale boolean.
-     *
-     * @param key The image key.
-     * @param size The size of the image.
-     * @param grayscale True if grayscale.
-     * @return A unique hash of these parameters.
-     */
-    private static long imageHash(final String key, final Dimension size,
-                                  final boolean grayscale) {
-        return (key.hashCode() & 0xFFFFFFFFL)
-            | ((size.width & 0x7FFFL) << 32)
-            | ((size.height & 0x7FFFL) << 47)
-            | ((grayscale) ? (0x1L << 62) : 0L);
-    }
-
-    /**
-     * Invert imageHash.
-     *
-     * Public for ImageLibrary.getImageResourceSummary.
-     *
-     * @param h A hash code from imageHash.
-     * @return A string in the form "key.width(g|_)height", except the
-     *     image key is a hash code.
-     */
-    public static String imageUnhash(long h) {
-        int key = (int)(h & 0xFFFFFFFFL); h >>= 32;
-        int width = (int)(h & 0x7FFFL); h >>= 15;
-        int height = (int)(h & 0x7FFFL); h >>= 15;
-        boolean grey = (h & 0x1L)==1L;
-        StringBuilder sb = new StringBuilder(32);
-        sb.append(key).append('.').append(width)
-            .append((grey) ? 'g' : '_').append(height);
-        return sb.toString();
-    }
-
-    /**
-     * Low level image access.
-     *
-     * All requests for scaled images come through here, so this is
-     * where to maintain the image cache.
-     *
-     * @param ir The {@code ImageResource} to load from.
-     * @param key The name of the resource to return.
-     * @param size The size of the requested image.
-     *     Rescaling will be performed if necessary.
-     * @param grayscale If true return a grayscale image.
-     * @return The image identified by {@code resource}.
-     */
-    private static BufferedImage getImage(final ImageResource ir,
-                                          final String key,
-                                          final Dimension size,
-                                          final boolean grayscale) {
-        final long hashKey = imageHash(key, size, grayscale);
-        final BufferedImage cached = imageCache.get(hashKey);
-        if (cached != null) return cached;
-
-        BufferedImage image = ir.getImage(size, grayscale);
-        if (image == null) {
-            logger.warning("getImage(" + key + ", " + size + ", " + grayscale
-                + ") failed");
-            if ((image = getImageResource(REPLACEMENT_IMAGE)
-                    .getImage(size, grayscale)) == null) {
-                FreeCol.fatal(logger, "Failed getting replacement image.");
-            }
-        } else {
-            imageCache.put(hashKey, image);
-        }
-        return image;
     }
 
 
@@ -356,47 +255,16 @@ public class ResourceManager {
     /**
      * Get the image specified by the given key.
      *
-     * Trying to get non-existing images from any of the below methods
-     * is an error. To make modding easier and prevent edited resource
-     * files from crashing the game, a replacement image is returned
-     * and a warning logged.
-     *
      * @param key The name of the resource to return.
      * @return The image identified by {@code resource}.
      */
     public static BufferedImage getImage(final String key) {
-        final ImageResource ir = getImageResource(key);
-        return ir.getImage();
-    }
-
-    /**
-     * Get the image specified by the given name, scale and grayscale.
-     *
-     * @param key The name of the resource to return.
-     * @param scale The size of the requested image (with 1 being normal size,
-     *     2 twice the size, 0.5 half the size etc). Rescaling
-     *     will be performed unless using 1.
-     * @param grayscale If true return a grayscale image.
-     * @return The image identified by {@code resource}.
-     */
-    public static BufferedImage getImage(final String key, final float scale,
-                                         boolean grayscale) {
-        final ImageResource ir = getImageResource(key);
-        final BufferedImage image = ir.getImage();
-        // Shortcut trivial cases
-        if (image == null || (scale == 1f && !grayscale)) return image;
-
-        Dimension d = new Dimension(Math.round(image.getWidth() * scale),
-                                    Math.round(image.getHeight() * scale));
-        return getImage(ir, key, d, grayscale);
+        ImageResource ir = getImageResource(key);
+        return (ir == null) ? null : ir.getImage();
     }
 
     /**
      * Get the image specified by the given name, size and grayscale.
-     *
-     * Please, avoid using too many different sizes!
-     * For each is a scaled image cached here for a long time,
-     * which wastes memory if you are not careful.
      *
      * @param key The name of the resource to return.
      * @param size The size of the requested image.
@@ -407,7 +275,8 @@ public class ResourceManager {
     public static BufferedImage getImage(final String key,
                                          final Dimension size,
                                          final boolean grayscale) {
-        return getImage(getImageResource(key), key, size, grayscale);
+        ImageResource ir = getImageResource(key);
+        return (ir == null) ? null : ir.getImage(size, grayscale);
     }
 
     /**
@@ -505,24 +374,12 @@ public class ResourceManager {
     }
 
     /**
-     * Summarize the image resources and image cache contents.
+     * Summarize the image resources.
      *
      * @param sb A {@code StringBuilder} to summarize to.
      */
     public static void summarizeImageResources(StringBuilder sb) {
         Set<String> keys = mergedContainer.getImageKeySet();
         sb.append("All keys\n").append(join(" ", keys)).append('\n');
-        Map<Integer,String> decode = new HashMap<>();
-        for (String k : keys) decode.put(k.hashCode(), k);
-        sb.append("Cache\n");
-        synchronized (imageCache) {
-            forEachMapEntry(imageCache, e -> {
-                    Long key = e.getKey();
-                    String rep = ResourceManager.imageUnhash(key);
-                    int i = Integer.parseInt(firstPart(rep, "."));
-                    sb.append(decode.get(i)).append('.')
-                        .append(lastPart(rep, ".")).append('\n');
-                });
-        }
     }
 }
