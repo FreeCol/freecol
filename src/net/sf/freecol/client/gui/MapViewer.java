@@ -294,7 +294,7 @@ public final class MapViewer extends FreeColClientHolder {
 
     /**
      * Gets the contained {@code ImageLibrary}.
-     * 
+     *
      * @return The image library;
      */
     public ImageLibrary getImageLibrary() {
@@ -306,7 +306,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @return The scale factor.
      */
-    public float getScale() {
+    private float getScale() {
         return this.lib.getScaleFactor();
     }
 

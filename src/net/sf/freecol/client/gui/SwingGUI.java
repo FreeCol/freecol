@@ -678,7 +678,7 @@ public class SwingGUI extends GUI {
         animations(Animations.unitAttack(getFreeColClient(),
                                          attacker, defender,
                                          attackerTile, defenderTile,
-                                         success, this.mapViewer.getScale()));
+                                         success, getMapScale()));
     }
 
     /**
@@ -687,8 +687,7 @@ public class SwingGUI extends GUI {
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         animations(Animations.unitMove(getFreeColClient(),
-                                       unit, srcTile, dstTile,
-                                       this.mapViewer.getScale()));
+                                       unit, srcTile, dstTile, getMapScale()));
     }
 
 
