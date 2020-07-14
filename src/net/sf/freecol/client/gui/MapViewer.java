@@ -1497,16 +1497,15 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            FontLibrary fontLibrary = new FontLibrary(getScale());
-            Font font = fontLibrary.createScaledFont(
-                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
-                Font.BOLD);
-            Font italicFont = fontLibrary.createScaledFont(
-                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
-                Font.BOLD | Font.ITALIC);
-            Font productionFont = fontLibrary.createScaledFont(
-                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY,
-                Font.BOLD);
+            Font normal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.SMALLER, Font.BOLD,
+                getScale());
+            Font italic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC,
+                getScale());
+            Font prod = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, Font.BOLD,
+                getScale());
 
             if (extendedTiles == null) {
                 extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
@@ -1529,7 +1528,7 @@ public final class MapViewer extends FreeColClientHolder {
                     ? null : fow;
 
                 displaySettlementLabels(g, settlement, player, colonyLabels,
-                                        font, italicFont, productionFont, rop);
+                                        normal, italic, prod, rop);
 
             }
             g.translate(-xt0, -yt0);

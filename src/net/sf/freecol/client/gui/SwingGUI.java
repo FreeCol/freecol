@@ -550,8 +550,11 @@ public class SwingGUI extends GUI {
     public void installLookAndFeel(String fontName) throws FreeColException {
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
-        Font font = FontLibrary.createMainFont(fontName,
-            this.imageLibrary.getScaleFactor());
+        Font font = FontLibrary.createMainFont(fontName, getMapScale());
+        if (font == null) {
+            throw new FreeColException("Unable to create main font: "
+                + fontName);
+        }
         FreeColLookAndFeel.installFont(font);
         Utility.initStyleContext(font);
     }
