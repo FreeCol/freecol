@@ -28,6 +28,8 @@ import java.net.URI;
  */
 public class StringResource extends Resource {
 
+    public static final String REPLACEMENT_STRING = "X";
+
     private String data;
 
     /**

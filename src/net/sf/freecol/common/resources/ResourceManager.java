@@ -54,7 +54,6 @@ public class ResourceManager {
     // but Resources are only retrieved or cleaned from the AWT thread.
 
     public static final String REPLACEMENT_IMAGE = "image.miscicon.delete";
-    public static final String REPLACEMENT_STRING = "X";
 
     /**
      * All the mappings are merged in order into this single ResourceMapping.
@@ -454,7 +453,7 @@ public class ResourceManager {
      */
     public static String getString(final String key) {
         final StringResource r = getStringResource(key);
-        return (r == null) ? REPLACEMENT_STRING : r.getString();
+        return (r == null) ? StringResource.REPLACEMENT_STRING : r.getString();
     }
 
     /**
