@@ -1103,9 +1103,12 @@ public final class Canvas extends JDesktopPane {
         }
 
         closeMenus();
+        // Clicks or keyboard on the canvas and the video stop the video
         AbortListener l = new AbortListener();
         addMouseListener(l);
         addKeyListener(l);
+        vc.addMouseListener(l);
+        vc.addKeyListener(l);
         // The Cortado applet is failing to quit when finished, make
         // sure it eventually gets kicked.
         // Change the magic number if we change the opening video length.
