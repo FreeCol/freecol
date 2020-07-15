@@ -431,8 +431,7 @@ public final class Widgets {
     public FreeColPanel showDeclarationPanel() {
         DeclarationPanel panel
             = new DeclarationPanel(this.freeColClient);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED,
-                                        false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -565,8 +564,7 @@ public final class Widgets {
                                        String footer) {
         EventPanel panel
             = new EventPanel(this.freeColClient, header, image, footer);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED,
-                                        false);
+        return this.canvas.showFreeColPanel(panel, false);
     }
 
     /**
@@ -578,7 +576,7 @@ public final class Widgets {
         FindSettlementPanel panel
             = new FindSettlementPanel(this.freeColClient);
         return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.ORIGIN,
-                                        true);
+                                            true);
     }
 
     /**
@@ -625,7 +623,7 @@ public final class Widgets {
                                             List<HighScore> scores) {
         ReportHighScoresPanel panel
             = new ReportHighScoresPanel(this.freeColClient, messageId, scores);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED, true);
+        return this.canvas.showFreeColPanel(panel, true);
     }
 
     /**

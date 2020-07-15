@@ -671,6 +671,7 @@ public class SwingGUI extends GUI {
         // No longer doing anything special for pmoffscreen et al as
         // changing these in-game does not change the now initialized
         // graphics pipeline.
+        this.mapViewer.startCursorBlinking();
         logger.info("GUI started.");
     }
 
