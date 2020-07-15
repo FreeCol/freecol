@@ -157,6 +157,9 @@ public final class MapViewer extends FreeColClientHolder {
     /** Fog of war area. */
     private final GeneralPath fog = new GeneralPath();
 
+    /** Fonts (scaled). */
+    private Font fontNormal, fontItalic, fontProduction, fontTiny;
+        
     // Helper variables for displaying the map.
     private int tileHeight, tileWidth, halfHeight, halfWidth,
         topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
@@ -244,7 +247,20 @@ public final class MapViewer extends FreeColClientHolder {
         this.fog.lineTo(this.halfWidth, this.tileHeight);
         this.fog.lineTo(0, this.halfHeight);
         this.fog.closePath();
-        
+
+        this.fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.SMALLER, Font.BOLD,
+            getScale());
+        this.fontItalic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC,
+            getScale());
+        this.fontProduction = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.BOLD,
+            getScale());
+        this.fontTiny = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.PLAIN,
+            getScale());
+            
         final int dx = this.tileWidth/16;
         final int dy = this.tileHeight/16;
         final int ddx = dx + dx/2;
@@ -1497,16 +1513,6 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            Font normal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.SMALLER, Font.BOLD,
-                getScale());
-            Font italic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC,
-                getScale());
-            Font prod = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, Font.BOLD,
-                getScale());
-
             if (extendedTiles == null) {
                 extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
                                            lastRow-firstRow+1+1);
@@ -1527,9 +1533,8 @@ public final class MapViewer extends FreeColClientHolder {
                 RescaleOp rop = (player == null || player.canSee(t))
                     ? null : fow;
 
-                displaySettlementLabels(g, settlement, player, colonyLabels,
-                                        normal, italic, prod, rop);
-
+                displaySettlementLabels(g, settlement, player,
+                                        colonyLabels, rop);
             }
             g.translate(-xt0, -yt0);
         }
@@ -1552,8 +1557,7 @@ public final class MapViewer extends FreeColClientHolder {
 
     private void displaySettlementLabels(Graphics2D g, Settlement settlement,
                                          Player player, int colonyLabels,
-                                         Font font, Font italicFont,
-                                         Font productionFont, RescaleOp rop) {
+                                         RescaleOp rop) {
         if (settlement.isDisposed()) {
             logger.warning("Settlement display race detected: "
                            + settlement.getName());
@@ -1568,7 +1572,8 @@ public final class MapViewer extends FreeColClientHolder {
         int yOffset = tileHeight;
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
-            BufferedImage img = lib.getStringImage(g, name, backgroundColor, font);
+            BufferedImage img = lib.getStringImage(g, name, backgroundColor,
+                                                   this.fontNormal);
             g.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
             break;
 
@@ -1586,10 +1591,10 @@ public final class MapViewer extends FreeColClientHolder {
                     specs = new TextSpecification[2];
                     String t = Messages.getName(buildable) + " " +
                         Turn.getTurnsText(colony.getTurnsToComplete(buildable));
-                    specs[1] = new TextSpecification(t, productionFont);
+                    specs[1] = new TextSpecification(t, this.fontProduction);
                 }
             }
-            specs[0] = new TextSpecification(name, font);
+            specs[0] = new TextSpecification(name, this.fontNormal);
 
             BufferedImage nameImage = createLabel(g, specs, backgroundColor);
             int spacing = 3;
@@ -1600,7 +1605,7 @@ public final class MapViewer extends FreeColClientHolder {
                 String string = Integer.toString(colony.getApparentUnitCount());
                 leftImage = createLabel(g, string,
                     ((colony.getPreferredSizeChange() > 0)
-                        ? italicFont : font),
+                        ? this.fontItalic : this.fontNormal),
                     backgroundColor);
                 if (player.owns(settlement)) {
                     int bonusProduction = colony.getProductionBonus();
@@ -1608,8 +1613,8 @@ public final class MapViewer extends FreeColClientHolder {
                         String bonus = (bonusProduction > 0)
                             ? "+" + bonusProduction
                             : Integer.toString(bonusProduction);
-                        rightImage = createLabel(g, bonus, font,
-                            backgroundColor);
+                        rightImage = createLabel(g, bonus, this.fontNormal,
+                                                 backgroundColor);
                     }
                 }
             } else if (settlement instanceof IndianSettlement) {
@@ -1735,7 +1740,8 @@ public final class MapViewer extends FreeColClientHolder {
 
         for (i = 0; i < textSpecs.length; i++) {
             spec = textSpecs[i];
-            label = new TextLayout(spec.text, spec.font, g.getFontRenderContext());
+            label = new TextLayout(spec.text, spec.font,
+                                   g.getFontRenderContext());
             labels[i] = label;
             Rectangle textRectangle = label.getPixelBounds(null, 0, 0);
             width = Math.max(width, textRectangle.width + hPadding);
@@ -1745,12 +1751,15 @@ public final class MapViewer extends FreeColClientHolder {
 
         int radius = Math.min(hPadding, vPadding);
 
-        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(width, height,
+                                             BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                            RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
         g2.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
@@ -1829,8 +1838,6 @@ public final class MapViewer extends FreeColClientHolder {
      * @param path The {@code PathNode} to display.
      */
     private void displayPath(Graphics2D g, PathNode path) {
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, getScale());
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1848,7 +1855,7 @@ public final class MapViewer extends FreeColClientHolder {
 
             BufferedImage turns = (p.getTurns() <= 0) ? null
                 : lib.getStringImage(g, Integer.toString(p.getTurns()),
-                                      Color.WHITE, font);
+                                     Color.WHITE, this.fontTiny);
             g.setColor((turns == null) ? Color.GREEN : Color.RED);
 
             if (debug) { // More detailed display
@@ -1857,7 +1864,7 @@ public final class MapViewer extends FreeColClientHolder {
                 }
                 turns = lib.getStringImage(g, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
-                    Color.WHITE, font);
+                    Color.WHITE, this.fontTiny);
             }
 
             g.translate(point.x, point.y);
