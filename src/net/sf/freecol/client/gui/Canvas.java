@@ -995,7 +995,6 @@ public final class Canvas extends JDesktopPane {
         this.gotoStarted = true;
         setCursor(GO_CURSOR);
         mapViewer.changeGotoPath(null);
-        refresh();
     }
 
     /**
@@ -1008,7 +1007,6 @@ public final class Canvas extends JDesktopPane {
         this.gotoStarted = false;
         setCursor(null);
         mapViewer.changeGotoPath(null);
-        refresh();
         return ret;
     }
 
@@ -1250,13 +1248,6 @@ public final class Canvas extends JDesktopPane {
      */
     private boolean isPanelShowing() {
         return getShowingSubPanel() != null;
-    }
-
-    /**
-     * Refresh this canvas.
-     */
-    public void refresh() {
-        repaint(0, 0, getWidth(), getHeight());
     }
 
     /**

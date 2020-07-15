@@ -356,6 +356,23 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Finish a view mode change.
+     *
+     * @param update Update the map controls if true.
+     */
+    private void changeDone(boolean update) {
+        if (getViewMode() == ViewMode.MOVE_UNITS
+            && getActiveUnit() != null) {
+            this.mapViewer.startCursorBlinking();
+        } else {
+            this.mapViewer.stopCursorBlinking();
+        }
+            
+        if (update) updateMapControls();
+        updateMenuBar();
+    }
+
+    /**
      * Update the path for the active unit.
      */
     private void updateUnitPath() {
@@ -739,127 +756,10 @@ public class SwingGUI extends GUI {
     @Override
     public void setFocus(Tile tileToFocus) {
         this.mapViewer.changeFocus(tileToFocus);
-        this.canvas.refresh();
+        refresh();
     }
 
 
-    // Path handling
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setUnitPath(PathNode path) {
-        this.mapViewer.setUnitPath(path);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void activateGotoPath() {
-        Unit unit = getActiveUnit();
-        if (unit == null) return;
-
-        // Enter "goto mode" if not already activated; otherwise cancel it
-        if (this.canvas.isGotoStarted()) {
-            clearGotoPath();
-        } else {
-            this.canvas.startGoto();
-
-            // Draw the path to the current mouse position, if the
-            // mouse is over the screen; see also
-            // CanvasMouseMotionListener.
-            Point pt = this.canvas.getMousePosition();
-            updateGotoTile((pt == null) ? null : tileAt(pt.x, pt.y));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clearGotoPath() {
-        this.canvas.stopGoto();
-        updateUnitPath();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isGotoStarted() {
-        return this.canvas.isGotoStarted();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void performGoto(Tile tile) {
-        if (this.canvas.isGotoStarted()) this.canvas.stopGoto();
-
-        final Unit active = getActiveUnit();
-        if (active == null) return;
-
-        if (tile != null && active.getTile() != tile) {
-            this.canvas.startGoto();
-            updateGotoTile(tile);
-            traverseGotoPath();
-        }
-        updateUnitPath();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void performGoto(int x, int y) {
-        performGoto(tileAt(x, y));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void traverseGotoPath() {
-        final Unit unit = getActiveUnit();
-        if (unit == null || !this.canvas.isGotoStarted()) return;
-
-        final PathNode path = this.canvas.stopGoto();
-        if (path == null) {
-            igc().clearGotoOrders(unit);
-        } else {
-            igc().goToTile(unit, path);
-        }
-        // Only update the path if the unit is still active
-        if (unit == getActiveUnit()) updateUnitPath();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateGoto(int x, int y, boolean start) {
-        if (start && isDrag(x, y)) {
-            this.canvas.startGoto();
-        }
-        if (this.canvas.isGotoStarted()) {
-            updateGotoTile(tileAt(x, y));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void prepareDrag(int x, int y) {
-        if (this.canvas.isGotoStarted()) this.canvas.stopGoto();
-        setDragPoint(x, y);
-        this.canvas.requestFocus();
-    }
-    
-    
     // MapControls
 
     /**
@@ -968,6 +868,132 @@ public class SwingGUI extends GUI {
     }
 
 
+    // Path handling
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUnitPath(PathNode path) {
+        this.mapViewer.setUnitPath(path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void activateGotoPath() {
+        Unit unit = getActiveUnit();
+        if (unit == null) return;
+
+        // Enter "goto mode" if not already activated; otherwise cancel it
+        if (this.canvas.isGotoStarted()) {
+            clearGotoPath();
+        } else {
+            this.canvas.startGoto();
+            
+            // Draw the path to the current mouse position, if the
+            // mouse is over the screen; see also
+            // CanvasMouseMotionListener.
+            Point pt = this.canvas.getMousePosition();
+            updateGotoTile((pt == null) ? null
+                : tileAt(pt.x, pt.y));
+            refresh();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearGotoPath() {
+        this.canvas.stopGoto();
+        updateUnitPath();
+        refresh();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isGotoStarted() {
+        return this.canvas.isGotoStarted();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void performGoto(Tile tile) {
+        if (this.canvas.isGotoStarted()) this.canvas.stopGoto();
+
+        final Unit active = getActiveUnit();
+        if (active != null) {
+            if (tile != null && active.getTile() != tile) {
+                this.canvas.startGoto();
+                updateGotoTile(tile);
+                traverseGotoPath();
+            }
+            updateUnitPath();
+        }
+        refresh();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void performGoto(int x, int y) {
+        performGoto(tileAt(x, y));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void traverseGotoPath() {
+        final Unit unit = getActiveUnit();
+        if (unit == null || !this.canvas.isGotoStarted()) return;
+
+        final PathNode path = this.canvas.stopGoto();
+        if (path == null) {
+            igc().clearGotoOrders(unit);
+        } else {
+            igc().goToTile(unit, path);
+        }
+        // Only update the path if the unit is still active
+        if (unit == getActiveUnit()) updateUnitPath();
+        refresh();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateGoto(int x, int y, boolean start) {
+        if (start && isDrag(x, y)) {
+            this.canvas.startGoto();
+        }
+        if (this.canvas.isGotoStarted()) {
+            updateGotoTile(tileAt(x, y));
+        }
+        refresh();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void prepareDrag(int x, int y) {
+        if (this.canvas.isGotoStarted()) {
+            this.canvas.stopGoto();
+            refresh();
+        }
+        setDragPoint(x, y);
+        this.canvas.requestFocus();
+    }
+    
+    
     // Tile image manipulation
 
     /**
@@ -1027,23 +1053,6 @@ public class SwingGUI extends GUI {
     @Override
     public Tile getSelectedTile() {
         return this.mapViewer.getSelectedTile();
-    }
-
-    /**
-     * Finish a view mode change.
-     *
-     * @param update Update the map controls if true.
-     */
-    private void changeDone(boolean update) {
-        if (getViewMode() == ViewMode.MOVE_UNITS
-            && getActiveUnit() != null) {
-            this.mapViewer.startCursorBlinking();
-        } else {
-            this.mapViewer.stopCursorBlinking();
-        }
-            
-        if (update) updateMapControls();
-        updateMenuBar();
     }
 
     /**
@@ -1292,7 +1301,7 @@ public class SwingGUI extends GUI {
     @Override
     public void refresh() {
         this.mapViewer.forceReposition();
-        this.canvas.refresh();
+        this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 
     /**
