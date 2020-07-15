@@ -122,9 +122,6 @@ public final class Canvas extends JDesktopPane {
     /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
-    /** The image library to create icons etc with. */
-    private final ImageLibrary imageLibrary;
-
     /** Is the canvas in windowed mode? */
     private boolean windowed;
 
@@ -176,7 +173,6 @@ public final class Canvas extends JDesktopPane {
                   MapControls mapControls) {
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
-        this.imageLibrary = mapViewer.getImageLibrary();
 
         // Determine if windowed mode should be used and set the window size.
         this.windowed = checkWindowed(graphicsDevice, desiredSize);
@@ -1485,7 +1481,8 @@ public final class Canvas extends JDesktopPane {
             }
 
             // draw the chat
-            this.chatDisplay.display(g2d, this.imageLibrary, size);
+            this.chatDisplay.display(g2d, this.mapViewer.getImageLibrary(),
+                                     size);
 
         } else { /* main menu */
             // Get the background without scaling, to avoid wasting
