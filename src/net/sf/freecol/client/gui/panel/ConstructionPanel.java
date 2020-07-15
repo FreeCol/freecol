@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -187,7 +187,7 @@ public class ConstructionPanel extends MigPanel
                 int amountNeeded = ag.getAmount();
                 int amountAvailable = colony.getGoodsCount(ag.getType());
                 int amountProduced = colony.getAdjustedNetProductionOf(ag.getType());
-                add(new FreeColProgressBar(ag.getType(), 0,
+                add(new FreeColProgressBar(this.freeColClient, ag.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");
             }

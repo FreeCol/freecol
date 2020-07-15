@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002-2019   The FreeCol Team
+ * Copyright (C) 2002-2020   The FreeCol Team
  * <p>
  * This file is part of FreeCol.
  * <p>
@@ -60,7 +60,7 @@ public final class ColorCellEditor extends AbstractCellEditor
 
         this.colorEditButton = new JButton();
         this.colorEditButton.addActionListener(ae ->
-            this.colorChooserPanel = freeColClient.getGUI()
+            this.colorChooserPanel = (ColorChooserPanel)freeColClient.getGUI()
                 .showColorChooserPanel(this));
         this.colorEditButton.setBorderPainted(false);
     }

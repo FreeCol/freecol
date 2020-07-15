@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -604,9 +604,8 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
-        return new ImageIcon(ImageLibrary.getSettlementImage(this,
-                                                             new Dimension(64, -1)));
+    public String getLocationImageKey() {
+        return ImageLibrary.getSettlementKey(this);
     }
 
 

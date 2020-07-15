@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -115,12 +115,16 @@ public final class TileViewer extends FreeColClientHolder {
     static final int STATE_OFFSET_X = 25,
                      STATE_OFFSET_Y = 10;
 
-    private ImageLibrary lib;
+    /** The image library derived from the parent map viewer. */
+    private final ImageLibrary lib;
 
     private RoadPainter rp;
 
     // Helper variables for displaying.
     private int tileHeight, tileWidth, halfHeight, halfWidth;
+
+    /** Font for tile text. */
+    private final Font tinyFont;
 
     /** Standard rescaling used in displayTile. */
     private final RescaleOp standardRescale
@@ -134,10 +138,20 @@ public final class TileViewer extends FreeColClientHolder {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      */
-    public TileViewer(FreeColClient freeColClient) {
+    public TileViewer(FreeColClient freeColClient, ImageLibrary lib) {
         super(freeColClient);
 
-        changeImageLibrary(new ImageLibrary());
+        this.lib = lib;
+        // ATTENTION: we assume that all base tiles have the same size
+        Dimension tileSize = lib.tileSize;
+        rp = new RoadPainter(tileSize);
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
+        halfHeight = tileHeight/2;
+        halfWidth = tileWidth/2;
+
+        this.tinyFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScaleFactor());
     }
 
 
@@ -152,34 +166,6 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public ImageLibrary getImageLibrary() {
         return this.lib;
-    }
-
-    /**
-     * Set the {@code ImageLibrary}.
-     * 
-     * @param lib The new {@code ImageLibrary}.
-     */
-    private void setImageLibrary(ImageLibrary lib) {
-        this.lib = lib;
-    }
-
-    
-    /**
-     * Sets the ImageLibrary and calculates various items that depend
-     * on tile size.
-     *
-     * @param lib an {@code ImageLibrary} value
-     */
-    public void changeImageLibrary(ImageLibrary lib) {
-        setImageLibrary(lib);
-
-        // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.tileSize;
-        rp = new RoadPainter(tileSize);
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
     }
 
 
@@ -581,8 +567,7 @@ public final class TileViewer extends FreeColClientHolder {
         }
 
         g.setColor(Color.BLACK);
-        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor()));
+        g.setFont(this.tinyFont);
         if (text != null) {
             int b = getBreakingPoint(text);
             if (b == -1) {

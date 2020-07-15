@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -49,6 +49,6 @@ public class TilePopupAction extends MapboardAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getGUI().showTilePopup();
+        getGUI().showTilePopup(getGUI().getSelectedTile());
     }
 }

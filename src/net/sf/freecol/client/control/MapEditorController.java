@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -141,6 +141,7 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void startMapEditor() {
         final FreeColClient fcc = getFreeColClient();
+        final GUI gui = getGUI();
         try {
             Specification specification = getDefaultSpecification();
             fcc.setMapEditor(true);
@@ -151,15 +152,14 @@ public final class MapEditorController extends FreeColClientHolder {
             requireNativeNations(serverGame);
             fcc.setGame(serverGame);
             fcc.setMyPlayer(null);
-            getSoundController().playSound(null);
-
-            getGUI().closeMainPanel();
-            getGUI().closeMenus();
+            gui.playSound(null);
+            gui.closeMainPanel();
+            gui.closeMenus();
             //fcc.changeClientState(true);
-            getGUI().changeView((Tile)null);
-            getGUI().startMapEditorGUI();
+            gui.changeView((Tile)null);
+            gui.startMapEditorGUI();
         } catch (IOException e) {
-            getGUI().showErrorPanel(StringTemplate
+            gui.showErrorPanel(StringTemplate
                 .template("server.initialize"));
             return;
         }
@@ -183,8 +183,7 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
-        if (mt != null) getGUI().changeView(mt);
-        getGUI().updateMapControls();
+        getGUI().changeView(mt);
     }
 
     /**
@@ -305,7 +304,6 @@ public final class MapEditorController extends FreeColClientHolder {
             @Override
             public void run() {
                 final FreeColServer freeColServer = getFreeColServer();
-                GUI.ErrorJob ej = null;
                 try {
                     Specification spec = getDefaultSpecification();
                     Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
@@ -319,18 +317,17 @@ public final class MapEditorController extends FreeColClientHolder {
                             gui.refresh();
                         });
                 } catch (FileNotFoundException fnfe) {
-                    ej = gui.errorJob(fnfe,
+                    gui.showErrorPanel(fnfe,
                         FreeCol.badFile("error.couldNotFind", theFile));
                 } catch (IOException ioe) {
-                    ej = gui.errorJob(ioe, "server.initialize");
+                    gui.showErrorPanel(ioe,
+                        StringTemplate.key("server.initialize"));
                 } catch (XMLStreamException xse) {
-                    ej = gui.errorJob(xse,
+                    gui.showErrorPanel(xse,
                         FreeCol.badFile("error.couldNotLoad", theFile));
                 } catch (FreeColException ex) {
-                    ej = gui.errorJob(ex, "server.initialize");
-                }
-                if (ej != null) {
-                    ej.setRunnable(fcc.invokeMainPanel(null)).invokeLater();
+                    gui.showErrorPanel(ex,
+                        StringTemplate.key("server.initialize"));
                 }
             }
         }.start();

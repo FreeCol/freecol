@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -130,15 +130,6 @@ public class FreeColClientHolder {
      */
     protected Player getMyPlayer() {
         return this.freeColClient.getMyPlayer();
-    }
-
-    /**
-     * Gets the controller for the sound.
-     *
-     * @return The sound controller, if any.
-     */
-    public SoundController getSoundController() {
-        return this.freeColClient.getSoundController();
     }
 
     /**

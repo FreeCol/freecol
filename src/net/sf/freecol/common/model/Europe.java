@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -419,10 +419,8 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
-        Nation nation = this.getOwner().getNation();
-        return new ImageIcon(ImageLibrary.getNationImage(nation,
-                new Dimension(-1, cellHeight)));
+    public String getLocationImageKey() {
+        return ImageLibrary.getNationKey(this.getOwner().getNation());
     }
 
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -68,7 +68,7 @@ public final class TilePopup extends JPopupMenu {
 
     private final FreeColClient freeColClient;
     private final GUI gui;
-    private final Canvas canvas;
+    private Font font;
     private boolean hasAnItem = false;
 
 
@@ -76,18 +76,17 @@ public final class TilePopup extends JPopupMenu {
      * The constructor that will insert the MenuItems.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param canvas The Canvas.
      * @param tile The {@code Tile} to create a popup for.
      *       The popup menu also appears near this {@code Tile}.
      */
-    public TilePopup(final FreeColClient freeColClient, final Canvas canvas,
-                     final Tile tile) {
+    public TilePopup(final FreeColClient freeColClient, final Tile tile) {
         super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
-        this.canvas = canvas;
-
+        this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale());
+        
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
 
@@ -388,9 +387,7 @@ public final class TilePopup extends JPopupMenu {
             + unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message(occ) + ')';
         JMenuItem menuItem = new JMenuItem(text);
-        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScaleFactor()));
+        menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.changeView(unit);
             });
@@ -435,9 +432,7 @@ public final class TilePopup extends JPopupMenu {
         StringTemplate name
             = colony.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
-        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScaleFactor()));
+        menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.showColonyPanel(colony, null);
             });
@@ -464,9 +459,7 @@ public final class TilePopup extends JPopupMenu {
         StringTemplate name
             = is.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
-        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScaleFactor()));
+        menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.showIndianSettlementPanel(is);
             });

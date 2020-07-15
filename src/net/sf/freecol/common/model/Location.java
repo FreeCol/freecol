@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -209,14 +209,11 @@ public interface Location extends ObjectWithId {
     }
 
     /**
-     * Return an ImageIcon for a Location
+     * Get an image key for this location.
      *
-     * @param cellHeight The size of a destination cell, used by Europe
-     * @param library The image library
-     * @return The ImageIcon, null by default.
+     * @return A key for image lookup, null by default.
      */
-    public default ImageIcon getLocationImage(final int cellHeight,
-                                              final ImageLibrary library) {
+    public default String getLocationImageKey() {
         return null;
     }
 }

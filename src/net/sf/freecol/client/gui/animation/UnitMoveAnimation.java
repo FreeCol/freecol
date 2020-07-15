@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -87,14 +87,16 @@ final class UnitMoveAnimation extends Animation {
             / (double)ImageLibrary.TILE_SIZE.height;
         final Point srcPoint = this.points.get(0);
         final Point dstPoint = this.points.get(1);
-        final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
-        final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
+        final int stepX = (int)(Math.signum(dstPoint.getX() - srcPoint.getX())
+            * xratio * movementRatio);
+        final int stepY = (int)(Math.signum(dstPoint.getY() - srcPoint.getY())
+            * movementRatio);
 
         Point point = srcPoint;
         long time = now(), dropFrames = 0;
         while (!point.equals(dstPoint)) {
-            point.x += stepX * xratio * movementRatio;
-            point.y += stepY * movementRatio;
+            point.x += stepX;
+            point.y += stepY;
             if ((stepX < 0 && point.x < dstPoint.x)
                 || (stepX > 0 && point.x > dstPoint.x)) {
                 point.x = dstPoint.x;

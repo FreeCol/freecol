@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -18,6 +18,8 @@
  */
 
 package net.sf.freecol.client.control;
+
+import java.awt.Color;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,7 +188,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param soundKey The sound resource key.
      */
     public void sound(String soundKey) {
-        getSoundController().playSound(soundKey);
+        getGUI().playSound(soundKey);
     }
     
     /**
@@ -1383,8 +1385,7 @@ public final class InGameController extends FreeColClientHolder {
         if (disembarkable.isEmpty()) return false; // Fail, did not find one
         for (Unit u : disembarkable) changeState(u, UnitState.ACTIVE);
         if (disembarkable.size() == 1) {
-            if (getGUI().confirm(tile,
-                                 StringTemplate.key("disembark.text"),
+            if (getGUI().confirm(tile, StringTemplate.key("disembark.text"),
                                  disembarkable.get(0), "ok", "cancel")) {
                 moveDirection(disembarkable.get(0), direction, false);
             }
@@ -2608,20 +2609,23 @@ public final class InGameController extends FreeColClientHolder {
         if (chat == null) return false;
 
         final Player player = getMyPlayer();
-        getGUI().displayChat(player, chat, false);
+        getGUI().displayChat(player.getName(), chat, player.getNationColor(),
+                             false);
         return askServer().chat(player, chat);
     }
 
     /**
      * Chat with another player.
      *
-     * @param player The {@code Player} to chat with.
+     * @param sender The sender of the chat message.
      * @param message What to say.
+     * @param color The message color.
      * @param pri If true, the message is private.
      */
-    public void chatHandler(Player player, String message, boolean pri) {
+    public void chatHandler(String sender, String message, Color color,
+                            boolean pri) {
         invokeLater(() ->
-            getGUI().displayChat(player, message, pri));
+            getGUI().displayChat(sender, message, color, pri));
     }
 
     /**

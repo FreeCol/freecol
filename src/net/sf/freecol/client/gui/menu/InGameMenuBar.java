@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -95,6 +95,7 @@ import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
 
@@ -122,7 +123,8 @@ public class InGameMenuBar extends FreeColMenuBar {
      * @param freeColClient The main controller.
      * @param listener An optional mouse motion listener.
      */
-    public InGameMenuBar(FreeColClient freeColClient, MouseMotionListener listener) {
+    public InGameMenuBar(FreeColClient freeColClient,
+                         MouseMotionListener listener) {
         // FIXME: FreeColClient should not have to be passed in to
         // this class.  This is only a menu bar, it doesn't need a
         // reference to the main controller.  The only reason it has
@@ -319,27 +321,28 @@ public class InGameMenuBar extends FreeColMenuBar {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if (freeColClient != null && freeColClient.getMyPlayer() != null) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                 RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-                                 RenderingHints.VALUE_RENDER_QUALITY);
-            final int gold = freeColClient.getMyPlayer().getGold();
-            String displayString =
-                Messages.message(StringTemplate.template("menuBar.statusLine")
-                    .addAmount("%gold%", gold)
-                    .addAmount("%tax%", freeColClient.getMyPlayer().getTax())
-                    .addAmount("%score%",
-                        freeColClient.getMyPlayer().getScore())
-                    .addStringTemplate("%year%",
-                        freeColClient.getGame().getTurn().getLabel()));
-            Rectangle2D displayStringBounds
-                = g2d.getFontMetrics().getStringBounds(displayString, g);
-            int y = Math.round(12f*freeColClient.getGUI().getImageLibrary().getScaleFactor())
-                  + 3 + getInsets().top;
-            g2d.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);
-        }
+        // Fail fast
+        if (this.freeColClient == null) return;
+        Player player = this.freeColClient.getMyPlayer();
+        if (player == null) return;
+        
+        Graphics2D g2d = (Graphics2D)g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+                             RenderingHints.VALUE_RENDER_QUALITY);
+        StringTemplate t = StringTemplate.template("menuBar.statusLine")
+            .addAmount("%gold%", player.getGold())
+            .addAmount("%tax%", player.getTax())
+            .addAmount("%score%", player.getScore())
+            .addStringTemplate("%year%",
+                this.freeColClient.getGame().getTurn().getLabel());
+        String displayString = Messages.message(t);
+        Rectangle2D bounds = g2d.getFontMetrics()
+            .getStringBounds(displayString, g);
+        int x = getWidth() - 10 - (int)bounds.getWidth();
+        int y = Math.round(12f * this.freeColClient.getGUI().getMapScale())
+            + 3 + getInsets().top;
+        g2d.drawString(displayString, x, y);
     }
-
 }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,8 +23,6 @@ import java.awt.Color;
 
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -93,12 +91,15 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Display a chat message.
      *
-     * @param player The {@code Player} to chat with.
+     * @param sender The sender of the chat message.
      * @param message What to say.
+     * @param color The message color.
      * @param pri If true, the message is private.
      */
-    public void chatHandler(Player player, String message, boolean pri) {
-        getGUI().displayStartChat(player, message, pri);
+    public void chatHandler(String sender, String message, Color color,
+                            boolean pri) {
+        // Ignoring color as it is not fixed yet
+        getGUI().displayStartChat(sender, message, pri);
     }
 
     /**
@@ -250,20 +251,20 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void startGameHandler() {
         final FreeColClient fcc = getFreeColClient();
+        final GUI gui = getGUI();
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
                     logger.info("Client starting game");
                     for (int tries = 50; tries >= 0; tries--) {
                         if (fcc.isReadyToStart()) {
-                            SwingUtilities.invokeLater(() -> {
+                            gui.invokeNowOrLater(() -> {
                                     startGameInternal();
                                 });
                             return;
                         }
                         Utils.delay(200, "StartGame has been interupted.");
                     }
-                    final GUI gui = getGUI();
                     String err = (getGame() == null) ? "client.noGame"
                         : "client.noMap";
                     gui.closeMainPanel();
@@ -290,8 +291,8 @@ public final class PreGameController extends FreeColClientHolder {
         gui.closeStatusPanel();
         
         // Stop the long introduction sound and play the player intro
-        getSoundController().playSound(null);
-        getSoundController().playSound("sound.intro." + player.getNationId());
+        gui.playSound(null);
+        gui.playSound("sound.intro." + player.getNationId());
         
         // Switch to InGame mode
         fcc.changeClientState(true);

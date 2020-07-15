@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -96,7 +96,7 @@ public final class ColopediaPanel extends FreeColPanel
 
         add(okButton, "newline 20, span, tag ok");
 
-        float scale = getImageLibrary().getScaleFactor();
+        final float scale = getGUI().getMapScale();
         getGUI().restoreSavedSize(this,
             new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
         tree = buildTree();
@@ -142,9 +142,8 @@ public final class ColopediaPanel extends FreeColPanel
         tree = new JTree(treeModel) {
                 @Override
                 public Dimension getPreferredSize() {
-                    return new Dimension(
-                        (int)(200 * getImageLibrary().getScaleFactor()),
-                        super.getPreferredSize().height);
+                    return new Dimension((int)(200 * getGUI().getMapScale()),
+                                         super.getPreferredSize().height);
                 }
             };
         tree.setRootVisible(false);

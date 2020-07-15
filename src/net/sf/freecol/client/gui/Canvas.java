@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -122,9 +122,6 @@ public final class Canvas extends JDesktopPane {
     /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
-    /** The image library to create icons etc with. */
-    private final ImageLibrary imageLibrary;
-
     /** Is the canvas in windowed mode? */
     private boolean windowed;
 
@@ -176,7 +173,6 @@ public final class Canvas extends JDesktopPane {
                   MapControls mapControls) {
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
-        this.imageLibrary = mapViewer.getImageLibrary();
 
         // Determine if windowed mode should be used and set the window size.
         this.windowed = checkWindowed(graphicsDevice, desiredSize);
@@ -198,15 +194,22 @@ public final class Canvas extends JDesktopPane {
         setLayout(null);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        createKeyBindings();
+        // Create key bindings for all actions
+        for (Option option : freeColClient.getActionManager().getOptions()) {
+            FreeColAction action = (FreeColAction)option;
+            getInputMap().put(action.getAccelerator(), action.getId());
+            getActionMap().put(action.getId(), action);
+        }
 
         this.parentFrame.setVisible(true);
-        mapViewer.startCursorBlinking();
+        this.mapViewer.startCursorBlinking();
         logger.info("Canvas created with bounds: " + windowBounds);
     }
 
     // Internals
-    
+
+    // Frames and Windows
+
     /**
      * Toggle windowed flag.
      */
@@ -455,17 +458,6 @@ public final class Canvas extends JDesktopPane {
             y = p.y;
         }
         return new Point(x, y);
-    }
-
-    /**
-     * Create key bindings for all actions.
-     */
-    private void createKeyBindings() {
-        for (Option option : freeColClient.getActionManager().getOptions()) {
-            FreeColAction action = (FreeColAction) option;
-            getInputMap().put(action.getAccelerator(), action.getId());
-            getActionMap().put(action.getId(), action);
-        }
     }
 
     /**
@@ -807,48 +799,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A {@code Tile} to make visible (not under the panel!)
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
-                                         boolean resizable) {
-        return showSubPanel(panel, setOffsetFocus(tile), resizable);
-    }
-
-    /**
-     * Displays a {@code FreeColPanel}.
-     *
-     * @param panel {@code FreeColPanel}, panel to show
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showSubPanel(FreeColPanel panel, boolean resizable) {
-        return showSubPanel(panel, PopupPosition.CENTERED, resizable);
-    }
-
-    /**
-     * Displays a {@code FreeColPanel} at a generalized position.
-     *
-     * @param panel {@code FreeColPanel}, panel to show
-     * @param popupPosition {@code PopupPosition} The generalized
-     *     position to place the panel.
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showSubPanel(FreeColPanel panel,
-                                     PopupPosition popupPosition,
-                                     boolean resizable) {
-        repaint();
-        addAsFrame(panel, false, popupPosition, resizable);
-        panel.requestFocus();
-        return panel;
-    }
-
-    /**
      * Displays the given dialog, optionally making sure a tile is visible.
      *
      * @param <T> The type to be returned from the dialog.
@@ -881,6 +831,49 @@ public final class Canvas extends JDesktopPane {
         if (freeColDialog.isModal()) stopBlinking();
         freeColDialog.requestFocus();
         freeColDialog.setVisible(true);
+    }
+
+    /**
+     * Displays a {@code FreeColPanel}.
+     *
+     * @param panel {@code FreeColPanel}, panel to show
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel,
+                                         boolean resizable) {
+        return showFreeColPanel(panel, PopupPosition.CENTERED, resizable);
+    }
+
+    /**
+     * Displays the given panel, making sure a tile is visible.
+     *
+     * @param panel The panel to be displayed
+     * @param tile A {@code Tile} to make visible (not under the panel!)
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
+                                         boolean resizable) {
+        return showFreeColPanel(panel, setOffsetFocus(tile), resizable);
+    }
+
+    /**
+     * Displays a {@code FreeColPanel} at a generalized position.
+     *
+     * @param panel {@code FreeColPanel}, panel to show
+     * @param popupPosition {@code PopupPosition} The generalized
+     *     position to place the panel.
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel,
+                                         PopupPosition popupPosition,
+                                         boolean resizable) {
+        repaint();
+        addAsFrame(panel, false, popupPosition, resizable);
+        panel.requestFocus();
+        return panel;
     }
 
 
@@ -1002,7 +995,6 @@ public final class Canvas extends JDesktopPane {
         this.gotoStarted = true;
         setCursor(GO_CURSOR);
         mapViewer.changeGotoPath(null);
-        refresh();
     }
 
     /**
@@ -1015,7 +1007,6 @@ public final class Canvas extends JDesktopPane {
         this.gotoStarted = false;
         setCursor(null);
         mapViewer.changeGotoPath(null);
-        refresh();
         return ret;
     }
 
@@ -1102,9 +1093,12 @@ public final class Canvas extends JDesktopPane {
         }
 
         closeMenus();
+        // Clicks or keyboard on the canvas and the video stop the video
         AbortListener l = new AbortListener();
         addMouseListener(l);
         addKeyListener(l);
+        vc.addMouseListener(l);
+        vc.addKeyListener(l);
         // The Cortado applet is failing to quit when finished, make
         // sure it eventually gets kicked.
         // Change the magic number if we change the opening video length.
@@ -1229,7 +1223,7 @@ public final class Canvas extends JDesktopPane {
      * @return A {@code Component} the {@code Canvas} is
      *         displaying, or null if none found.
      */
-    public Component getShowingSubPanel() {
+    public Component getShowingPanel() {
         for (Component c : getComponents()) {
             if (c instanceof ToolBoxFrame) {
                 continue;
@@ -1241,26 +1235,6 @@ public final class Canvas extends JDesktopPane {
             }
         }
         return null;
-    }
-
-    /**
-     * Checks if this {@code Canvas} displaying another panel.
-     * <p>
-     * Note that the previous implementation could throw exceptions
-     * in some cases, thus the change.
-     *
-     * @return {@code true} if the {@code Canvas} is displaying an
-     *         internal frame.
-     */
-    private boolean isPanelShowing() {
-        return getShowingSubPanel() != null;
-    }
-
-    /**
-     * Refresh this canvas.
-     */
-    public void refresh() {
-        repaint(0, 0, getWidth(), getHeight());
     }
 
     /**
@@ -1441,23 +1415,6 @@ public final class Canvas extends JDesktopPane {
         repaint();
     }
 
-    /**
-     * Shows a tile popup.
-     *
-     * @param tile The {@code Tile} where the popup occurred.
-     * @return True if the popup was shown.
-     */
-    public boolean showTilePopup(Tile tile) {
-        TilePopup tp = new TilePopup(freeColClient, this, tile);
-        if (tp.hasItem()) {
-            Point point = mapViewer.calculateTilePosition(tile, true);
-            tp.show(this, point.x, point.y);
-            tp.repaint();
-            return true;
-        }
-        return false;
-    }
-
 
     // Override JComponent
 
@@ -1496,9 +1453,6 @@ public final class Canvas extends JDesktopPane {
                     addToCanvas(greyLayer, JLayeredPane.DRAG_LAYER);
                 }
             }
-
-            // draw the chat
-            this.chatDisplay.display(g2d, this.imageLibrary, size);
 
         } else { /* main menu */
             // Get the background without scaling, to avoid wasting

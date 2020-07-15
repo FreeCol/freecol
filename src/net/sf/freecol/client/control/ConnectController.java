@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -346,24 +346,22 @@ public final class ConnectController extends FreeColClientHolder {
         // public server state from the file, and update the client
         // options if possible.
         final ClientOptions options = getClientOptions();
-
-
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         FreeColSavegameFile fis = null;
         try {
             fis = new FreeColSavegameFile(file);
         } catch (FileNotFoundException fnfe) {
-            gui.errorJob(fnfe, FreeCol.badFile("error.couldNotFind", file))
-                .invokeLater();
             logger.log(Level.WARNING, "Can not find file: " + file.getName(),
                        fnfe);
+            gui.showErrorPanel(fnfe,
+                FreeCol.badFile("error.couldNotFind", file));
             return false;
         } catch (IOException ioe) {
-            gui.errorJob(FreeCol.badFile("error.couldNotLoad", file))
-                .invokeLater();
             logger.log(Level.WARNING, "Could not load file: " + file.getName(),
                        ioe);
+            gui.showErrorPanel(ioe,
+                FreeCol.badFile("error.couldNotLoad", file));
             return false;
         }
         options.merge(fis);
@@ -373,10 +371,10 @@ public final class ConnectController extends FreeColClientHolder {
         try {
             values = fis.peekAttributes(savedKeys);
         } catch (Exception ex) {
-            gui.errorJob(ex, FreeCol.badFile("error.couldNotLoad", file))
-                .invokeLater();
             logger.log(Level.WARNING, "Could not read from: " + file.getName(),
                        ex);
+            gui.showErrorPanel(ex,
+                FreeCol.badFile("error.couldNotLoad", file));
             return false;
         }
         if (values != null && values.size() == savedKeys.size()) {

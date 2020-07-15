@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
@@ -227,24 +226,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Handy utility to create a runnable to restart the main panel.
-     *
-     * Called in a few places to recover from assorted failure.
-     * The indirection through invokeLater is necessary if this is
-     * called in the closing callback of another panel --- if called
-     * directly it loops when Canvas.showMainPanel tries to close all
-     * existing panels.     
-     *
-     * @param userMsg A message to the user.
-     * @return A {@code Runnable} for the main panel.
-     */
-    public Runnable invokeMainPanel(final String userMsg) {
-        return () -> SwingUtilities.invokeLater(() -> {
-                gui.showMainPanel(userMsg);
-            });
-    }
-
-    /**
      * Starts the new {@code FreeColClient}, including the GUI.
      *
      * @param size An optional window size.
@@ -298,37 +279,41 @@ public final class FreeColClient {
         //     NewPanel to a call to the connect controller to start a game)
         //
         if (savedGame != null) { // Restore from saved
-            soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() ->
-                getGUI().showStatusPanel(Messages.message("status.loadingGame")));
+            gui.playSound("sound.intro.general");
+            gui.invokeNowOrWait(() ->
+                gui.showStatusPanel(Messages.message("status.loadingGame")));
             if (connectController.startSavedGame(savedGame)) {
-                SwingUtilities.invokeLater(() -> {
+                gui.invokeNowOrLater(() -> {
                         gui.closeStatusPanel();
                         if (userMsg != null) {
                             gui.showInformationPanel(userMsg);
                         }
                     });
             } else {
-                invokeMainPanel(userMsg).run();
+                gui.invokeNowOrLater(() -> {
+                        gui.closeStatusPanel();
+                        gui.showMainPanel(userMsg);
+                    });
             }
         } else if (spec != null) { // Debug or fast start
-            soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() -> {
-                    if (!connectController.startSinglePlayerGame(spec)) {
+            gui.playSound("sound.intro.general");
+            gui.invokeNowOrLater(() -> {
+                    if (connectController.startSinglePlayerGame(spec)) {
+                        ; // all is well
+                    } else {
                         gui.showMainPanel(userMsg);
                     }
                 });
         } else if (showOpeningVideo) { // Video first
-            SwingUtilities.invokeLater(() -> {
-                    gui.showOpeningVideo(userMsg);
-                });
+            gui.showOpeningVideo(userMsg,
+                () -> gui.showMainPanel(userMsg));
         } else { // Start main panel
-            soundController.playSound("sound.intro.general");
-            invokeMainPanel(userMsg).run();
+            gui.playSound("sound.intro.general");
+            gui.invokeNowOrLater(() -> gui.showMainPanel(userMsg));
         }
 
-        String quit = FreeCol.CLIENT_THREAD + "Quit Game";
-        Runtime.getRuntime().addShutdownHook(new Thread(quit) {
+        String quitName = FreeCol.CLIENT_THREAD + "Quit Game";
+        Runtime.getRuntime().addShutdownHook(new Thread(quitName) {
                 @Override
                 public void run() {
                     stopServer();
@@ -760,13 +745,14 @@ public final class FreeColClient {
      * @return Null.
      */
     private FreeColServer failToMain(Exception ex, StringTemplate template) {
-        GUI.ErrorJob ej = gui.errorJob(ex, template);
-        logger.log(Level.WARNING, Messages.message(template), ex);
         if (FreeCol.getHeadless() // If this is a debug run, fail hard.
             || FreeColDebugger.getDebugRunTurns() >= 0) {
-            FreeCol.fatal(logger, ej.toString());
+            final StringTemplate t = FreeCol.errorFromException(ex, template);
+            final String msg = Messages.message(t);
+            FreeCol.fatal(null, msg);
+        } else {
+            getGUI().showErrorPanel(ex, template);
         }
-        ej.setRunnable(invokeMainPanel(null)).invokeLater();
         return null;
     }
 
@@ -809,7 +795,6 @@ public final class FreeColClient {
         if (freeColServer != null) {
             freeColServer.getController().shutdown();
             setFreeColServer(null);
-            ResourceManager.clearImageCache();
         }
     }
 

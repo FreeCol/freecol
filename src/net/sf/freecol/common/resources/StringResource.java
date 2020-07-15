@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,6 +27,8 @@ import java.net.URI;
  * @see Resource
  */
 public class StringResource extends Resource {
+
+    public static final String REPLACEMENT_STRING = "X";
 
     private String data;
 

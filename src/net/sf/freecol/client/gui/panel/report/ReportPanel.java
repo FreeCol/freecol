@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -89,7 +89,7 @@ public class ReportPanel extends FreeColPanel {
         add(scrollPane, SCROLL_PANE_SIZE);
         add(okButton, "cell 0 2, tag ok");
 
-        float scale = getImageLibrary().getScaleFactor();
+        final float scale = getGUI().getMapScale();
         getGUI().restoreSavedSize(this,
             new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,9 +23,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 
@@ -72,26 +72,27 @@ public class ChatDisplay {
     }
 
     /**
-     * Removes all the message that are older than MESSAGE_AGE.
+     * Collect all messages to display, removing all older than MESSAGE_AGE.
      *
-     * This can be useful to see if it is necessary to refresh the screen.
-     *
-     * @return True if all messages are gone.
+     * @return A copy of any messages found.
      */
-    private boolean removeOldMessages() {
+    private synchronized List<GUIMessage> prepareMessages() {
         long currentTime = new Date().getTime();
         boolean result = false;
-
+        List<GUIMessage> ret = new ArrayList<>();
+        
         int i = 0;
         while (i < this.messages.size()) {
-            long creationTime = this.messages.get(i).getCreationTime();
+            GUIMessage m = this.messages.get(i);
+            long creationTime = m.getCreationTime();
             if ((currentTime - creationTime) >= MESSAGE_AGE) {
                 this.messages.remove(i);
             } else {
+                ret.add(m);
                 i++;
             }
         }
-        return this.messages.isEmpty();
+        return ret;
     }
 
     /**
@@ -101,22 +102,22 @@ public class ChatDisplay {
      * @param lib The imageLibrary to use.
      * @param size The size of the space for displaying in.
      */
-    public synchronized void display(Graphics2D g, ImageLibrary lib,
-                                     Dimension size) {
+    public void display(Graphics2D g, ImageLibrary lib, Dimension size) {
         // Return quickly if there are no messages, which is always
         // true in single player games.
-        if (this.messages.isEmpty() || removeOldMessages()) return;
+        List<GUIMessage> msgs = prepareMessages();
+        if (msgs.isEmpty()) return;
         
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, lib.getScaleFactor());
         int yy = -1;
         final int xx = LEFT_MARGIN;
-        for (GUIMessage m : this.messages) {
+        for (GUIMessage m : msgs) {
             Image si = lib.getStringImage(g, m.getMessage(),
                                           m.getColor(), font);
             if (yy < 0) {
                 yy = size.height - TOP_MARGIN
-                    - this.messages.size() * si.getHeight(null);
+                    - msgs.size() * si.getHeight(null);
             }
             g.drawImage(si, xx, yy, null);
             yy += si.getHeight(null);

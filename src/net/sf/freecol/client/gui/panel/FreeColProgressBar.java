@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -28,6 +29,7 @@ import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -59,45 +61,63 @@ public class FreeColProgressBar extends JPanel {
      * The type of goods this progress bar is for.  The default value
      * of null indicates no goods type.
      */
-    private GoodsType goodsType = null;
+    private final GoodsType goodsType;
+
+    /** An image for the goods type. */
+    private final Image image;
+
+    /** The font to use in the progress bar. */
+    private final Font font;
 
 
     /**
      * Creates a new {@code FreeColProgressBar} instance.
      *
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param goodsType the type of goods produced
      */
-    public FreeColProgressBar(GoodsType goodsType) {
-        this(goodsType, 0, 100, 0, 0);
+    public FreeColProgressBar(FreeColClient freeColClient,
+                              GoodsType goodsType) {
+        this(freeColClient, goodsType, 0, 100, 0, 0);
     }
 
     /**
      * Creates a new {@code FreeColProgressBar} instance.
      *
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      */
-    public FreeColProgressBar(GoodsType goodsType, int min, int max) {
-        this(goodsType, min, max, 0, 0);
+    public FreeColProgressBar(FreeColClient freeColClient,
+                              GoodsType goodsType, int min, int max) {
+        this(freeColClient, goodsType, min, max, 0, 0);
     }
 
     /**
      * Creates a new {@code FreeColProgressBar} instance.
      *
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
-    public FreeColProgressBar(GoodsType goodsType, int min, int max,
+    public FreeColProgressBar(FreeColClient freeColClient,
+                              GoodsType goodsType, int min, int max,
                               int value, int step) {
         this.min = min;
         this.max = max;
         this.value = value;
         this.step = step;
         this.goodsType = goodsType;
+        this.image = (goodsType == null) ? null
+            : (freeColClient.getGUI().getImageLibrary()
+                .getGoodsTypeImage(goodsType,
+                    new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2)));
+        this.font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                                           FontLibrary.FontSize.TINY);
 
         setBorder(Utility.PROGRESS_BORDER);
         setPreferredSize(new Dimension(200, 20));
@@ -130,18 +150,6 @@ public class FreeColProgressBar extends JPanel {
         repaint();
     }
 
-    /**
-     * Get an image to use for the goods type, if any.
-     *
-     * @return A suitable {@code Image}, or null if there is no
-     *      goods type.
-     */
-    private Image getImage() {
-        return (this.goodsType == null) ? null
-            : ImageLibrary.getGoodsTypeImage(this.goodsType,
-                new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2));
-    }
-
 
     // Override JComponent
 
@@ -154,8 +162,7 @@ public class FreeColProgressBar extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D)g.create();
-        g2d.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                           FontLibrary.FontSize.TINY));
+        g2d.setFont(this.font);
         int width = getWidth() - getInsets().left - getInsets().right;
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
@@ -192,7 +199,8 @@ public class FreeColProgressBar extends JPanel {
 
         String stepSignal = (step < 0) ? "-" : "+";
         StringBuilder progress = new StringBuilder(32);
-        progress.append(String.valueOf(value)).append(stepSignal).append(Math.abs(step)).append('/').append(max);
+        progress.append(String.valueOf(value)).append(stepSignal)
+            .append(Math.abs(step)).append('/').append(max);
         String turnsString;
         if (max <= value) { // Already complete
             turnsString = "0";
@@ -205,21 +213,20 @@ public class FreeColProgressBar extends JPanel {
         } else { // No progress
             turnsString = Messages.message("notApplicable");
         }
-        progress.append(' ')
-                .append(Messages.message(StringTemplate.template("freeColProgressBar.turnsToComplete")
-                                                       .addName("%number%", turnsString))
-                       );
+        StringTemplate t = StringTemplate
+            .template("freeColProgressBar.turnsToComplete")
+            .addName("%number%", turnsString);
+        progress.append(' ').append(Messages.message(t));
 
         int stringWidth = g2d.getFontMetrics().stringWidth(progress.toString());
         int stringHeight = g2d.getFontMetrics().getAscent()
             + g2d.getFontMetrics().getDescent();
         int restWidth = getWidth() - stringWidth;
 
-        Image image = null;
         int iconWidth = 0;
-        if (goodsType != null && (image = getImage()) != null) {
-            iconWidth = image.getWidth(this);
-            g2d.drawImage(image, restWidth / 2,
+        if (this.image != null) {
+            iconWidth = this.image.getWidth(this);
+            g2d.drawImage(this.image, restWidth / 2,
                 (getHeight() - ImageLibrary.ICON_SIZE.height / 2) / 2,
                 null);
         }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2019   The FreeCol Team
+ *  Copyright (C) 2002-2020   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -104,11 +104,11 @@ public final class AboutPanel extends FreeColPanel {
         add(apLogoLabel, "center");
 
         // Create available Font choices
+        final float mapScale = getGUI().getMapScale();
         Font fontBold = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            getImageLibrary().getScaleFactor());
+            FontLibrary.FontSize.TINY, Font.BOLD, mapScale);
         Font fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, getImageLibrary().getScaleFactor());
+            FontLibrary.FontSize.TINY, mapScale);
 
         // Version
         JLabel apVersion = Utility.localizedLabel("aboutPanel.version");
