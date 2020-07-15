@@ -123,6 +123,9 @@ public final class TileViewer extends FreeColClientHolder {
     // Helper variables for displaying.
     private int tileHeight, tileWidth, halfHeight, halfWidth;
 
+    /** Font for tile text. */
+    private final Font tinyFont;
+
     /** Standard rescaling used in displayTile. */
     private final RescaleOp standardRescale
         = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
@@ -146,6 +149,9 @@ public final class TileViewer extends FreeColClientHolder {
         tileWidth = tileSize.width;
         halfHeight = tileHeight/2;
         halfWidth = tileWidth/2;
+
+        this.tinyFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScaleFactor());
     }
 
 
@@ -561,8 +567,7 @@ public final class TileViewer extends FreeColClientHolder {
         }
 
         g.setColor(Color.BLACK);
-        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor()));
+        g.setFont(this.tinyFont);
         if (text != null) {
             int b = getBreakingPoint(text);
             if (b == -1) {

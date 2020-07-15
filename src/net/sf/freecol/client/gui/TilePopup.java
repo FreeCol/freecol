@@ -69,8 +69,9 @@ public final class TilePopup extends JPopupMenu {
     private final FreeColClient freeColClient;
     private final GUI gui;
     private final Canvas canvas;
+    private Font font;
     private boolean hasAnItem = false;
-
+    
 
     /**
      * The constructor that will insert the MenuItems.
@@ -87,7 +88,9 @@ public final class TilePopup extends JPopupMenu {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.canvas = canvas;
-
+        this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale());
+        
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
 
@@ -388,8 +391,7 @@ public final class TilePopup extends JPopupMenu {
             + unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message(occ) + ')';
         JMenuItem menuItem = new JMenuItem(text);
-        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale()));
+        menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.changeView(unit);
             });
@@ -434,8 +436,7 @@ public final class TilePopup extends JPopupMenu {
         StringTemplate name
             = colony.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
-        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale()));
+        menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.showColonyPanel(colony, null);
             });
@@ -462,8 +463,7 @@ public final class TilePopup extends JPopupMenu {
         StringTemplate name
             = is.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
-        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale()));
+        menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.showIndianSettlementPanel(is);
             });
