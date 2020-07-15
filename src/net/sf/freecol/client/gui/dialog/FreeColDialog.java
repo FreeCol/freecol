@@ -100,8 +100,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     }
 
     /**
-     * Full constructor for canvas to build a dialog in one hit (supplying
-     * the getResponse() implementation).
+     * Full constructor to build a dialog in one hit (supplying the
+     * getResponse() implementation).
      *
      * Much of this was extracted from the source for
      * JOptionPane.createDialog.  We needed a way to control modality.

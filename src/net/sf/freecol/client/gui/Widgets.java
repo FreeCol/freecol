@@ -191,7 +191,7 @@ public final class Widgets {
          */
         @Override
         public void run() {
-            canvas.viewFreeColDialog(fcd, tile);
+            Widgets.this.canvas.viewFreeColDialog(fcd, tile);
             // ...and use another thread to wait for a dialog response...
             new Thread(fcd.toString()) {
                 @Override
