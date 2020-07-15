@@ -1223,7 +1223,7 @@ public final class Canvas extends JDesktopPane {
      * @return A {@code Component} the {@code Canvas} is
      *         displaying, or null if none found.
      */
-    public Component getShowingSubPanel() {
+    public Component getShowingPanel() {
         for (Component c : getComponents()) {
             if (c instanceof ToolBoxFrame) {
                 continue;
@@ -1235,19 +1235,6 @@ public final class Canvas extends JDesktopPane {
             }
         }
         return null;
-    }
-
-    /**
-     * Checks if this {@code Canvas} displaying another panel.
-     * <p>
-     * Note that the previous implementation could throw exceptions
-     * in some cases, thus the change.
-     *
-     * @return {@code true} if the {@code Canvas} is displaying an
-     *         internal frame.
-     */
-    private boolean isPanelShowing() {
-        return getShowingSubPanel() != null;
     }
 
     /**

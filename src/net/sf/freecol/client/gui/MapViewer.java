@@ -537,19 +537,19 @@ public final class MapViewer extends FreeColClientHolder {
 
         BufferedImage img = new BufferedImage(width, height,
                                               BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = img.createGraphics();
+        Graphics2D g2d = img.createGraphics();
 
         final int unitX = (width - unitImg.getWidth()) / 2;
-        g.drawImage(unitImg, unitX, 0, null);
+        g2d.drawImage(unitImg, unitX, 0, null);
 
         final Player player = getMyPlayer();
         String text = Messages.message(unit.getOccupationLabel(player, false));
-        g.drawImage(this.lib.getOccupationIndicatorChip(g, unit, text),
-                    0, 0, null);
+        g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
+                      0, 0, null);
 
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);
-        g.dispose();
+        g2d.dispose();
         return label;
     }
 
@@ -1230,11 +1230,11 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Displays the Map.
      *
-     * @param g The Graphics2D object on which to draw the Map.
+     * @param g2d The {@code Graphics2D} object on which to draw the Map.
      */
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
-    public void displayMap(Graphics2D g) {
+    public void displayMap(Graphics2D g2d) {
         //final long now = now();
         final ClientOptions options = getClientOptions();
         final int colonyLabels
@@ -1244,8 +1244,8 @@ public final class MapViewer extends FreeColClientHolder {
         final Player player = getMyPlayer(); // Check, can be null in map editor
 
         // Remember transform
-        AffineTransform originTransform = g.getTransform();
-        Rectangle clipBounds = g.getClipBounds();
+        AffineTransform originTransform = g2d.getTransform();
+        Rectangle clipBounds = g2d.getClipBounds();
 
         // Position the map if it is not positioned yet
         repositionMapIfNeeded();
@@ -1265,15 +1265,15 @@ public final class MapViewer extends FreeColClientHolder {
         lastColumn = leftColumn + lastColumn;
 
         // Clear background
-        g.setColor(Color.black);
-        g.fillRect(clipBounds.x, clipBounds.y,
-                   clipBounds.width, clipBounds.height);
+        g2d.setColor(Color.black);
+        g2d.fillRect(clipBounds.x, clipBounds.y,
+                     clipBounds.width, clipBounds.height);
 
         // Set and remember transform for upper left corner
-        g.translate(clipLeftX, clipTopY);
-        AffineTransform baseTransform = g.getTransform();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.translate(clipLeftX, clipTopY);
+        AffineTransform baseTransform = g2d.getTransform();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Create the common tile lists
         final int x0 = firstColumn;
@@ -1289,13 +1289,13 @@ public final class MapViewer extends FreeColClientHolder {
             final int y = t.getY();
             final int xt = (x-x0) * tileWidth + (((y&1)==1) ? halfWidth : 0);
             final int yt = (y-y0) * halfHeight;
-            g.translate(xt - xt0, yt - yt0);
+            g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
-            this.tv.displayTileWithBeachAndBorder(g, t);
-            this.tv.displayUnknownTileBorder(g, t);
+            this.tv.displayTileWithBeachAndBorder(g2d, t);
+            this.tv.displayUnknownTileBorder(g2d, t);
         }
-        g.translate(-xt0, -yt0);
+        g2d.translate(-xt0, -yt0);
 
         // Draw the grid, if needed
         if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
@@ -1311,18 +1311,18 @@ public final class MapViewer extends FreeColClientHolder {
             }
 
             // Display the grid
-            g.setStroke(gridStroke);
-            g.setColor(Color.BLACK);
+            g2d.setStroke(gridStroke);
+            g2d.setColor(Color.BLACK);
             for (int row = firstRow; row <= lastRow; row++) {
-                g.translate(0, halfHeight);
-                AffineTransform rowTransform = g.getTransform();
+                g2d.translate(0, halfHeight);
+                AffineTransform rowTransform = g2d.getTransform();
                 if ((row & 1) == 1) {
-                    g.translate(halfWidth, 0);
+                    g2d.translate(halfWidth, 0);
                 }
-                g.draw(gridPath);
-                g.setTransform(rowTransform);
+                g2d.draw(gridPath);
+                g2d.setTransform(rowTransform);
             }
-            g.setTransform(baseTransform);
+            g2d.setTransform(baseTransform);
         }
 
         // Paint full region borders
@@ -1339,11 +1339,11 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
-                displayTerritorialBorders(g, t, BorderType.REGION, true);
+                displayTerritorialBorders(g2d, t, BorderType.REGION, true);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         }
 
         // Paint full country borders
@@ -1359,15 +1359,15 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
-                displayTerritorialBorders(g, t, BorderType.COUNTRY, true);
+                displayTerritorialBorders(g2d, t, BorderType.COUNTRY, true);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         }
 
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_OFF);
 
         // Apply fog of war to flat parts of all tiles
         RescaleOp fow = null;
@@ -1379,10 +1379,10 @@ public final class MapViewer extends FreeColClientHolder {
                                 new float[] { 0, 0, 0, 0 },
                                 null);
 
-            final Composite oldComposite = g.getComposite();
-            g.setColor(Color.BLACK);
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                                                      0.2f));
+            final Composite oldComposite = g2d.getComposite();
+            g2d.setColor(Color.BLACK);
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                                                        0.2f));
             xt0 = yt0 = 0;
             for (Tile t : baseTiles) {
                 if (!t.isExplored() || player.canSee(t)) continue;
@@ -1390,12 +1390,12 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * this.tileWidth + (y&1) * this.halfWidth;
                 final int yt = (y-y0) * this.halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
-                g.fill(this.fog);
+                g2d.fill(this.fog);
             }
-            g.translate(-xt0, -yt0);
-            g.setComposite(oldComposite);
+            g2d.translate(-xt0, -yt0);
+            g2d.setComposite(oldComposite);
         }
 
         // Display the Tile overlays
@@ -1408,22 +1408,22 @@ public final class MapViewer extends FreeColClientHolder {
             final int y = t.getY();
             final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
             final int yt = (y-y0) * halfHeight;
-            g.translate(xt - xt0, yt - yt0);
+            g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
             
             BufferedImage overlayImage
                 = lib.getScaledOverlayImage(t, overlayCache);
             RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
-            this.tv.displayTileItems(g, t, rop, overlayImage);
-            this.tv.displaySettlementWithChipsOrPopulationNumber(g, t,
+            this.tv.displayTileItems(g2d, t, rop, overlayImage);
+            this.tv.displaySettlementWithChipsOrPopulationNumber(g2d, t,
                 withNumbers, rop);
-            this.tv.displayOptionalTileText(g, t);
+            this.tv.displayOptionalTileText(g2d, t);
         }
-        g.translate(-xt0, -yt0);
+        g2d.translate(-xt0, -yt0);
         
         // Paint transparent region borders
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT)
             == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
             if (extendedTiles == null) {
@@ -1437,12 +1437,12 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
-                displayTerritorialBorders(g, t, BorderType.REGION, false);
+                displayTerritorialBorders(g2d, t, BorderType.REGION, false);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         }
 
         // Paint transparent country borders
@@ -1458,12 +1458,12 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
-                displayTerritorialBorders(g, t, BorderType.COUNTRY, false);
+                displayTerritorialBorders(g2d, t, BorderType.COUNTRY, false);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         }
 
         // Display cursor for selected tile or active unit
@@ -1474,15 +1474,15 @@ public final class MapViewer extends FreeColClientHolder {
             if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt, yt);
-                g.drawImage(lib.getScaledImage(ImageLibrary.UNIT_SELECT),
-                            0, 0, null);
-                g.translate(-xt, -yt);
+                g2d.translate(xt, yt);
+                g2d.drawImage(lib.getScaledImage(ImageLibrary.UNIT_SELECT),
+                              0, 0, null);
+                g2d.translate(-xt, -yt);
             }
         }
 
         // Display units
-        g.setColor(Color.BLACK);
+        g2d.setColor(Color.BLACK);
         if (!game.isInRevengeMode()) {
             xt0 = yt0 = 0;
             for (Tile t : baseTiles) {
@@ -1493,12 +1493,12 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
-                displayUnit(g, unit);
+                displayUnit(g2d, unit);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         } else {
             /* Add extra rows and colums, as the dark halo is huge to enable
                a very slow fade into transparency, see BR#2580 */
@@ -1513,15 +1513,15 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0);
+                g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
                 if (unit.isUndead()) {
-                    this.tv.displayCenteredImage(g, darkness);
+                    this.tv.displayCenteredImage(g2d, darkness);
                 }
-                displayUnit(g, unit);
+                displayUnit(g2d, unit);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         }
 
         // Display the colony names, if needed
@@ -1541,26 +1541,26 @@ public final class MapViewer extends FreeColClientHolder {
                 final int y = t.getY();
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
-                g.translate(xt - xt0, yt - yt0); 
+                g2d.translate(xt - xt0, yt - yt0); 
                 xt0 = xt; yt0 = yt;
                 RescaleOp rop = (player == null || player.canSee(t))
                     ? null : fow;
 
-                displaySettlementLabels(g, settlement, player,
+                displaySettlementLabels(g2d, settlement, player,
                                         colonyLabels, rop);
             }
-            g.translate(-xt0, -yt0);
+            g2d.translate(-xt0, -yt0);
         }
 
         // Restore original transform to allow for more drawing
-        g.setTransform(originTransform);
+        g2d.setTransform(originTransform);
 
         // Display goto path
-        if (this.unitPath != null) displayPath(g, this.unitPath);
-        else if (this.gotoPath != null) displayPath(g, this.gotoPath);
+        if (this.unitPath != null) displayPath(g2d, this.unitPath);
+        else if (this.gotoPath != null) displayPath(g2d, this.gotoPath);
 
         // Draw the chat
-        this.chatDisplay.display(g, this.lib, this.size);
+        this.chatDisplay.display(g2d, this.lib, this.size);
 
         // Timing log
         //final long gap = now() - now;
@@ -1571,7 +1571,7 @@ public final class MapViewer extends FreeColClientHolder {
         //    + ((double)gap) / ((lastRow-firstRow) * (lastColumn-firstColumn)));
     }
 
-    private void displaySettlementLabels(Graphics2D g, Settlement settlement,
+    private void displaySettlementLabels(Graphics2D g2d, Settlement settlement,
                                          Player player, int colonyLabels,
                                          RescaleOp rop) {
         if (settlement.isDisposed()) {
@@ -1588,9 +1588,9 @@ public final class MapViewer extends FreeColClientHolder {
         int yOffset = tileHeight;
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
-            BufferedImage img = lib.getStringImage(g, name, backgroundColor,
+            BufferedImage img = lib.getStringImage(g2d, name, backgroundColor,
                                                    this.fontNormal);
-            g.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
+            g2d.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
             break;
 
         case ClientOptions.COLONY_LABELS_MODERN:
@@ -1612,14 +1612,14 @@ public final class MapViewer extends FreeColClientHolder {
             }
             specs[0] = new TextSpecification(name, this.fontNormal);
 
-            BufferedImage nameImage = createLabel(g, specs, backgroundColor);
+            BufferedImage nameImage = createLabel(g2d, specs, backgroundColor);
             int spacing = 3;
             BufferedImage leftImage = null;
             BufferedImage rightImage = null;
             if (settlement instanceof Colony) {
                 Colony colony = (Colony)settlement;
                 String string = Integer.toString(colony.getApparentUnitCount());
-                leftImage = createLabel(g, string,
+                leftImage = createLabel(g2d, string,
                     ((colony.getPreferredSizeChange() > 0)
                         ? this.fontItalic : this.fontNormal),
                     backgroundColor);
@@ -1629,7 +1629,7 @@ public final class MapViewer extends FreeColClientHolder {
                         String bonus = (bonusProduction > 0)
                             ? "+" + bonusProduction
                             : Integer.toString(bonusProduction);
-                        rightImage = createLabel(g, bonus, this.fontNormal,
+                        rightImage = createLabel(g2d, bonus, this.fontNormal,
                                                  backgroundColor);
                     }
                 }
@@ -1662,13 +1662,13 @@ public final class MapViewer extends FreeColClientHolder {
             int labelOffset = (tileWidth - width)/2;
             yOffset -= (nameImage.getHeight() * getScale())/2;
             if (leftImage != null) {
-                g.drawImage(leftImage, rop, labelOffset, yOffset);
+                g2d.drawImage(leftImage, rop, labelOffset, yOffset);
                 labelOffset += (leftImage.getWidth() * getScale()) + spacing;
             }
-            g.drawImage(nameImage, rop, labelOffset, yOffset);
+            g2d.drawImage(nameImage, rop, labelOffset, yOffset);
             if (rightImage != null) {
                 labelOffset += (nameImage.getWidth() * getScale()) + spacing;
-                g.drawImage(rightImage, rop, labelOffset, yOffset);
+                g2d.drawImage(rightImage, rop, labelOffset, yOffset);
             }
             break;
         }
@@ -1700,17 +1700,19 @@ public final class MapViewer extends FreeColClientHolder {
 
         // draw everything
         BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setColor(backgroundColor);
-        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g.draw(path);
-        g.setColor(Color.WHITE);
-        g.fill(path);
-        g.dispose();
+        Graphics2D g2d = bi.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+                             RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(backgroundColor);
+        g2d.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
+        g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.draw(path);
+        g2d.setColor(Color.WHITE);
+        g2d.fill(path);
+        g2d.dispose();
         return bi;
     }
 
@@ -1718,29 +1720,29 @@ public final class MapViewer extends FreeColClientHolder {
      * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
-     * @param g a {@code Graphics2D}
+     * @param g2d a {@code Graphics2D}
      * @param text a {@code String}
      * @param font a {@code Font}
      * @param backgroundColor a {@code Color}
      * @return an {@code BufferedImage}
      */
-    private static BufferedImage createLabel(Graphics2D g, String text,
+    private static BufferedImage createLabel(Graphics2D g2d, String text,
                                              Font font, Color backgroundColor) {
         TextSpecification[] specs = new TextSpecification[1];
         specs[0] = new TextSpecification(text, font);
-        return createLabel(g, specs, backgroundColor);
+        return createLabel(g2d, specs, backgroundColor);
     }
 
     /**
      * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
-     * @param g a {@code Graphics2D}
+     * @param g2d a {@code Graphics2D}
      * @param textSpecs a {@code TextSpecification} array
      * @param backgroundColor a {@code Color}
      * @return a {@code BufferedImage}
      */
-    private static BufferedImage createLabel(Graphics2D g,
+    private static BufferedImage createLabel(Graphics2D g2d,
                                              TextSpecification[] textSpecs,
                                              Color backgroundColor) {
         int hPadding = 15;
@@ -1757,7 +1759,7 @@ public final class MapViewer extends FreeColClientHolder {
         for (i = 0; i < textSpecs.length; i++) {
             spec = textSpecs[i];
             label = new TextLayout(spec.text, spec.font,
-                                   g.getFontRenderContext());
+                                   g2d.getFontRenderContext());
             labels[i] = label;
             Rectangle textRectangle = label.getPixelBounds(null, 0, 0);
             width = Math.max(width, textRectangle.width + hPadding);
@@ -1828,21 +1830,21 @@ public final class MapViewer extends FreeColClientHolder {
 
         // draw everything
         BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setColor(backgroundColor);
-        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
+        Graphics2D g2d = bi.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(backgroundColor);
+        g2d.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
+        g2d.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
         if (expertMissionary) {
-            g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            g.draw(circle);
-            g.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.draw(circle);
+            g2d.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         } else {
-            g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         }
-        g.draw(cross);
-        g.dispose();
+        g2d.draw(cross);
+        g2d.dispose();
         return bi;
     }
 
@@ -1850,10 +1852,10 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Display a path.
      *
-     * @param g The {@code Graphics2D} to display on.
+     * @param g2d The {@code Graphics2D} to display on.
      * @param path The {@code PathNode} to display.
      */
-    private void displayPath(Graphics2D g, PathNode path) {
+    private void displayPath(Graphics2D g2d, PathNode path) {
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1870,31 +1872,31 @@ public final class MapViewer extends FreeColClientHolder {
                 : null;
 
             BufferedImage turns = (p.getTurns() <= 0) ? null
-                : lib.getStringImage(g, Integer.toString(p.getTurns()),
+                : lib.getStringImage(g2d, Integer.toString(p.getTurns()),
                                      Color.WHITE, this.fontTiny);
-            g.setColor((turns == null) ? Color.GREEN : Color.RED);
+            g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
 
             if (debug) { // More detailed display
                 if (this.activeUnit != null) {
                     image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
                 }
-                turns = lib.getStringImage(g, Integer.toString(p.getTurns())
+                turns = lib.getStringImage(g2d, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
                     Color.WHITE, this.fontTiny);
             }
 
-            g.translate(point.x, point.y);
+            g2d.translate(point.x, point.y);
             if (image == null) {
-                g.fillOval(halfWidth, halfHeight, 10, 10);
-                g.setColor(Color.BLACK);
-                g.drawOval(halfWidth, halfHeight, 10, 10);
+                g2d.fillOval(halfWidth, halfHeight, 10, 10);
+                g2d.setColor(Color.BLACK);
+                g2d.drawOval(halfWidth, halfHeight, 10, 10);
             } else {
-                this.tv.displayCenteredImage(g, image);
+                this.tv.displayCenteredImage(g2d, image);
                 if (turns != null) {
-                    this.tv.displayCenteredImage(g, turns);
+                    this.tv.displayCenteredImage(g2d, turns);
                 }
             }
-            g.translate(-point.x, -point.y);
+            g2d.translate(-point.x, -point.y);
         }
     }
 
@@ -1902,10 +1904,10 @@ public final class MapViewer extends FreeColClientHolder {
      * Displays the given Unit onto the given Graphics2D object at the
      * location specified by the coordinates.
      *
-     * @param g The Graphics2D object on which to draw the Unit.
+     * @param g2d The Graphics2D object on which to draw the Unit.
      * @param unit The Unit to draw.
      */
-    private void displayUnit(Graphics2D g, Unit unit) {
+    private void displayUnit(Graphics2D g2d, Unit unit) {
         final Player player = getMyPlayer();
 
         // Draw the unit.
@@ -1915,11 +1917,11 @@ public final class MapViewer extends FreeColClientHolder {
                 && player != null && !player.canSee(unit.getTile()));
         BufferedImage image = lib.getScaledUnitImage(unit, fade);
         Point p = calculateUnitImagePositionInTile(image);
-        g.drawImage(image, p.x, p.y, null);
+        g2d.drawImage(image, p.x, p.y, null);
 
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
-        g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
+        g2d.drawImage(lib.getOccupationIndicatorChip(g2d, unit, text),
                     (int)(TileViewer.STATE_OFFSET_X * getScale()), 0,
                     null);
 
@@ -1933,14 +1935,14 @@ public final class MapViewer extends FreeColClientHolder {
             unitsOnTile = unit.getTile().getTotalUnitCount();
         }
         if (unitsOnTile > 1) {
-            g.setColor(Color.WHITE);
+            g2d.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
             int x1 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
                 * getScale());
             int x2 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
                     + OTHER_UNITS_WIDTH) * getScale());
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
-                g.drawLine(x1, unitLinesY, x2, unitLinesY);
+                g2d.drawLine(x1, unitLinesY, x2, unitLinesY);
                 unitLinesY += 2;
             }
         }
@@ -1954,14 +1956,14 @@ public final class MapViewer extends FreeColClientHolder {
             && getFreeColServer().getAIMain() != null
             && (au = getFreeColServer().getAIMain().getAIUnit(unit)) != null) {
             if (FreeColDebugger.debugShowMission()) {
-                g.setColor(Color.WHITE);
-                g.drawString((!au.hasMission()) ? "No mission"
+                g2d.setColor(Color.WHITE);
+                g2d.drawString((!au.hasMission()) ? "No mission"
                     : lastPart(au.getMission().getClass().toString(), "."),
                     0, 0);
             }
             if (FreeColDebugger.debugShowMissionInfo() && au.hasMission()) {
-                g.setColor(Color.WHITE);
-                g.drawString(au.getMission().toString(), 0, 25);
+                g2d.setColor(Color.WHITE);
+                g2d.drawString(au.getMission().toString(), 0, 25);
             }
         }
     }
@@ -1984,19 +1986,20 @@ public final class MapViewer extends FreeColClientHolder {
      * Draws the borders of a territory on the given Tile. The
      * territory is either a country or a region.
      *
-     * @param g a {@code Graphics2D}
+     * @param g2d a {@code Graphics2D}
      * @param tile a {@code Tile}
      * @param type a {@code BorderType}
      * @param opaque a {@code boolean}
      */
-    private void displayTerritorialBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
+    private void displayTerritorialBorders(Graphics2D g2d, Tile tile,
+                                           BorderType type, boolean opaque) {
         Player owner = tile.getOwner();
         Region region = tile.getRegion();
         if ((type == BorderType.COUNTRY && owner != null)
             || (type == BorderType.REGION && region != null)) {
-            Stroke oldStroke = g.getStroke();
-            g.setStroke(borderStroke);
-            Color oldColor = g.getColor();
+            Stroke oldStroke = g2d.getStroke();
+            g2d.setStroke(borderStroke);
+            Color oldColor = g2d.getColor();
             Color c = null;
             if (type == BorderType.COUNTRY)
                 c = owner.getNationColor();
@@ -2004,7 +2007,7 @@ public final class MapViewer extends FreeColClientHolder {
                 c = Color.WHITE;
             Color newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(),
                                  (opaque) ? 255 : 100);
-            g.setColor(newColor);
+            g2d.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
             path.moveTo(borderPoints.get(Direction.longSides.get(0)).x,
                         borderPoints.get(Direction.longSides.get(0)).y);
@@ -2068,9 +2071,9 @@ public final class MapViewer extends FreeColClientHolder {
                                 borderPoints.get(next2).y);
                 }
             }
-            g.draw(path);
-            g.setColor(oldColor);
-            g.setStroke(oldStroke);
+            g2d.draw(path);
+            g2d.setColor(oldColor);
+            g2d.setStroke(oldStroke);
         }
     }
 
