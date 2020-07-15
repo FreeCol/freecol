@@ -1293,7 +1293,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean isPanelShowing() {
-        return this.canvas != null && this.canvas.getShowingSubPanel() != null;
+        return this.canvas != null && this.canvas.getShowingPanel() != null;
     }
 
     /**
