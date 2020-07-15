@@ -160,6 +160,9 @@ public final class MapViewer extends FreeColClientHolder {
     /** Fonts (scaled). */
     private Font fontNormal, fontItalic, fontProduction, fontTiny;
         
+    /** The chat message area. */
+    private final ChatDisplay chatDisplay;
+
     // Helper variables for displaying the map.
     private int tileHeight, tileWidth, halfHeight, halfWidth,
         topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
@@ -217,6 +220,7 @@ public final class MapViewer extends FreeColClientHolder {
         changeImageLibrary(new ImageLibrary());
         this.cursor = new TerrainCursor();
         this.cursor.addActionListener(al);
+        this.chatDisplay = new ChatDisplay();
     }
 
    
@@ -605,6 +609,15 @@ public final class MapViewer extends FreeColClientHolder {
         this.gotoPath = gotoPath;
         forceReposition();
         return true;
+    }
+
+    /**
+     * Tells that a chat message was received.
+     *
+     * @param message The chat message.
+     */
+    public void displayChat(GUIMessage message) {
+        this.chatDisplay.addMessage(message);
     }
 
 
@@ -1545,6 +1558,9 @@ public final class MapViewer extends FreeColClientHolder {
         // Display goto path
         if (this.unitPath != null) displayPath(g, this.unitPath);
         else if (this.gotoPath != null) displayPath(g, this.gotoPath);
+
+        // Draw the chat
+        this.chatDisplay.display(g, this.lib, this.size);
 
         // Timing log
         //final long gap = now() - now;

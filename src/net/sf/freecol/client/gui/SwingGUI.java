@@ -1236,8 +1236,9 @@ public class SwingGUI extends GUI {
     @Override
     public void displayChat(String sender, String message, Color color,
                             boolean privateChat) {
-        this.canvas.displayChat(new GUIMessage(sender + ": " + message,
-                                               color));
+        this.mapViewer.displayChat(new GUIMessage(sender + ": " + message,
+                                                  color));
+        refresh();
     }
 
     /**

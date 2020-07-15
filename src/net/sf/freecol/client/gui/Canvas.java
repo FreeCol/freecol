@@ -1467,10 +1467,6 @@ public final class Canvas extends JDesktopPane {
                 }
             }
 
-            // draw the chat
-            this.chatDisplay.display(g2d, this.mapViewer.getImageLibrary(),
-                                     size);
-
         } else { /* main menu */
             // Get the background without scaling, to avoid wasting
             // memory needlessly keeping an unbounded number of rescaled
