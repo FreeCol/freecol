@@ -1754,12 +1754,12 @@ public class GUI extends FreeColClientHolder {
     public void showTilePopup(Tile tile) {}
 
     /**
-     * Shows a tile popup for the tile at a given coordinate.
+     * Get the tile at given coordinate.
      *
      * @param x The x coordinate.
      * @param y The y coordinate.
      */
-    public void showTilePopup(int x, int y) {}
+    public Tile tileAt(int x, int y) { return null; }
 
     /**
      * Update all panels derived from the EuropePanel.

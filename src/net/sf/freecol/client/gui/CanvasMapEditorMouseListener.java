@@ -111,7 +111,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         try {
             if (e.getClickCount() > 1) {
-                Tile t = canvas.convertToMapTile(e.getX(), e.getY());
+                Tile t = getGUI().tileAt(e.getX(), e.getY());
                 if (t != null) getGUI().showTilePanel(t);
             } else {
                 canvas.requestFocus();
@@ -130,7 +130,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         try {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
+                Tile tile = getGUI().tileAt(e.getX(), e.getY());
                 if (tile != null) getGUI().changeView(tile);
                 startPoint = endPoint = null;
 
@@ -142,7 +142,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             } else if (e.getButton() == MouseEvent.BUTTON3
                 || e.isPopupTrigger()) {
                 startPoint = endPoint = e.getPoint();
-                Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
+                Tile tile = getGUI().tileAt(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.getIndianSettlement() != null) {
                         getGUI().showEditSettlementDialog(tile.getIndianSettlement());
@@ -168,9 +168,9 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         endPoint = e.getPoint();
         if (startPoint == null) startPoint = endPoint;
         drawBox(component, startPoint, endPoint);
-        Tile start = canvas.convertToMapTile(startPoint.x, startPoint.y);
+        Tile start = getGUI().tileAt(startPoint.x, startPoint.y);
         Tile end = (startPoint == endPoint) ? start
-            : canvas.convertToMapTile(endPoint.x, endPoint.y);
+            : getGUI().tileAt(endPoint.x, endPoint.y);
 
         if (!isTransformActive) {
             if (end.getX() >= 0 && end.getY() >= 0) getGUI().setFocus(end);

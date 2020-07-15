@@ -771,8 +771,7 @@ public class SwingGUI extends GUI {
             // mouse is over the screen; see also
             // CanvasMouseMotionListener.
             Point pt = this.canvas.getMousePosition();
-            updateGotoTile((pt == null) ? null
-                : this.canvas.convertToMapTile(pt.x, pt.y));
+            updateGotoTile((pt == null) ? null : tileAt(pt.x, pt.y));
         }
     }
 
@@ -816,7 +815,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void performGoto(int x, int y) {
-        performGoto(this.canvas.convertToMapTile(x, y));
+        performGoto(tileAt(x, y));
     }
 
     /**
@@ -846,7 +845,7 @@ public class SwingGUI extends GUI {
             this.canvas.startGoto();
         }
         if (this.canvas.isGotoStarted()) {
-            updateGotoTile(this.canvas.convertToMapTile(x, y));
+            updateGotoTile(tileAt(x, y));
         }
     }
 
@@ -1144,7 +1143,7 @@ public class SwingGUI extends GUI {
         // in @see CanvasMouseListener#mouseReleased
         if (count == 1 && isDrag(x, y)) return;
 
-        final Tile tile = this.canvas.convertToMapTile(x, y);
+        final Tile tile = tileAt(x, y);
         if (tile == null) return;
         Unit other = null;
 
@@ -1347,15 +1346,21 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showTilePopup(Tile tile) {
-        this.canvas.showTilePopup(tile);
+        if (tile == null || !tile.isExplored()) return;
+        TilePopup tp = new TilePopup(getFreeColClient(), tile);
+        if (tp.hasItem()) {
+            Point point = this.mapViewer.calculateTilePosition(tile, true);
+            tp.show(this.canvas, point.x, point.y);
+            tp.repaint();
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void showTilePopup(int x, int y) {
-        showTilePopup(this.canvas.convertToMapTile(x, y));
+    public Tile tileAt(int x, int y) {
+        return this.mapViewer.convertToMapTile(x, y);
     }
 
     /**

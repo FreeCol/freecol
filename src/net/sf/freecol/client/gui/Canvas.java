@@ -1445,24 +1445,6 @@ public final class Canvas extends JDesktopPane {
         repaint();
     }
 
-    /**
-     * Shows a tile popup.
-     *
-     * @param tile The {@code Tile} where the popup occurred.
-     * @return True if the popup was shown.
-     */
-    public boolean showTilePopup(Tile tile) {
-        if (tile == null || !tile.isExplored()) return false;
-        TilePopup tp = new TilePopup(freeColClient, this, tile);
-        if (tp.hasItem()) {
-            Point point = mapViewer.calculateTilePosition(tile, true);
-            tp.show(this, point.x, point.y);
-            tp.repaint();
-            return true;
-        }
-        return false;
-    }
-
 
     // Override JComponent
 

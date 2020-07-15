@@ -68,26 +68,22 @@ public final class TilePopup extends JPopupMenu {
 
     private final FreeColClient freeColClient;
     private final GUI gui;
-    private final Canvas canvas;
     private Font font;
     private boolean hasAnItem = false;
-    
+
 
     /**
      * The constructor that will insert the MenuItems.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param canvas The Canvas.
      * @param tile The {@code Tile} to create a popup for.
      *       The popup menu also appears near this {@code Tile}.
      */
-    public TilePopup(final FreeColClient freeColClient, final Canvas canvas,
-                     final Tile tile) {
+    public TilePopup(final FreeColClient freeColClient, final Tile tile) {
         super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
-        this.canvas = canvas;
         this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale());
         

@@ -71,30 +71,31 @@ public final class CanvasMouseListener extends FreeColClientHolder
      */
     public void mousePressed(MouseEvent e) {
         if (!e.getComponent().isEnabled()) return;
-
+        final GUI gui = getGUI();
+        
         if (e.isPopupTrigger()) {
-            getGUI().showTilePopup(e.getX(), e.getY());
+            gui.showTilePopup(gui.tileAt(e.getX(), e.getY()));
             return;
         }
 
         switch (e.getButton()) {
         case MouseEvent.BUTTON1: 
             // If we have GoTo mode enabled then GoTo takes precedence
-            if (getGUI().isGotoStarted()) {
-                getGUI().performGoto(e.getX(), e.getY());
+            if (gui.isGotoStarted()) {
+                gui.performGoto(e.getX(), e.getY());
                 break;
             }
 
             // Drag and selection
             // Enable dragging with button 1
             // @see CanvasMouseMotionListener#mouseDragged
-            getGUI().prepareDrag(e.getX(), e.getY());
+            gui.prepareDrag(e.getX(), e.getY());
             break;
         case MouseEvent.BUTTON2: // Immediate goto
-            getGUI().performGoto(e.getX(), e.getY());
+            gui.performGoto(e.getX(), e.getY());
             break;
         case MouseEvent.BUTTON3: // Immediate tile popup
-            getGUI().showTilePopup(e.getX(), e.getY());
+            gui.showTilePopup(gui.tileAt(e.getX(), e.getY()));
             break;
         default:
             break;
