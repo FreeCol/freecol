@@ -180,17 +180,17 @@ public final class ImageLibrary {
 
 
     /**
-     * The scale factor used when creating this
-     * {@code ImageLibrary}.  The value {@code 1} is used if
-     * this object is not a result of a scaling operation.
+     * The scale factor used when creating this library.  The value
+     * {@code 1} is used if this object is not a result of a scaling
+     * operation.
      */
-    private final float scaleFactor;
+    private float scaleFactor;
 
     /** Fixed tile dimensions. */
-    final Dimension tileSize, tileOverlaySize, tileForestSize;
+    private Dimension tileSize, tileOverlaySize, tileForestSize;
 
     /** Cache for the string images. */
-    private final HashMap<String,BufferedImage> stringImageCache;
+    private HashMap<String,BufferedImage> stringImageCache;
 
 
     /**
@@ -214,13 +214,8 @@ public final class ImageLibrary {
      *      the size of the original images and 0.5 is half.
      */
     public ImageLibrary(float scaleFactor) {
-        this.scaleFactor = scaleFactor;
-        this.tileSize = scaleDimension(TILE_SIZE, scaleFactor);
-        this.tileOverlaySize = scaleDimension(TILE_OVERLAY_SIZE, scaleFactor);
-        this.tileForestSize = scaleDimension(TILE_FOREST_SIZE, scaleFactor);
-        this.stringImageCache = new HashMap<>();
+        changeScaleFactor(scaleFactor);
     }
-
 
     /**
      * Get the scaling factor used when creating this {@code ImageLibrary}.
@@ -232,6 +227,21 @@ public final class ImageLibrary {
      */
     public float getScaleFactor() {
         return this.scaleFactor;
+    }
+
+    /**
+     * Change the scale factor for this image library.
+     *
+     * All the other variables depend on the scale factor.
+     *
+     * @param scaleFactor The factor used when scaling. 2 is twice
+     */
+    public void changeScaleFactor(float scaleFactor) {
+        this.scaleFactor = scaleFactor;
+        this.tileSize = scale(TILE_SIZE);
+        this.tileOverlaySize = scale(TILE_OVERLAY_SIZE);
+        this.tileForestSize = scale(TILE_FOREST_SIZE);
+        this.stringImageCache = new HashMap<>();
     }
 
     /**
@@ -267,6 +277,24 @@ public final class ImageLibrary {
                              Math.round(size.height * scaleFactor));
     }
 
+    /**
+     * Get the scaled size of a tile.
+     *
+     * @return The tile size.
+     */
+    public Dimension getTileSize() {
+        return this.tileSize;
+    }
+
+    /**
+     * Get the scaled size of a forested tile.
+     *
+     * @return The forested tile size.
+     */
+    public Dimension getForestedTileSize() {
+        return this.tileForestSize;
+    }
+    
     /**
      * Should the tile with the given coordinates be considered "even"?
      *

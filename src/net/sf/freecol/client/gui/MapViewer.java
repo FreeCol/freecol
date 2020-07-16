@@ -239,7 +239,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.tv = new TileViewer(getFreeColClient(), this.lib);
 
         // ATTENTION: we assume that all base tiles have the same size
-        final Dimension tileSize = lib.tileSize;
+        final Dimension tileSize = lib.getTileSize();
         this.tileHeight = tileSize.height;
         this.tileWidth = tileSize.width;
         this.halfHeight = this.tileHeight/2;

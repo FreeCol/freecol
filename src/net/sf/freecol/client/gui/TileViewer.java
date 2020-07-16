@@ -143,7 +143,7 @@ public final class TileViewer extends FreeColClientHolder {
 
         this.lib = lib;
         // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.tileSize;
+        Dimension tileSize = lib.getTileSize();
         rp = new RoadPainter(tileSize);
         tileHeight = tileSize.height;
         tileWidth = tileSize.width;
@@ -231,11 +231,11 @@ public final class TileViewer extends FreeColClientHolder {
         if (!tile.isExplored())
             return lib.getScaledTerrainImage(null, tile.getX(), tile.getY());
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.tileSize;
+        Dimension terrainTileSize = lib.getTileSize();
         BufferedImage overlayImage = lib.getScaledOverlayImage(tile);
         final int compoundHeight
             = (overlayImage != null) ? overlayImage.getHeight()
-            : (tileType.isForested()) ? lib.tileForestSize.height
+            : (tileType.isForested()) ? lib.getForestedTileSize().height
             : terrainTileSize.height;
         BufferedImage image = new BufferedImage(terrainTileSize.width,
             compoundHeight, BufferedImage.TYPE_INT_ARGB);
@@ -258,11 +258,11 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public BufferedImage createTileImage(Tile tile, Player player) {
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.tileSize;
+        Dimension terrainTileSize = lib.getTileSize();
         BufferedImage overlayImage = lib.getScaledOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
-            : (tileType.isForested()) ? lib.tileForestSize.height
+            : (tileType.isForested()) ? lib.getForestedTileSize().height
             : terrainTileSize.height;
         BufferedImage image = new BufferedImage(terrainTileSize.width,
             compoundHeight, BufferedImage.TYPE_INT_ARGB);
@@ -289,13 +289,13 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.tileSize;
+        Dimension terrainTileSize = lib.getTileSize();
         BufferedImage overlayImage = lib.getScaledOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
-            : tileType.isForested()
-                ? lib.tileForestSize.height
-                : terrainTileSize.height;
+            : ((tileType.isForested())
+                ? lib.getForestedTileSize().height
+                : terrainTileSize.height);
         BufferedImage image = new BufferedImage(
             terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
@@ -318,7 +318,7 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
-        Dimension tileSize = lib.tileSize;
+        Dimension tileSize = lib.getTileSize();
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
