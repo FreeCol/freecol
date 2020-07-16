@@ -59,7 +59,7 @@ public class BuildingToolTip extends JToolTip {
      * @param building The building to display information from.
      */
     public BuildingToolTip(FreeColClient freeColClient, Building building) {
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = freeColClient.getGUI().getFixedImageLibrary();
         final Game game = building.getGame();
         final int workplaces = building.getUnitCapacity();
         // FIXME: consider several outputs

@@ -113,7 +113,7 @@ public class FreeColProgressBar extends JPanel {
         this.step = step;
         this.goodsType = goodsType;
         this.image = (goodsType == null) ? null
-            : (freeColClient.getGUI().getImageLibrary()
+            : (freeColClient.getGUI().getFixedImageLibrary()
                 .getGoodsTypeImage(goodsType,
                     new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2)));
         this.font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,

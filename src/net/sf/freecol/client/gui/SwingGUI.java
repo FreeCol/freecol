@@ -128,16 +128,18 @@ public class SwingGUI extends GUI {
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
-    /** The generally use scaled image library. */
-    private ImageLibrary imageLibrary;
+    /** The scaled image library used by the map. */
+    private ImageLibrary scaledImageLibrary;
+
+    /** The fixed/unscaled image library used by panels et al. */
+    private ImageLibrary fixedImageLibrary;
     
     /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
     /**
-     * This is the TileViewer instance used to paint the map tiles
-     * in the ColonyPanel and other panels.  It should not be scaled
-     * along with the default MapViewer.
+     * This is the TileViewer instance used for tiles in panels.
+     * It uses the fixed ImageLibrary.
      */
     private TileViewer tileViewer;
 
@@ -172,12 +174,13 @@ public class SwingGUI extends GUI {
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient, scaleFactor);
 
-        this.imageLibrary = new ImageLibrary(scaleFactor);
         this.graphicsDevice = Utils.getGoodGraphicsDevice();
         if (this.graphicsDevice == null) {
             FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         }
-        this.tileViewer = new TileViewer(freeColClient, new ImageLibrary());
+        this.scaledImageLibrary = new ImageLibrary(scaleFactor);
+        this.fixedImageLibrary = new ImageLibrary(scaleFactor);
+        this.tileViewer = new TileViewer(freeColClient, fixedImageLibrary);
         // Defer remaining initializations, possibly to startGUI
         this.mapViewer = null;
         this.mapControls = null;
@@ -457,8 +460,11 @@ public class SwingGUI extends GUI {
      * Reset the map zoom and refresh the canvas.
      */
     private void resetMapZoom() {
-        this.mapViewer.resetMapScale();
-        refresh();
+        if (this.scaledImageLibrary.getScaleFactor()
+            != ImageLibrary.NORMAL_SCALE) {
+            this.mapViewer.changeScale(ImageLibrary.NORMAL_SCALE);
+            refresh();
+        }
     }
    
 
@@ -470,16 +476,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public ImageLibrary getImageLibrary() {
-        return this.imageLibrary;
+    public ImageLibrary getFixedImageLibrary() {
+        return this.fixedImageLibrary;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ImageLibrary getTileImageLibrary() {
-        return this.tileViewer.getImageLibrary();
+    public ImageLibrary getScaledImageLibrary() {
+        return this.scaledImageLibrary;
     }
 
     /**
@@ -645,7 +651,7 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         final ActionListener al = (ActionEvent ae) ->
             this.refreshTile(this.mapViewer.getActiveTile());
-        this.mapViewer = new MapViewer(fcc, al);
+        this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
         this.mapControls = MapControls.newInstance(fcc);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
@@ -1112,7 +1118,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomInMap() {
-        return !this.mapViewer.isAtMaxMapScale();
+        return this.scaledImageLibrary.getScaleFactor() < ImageLibrary.MAX_SCALE;
     }
 
     /**
@@ -1120,7 +1126,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomOutMap() {
-        return !this.mapViewer.isAtMinMapScale();
+        return this.scaledImageLibrary.getScaleFactor() > ImageLibrary.MIN_SCALE;
     }
 
     /**
@@ -1128,8 +1134,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomInMap() {
-        this.mapViewer.increaseMapScale();
-        refresh();
+        float scale = this.scaledImageLibrary.getScaleFactor();
+        float newScale = scale + ImageLibrary.SCALE_STEP;
+        if (scale < newScale && newScale <= ImageLibrary.MAX_SCALE) {
+            this.mapViewer.changeScale(newScale);
+            refresh();
+        }
     }
 
     /**
@@ -1137,8 +1147,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomOutMap() {
-        this.mapViewer.decreaseMapScale();
-        refresh();
+        float scale = this.scaledImageLibrary.getScaleFactor();
+        float newScale = scale - ImageLibrary.SCALE_STEP;
+        if (ImageLibrary.MIN_SCALE <= newScale && newScale < scale) {
+            this.mapViewer.changeScale(newScale);
+            refresh();
+        }
     }
 
 
@@ -1679,7 +1693,7 @@ public class SwingGUI extends GUI {
         ImageIcon icon = null;
         Tile tile = null;
         if (displayObject != null) {
-            icon = this.imageLibrary.getObjectImageIcon(displayObject);
+            icon = this.fixedImageLibrary.getObjectImageIcon(displayObject);
             tile = (displayObject instanceof Location)
                 ? ((Location)displayObject).getTile()
                 : null;
@@ -1779,7 +1793,7 @@ public class SwingGUI extends GUI {
             ModelMessage m = modelMessages.get(i);
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
-            icons[i] = this.imageLibrary
+            icons[i] = this.fixedImageLibrary
                 .getObjectImageIcon(game.getMessageDisplay(m));
             if (tile == null && fcos[i] instanceof Location) {
                 tile = ((Location)fcos[i]).getTile();

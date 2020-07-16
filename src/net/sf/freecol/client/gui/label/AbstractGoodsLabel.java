@@ -60,10 +60,10 @@ public class AbstractGoodsLabel extends FreeColLabel {
      */
     public AbstractGoodsLabel(FreeColClient freeColClient,
                               AbstractGoods abstractGoods) {
-        super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
+        super(new ImageIcon(freeColClient.getGUI().getFixedImageLibrary()
                 .getScaledGoodsTypeImage(abstractGoods.getType())));
 
-        this.lib = freeColClient.getGUI().getImageLibrary();
+        this.lib = freeColClient.getGUI().getFixedImageLibrary();
         this.abstractGoods = abstractGoods;
 
         setToolTipText(Messages.getName(abstractGoods));

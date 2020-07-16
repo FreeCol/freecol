@@ -146,7 +146,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * @return The {@code ImageLibrary}.
      */
     protected final ImageLibrary getImageLibrary() {
-        return getGUI().getImageLibrary();
+        return getGUI().getFixedImageLibrary();
     }
 
     /**

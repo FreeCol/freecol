@@ -119,11 +119,11 @@ public final class MapViewer extends FreeColClientHolder {
         }
     }
 
-    /** The internal tile viewer to use. */
-    private TileViewer tv;
-
-    /** Scaled ImageLibrary only used for map painting. */
+    /** Scaled ImageLibrary only to use for map operations. */
     private ImageLibrary lib;
+
+    /** The internal scaled tile viewer to use. */
+    private TileViewer tv;
 
     /** The map size. */
     private Dimension size = null;
@@ -212,32 +212,30 @@ public final class MapViewer extends FreeColClientHolder {
      * The constructor to use.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
+     * @param lib An {@code ImageLibrary} to use for drawing to the map
+     *     (and thus are subject to the map scaling).
      * @param al An {@code ActionListener} for the cursor.
      */
-    public MapViewer(FreeColClient freeColClient, ActionListener al) {
+    public MapViewer(FreeColClient freeColClient, ImageLibrary lib,
+                     ActionListener al) {
         super(freeColClient);
         
-        changeImageLibrary(new ImageLibrary());
+        this.lib = lib;
+        this.tv = new TileViewer(freeColClient, lib);
         this.cursor = new TerrainCursor();
         this.cursor.addActionListener(al);
         this.chatDisplay = new ChatDisplay();
+
+        updateScaledVariables();
     }
 
    
     // Critical internals
     
     /**
-     * Change the internal image libraries.
-     *
-     * Update several internal variables that depend directly on the
-     * tile size in the image library.
-     *
-     * @param lib The new {@code ImageLibrary} to use.
+     * Update the variables that depend on the image library scale.
      */
-    private void changeImageLibrary(ImageLibrary lib) {
-        this.lib = lib;
-        this.tv = new TileViewer(getFreeColClient(), this.lib);
-
+    private void updateScaledVariables() {
         // ATTENTION: we assume that all base tiles have the same size
         final Dimension tileSize = lib.getTileSize();
         this.tileHeight = tileSize.height;
@@ -252,18 +250,15 @@ public final class MapViewer extends FreeColClientHolder {
         this.fog.lineTo(0, this.halfHeight);
         this.fog.closePath();
 
+        final float scale = getScale();
         this.fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD,
-            getScale());
+            FontLibrary.FontSize.SMALLER, Font.BOLD, scale);
         this.fontItalic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC,
-            getScale());
+            FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC, scale);
         this.fontProduction = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            getScale());
+            FontLibrary.FontSize.TINY, Font.BOLD, scale);
         this.fontTiny = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.PLAIN,
-            getScale());
+            FontLibrary.FontSize.TINY, Font.PLAIN, scale);
             
         final int dx = this.tileWidth/16;
         final int dy = this.tileHeight/16;
@@ -307,19 +302,30 @@ public final class MapViewer extends FreeColClientHolder {
                          new Point2D.Float(dx + ddx, this.halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(getScale());
-    }
+        gridStroke = new BasicStroke(scale);
 
-    // Accessors
+        updateSizeVariables();
+    }
 
     /**
-     * Gets the contained {@code ImageLibrary}.
-     *
-     * @return The image library;
+     * Update the variables that depend on the screen size (and scale).
      */
-    public ImageLibrary getImageLibrary() {
-        return this.lib;
+    private void updateSizeVariables() {
+        // Calculate the number of rows that will be drawn above the
+        // central tile
+        topSpace = (getScreenHeight() - tileHeight) / 2;
+        if ((topSpace % (halfHeight)) != 0) {
+            topRows = topSpace / (halfHeight) + 2;
+        } else {
+            topRows = topSpace / (halfHeight) + 1;
+        }
+        bottomRows = topRows;
+        leftSpace = (getScreenWidth() - tileWidth) / 2;
+        rightSpace = leftSpace;
     }
+
+
+    // Accessors
 
     /**
      * Get the scale factor for the image library.
@@ -557,17 +563,6 @@ public final class MapViewer extends FreeColClientHolder {
    // Higher level public routines
 
     /**
-     * Change the displayed map size.
-     *
-     * @param size The new map size.
-     */
-    public void changeSize(Dimension size) {
-        this.size = size;
-        updateMapDisplayVariables();
-        forceReposition();
-    }
-
-    /**
      * Change the focus tile.
      *
      * @param tile The new focus {@code Tile}.
@@ -575,6 +570,49 @@ public final class MapViewer extends FreeColClientHolder {
     public void changeFocus(Tile tile) {
         setFocus(tile);
         forceReposition();
+    }
+
+    /**
+     * Change the goto path.
+     * 
+     * @param gotoPath The new goto {@code PathNode}.
+     * @return True if the goto path was changed.
+     */
+    public boolean changeGotoPath(PathNode gotoPath) {
+        if (this.gotoPath == gotoPath) return false;
+        this.gotoPath = gotoPath;
+        forceReposition();
+        return true;
+    }
+
+    /**
+     * Change the scale of the map.
+     *
+     * @param newScale The new map scale.
+     */
+    public void changeScale(float newScale) {
+        this.lib.changeScaleFactor(newScale);
+        updateScaledVariables();
+    }
+
+    /**
+     * Change the displayed map size.
+     *
+     * @param size The new map size.
+     */
+    public void changeSize(Dimension size) {
+        this.size = size;
+        updateSizeVariables();
+        forceReposition(); // TODO: needed?
+    }
+
+    /**
+     * Tells that a chat message was received.
+     *
+     * @param message The chat message.
+     */
+    public void displayChat(GUIMessage message) {
+        this.chatDisplay.addMessage(message);
     }
 
     /**
@@ -596,28 +634,6 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void stopCursorBlinking() {
         this.cursor.stopBlinking();
-    }
-
-    /**
-     * Change the goto path.
-     * 
-     * @param gotoPath The new goto {@code PathNode}.
-     * @return True if the goto path was changed.
-     */
-    public boolean changeGotoPath(PathNode gotoPath) {
-        if (this.gotoPath == gotoPath) return false;
-        this.gotoPath = gotoPath;
-        forceReposition();
-        return true;
-    }
-
-    /**
-     * Tells that a chat message was received.
-     *
-     * @param message The chat message.
-     */
-    public void displayChat(GUIMessage message) {
-        this.chatDisplay.addMessage(message);
     }
 
 
@@ -1175,56 +1191,6 @@ public final class MapViewer extends FreeColClientHolder {
             }
         }
         return result;
-    }
-
-
-    /**
-     * Reset the scale of the map to the default.
-     */
-    void resetMapScale() {
-        this.changeImageLibrary(new ImageLibrary());
-        updateMapDisplayVariables();
-    }
-
-    boolean isAtMaxMapScale() {
-        return getScale() >= MAP_SCALE_MAX;
-    }
-
-    boolean isAtMinMapScale() {
-        return getScale() <= MAP_SCALE_MIN;
-    }
-
-    void increaseMapScale() {
-        float newScale = getScale() + MAP_SCALE_STEP;
-        if (newScale >= MAP_SCALE_MAX)
-            newScale = MAP_SCALE_MAX;
-        this.changeImageLibrary(new ImageLibrary(newScale));
-        updateMapDisplayVariables();
-    }
-
-    void decreaseMapScale() {
-        float newScale = getScale() - MAP_SCALE_STEP;
-        if (newScale <= MAP_SCALE_MIN)
-            newScale = MAP_SCALE_MIN;
-        this.changeImageLibrary(new ImageLibrary(newScale));
-        updateMapDisplayVariables();
-    }
-
-    /**
-     * Update the *Space variables.
-     */
-    private void updateMapDisplayVariables() {
-        // Calculate the number of rows that will be drawn above the
-        // central tile
-        topSpace = (getScreenHeight() - tileHeight) / 2;
-        if ((topSpace % (halfHeight)) != 0) {
-            topRows = topSpace / (halfHeight) + 2;
-        } else {
-            topRows = topSpace / (halfHeight) + 1;
-        }
-        bottomRows = topRows;
-        leftSpace = (getScreenWidth() - tileWidth) / 2;
-        rightSpace = leftSpace;
     }
 
     /**

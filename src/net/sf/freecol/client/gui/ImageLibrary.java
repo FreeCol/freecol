@@ -111,12 +111,16 @@ public final class ImageLibrary {
 
     /**
      * Constants for the current "named" scales (tiny, smaller, small) plus
-     * a trivial value unscaled.
+     * a trivial value for unscaled.
      */
-    public static final float TINY_SCALE = 0.25f,
-                              SMALLER_SCALE = 0.5f,
-                              SMALL_SCALE = 0.75f,
-                              NORMAL_SCALE = 1f;
+    public static final float
+        TINY_SCALE = 0.25f,
+        SMALLER_SCALE = 0.5f,
+        SMALL_SCALE = 0.75f,
+        NORMAL_SCALE = 1f,
+        MIN_SCALE = 0.25f,    // Minimum of the above
+        MAX_SCALE = 2.0f,     // Maximum of the above
+        SCALE_STEP = 0.25f;   // Steps between scales
 
     // TODO: should these be hidden?
     public static final String DELETE = "image.miscicon.delete",

@@ -304,7 +304,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         AffineTransform baseTransform = g.getTransform();
         AffineTransform rowTransform = null;
 
-        final ImageLibrary library = getGUI().getImageLibrary();
+        final ImageLibrary library = getGUI().getFixedImageLibrary();
         final ClientOptions clientOptions = freeColClient.getClientOptions();
 
         // Row per row; start with the top modified row

@@ -187,8 +187,8 @@ public final class UnitLabel extends FreeColLabel
      * @return The {@code ImageLibrary} to use.
      */
     private ImageLibrary getImageLibrary() {
-        return (this.useTileImageLibrary) ? getGUI().getTileImageLibrary()
-            : getGUI().getImageLibrary();
+        // TODO: audit UnitLabel, are there any where this is wrong?
+        return getGUI().getFixedImageLibrary();
     }
 
     /**

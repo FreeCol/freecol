@@ -324,7 +324,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return The {@code ImageLibrary}.
      */
     protected ImageLibrary getImageLibrary() {
-        return getGUI().getImageLibrary();
+        return getGUI().getFixedImageLibrary();
     }
 
     /**

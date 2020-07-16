@@ -163,7 +163,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template,
                                  GoodsType goodsType,
                                  String okKey, String cancelKey) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
         return confirm(tile, template, icon, okKey, cancelKey);
     }
@@ -181,7 +181,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template,
                                  Settlement settlement,
                                  String okKey, String cancelKey) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
         return confirm(tile, template, icon, okKey, cancelKey);
     }
@@ -198,7 +198,7 @@ public class GUI extends FreeColClientHolder {
      */
     public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
                                  String okKey, String cancelKey) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
         return confirm(tile, template, icon, okKey, cancelKey);
     }
@@ -519,7 +519,7 @@ public class GUI extends FreeColClientHolder {
      */
     public final <T> T getChoice(StringTemplate explain, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getPlaceholderImage());
         return getChoice(null, explain, icon, cancelKey, choices);
     }
@@ -539,7 +539,7 @@ public class GUI extends FreeColClientHolder {
     private final <T> T getChoice(Tile tile, StringTemplate template,
                                   GoodsType goodsType, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -559,7 +559,7 @@ public class GUI extends FreeColClientHolder {
     private final <T> T getChoice(Tile tile, StringTemplate template,
                                   Nation nation, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledNationImage(nation));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -579,7 +579,7 @@ public class GUI extends FreeColClientHolder {
     public final <T> T getChoice(Tile tile, StringTemplate template,
                                  Settlement settlement, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -599,7 +599,7 @@ public class GUI extends FreeColClientHolder {
     public final <T> T getChoice(Tile tile, StringTemplate template,
                                  Unit unit, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -1004,7 +1004,7 @@ public class GUI extends FreeColClientHolder {
      * @return The scale for the (rescalable) map.
      */
     public final float getMapScale() {
-        ImageLibrary lib = getImageLibrary();
+        ImageLibrary lib = getScaledImageLibrary();
         return (lib == null) ? 1.0f : lib.getScaleFactor();
     }
 
@@ -1040,20 +1040,20 @@ public class GUI extends FreeColClientHolder {
     // Simple accessors
 
     /**
-     * Get the image library.
-     *
-     * @return Null here, real implementations will override.
-     */
-    public ImageLibrary getImageLibrary() { return null; }
-
-    /**
-     * Get the tile image library.
+     * Get the fixed image library for use on panels.
      *
      * Used by: ColonyPanel, ConstructionPanel, InfoPanel, certain UnitLabels.
      *
      * @return Null here, real implementations will override.
      */
-    public ImageLibrary getTileImageLibrary() { return null; }
+    public ImageLibrary getFixedImageLibrary() { return null; }
+
+    /**
+     * Get the scaled image library for use on the map.
+     *
+     * @return Null here, real implementations will override.
+     */
+    public ImageLibrary getScaledImageLibrary() { return null; }
 
     /**
      * Is this GUI in windowed mode?

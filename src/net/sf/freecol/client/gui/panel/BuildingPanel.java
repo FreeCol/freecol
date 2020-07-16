@@ -86,6 +86,10 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     }
 
 
+    private ImageLibrary getImageLibrary() {
+        return this.freeColClient.getGUI().getFixedImageLibrary();
+    }
+
     /**
      * Initialize this building panel.
      */
@@ -170,7 +174,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             add(unitLabel);
         }
 
-        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        ImageLibrary lib = getImageLibrary();
         Image buildingImage = lib.getScaledBuildingImage(building);
         setPreferredSize(new Dimension(buildingImage.getWidth(null), 
                                        buildingImage.getHeight(null)));
@@ -232,7 +236,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        ImageLibrary lib = getImageLibrary();
         g.drawImage(lib.getScaledBuildingImage(building), 0, 0, this);
     }
 
@@ -251,7 +255,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
          * @param number The upkeep cost.
          */
         public UpkeepLabel(int number) {
-            super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
+            super(new ImageIcon(getImageLibrary()
                 .getScaledImage(ImageLibrary.ICON_COIN)));
             this.number = number;
         }
@@ -262,8 +266,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         @Override
         public void paintComponent(Graphics g) {
             getIcon().paintIcon(null, g, 0, 0);
-            GUI gui = freeColClient.getGUI();
-            ImageLibrary lib = gui.getImageLibrary();
+            ImageLibrary lib = getImageLibrary();
             BufferedImage img = lib.getStringImage(g, Integer.toString(number),
                 getForeground(),
                 FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD);

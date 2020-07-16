@@ -1180,7 +1180,7 @@ public final class ColonyPanel extends PortPanel
         public void update() {
             final Colony colony = getColony();
             if (colony == null) return;
-            final ImageLibrary lib = getGUI().getTileImageLibrary();
+            final ImageLibrary lib = getImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.SMALLER, lib.getScaleFactor());
             final int uc = colony.getUnitCount();
@@ -2021,8 +2021,7 @@ public final class ColonyPanel extends PortPanel
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
                 // Size and position:
-                Dimension size = getGUI().getTileImageLibrary()
-                    .scale(ImageLibrary.TILE_SIZE);
+                Dimension size = getImageLibrary().getTileSize();
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
                     (x + y) * size.height / 2);
