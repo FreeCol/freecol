@@ -192,17 +192,18 @@ public abstract class ReportUnitPanel extends ReportPanel {
             if (present.isEmpty()) {
                 this.reportPanel.add(Utility.localizedLabel("none"), "sg");
             } else {
+                final FreeColClient fcc = getFreeColClient();
                 for (Unit u : sort(present, Unit.typeRoleComparator)) {
                     JButton unitButton = getUnitButton(u);
                     if (u.isCarrier()) {
                         this.reportPanel.add(unitButton, "newline, sg");
                         for (Goods goods : u.getGoodsList()) {
-                            GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
+                            GoodsLabel goodsLabel = new GoodsLabel(fcc, goods);
                             this.reportPanel.add(goodsLabel);
                         }
                         for (Unit unitLoaded : u.getUnitList()) {
                             UnitLabel unitLoadedLabel
-                                = new UnitLabel(getFreeColClient(), unitLoaded, true);
+                                = new UnitLabel(fcc, unitLoaded, true);
                             this.reportPanel.add(unitLoadedLabel);
                         }
                     } else {

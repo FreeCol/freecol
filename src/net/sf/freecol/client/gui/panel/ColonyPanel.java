@@ -1557,7 +1557,8 @@ public final class ColonyPanel extends PortPanel
                 int count = colony.getGoodsCount(goodsType);
                 if (count >= threshold) {
                     Goods goods = new Goods(game, colony, goodsType, count);
-                    GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
+                    GoodsLabel goodsLabel
+                        = new GoodsLabel(getFreeColClient(), goods);
                     if (ColonyPanel.this.isEditable()) {
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);
@@ -2095,13 +2096,12 @@ public final class ColonyPanel extends PortPanel
                 updateDescriptionLabel(label);
                 if (this.colonyTile.isColonyCenterTile()) {
                     setLayout(new GridLayout(2, 1));
-                    final ImageLibrary til = getGUI().getTileImageLibrary();
                     ProductionInfo info
                         = colony.getProductionInfo(this.colonyTile);
                     if (info != null) {
                         for (AbstractGoods ag : info.getProduction()) {
                             ProductionLabel productionLabel
-                                = new ProductionLabel(fcc, til, ag);
+                                = new ProductionLabel(fcc, ag);
                             productionLabel.addMouseListener(pressListener);
                             add(productionLabel);
                         }

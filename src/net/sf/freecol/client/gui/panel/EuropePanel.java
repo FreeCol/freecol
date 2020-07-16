@@ -390,10 +390,10 @@ public final class EuropePanel extends PortPanel {
         public void initialize() {
             removeAll();
 
+            final FreeColClient fcc = getFreeColClient();
             final Market market = getMyPlayer().getMarket();
-            ImageLibrary lib = getImageLibrary();
             for (GoodsType goodsType : getSpecification().getStorableGoodsTypeList()) {
-                MarketLabel label = new MarketLabel(lib, goodsType, market);
+                MarketLabel label = new MarketLabel(fcc, goodsType, market);
                 label.setTransferHandler(defaultTransferHandler);
                 label.addMouseListener(pressListener);
                 MarketData md = market.getMarketData(goodsType);

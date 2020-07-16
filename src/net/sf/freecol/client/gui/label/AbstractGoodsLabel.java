@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.label;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -34,6 +35,8 @@ import net.sf.freecol.common.util.Utils;
  * This label represents AbstractGoods.
  */
 public class AbstractGoodsLabel extends FreeColLabel {
+
+    private final ImageLibrary lib;
 
     private final AbstractGoods abstractGoods;
 
@@ -51,16 +54,28 @@ public class AbstractGoodsLabel extends FreeColLabel {
     /**
      * Initializes this JLabel with the given goods data.
      *
-     * @param lib The {@code ImageLibrary} to use to display the label.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param abstractGoods The {@code AbstractGoods} that this JLabel
      *     will visually represent.
      */
-    public AbstractGoodsLabel(ImageLibrary lib, AbstractGoods abstractGoods) {
-        super(new ImageIcon(lib.getScaledGoodsTypeImage(abstractGoods.getType())));
+    public AbstractGoodsLabel(FreeColClient freeColClient,
+                              AbstractGoods abstractGoods) {
+        super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
+                .getScaledGoodsTypeImage(abstractGoods.getType())));
 
+        this.lib = freeColClient.getGUI().getImageLibrary();
         this.abstractGoods = abstractGoods;
 
         setToolTipText(Messages.getName(abstractGoods));
+    }
+
+    /**
+     * Get the image library for this label.
+     *
+     * @return The {@code ImageLibrary}.
+     */
+    protected ImageLibrary getImageLibrary() {
+        return this.lib;
     }
 
     /**

@@ -132,7 +132,7 @@ public final class ReportTradePanel extends ReportPanel {
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            goodsHeader.add(new MarketLabel(lib, goodsType, market)
+            goodsHeader.add(new MarketLabel(freeColClient, goodsType, market)
                 .addBorder());
 
             jl = createNumberLabel(sales);

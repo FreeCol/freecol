@@ -76,6 +76,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         this(freeColClient, ag, -1);
     }
 
+
     /**
      * Creates a new production label.
      *
@@ -98,36 +99,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag,
                            int maximumProduction, int stockNumber) {
-        this(freeColClient,freeColClient.getGUI().getImageLibrary(), ag,
-             maximumProduction, stockNumber);
-    }
+        super(freeColClient, ag);
 
-    /**
-     * Creates a new production label.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     * @param lib The {@code ImageLibrary} to use for the label.
-     * @param ag The {@code AbstractGoods} to create a label for.
-     */
-    public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
-                           AbstractGoods ag) {
-        this(freeColClient, lib, ag, -1, 0);
-    }
-
-    /**
-     * Creates a new production label.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     * @param lib The {@code ImageLibrary} to use for the label.
-     * @param ag The {@code AbstractGoods} to create a label for.
-     * @param maximumProduction The maximum production.
-     * @param stockNumber The lower bound on number of items to display.
-     */
-    private ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
-                            AbstractGoods ag,
-                            int maximumProduction, int stockNumber) {
-        super(lib, ag);
-
+        final ImageLibrary lib = getImageLibrary();
         if (getType() == null) {
             FreeCol.trace(logger, "Bad production label (no type)");
         } else if (stockNumber < 0 && getAmount() == 0) {

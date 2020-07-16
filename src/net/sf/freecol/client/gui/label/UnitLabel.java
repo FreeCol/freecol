@@ -419,7 +419,7 @@ public final class UnitLabel extends FreeColLabel
             if (workType != null) {
                 int production = ((ColonyTile)unit.getLocation())
                     .getTotalProductionOf(workType);
-                ProductionLabel pl = new ProductionLabel(freeColClient, lib,
+                ProductionLabel pl = new ProductionLabel(freeColClient,
                     new AbstractGoods(workType, production));
                 g.translate(0, 10);
                 pl.paintComponent(g);
