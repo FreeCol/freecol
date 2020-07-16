@@ -100,7 +100,7 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
         JTextArea text = Utility.localizedTextArea(template);
         panel.add(text);
 
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         ImageIcon icon = new ImageIcon(lib.getSmallSettlementImage(colony));
 
         initializeConfirmDialog(frame, true, panel, icon, yes, no);

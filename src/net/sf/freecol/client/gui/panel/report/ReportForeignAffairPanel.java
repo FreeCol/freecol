@@ -51,7 +51,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
     public ReportForeignAffairPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportForeignAction");
 
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor());
         final String stance = Messages.message(

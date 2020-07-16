@@ -65,7 +65,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             Unit attacker, FreeColGameObject defender) {
         super(freeColClient, frame);
         
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final Game game = attacker.getGame();
         final CombatModel combatModel = game.getCombatModel();
         final Turn turn = game.getTurn();

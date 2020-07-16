@@ -66,7 +66,7 @@ public class WorkProductionPanel extends FreeColPanel {
               new MigLayout("wrap 3, insets 10 10 10 10",
                             "[]30:push[right][]", ""));
 
-        final ImageLibrary lib = getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final Colony colony = unit.getColony();
         final UnitType unitType = unit.getType();
         final WorkLocation wl = (WorkLocation)unit.getLocation();
