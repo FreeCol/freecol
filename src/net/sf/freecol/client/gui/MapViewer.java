@@ -120,7 +120,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /** Scaled ImageLibrary only to use for map operations. */
-    private ImageLibrary lib;
+    private final ImageLibrary lib;
 
     /** The internal scaled tile viewer to use. */
     private TileViewer tv;
@@ -608,6 +608,15 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
+     * Add a chat message.
+     *
+     * @param message The chat message.
+     */
+    public void displayChat(GUIMessage message) {
+        this.chatDisplay.addMessage(message);
+    }
+
+    /**
      * Force the next screen repaint to reposition the tiles on the window.
      */
     public void forceReposition() {
@@ -629,12 +638,52 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Tells that a chat message was received.
+     * Sets the focus of the map but offset to the left or right so
+     * that the focus position can still be visible when a popup is
+     * raised.  If successful, the supplied position will either be at
+     * the center of the left or right half of the map.
      *
-     * @param message The chat message.
+     * @param tile The {@code Tile} to display.
+     * @return Positive if the focus is on the right hand side, negative
+     *     if on the left, zero on failure.
      */
-    public void displayChat(GUIMessage message) {
-        this.chatDisplay.addMessage(message);
+    public int setOffsetFocus(Tile tile) {
+        if (tile == null) return 0;
+        int where;
+        final Map map = getGame().getMap();
+        final int tx = tile.getX(), ty = tile.getY(),
+            width = rightColumn - leftColumn;
+        int moveX = -1;
+        setFocus(tile);
+        positionMap(tile);
+        if (leftColumn <= 0) { // At left edge already
+            if (tx <= width / 4) {
+                where = -1;
+            } else if (tx >= 3 * width / 4) {
+                where = 1;
+            } else {
+                moveX = tx + width / 4;
+                where = -1;
+            }
+        } else if (rightColumn >= width - 1) { // At right edge
+            if (tx >= rightColumn - width / 4) {
+                where = 1;
+            } else if (tx <= rightColumn - 3 * width / 4) {
+                where = -1;
+            } else {
+                moveX = tx - width / 4;
+                where = 1;
+            }
+        } else { // Move focus left 1/4 screen
+            moveX = tx - width / 4;
+            where = 1;
+        }
+        if (moveX >= 0) {
+            Tile other = map.getTile(moveX, ty);
+            setFocus(other);
+            positionMap(other);
+        }
+        return where;
     }
 
 
@@ -846,56 +895,6 @@ public final class MapViewer extends FreeColClientHolder {
         return tile != null
             && tile.getY() >= topRow     && tile.getY() <= bottomRow
             && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
-    }
-
-    /**
-     * Sets the focus of the map but offset to the left or right so
-     * that the focus position can still be visible when a popup is
-     * raised.  If successful, the supplied position will either be at
-     * the center of the left or right half of the map.
-     *
-     * @param tile The {@code Tile} to display.
-     * @return Positive if the focus is on the right hand side, negative
-     *     if on the left, zero on failure.
-     * @see #getFocus
-     */
-    int setOffsetFocus(Tile tile) {
-        if (tile == null) return 0;
-        int where;
-        final Map map = getMap();
-        final int tx = tile.getX(), ty = tile.getY(),
-            width = rightColumn - leftColumn;
-        int moveX = -1;
-        getGUI().setFocus(tile);
-        positionMap(tile);
-        if (leftColumn <= 0) { // At left edge already
-            if (tx <= width / 4) {
-                where = -1;
-            } else if (tx >= 3 * width / 4) {
-                where = 1;
-            } else {
-                moveX = tx + width / 4;
-                where = -1;
-            }
-        } else if (rightColumn >= width - 1) { // At right edge
-            if (tx >= rightColumn - width / 4) {
-                where = 1;
-            } else if (tx <= rightColumn - 3 * width / 4) {
-                where = -1;
-            } else {
-                moveX = tx - width / 4;
-                where = 1;
-            }
-        } else { // Move focus left 1/4 screen
-            moveX = tx - width / 4;
-            where = 1;
-        }
-        if (moveX >= 0) {
-            Tile other = map.getTile(moveX, ty);
-            getGUI().setFocus(other);
-            positionMap(other);
-        }
-        return where;
     }
 
     private void repositionMapIfNeeded() {
@@ -1551,12 +1550,12 @@ public final class MapViewer extends FreeColClientHolder {
 
         Color backgroundColor = settlement.getOwner().getNationColor();
         if (backgroundColor == null) backgroundColor = Color.WHITE;
-        // int yOffset = lib.getSettlementImage(settlement).getHeight() + 1;
+        // int yOffset = this.lib.getSettlementImage(settlement).getHeight() + 1;
         int yOffset = tileHeight;
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
-            BufferedImage img = lib.getStringImage(g2d, name, backgroundColor,
-                                                   this.fontNormal);
+            BufferedImage img = this.lib.getStringImage(g2d, name, backgroundColor,
+                                                        this.fontNormal);
             g2d.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
             break;
 
@@ -1839,15 +1838,15 @@ public final class MapViewer extends FreeColClientHolder {
                 : null;
 
             BufferedImage turns = (p.getTurns() <= 0) ? null
-                : lib.getStringImage(g2d, Integer.toString(p.getTurns()),
-                                     Color.WHITE, this.fontTiny);
+                : this.lib.getStringImage(g2d, Integer.toString(p.getTurns()),
+                                          Color.WHITE, this.fontTiny);
             g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
 
             if (debug) { // More detailed display
                 if (this.activeUnit != null) {
                     image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
                 }
-                turns = lib.getStringImage(g2d, Integer.toString(p.getTurns())
+                turns = this.lib.getStringImage(g2d, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
                     Color.WHITE, this.fontTiny);
             }
