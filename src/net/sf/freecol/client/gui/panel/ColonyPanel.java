@@ -2085,7 +2085,7 @@ public final class ColonyPanel extends PortPanel
                 final FreeColClient fcc = getFreeColClient();
                 UnitLabel label = null;
                 for (Unit unit : this.colonyTile.getUnitList()) {
-                    label = new UnitLabel(fcc, unit, false, false, true);
+                    label = new UnitLabel(fcc, unit, false, false);
                     if (ColonyPanel.this.isEditable()) {
                         label.setTransferHandler(defaultTransferHandler);
                         label.addMouseListener(pressListener);

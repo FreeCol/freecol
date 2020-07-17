@@ -105,9 +105,6 @@ public final class UnitLabel extends FreeColLabel
      */
     private boolean ignoreLocation;
 
-    /** Use the tile image library if set. */
-    private final boolean useTileImageLibrary;
-
 
     /**
      * Creates a JLabel to display a unit.
@@ -143,30 +140,11 @@ public final class UnitLabel extends FreeColLabel
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation) {
-        this(freeColClient, unit, isSmall, ignoreLocation, false);
-    }
-
-
-    /**
-     * Creates a JLabel to display a unit.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     * @param unit The {@code Unit} to display.
-     * @param isSmall The image will be smaller if set to {@code true}.
-     * @param ignoreLocation The image will not include production or state
-     *            information if set to {@code true}.
-     * @param useTileImageLibrary If false use the standard ImageLibrary,
-     *     otherwise use the tile ImageLibrary.
-     */
-    public UnitLabel(FreeColClient freeColClient, Unit unit,
-                     boolean isSmall, boolean ignoreLocation,
-                     boolean useTileImageLibrary) {
         this.freeColClient = freeColClient;
         this.unit = unit;
         this.selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
-        this.useTileImageLibrary = useTileImageLibrary;
 
         updateIcon();
     }
@@ -187,7 +165,6 @@ public final class UnitLabel extends FreeColLabel
      * @return The {@code ImageLibrary} to use.
      */
     private ImageLibrary getImageLibrary() {
-        // TODO: audit UnitLabel, are there any where this is wrong?
         return getGUI().getFixedImageLibrary();
     }
 
@@ -218,11 +195,11 @@ public final class UnitLabel extends FreeColLabel
         final ImageLibrary lib = getImageLibrary();
         if (isSmall) {
             setPreferredSize(null);
-            setIcon(new ImageIcon(lib.getSmallUnitImage(unit)));
+            setIcon(new ImageIcon(lib.getSmallUnitImage(this.unit)));
             setBorder(Utility.blankBorder(0, 2, 0, 0));
         } else {
-            Icon imageIcon = new ImageIcon(lib.getScaledUnitImage(unit));
-            if (unit.getLocation() instanceof ColonyTile) {
+            Icon imageIcon = new ImageIcon(lib.getScaledUnitImage(this.unit));
+            if (this.unit.getLocation() instanceof ColonyTile) {
                 Dimension tileSize = lib.scale(ImageLibrary.TILE_SIZE);
                 tileSize.width /= 2;
                 tileSize.height = imageIcon.getIconHeight();
@@ -231,7 +208,7 @@ public final class UnitLabel extends FreeColLabel
                 setPreferredSize(null);
             }
             setIcon(imageIcon);
-            setBorder((unit.getLocation() instanceof ColonyTile)
+            setBorder((this.unit.getLocation() instanceof ColonyTile)
                       ? Utility.blankBorder(0, 15, 0, 15)
                       : Utility.blankBorder(0, 5, 0, 5));
         }
@@ -279,11 +256,11 @@ public final class UnitLabel extends FreeColLabel
      */
     @Override
     public boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
-        Unit unit = ((UnitLabel)comp).getUnit();
-        if (carrier.canAdd(unit)) {
+        final Unit u = ((UnitLabel)comp).getUnit();
+        if (carrier.canAdd(u)) {
             Container oldParent = comp.getParent();
-            if (cargoPanel.igc().boardShip(unit, carrier)) {
-                ((UnitLabel) comp).setSmall(false);
+            if (cargoPanel.igc().boardShip(u, carrier)) {
+                ((UnitLabel)comp).setSmall(false);
                 if (oldParent != null) oldParent.remove(comp);
                 cargoPanel.update();
                 return true;
@@ -297,8 +274,8 @@ public final class UnitLabel extends FreeColLabel
      */
     @Override
     public void removeCargo(Component comp, CargoPanel cargoPanel) {
-        Unit unit = ((UnitLabel)comp).getUnit();
-        cargoPanel.igc().leaveShip(unit);
+        final Unit u = ((UnitLabel)comp).getUnit();
+        cargoPanel.igc().leaveShip(u);
         cargoPanel.update();
     }
 
@@ -321,15 +298,15 @@ public final class UnitLabel extends FreeColLabel
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        final Game game = freeColClient.getGame();
+        final Game game = this.freeColClient.getGame();
         final Specification spec = game.getSpecification();
-        final InGameController igc = freeColClient.getInGameController();
+        final InGameController igc = this.freeColClient.getInGameController();
         String[] args = ae.getActionCommand().split("/");
         GoodsType gt;
         switch (Enum.valueOf(UnitAction.class, upCase(args[0]))) {
             case ASSIGN:
-                igc.assignTeacher(unit,
-                                  game.getFreeColGameObject(args[1], Unit.class));
+                igc.assignTeacher(this.unit,
+                    game.getFreeColGameObject(args[1], Unit.class));
                 break;
             case WORK_COLONYTILE:
                 if (args.length < 3) break;
@@ -338,54 +315,58 @@ public final class UnitLabel extends FreeColLabel
                 if (args.length >= 4 && "!".equals(args[3])) {
                     // Claim tile if needed
                     if (!igc.claimTile(colonyTile.getWorkTile(),
-                                       unit.getColony())) break;
+                                       this.unit.getColony())) break;
                 }
-                if (colonyTile != unit.getLocation()) igc.work(unit, colonyTile);
+                if (colonyTile != this.unit.getLocation()) {
+                    igc.work(this.unit, colonyTile);
+                }
                 if ((gt = spec.getGoodsType(args[2])) != null
-                    && unit.getWorkType() != gt) {
-                    igc.changeWorkType(unit, gt);
+                    && this.unit.getWorkType() != gt) {
+                    igc.changeWorkType(this.unit, gt);
                 }
                 break;
             case WORK_BUILDING:
                 if (args.length < 3) break;
                 Building building
                     = game.getFreeColGameObject(args[1], Building.class);
-                if (building != unit.getLocation()) igc.work(unit, building);
+                if (building != this.unit.getLocation()) {
+                    igc.work(this.unit, building);
+                }
                 if ((gt = spec.getGoodsType(args[2])) != null
-                    && unit.getWorkType() != gt) {
-                    igc.changeWorkType(unit, gt);
+                    && this.unit.getWorkType() != gt) {
+                    igc.changeWorkType(this.unit, gt);
                 }
                 break;
             case ACTIVATE_UNIT:
-                igc.changeState(unit, UnitState.ACTIVE);
-                getGUI().changeView(unit);
+                igc.changeState(this.unit, UnitState.ACTIVE);
+                getGUI().changeView(this.unit);
                 break;
             case FORTIFY:
-                igc.changeState(unit, UnitState.FORTIFYING);
+                igc.changeState(this.unit, UnitState.FORTIFYING);
                 break;
             case SENTRY:
-                igc.changeState(unit, UnitState.SENTRY);
+                igc.changeState(this.unit, UnitState.SENTRY);
                 break;
             case COLOPEDIA:
-                getGUI().showColopediaPanel(unit.getType().getId());
+                getGUI().showColopediaPanel(this.unit.getType().getId());
                 break;
             case LEAVE_TOWN:
-                igc.putOutsideColony(unit);
+                igc.putOutsideColony(this.unit);
                 break;
             case CLEAR_SPECIALITY:
-                igc.clearSpeciality(unit);
+                igc.clearSpeciality(this.unit);
                 break;
             case CLEAR_ORDERS:
-                igc.clearOrders(unit);
+                igc.clearOrders(this.unit);
                 break;
             case ASSIGN_TRADE_ROUTE:
-                getGUI().showTradeRoutePanel(unit);
+                getGUI().showTradeRoutePanel(this.unit);
                 break;
             case LEAVE_SHIP:
-                igc.leaveShip(unit);
+                igc.leaveShip(this.unit);
                 break;
             case UNLOAD:
-                igc.unload(unit);
+                igc.unload(this.unit);
                 break;
         }
         updateIcon();
@@ -399,12 +380,13 @@ public final class UnitLabel extends FreeColLabel
      */
     @Override
     public void paintComponent(Graphics g) {
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = this.freeColClient.getMyPlayer();
         final ImageLibrary lib = getImageLibrary();
         if (ignoreLocation || selected
-            || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
+            || (!this.unit.isCarrier()
+                && this.unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);
-        } else if (!player.owns(unit) && unit.getColony() == null) {
+        } else if (!player.owns(this.unit) && this.unit.getColony() == null) {
             setEnabled(true);
         } else {
             setEnabled(false);
@@ -413,13 +395,13 @@ public final class UnitLabel extends FreeColLabel
         super.paintComponent(g);
         if (ignoreLocation) return;
 
-        if (unit.getLocation() instanceof ColonyTile) {
+        if (this.unit.getLocation() instanceof ColonyTile) {
             // Not Buildings.  Buildings have their own production display.
-            GoodsType workType = unit.getWorkType();
+            GoodsType workType = this.unit.getWorkType();
             if (workType != null) {
-                int production = ((ColonyTile)unit.getLocation())
+                int production = ((ColonyTile)this.unit.getLocation())
                     .getTotalProductionOf(workType);
-                ProductionLabel pl = new ProductionLabel(freeColClient,
+                ProductionLabel pl = new ProductionLabel(this.freeColClient,
                     new AbstractGoods(workType, production));
                 g.translate(0, 10);
                 pl.paintComponent(g);
@@ -429,11 +411,11 @@ public final class UnitLabel extends FreeColLabel
                 getParent() instanceof InPortPanel ||
                 getParent() instanceof EuropePanel.EuropeanDocksPanel ||
                 getParent().getParent() instanceof ReportPanel) {
-            String text = Messages.message(unit.getOccupationLabel(player, false));
-            g.drawImage(lib.getOccupationIndicatorChip((Graphics2D)g, unit, text), 0, 0, null);
+            String text = Messages.message(this.unit.getOccupationLabel(player, false));
+            g.drawImage(lib.getOccupationIndicatorChip((Graphics2D)g, this.unit, text), 0, 0, null);
 
-            if (unit.isDamaged()) {
-                String underRepair = Messages.message(unit.getRepairLabel());
+            if (this.unit.isDamaged()) {
+                String underRepair = Messages.message(this.unit.getRepairLabel());
                 int idx = underRepair.indexOf('(');
                 String underRepair1 = underRepair.substring(0, idx).trim();
                 String underRepair2 = underRepair.substring(idx).trim();
@@ -468,8 +450,8 @@ public final class UnitLabel extends FreeColLabel
             // rare case we need them and let the image cache keep it.
             ImageLibrary lib = getImageLibrary();
             Icon disabledImageIcon = (this.isSmall)
-                ? new ImageIcon(lib.getSmallUnitImage(unit, true))
-                : new ImageIcon(lib.getScaledUnitImage(unit, true));
+                ? new ImageIcon(lib.getSmallUnitImage(this.unit, true))
+                : new ImageIcon(lib.getScaledUnitImage(this.unit, true));
             setDisabledIcon(disabledImageIcon);
         }
         super.setEnabled(b);
