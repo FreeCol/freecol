@@ -66,17 +66,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
 
     /**
-     * This method can be called to make sure the map is loaded.
-     *
-     * There is no point executing mouse events if the map is not loaded.
-     *
-     * @return The associated game {@code Map}.
-     */
-    private Map getMap() {
-        return (getGame() == null) ? null : getGame().getMap();
-    }
-
-    /**
      * Draw a box on screen.
      *
      * @param component The {@code JComponent} to draw on.

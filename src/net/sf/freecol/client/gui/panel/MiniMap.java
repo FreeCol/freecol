@@ -160,9 +160,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @return a {@code boolean} value
      */
     public boolean canZoomIn() {
-        return tileSize < MAX_TILE_SIZE
-            && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null;
+        return tileSize < MAX_TILE_SIZE && getMap() != null;
     }
 
     /**
@@ -171,9 +169,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @return a {@code boolean} value
      */
     public boolean canZoomOut() {
-        return tileSize > MIN_TILE_SIZE
-            && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null;
+        return tileSize > MIN_TILE_SIZE && getMap() != null;
     }
 
     private void setZoomOption(int tileSize) {
@@ -199,10 +195,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
-            return;
-        }
+        if (getMap() == null) return;
         graphics.drawImage(ImageLibrary.getMiniMapBackground(), 0, 0, null);
         paintMap(graphics);
      }
@@ -243,7 +236,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         /* Make sure the mini map won't try to display tiles off the
          * bounds of the world map */
 
-        final Map map = freeColClient.getGame().getMap();
+        final Map map = getMap();
 
         if (firstColumn < 0) {
             firstColumn = 0;

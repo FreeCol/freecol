@@ -26,6 +26,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.server.FreeColServer;
@@ -112,6 +113,16 @@ public class FreeColClientHolder {
      */
     protected Game getGame() {
         return this.freeColClient.getGame();
+    }
+
+    /**
+     * Get the Map.
+     *
+     * @return The game {@code Map}.
+     */
+    protected Map getMap() {
+        Game game = getGame();
+        return (game == null) ? null : game.getMap();
     }
 
     /**

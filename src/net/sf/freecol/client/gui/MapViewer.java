@@ -650,9 +650,8 @@ public final class MapViewer extends FreeColClientHolder {
      *     on the screen.
      */
     public Tile convertToMapTile(int x, int y) {
-        final Game game = getGame();
-        if (game == null || game.getMap() == null
-            || this.focus == null) return null;
+        final Map map = getMap();
+        if (map == null || this.focus == null) return null;
 
         final int fx = this.focus.getX(), fy = this.focus.getY();
         int leftOffset;
@@ -664,7 +663,7 @@ public final class MapViewer extends FreeColClientHolder {
                 leftOffset = tileWidth * (fx + 1);
             }
         } else {
-            final int mapWidth = game.getMap().getWidth();
+            final int mapWidth = map.getWidth();
             if (fx >= mapWidth - getRightColumns()) {
                 // we are at the right side of the map
                 if ((fy & 1) == 0) {
@@ -688,7 +687,7 @@ public final class MapViewer extends FreeColClientHolder {
             // we are at the top of the map
             topOffset = (fy + 1) * halfHeight;
         } else {
-            final int mapHeight = game.getMap().getHeight();
+            final int mapHeight = map.getHeight();
             if (fy >= mapHeight - bottomRows) {
                 // we are at the bottom of the map
                 topOffset = getScreenHeight() - halfHeight * (mapHeight - fy);
@@ -754,7 +753,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         logger.finest("Direction is " + direction
                       + ", new focus is " + col + ", " + row);
-        return game.getMap().getTile(col, row);
+        return map.getTile(col, row);
 
     }
 
@@ -863,7 +862,7 @@ public final class MapViewer extends FreeColClientHolder {
     int setOffsetFocus(Tile tile) {
         if (tile == null) return 0;
         int where;
-        final Map map = getGame().getMap();
+        final Map map = getMap();
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
         int moveX = -1;
@@ -934,16 +933,16 @@ public final class MapViewer extends FreeColClientHolder {
             topRow = 0;
             bottomRowY = bottomRow * (halfHeight);
             topRowY = 0;
-        } else if (y >= (game.getMap().getHeight() - bottomRows)) {
+        } else if (y >= (getMap().getHeight() - bottomRows)) {
             alignedBottom = true;
             // We are at the bottom of the map
-            bottomRow = game.getMap().getHeight() - 1;
+            bottomRow = getMap().getHeight() - 1;
 
             topRow = getScreenHeight() / (halfHeight);
             if ((getScreenHeight() % (halfHeight)) > 0) {
                 topRow++;
             }
-            topRow = game.getMap().getHeight() - topRow;
+            topRow = getMap().getHeight() - topRow;
 
             bottomRowY = getScreenHeight() - tileHeight;
             topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
@@ -979,9 +978,9 @@ public final class MapViewer extends FreeColClientHolder {
 
             leftColumnX = 0;
             alignedLeft = true;
-        } else if (x >= (game.getMap().getWidth() - rightColumns)) {
+        } else if (x >= (getMap().getWidth() - rightColumns)) {
             // We are at the right side of the map
-            rightColumn = game.getMap().getWidth() - 1;
+            rightColumn = getMap().getWidth() - 1;
 
             leftColumn = getScreenWidth() / tileWidth;
             if ((getScreenWidth() % tileWidth) > 0) {
@@ -1020,7 +1019,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
             y = (ty <= fy) ? fy : topRows;
         } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : getGame().getMap().getWidth()
+            y = (ty >= fy) ? fy : getMap().getWidth()
                 - bottomRows;
         } else {
             y = ty;
@@ -1028,14 +1027,14 @@ public final class MapViewer extends FreeColClientHolder {
         if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
             x = (tx <= fx) ? fx : getLeftColumns(ty);
         } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
-            x = (tx >= fx) ? fx : getGame().getMap().getWidth()
+            x = (tx >= fx) ? fx : getMap().getWidth()
                 - getRightColumns(ty);
         } else {
             x = tx;
         }
 
         if (x == fx && y == fy) return false;
-        getGUI().setFocus(getGame().getMap().getTile(x,y));
+        getGUI().setFocus(getMap().getTile(x,y));
         return true;
     }
 
@@ -1046,7 +1045,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return True if near the bottom.
      */
     private boolean isMapNearBottom(int y) {
-        return y >= getGame().getMap().getHeight() - bottomRows;
+        return y >= getMap().getHeight() - bottomRows;
     }
 
     /**
@@ -1068,7 +1067,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return True if near the right.
      */
     private boolean isMapNearRight(int x, int y) {
-        return x >= getGame().getMap().getWidth() - getRightColumns(y);
+        return x >= getMap().getWidth() - getRightColumns(y);
     }
 
     /**
@@ -1208,7 +1207,7 @@ public final class MapViewer extends FreeColClientHolder {
         final int colonyLabels
             = options.getInteger(ClientOptions.COLONY_LABELS);
         final Game game = getGame();
-        final Map map = game.getMap();
+        final Map map = getMap();
         final Player player = getMyPlayer(); // Check, can be null in map editor
 
         // Remember transform

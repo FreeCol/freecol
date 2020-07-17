@@ -19,23 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
-
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -46,6 +29,26 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
+
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
+
 
 
 /**
@@ -129,6 +132,16 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      */
     protected final Game getGame() {
         return freeColClient.getGame();
+    }
+
+    /**
+     * Get the map.
+     *
+     * @return The current {@code Map}.
+     */
+    protected final Map getMap() {
+        final Game game = getGame();
+        return (game == null) ? null : game.getMap();
     }
 
     /**

@@ -1373,7 +1373,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Settlement getNearestSettlement(Player owner, int radius,
                                            boolean same) {
         if (radius <= 0) radius = INFINITY;
-        Map map = getGame().getMap();
+        Map map = getMap();
         for (Tile t : map.getCircleTiles(this, true, radius)) {
             if (t == this
                 || (same && !isConnectedTo(t))) continue;

@@ -45,6 +45,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.option.Option;
 
 
@@ -159,6 +160,16 @@ public abstract class FreeColAction extends AbstractAction
      */
     protected Game getGame() {
         return freeColClient.getGame();
+    }
+
+    /**
+     * Gets the map.
+     *
+     * @return The {@code Map}.
+     */
+    protected Map getMap() {
+        final Game game = getGame();
+        return (game == null) ? null : game.getMap();
     }
 
     /**

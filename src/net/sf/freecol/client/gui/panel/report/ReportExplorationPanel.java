@@ -79,7 +79,7 @@ public final class ReportExplorationPanel extends ReportPanel {
         
         // Content Rows
         // TODO: Display "None" if no contents, though this would be rare.
-        for (Region region : transform(getGame().getMap().getRegions(),
+        for (Region region : transform(getMap().getRegions(),
                                        isNotNull(Region::getDiscoveredIn),
                                        Function.<Region>identity(),
                                        regionComparator)) {
