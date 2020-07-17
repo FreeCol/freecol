@@ -36,6 +36,9 @@ public class FontLibrary {
 
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
 
+    /** Default size, used for the main-font. */
+    public static final float DEFAULT_FONT_SIZE = 12f;
+
     /**
      * FontType is used for choosing the typeface of the {@code Font}.
      * 
@@ -119,15 +122,13 @@ public class FontLibrary {
      * 
      * @param fontName Can be used to choose a different font from a
      *     user-provided name.
-     * @param scaleFactor The applied scale factor.
      * @return The new {@code Font}.
      */
-    public static Font createMainFont(String fontName, float scaleFactor) {
-        final float defaultSize = 12f * scaleFactor;
+    public static Font createMainFont(String fontName) {
         Font font = null;
         if (fontName != null) font = Font.decode(fontName);
         if (font == null) font = ResourceManager.getFont("font.normal");
-        mainFont = font = font.deriveFont(defaultSize);
+        mainFont = font = font.deriveFont(DEFAULT_FONT_SIZE);
         return font;
     }
 

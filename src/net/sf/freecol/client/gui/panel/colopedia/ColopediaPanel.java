@@ -142,8 +142,7 @@ public final class ColopediaPanel extends FreeColPanel
         tree = new JTree(treeModel) {
                 @Override
                 public Dimension getPreferredSize() {
-                    return new Dimension((int)(200 * getGUI().getMapScale()),
-                                         super.getPreferredSize().height);
+                    return new Dimension(200, super.getPreferredSize().height);
                 }
             };
         tree.setRootVisible(false);

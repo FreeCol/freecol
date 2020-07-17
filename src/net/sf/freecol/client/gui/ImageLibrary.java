@@ -1692,7 +1692,7 @@ public final class ImageLibrary {
                                      Color foreground,
                                      boolean filled) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD, this.scaleFactor);
+            FontLibrary.FontSize.TINY, Font.BOLD);
         FontMetrics fm = g.getFontMetrics(font);
         int padding = (int)(6 * this.scaleFactor);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,

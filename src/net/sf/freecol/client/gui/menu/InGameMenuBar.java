@@ -24,13 +24,13 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.CenterAction;
@@ -96,6 +96,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
 
@@ -103,9 +104,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 /**
  * This is the menu bar used in-game.
  *
- * <br><br>
- *
- * The menu bar that is displayed on the top left corner of the
+ * That is, the menu bar that is displayed on the top left corner of the
  * {@code Canvas}.
  *
  * @see MapEditorMenuBar
@@ -125,25 +124,9 @@ public class InGameMenuBar extends FreeColMenuBar {
      */
     public InGameMenuBar(FreeColClient freeColClient,
                          MouseMotionListener listener) {
-        // FIXME: FreeColClient should not have to be passed in to
-        // this class.  This is only a menu bar, it doesn't need a
-        // reference to the main controller.  The only reason it has
-        // one now is because DebugMenu needs it.  And DebugMenu needs
-        // it because it is using inner classes for ActionListeners
-        // and those inner classes use the reference.  If those inner
-        // classes were in seperate classes, when they were created,
-        // they could use the FreeColClient reference of the
-        // ActionManger.  So DebugMenu needs to be refactored to remove
-        // inner classes so that this MenuBar can lose its unnecessary
-        // reference to the main controller.  See FreeColMenuTest.
-        //
-        // Okay, I lied.. the update() and paintComponent() methods in
-        // this MenuBar use freeColClient, too. But so what.  Move
-        // those to another class too. :)
         super(freeColClient);
 
-        // Add a mouse listener so that autoscrolling can happen in
-        // this menubar
+        // Add a mouse listener so that autoscrolling can happen here
         this.addMouseMotionListener(listener);
         
         reset();
@@ -164,7 +147,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         buildColopediaMenu();
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-            add(new DebugMenu(freeColClient));
+            add(new DebugMenu(this.freeColClient));
         }
 
         update();
@@ -237,6 +220,8 @@ public class InGameMenuBar extends FreeColMenuBar {
     }
 
     private void buildOrdersMenu() {
+        final Specification spec = this.freeColClient.getGame()
+            .getSpecification();
         // --> Orders
         JMenu menu = Utility.localizedMenu("menuBar.orders");
         menu.setOpaque(false);
@@ -256,8 +241,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(BuildColonyAction.id));
         // Insert all Improvements here:
-        for (TileImprovementType type : freeColClient.getGame().getSpecification()
-                 .getTileImprovementTypeList()) {
+        for (TileImprovementType type : spec.getTileImprovementTypeList()) {
             if (!type.isNatural()) {
                 menu.add(getMenuItem(type.getSuffix() + "Action"));
             }
@@ -310,39 +294,39 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ShowMapGeneratorOptionsAction.id));
 
         add(menu);
-
     }
 
 
+    // Override JComponent
+
     /**
-     * Paints information about gold, tax and year.
+     * {@inheritDoc}
      */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Fail fast
-        if (this.freeColClient == null) return;
-        Player player = this.freeColClient.getMyPlayer();
+        if (this.freeColClient == null) return; // Fail fast
+        final Player player = this.freeColClient.getMyPlayer();
         if (player == null) return;
-        
+        final GUI gui = this.freeColClient.getGUI();
+        final float scale = gui.getFixedImageLibrary().getScaleFactor();
+
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                              RenderingHints.VALUE_RENDER_QUALITY);
+        StringTemplate y = this.freeColClient.getGame().getTurn().getLabel();
         StringTemplate t = StringTemplate.template("menuBar.statusLine")
             .addAmount("%gold%", player.getGold())
             .addAmount("%tax%", player.getTax())
             .addAmount("%score%", player.getScore())
-            .addStringTemplate("%year%",
-                this.freeColClient.getGame().getTurn().getLabel());
+            .addStringTemplate("%year%", y);
         String displayString = Messages.message(t);
-        Rectangle2D bounds = g2d.getFontMetrics()
-            .getStringBounds(displayString, g);
-        int x = getWidth() - 10 - (int)bounds.getWidth();
-        int y = Math.round(12f * this.freeColClient.getGUI().getMapScale())
-            + 3 + getInsets().top;
-        g2d.drawString(displayString, x, y);
+        int w = (int)g2d.getFontMetrics().getStringBounds(displayString, g)
+            .getWidth();
+        g2d.drawString(displayString, getWidth() - 10 - w,
+                       Math.round(12f * scale) + 3 + getInsets().top);
     }
 }

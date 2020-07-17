@@ -85,7 +85,7 @@ public final class TilePopup extends JPopupMenu {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, gui.getMapScale());
+            FontLibrary.FontSize.TINY, Font.BOLD);
         
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();

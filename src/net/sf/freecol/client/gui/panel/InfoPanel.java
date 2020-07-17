@@ -125,7 +125,7 @@ public final class InfoPanel extends FreeColPanel
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
         this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor());
+            FontLibrary.FontSize.TINY);
         this.skin = (!useSkin) ? null
             : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 

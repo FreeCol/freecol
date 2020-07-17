@@ -62,6 +62,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * 
  * This class is responsible for drawing map tiles
  * for MapViewer and some GUI-panels.
+ *
+ * It needs to be a FreeColClientHolder so it can check the client options.
  */
 public final class TileViewer extends FreeColClientHolder {
 

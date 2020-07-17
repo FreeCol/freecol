@@ -109,7 +109,7 @@ public class ChatDisplay {
         if (msgs.isEmpty()) return;
         
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor());
+            FontLibrary.FontSize.TINY);
         int yy = -1;
         final int xx = LEFT_MARGIN;
         for (GUIMessage m : msgs) {

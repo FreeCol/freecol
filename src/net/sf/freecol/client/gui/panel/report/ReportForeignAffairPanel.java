@@ -53,7 +53,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
         final ImageLibrary lib = getImageLibrary();
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor());
+            FontLibrary.FontSize.SMALL, Font.BOLD);
         final String stance = Messages.message(
             StringTemplate.key("report.foreignAffair.stance"));
         final String numberOfColonies = Messages.message(

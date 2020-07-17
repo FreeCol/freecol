@@ -122,7 +122,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             : this.goodsIcon.getIconWidth() * 2;
 
         setFont(FontLibrary.createFont(FontType.SIMPLE,
-                FontSize.TINY, Font.BOLD, lib.getScaleFactor()));
+                FontSize.TINY, Font.BOLD));
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
         setToolTipText((getType() == null || getAmount() == 0) ? null
             : Messages.message(getAbstractGoods().getLabel()));

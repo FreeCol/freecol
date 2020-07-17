@@ -88,10 +88,10 @@ public class AbstractGoodsLabel extends FreeColLabel {
     }
 
     /**
-     * Set DRAG-ALL functionality when SHIFT+ALT used on drag from {@code DragListener}
+     * Set DRAG-ALL functionality when SHIFT+ALT used on drag from
+     * {@code DragListener}
      * 
-     * @param superFullChosen
-     *            The new state of drag-all 
+     * @param superFullChosen The new state of drag-all 
      */
     public void setSuperFullChosen(boolean superFullChosen) {
         this.superFullChosen = superFullChosen;

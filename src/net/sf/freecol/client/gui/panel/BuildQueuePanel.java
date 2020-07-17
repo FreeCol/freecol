@@ -590,7 +590,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Create Font choice
         Font fontSubHead = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, getGUI().getMapScale());
+            FontLibrary.FontSize.SMALLER, Font.BOLD);
         
         // Create the components
         JLabel header = Utility.localizedHeaderLabel(
