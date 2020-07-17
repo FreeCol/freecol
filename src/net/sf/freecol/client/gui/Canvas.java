@@ -67,6 +67,7 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 
@@ -75,7 +76,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -98,13 +98,6 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 public final class Canvas extends JDesktopPane {
 
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
-
-    public static enum PopupPosition {
-        ORIGIN,
-        CENTERED,
-        CENTERED_LEFT,
-        CENTERED_RIGHT,
-    }
 
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
@@ -636,21 +629,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Make a tile visible, then determine corresponding position to popup
-     * a panel.
-     *
-     * @param tile A {@code Tile} to be made visible.
-     * @return A {@code PopupPosition} for a panel to be displayed.
-     */
-    private PopupPosition setOffsetFocus(Tile tile) {
-        if (tile == null) return PopupPosition.CENTERED;
-        int where = this.mapViewer.setOffsetFocus(tile);
-        return (where > 0) ? PopupPosition.CENTERED_LEFT
-            : (where < 0) ? PopupPosition.CENTERED_RIGHT
-            : PopupPosition.CENTERED;
-    }
-
-    /**
      * A component is closing.  Some components need position and size
      * to be saved.
      *
@@ -666,6 +644,7 @@ public final class Canvas extends JDesktopPane {
             saveSize(fcp, fcp.getSize());
         }
     }
+
 
     // Public routines follow
 
@@ -937,13 +916,12 @@ public final class Canvas extends JDesktopPane {
      *
      * @param <T> The type to be returned from the dialog.
      * @param dialog The {@code FreeColDialog} to be displayed
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return The {@link FreeColDialog#getResponse reponse} returned by
      *     the dialog.
      */
-    public <T> T showFreeColDialog(FreeColDialog<T> dialog, Tile tile) {
-        viewFreeColDialog(dialog, tile);
+    public <T> T showFreeColDialog(FreeColDialog<T> dialog, PopupPosition pos) {
+        viewFreeColDialog(dialog, pos);
         T response = dialog.getResponse();
         remove(dialog);
         dialogRemove(dialog);
@@ -965,19 +943,6 @@ public final class Canvas extends JDesktopPane {
     public FreeColPanel showFreeColPanel(FreeColPanel panel,
                                          boolean resizable) {
         return showFreeColPanel(panel, PopupPosition.CENTERED, resizable);
-    }
-
-    /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A {@code Tile} to make visible (not under the panel!)
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
-                                         boolean resizable) {
-        return showFreeColPanel(panel, setOffsetFocus(tile), resizable);
     }
 
     /**
@@ -1003,24 +968,21 @@ public final class Canvas extends JDesktopPane {
      *
      * @param <T> The type to be returned from the dialog.
      * @param freeColDialog The dialog to be displayed
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
+     * @param pos A {@code PopupPosition} for the dialog.
      */
     public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
-                                      Tile tile) {
-        PopupPosition pp = setOffsetFocus(tile);
-
+                                      PopupPosition pos) {
         // TODO: Remove compatibility code when all non-modal dialogs
         //       have been converted into panels.
         if (!freeColDialog.isModal()) {
             int canvasWidth = getWidth();
             int dialogWidth = freeColDialog.getWidth();
-            if(dialogWidth*2 <= canvasWidth) {
+            if (dialogWidth*2 <= canvasWidth) {
                 Point location = freeColDialog.getLocation();
-                if(pp == PopupPosition.CENTERED_LEFT) {
+                if (pos == PopupPosition.CENTERED_LEFT) {
                     freeColDialog.setLocation(location.x - canvasWidth/4,
                                               location.y);
-                } else if(pp == PopupPosition.CENTERED_RIGHT) {
+                } else if (pos == PopupPosition.CENTERED_RIGHT) {
                     freeColDialog.setLocation(location.x + canvasWidth/4,
                                               location.y);
                 }
@@ -1107,7 +1069,8 @@ public final class Canvas extends JDesktopPane {
     }
 
 
-    // Map controls, called out of paintComponent via checkResize
+    // Map controls, called from SwingGUI,
+    // but also here in paintComponent when the canvas is resized
 
     /**
      * Add the map controls.
@@ -1359,7 +1322,7 @@ public final class Canvas extends JDesktopPane {
             = new MapEditorTransformPanel(this.freeColClient);
         JInternalFrame f = addAsFrame(panel, true, PopupPosition.CENTERED,
                                       false);
-        f.setLocation(f.getX(), 50);
+        f.setLocation(f.getX(), 50); // move up to near the top
         repaint();
     }
 

@@ -120,6 +120,14 @@ import net.sf.freecol.common.util.Utils;
  */
 public class SwingGUI extends GUI {
 
+    /** A rough position to place dialogs and panels on the canvas. */
+    public static enum PopupPosition {
+        ORIGIN,
+        CENTERED,
+        CENTERED_LEFT,
+        CENTERED_RIGHT,
+    }
+
     /** European subpanel classes. */
     private static final List<Class<? extends FreeColPanel>> EUROPE_CLASSES
         = makeUnmodifiableList(RecruitPanel.class,
@@ -302,6 +310,21 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Is mouse movement differnce above the drag threshold?
+     *
+     * @param x The new mouse x position.
+     * @param y The new mouse y position.
+     * @return True if the mouse has been dragged.
+     */
+    public boolean isDrag(int x, int y) {
+        final Point drag = getDragPoint();
+        if (drag == null) return false;
+        int deltaX = Math.abs(x - drag.x);
+        int deltaY = Math.abs(y - drag.y);
+        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
+    }
+
+    /**
      * Change the view mode.
      *
      * Always stop the blinking cursor if leaving MOVE_UNITS mode,
@@ -381,6 +404,21 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Get a rough position to place a dialog given a tile which we wish
+     * to remain visible.
+     *
+     * @param tile The {@code Tile} to expose.
+     * @return A suitable {@code PopupPosition}.
+     */
+    private PopupPosition getPopupPosition(Tile tile) {
+        if (tile == null) return PopupPosition.CENTERED;
+        int where = this.mapViewer.setOffsetFocus(tile);
+        return (where > 0) ? PopupPosition.CENTERED_LEFT
+            : (where < 0) ? PopupPosition.CENTERED_RIGHT
+            : PopupPosition.CENTERED;
+    }
+    
+    /**
      * Update the path for the active unit.
      */
     private void updateUnitPath() {
@@ -400,21 +438,6 @@ public class SwingGUI extends GUI {
             }
         }
         setUnitPath(path);
-    }
-
-    /**
-     * Is mouse movement differnce above the drag threshold?
-     *
-     * @param x The new mouse x position.
-     * @param y The new mouse y position.
-     * @return True if the mouse has been dragged.
-     */
-    public boolean isDrag(int x, int y) {
-        final Point drag = getDragPoint();
-        if (drag == null) return false;
-        int deltaX = Math.abs(x - drag.x);
-        int deltaY = Math.abs(y - drag.y);
-        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
     }
 
     /**
@@ -730,7 +753,8 @@ public class SwingGUI extends GUI {
     @Override
     public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey) {
-        return this.widgets.confirm(tile, tmpl, icon, okKey, cancelKey);
+        return this.widgets.confirm(tmpl, icon, okKey, cancelKey,
+                                    getPopupPosition(tile));
     }
 
     /**
@@ -739,7 +763,8 @@ public class SwingGUI extends GUI {
     @Override
     protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
                               String cancelKey, List<ChoiceItem<T>> choices) {
-        return this.widgets.getChoice(tile, tmpl, icon, cancelKey, choices);
+        return this.widgets.getChoice(tmpl, icon, cancelKey, choices,
+                                      getPopupPosition(tile));
     }
 
     /**
@@ -748,7 +773,8 @@ public class SwingGUI extends GUI {
     @Override
     public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
                            String okKey, String cancelKey) {
-        return this.widgets.getInput(tile, tmpl, defaultValue, okKey, cancelKey);
+        return this.widgets.getInput(tmpl, defaultValue, okKey, cancelKey,
+                                     getPopupPosition(tile));
     }
 
 
@@ -1501,7 +1527,7 @@ public class SwingGUI extends GUI {
                     + colony.getId(), e);
                 return null;
             }
-            this.canvas.showFreeColPanel(panel, colony.getTile(), true);
+            this.canvas.showFreeColPanel(panel, getPopupPosition(colony.getTile()), true);
         } else {
             panel.requestFocus();
         }
@@ -1576,7 +1602,8 @@ public class SwingGUI extends GUI {
     @Override
     public void showDumpCargoDialog(Unit unit,
                                     DialogHandler<List<Goods>> handler) {
-        this.widgets.showDumpCargoDialog(unit, handler);
+        this.widgets.showDumpCargoDialog(unit, getPopupPosition(unit.getTile()),
+                                         handler);
     }
 
     /**
@@ -1661,7 +1688,8 @@ public class SwingGUI extends GUI {
                                        final Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
         this.widgets.showFirstContactDialog(player, other, tile,
-                                            settlementCount, handler);
+                                            settlementCount,
+                                            getPopupPosition(tile), handler);
     }
 
     /**
@@ -1686,7 +1714,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showIndianSettlementPanel(IndianSettlement is) {
-        return this.widgets.showIndianSettlementPanel(is);
+        return this.widgets.showIndianSettlementPanel(is,
+            getPopupPosition(is.getTile()));
     }
 
     /**
@@ -1706,7 +1735,8 @@ public class SwingGUI extends GUI {
         if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
             playSound("sound.event.alertSound");
         }
-        return this.widgets.showInformationPanel(displayObject, tile,
+        return this.widgets.showInformationPanel(displayObject,
+                                                 getPopupPosition(tile),
                                                  icon, template);
     }
 
@@ -1806,7 +1836,7 @@ public class SwingGUI extends GUI {
         }
         InformationPanel panel
             = new InformationPanel(getFreeColClient(), texts, fcos, icons);
-        return this.canvas.showFreeColPanel(panel, tile, true);
+        return this.canvas.showFreeColPanel(panel, getPopupPosition(tile), true);
     }
 
     /**
@@ -1827,7 +1857,9 @@ public class SwingGUI extends GUI {
                                       final String defaultName,
                                       final Unit unit,
                                       DialogHandler<String> handler) {
-        this.widgets.showNamingDialog(template, defaultName, unit, handler);
+        this.widgets.showNamingDialog(template, defaultName,
+                                      getPopupPosition(unit.getTile()),
+                                      handler);
     }
 
     /**
@@ -1837,7 +1869,9 @@ public class SwingGUI extends GUI {
     public void showNativeDemandDialog(Unit unit, Colony colony,
                                        GoodsType type, int amount,
                                        DialogHandler<Boolean> handler) {
-        this.widgets.showNativeDemandDialog(unit, colony, type, amount, handler);
+        this.widgets.showNativeDemandDialog(unit, colony, type, amount,
+                                            getPopupPosition(unit.getTile()),
+                                            handler);
     }
 
     /**
@@ -1853,7 +1887,8 @@ public class SwingGUI extends GUI {
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        return this.widgets.showNegotiationDialog(our, other, agreement, comment);
+        return this.widgets.showNegotiationDialog(our, other, agreement,
+            comment, getPopupPosition(((Location)our).getTile()));
     }
 
     /**
@@ -1878,7 +1913,8 @@ public class SwingGUI extends GUI {
     @Override
     public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender, Tile tile) {
-        return this.widgets.showPreCombatDialog(attacker, defender, tile);
+        return this.widgets.showPreCombatDialog(attacker, defender,
+                                                getPopupPosition(tile));
     }
 
     /**
@@ -2087,7 +2123,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Location showSelectDestinationDialog(Unit unit) {
-        return this.widgets.showSelectDestinationDialog(unit);
+        return this.widgets.showSelectDestinationDialog(unit,
+            getPopupPosition(unit.getTile()));
     }
 
     /**
@@ -2177,7 +2214,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showTradeRoutePanel(Unit unit) {
-        return this.widgets.showTradeRoutePanel(unit);
+        return this.widgets.showTradeRoutePanel(unit,
+            getPopupPosition(unit.getTile()));
     }
 
     /**
