@@ -175,6 +175,9 @@ public class SwingGUI extends GUI {
     /** Where the map was drag-clicked. */
     private Point dragPoint;
 
+    /** Has a goto operation started? */
+    private boolean gotoStarted = false;
+
     /** The splash screen. */
     private SplashScreen splash;
 
@@ -443,6 +446,28 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Starts a goto operation.
+     */
+    private void startGoto() {
+        this.gotoStarted = true;
+        this.canvas.setCursor(Canvas.GO_CURSOR);
+        this.mapViewer.changeGotoPath(null);
+    }
+
+    /**
+     * Stops any ongoing goto operation.
+     *
+     * @return The old goto path if any.
+     */
+    private PathNode stopGoto() {
+        PathNode ret = (this.gotoStarted) ? this.mapViewer.getGotoPath() : null;
+        this.gotoStarted = false;
+        this.canvas.setCursor(null);
+        this.mapViewer.changeGotoPath(null);
+        return ret;
+    }
+
+    /**
      * Update the current goto to a given tile.
      *
      * @param tile The new goto {@code Tile}.
@@ -451,7 +476,7 @@ public class SwingGUI extends GUI {
         final Unit unit = getActiveUnit();
         if (tile == null || unit == null) {
             clearGotoPath();
-        } else if (this.canvas.isGotoStarted()) {
+        } else if (isGotoStarted()) {
             // Do nothing if the tile has not changed.
             PathNode oldPath = this.mapViewer.getGotoPath();
             Tile lastTile = (oldPath == null) ? null
@@ -927,10 +952,10 @@ public class SwingGUI extends GUI {
         if (unit == null) return;
 
         // Enter "goto mode" if not already activated; otherwise cancel it
-        if (this.canvas.isGotoStarted()) {
+        if (isGotoStarted()) {
             clearGotoPath();
         } else {
-            this.canvas.startGoto();
+            startGoto();
             
             // Draw the path to the current mouse position, if the
             // mouse is over the screen; see also
@@ -947,7 +972,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void clearGotoPath() {
-        this.canvas.stopGoto();
+        stopGoto();
         updateUnitPath();
         refresh();
     }
@@ -957,7 +982,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean isGotoStarted() {
-        return this.canvas.isGotoStarted();
+        return this.gotoStarted;
     }
 
     /**
@@ -965,12 +990,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void performGoto(Tile tile) {
-        if (this.canvas.isGotoStarted()) this.canvas.stopGoto();
+        if (isGotoStarted()) stopGoto();
 
         final Unit active = getActiveUnit();
         if (active != null) {
             if (tile != null && active.getTile() != tile) {
-                this.canvas.startGoto();
+                startGoto();
                 updateGotoTile(tile);
                 traverseGotoPath();
             }
@@ -993,9 +1018,9 @@ public class SwingGUI extends GUI {
     @Override
     public void traverseGotoPath() {
         final Unit unit = getActiveUnit();
-        if (unit == null || !this.canvas.isGotoStarted()) return;
+        if (unit == null || !isGotoStarted()) return;
 
-        final PathNode path = this.canvas.stopGoto();
+        final PathNode path = stopGoto();
         if (path == null) {
             igc().clearGotoOrders(unit);
         } else {
@@ -1012,9 +1037,9 @@ public class SwingGUI extends GUI {
     @Override
     public void updateGoto(int x, int y, boolean start) {
         if (start && isDrag(x, y)) {
-            this.canvas.startGoto();
+            startGoto();
         }
-        if (this.canvas.isGotoStarted()) {
+        if (isGotoStarted()) {
             updateGotoTile(tileAt(x, y));
         }
         refresh();
@@ -1025,8 +1050,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void prepareDrag(int x, int y) {
-        if (this.canvas.isGotoStarted()) {
-            this.canvas.stopGoto();
+        if (isGotoStarted()) {
+            stopGoto();
             refresh();
         }
         setDragPoint(x, y);

@@ -102,7 +102,7 @@ public final class Canvas extends JDesktopPane {
     private static final int MAXTRY = 3;
 
     /** The cursor to show for goto operations. */
-    private static final java.awt.Cursor GO_CURSOR
+    public static final java.awt.Cursor GO_CURSOR
         = (java.awt.Cursor)UIManager.get("cursor.go");
     
     /** A class for frames being used as tool boxes. */
@@ -128,9 +128,6 @@ public final class Canvas extends JDesktopPane {
 
     /** The various sorts of map controls. */
     private MapControls mapControls;
-
-    /** Has a goto operation started? */
-    private boolean gotoStarted = false;
 
     /** The special overlay used when it is not the player turn. */
     private GrayLayer greyLayer;
@@ -1052,42 +1049,7 @@ public final class Canvas extends JDesktopPane {
     }
 
 
-    // Gotos
-    
-    /**
-     * Checks if there is currently a goto operation on the mapboard.
-     *
-     * @return True if a goto operation is in progress.
-     */
-    public boolean isGotoStarted() {
-        return this.gotoStarted;
-    }
-
-    /**
-     * Starts a goto operation.
-     */
-    public void startGoto() {
-        this.gotoStarted = true;
-        setCursor(GO_CURSOR);
-        this.mapViewer.changeGotoPath(null);
-    }
-
-    /**
-     * Stops any ongoing goto operation.
-     *
-     * @return The old goto path if any.
-     */
-    public PathNode stopGoto() {
-        PathNode ret = (this.gotoStarted) ? this.mapViewer.getGotoPath() : null;
-        this.gotoStarted = false;
-        setCursor(null);
-        this.mapViewer.changeGotoPath(null);
-        return ret;
-    }
-
-
-    // Map controls, called from SwingGUI,
-    // but also here in paintComponent when the canvas is resized
+    // Map controls, called out of paintComponent via checkResize
 
     /**
      * Add the map controls.
