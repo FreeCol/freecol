@@ -593,6 +593,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void changeScale(float newScale) {
         this.lib.changeScaleFactor(newScale);
+        this.tv.updateScaledVariables();
         updateScaledVariables();
     }
 
