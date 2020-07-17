@@ -225,7 +225,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.size = new Dimension(0, 0); // Start empty, update is coming
         this.cursor = new TerrainCursor();
         this.cursor.addActionListener(al);
-        this.chatDisplay = new ChatDisplay();
+        this.chatDisplay = new ChatDisplay(freeColClient);
 
         updateScaledVariables();
     }
@@ -1201,7 +1201,6 @@ public final class MapViewer extends FreeColClientHolder {
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
     public void displayMap(Graphics2D g2d) {
-        //final long now = now();
         final ClientOptions options = getClientOptions();
         final int colonyLabels
             = options.getInteger(ClientOptions.COLONY_LABELS);
@@ -1526,15 +1525,7 @@ public final class MapViewer extends FreeColClientHolder {
         else if (this.gotoPath != null) displayPath(g2d, this.gotoPath);
 
         // Draw the chat
-        this.chatDisplay.display(g2d, this.lib, this.size);
-
-        // Timing log
-        //final long gap = now() - now;
-        //logger.finest("displayMap time = " + gap
-        //    + " for " + firstColumn + " " + firstRow
-        //    + " to " + lastColumn + " " + lastRow
-        //    + " average "
-        //    + ((double)gap) / ((lastRow-firstRow) * (lastColumn-firstColumn)));
+        this.chatDisplay.display(g2d, this.size);
     }
 
     private void displaySettlementLabels(Graphics2D g2d, Settlement settlement,
