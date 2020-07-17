@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants.*; // Imports all ENUMS.
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -1465,6 +1466,30 @@ public class GUI extends FreeColClientHolder {
     public void showPopupMenu(JPopupMenu menu, int x, int y) {}
 
 
+    // Scrolling
+
+    /**
+     * Work out what direction to scroll the map if a coordinate is close
+     * to an edge.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param scrollSpace The clearance from the relevant edge
+     * @param ignoreTop If the top should be ignored
+     * @return The {@code Direction} to scroll, or null if not.
+     */
+    public Direction getScrollDirection(int x, int y, int scrollSpace,
+                                        boolean ignoreTop) { return null; }
+
+    /**
+     * Scroll the map in a given direction.
+     *
+     * @param direction The {@code Direction} to scroll.
+     * @return True if scrolling can continue.
+     */
+    public boolean scrollMap(Direction direction) { return false; }
+
+
     // Tile image manipulation
 
     // Used by: InfoPanel
@@ -1663,6 +1688,7 @@ public class GUI extends FreeColClientHolder {
      */
     public void displayStartChat(String sender, String message,
                                  boolean privateChat) {}
+
 
     /**
      * Checks if a client options dialog is present.

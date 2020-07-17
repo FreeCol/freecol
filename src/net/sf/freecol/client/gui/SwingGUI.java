@@ -79,6 +79,7 @@ import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -1032,7 +1033,51 @@ public class SwingGUI extends GUI {
         this.canvas.requestFocus();
     }
     
+
+    // Scrolling
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Direction getScrollDirection(int x, int y, int scrollSpace,
+                                        boolean ignoreTop) {
+        Direction ret;
+        final Dimension size = this.canvas.getSize();
+        if (x < scrollSpace && y < scrollSpace) { // Upper-Left
+            ret = !ignoreTop ? Direction.NW : Direction.W;
+        } else if (x >= size.width - scrollSpace
+            && y < scrollSpace) { // Upper-Right
+            ret = !ignoreTop ? Direction.NE : Direction.E;
+        } else if (x >= size.width - scrollSpace
+            && y >= size.height - scrollSpace) { // Bottom-Right
+            ret = Direction.SE;
+        } else if (x < scrollSpace
+            && y >= size.height - scrollSpace) { // Bottom-Left
+            ret = Direction.SW;
+        } else if (y < scrollSpace) { // Top
+            ret = !ignoreTop ? Direction.N : null;
+        } else if (x >= size.width - scrollSpace) { // Right
+            ret = Direction.E;
+        } else if (y >= size.height - scrollSpace) { // Bottom
+            ret = Direction.S;
+        } else if (x < scrollSpace) { // Left
+            ret = Direction.W;
+        } else {
+            ret = null;
+        }
+        return ret;
+    }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean scrollMap(Direction direction) {
+        return this.mapViewer.scrollMap(direction);
+    }
+
+
     // Tile image manipulation
 
     /**

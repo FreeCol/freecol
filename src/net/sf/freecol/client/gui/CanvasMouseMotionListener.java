@@ -47,7 +47,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      */
     public CanvasMouseMotionListener(FreeColClient freeColClient,
                                      Canvas canvas) {
-        super(freeColClient, canvas);
+        super(freeColClient);
     }
 
 

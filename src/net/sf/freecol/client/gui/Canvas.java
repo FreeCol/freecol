@@ -679,9 +679,9 @@ public final class Canvas extends JDesktopPane {
      */
     public void startMapEditorGUI() {
         this.parentFrame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
-                new MenuMouseMotionListener(this.freeColClient, this)));
+                new MenuMouseMotionListener(this.freeColClient)));
         CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(this.freeColClient, this);
+            = new CanvasMapEditorMouseListener(this.freeColClient);
         addMouseListener(listener);
         addMouseMotionListener(listener);
     }
@@ -691,7 +691,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void initializeInGame() {
         this.parentFrame.setMenuBar(new InGameMenuBar(this.freeColClient,
-                new MenuMouseMotionListener(this.freeColClient, this)));
+                new MenuMouseMotionListener(this.freeColClient)));
         addMouseListener(new CanvasMouseListener(this.freeColClient));
         addMouseMotionListener(new CanvasMouseMotionListener(this.freeColClient, this));
     }
@@ -1119,21 +1119,6 @@ public final class Canvas extends JDesktopPane {
             ret = true;
         }
         return ret;
-    }
-
-
-    // Map viewer
-    
-    /**
-     * Scroll the map in the given direction.
-     *
-     * Called from ScrollThread.
-     *
-     * @param direction The {@code Direction} to scroll in.
-     * @return True if scrolling occurred.
-     */
-    public boolean scrollMap(Direction direction) {
-        return this.mapViewer.scrollMap(direction);
     }
 
 
