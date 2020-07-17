@@ -41,6 +41,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,7 +73,6 @@ import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
@@ -83,7 +83,6 @@ import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
-import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
@@ -861,6 +860,24 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Gets any currently displayed component matching a predicate.
+     *
+     * @param pred The predicate to apply.
+     * @return The first match for the predicate, or null if none found.
+     */
+    public Component getMatchingComponent(Predicate<Component> pred) {
+        for (Component c1 : getComponents()) {
+            if (c1 instanceof JInternalFrame) {
+                for (Component c2 : ((JInternalFrame) c1).getContentPane()
+                         .getComponents()) {
+                    if (pred.test(c2)) return c2;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get any panel this {@code Canvas} is displaying.
      *
      * @return A {@code Component} the {@code Canvas} is
@@ -1265,30 +1282,6 @@ public final class Canvas extends JDesktopPane {
             remove(this.mainPanel);
             this.mainPanel = null;
         }
-    }
-
-    /**
-     * Gets any currently displayed colony panel for the specified colony.
-     *
-     * This is distinct from {@link #getExistingFreeColPanel} because
-     * there can be multiple ColonyPanels.
-     *
-     * @param colony The {@code Colony} to check.
-     * @return A currently displayed colony panel, or null if not found.
-     */
-    public ColonyPanel getColonyPanel(Colony colony) {
-        for (Component c1 : getComponents()) {
-            if (c1 instanceof JInternalFrame) {
-                for (Component c2 : ((JInternalFrame) c1).getContentPane()
-                         .getComponents()) {
-                    if (c2 instanceof ColonyPanel
-                        && ((ColonyPanel)c2).getColony() == colony) {
-                        return (ColonyPanel)c2;
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     /**

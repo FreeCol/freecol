@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.InputStream;
+import java.util.function.Predicate;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -1516,9 +1517,12 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public FreeColPanel showColonyPanel(Colony colony, Unit unit) {
+    public FreeColPanel showColonyPanel(final Colony colony, Unit unit) {
         if (colony == null) return null;
-        ColonyPanel panel = this.canvas.getColonyPanel(colony);
+        final Predicate<Component> pred = (c) ->
+            (c instanceof ColonyPanel
+                && ((ColonyPanel)c).getColony() == colony);
+        ColonyPanel panel = (ColonyPanel)this.canvas.getMatchingComponent(pred);
         if (panel == null) {
             try {
                 panel = new ColonyPanel(getFreeColClient(), colony);
