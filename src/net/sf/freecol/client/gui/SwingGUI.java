@@ -706,7 +706,7 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         this.mapControls = MapControls.newInstance(fcc);
         final ActionListener al = (ActionEvent ae) ->
-            this.refreshTile(this.mapViewer.getActiveTile());
+            this.refreshTile(this.mapViewer.getCursorTile());
         this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
@@ -1099,7 +1099,9 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean scrollMap(Direction direction) {
-        return this.mapViewer.scrollMap(direction);
+        boolean ret = this.mapViewer.scrollMap(direction);
+        refresh();
+        return ret;
     }
 
 
