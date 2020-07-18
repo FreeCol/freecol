@@ -1601,7 +1601,8 @@ public class SwingGUI extends GUI {
                     + colony.getId(), e);
                 return null;
             }
-            this.canvas.showFreeColPanel(panel, getPopupPosition(colony.getTile()), true);
+            this.canvas.showFreeColPanel(panel,
+                getPopupPosition(colony.getTile()), true);
         } else {
             panel.requestFocus();
         }
@@ -1910,7 +1911,8 @@ public class SwingGUI extends GUI {
         }
         InformationPanel panel
             = new InformationPanel(getFreeColClient(), texts, fcos, icons);
-        return this.canvas.showFreeColPanel(panel, getPopupPosition(tile), true);
+        return this.canvas.showFreeColPanel(panel,
+            getPopupPosition(tile), true);
     }
 
     /**
@@ -2237,7 +2239,8 @@ public class SwingGUI extends GUI {
                 panel = new StartGamePanel(getFreeColClient());
             }
             panel.initialize(singlePlayerMode);
-            return this.canvas.showFreeColPanel(panel, false);
+            return this.canvas.showFreeColPanel(panel,
+                PopupPosition.CENTERED, false);
         }
         return null;
     }
@@ -2264,7 +2267,8 @@ public class SwingGUI extends GUI {
             this.canvas.removeFromCanvas(panel);
         }
         panel.setStatusMessage(message);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel,
+            PopupPosition.CENTERED, true);
     }
 
     /**
