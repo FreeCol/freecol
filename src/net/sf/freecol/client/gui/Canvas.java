@@ -801,6 +801,9 @@ public final class Canvas extends JDesktopPane {
      * @param fcd The dialog to add.
      */
     public void dialogAdd(FreeColDialog<?> fcd) {
+        if (fcd.isModal()) {
+            this.mapViewer.stopCursorBlinking();
+        }
         dialogs.add(fcd);
     }
 
@@ -811,6 +814,9 @@ public final class Canvas extends JDesktopPane {
      */
     public void dialogRemove(FreeColDialog<?> fcd) {
         dialogs.remove(fcd);
+        if (fcd.isModal() && none(dialogs, FreeColDialog::isModal)) {
+            this.mapViewer.startCursorBlinking();
+        }
     }
 
     /**
@@ -939,24 +945,7 @@ public final class Canvas extends JDesktopPane {
         T response = dialog.getResponse();
         remove(dialog);
         dialogRemove(dialog);
-        if (dialog.isModal()
-            && this.mapViewer.getViewMode() == GUI.ViewMode.MOVE_UNITS
-            && none(dialogs, FreeColDialog::isModal)) {
-            this.mapViewer.startCursorBlinking();
-        }
         return response;
-    }
-
-    /**
-     * Displays a {@code FreeColPanel}.
-     *
-     * @param panel {@code FreeColPanel}, panel to show
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showFreeColPanel(FreeColPanel panel,
-                                         boolean resizable) {
-        return showFreeColPanel(panel, PopupPosition.CENTERED, resizable);
     }
 
     /**
@@ -1004,7 +993,6 @@ public final class Canvas extends JDesktopPane {
         }
 
         dialogAdd(freeColDialog);
-        if (freeColDialog.isModal()) this.mapViewer.stopCursorBlinking();
         freeColDialog.requestFocus();
         freeColDialog.setVisible(true);
     }
