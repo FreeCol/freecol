@@ -38,7 +38,7 @@ public class ImageCache {
 
     public static final String REPLACEMENT_IMAGE = "image.miscicon.delete";
 
-    /** A cache of scaled and possibly greyed images. */
+    /** A cache of scaled (and possibly greyed) images. */
     private final Map<Long, BufferedImage> cache;
 
 
@@ -83,8 +83,8 @@ public class ImageCache {
      * @param grayscale True if grayscale.
      * @return A unique hash of these parameters.
      */
-    private static long imageHash(final String key, final Dimension size,
-                                  final boolean grayscale) {
+    public static long imageHash(final String key, final Dimension size,
+                                 final boolean grayscale) {
         return (key.hashCode() & 0xFFFFFFFFL)
             ^ ((size.width & 0x7FFFL) << 32)
             ^ ((size.height & 0x7FFFL) << 47)
@@ -106,26 +106,21 @@ public class ImageCache {
      */
     private BufferedImage getCachedImage(final ImageResource ir,
                                          final String key,
-                                         final Dimension siz,
+                                         final Dimension size,
                                          final boolean grayscale) {
-        final long hashKey = imageHash(key, siz, grayscale);
+        // TODO: add logging but probably in a branch for now
+        // until we understand the performance issue better
+        final long hashKey = imageHash(key, size, grayscale);
         final BufferedImage cached = this.cache.get(hashKey);
         if (cached != null) return cached;
 
-        BufferedImage img = ir.getImage(siz, grayscale);
-        if (img != null) this.cache.put(hashKey, img);
-        return img;
+        BufferedImage image = ir.getImage(size, grayscale);
+        if (image != null) this.cache.put(hashKey, image);
+        return image;
     }
 
 
     // Public interface
-
-    /**
-     * Clear this cache.
-     */
-    public void clear() {
-        this.cache.clear();
-    }
 
     /**
      * Get the image specified by the given name, scale and grayscale.
@@ -137,18 +132,15 @@ public class ImageCache {
      */
     public BufferedImage getScaledImage(final String key,
                                         final float scale,
-                                        final boolean grayscale) {
+                                        boolean grayscale) {
         final ImageResource ir = getImageResource(key);
-        final BufferedImage img = ir.getImage();
-        if (img == null) return null;
+        final BufferedImage image = ir.getImage();
+        // Shortcut trivial cases
+        if (image == null) return null;
 
-        // TODO: consider just using w,h parameters and drop
-        // all the Dimension wrangling here and in ImageResource
-        Dimension siz = (scale == 1f)
-            ? new Dimension(img.getWidth(), img.getHeight())
-            : new Dimension(Math.round(img.getWidth() * scale),
-                            Math.round(img.getHeight() * scale));
-        return getCachedImage(ir, key, siz, grayscale);
+        Dimension d = new Dimension(Math.round(image.getWidth() * scale),
+                                    Math.round(image.getHeight() * scale));
+        return getCachedImage(ir, key, d, grayscale);
     }
 
     /**
@@ -159,20 +151,20 @@ public class ImageCache {
      * which wastes memory if you are not careful.
      *
      * @param key The name of the resource to return.
-     * @param siz The requested image size (negative quantities
-     *     are treated as wildcards).
+     * @param size The size of the requested image.
      * @param grayscale If true return a grayscale image.
      * @return The image found.
      */
     public BufferedImage getSizedImage(final String key,
-                                       final Dimension siz,
+                                       final Dimension size,
                                        final boolean grayscale) {
-        final ImageResource ir = getImageResource(key);
-        final BufferedImage img = ir.getImage();
-        if (img == null) return null;
+        return getCachedImage(getImageResource(key), key, size, grayscale);
+    }
 
-        // Do wildcard processing so resolved values are cached
-        return getCachedImage(getImageResource(key), key,
-            ImageResource.wildcardedDimensions(img, siz), grayscale);
+    /**
+     * Clear this cache.
+     */
+    public void clear() {
+        this.cache.clear();
     }
 }
