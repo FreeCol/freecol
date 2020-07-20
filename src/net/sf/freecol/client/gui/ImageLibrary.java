@@ -32,8 +32,6 @@ import java.awt.image.RescaleOp;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.TexturePaint;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -84,6 +82,7 @@ import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.ImageUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -499,89 +498,6 @@ public final class ImageLibrary {
             g.setColor(c.getBackground());
             g.fillRect(xmin, ymin, width, height);
         }
-    }
-
-    /**
-     * Fills a certain rectangle with the image texture.
-     * 
-     * @param g2 The {@code Graphics} used for painting the border.
-     * @param img The {@code BufferedImage} to fill the texture.
-     * @param x The x-component of the offset.
-     * @param y The y-component of the offset.
-     * @param width The width of the rectangle.
-     * @param height The height of the rectangle.
-     */
-    public static void fillTexture(Graphics2D g2, BufferedImage img,
-                                   int x, int y, int width, int height) {
-        Rectangle anchor = new Rectangle(
-            x, y, img.getWidth(), img.getHeight());
-        TexturePaint paint = new TexturePaint(img, anchor);
-        g2.setPaint(paint);
-        g2.fillRect(x, y, width, height);
-    }
-
-    /**
-     * Creates a buffered image out of a given {@code Image} object.
-     * 
-     * @param image The {@code Image} object.
-     * @return The created {@code BufferedImage} object.
-     */
-    public static BufferedImage createBufferedImage(Image image) {
-        if (image == null) return null;
-        BufferedImage result = new BufferedImage(image.getWidth(null),
-            image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = result.createGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        return result;
-    }
-
-    public static BufferedImage createMirroredImage(Image image) {
-        if (image == null) return null;
-        final int width = image.getWidth(null);
-        final int height = image.getHeight(null);
-        BufferedImage result = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = result.createGraphics();
-        g.drawImage(image, width, 0, -width, height, null);
-        g.dispose();
-        return result;
-    }
-
-    public static BufferedImage createResizedImage(Image image,
-                                                   int width, int height) {
-        BufferedImage scaled = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = scaled.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g.drawImage(image, 0, 0, width, height, null);
-        g.dispose();
-        return scaled;
-    }
-
-    /**
-     * Create a faded version of an image.
-     *
-     * @param img The {@code Image} to fade.
-     * @param fade The amount of fading.
-     * @param target The offset.
-     * @return The faded image.
-     */
-    public static BufferedImage fadeImage(Image img, float fade, float target) {
-        int w = img.getWidth(null);
-        int h = img.getHeight(null);
-        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.drawImage(img, 0, 0, null);
-
-        float offset = target * (1.0f - fade);
-        float[] scales = { fade, fade, fade, 1.0f };
-        float[] offsets = { offset, offset, offset, 0.0f };
-        RescaleOp rop = new RescaleOp(scales, offsets, null);
-        g.drawImage(bi, rop, 0, 0);
-        g.dispose();
-        return bi;
     }
 
 

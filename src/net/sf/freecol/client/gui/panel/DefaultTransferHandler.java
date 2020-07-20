@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**
@@ -116,9 +117,9 @@ public final class DefaultTransferHandler extends TransferHandler {
                             / ((double)imageIcon.getIconHeight()))
                         * imageIcon.getIconWidth());
                 }
-                BufferedImage scaled = ImageLibrary
-                    .createResizedImage(imageIcon.getImage(),
-                                        bestSize.width, bestSize.height);
+                BufferedImage scaled
+                    = createResizedImage(imageIcon.getImage(),
+                                         bestSize.width, bestSize.height);
                 Point point = new Point(bestSize.width / 2,
                                         bestSize.height / 2);
                 return tk.createCustomCursor(scaled, point,

@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.border.AbstractBorder;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**
@@ -185,61 +186,61 @@ public class FreeColImageBorder extends AbstractBorder {
         int bottomRightCornerHeight = getHeight(bottomRightCornerImage);
 
         // Add the image border
-        if(topImage != null) {
-            ImageLibrary.fillTexture(g2, topImage,
-                x + topLeftCornerWidth,
-                y + insets.top - topHeight,
-                width - topLeftCornerWidth - topRightCornerWidth,
-                topHeight);
+        if (topImage != null) {
+            fillTexture(g2, topImage,
+                        x + topLeftCornerWidth,
+                        y + insets.top - topHeight,
+                        width - topLeftCornerWidth - topRightCornerWidth,
+                        topHeight);
         }
         if(leftImage != null) {
-            ImageLibrary.fillTexture(g2, leftImage,
-                x + insets.left - leftWidth,
-                y + topLeftCornerHeight,
-                leftWidth,
-                height - topLeftCornerHeight - bottomLeftCornerHeight);
+            fillTexture(g2, leftImage,
+                        x + insets.left - leftWidth,
+                        y + topLeftCornerHeight,
+                        leftWidth,
+                        height - topLeftCornerHeight - bottomLeftCornerHeight);
         }
-        if(bottomImage != null) {
-            ImageLibrary.fillTexture(g2, bottomImage,
-                x + bottomLeftCornerWidth,
-                y + height - insets.bottom,
-                width - bottomLeftCornerWidth - bottomRightCornerWidth,
-                bottomHeight);
+        if (bottomImage != null) {
+            fillTexture(g2, bottomImage,
+                        x + bottomLeftCornerWidth,
+                        y + height - insets.bottom,
+                        width - bottomLeftCornerWidth - bottomRightCornerWidth,
+                        bottomHeight);
         }
-        if(rightImage != null) {
-            ImageLibrary.fillTexture(g2, rightImage,
-                x + width - insets.right,
-                y + topRightCornerHeight,
-                rightWidth,
-                height - topRightCornerHeight - bottomRightCornerHeight);
+        if (rightImage != null) {
+            fillTexture(g2, rightImage,
+                        x + width - insets.right,
+                        y + topRightCornerHeight,
+                        rightWidth,
+                        height - topRightCornerHeight - bottomRightCornerHeight);
         }
-        if(topLeftCornerImage != null) {
-            ImageLibrary.fillTexture(g2, topLeftCornerImage,
-                x + Math.max(insets.left, topLeftCornerWidth) - topLeftCornerWidth,
-                y + Math.max(insets.top, topLeftCornerHeight) - topLeftCornerHeight,
-                topLeftCornerWidth,
-                topLeftCornerHeight);
+        if (topLeftCornerImage != null) {
+            fillTexture(g2, topLeftCornerImage,
+                        x + Math.max(insets.left, topLeftCornerWidth) - topLeftCornerWidth,
+                        y + Math.max(insets.top, topLeftCornerHeight) - topLeftCornerHeight,
+                        topLeftCornerWidth,
+                        topLeftCornerHeight);
         }
-        if(topRightCornerImage != null) {
-            ImageLibrary.fillTexture(g2, topRightCornerImage,
-                x + width - Math.max(insets.right, topRightCornerWidth),
-                y + Math.max(insets.top, topRightCornerHeight) - topRightCornerHeight,
-                topRightCornerWidth,
-                topRightCornerHeight);
+        if (topRightCornerImage != null) {
+            fillTexture(g2, topRightCornerImage,
+                        x + width - Math.max(insets.right, topRightCornerWidth),
+                        y + Math.max(insets.top, topRightCornerHeight) - topRightCornerHeight,
+                        topRightCornerWidth,
+                        topRightCornerHeight);
         }
-        if(bottomLeftCornerImage != null) {
-            ImageLibrary.fillTexture(g2, bottomLeftCornerImage,
-                x + Math.max(insets.left, bottomLeftCornerWidth) - bottomLeftCornerWidth,
-                y + height - Math.max(insets.bottom, bottomLeftCornerHeight),
-                bottomLeftCornerWidth,
-                bottomLeftCornerHeight);
+        if (bottomLeftCornerImage != null) {
+            fillTexture(g2, bottomLeftCornerImage,
+                        x + Math.max(insets.left, bottomLeftCornerWidth) - bottomLeftCornerWidth,
+                        y + height - Math.max(insets.bottom, bottomLeftCornerHeight),
+                        bottomLeftCornerWidth,
+                        bottomLeftCornerHeight);
         }
-        if(bottomRightCornerImage != null) {
-            ImageLibrary.fillTexture(g2, bottomRightCornerImage,
-                x + width - Math.max(insets.right, bottomRightCornerWidth),
-                y + height - Math.max(insets.bottom, bottomRightCornerHeight),
-                bottomRightCornerWidth,
-                bottomRightCornerHeight);
+        if (bottomRightCornerImage != null) {
+            fillTexture(g2, bottomRightCornerImage,
+                        x + width - Math.max(insets.right, bottomRightCornerWidth),
+                        y + height - Math.max(insets.bottom, bottomRightCornerHeight),
+                        bottomRightCornerWidth,
+                        bottomRightCornerHeight);
         }
     }
 
