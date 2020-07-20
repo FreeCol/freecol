@@ -154,15 +154,24 @@ public final class MapViewer extends FreeColClientHolder {
     /** The active unit, for ViewMode.MOVE_UNITS. */
     private Unit activeUnit;
 
+    /** The chat message area. */
+    private final ChatDisplay chatDisplay;
+
+    /*
+     * These variables are directly dependent on the map scale, which
+     * changes in changeScale().
+     * Their consistency is maintained by calling updateScaledVariables().
+     */
+
+    /** Tile width and height, and half values thereof. */
+    private int tileHeight, tileWidth, halfHeight, halfWidth;
+
     /** Fog of war area. */
     private final GeneralPath fog = new GeneralPath();
 
     /** Fonts (scaled). */
     private Font fontNormal, fontItalic, fontProduction, fontTiny;
         
-    /** The chat message area. */
-    private final ChatDisplay chatDisplay;
-
     /** Points to use to draw the borders. */
     private final EnumMap<Direction, Point2D.Float> borderPoints
         = new EnumMap<>(Direction.class);
@@ -178,8 +187,7 @@ public final class MapViewer extends FreeColClientHolder {
 
 
     // Helper variables for displaying the map.
-    private int tileHeight, tileWidth, halfHeight, halfWidth,
-        topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
+    private int topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
 
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
@@ -215,7 +223,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param lib An {@code ImageLibrary} to use for drawing to the map
-     *     (and thus is subject to the map scaling).
+     *     (and thus are subject to the map scaling).
      * @param al An {@code ActionListener} for the cursor.
      */
     public MapViewer(FreeColClient freeColClient, ImageLibrary lib,
@@ -232,8 +240,10 @@ public final class MapViewer extends FreeColClientHolder {
         updateScaledVariables();
     }
 
-   
-    // Accessors
+
+    // Internals
+    
+    // Trivial
 
     /**
      * Get the scale factor for the image library.
@@ -254,7 +264,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
 
-    // Critical internals, consistency maintenance
+    // Critical internals for consistency maintenance
     
     /**
      * Update the variables that depend on the image library scale.
@@ -337,14 +347,14 @@ public final class MapViewer extends FreeColClientHolder {
     private void updateSizeVariables() {
         // Calculate the number of rows that will be drawn above the
         // central tile
-        topSpace = (this.size.height - tileHeight) / 2;
-        if ((topSpace % (halfHeight)) != 0) {
-            topRows = topSpace / (halfHeight) + 2;
+        topSpace = (this.size.height - this.tileHeight) / 2;
+        if ((topSpace % this.halfHeight) != 0) {
+            topRows = topSpace / this.halfHeight + 2;
         } else {
-            topRows = topSpace / (halfHeight) + 1;
+            topRows = topSpace / this.halfHeight + 1;
         }
         bottomRows = topRows;
-        leftSpace = (this.size.width - tileWidth) / 2;
+        leftSpace = (this.size.width - this.tileWidth) / 2;
         rightSpace = leftSpace;
     }
 
@@ -432,14 +442,14 @@ public final class MapViewer extends FreeColClientHolder {
      *     with the given y-coordinate.
      */
     private int getLeftColumns(int y) {
-        int leftColumns = leftSpace / tileWidth + 1;
+        int leftColumns = leftSpace / this.tileWidth + 1;
 
         if ((y & 1) == 0) {
-            if ((leftSpace % tileWidth) > 32) {
+            if ((leftSpace % this.tileWidth) > 32) {
                 leftColumns++;
             }
         } else {
-            if ((leftSpace % tileWidth) == 0) {
+            if ((leftSpace % this.tileWidth) == 0) {
                 leftColumns--;
             }
         }
@@ -467,14 +477,14 @@ public final class MapViewer extends FreeColClientHolder {
      *     with the given y-coordinate.
      */
     private int getRightColumns(int y) {
-        int rightColumns = rightSpace / tileWidth + 1;
+        int rightColumns = rightSpace / this.tileWidth + 1;
 
         if ((y & 1) == 0) {
-            if ((rightSpace % tileWidth) == 0) {
+            if ((rightSpace % this.tileWidth) == 0) {
                 rightColumns--;
             }
         } else {
-            if ((rightSpace % tileWidth) > 32) {
+            if ((rightSpace % this.tileWidth) > 32) {
                 rightColumns++;
             }
         }
@@ -666,9 +676,9 @@ public final class MapViewer extends FreeColClientHolder {
         if (fx < getLeftColumns()) {
             // we are at the left side of the map
             if ((fy & 1) == 0) {
-                leftOffset = tileWidth * fx + halfWidth;
+                leftOffset = this.tileWidth * fx + this.halfWidth;
             } else {
-                leftOffset = tileWidth * (fx + 1);
+                leftOffset = this.tileWidth * (fx + 1);
             }
         } else {
             final int mapWidth = map.getWidth();
@@ -676,16 +686,16 @@ public final class MapViewer extends FreeColClientHolder {
                 // we are at the right side of the map
                 if ((fy & 1) == 0) {
                     leftOffset = this.size.width
-                        - tileWidth * (mapWidth - fx);
+                        - this.tileWidth * (mapWidth - fx);
                 } else {
-                    leftOffset = this.size.width - halfWidth
-                        - tileWidth * (mapWidth - fx - 1);
+                    leftOffset = this.size.width - this.halfWidth
+                        - this.tileWidth * (mapWidth - fx - 1);
                 }
             } else {
                 if ((fy & 1) == 0) {
                     leftOffset = (this.size.width / 2);
                 } else {
-                    leftOffset = (this.size.width / 2) + halfWidth;
+                    leftOffset = (this.size.width / 2) + this.halfWidth;
                 }
             }
         }
@@ -693,12 +703,12 @@ public final class MapViewer extends FreeColClientHolder {
         int topOffset;
         if (fy < topRows) {
             // we are at the top of the map
-            topOffset = (fy + 1) * halfHeight;
+            topOffset = (fy + 1) * this.halfHeight;
         } else {
             final int mapHeight = map.getHeight();
             if (fy >= mapHeight - bottomRows) {
                 // we are at the bottom of the map
-                topOffset = this.size.height - halfHeight * (mapHeight - fy);
+                topOffset = this.size.height - this.halfHeight * (mapHeight - fy);
             } else {
                 topOffset = this.size.height / 2;
             }
@@ -711,12 +721,12 @@ public final class MapViewer extends FreeColClientHolder {
         // Next, we can calculate the center pixel of the tile-sized
         // rectangle that was clicked. First, we calculate the
         // difference in units of rows and columns.
-        int dcol = (x - leftOffset + (x > leftOffset ? halfWidth : -halfWidth))
-            / tileWidth;
-        int drow = (y - topOffset + (y > topOffset ? halfHeight : -halfHeight))
-            / tileHeight;
-        int px = leftOffset + dcol * tileWidth;
-        int py = topOffset + drow * tileHeight;
+        int dcol = (x - leftOffset + (x > leftOffset ? this.halfWidth : -this.halfWidth))
+            / this.tileWidth;
+        int drow = (y - topOffset + (y > topOffset ? this.halfHeight : -this.halfHeight))
+            / this.tileHeight;
+        int px = leftOffset + dcol * this.tileWidth;
+        int py = topOffset + drow * this.tileHeight;
         // Since rows are shifted, we need to correct.
         int newCol = fx + dcol;
         int newRow = fy + drow * 2;
@@ -726,21 +736,21 @@ public final class MapViewer extends FreeColClientHolder {
         Direction direction = null;
         if (x > px) { // right half of the rectangle
             if (y > py) { // bottom right
-                if ((y - py) > halfHeight - (x - px)/2) {
+                if ((y - py) > this.halfHeight - (x - px)/2) {
                     direction = Direction.SE;
                 }
             } else { // top right
-                if ((y - py) < (x - px)/2 - halfHeight) {
+                if ((y - py) < (x - px)/2 - this.halfHeight) {
                     direction = Direction.NE;
                 }
             }
         } else { // left half of the rectangle
             if (y > py) { // bottom left
-                if ((y - py) > (x - px)/2 + halfHeight) {
+                if ((y - py) > (x - px)/2 + this.halfHeight) {
                     direction = Direction.SW;
                 }
             } else { // top left
-                if ((y - py) < (px - x)/2 - halfHeight) {
+                if ((y - py) < (px - x)/2 - this.halfHeight) {
                     direction = Direction.NW;
                 }
             }
@@ -769,13 +779,15 @@ public final class MapViewer extends FreeColClientHolder {
         Rectangle result
             = new Rectangle(0, 0, this.size.width, this.size.height);
         if (isTileVisible(tile)) {
-            result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
-            result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
+            result.x = ((tile.getX() - leftColumn) * this.tileWidth)
+                + leftColumnX;
+            result.y = ((tile.getY() - topRow) * this.halfHeight)
+                + topRowY - this.tileHeight;
             if ((tile.getY() & 1) != 0) {
-                result.x += halfWidth;
+                result.x += this.halfWidth;
             }
-            result.width = tileWidth;
-            result.height = tileHeight * 2;
+            result.width = this.tileWidth;
+            result.height = this.tileHeight * 2;
         }
         return result;
     }
@@ -792,9 +804,9 @@ public final class MapViewer extends FreeColClientHolder {
     public Point calculateTilePosition(Tile t, boolean rhs) {
         if (!isTileVisible(t)) return null;
 
-        int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
-        int y = ((t.getY() - topRow) * halfHeight) + topRowY;
-        if ((t.getY() & 1) != 0) x += halfWidth;
+        int x = ((t.getX() - leftColumn) * this.tileWidth) + leftColumnX;
+        int y = ((t.getY() - topRow) * this.halfHeight) + topRowY;
+        if ((t.getY() & 1) != 0) x += this.halfWidth;
         if (rhs) x += this.tileWidth;
         return new Point(x, y);
     }
@@ -809,9 +821,9 @@ public final class MapViewer extends FreeColClientHolder {
     public Point calculateUnitLabelPositionInTile(JLabel unitLabel,
                                                   Point tileP) {
         if (tileP == null) return null;
-        int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
-        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2
-            - (int) (UNIT_OFFSET * getScale());
+        int labelX = tileP.x + this.tileWidth / 2 - unitLabel.getWidth() / 2;
+        int labelY = tileP.y + this.tileHeight / 2 - unitLabel.getHeight() / 2
+            - (int)(UNIT_OFFSET * getScale());
         return new Point(labelX, labelY);
     }
 
@@ -1115,32 +1127,32 @@ public final class MapViewer extends FreeColClientHolder {
         if (y < topRows) {
             alignedTop = true;
             // We are at the top of the map
-            bottomRow = (this.size.height / (halfHeight)) - 1;
-            if ((this.size.height % (halfHeight)) != 0) {
+            bottomRow = (this.size.height / this.halfHeight) - 1;
+            if ((this.size.height % this.halfHeight) != 0) {
                 bottomRow++;
             }
             topRow = 0;
-            bottomRowY = bottomRow * (halfHeight);
+            bottomRowY = bottomRow * this.halfHeight;
             topRowY = 0;
         } else if (y >= (getMap().getHeight() - bottomRows)) {
             alignedBottom = true;
             // We are at the bottom of the map
             bottomRow = getMap().getHeight() - 1;
 
-            topRow = this.size.height / (halfHeight);
-            if ((this.size.height % (halfHeight)) > 0) {
+            topRow = this.size.height / this.halfHeight;
+            if ((this.size.height % this.halfHeight) > 0) {
                 topRow++;
             }
             topRow = getMap().getHeight() - topRow;
 
-            bottomRowY = this.size.height - tileHeight;
-            topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
+            bottomRowY = this.size.height - this.tileHeight;
+            topRowY = bottomRowY - (bottomRow - topRow) * this.halfHeight;
         } else {
             // We are not at the top of the map and not at the bottom
             bottomRow = y + bottomRows - 1;
             topRow = y - topRows;
-            bottomRowY = topSpace + (halfHeight) * bottomRows;
-            topRowY = topSpace - topRows * (halfHeight);
+            bottomRowY = topSpace + this.halfHeight * bottomRows;
+            topRowY = topSpace - topRows * this.halfHeight;
         }
 
         /*
@@ -1160,8 +1172,8 @@ public final class MapViewer extends FreeColClientHolder {
             // We are at the left side of the map
             leftColumn = 0;
 
-            rightColumn = this.size.width / tileWidth - 1;
-            if ((this.size.width % tileWidth) > 0) {
+            rightColumn = this.size.width / this.tileWidth - 1;
+            if ((this.size.width % this.tileWidth) > 0) {
                 rightColumn++;
             }
 
@@ -1171,24 +1183,23 @@ public final class MapViewer extends FreeColClientHolder {
             // We are at the right side of the map
             rightColumn = getMap().getWidth() - 1;
 
-            leftColumn = this.size.width / tileWidth;
-            if ((this.size.width % tileWidth) > 0) {
+            leftColumn = this.size.width / this.tileWidth;
+            if ((this.size.width % this.tileWidth) > 0) {
                 leftColumn++;
             }
 
-            leftColumnX = this.size.width - tileWidth - halfWidth -
-                leftColumn * tileWidth;
+            leftColumnX = this.size.width - this.tileWidth - this.halfWidth
+                - leftColumn * this.tileWidth;
             leftColumn = rightColumn - leftColumn;
             alignedRight = true;
         } else {
             // We are not at the left side of the map and not at the right side
             leftColumn = x - leftColumns;
             rightColumn = x + rightColumns;
-            leftColumnX = (this.size.width - tileWidth) / 2
-                - leftColumns * tileWidth;
+            leftColumnX = (this.size.width - this.tileWidth) / 2
+                - leftColumns * this.tileWidth;
         }
     }
-
 
 
     /**
@@ -1214,17 +1225,17 @@ public final class MapViewer extends FreeColClientHolder {
         repositionMapIfNeeded();
 
         // Determine which tiles need to be redrawn
-        int firstRow = (clipBounds.y - topRowY) / (halfHeight) - 1;
-        int clipTopY = topRowY + firstRow * (halfHeight);
+        int firstRow = (clipBounds.y - topRowY) / this.halfHeight - 1;
+        int clipTopY = topRowY + firstRow * this.halfHeight;
         firstRow = topRow + firstRow;
-        int firstColumn = (clipBounds.x - leftColumnX) / tileWidth - 1;
-        int clipLeftX = leftColumnX + firstColumn * tileWidth;
+        int firstColumn = (clipBounds.x - leftColumnX) / this.tileWidth - 1;
+        int clipLeftX = leftColumnX + firstColumn * this.tileWidth;
         firstColumn = leftColumn + firstColumn;
         int lastRow = (clipBounds.y + clipBounds.height - topRowY)
-            / (halfHeight);
+            / this.halfHeight;
         lastRow = topRow + lastRow;
         int lastColumn = (clipBounds.x + clipBounds.width - leftColumnX)
-            / tileWidth;
+            / this.tileWidth;
         lastColumn = leftColumn + lastColumn;
 
         // Clear background
@@ -1250,8 +1261,9 @@ public final class MapViewer extends FreeColClientHolder {
         for (Tile t : baseTiles) {
             final int x = t.getX();
             final int y = t.getY();
-            final int xt = (x-x0) * tileWidth + (((y&1)==1) ? halfWidth : 0);
-            final int yt = (y-y0) * halfHeight;
+            final int xt = (x-x0) * this.tileWidth
+                + (((y&1)==1) ? this.halfWidth : 0);
+            final int yt = (y-y0) * this.halfHeight;
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
@@ -1265,22 +1277,22 @@ public final class MapViewer extends FreeColClientHolder {
             // Generate a zigzag GeneralPath
             GeneralPath gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
-            int nextX = halfWidth;
-            int nextY = -halfHeight;
+            int nextX = this.halfWidth;
+            int nextY = -this.halfHeight;
             for (int i = 0; i <= ((lastColumn - firstColumn) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
-                nextX += halfWidth;
-                nextY = (nextY == 0 ? -halfHeight : 0);
+                nextX += this.halfWidth;
+                nextY = (nextY == 0) ? -this.halfHeight : 0;
             }
 
             // Display the grid
             g2d.setStroke(this.gridStroke);
             g2d.setColor(Color.BLACK);
             for (int row = firstRow; row <= lastRow; row++) {
-                g2d.translate(0, halfHeight);
+                g2d.translate(0, this.halfHeight);
                 AffineTransform rowTransform = g2d.getTransform();
                 if ((row & 1) == 1) {
-                    g2d.translate(halfWidth, 0);
+                    g2d.translate(this.halfWidth, 0);
                 }
                 g2d.draw(gridPath);
                 g2d.setTransform(rowTransform);
@@ -1300,8 +1312,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
                 displayTerritorialBorders(g2d, t, BorderType.REGION, true);
@@ -1320,8 +1333,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
                 displayTerritorialBorders(g2d, t, BorderType.COUNTRY, true);
@@ -1351,7 +1365,8 @@ public final class MapViewer extends FreeColClientHolder {
                 if (!t.isExplored() || player.canSee(t)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth + (y&1) * this.halfWidth;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
                 final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
@@ -1369,8 +1384,9 @@ public final class MapViewer extends FreeColClientHolder {
             if (!t.isExplored()) continue;
             final int x = t.getX();
             final int y = t.getY();
-            final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-            final int yt = (y-y0) * halfHeight;
+            final int xt = (x-x0) * this.tileWidth
+                + (y&1) * this.halfWidth;
+            final int yt = (y-y0) * this.halfHeight;
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
             
@@ -1398,8 +1414,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1419,8 +1436,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1435,8 +1453,9 @@ public final class MapViewer extends FreeColClientHolder {
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
             if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt, yt);
                 g2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT),
                               0, 0, null);
@@ -1454,8 +1473,9 @@ public final class MapViewer extends FreeColClientHolder {
                 if (unit == null || isOutForAnimation(unit)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1475,8 +1495,9 @@ public final class MapViewer extends FreeColClientHolder {
                 if (unit == null || isOutForAnimation(unit)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1503,8 +1524,9 @@ public final class MapViewer extends FreeColClientHolder {
                 if (settlement == null) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0); 
                 xt0 = xt; yt0 = yt;
                 RescaleOp rop = (player == null || player.canSee(t))
@@ -1541,12 +1563,13 @@ public final class MapViewer extends FreeColClientHolder {
         Color backgroundColor = settlement.getOwner().getNationColor();
         if (backgroundColor == null) backgroundColor = Color.WHITE;
         // int yOffset = this.lib.getSettlementImage(settlement).getHeight() + 1;
-        int yOffset = tileHeight;
+        int yOffset = this.tileHeight;
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
             BufferedImage img = this.lib.getStringImage(g2d, name, backgroundColor,
                                                         this.fontNormal);
-            g2d.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
+            g2d.drawImage(img, rop, (this.tileWidth - img.getWidth())/2 + 1,
+                          yOffset);
             break;
 
         case ClientOptions.COLONY_LABELS_MODERN:
@@ -1615,7 +1638,7 @@ public final class MapViewer extends FreeColClientHolder {
                 + ((rightImage != null)
                     ? (rightImage.getWidth() * getScale()) + spacing
                     : 0));
-            int labelOffset = (tileWidth - width)/2;
+            int labelOffset = (this.tileWidth - width)/2;
             yOffset -= (nameImage.getHeight() * getScale())/2;
             if (leftImage != null) {
                 g2d.drawImage(leftImage, rop, labelOffset, yOffset);
@@ -1843,9 +1866,9 @@ public final class MapViewer extends FreeColClientHolder {
 
             g2d.translate(point.x, point.y);
             if (image == null) {
-                g2d.fillOval(halfWidth, halfHeight, 10, 10);
+                g2d.fillOval(this.halfWidth, this.halfHeight, 10, 10);
                 g2d.setColor(Color.BLACK);
-                g2d.drawOval(halfWidth, halfHeight, 10, 10);
+                g2d.drawOval(this.halfWidth, this.halfHeight, 10, 10);
             } else {
                 this.tv.displayCenteredImage(g2d, image);
                 if (turns != null) {
@@ -1931,9 +1954,9 @@ public final class MapViewer extends FreeColClientHolder {
      * @return The coordinates where the unit should be drawn on screen
      */
     private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
-        int unitX = (tileWidth - unitImage.getWidth()) / 2;
-        int unitY = (tileHeight - unitImage.getHeight()) / 2 -
-                    (int) (UNIT_OFFSET * getScale());
+        int unitX = (this.tileWidth - unitImage.getWidth()) / 2;
+        int unitY = (this.tileHeight - unitImage.getHeight()) / 2 -
+                    (int)(UNIT_OFFSET * getScale());
         return new Point(unitX, unitY);
     }
 
@@ -1988,10 +2011,10 @@ public final class MapViewer extends FreeColClientHolder {
                     } else {
                         int dx = 0, dy = 0;
                         switch(d) {
-                        case NW: dx = halfWidth; dy = -halfHeight; break;
-                        case NE: dx = halfWidth; dy = halfHeight; break;
-                        case SE: dx = -halfWidth; dy = halfHeight; break;
-                        case SW: dx = -halfWidth; dy = -halfHeight; break;
+                        case NW: dx = this.halfWidth; dy = -this.halfHeight; break;
+                        case NE: dx = this.halfWidth; dy = this.halfHeight; break;
+                        case SE: dx = -this.halfWidth; dy = this.halfHeight; break;
+                        case SW: dx = -this.halfWidth; dy = -this.halfHeight; break;
                         default: break;
                         }
                         if (tile1 != null
@@ -2005,10 +2028,10 @@ public final class MapViewer extends FreeColClientHolder {
                             Direction previous2 = previous.getPreviousDirection();
                             int ddx = 0, ddy = 0;
                             switch(d) {
-                            case NW: ddy = -tileHeight; break;
-                            case NE: ddx = tileWidth; break;
-                            case SE: ddy = tileHeight; break;
-                            case SW: ddx = -tileWidth; break;
+                            case NW: ddy = -this.tileHeight; break;
+                            case NE: ddx = this.tileWidth; break;
+                            case SE: ddy = this.tileHeight; break;
+                            case SW: ddx = -this.tileWidth; break;
                             default: break;
                             }
                             path.quadTo(this.controlPoints.get(previous).x + dx,
