@@ -19,10 +19,12 @@
 
 package net.sf.freecol.common.util;
 
+import java.awt.color.ColorSpace;
 import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.ColorConvertOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.awt.RenderingHints;
@@ -51,6 +53,25 @@ public class ImageUtils {
         g2d.drawImage(image, 0, 0, null);
         g2d.dispose();
         return result;
+    }
+
+    /**
+     * Create a grayscale buffered image version of an input {@code Image}.
+     *
+     * @param image The {@code Image}.
+     * @return The new halved {@code BufferedImage}.
+     */ 
+    public static BufferedImage createGrayscaleImage(Image image) {
+        if (image == null) return null;
+        final int width = image.getWidth(null), height = image.getHeight(null);
+        BufferedImage result = new BufferedImage(width, height,
+                                                 BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = result.createGraphics();
+        g2d.drawImage(image, 0, 0, null);
+        g2d.dispose();
+        ColorConvertOp filter
+            = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        return filter.filter(result, null);
     }
 
     /**
@@ -119,6 +140,27 @@ public class ImageUtils {
     }
 
     /**
+     * Fill a rectangle with a texture image.
+     * 
+     * @param g2d The {@code Graphics2D} used for painting the border.
+     * @param img The {@code BufferedImage} to fill the texture.
+     * @param x The x-component of the offset to start filling at.
+     * @param y The y-component of the offset to start filling at.
+     * @param width The width of the rectangle.
+     * @param height The height of the rectangle.
+     */
+    public static void fillTexture(Graphics2D g2d, BufferedImage img,
+                                   int x, int y, int width, int height) {
+        Rectangle anchor = new Rectangle(x, y,
+                                         img.getWidth(), img.getHeight());
+        TexturePaint paint = new TexturePaint(img, anchor);
+        g2d.setPaint(paint);
+        g2d.fillRect(x, y, width, height);
+    }
+
+    /* TODO: currently unused below? */
+
+    /**
      * Create a faded version of an image.
      *
      * @param img The {@code Image} to fade.
@@ -141,24 +183,4 @@ public class ImageUtils {
         g.dispose();
         return bi;
     }
-
-    /**
-     * Fill a rectangle with a texture image.
-     * 
-     * @param g2d The {@code Graphics2D} used for painting the border.
-     * @param img The {@code BufferedImage} to fill the texture.
-     * @param x The x-component of the offset to start filling at.
-     * @param y The y-component of the offset to start filling at.
-     * @param width The width of the rectangle.
-     * @param height The height of the rectangle.
-     */
-    public static void fillTexture(Graphics2D g2d, BufferedImage img,
-                                   int x, int y, int width, int height) {
-        Rectangle anchor = new Rectangle(x, y,
-                                         img.getWidth(), img.getHeight());
-        TexturePaint paint = new TexturePaint(img, anchor);
-        g2d.setPaint(paint);
-        g2d.fillRect(x, y, width, height);
-    }
-
 }
