@@ -42,11 +42,12 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.MigPanel;
-import net.sf.freecol.client.gui.action.EndTurnAction;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -125,7 +126,7 @@ public final class InfoPanel extends FreeColPanel
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
         this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY);
+                                           Size.TINY);
         this.skin = (!useSkin) ? null
             : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 

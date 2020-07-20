@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -136,7 +137,7 @@ public class BuildingDetailPanel
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedHeaderLabel(buildingType, FontLibrary.FontSize.SMALL);
+        JLabel name = Utility.localizedHeaderLabel(buildingType, Size.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build
@@ -209,8 +210,10 @@ public class BuildingDetailPanel
                 if (input != null) {
                     panel.add(getGoodsButton(input), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
-                    arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                        FontLibrary.FontSize.SMALL, Font.BOLD));
+                    Font font
+                        = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                                                 Size.SMALL, Font.BOLD);
+                    arrow.setFont(font);
                     panel.add(arrow);
                 }
                 AbstractGoods output = first(pt.getOutputs());

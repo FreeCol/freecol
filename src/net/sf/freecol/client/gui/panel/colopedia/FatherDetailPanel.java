@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -130,7 +131,7 @@ public class FatherDetailPanel
         String text = name + " (" + type + ")";
         JLabel header = new JLabel(text);
         header.setFont(FontLibrary.createCompatibleFont(text,
-            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
+            FontLibrary.FontType.HEADER, Size.SMALL));
 
         Image image = getImageLibrary().getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));

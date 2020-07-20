@@ -48,6 +48,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1608,7 +1609,7 @@ public final class ImageLibrary {
                                      Color foreground,
                                      boolean filled) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD);
+                                           Size.TINY, Font.BOLD);
         FontMetrics fm = g.getFontMetrics(font);
         int padding = (int)(6 * this.scaleFactor);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
@@ -1639,13 +1640,13 @@ public final class ImageLibrary {
     
     public BufferedImage getStringImage(Graphics g, String text, String color,
                                         FontLibrary.FontType type,
-                                        FontLibrary.FontSize size, int style) {
+                                        Size size, int style) {
         return getStringImage(g, text, getColor(color), type, size, style);
     }
     
     public BufferedImage getStringImage(Graphics g, String text, Color color,
                                         FontLibrary.FontType type,
-                                        FontLibrary.FontSize size, int style) {
+                                        Size size, int style) {
         return getStringImage(g, text, color,
             FontLibrary.createFont(type, size, style, getScaleFactor()));
     }

@@ -52,6 +52,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -962,7 +963,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         // Panel contents Header row
         JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD);
+                                           Size.TINY, Font.BOLD);
         labelDemandMessage.setFont(font);
         panel.add(labelDemandMessage);
         JTextArea blank = new JTextArea(" ");

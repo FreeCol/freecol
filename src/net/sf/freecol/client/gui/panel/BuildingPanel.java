@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.client.gui.tooltip.*;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -269,7 +270,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             ImageLibrary lib = getImageLibrary();
             BufferedImage img = lib.getStringImage(g, Integer.toString(number),
                 getForeground(),
-                FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD);
+                FontLibrary.FontType.SIMPLE, Size.TINY, Font.BOLD);
             g.drawImage(img,
                 (getIcon().getIconWidth() - img.getWidth(null))/2,
                 (getIcon().getIconHeight() - img.getHeight(null))/2, null);

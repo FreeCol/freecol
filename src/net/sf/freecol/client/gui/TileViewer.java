@@ -152,6 +152,18 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
 
+    // Accessor
+
+    /**
+     * Gets the contained {@code ImageLibrary}.
+     * 
+     * @return The image library;
+     */
+    private ImageLibrary getImageLibrary() {
+        return this.lib;
+    }
+
+
     // Public API
     
     /**
@@ -165,8 +177,9 @@ public final class TileViewer extends FreeColClientHolder {
         this.tileWidth = tileSize.width;
         this.halfHeight = tileHeight/2;
         this.halfWidth = tileWidth/2;
-        this.tinyFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, this.lib.getScaleFactor());
+        this.tinyFont
+            = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                                     Size.TINY, this.lib.getScaleFactor());
     }
         
         
@@ -639,12 +652,10 @@ public final class TileViewer extends FreeColClientHolder {
                         = (colony.getPreferredSizeChange() > 0)
                         ? this.lib.getStringImage(g2d, populationString, bonusString,
                             FontLibrary.FontType.SIMPLE,
-                            FontLibrary.FontSize.SMALLER,
-                            Font.BOLD | Font.ITALIC)
+                            Size.SMALLER, Font.BOLD|Font.ITALIC)
                         : this.lib.getStringImage(g2d, populationString, bonusString,
                             FontLibrary.FontType.SIMPLE,
-                            FontLibrary.FontSize.TINY,
-                            Font.BOLD);
+                            Size.TINY, Font.BOLD);
                     displayCenteredImage(g2d, stringImage, rop);
                 }
 

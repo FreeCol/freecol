@@ -50,6 +50,7 @@ import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
@@ -423,7 +424,7 @@ public final class Utility {
      */
     public static JLabel localizedHeader(String key, boolean small) {
         JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
-            (small ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
+                                             (small) ? Size.SMALL : Size.BIG);
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
@@ -437,7 +438,7 @@ public final class Utility {
      * @return A suitable {@code JLabel}.
      */
     public static JLabel localizedHeaderLabel(String key, int alignment,
-                                              FontLibrary.FontSize size) {
+                                              Size size) {
         String text = Messages.message(key);
         JLabel header = new JLabel(text, alignment);
         header.setFont(FontLibrary.createCompatibleFont(
@@ -448,7 +449,7 @@ public final class Utility {
 
     public static JLabel localizedHeaderLabel(StringTemplate template,
                                               int alignment,
-                                              FontLibrary.FontSize size) {
+                                              Size size) {
         String text = Messages.message(template);
         JLabel header = new JLabel(text, alignment);
         header.setFont(FontLibrary.createCompatibleFont(
@@ -458,7 +459,7 @@ public final class Utility {
     }
 
     public static JLabel localizedHeaderLabel(Named named,
-                                              FontLibrary.FontSize size) {
+                                              Size size) {
         return localizedHeaderLabel(named.getNameKey(),
                                     SwingConstants.LEADING, size);
     }

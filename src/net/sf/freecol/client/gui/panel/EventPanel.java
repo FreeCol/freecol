@@ -29,6 +29,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.Size;
 
 
 /**
@@ -54,7 +55,7 @@ public final class EventPanel extends FreeColPanel {
 
         JLabel headerLabel = new JLabel(header);
         headerLabel.setFont(FontLibrary.createCompatibleFont(header,
-            FontLibrary.FontType.HEADER, FontLibrary.FontSize.MEDIUM));
+            FontLibrary.FontType.HEADER, Size.NORMAL));
 
         JLabel imageLabel
             = new JLabel(new ImageIcon(ImageLibrary.getUnscaledImage(key)));

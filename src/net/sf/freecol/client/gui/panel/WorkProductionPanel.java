@@ -111,7 +111,7 @@ public class WorkProductionPanel extends FreeColPanel {
         }
 
         Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD);
+                                              Size.SMALLER, Font.BOLD);
         JLabel finalLabel = Utility.localizedLabel("finalResult");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
@@ -125,7 +125,7 @@ public class WorkProductionPanel extends FreeColPanel {
         result = wl.getBaseProduction(null, workType, null);
         if (wl instanceof Building && result > 0) {
             Font boldFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, Font.BOLD);
+                                                   Size.TINY, Font.BOLD);
             JLabel unattendedLabel = Utility
                 .localizedLabel("workProductionPanel.unattendedProduction");
             unattendedLabel.setFont(boldFont);

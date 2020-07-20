@@ -31,8 +31,9 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -63,7 +64,7 @@ public final class ClassicMapControls extends MapControls {
         super(freeColClient, false);
 
         this.arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALL, Font.BOLD);
+                                                Size.SMALL, Font.BOLD);
 
         this.panel = new MigPanel(new MigLayout("wrap 3"));
         this.panel.add(this.miniMap, "span, width " + MINI_MAP_WIDTH

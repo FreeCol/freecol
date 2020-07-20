@@ -30,6 +30,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.model.Region;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -60,7 +61,7 @@ public final class ReportExplorationPanel extends ReportPanel {
 
         // Header Row
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD);
+                                           Size.TINY, Font.BOLD);
         JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
         nameOfRegion.setFont(font);
         reportPanel.add(nameOfRegion);

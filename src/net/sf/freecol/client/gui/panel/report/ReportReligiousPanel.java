@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.BuildingPanel;
 import net.sf.freecol.client.gui.panel.FreeColProgressBar;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
@@ -52,7 +53,7 @@ public final class ReportReligiousPanel extends ReportPanel {
         super(freeColClient, "reportReligionAction");
 
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD);
+                                                 Size.SMALLER, Font.BOLD);
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
 

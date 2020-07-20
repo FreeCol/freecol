@@ -33,6 +33,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Player;
@@ -70,7 +71,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
         String headerKey = BASE_KEY + other.getNation().getSuffix();
         if (!Messages.containsKey(headerKey)) headerKey = BASE_KEY + NATIVES;
         JLabel header = Utility.localizedHeaderLabel(headerKey,
-            SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
+            SwingConstants.LEADING, Size.NORMAL);
         JLabel image = new JLabel(new ImageIcon(ImageLibrary
                 .getMeetingImage(other)));
         image.setOpaque(false);

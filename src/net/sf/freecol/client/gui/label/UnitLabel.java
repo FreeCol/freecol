@@ -46,6 +46,7 @@ import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.InPortPanel;
 import net.sf.freecol.client.gui.panel.report.ReportPanel;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -420,7 +421,7 @@ public final class UnitLabel extends FreeColLabel
                 String underRepair1 = underRepair.substring(0, idx).trim();
                 String underRepair2 = underRepair.substring(idx).trim();
                 Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                   FontLibrary.FontSize.TINY);
+                                                   Size.TINY);
                 Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);
                 Image repairImage2 = lib.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);

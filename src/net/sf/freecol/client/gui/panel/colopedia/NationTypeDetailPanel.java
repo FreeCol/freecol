@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.EuropeanNationType;
@@ -116,11 +117,11 @@ public class NationTypeDetailPanel
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType,
                                                JPanel panel) {
         Font boldFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALLER, Font.BOLD);
+                                               Size.SMALLER, Font.BOLD);
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
-        JLabel label = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
+        JLabel label = Utility.localizedHeaderLabel(nationType, Size.SMALL);
         panel.add(label, "span, align center, wrap 40");
 
         label = Utility.localizedLabel("colopedia.nationType.units");
@@ -175,7 +176,7 @@ public class NationTypeDetailPanel
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
+        JLabel name = Utility.localizedHeaderLabel(nationType, Size.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(Utility.localizedLabel("colopedia.nationType.aggression"));

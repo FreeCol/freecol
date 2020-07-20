@@ -36,6 +36,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
@@ -95,7 +96,7 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
         JLabel header = Utility.localizedHeaderLabel(StringTemplate
                 .template("nativeDemandDialog.name")
                 .addName("%colony%", colony.getName()),
-            SwingConstants.LEADING, FontLibrary.FontSize.BIG);
+            SwingConstants.LEADING, Size.BIG);
         panel.add(header);
         JTextArea text = Utility.localizedTextArea(template);
         panel.add(text);

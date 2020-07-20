@@ -215,7 +215,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param lib An {@code ImageLibrary} to use for drawing to the map
-     *     (and thus are subject to the map scaling).
+     *     (and thus is subject to the map scaling).
      * @param al An {@code ActionListener} for the cursor.
      */
     public MapViewer(FreeColClient freeColClient, ImageLibrary lib,
@@ -276,13 +276,13 @@ public final class MapViewer extends FreeColClientHolder {
 
         final float scale = getScale();
         this.fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, scale);
+            Size.SMALLER, Font.BOLD, scale);
         this.fontItalic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC, scale);
+            Size.SMALLER, Font.BOLD|Font.ITALIC, scale);
         this.fontProduction = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, scale);
+            Size.TINY, Font.BOLD, scale);
         this.fontTiny = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.PLAIN, scale);
+            Size.TINY, Font.PLAIN, scale);
             
         final int dx = this.tileWidth / 16;
         final int dy = this.tileHeight / 16;

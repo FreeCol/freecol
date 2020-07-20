@@ -56,26 +56,6 @@ public class FontLibrary {
     }
 
     /**
-     * FontSize allows for choosing the relative size of the {@code Font}.
-     * 
-     * Choices are:
-     * <ul>
-     * <li>TINY -- used for normal text</li>
-     * <li>SMALLER -- used for subsubheaders</li>
-     * <li>SMALL -- used for subheaders</li>
-     * <li>MEDIUM -- used for some headers</li>
-     * <li>BIG -- used for panel headers</li>
-     * </ul>
-     */
-    public static enum FontSize {
-        TINY,
-        SMALLER,
-        SMALL,
-        MEDIUM,
-        BIG
-    }
-
-    /**
      * Scale to use if otherwise unspecified.
      * May be redundant but we avoid magic numbers.
      */
@@ -87,12 +67,6 @@ public class FontLibrary {
                              FontType.HEADER },
             new String[] { "font.normal", "font.simple", "font.header" });
     
-    /** Conversion map for getScaledSize. */
-    private static final Map<FontSize, Float> scaleMap = makeUnmodifiableMap(
-            new FontSize[] { FontSize.TINY, FontSize.SMALLER, FontSize.SMALL,
-                             FontSize.MEDIUM, FontSize.BIG },
-            new Float[] { 12f, 16f, 24f, 36f, 48f });
-
     /** Cache for the (optional) custom main Font. */
     private static Font mainFont = null;
 
@@ -109,12 +83,14 @@ public class FontLibrary {
     }
 
     /**
-     * Convert a {@code FontSize} and scale factor to float.
+     * Convert a font size and scale factor to float.
      *
+     * @param fontSize The font size expressed as a {@code Size}.
+     * @param scaleFactor A secondary scaling.
      * @return The conversion result.
      */
-    private static float getScaledSize(FontSize fontSize, float scaleFactor) {
-        return FontLibrary.scaleMap.get(fontSize) * scaleFactor;
+    private static float getScaledSize(Size fontSize, float scaleFactor) {
+        return fontSize.forFont() * scaleFactor;
     }
 
     /**
@@ -139,7 +115,7 @@ public class FontLibrary {
      * @param fontSize Its size.
      * @return The font created.
      */
-    public static Font createFont(FontType fontType, FontSize fontSize) {
+    public static Font createFont(FontType fontType, Size fontSize) {
         return createFont(fontType, fontSize, Font.PLAIN, DEFAULT_SCALE);
     }
 
@@ -151,7 +127,7 @@ public class FontLibrary {
      * @param style The font style for choosing plain, bold or italic.
      * @return The created Font.
      */
-    public static Font createFont(FontType fontType, FontSize fontSize,
+    public static Font createFont(FontType fontType, Size fontSize,
                                   int style) {
         return createFont(fontType, fontSize, style, DEFAULT_SCALE);
     }
@@ -164,7 +140,7 @@ public class FontLibrary {
      * @param scaleFactor The applied scale factor.
      * @return The created Font.
      */
-    public static Font createFont(FontType fontType, FontSize fontSize,
+    public static Font createFont(FontType fontType, Size fontSize,
                                   float scaleFactor) {
         return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
     }
@@ -178,7 +154,7 @@ public class FontLibrary {
      * @param scaleFactor The applied scale factor.
      * @return The created Font.
      */
-    public static Font createFont(FontType fontType, FontSize fontSize,
+    public static Font createFont(FontType fontType, Size fontSize,
                                   int style, float scaleFactor) {
         float scaledSize = getScaledSize(fontSize, scaleFactor);
         String fontKey = getFontKey(fontType);
@@ -197,7 +173,7 @@ public class FontLibrary {
      * @return The created Font.
      */
     public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize) {
+                                            Size fontSize) {
         return createCompatibleFont(string, fontType, fontSize, Font.PLAIN,
                                     DEFAULT_SCALE);
     }
@@ -213,7 +189,7 @@ public class FontLibrary {
      * @return The created Font.
      */
     public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize, int style) {
+                                            Size fontSize, int style) {
         return createCompatibleFont(string, fontType, fontSize, style,
                                     DEFAULT_SCALE);
     }
@@ -229,7 +205,7 @@ public class FontLibrary {
      * @return The created Font.
      */
     public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize,
+                                            Size fontSize,
                                             float scaleFactor) {
         return createCompatibleFont(string, fontType, fontSize, Font.PLAIN,
                                     scaleFactor);
@@ -251,7 +227,7 @@ public class FontLibrary {
      * @return The created Font.
      */
     private static Font createCompatibleFont(String string, FontType fontType,
-                                             FontSize fontSize,
+                                             Size fontSize,
                                              int style, float scaleFactor) {
         // TODO: Consider testing the normal font for compatibility and try
         //       some or all other available fonts for complete/longest match:

@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
@@ -117,7 +118,7 @@ public class FreeColProgressBar extends JPanel {
                 .getGoodsTypeImage(goodsType,
                     new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2)));
         this.font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                           FontLibrary.FontSize.TINY);
+                                           Size.TINY);
 
         setBorder(Utility.PROGRESS_BORDER);
         setPreferredSize(new Dimension(200, 20));
