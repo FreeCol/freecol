@@ -296,25 +296,6 @@ public final class ResourceMapping {
         return new HashMap<>(imageResources);
     }
 
-    /**
-     * Returns all the mappings between IDs and {@code Resource}s
-     * that are kept by this object.
-     *
-     * @return An unmodifiable {@code Map}.
-     */
-    public Map<String, Resource> getResources() {
-        HashMap<String, Resource> result = new HashMap<>();
-            result.putAll(colorResources);
-            result.putAll(fontResources);
-            result.putAll(stringResources);
-            result.putAll(fafResources);
-            result.putAll(szaResources);
-            result.putAll(audioResources);
-            result.putAll(videoResources);
-            result.putAll(imageResources);
-        return result;
-    }
-
     public StringResource getStringResource(String key) {
         return stringResources.get(key);
     }
@@ -325,5 +306,45 @@ public final class ResourceMapping {
 
     public VideoResource getVideoResource(String key) {
         return videoResources.get(key);
+    }
+
+    /**
+     * Preload all resources in this mapping.
+     */
+    public int preload() {
+        int ret = 0;
+        for (Resource r : colorResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : fontResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : stringResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : fafResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : szaResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : audioResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : videoResources.values()) {
+            r.preload();
+            ret++;
+        }
+        for (Resource r : imageResources.values()) {
+            r.preload();
+            ret++;
+        }
+        return ret;
     }
 }

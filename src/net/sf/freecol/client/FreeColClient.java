@@ -285,6 +285,12 @@ public final class FreeColClient {
             start = () -> gui.showMainPanel(userMsg);
         }
 
+        // All resources mappings should be queued by now
+        // (startSavedGame above should be the last source of
+        // addMapping calls), so allow preload thread to die when it
+        // is done
+        ResourceManager.finishPreloading();
+        
         if (start != null) {
             gui.playSound("sound.intro.general");
             gui.invokeNowOrLater(start);
