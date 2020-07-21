@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
@@ -64,6 +65,11 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * for MapViewer and some GUI-panels.
  *
  * It needs to be a FreeColClientHolder so it can check the client options.
+ *
+ * create*() routines return a newly created BufferedImage, drawn with
+ * a Graphics2D object that is created and disposed within.
+ * display*() routines use a Graphics2D object passed as a parameter to
+ * draw to, which is neither created or disposed by the routine, just used
  */
 public final class TileViewer extends FreeColClientHolder {
 
@@ -119,8 +125,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /** The height offset to paint at (in pixels). */
-    static final int STATE_OFFSET_X = 25,
-                     STATE_OFFSET_Y = 10;
+    public static final int STATE_OFFSET_X = 25, STATE_OFFSET_Y = 10;
 
     /**
      * The image library derived from the parent map viewer.
@@ -149,18 +154,6 @@ public final class TileViewer extends FreeColClientHolder {
 
         this.lib = lib;
         updateScaledVariables();
-    }
-
-
-    // Accessor
-
-    /**
-     * Gets the contained {@code ImageLibrary}.
-     * 
-     * @return The image library;
-     */
-    private ImageLibrary getImageLibrary() {
-        return this.lib;
     }
 
 
@@ -200,7 +193,7 @@ public final class TileViewer extends FreeColClientHolder {
                     + (ImageLibrary.TILE_OVERLAY_SIZE.height+1)) /
                 (2*ImageLibrary.TILE_OVERLAY_SIZE.height)),
             -1);
-        BufferedImage terrainImage = this.lib.getTerrainImage(type, 0, 0, size2);
+        BufferedImage terrainImage = this.lib.getTerrainImage(type, 0,0, size2);
         BufferedImage overlayImage = this.lib.getOverlayImage(type, size2);
         BufferedImage forestImage = (type.isForested())
             ? this.lib.getForestImage(type, size2)
@@ -215,8 +208,8 @@ public final class TileViewer extends FreeColClientHolder {
         if (forestImage != null) {
             height = Math.max(height, forestImage.getHeight());
         }
-        BufferedImage compositeImage = new BufferedImage(width, height,
-                                                         BufferedImage.TYPE_INT_ARGB);
+        BufferedImage compositeImage
+            = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = compositeImage.createGraphics();
         g2d.drawImage(terrainImage, 0, height - terrainImage.getHeight(), null);
         if (overlayImage != null) {
@@ -243,16 +236,15 @@ public final class TileViewer extends FreeColClientHolder {
             return this.lib.getScaledTerrainImage(null, tile.getX(), tile.getY());
         }
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = this.lib.getTileSize();
         BufferedImage overlayImage = this.lib.getScaledOverlayImage(tile);
         final int compoundHeight
             = (overlayImage != null) ? overlayImage.getHeight()
             : (tileType.isForested()) ? this.lib.getForestedTileSize().height
-            : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(terrainTileSize.width,
-            compoundHeight, BufferedImage.TYPE_INT_ARGB);
+            : this.tileHeight;
+        BufferedImage image = new BufferedImage(this.tileWidth, compoundHeight,
+                                                BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
-        g2d.translate(0, compoundHeight - terrainTileSize.height);
+        g2d.translate(0, compoundHeight - this.tileHeight);
         displayTileWithBeachAndBorder(g2d, tile);
         displayTileItems(g2d, tile, null, overlayImage);
         g2d.dispose();
@@ -270,17 +262,16 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public BufferedImage createTileImage(Tile tile, Player player) {
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = this.lib.getTileSize();
         BufferedImage overlayImage = this.lib.getScaledOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : (tileType.isForested())
             ? this.lib.getForestedTileSize().height
-            : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(terrainTileSize.width,
-            compoundHeight, BufferedImage.TYPE_INT_ARGB);
+            : this.tileHeight;
+        BufferedImage image = new BufferedImage(this.tileWidth, compoundHeight,
+                                                BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
-        g2d.translate(0, compoundHeight - terrainTileSize.height);
+        g2d.translate(0, compoundHeight - this.tileHeight);
         displayTile(g2d, tile, player, overlayImage);
         g2d.dispose();
         return image;
@@ -302,17 +293,16 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = this.lib.getTileSize();
         BufferedImage overlayImage = this.lib.getScaledOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : ((tileType.isForested())
                 ? this.lib.getForestedTileSize().height
-                : terrainTileSize.height);
-        BufferedImage image = new BufferedImage(terrainTileSize.width,
-            compoundHeight, BufferedImage.TYPE_INT_ARGB);
+                : this.tileHeight);
+        BufferedImage image = new BufferedImage(this.tileWidth, compoundHeight,
+                                                BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
-        g2d.translate(0, compoundHeight - terrainTileSize.height);
+        g2d.translate(0, compoundHeight - this.tileHeight);
         displayColonyTile(g2d, tile, colony, overlayImage);
         g2d.dispose();
         return image;
@@ -332,12 +322,11 @@ public final class TileViewer extends FreeColClientHolder {
     public void displayColonyTiles(Graphics2D g2d, Tile[][] tiles,
                                    Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
-        Dimension tileSize = this.lib.getTileSize();
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < tiles.length; x++) {
+            for (int y = 0; y < tiles[x].length; y++) {
                 if (tiles[x][y] != null) {
-                    int xx = (((2 - x) + y) * tileSize.width) / 2;
-                    int yy = ((x + y) * tileSize.height) / 2;
+                    int xx = (((tiles.length-1 - x) + y) * this.tileWidth) / 2;
+                    int yy = ((x + y) * this.tileHeight) / 2;
                     g2d.translate(xx, yy);
                     BufferedImage overlayImage
                         = this.lib.getScaledOverlayImage(tiles[x][y], overlayCache);
@@ -386,8 +375,8 @@ public final class TileViewer extends FreeColClientHolder {
         if (unit != null) {
             BufferedImage image = this.lib.getSmallerUnitImage(unit);
             g2d.drawImage(image,
-                          tileWidth/4 - image.getWidth() / 2,
-                          halfHeight - image.getHeight() / 2, null);
+                          this.tileWidth/4 - image.getWidth() / 2,
+                          this.halfHeight - image.getHeight() / 2, null);
             // Draw an occupation and nation indicator.
             Player owner = getMyPlayer();
             String text = Messages.message(unit.getOccupationLabel(owner, false));
@@ -436,8 +425,8 @@ public final class TileViewer extends FreeColClientHolder {
     public void displayCenteredImage(Graphics2D g2d, BufferedImage image,
                                      RescaleOp rop) {
         g2d.drawImage(image, rop,
-                      (tileWidth - image.getWidth())/2,
-                      (tileHeight - image.getHeight())/2);
+                      (this.tileWidth - image.getWidth())/2,
+                      (this.tileHeight - image.getHeight())/2);
     }
 
     /**
@@ -450,8 +439,8 @@ public final class TileViewer extends FreeColClientHolder {
      */
     private void displayLargeCenteredImage(Graphics2D g2d, BufferedImage image,
                                            RescaleOp rop) {
-        int x = (tileWidth - image.getWidth())/2,
-            y = tileHeight - image.getHeight();
+        int x = (this.tileWidth - image.getWidth())/2,
+            y = this.tileHeight - image.getHeight();
         if (y > 0) y /= 2;
         g2d.drawImage(image, rop, x, y);
     }
@@ -486,7 +475,8 @@ public final class TileViewer extends FreeColClientHolder {
             }
         }
 
-        List<SortableImage> imageBorders = new ArrayList<>(8);
+        List<SortableImage> imageBorders
+            = new ArrayList<>(Direction.NUMBER_OF_DIRECTIONS);
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
             TileType borderingTileType;
@@ -499,31 +489,35 @@ public final class TileViewer extends FreeColClientHolder {
                 // If there is a Coast image (eg. beach) defined, use
                 // it, otherwise skip Draw the grass from the
                 // neighboring tile, spilling over on the side of this tile
-                si = new SortableImage(this.lib.getBorderImage(borderingTileType,
-                                       direction, x, y),
-                    borderingTileType.getIndex());
-                imageBorders.add(si);
+                BufferedImage bi = this.lib.getBorderImage(borderingTileType,
+                                                           direction, x, y);
+                imageBorders.add(new SortableImage(bi,
+                        borderingTileType.getIndex()));
                 TileImprovement river = borderingTile.getRiver();
                 if (river != null) {
-                    int magnitude = river.getRiverConnection(direction.getReverseDirection());
+                    Direction dr = direction.getReverseDirection();
+                    int magnitude = river.getRiverConnection(dr);
                     if (magnitude > 0) {
-                        si = new SortableImage(this.lib.getRiverMouthImage(direction,
-                                               magnitude, x, y), -1);
-                        imageBorders.add(si);
+                        BufferedImage ri
+                            = this.lib.getRiverMouthImage(direction,
+                                                          magnitude, x, y);
+                        imageBorders.add(new SortableImage(ri, -1));
                     }
                 }
             } else if (!tile.isLand() || borderingTile.isLand()) {
-                int bTIndex = borderingTileType.getIndex();
-                if (bTIndex < tileType.getIndex()
-                    && !ImageLibrary.getTerrainImageKey(tileType, 0, 0)
-                    .equals(ImageLibrary.getTerrainImageKey(borderingTileType, 0, 0))) {
+                final int bTIndex = borderingTileType.getIndex();
+                final String tik1 = ImageLibrary
+                    .getTerrainImageKey(tileType, 0, 0);
+                final String tik2 = ImageLibrary
+                    .getTerrainImageKey(borderingTileType, 0, 0);
+                if (bTIndex < tileType.getIndex() && !tik1.equals(tik2)) {
                     // Draw land terrain with bordering land type, or
                     // ocean/high seas limit, if the tiles do not
                     // share same graphics (ocean & great river)
-                    si = new SortableImage(this.lib.getBorderImage(borderingTileType,
-                                                              direction, x, y),
-                                           bTIndex);
-                    imageBorders.add(si);
+                    BufferedImage bi
+                        = this.lib.getBorderImage(borderingTileType,
+                                                  direction, x, y);
+                    imageBorders.add(new SortableImage(bi, bTIndex));
                 }
             }
         }
@@ -584,21 +578,22 @@ public final class TileViewer extends FreeColClientHolder {
             break;
         }
 
+        final FontMetrics fm = g2d.getFontMetrics();
         g2d.setColor(Color.BLACK);
         g2d.setFont(this.tinyFont);
         if (text != null) {
             int b = getBreakingPoint(text);
             if (b == -1) {
                 g2d.drawString(text,
-                    (tileWidth - g2d.getFontMetrics().stringWidth(text)) / 2,
-                    (tileHeight - g2d.getFontMetrics().getAscent()) / 2);
+                    (this.tileWidth - fm.stringWidth(text)) / 2,
+                    (this.tileHeight - fm.getAscent()) / 2);
             } else {
                 g2d.drawString(text.substring(0, b),
-                    (tileWidth - g2d.getFontMetrics().stringWidth(text.substring(0, b)))/2,
-                    halfHeight - (g2d.getFontMetrics().getAscent()*2)/3);
+                    (this.tileWidth - fm.stringWidth(text.substring(0, b)))/2,
+                    this.halfHeight - (fm.getAscent()*2)/3);
                 g2d.drawString(text.substring(b+1),
-                    (tileWidth - g2d.getFontMetrics().stringWidth(text.substring(b+1)))/2,
-                    halfHeight + (g2d.getFontMetrics().getAscent()*2)/3);
+                    (this.tileWidth - fm.stringWidth(text.substring(b+1)))/2,
+                    this.halfHeight + (fm.getAscent()*2)/3);
             }
         }
 
@@ -608,14 +603,14 @@ public final class TileViewer extends FreeColClientHolder {
                 posString += "/" + Integer.toString(tile.getHighSeasCount());
             }
             g2d.drawString(posString,
-                (tileWidth - g2d.getFontMetrics().stringWidth(posString)) / 2,
-                (tileHeight - g2d.getFontMetrics().getAscent()) / 2);
+                (this.tileWidth - fm.stringWidth(posString)) / 2,
+                (this.tileHeight - fm.getAscent()) / 2);
         }
         String value = DebugUtils.getColonyValue(tile);
         if (value != null) {
             g2d.drawString(value,
-                (tileWidth - g2d.getFontMetrics().stringWidth(value)) / 2,
-                (tileHeight - g2d.getFontMetrics().getAscent()) / 2);
+                (this.tileWidth - fm.stringWidth(value)) / 2,
+                (this.tileHeight - fm.getAscent()) / 2);
         }
     }
 
@@ -633,70 +628,63 @@ public final class TileViewer extends FreeColClientHolder {
         Tile tile, boolean withNumber, RescaleOp rop) {
         final Player player = getMyPlayer();
         final Settlement settlement = tile.getSettlement();
+        if (settlement == null) return;
+        
+        // Draw image of settlement in center of the tile
+        BufferedImage sImage = this.lib.getScaledSettlementImage(settlement);
+        displayLargeCenteredImage(g2d, sImage, rop);
 
-        if (settlement != null) {
-            if (settlement instanceof Colony) {
-                final Colony colony = (Colony)settlement;
-
-                // Draw image of colony in center of the tile.
-                BufferedImage colonyImage = this.lib.getScaledSettlementImage(settlement);
-                displayLargeCenteredImage(g2d, colonyImage, rop);
-
-                if (withNumber) {
-                    String populationString
-                        = Integer.toString(colony.getApparentUnitCount());
-                    String bonusString = "color.map.productionBonus."
-                        + colony.getProductionBonus();
-                    // If more units can be added, go larger and use italic
-                    BufferedImage stringImage
-                        = (colony.getPreferredSizeChange() > 0)
-                        ? this.lib.getStringImage(g2d, populationString, bonusString,
-                            FontLibrary.FontType.SIMPLE,
-                            Size.SMALLER, Font.BOLD|Font.ITALIC)
-                        : this.lib.getStringImage(g2d, populationString, bonusString,
-                            FontLibrary.FontType.SIMPLE,
-                            Size.TINY, Font.BOLD);
-                    displayCenteredImage(g2d, stringImage, rop);
-                }
-
-            } else if (settlement instanceof IndianSettlement) {
-                IndianSettlement is = (IndianSettlement)settlement;
-                BufferedImage settlementImage = this.lib.getScaledSettlementImage(settlement);
-
-                // Draw image of indian settlement in center of the tile.
-                displayLargeCenteredImage(g2d, settlementImage, rop);
-
-                BufferedImage chip;
-                float xOffset = STATE_OFFSET_X * this.lib.getScaleFactor();
-                float yOffset = STATE_OFFSET_Y * this.lib.getScaleFactor();
-                final int colonyLabels = getClientOptions()
-                    .getInteger(ClientOptions.COLONY_LABELS);
-                if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
-                    // Draw the settlement chip
-                    chip = this.lib.getIndianSettlementChip(g2d, is);
-                    int cWidth = chip.getWidth();
-                    g2d.drawImage(chip, rop, (int)xOffset, (int)yOffset);
-                    xOffset += cWidth + 2;
-
-                    // Draw the mission chip if needed.
-                    Unit missionary = is.getMissionary();
-                    if (missionary != null) {
-                        boolean expert
-                            = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                        g2d.drawImage(this.lib.getMissionChip(g2d,
-                                missionary.getOwner(), expert),
-                            rop, (int)xOffset, (int)yOffset);
-                        xOffset += cWidth + 2;
-                    }
-                }
-
-                // Draw the alarm chip if needed.
-                if ((chip = this.lib.getAlarmChip(g2d, is, player)) != null) {
-                    g2d.drawImage(chip, rop, (int)xOffset, (int)yOffset);
-                }
-            } else {
-                logger.warning("Bogus settlement: " + settlement);
+        if (settlement instanceof Colony) {
+            final Colony colony = (Colony)settlement;
+            if (withNumber) {
+                String populationString
+                    = Integer.toString(colony.getApparentUnitCount());
+                String bonusString = "color.map.productionBonus."
+                    + colony.getProductionBonus();
+                // If more units can be added, go larger and use italic
+                BufferedImage stringImage
+                    = (colony.getPreferredSizeChange() > 0)
+                    ? this.lib.getStringImage(g2d, populationString, bonusString,
+                        FontLibrary.FontType.SIMPLE,
+                        Size.SMALLER, Font.BOLD|Font.ITALIC)
+                    : this.lib.getStringImage(g2d, populationString, bonusString,
+                        FontLibrary.FontType.SIMPLE,
+                        Size.TINY, Font.BOLD);
+                displayCenteredImage(g2d, stringImage, rop);
             }
+
+        } else if (settlement instanceof IndianSettlement) {
+            IndianSettlement is = (IndianSettlement)settlement;
+            BufferedImage chip;
+            float xOffset = STATE_OFFSET_X * this.lib.getScaleFactor();
+            float yOffset = STATE_OFFSET_Y * this.lib.getScaleFactor();
+            final int colonyLabels = getClientOptions()
+                .getInteger(ClientOptions.COLONY_LABELS);
+            if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
+                // Draw the settlement chip
+                chip = this.lib.getIndianSettlementChip(g2d, is);
+                int cWidth = chip.getWidth();
+                g2d.drawImage(chip, rop, (int)xOffset, (int)yOffset);
+                xOffset += cWidth + 2;
+
+                // Draw the mission chip if needed.
+                Unit missionary = is.getMissionary();
+                if (missionary != null) {
+                    boolean expert
+                        = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                    g2d.drawImage(this.lib.getMissionChip(g2d,
+                            missionary.getOwner(), expert),
+                        rop, (int)xOffset, (int)yOffset);
+                    xOffset += cWidth + 2;
+                }
+            }
+
+            // Draw the alarm chip if needed.
+            if ((chip = this.lib.getAlarmChip(g2d, is, player)) != null) {
+                g2d.drawImage(chip, rop, (int)xOffset, (int)yOffset);
+            }
+        } else {
+            logger.warning("Bogus settlement: " + settlement);
         }
     }
 
@@ -714,10 +702,10 @@ public final class TileViewer extends FreeColClientHolder {
                                  BufferedImage overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
-        BufferedImage image = new BufferedImage(tileWidth,
-            tileHeight+halfHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(this.tileWidth,
+            this.tileHeight+this.halfHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g1 = (Graphics2D)image.getGraphics();
-        g1.translate(0, halfHeight);
+        g1.translate(0, this.halfHeight);
         // layer additions and improvements according to zIndex
         List<TileItem> tileItems = tile.getCompleteItems();
         int startIndex = 0;
@@ -733,7 +721,7 @@ public final class TileViewer extends FreeColClientHolder {
         // Tile Overlays (eg. hills and mountains)
         if (overlayImage != null) {
             g1.drawImage(overlayImage,
-                0, (tileHeight - overlayImage.getHeight()), null);
+                0, (this.tileHeight - overlayImage.getHeight()), null);
         }
         for (int index = startIndex; index < tileItems.size(); index++) {
             if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
@@ -749,7 +737,7 @@ public final class TileViewer extends FreeColClientHolder {
             BufferedImage forestImage = this.lib.getScaledForestImage(tile.getType(),
                 tile.getRiverStyle());
             g1.drawImage(forestImage,
-                0, (tileHeight - forestImage.getHeight()), null);
+                0, (this.tileHeight - forestImage.getHeight()), null);
         }
 
         // draw all remaining items
@@ -758,7 +746,7 @@ public final class TileViewer extends FreeColClientHolder {
         }
 
         g1.dispose();
-        g2d.drawImage(image, rop, 0, -halfHeight);
+        g2d.drawImage(image, rop, 0, -this.halfHeight);
     }
 
     /**
@@ -770,40 +758,29 @@ public final class TileViewer extends FreeColClientHolder {
      */
     private void displayTileItem(Graphics2D g2d, Tile tile, TileItem item) {
         if (item instanceof TileImprovement) {
-            displayTileImprovement(g2d, tile, (TileImprovement)item);
-        } else if (item instanceof LostCityRumour) {
-            displayLostCityRumour(g2d);
-        } else {
-            displayResourceTileItem(g2d, (Resource) item);
-        }
-    }
-
-    private void displayResourceTileItem(Graphics2D g2d, Resource item) {
-        displayCenteredImage(g2d, this.lib.getScaledResourceImage(item));
-    }
-
-    private void displayLostCityRumour(Graphics2D g2d) {
-        displayCenteredImage(g2d,
-            this.lib.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
-    }
-
-    private void displayTileImprovement(Graphics2D g2d,
-                                        Tile tile, TileImprovement  ti) {
-        if (ti.isComplete()) {
+            TileImprovement ti = (TileImprovement)item;
+            if (!ti.isComplete()) return;
             if (ti.isRoad()) {
-                rp.displayRoad(g2d, tile);
+                this.rp.displayRoad(g2d, tile);
             } else if (ti.isRiver()) {
                 TileImprovementStyle style = ti.getStyle();
                 if (style == null) { // This is all too common with broken maps
                     logger.severe("Null river style for " + tile);
                 } else {
-                    BufferedImage im = this.lib.getScaledRiverImage(style);
-                    if (im != null) g2d.drawImage(im, 0, 0, null);
+                    BufferedImage img = this.lib.getScaledRiverImage(style);
+                    if (img != null) g2d.drawImage(img, 0, 0, null);
                 }
             } else {
-                BufferedImage im = this.lib.getTileImprovementImage(ti.getType().getId());
-                if (im != null) g2d.drawImage(im, 0, 0, null);
+                BufferedImage img
+                    = this.lib.getTileImprovementImage(ti.getType().getId());
+                if (img != null) g2d.drawImage(img, 0, 0, null);
             }
+        } else if (item instanceof LostCityRumour) {
+            displayCenteredImage(g2d,
+                this.lib.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
+        } else if (item instanceof Resource) {
+            displayCenteredImage(g2d,
+                this.lib.getScaledResourceImage((Resource)item));
         }
     }
 }
