@@ -391,6 +391,62 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
+     * Get the number of columns that are to the left of the tile
+     * with the given y-coordinate.
+     *
+     * @param y The y-coordinate of the tile in question.
+     * @return The number of columns.
+     */
+    private int getLeftColumns(int y) {
+        int leftColumns = leftSpace / this.tileWidth + 1;
+
+        if ((y & 1) == 0) {
+            if ((leftSpace % this.tileWidth) > 32) {
+                leftColumns++;
+            }
+        } else {
+            if ((leftSpace % this.tileWidth) == 0) {
+                leftColumns--;
+            }
+        }
+
+        return leftColumns;
+    }
+
+    /**
+     * Get the number of columns that are to the right of the tile
+     * with the given y-coordinate.
+     *
+     * @param y The y-coordinate of the tile in question.
+     * @return The number of columns.
+     */
+    private int getRightColumns(int y) {
+        int rightColumns = rightSpace / this.tileWidth + 1;
+
+        if ((y & 1) == 0) {
+            if ((rightSpace % this.tileWidth) == 0) {
+                rightColumns--;
+            }
+        } else {
+            if ((rightSpace % this.tileWidth) > 32) {
+                rightColumns++;
+            }
+        }
+
+        return rightColumns;
+    }
+
+    /**
+     * Is a y-coordinate near the top?
+     *
+     * @param y The y-coordinate.
+     * @return True if near the top.
+     */
+    private boolean isMapNearTop(int y) {
+        return y < topRows;
+    }
+
+    /**
      * Is a y-coordinate near the bottom?
      *
      * @param y The y-coordinate.
@@ -420,86 +476,6 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private boolean isMapNearRight(int x, int y) {
         return x >= getMap().getWidth() - getRightColumns(y);
-    }
-
-    /**
-     * Returns the amount of columns that are to the left of the Tile
-     * that is displayed in the center of the Map.
-     *
-     * @return The amount of columns that are to the left of the Tile
-     *     that is displayed in the center of the Map.
-     */
-    private int getLeftColumns() {
-        return getLeftColumns(getFocus().getY());
-    }
-
-    /**
-     * Returns the amount of columns that are to the left of the Tile
-     * with the given y-coordinate.
-     *
-     * @param y The y-coordinate of the Tile in question.
-     * @return The amount of columns that are to the left of the Tile
-     *     with the given y-coordinate.
-     */
-    private int getLeftColumns(int y) {
-        int leftColumns = leftSpace / this.tileWidth + 1;
-
-        if ((y & 1) == 0) {
-            if ((leftSpace % this.tileWidth) > 32) {
-                leftColumns++;
-            }
-        } else {
-            if ((leftSpace % this.tileWidth) == 0) {
-                leftColumns--;
-            }
-        }
-
-        return leftColumns;
-    }
-
-    /**
-     * Returns the amount of columns that are to the right of the Tile
-     * that is displayed in the center of the Map.
-     *
-     * @return The amount of columns that are to the right of the Tile
-     *     that is displayed in the center of the Map.
-     */
-    private int getRightColumns() {
-        return getRightColumns(getFocus().getY());
-    }
-
-    /**
-     * Returns the amount of columns that are to the right of the Tile
-     * with the given y-coordinate.
-     *
-     * @param y The y-coordinate of the Tile in question.
-     * @return The amount of columns that are to the right of the Tile
-     *     with the given y-coordinate.
-     */
-    private int getRightColumns(int y) {
-        int rightColumns = rightSpace / this.tileWidth + 1;
-
-        if ((y & 1) == 0) {
-            if ((rightSpace % this.tileWidth) == 0) {
-                rightColumns--;
-            }
-        } else {
-            if ((rightSpace % this.tileWidth) > 32) {
-                rightColumns++;
-            }
-        }
-
-        return rightColumns;
-    }
-
-    /**
-     * Is a y-coordinate near the top?
-     *
-     * @param y The y-coordinate.
-     * @return True if near the top.
-     */
-    private boolean isMapNearTop(int y) {
-        return y < topRows;
     }
 
 
@@ -673,7 +649,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         final int fx = this.focus.getX(), fy = this.focus.getY();
         int leftOffset;
-        if (fx < getLeftColumns()) {
+        if (fx < getLeftColumns(fy)) {
             // we are at the left side of the map
             if ((fy & 1) == 0) {
                 leftOffset = this.tileWidth * fx + this.halfWidth;
@@ -682,7 +658,7 @@ public final class MapViewer extends FreeColClientHolder {
             }
         } else {
             final int mapWidth = map.getWidth();
-            if (fx >= mapWidth - getRightColumns()) {
+            if (fx >= mapWidth - getRightColumns(fy)) {
                 // we are at the right side of the map
                 if ((fy & 1) == 0) {
                     leftOffset = this.size.width
@@ -1111,7 +1087,8 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void positionMap(Tile pos) {
         int x = pos.getX(), y = pos.getY();
-        int leftColumns = getLeftColumns(), rightColumns = getRightColumns();
+        int leftColumns = getLeftColumns(this.focus.getY()),
+            rightColumns = getRightColumns(this.focus.getY());
 
         /*
           PART 1
