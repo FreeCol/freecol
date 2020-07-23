@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.awt.color.ColorSpace;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -158,6 +159,32 @@ public class ImageUtils {
         g2d.fillRect(x, y, width, height);
     }
 
+    /**
+     * Given a dimension with potential wildcard (non-positive) parts,
+     * and a nominal dimension, use the nominal dimension to remove
+     * any wildcard parts.
+     *
+     * @param d The {@code Dimension} to consider.
+     * @param nominal The nominal {@code Dimension}.
+     * @return The conformning wildcard-free {@code Dimension}.
+     */
+    public static Dimension wildcardDimension(Dimension d, Dimension nominal) {
+        final int w = nominal.width, h = nominal.height;
+        int wNew = d.width, hNew = d.height;
+
+        // Both wildcards?  Just return the nominal value
+        if (wNew <= 0 && hNew <= 0) return nominal;
+        // If width is wildcarded, new width tends to w * hNew/h + eps,
+        // If height is wildcarded, new height tends to h * wNew/w + eps,
+        // Also applies if new aspect ratio is significantly different
+        if (wNew <= 0 || (hNew > 0 && wNew * h > hNew * w)) {
+            wNew = (2 * w * hNew + (h+1)) / (2 * h);
+        } else if (hNew <= 0 || wNew * h < hNew * w) {
+            hNew = (2 * h * wNew + (w+1)) / (2 * w);
+        }
+        return new Dimension(wNew, hNew);
+    }
+        
     /* TODO: currently unused below? */
 
     /**
