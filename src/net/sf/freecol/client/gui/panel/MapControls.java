@@ -94,11 +94,13 @@ public abstract class MapControls extends FreeColClientHolder {
     /**
      * Initialize the unit buttons.
      *
-     * Initialization is deferred until we are confident we are in-game.
-     * @return true if successful.
+     * Initialization is deferred until in-game and the action manager is
+     * available.
+     *
+     * @return True if initialization occurs.
      */
     protected boolean initializeUnitButtons() {
-        if (this.unitButtons.isEmpty()) return false;
+        if (!this.unitButtons.isEmpty()) return false;
         final ActionManager am = getFreeColClient().getActionManager();
         this.unitButtons.addAll(am.makeUnitActionButtons(getSpecification()));
         return true;
@@ -161,7 +163,10 @@ public abstract class MapControls extends FreeColClientHolder {
      * @param tile The selected {@code Tile} if any.
      */
     public void update(GUI.ViewMode viewMode, Unit active, Tile tile) {
-        if (active != null) initializeUnitButtons();
+        if (active != null) {
+            boolean iub = initializeUnitButtons();
+            if (iub) logger.fine("Unit buttons initialized.");
+        }
         for (UnitButton ub : this.unitButtons) {
             ub.setVisible(active != null);
         }
