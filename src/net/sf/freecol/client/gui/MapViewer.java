@@ -185,9 +185,17 @@ public final class MapViewer extends FreeColClientHolder {
     /** Stroke to draw the grid with. */
     private Stroke gridStroke = new BasicStroke(1);
 
+    /*
+     * These variables depend on the map scale and also the map pixel size,
+     * which changes in changeSize().
+     * Their consistency is maintained by calling updateSizedVariables().
+     */
+
+    /** Horizonal and vertical pixel distance to the center tile. */
+    private int hSpace, vSpace;
 
     // Helper variables for displaying the map.
-    private int topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
+    private int topRows, bottomRows;
 
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
@@ -223,7 +231,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param lib An {@code ImageLibrary} to use for drawing to the map
-     *     (and thus are subject to the map scaling).
+     *     (and this is subject to the map scaling).
      * @param al An {@code ActionListener} for the cursor.
      */
     public MapViewer(FreeColClient freeColClient, ImageLibrary lib,
@@ -345,17 +353,20 @@ public final class MapViewer extends FreeColClientHolder {
      * Update the variables that depend on the screen size (and scale).
      */
     private void updateSizeVariables() {
+        // If we draw a tile in the center of the frame, then there is
+        // vSpace pixels above and below it, and hSpace pixels to the
+        // left and right.
+        this.vSpace = (this.size.height - this.tileHeight) / 2;
+        this.hSpace = (this.size.width - this.tileWidth) / 2;
+
         // Calculate the number of rows that will be drawn above the
         // central tile
-        topSpace = (this.size.height - this.tileHeight) / 2;
-        if ((topSpace % this.halfHeight) != 0) {
-            topRows = topSpace / this.halfHeight + 2;
+        if ((this.vSpace % this.halfHeight) != 0) {
+            topRows = this.vSpace / this.halfHeight + 2;
         } else {
-            topRows = topSpace / this.halfHeight + 1;
+            topRows = this.vSpace / this.halfHeight + 1;
         }
         bottomRows = topRows;
-        leftSpace = (this.size.width - this.tileWidth) / 2;
-        rightSpace = leftSpace;
     }
 
 
@@ -398,14 +409,14 @@ public final class MapViewer extends FreeColClientHolder {
      * @return The number of columns.
      */
     private int getLeftColumns(int y) {
-        int leftColumns = leftSpace / this.tileWidth + 1;
+        int leftColumns = this.hSpace / this.tileWidth + 1;
 
         if ((y & 1) == 0) {
-            if ((leftSpace % this.tileWidth) > 32) {
+            if ((this.hSpace % this.tileWidth) > 32) {
                 leftColumns++;
             }
         } else {
-            if ((leftSpace % this.tileWidth) == 0) {
+            if ((this.hSpace % this.tileWidth) == 0) {
                 leftColumns--;
             }
         }
@@ -421,14 +432,14 @@ public final class MapViewer extends FreeColClientHolder {
      * @return The number of columns.
      */
     private int getRightColumns(int y) {
-        int rightColumns = rightSpace / this.tileWidth + 1;
+        int rightColumns = this.hSpace / this.tileWidth + 1;
 
         if ((y & 1) == 0) {
-            if ((rightSpace % this.tileWidth) == 0) {
+            if ((this.hSpace % this.tileWidth) == 0) {
                 rightColumns--;
             }
         } else {
-            if ((rightSpace % this.tileWidth) > 32) {
+            if ((this.hSpace % this.tileWidth) > 32) {
                 rightColumns++;
             }
         }
@@ -1128,8 +1139,8 @@ public final class MapViewer extends FreeColClientHolder {
             // We are not at the top of the map and not at the bottom
             bottomRow = y + bottomRows - 1;
             topRow = y - topRows;
-            bottomRowY = topSpace + this.halfHeight * bottomRows;
-            topRowY = topSpace - topRows * this.halfHeight;
+            bottomRowY = this.vSpace + this.halfHeight * bottomRows;
+            topRowY = this.vSpace - topRows * this.halfHeight;
         }
 
         /*
