@@ -252,7 +252,6 @@ public final class FreeColClient {
         this.clientOptions.fixClientOptions();
 
         // Reset the mod resources as a result of the client option update.
-        ResourceMapping modMappings = new ResourceMapping();
         for (FreeColModFile f : this.clientOptions.getActiveMods()) {
             ResourceManager.addMapping("mod " + f.getId(),
                                        f.getResourceMapping());
