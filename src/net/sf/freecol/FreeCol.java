@@ -1539,10 +1539,22 @@ public final class FreeCol {
             // savegame was specified on command line
         }
 
-        final FreeColClient freeColClient
-            = new FreeColClient(splashStream, fontName, guiScale);
-        freeColClient.startClient(windowSize, null, sound, introVideo,
-                                  savegame, spec);
+        new FreeColClient(splashStream, fontName,
+                          guiScale, windowSize,
+                          (String)null, sound, introVideo, savegame, spec);
+    }
+
+    /**
+     * Wrapper for the test suite to start a test client.
+     *
+     * @param spec The {@code Specification} to use in the new client.
+     * @return The new {@code FreeColClient}.
+     */
+    public static FreeColClient startTestClient(Specification spec) {
+        FreeCol.setHeadless(true);
+        return new FreeColClient((InputStream)null, (String)null,
+                                 FreeCol.GUI_SCALE_DEFAULT, (Dimension)null,
+                                 (String)null, false, false, (File)null, spec);
     }
 
     /**

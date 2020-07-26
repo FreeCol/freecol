@@ -143,9 +143,26 @@ public final class FreeColClient {
      * @param splashStream A stream to read the splash image from.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
+     * @param size An optional window size.
+     * @param userMsg An optional message key to be displayed early.
+     * @param sound True if sounds should be played
+     * @param showOpeningVideo Display the opening video.
+     * @param savedGame An optional saved game.
+     * @param spec If non-null, a {@code Specification} to use to start
+     *     a new game immediately.
      */
-    public FreeColClient(final InputStream splashStream, final String fontName,
-                         final float scale) {
+    public FreeColClient(final InputStream splashStream,
+                         final String fontName,
+                         final float scale,
+                         final Dimension size,
+                         final String userMsg,
+                         final boolean sound,
+                         final boolean showOpeningVideo,
+                         final File savedGame,
+                         final Specification spec) {
+        if (FreeCol.getHeadless() && savedGame == null && spec == null) {
+            FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
+        }
         mapEditor = false;
 
         // Get the splash screen up early on to show activity.
@@ -209,42 +226,6 @@ public final class FreeColClient {
         }
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
-    }
-
-    /**
-     * Wrapper for the test suite to start a test client.
-     *
-     * @param spec The {@code Specification} to use in the new client.
-     * @return The new {@code FreeColClient}.
-     */
-    public static FreeColClient startTestClient(Specification spec) {
-        FreeCol.setHeadless(true);
-        FreeColClient freeColClient
-            = new FreeColClient(null, null, FreeCol.GUI_SCALE_DEFAULT);
-        freeColClient.startClient(null, null, false, false, null, spec);
-        return freeColClient;
-    }
-
-    /**
-     * Starts the new {@code FreeColClient}, including the GUI.
-     *
-     * @param size An optional window size.
-     * @param userMsg An optional message key to be displayed early.
-     * @param sound True if sounds should be played
-     * @param showOpeningVideo Display the opening video.
-     * @param savedGame An optional saved game.
-     * @param spec If non-null, a {@code Specification} to use to start
-     *     a new game immediately.
-     */
-    public void startClient(final Dimension size,
-                            final String userMsg,
-                            final boolean sound,
-                            final boolean showOpeningVideo,
-                            final File savedGame,
-                            final Specification spec) {
-        if (FreeCol.getHeadless() && savedGame == null && spec == null) {
-            FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
-        }
 
         // Load the client options, which handle reloading the
         // resources specified in the active mods.
