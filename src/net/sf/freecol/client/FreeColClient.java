@@ -258,42 +258,43 @@ public final class FreeColClient {
         //     do (which will often be to progress through the
         //     NewPanel to a call to the connect controller to start a game)
         //
+        Runnable start = null;
         if (savedGame != null) { // Restore from saved
-            gui.playSound("sound.intro.general");
             gui.invokeNowOrWait(() ->
                 gui.showStatusPanel(Messages.message("status.loadingGame")));
             if (connectController.startSavedGame(savedGame)) {
-                gui.invokeNowOrLater(() -> {
-                        gui.closeStatusPanel();
-                        if (userMsg != null) {
-                            gui.showInformationPanel(userMsg);
-                        }
-                    });
+                start = () -> {
+                    gui.closeStatusPanel();
+                    if (userMsg != null) gui.showInformationPanel(userMsg);
+                };
             } else {
-                gui.invokeNowOrLater(() -> {
-                        gui.closeStatusPanel();
-                        gui.showMainPanel(userMsg);
-                    });
+                start = () -> {
+                    gui.closeStatusPanel();
+                    gui.showMainPanel(userMsg);
+                };
             }
         } else if (spec != null) { // Debug or fast start
-            gui.playSound("sound.intro.general");
-            gui.invokeNowOrLater(() -> {
-                    if (connectController.startSinglePlayerGame(spec)) {
-                        ; // all is well
-                    } else {
-                        gui.showMainPanel(userMsg);
-                    }
-                });
+            start = () -> {
+                if (!connectController.startSinglePlayerGame(spec)) {
+                    gui.showMainPanel(userMsg);
+                }
+            };
         } else if (showOpeningVideo) { // Video first
-            gui.showOpeningVideo(userMsg,
-                () -> gui.showMainPanel(userMsg));
+            gui.showOpeningVideo(userMsg, () -> gui.showMainPanel(userMsg));
         } else { // Start main panel
-            gui.playSound("sound.intro.general");
-            gui.invokeNowOrLater(() -> gui.showMainPanel(userMsg));
+            start = () -> gui.showMainPanel(userMsg);
         }
 
+        if (start != null) {
+            gui.playSound("sound.intro.general");
+            gui.invokeNowOrLater(start);
+        }
+        
         String quitName = FreeCol.CLIENT_THREAD + "Quit Game";
         Runtime.getRuntime().addShutdownHook(new Thread(quitName) {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public void run() {
                     stopServer();
