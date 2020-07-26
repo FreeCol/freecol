@@ -175,53 +175,6 @@ public final class TileViewer extends FreeColClientHolder {
                                      Size.TINY, this.lib.getScaleFactor());
     }
         
-        
-    /**
-     * Returns the scaled terrain-image for a terrain type (and position 0, 0).
-     *
-     * Public for {@link GUI#createTileImageWithOverlayAndForest}.
-     *
-     * @param type The type of the terrain-image to return.
-     * @param size The maximum size of the terrain image to return.
-     * @return The terrain-image
-     */
-    public BufferedImage createTileImageWithOverlayAndForest(TileType type,
-                                                             Dimension size) {
-        Dimension size2 = new Dimension((size.width > 0)
-            ? size.width
-            : ((2*ImageLibrary.TILE_SIZE.width*size.height
-                    + (ImageLibrary.TILE_OVERLAY_SIZE.height+1)) /
-                (2*ImageLibrary.TILE_OVERLAY_SIZE.height)),
-            -1);
-        BufferedImage terrainImage = this.lib.getTerrainImage(type, 0,0, size2);
-        BufferedImage overlayImage = this.lib.getOverlayImage(type, size2);
-        BufferedImage forestImage = (type.isForested())
-            ? this.lib.getForestImage(type, size2)
-            : null;
-        if (overlayImage == null && forestImage == null) return terrainImage;
-
-        int width = terrainImage.getWidth();
-        int height = terrainImage.getHeight();
-        if (overlayImage != null) {
-            height = Math.max(height, overlayImage.getHeight());
-        }
-        if (forestImage != null) {
-            height = Math.max(height, forestImage.getHeight());
-        }
-        BufferedImage compositeImage
-            = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = compositeImage.createGraphics();
-        g2d.drawImage(terrainImage, 0, height - terrainImage.getHeight(), null);
-        if (overlayImage != null) {
-            g2d.drawImage(overlayImage, 0, height - overlayImage.getHeight(), null);
-        }
-        if (forestImage != null) {
-            g2d.drawImage(forestImage, 0, height - forestImage.getHeight(), null);
-        }
-        g2d.dispose();
-        return compositeImage;
-    }
-
     /**
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      * Draws the terrain and improvements.
