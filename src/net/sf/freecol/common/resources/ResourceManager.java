@@ -123,20 +123,21 @@ public class ResourceManager {
     }
 
 
-    // These *should* be synchronized, but do not need to be because
-    // the mergedContainer is never written again after the preload
-    // thread is done.
+    // Normally these accessors *should* be synchronized, but do not
+    // need to be because the mergedContainer is never written again
+    // after the preload thread is done.
 
     /**
      * Get an audio resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static AudioResource getAudioResource(final String key) {
+    public static AudioResource getAudioResource(String key, boolean warn) {
         final AudioResource r = mergedContainer.getAudioResource(key);
-        if (r == null) logger.warning("getAudioResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getAudioResource(" + key + ") failed");
         return r;
     }
 
@@ -144,12 +145,13 @@ public class ResourceManager {
      * Get a color resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static ColorResource getColorResource(final String key) {
+    public static ColorResource getColorResource(String key, boolean warn) {
         final ColorResource r = mergedContainer.getColorResource(key);
-        if (r == null) logger.warning("getColorResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getColorResource(" + key + ") failed");
         return r;
     }
 
@@ -157,12 +159,13 @@ public class ResourceManager {
      * Get a FAFile resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static FAFileResource getFAFileResource(final String key) {
+    public static FAFileResource getFAFileResource(String key, boolean warn) {
         final FAFileResource r = mergedContainer.getFAFileResource(key);
-        if (r == null) logger.warning("getFAFileResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getFAFileResource(" + key + ") failed");
         return r;
     }
 
@@ -170,12 +173,13 @@ public class ResourceManager {
      * Get a font resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static FontResource getFontResource(final String key) {
+    public static FontResource getFontResource(String key, boolean warn) {
         final FontResource r = mergedContainer.getFontResource(key);
-        if (r == null) logger.warning("getFontResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getFontResource(" + key + ") failed");
         return r;
     }
 
@@ -183,13 +187,14 @@ public class ResourceManager {
      * Get an image resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    public static ImageResource getImageResource(final String key) {
+    public static ImageResource getImageResource(String key, boolean warn) {
         // Public for ImageCache
         final ImageResource r = mergedContainer.getImageResource(key);
-        if (r == null) logger.warning("getImageResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getImageResource(" + key + ") failed");
         return r;
     }
 
@@ -197,12 +202,13 @@ public class ResourceManager {
      * Get a string resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static StringResource getStringResource(final String key) {
+    public static StringResource getStringResource(String key, boolean warn) {
         final StringResource r = mergedContainer.getStringResource(key);
-        if (r == null) logger.warning("getStringResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getStringResource(" + key + ") failed");
         return r;
     }
 
@@ -210,12 +216,13 @@ public class ResourceManager {
      * Get a SZA resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static SZAResource getSZAResource(final String key) {
+    public static SZAResource getSZAResource(String key, boolean warn) {
         final SZAResource r = mergedContainer.getSZAResource(key);
-        if (r == null) logger.warning("getSZAResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getSZAResource(" + key + ") failed");
         return r;
     }
 
@@ -223,30 +230,15 @@ public class ResourceManager {
      * Get a video resource.
      *
      * @param key The resource to get.
+     * @param warn Log a warning if the resource is not found.
      * @return The resource if there is one with the given
      *     resource key and type, or else {@code null}.
      */
-    private static VideoResource getVideoResource(final String key) {
+    public static VideoResource getVideoResource(String key, boolean warn) {
         final VideoResource r = mergedContainer.getVideoResource(key);
-        if (r == null) logger.warning("getVideoResource(" + key + ") failed");
+        if (warn && r == null) logger.warning("getVideoResource(" + key + ") failed");
         return r;
     }
-
-
-    // Public resource accessors
-
-    public static synchronized boolean hasImageResource(final String key) {
-        return mergedContainer.containsImageKey(key);
-    }
-
-    public static synchronized boolean hasStringResource(final String key) {
-        return mergedContainer.containsStringKey(key);
-    }
-
-    public static synchronized boolean hasSZAResource(final String key) {
-        return mergedContainer.containsSZAKey(key);
-    }
-    
 
     /**
      * Gets an audio resource with the given name.
@@ -259,7 +251,7 @@ public class ResourceManager {
      * @return A {@code File} containing the audio data.
      */
     public static File getAudio(final String key) {
-        final AudioResource r = getAudioResource(key);
+        final AudioResource r = getAudioResource(key, true);
         return (r == null) ? null : r.getAudio();
     }
 
@@ -272,7 +264,7 @@ public class ResourceManager {
      *     or finally the generic replacement color.
      */
     public static Color getColor(final String key, Color replacement) {
-        final ColorResource r = getColorResource(key);
+        final ColorResource r = getColorResource(key, true);
         return (r != null) ? r.getColor()
             : (replacement != null) ? replacement
             : ColorResource.REPLACEMENT_COLOR;
@@ -287,7 +279,7 @@ public class ResourceManager {
      * @return The {@code FAFile} found in a FAFileResource.
      */
     public static FAFile getFAFile(final String key) {
-        final FAFileResource r = getFAFileResource(key);
+        final FAFileResource r = getFAFileResource(key, true);
         return (r == null) ? null : r.getFAFile();
     }
 
@@ -299,7 +291,7 @@ public class ResourceManager {
      *     Java font if not found.
      */
     public static Font getFont(final String key) {
-        final FontResource r = getFontResource(key);
+        final FontResource r = getFontResource(key, true);
         if (r == null) return FontResource.getEmergencyFont();
         return r.getFont();
     }
@@ -311,7 +303,7 @@ public class ResourceManager {
      * @return The image identified by {@code resource}.
      */
     public static BufferedImage getImage(final String key) {
-        ImageResource ir = getImageResource(key);
+        ImageResource ir = getImageResource(key, true);
         return (ir == null) ? null : ir.getImage();
     }
 
@@ -327,7 +319,7 @@ public class ResourceManager {
     public static BufferedImage getImage(final String key,
                                          final Dimension size,
                                          final boolean grayscale) {
-        ImageResource ir = getImageResource(key);
+        ImageResource ir = getImageResource(key, true);
         return (ir == null) ? null : ir.getImage(size, grayscale);
     }
 
@@ -337,7 +329,7 @@ public class ResourceManager {
      * @param prefix the prefix
      * @return a list of all keys starting with the given prefix
      */
-    public static synchronized List<String> getImageKeys(String prefix) {
+    public static List<String> getImageKeys(String prefix) {
         return mergedContainer.getImageKeys(prefix);
     }
 
@@ -349,8 +341,7 @@ public class ResourceManager {
      * @param suffix the suffix
      * @return a list of all resulting keys
      */
-    public static synchronized List<String> getImageKeys(String prefix,
-                                                         String suffix) {
+    public static List<String> getImageKeys(String prefix, String suffix) {
         return mergedContainer.getImageKeys(prefix, suffix);
     }
 
@@ -360,7 +351,7 @@ public class ResourceManager {
      * @param prefix the prefix
      * @return a set of all keysstarting with the given prefix
      */
-    public static synchronized Set<String> getImageKeySet(String prefix) {
+    public static Set<String> getImageKeySet(String prefix) {
         return mergedContainer.getImageKeySet(prefix);
     }
 
@@ -373,7 +364,7 @@ public class ResourceManager {
      * @return The string value.
      */
     public static String getString(final String key) {
-        final StringResource r = getStringResource(key);
+        final StringResource r = getStringResource(key, true);
         return (r == null) ? StringResource.REPLACEMENT_STRING : r.getString();
     }
 
@@ -391,7 +382,7 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSZA(final String key) {
-        final SZAResource r = getSZAResource(key);
+        final SZAResource r = getSZAResource(key, true);
         return (r != null) ? r.getSimpleZippedAnimation() : null;
     }
 
@@ -408,7 +399,7 @@ public class ResourceManager {
      */
     public static SimpleZippedAnimation getSZA(final String key,
                                                final float scale) {
-        final SZAResource r = getSZAResource(key);
+        final SZAResource r = getSZAResource(key, true);
         return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
     }
 
@@ -421,7 +412,7 @@ public class ResourceManager {
      * @return The {@code Video} in it's original size.
      */
     public static Video getVideo(final String key) {
-        final VideoResource r = getVideoResource(key);
+        final VideoResource r = getVideoResource(key, true);
         return (r != null) ? r.getVideo() : null;
     }
 

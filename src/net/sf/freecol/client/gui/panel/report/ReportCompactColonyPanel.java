@@ -508,8 +508,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             key = "annotation." + building.getType().getSuffix();
             t.add(Messages.message(building.getLabel()));
         }
-        if (ResourceManager.hasStringResource(key))
+        if (ResourceManager.getStringResource(key, false) != null) {
             annotations += ResourceManager.getString(key);
+        }
         if (!s.colony.getTile().isCoastland()) {
             key = "annotation.inland";
             t.add(Messages.message("report.colony.annotation.inland"));
@@ -520,8 +521,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             key = "annotation." + building.getType().getSuffix();
             t.add(Messages.message(building.getLabel()));
         }
-        if (ResourceManager.hasStringResource(key))
+        if (ResourceManager.getStringResource(key, false) != null) {
             annotations += ResourceManager.getString(key);
+        }
         /* Omit for now, too much detail.
            for (GoodsType gt : spec.getLibertyGoodsTypeList()) {
            if ((building = s.colony.getWorkLocationWithModifier(gt.getId(), Building.class)) != null) {

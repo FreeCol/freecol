@@ -341,7 +341,7 @@ public final class ImageLibrary {
     // Animation handling
 
     public static SimpleZippedAnimation getSZA(String key, float scale) {
-        return (!ResourceManager.hasSZAResource(key)) ? null
+        return (ResourceManager.getSZAResource(key, false) == null) ? null
             : ResourceManager.getSZA(key, scale);
     }
 
@@ -483,7 +483,7 @@ public final class ImageLibrary {
             height -= insets.top + insets.bottom;
         }
 
-        if (ResourceManager.hasImageResource(key)) {
+        if (ResourceManager.getImageResource(key, false) != null) {
             BufferedImage image = getUnscaledImage(key);
             // FIXME: Test and profile if calling fillTexture is better.
             int dx = image.getWidth();
@@ -552,7 +552,7 @@ public final class ImageLibrary {
         List<BufferedImage> ret = new ArrayList<>();
         for (String base : buttonKeys) {
             String k = base + key;
-            if (ResourceManager.hasImageResource(k)) {
+            if (ResourceManager.getImageResource(k, false) != null) {
                 ret.add(getUnscaledImage(k));
             }
         }
@@ -561,7 +561,7 @@ public final class ImageLibrary {
         
     public static BufferedImage getCanvasBackgroundImage() {
         final String key = "image.flavor.Canvas.map";
-        return (!ResourceManager.hasImageResource(key)) ? null
+        return (ResourceManager.getImageResource(key, false) == null) ? null
             : getUnscaledImage(key);
     }
 
@@ -582,7 +582,7 @@ public final class ImageLibrary {
      */
     public static Cursor getCursor() {
         String key = "image.icon.cursor.go";
-        if (ResourceManager.hasImageResource(key)) {
+        if (ResourceManager.getImageResource(key, false) != null) {
             Image im = getUnscaledImage(key);
             return Toolkit.getDefaultToolkit().createCustomCursor(im,
                 new Point(im.getWidth(null)/2, im.getHeight(null)/2), "go");
@@ -607,8 +607,9 @@ public final class ImageLibrary {
         String key = (player == null) ? "image.skin.InformationPanel"
             : (player.isRebel()) ? "image.skin.InformationPanel.rebel"
             : "image.skin.InformationPanel." + player.getNationResourceKey();
-        if (!ResourceManager.hasImageResource(key))
+        if (ResourceManager.getImageResource(key, false) == null) {
             key = "image.skin.InformationPanel";
+        }
         return getUnscaledImage(key);
     }
 
@@ -629,7 +630,9 @@ public final class ImageLibrary {
     public static BufferedImage getMeetingImage(Player meet) {
         final String base = "image.flavor.event.meeting.";
         String key = base + meet.getNationResourceKey();
-        if (!ResourceManager.hasImageResource(key)) key = base + "natives";
+        if (ResourceManager.getImageResource(key, false) == null) {
+            key = base + "natives";
+        }
         return getUnscaledImage(key);
     }
         
@@ -639,7 +642,7 @@ public final class ImageLibrary {
 
     public static BufferedImage getMiniMapSkin() {
         final String key = "image.skin.MiniMap";
-        return (!ResourceManager.hasImageResource(key)) ? null
+        return (ResourceManager.getImageResource(key, false) == null) ? null
             : getUnscaledImage(key);
     }
 
@@ -763,11 +766,12 @@ public final class ImageLibrary {
     private BufferedImage getScaledBuildingTypeImage(BuildingType buildingType,
                                                      Player player,
                                                      float scale) {
-        final String key = getBuildingTypeKey(buildingType);
+        String key = getBuildingTypeKey(buildingType);
         final String extraKey = key + "." + player.getNationResourceKey();
-        final boolean hasExtra = ResourceManager.hasImageResource(extraKey);
-        return this.imageCache.getScaledImage((hasExtra) ? extraKey : key,
-                                              scale, false);
+        if (ResourceManager.getImageResource(extraKey, false) != null) {
+            key = extraKey;
+        }
+        return this.imageCache.getScaledImage(key, scale, false);
     }
 
     public BufferedImage getScaledBuildingImage(Building building) {
@@ -987,7 +991,7 @@ public final class ImageLibrary {
             key = "image.tileforest." + type.getId() + ".s"
                 + (("0000".equals(mask)) ? "0100" : mask);
             // Safety check providing fallback for incomplete mods
-            if (ResourceManager.hasImageResource(key)) {
+            if (ResourceManager.getImageResource(key, false) != null) {
                 return this.imageCache.getSizedImage(key, size, false);
             }
         }
@@ -1299,7 +1303,7 @@ public final class ImageLibrary {
      */
     public BufferedImage getTileImprovementImage(String id) {
         final String key = "image.tile." + id;
-        return (!ResourceManager.hasImageResource(key)) ? null
+        return (ResourceManager.getImageResource(key, false) == null) ? null
             // Has its own Overlay Image in Misc, use it
             : this.imageCache.getSizedImage(key, this.tileSize, false);
     }
@@ -1373,12 +1377,15 @@ public final class ImageLibrary {
             : "." + Role.getRoleIdSuffix(roleId);
         String key = "image.unit." + unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "");
-        if (nativeEthnicity && !ResourceManager.hasImageResource(key)) {
+        if (nativeEthnicity
+            && ResourceManager.getImageResource(key, false) == null) {
             key = "image.unit." + unitType.getId() + roleQual;
         }
         if (owner != null) {
             final String extraKey = key + "." + owner.getNationResourceKey();
-            if (ResourceManager.hasImageResource(extraKey)) key = extraKey;
+            if (ResourceManager.getImageResource(extraKey, false) != null) {
+                key = extraKey;
+            }
         }
         return key;
     }
