@@ -194,8 +194,8 @@ public final class MapViewer extends FreeColClientHolder {
     /** Horizonal and vertical pixel distance to the center tile. */
     private int hSpace, vSpace;
 
-    // Helper variables for displaying the map.
-    private int topRows, bottomRows;
+    /** Number of rows above/below the center tile. */
+    private int vRows;
 
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
@@ -362,11 +362,10 @@ public final class MapViewer extends FreeColClientHolder {
         // Calculate the number of rows that will be drawn above the
         // central tile
         if ((this.vSpace % this.halfHeight) != 0) {
-            topRows = this.vSpace / this.halfHeight + 2;
+            this.vRows = this.vSpace / this.halfHeight + 2;
         } else {
-            topRows = this.vSpace / this.halfHeight + 1;
+            this.vRows = this.vSpace / this.halfHeight + 1;
         }
-        bottomRows = topRows;
     }
 
 
@@ -454,7 +453,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return True if near the top.
      */
     private boolean isMapNearTop(int y) {
-        return y < topRows;
+        return y < this.vRows;
     }
 
     /**
@@ -464,7 +463,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return True if near the bottom.
      */
     private boolean isMapNearBottom(int y) {
-        return y >= getMap().getHeight() - bottomRows;
+        return y >= getMap().getHeight() - this.vRows;
     }
 
     /**
@@ -688,12 +687,12 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         int topOffset;
-        if (fy < topRows) {
+        if (fy < this.vRows) {
             // we are at the top of the map
             topOffset = (fy + 1) * this.halfHeight;
         } else {
             final int mapHeight = map.getHeight();
-            if (fy >= mapHeight - bottomRows) {
+            if (fy >= mapHeight - this.vRows) {
                 // we are at the bottom of the map
                 topOffset = this.size.height - this.halfHeight * (mapHeight - fy);
             } else {
@@ -918,9 +917,9 @@ public final class MapViewer extends FreeColClientHolder {
         // When already close to an edge, resist moving the focus closer,
         // but if moving away immediately jump out of the `nearTo' area.
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
-            y = (ty <= fy) ? fy : topRows;
+            y = (ty <= fy) ? fy : this.vRows;
         } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : map.getWidth() - bottomRows;
+            y = (ty >= fy) ? fy : map.getWidth() - this.vRows;
         } else {
             y = ty;
         }
@@ -1112,7 +1111,7 @@ public final class MapViewer extends FreeColClientHolder {
         */
         alignedTop = false;
         alignedBottom = false;
-        if (y < topRows) {
+        if (y < this.vRows) {
             alignedTop = true;
             // We are at the top of the map
             bottomRow = (this.size.height / this.halfHeight) - 1;
@@ -1122,7 +1121,7 @@ public final class MapViewer extends FreeColClientHolder {
             topRow = 0;
             bottomRowY = bottomRow * this.halfHeight;
             topRowY = 0;
-        } else if (y >= (getMap().getHeight() - bottomRows)) {
+        } else if (y >= (getMap().getHeight() - this.vRows)) {
             alignedBottom = true;
             // We are at the bottom of the map
             bottomRow = getMap().getHeight() - 1;
@@ -1137,10 +1136,10 @@ public final class MapViewer extends FreeColClientHolder {
             topRowY = bottomRowY - (bottomRow - topRow) * this.halfHeight;
         } else {
             // We are not at the top of the map and not at the bottom
-            bottomRow = y + bottomRows - 1;
-            topRow = y - topRows;
-            bottomRowY = this.vSpace + this.halfHeight * bottomRows;
-            topRowY = this.vSpace - topRows * this.halfHeight;
+            bottomRow = y + this.vRows - 1;
+            topRow = y - this.vRows;
+            bottomRowY = this.vSpace + this.halfHeight * this.vRows;
+            topRowY = this.vSpace - this.vRows * this.halfHeight;
         }
 
         /*
