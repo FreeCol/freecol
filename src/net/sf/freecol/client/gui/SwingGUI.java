@@ -1135,8 +1135,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
-        tileViewer.displayColonyTiles(g, tiles, colony);
+    public void displayColonyTiles(Graphics2D g2d, Tile[][] tiles,
+                                   Colony colony) {
+        this.tileViewer.displayColonyTiles(g2d, tiles, colony);
     }
 
 

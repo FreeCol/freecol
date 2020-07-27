@@ -1501,8 +1501,17 @@ public class GUI extends FreeColClientHolder {
     // Used by: WorkProductionPanel
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) { return null; }
 
-    // Used by: ColonyPanel.TilesPanel
-    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {}
+    /**
+     * Display the ColonyTiles of a Colony.
+     *
+     * Used by: ColonyPanel.TilesPanel
+     *
+     * @param g2d A {@code Graphics2D} to draw to.
+     * @param tiles The {@code Tile}s to display.
+     * @param colony The enclosing {@code Colony}.
+     */
+    public void displayColonyTiles(Graphics2D g2d, Tile[][] tiles,
+                                   Colony colony) {}
 
 
     // View mode handling, including accessors for the active unit for

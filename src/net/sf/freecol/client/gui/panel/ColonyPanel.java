@@ -1915,8 +1915,8 @@ public final class ColonyPanel extends PortPanel
             tiles[2][2] = tile.getNeighbourOrNull(Direction.S);
 
             int layer = 2;
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < tiles.length; x++) {
+                for (int y = 0; y < tiles[x].length; y++) {
                     if (tiles[x][y] == null) {
                         logger.warning("Null tile for " + getColony()
                             + " at " + x + "," + y);
@@ -1989,12 +1989,13 @@ public final class ColonyPanel extends PortPanel
          */
         @Override
         public void paintComponent(Graphics g) {
-            final Colony colony = getColony();
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, getWidth(), getHeight());
-            if (colony == null) return;
 
-            getGUI().displayColonyTiles((Graphics2D)g, tiles, colony);
+            final Colony colony = getColony();
+            if (colony != null) {
+                getGUI().displayColonyTiles((Graphics2D)g, tiles, colony);
+            }
         }
 
         /**
