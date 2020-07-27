@@ -195,7 +195,12 @@ public final class MapViewer extends FreeColClientHolder {
     private int hSpace, vSpace;
 
     /** Number of rows above/below the center tile. */
-    private int vRows;
+    private int centerRows;
+    /**
+     * Almost the number of columns to the left/right of the center tile.
+     * There are special cases handled in getLeft/RightColumns().
+     */
+    private int centerColumns;    
 
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
@@ -362,10 +367,11 @@ public final class MapViewer extends FreeColClientHolder {
         // Calculate the number of rows that will be drawn above the
         // central tile
         if ((this.vSpace % this.halfHeight) != 0) {
-            this.vRows = this.vSpace / this.halfHeight + 2;
+            this.centerRows = this.vSpace / this.halfHeight + 2;
         } else {
-            this.vRows = this.vSpace / this.halfHeight + 1;
+            this.centerRows = this.vSpace / this.halfHeight + 1;
         }
+        this.centerColumns = this.hSpace / this.tileWidth + 1;
     }
 
 
@@ -400,74 +406,64 @@ public final class MapViewer extends FreeColClientHolder {
         return label;
     }
 
+    // There is no getTop/BottomRows(), this.centerRows is sufficient
+    
     /**
-     * Get the number of columns that are to the left of the tile
+     * Get the number of columns that are to the left of the center tile
      * with the given y-coordinate.
      *
      * @param y The y-coordinate of the tile in question.
      * @return The number of columns.
      */
     private int getLeftColumns(int y) {
-        int leftColumns = this.hSpace / this.tileWidth + 1;
-
+        int ret = this.centerColumns;
         if ((y & 1) == 0) {
-            if ((this.hSpace % this.tileWidth) > 32) {
-                leftColumns++;
-            }
+            if ((this.hSpace % this.tileWidth) > 32) ret++;
         } else {
-            if ((this.hSpace % this.tileWidth) == 0) {
-                leftColumns--;
-            }
+            if ((this.hSpace % this.tileWidth) == 0) ret--;
         }
-
-        return leftColumns;
+        return ret;
     }
 
     /**
-     * Get the number of columns that are to the right of the tile
+     * Get the number of columns that are to the right of the center tile
      * with the given y-coordinate.
      *
      * @param y The y-coordinate of the tile in question.
      * @return The number of columns.
      */
     private int getRightColumns(int y) {
-        int rightColumns = this.hSpace / this.tileWidth + 1;
-
+        int ret = this.centerColumns;
         if ((y & 1) == 0) {
-            if ((this.hSpace % this.tileWidth) == 0) {
-                rightColumns--;
-            }
+            if ((this.hSpace % this.tileWidth) == 0) ret--;
         } else {
-            if ((this.hSpace % this.tileWidth) > 32) {
-                rightColumns++;
-            }
+            if ((this.hSpace % this.tileWidth) > 32) ret++;
         }
-
-        return rightColumns;
+        return ret;
     }
 
     /**
-     * Is a y-coordinate near the top?
+     * Is a tile with given y-coordinate near the top?
      *
      * @param y The y-coordinate.
      * @return True if near the top.
      */
     private boolean isMapNearTop(int y) {
-        return y < this.vRows;
+        return y < this.centerRows;
     }
 
     /**
-     * Is a y-coordinate near the bottom?
+     * Is a tile with given y-coordinate near the bottom?
      *
      * @param y The y-coordinate.
      * @return True if near the bottom.
      */
     private boolean isMapNearBottom(int y) {
-        return y >= getMap().getHeight() - this.vRows;
+        return y >= getMap().getHeight() - this.centerRows;
     }
 
     /**
-     * Is an x,y coordinate near the left?
+     * Is a tile with given x,y coordinates near the left?
      *
      * @param x The x-coordinate.
      * @param y The y-coordinate.
@@ -478,7 +474,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Is an x,y coordinate near the right?
+     * Is a tile with given x,y coordinates near the right?
      *
      * @param x The x-coordinate.
      * @param y The y-coordinate.
@@ -687,12 +683,12 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         int topOffset;
-        if (fy < this.vRows) {
+        if (fy < this.centerRows) {
             // we are at the top of the map
             topOffset = (fy + 1) * this.halfHeight;
         } else {
             final int mapHeight = map.getHeight();
-            if (fy >= mapHeight - this.vRows) {
+            if (fy >= mapHeight - this.centerRows) {
                 // we are at the bottom of the map
                 topOffset = this.size.height - this.halfHeight * (mapHeight - fy);
             } else {
@@ -917,9 +913,9 @@ public final class MapViewer extends FreeColClientHolder {
         // When already close to an edge, resist moving the focus closer,
         // but if moving away immediately jump out of the `nearTo' area.
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
-            y = (ty <= fy) ? fy : this.vRows;
+            y = (ty <= fy) ? fy : this.centerRows;
         } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : map.getHeight() - this.vRows;
+            y = (ty >= fy) ? fy : map.getHeight() - this.centerRows;
         } else {
             y = ty;
         }
@@ -1111,7 +1107,7 @@ public final class MapViewer extends FreeColClientHolder {
         */
         alignedTop = false;
         alignedBottom = false;
-        if (y < this.vRows) {
+        if (y < this.centerRows) {
             alignedTop = true;
             // We are at the top of the map
             bottomRow = (this.size.height / this.halfHeight) - 1;
@@ -1121,7 +1117,7 @@ public final class MapViewer extends FreeColClientHolder {
             topRow = 0;
             bottomRowY = bottomRow * this.halfHeight;
             topRowY = 0;
-        } else if (y >= (getMap().getHeight() - this.vRows)) {
+        } else if (y >= (getMap().getHeight() - this.centerRows)) {
             alignedBottom = true;
             // We are at the bottom of the map
             bottomRow = getMap().getHeight() - 1;
@@ -1136,10 +1132,10 @@ public final class MapViewer extends FreeColClientHolder {
             topRowY = bottomRowY - (bottomRow - topRow) * this.halfHeight;
         } else {
             // We are not at the top of the map and not at the bottom
-            bottomRow = y + this.vRows - 1;
-            topRow = y - this.vRows;
-            bottomRowY = this.vSpace + this.halfHeight * this.vRows;
-            topRowY = this.vSpace - this.vRows * this.halfHeight;
+            bottomRow = y + this.centerRows - 1;
+            topRow = y - this.centerRows;
+            bottomRowY = this.vSpace + this.centerRows * this.halfHeight;
+            topRowY = this.vSpace - this.centerRows * this.halfHeight;
         }
 
         /*
