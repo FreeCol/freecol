@@ -324,35 +324,14 @@ public class ResourceManager {
     }
 
     /**
-     * Returns a list of all keys starting with the given prefix.
+     * Get a list of all image keys starting with the given prefix.
      *
-     * @param prefix the prefix
-     * @return a list of all keys starting with the given prefix
+     * @param prefix The prefix.
+     * @return A list of all image resource keys starting with the prefix.
      */
     public static List<String> getImageKeys(String prefix) {
-        return mergedContainer.getImageKeys(prefix);
-    }
-
-    /**
-     * Returns a list of all keys starting with the given prefix and
-     * ending with the given suffix.
-     *
-     * @param prefix the prefix
-     * @param suffix the suffix
-     * @return a list of all resulting keys
-     */
-    public static List<String> getImageKeys(String prefix, String suffix) {
-        return mergedContainer.getImageKeys(prefix, suffix);
-    }
-
-    /**
-     * Returns a set of all keys starting with the given prefix.
-     *
-     * @param prefix the prefix
-     * @return a set of all keysstarting with the given prefix
-     */
-    public static Set<String> getImageKeySet(String prefix) {
-        return mergedContainer.getImageKeySet(prefix);
+        return transform(mergedContainer.getImageKeySet(),
+                         k -> k.startsWith(prefix));
     }
 
     /**

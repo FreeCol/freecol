@@ -1364,7 +1364,6 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display the Tile overlays
-        Set<String> overlayCache = ImageLibrary.createOverlayCache();
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
         xt0 = yt0 = 0;
         for (Tile t : baseTiles) {
@@ -1377,8 +1376,7 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
             
-            BufferedImage overlayImage
-                = this.lib.getScaledOverlayImage(t, overlayCache);
+            BufferedImage overlayImage = this.lib.getScaledOverlayImage(t);
             RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
             this.tv.displayTileItems(g2d, t, rop, overlayImage);
             this.tv.displaySettlementWithChipsOrPopulationNumber(g2d, t,

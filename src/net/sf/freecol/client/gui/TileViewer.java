@@ -274,7 +274,6 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public void displayColonyTiles(Graphics2D g2d, Tile[][] tiles,
                                    Colony colony) {
-        Set<String> overlayCache = ImageLibrary.createOverlayCache();
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[x].length; y++) {
                 if (tiles[x][y] != null) {
@@ -282,7 +281,7 @@ public final class TileViewer extends FreeColClientHolder {
                     int yy = ((x + y) * this.tileHeight) / 2;
                     g2d.translate(xx, yy);
                     BufferedImage overlayImage
-                        = this.lib.getScaledOverlayImage(tiles[x][y], overlayCache);
+                        = this.lib.getScaledOverlayImage(tiles[x][y]);
                     displayColonyTile(g2d, tiles[x][y], colony, overlayImage);
                     g2d.translate(-xx, -yy);
                 }

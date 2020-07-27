@@ -198,7 +198,10 @@ public final class ImageLibrary {
     private final ImageCache imageCache;
 
     /** Cache for the string images. */
-    private HashMap<String,BufferedImage> stringImageCache;
+    private Map<String,BufferedImage> stringImageCache;
+
+    /** Cache for the tile sets. */
+    private Map<TileType, List<String>> tileKeyListCache;
 
 
     /**
@@ -227,6 +230,7 @@ public final class ImageLibrary {
     public ImageLibrary(float scaleFactor, ImageCache imageCache) {
         changeScaleFactor(scaleFactor);
         this.imageCache = imageCache;
+        this.tileKeyListCache = new HashMap<>();
     }
 
 
@@ -321,22 +325,6 @@ public final class ImageLibrary {
     private static boolean isSpecialEven(int x, int y) {
         return ((y % 8 <= 2) || ((x + y) % 2 == 0));
     }
-
-    private BufferedImage getRandomizedImage(List<String> keys,
-                                             String id, Dimension size) {
-        final int count = keys.size();
-        switch (count) {
-        case 0:
-            return null;
-        case 1:
-            return this.imageCache.getSizedImage(keys.get(0), size, false);
-        default:
-            keys.sort(Comparator.naturalOrder());
-            String key = keys.get(Math.abs(id.hashCode() % count));
-            return this.imageCache.getSizedImage(key, size, false);
-        }
-    }
-
 
     // Animation handling
 
@@ -1018,40 +1006,39 @@ public final class ImageLibrary {
      * Currently used for hills and mountains.
      *
      * @param type The type of the terrain-image to return.
-     * @param id A string used to get a random image.
+     * @param id An identifier for the tile instance that needs a random image.
      * @param size The size of the image to return.
-     * @param overlayCache An optional overlay cache to draw from.
-     * @return The terrain-image at the given index.
+     * @return A stable (with respect to id) random overlay image.
      */
     private BufferedImage getOverlayImageInternal(TileType type, String id,
-                                                  Dimension size,
-                                                  Set<String> overlayCache) {
-        final String prefix = "image.tileoverlay." + type.getId() + ".r";
-        List<String> keys = (overlayCache == null)
-            ? ResourceManager.getImageKeys(prefix)
-            : transform(overlayCache, k -> k.startsWith(prefix));
-        return getRandomizedImage(keys, id, size);
-    }
-
-    public static Set<String> createOverlayCache() {
-        return ResourceManager.getImageKeySet("image.tileoverlay.");
-    }
-
-    public BufferedImage getOverlayImage(TileType type, Dimension size) {
-        return getOverlayImageInternal(type, type.getId(), size, null);
+                                                  Dimension size) {
+        List<String> keys = this.tileKeyListCache.get(type);
+        if (keys == null) {
+            final String prefix = "image.tileoverlay." + type.getId() + ".r";
+            keys = ResourceManager.getImageKeys(prefix);
+            keys.sort(Comparator.naturalOrder());
+            this.tileKeyListCache.put(type, keys);
+        }
+        final int count = keys.size();
+        switch (count) {
+        case 0:
+            return null;
+        case 1:
+            return this.imageCache.getSizedImage(keys.get(0), size, false);
+        default:
+            String key = keys.get(Math.abs(id.hashCode() % count));
+            return this.imageCache.getSizedImage(key, size, false);
+        }
     }
 
     public BufferedImage getScaledOverlayImage(Tile tile) {
         return getOverlayImageInternal(tile.getType(), tile.getId(),
-                                       this.tileOverlaySize, null);
+                                       this.tileOverlaySize);
     }
 
-    public BufferedImage getScaledOverlayImage(Tile tile,
-                                               Set<String> overlayCache) {
-        return getOverlayImageInternal(tile.getType(), tile.getId(),
-                                       this.tileOverlaySize, overlayCache);
+    public BufferedImage getSizedOverlayImage(TileType type, Dimension size) {
+        return getOverlayImageInternal(type, type.getId(), size);
     }
-
 
     private static String getResourceTypeKey(ResourceType rt) {
         return "image.tileitem." + rt.getId();
@@ -1325,7 +1312,7 @@ public final class ImageLibrary {
                 / (2 * ImageLibrary.TILE_OVERLAY_SIZE.height));
         Dimension size2 = new Dimension(width, -1);
         BufferedImage terrainImage = getTerrainImage(type, 0, 0, size2);
-        BufferedImage overlayImage = getOverlayImage(type, size2);
+        BufferedImage overlayImage = getSizedOverlayImage(type, size2);
         BufferedImage forestImage = (type.isForested())
             ? getForestImage(type, size2)
             : null;
