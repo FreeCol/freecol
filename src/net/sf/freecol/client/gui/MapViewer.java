@@ -919,7 +919,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
             y = (ty <= fy) ? fy : this.vRows;
         } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : map.getWidth() - this.vRows;
+            y = (ty >= fy) ? fy : map.getHeight() - this.vRows;
         } else {
             y = ty;
         }
