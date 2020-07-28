@@ -123,7 +123,14 @@ public final class Canvas extends JDesktopPane {
     /** Remember the current size (from getSize()), check for changes. */
     private Dimension oldSize;
 
-    /** The component that displays the map. */
+    /**
+     * The component that displays the map.
+     * Ideally this would be completely separate, but the displayMap
+     * (and possibly changeSize) call/s means we must retain a reference
+     * to the map viewer.
+     * We also use it for the Cursor, which remains in MapViewer so
+     * that displayMap can draw it when active needed.
+     */
     private final MapViewer mapViewer;
 
     /** The various sorts of map controls. */
