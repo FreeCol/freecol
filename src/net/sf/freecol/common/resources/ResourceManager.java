@@ -103,8 +103,8 @@ public class ResourceManager {
                             if (preloadDone) break;
                             Utils.delay(10, null);
                         } else { // Preload the mapping found
-                            n += mapping.preload();
                             mergedContainer.addAll(mapping);
+                            n += mapping.preload();
                         }
                     }
                     preloadThread = null;
