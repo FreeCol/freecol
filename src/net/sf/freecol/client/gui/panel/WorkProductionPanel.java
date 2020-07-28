@@ -118,7 +118,7 @@ public class WorkProductionPanel extends FreeColPanel {
 
         JLabel finalResult = new JLabel(ModifierFormat.format(result));
         finalResult.setFont(bigFont);
-        finalResult.setBorder(Utility.PRODUCTION_BORDER);
+        finalResult.setBorder(Utility.getProductionBorder());
         add(finalResult, "wrap 30");
 
         // Is there unattended production?

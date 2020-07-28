@@ -171,7 +171,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.getName("model.tradeItem.colony"));
             this.allColonies = source.getColonyList();
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(this.label);
             add(this.colonyBox);
@@ -274,7 +274,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                                                  .getTextField()
                                                  .setColumns(5);
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(Utility.localizedLabel(Messages.getName("model.tradeItem.gold")));
             add(Utility.localizedLabel(StringTemplate
@@ -375,7 +375,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.goods"));
             this.allGoods = allGoods;
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(this.label);
             add(this.goodsBox);
@@ -503,7 +503,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.setActionCommand(ADD);
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.incite"));
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             available.clear();
             final Predicate<Player> incitablePred = p ->
@@ -623,7 +623,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(Utility.localizedLabel(Messages.nameKey("model.tradeItem.stance")));
             add(this.stanceBox);
@@ -743,7 +743,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.unit"));
             this.allUnits = allUnits;
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(this.label);
             add(this.unitBox);
@@ -1162,7 +1162,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         
         button.setMargin(Utility.EMPTY_MARGIN);
         button.setOpaque(false);
-        button.setForeground(Utility.LINK_COLOR);
+        button.setForeground(Utility.getLinkColor());
         button.setBorder(Utility.blankBorder(0, 0, 0, 0));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;

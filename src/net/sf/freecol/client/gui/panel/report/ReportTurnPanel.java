@@ -296,7 +296,7 @@ public final class ReportTurnPanel extends ReportPanel {
             button.addActionListener(this);
             button.setActionCommand(commandId);
             headline = button;
-            headline.setForeground(Utility.LINK_COLOR);
+            headline.setForeground(Utility.getLinkColor());
         } else {
             headline = new JLabel(text);
         }

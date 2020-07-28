@@ -125,17 +125,17 @@ public final class ReportProductionPanel extends ReportPanel {
             // labels
             JLabel newLabel;
             newLabel = Utility.localizedLabel("Colony");
-            newLabel.setBorder(Utility.TOPLEFTCELLBORDER);
+            newLabel.setBorder(Utility.getTopLeftCellBorder());
             reportPanel.add(newLabel, "newline 20");
 
             for (int index = 0; index < selectedTypes.size(); index++) {
                 newLabel = Utility.localizedLabel(selectedTypes.get(index));
-                newLabel.setBorder(Utility.TOPCELLBORDER);
+                newLabel.setBorder(Utility.getTopCellBorder());
                 reportPanel.add(newLabel);
 
                 for (BuildingType bt : basicBuildingTypes.get(index)) {
                     newLabel = Utility.localizedLabel(bt);
-                    newLabel.setBorder(Utility.TOPCELLBORDER);
+                    newLabel.setBorder(Utility.getTopCellBorder());
                     reportPanel.add(newLabel);
                 }
             }
@@ -145,7 +145,7 @@ public final class ReportProductionPanel extends ReportPanel {
                 // colonyButton
                 JButton colonyButton = Utility.getLinkButton(colony.getName(),
                     null, colony.getId());
-                colonyButton.setBorder(Utility.LEFTCELLBORDER);
+                colonyButton.setBorder(Utility.getLeftCellBorder());
                 colonyButton.addActionListener(this);
                 reportPanel.add(colonyButton, "newline");
 
@@ -157,19 +157,19 @@ public final class ReportProductionPanel extends ReportPanel {
                                             goodsType, newValue);
                     GoodsLabel goodsLabel = new GoodsLabel(fcc, goods);
                     goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-                    goodsLabel.setBorder(Utility.CELLBORDER);
+                    goodsLabel.setBorder(Utility.getCellBorder());
                     reportPanel.add(goodsLabel);
 
                     for (BuildingType bt : basicBuildingTypes.get(index)) {
                         Building building = colony.getBuilding(bt);
                         if (building == null) {
                             newLabel = new JLabel();
-                            newLabel.setBorder(Utility.CELLBORDER);
+                            newLabel.setBorder(Utility.getCellBorder());
                             reportPanel.add(newLabel);
                         } else {
                             BuildingPanel buildingPanel
                                 = new BuildingPanel(fcc, building);
-                            buildingPanel.setBorder(Utility.CELLBORDER);
+                            buildingPanel.setBorder(Utility.getCellBorder());
                             buildingPanel.initialize();
                             reportPanel.add(buildingPanel);
                         }

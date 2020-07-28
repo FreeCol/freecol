@@ -82,7 +82,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         this.panel = new MigPanel(new MigLayout("wrap 2, fill",
                                                 "[fill, grow]20[fill]"));
         this.panel.setBorder(Utility.localizedBorder(super.getJLabel().getText(),
-                                                 Utility.BORDER_COLOR));
+                Utility.getBorderColor()));
 
         this.model = new DefaultListModel<>();
         for (AbstractOption<T> o : option.getValue()) {

@@ -178,7 +178,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
         this.pane = new JOptionPane(jc, paneType, JOptionPane.DEFAULT_OPTION,
                                     icon, selectOptions(), ci);
-        this.pane.setBorder(Utility.DIALOG_BORDER);
+        this.pane.setBorder(Utility.getDialogBorder());
         this.pane.setOpaque(false);
         this.pane.setName("FreeColDialog");
         this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);

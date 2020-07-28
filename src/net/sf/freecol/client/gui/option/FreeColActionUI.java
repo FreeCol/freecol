@@ -193,7 +193,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
             super(getHumanKeyStrokeText(keyStroke), JLabel.CENTER);
 
             setOpaque(false);
-            setBorder(Utility.TRIVIAL_LINE_BORDER);
+            setBorder(Utility.getTrivialLineBorder());
             addKeyListener(this);
             addMouseListener(this);
         }

@@ -98,7 +98,7 @@ public final class ReportLabourDetailPanel extends ReportPanel {
                 colonyButton.addActionListener(this);
                 detailPanel.add(colonyButton);
                 JLabel countLabel = new JLabel(unitLocations.get(colony).toString());
-                countLabel.setForeground(Utility.LINK_COLOR);
+                countLabel.setForeground(Utility.getLinkColor());
                 detailPanel.add(countLabel);
             }
         }
@@ -111,7 +111,7 @@ public final class ReportLabourDetailPanel extends ReportPanel {
                 linkButton.addActionListener(this);
                 detailPanel.add(linkButton);
                 JLabel countLabel = new JLabel(e.getValue().toString());
-                countLabel.setForeground(Utility.LINK_COLOR);
+                countLabel.setForeground(Utility.getLinkColor());
                 detailPanel.add(countLabel);
             });
         if (canTrain) {
