@@ -28,8 +28,10 @@ import java.awt.Image;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
+import javax.swing.JComponent;
 
 
 /**
@@ -138,6 +140,49 @@ public class ImageUtils {
         g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
         return result;
+    }
+
+    /**
+     * Draw a (usually small) background image into a (usually larger)
+     * space specified by a component, tiling the image to fill up the
+     * space.
+     *
+     * @param image A {@code BufferedImage} to tile with (null fills with
+     *     background color).
+     * @param g The {@code Graphics} to draw to.
+     * @param c The {@code JComponent} that defines the space.
+     * @param insets Optional {@code Insets} to apply.
+     */
+    public static void drawTiledImage(BufferedImage image, Graphics g,
+                                      JComponent c, Insets insets) {
+        int width = c.getWidth();
+        int height = c.getHeight();
+        int xmin, ymin;
+        if (insets == null) {
+            xmin = 0;
+            ymin = 0;
+        } else {
+            xmin = insets.left;
+            ymin = insets.top;
+            width -= insets.left + insets.right;
+            height -= insets.top + insets.bottom;
+        }
+
+        if (image != null) {
+            // FIXME: Test and profile if calling fillTexture is better.
+            int dx = image.getWidth();
+            int dy = image.getHeight();
+            int xmax = xmin + width;
+            int ymax = ymin + height;
+            for (int x = xmin; x < xmax; x += dx) {
+                for (int y = ymin; y < ymax; y += dy) {
+                    g.drawImage(image, x, y, null);
+                }
+            }
+        } else {
+            g.setColor(c.getBackground());
+            g.fillRect(xmin, ymin, width, height);
+        }
     }
 
     /**

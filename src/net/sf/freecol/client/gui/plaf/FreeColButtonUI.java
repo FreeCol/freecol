@@ -35,6 +35,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -62,8 +63,8 @@ public class FreeColButtonUI extends MetalButtonUI {
         LAFUtilities.setProperties(g, c);
 
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColButton",
-                                        g, c, null);
+            ImageUtils.drawTiledImage(ImageLibrary.getButtonBackground(),
+                                      g, c, null);
         }
         super.paint(g, c);
 

@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -161,7 +162,8 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setAction(action);
             rtn.setOpaque(false);
 
-            rtn.setSelected(((SelectableAction)am.getFreeColAction(actionId)).isSelected());
+            rtn.setSelected(((SelectableAction)am.getFreeColAction(actionId))
+                .isSelected());
         } else
             logger.finest("Could not create menu item. [" + actionId
                 + "] not found.");
@@ -239,8 +241,8 @@ public abstract class FreeColMenuBar extends JMenuBar {
         if (isOpaque()) {
             super.paintComponent(g);
         } else {
-            ImageLibrary.drawTiledImage("image.background.FreeColMenuBar",
-                                        g, this, getInsets());
+            ImageUtils.drawTiledImage(ImageLibrary.getMenuBackground(),
+                                      g, this, getInsets());
         }
     }
 }

@@ -29,7 +29,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -45,7 +44,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Size;
@@ -443,53 +441,6 @@ public final class ImageLibrary {
     }
 
 
-    // Image manipulation
-
-    /**
-     * Draw a (usually small) background image into a (usually larger)
-     * space specified by a component, tiling the image to fill up the
-     * space.  If the image is not available, just fill with the background
-     * colour.
-     *
-     * @param key The name of the {@code ImageResource} to tile with.
-     * @param g The {@code Graphics} to draw to.
-     * @param c The {@code JComponent} that defines the space.
-     * @param insets Optional {@code Insets} to apply.
-     */
-    public static void drawTiledImage(String key, Graphics g,
-                                      JComponent c, Insets insets) {
-        int width = c.getWidth();
-        int height = c.getHeight();
-        int xmin, ymin;
-        if (insets == null) {
-            xmin = 0;
-            ymin = 0;
-        } else {
-            xmin = insets.left;
-            ymin = insets.top;
-            width -= insets.left + insets.right;
-            height -= insets.top + insets.bottom;
-        }
-
-        if (ResourceManager.getImageResource(key, false) != null) {
-            BufferedImage image = getUnscaledImage(key);
-            // FIXME: Test and profile if calling fillTexture is better.
-            int dx = image.getWidth();
-            int dy = image.getHeight();
-            int xmax = xmin + width;
-            int ymax = ymin + height;
-            for (int x = xmin; x < xmax; x += dx) {
-                for (int y = ymin; y < ymax; y += dy) {
-                    g.drawImage(image, x, y, null);
-                }
-            }
-        } else {
-            g.setColor(c.getBackground());
-            g.fillRect(xmin, ymin, width, height);
-        }
-    }
-
-
     // Fundamental image retrieval
 
     /**
@@ -530,6 +481,10 @@ public final class ImageLibrary {
 
     // Miscellaneous image handling
 
+    public static BufferedImage getButtonBackground() {
+        return getUnscaledImage("image.background.FreeColButton");
+    }
+
     /**
      * Get the button images for a given key.
      *
@@ -547,6 +502,10 @@ public final class ImageLibrary {
         return ret;
     }
         
+    public static BufferedImage getBrightPanelBackground() {
+        return getUnscaledImage("image.background.FreeColBrightPanel");
+    }
+
     public static BufferedImage getCanvasBackgroundImage() {
         final String key = "image.flavor.Canvas.map";
         return (ResourceManager.getImageResource(key, false) == null) ? null
@@ -609,6 +568,10 @@ public final class ImageLibrary {
         return this.imageCache.getSizedImage(BELLS, ICON_SIZE, false);
     }
 
+    public static BufferedImage getListBackground() {
+        return getUnscaledImage("image.background.FreeColList");
+    }
+
     public JLabel getLockLabel() {
         BufferedImage img = this.imageCache.getScaledImage(ICON_LOCK,
             this.scaleFactor * SMALLER_SCALE, false);
@@ -623,7 +586,11 @@ public final class ImageLibrary {
         }
         return getUnscaledImage(key);
     }
-        
+
+    public static BufferedImage getMenuBackground() {
+        return getUnscaledImage("image.background.FreeColMenuBar");
+    }
+
     public static BufferedImage getMiniMapBackground() {
         return getUnscaledImage("image.background.MiniMap");
     }
@@ -707,6 +674,14 @@ public final class ImageLibrary {
         return (image == null) ? null : new ImageIcon(image);
     }
 
+    public static BufferedImage getOptionPaneBackground() {
+        return getUnscaledImage("image.background.FreeColOptionPane");
+    }
+
+    public static BufferedImage getPanelBackground() {
+        return getUnscaledImage("image.background.FreeColPanel");
+    }
+
     /**
      * Get the generic placeholder image.
      *
@@ -717,6 +692,26 @@ public final class ImageLibrary {
                                              ICON_SIZE, false);
     }
     
+    public static BufferedImage getPopupMenuBackground() {
+        return getUnscaledImage("image.background.FreeColPopupMenu");
+    }
+
+    public static BufferedImage getProgressBarBackground() {
+        return getUnscaledImage("image.background.FreeColProgressBar");
+    }
+
+    public static BufferedImage getTextAreaBackground() {
+        return getUnscaledImage("image.background.FreeColTextArea");
+    }
+
+    public static BufferedImage getTextFieldBackground() {
+        return getUnscaledImage("image.background.FreeColTextField");
+    }
+    
+    public static BufferedImage getToolTipBackground() {
+        return getUnscaledImage("image.background.FreeColToolTip");
+    }
+
 
     // BuildingType/Building/Buildable handling
 

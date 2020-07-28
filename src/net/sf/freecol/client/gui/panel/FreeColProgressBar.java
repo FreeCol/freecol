@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -168,8 +169,8 @@ public class FreeColProgressBar extends JPanel {
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
         if (isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColProgressBar",
-                                        g, this, getInsets());
+            ImageUtils.drawTiledImage(ImageLibrary.getProgressBarBackground(),
+                                      g, this, getInsets());
         }
 
         int dvalue = 0;
