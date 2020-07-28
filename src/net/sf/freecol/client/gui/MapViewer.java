@@ -456,10 +456,11 @@ public final class MapViewer extends FreeColClientHolder {
      * Is a tile with given y-coordinate near the bottom?
      *
      * @param y The y-coordinate.
+     * @param mapHeight The map tile height.
      * @return True if near the bottom.
      */
-    private boolean isMapNearBottom(int y) {
-        return y >= getMap().getHeight() - this.centerRows;
+    private boolean isMapNearBottom(int y, int mapHeight) {
+        return y >= mapHeight - this.centerRows;
     }
 
     /**
@@ -478,10 +479,11 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param x The x-coordinate.
      * @param y The y-coordinate.
+     * @param width The map tile width.
      * @return True if near the right.
      */
-    private boolean isMapNearRight(int x, int y) {
-        return x >= getMap().getWidth() - getRightColumns(y);
+    private boolean isMapNearRight(int x, int y, int mapWidth) {
+        return x >= mapWidth - getRightColumns(y);
     }
 
 
@@ -909,20 +911,23 @@ public final class MapViewer extends FreeColClientHolder {
         final int tx = t.getX(), ty = t.getY();
 
         final Map map = getMap();
+        final int mapHeight = map.getHeight(), mapWidth = map.getWidth();
         int x, y;
         // When already close to an edge, resist moving the focus closer,
         // but if moving away immediately jump out of the `nearTo' area.
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
             y = (ty <= fy) ? fy : this.centerRows;
-        } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : map.getHeight() - this.centerRows;
+        } else if (isMapNearBottom(ty, mapHeight)
+            && isMapNearBottom(fy, mapHeight)) {
+            y = (ty >= fy) ? fy : mapHeight - this.centerRows;
         } else {
             y = ty;
         }
         if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
             x = (tx <= fx) ? fx : getLeftColumns(ty);
-        } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
-            x = (tx >= fx) ? fx : map.getWidth() - getRightColumns(ty);
+        } else if (isMapNearRight(tx, ty, mapWidth)
+            && isMapNearRight(fx, fy, mapWidth)) {
+            x = (tx >= fx) ? fx : mapWidth - getRightColumns(ty);
         } else {
             x = tx;
         }
