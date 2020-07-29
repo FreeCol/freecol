@@ -260,6 +260,16 @@ public final class ImageLibrary {
     }
 
     /**
+     * Scale a pixel distance the current internal scale.
+     *
+     * @param n The pixels to scale.
+     * @return The scaled pixels.
+     */
+    public int scaleInt(int n) {
+        return (int)(n * this.scaleFactor);
+    }
+
+    /**
      * Scale a dimension with the current internal scale.
      *
      * @param size The {@code Dimension} to scale.
@@ -1600,7 +1610,7 @@ public final class ImageLibrary {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                                            Size.TINY, Font.BOLD);
         FontMetrics fm = g.getFontMetrics(font);
-        int padding = (int)(6 * this.scaleFactor);
+        int padding = scaleInt(6);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
             fm.getMaxAscent() + fm.getMaxDescent() + padding,
             BufferedImage.TYPE_INT_ARGB);

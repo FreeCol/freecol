@@ -69,7 +69,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * create*() routines return a newly created BufferedImage, drawn with
  * a Graphics2D object that is created and disposed within.
  * display*() routines use a Graphics2D object passed as a parameter to
- * draw to, which is neither created or disposed by the routine, just used
+ * draw to, which is neither created or disposed by the routine, just used.
  */
 public final class TileViewer extends FreeColClientHolder {
 
@@ -124,7 +124,7 @@ public final class TileViewer extends FreeColClientHolder {
         }
     }
 
-    /** The height offset to paint at (in pixels). */
+    /** The offset to paint the occupation indicator (in pixels). */
     public static final int STATE_OFFSET_X = 25, STATE_OFFSET_Y = 10;
 
     /**
@@ -333,8 +333,7 @@ public final class TileViewer extends FreeColClientHolder {
             Player owner = getMyPlayer();
             String text = Messages.message(unit.getOccupationLabel(owner, false));
             g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
-                          (int)(STATE_OFFSET_X * this.lib.getScaleFactor()),
-                          0, null);
+                          this.lib.scaleInt(STATE_OFFSET_X), 0, null);
         }
     }
 
@@ -608,8 +607,8 @@ public final class TileViewer extends FreeColClientHolder {
         } else if (settlement instanceof IndianSettlement) {
             IndianSettlement is = (IndianSettlement)settlement;
             BufferedImage chip;
-            float xOffset = STATE_OFFSET_X * this.lib.getScaleFactor();
-            float yOffset = STATE_OFFSET_Y * this.lib.getScaleFactor();
+            float xOffset = this.lib.scaleInt(STATE_OFFSET_X);
+            float yOffset = this.lib.scaleInt(STATE_OFFSET_Y);
             final int colonyLabels = getClientOptions()
                 .getInteger(ClientOptions.COLONY_LABELS);
             if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {

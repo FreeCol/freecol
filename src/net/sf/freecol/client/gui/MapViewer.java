@@ -261,15 +261,6 @@ public final class MapViewer extends FreeColClientHolder {
     // Trivial
 
     /**
-     * Get the scale factor for the image library.
-     *
-     * @return The scale factor.
-     */
-    private float getScale() {
-        return this.lib.getScaleFactor();
-    }
-
-    /**
      * Sets the focus tile.
      *
      * @param focus The new focus {@code Tile}.
@@ -299,7 +290,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.fog.lineTo(0, this.halfHeight);
         this.fog.closePath();
 
-        final float scale = getScale();
+        final float scale = this.lib.getScaleFactor();
         this.fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             Size.SMALLER, Font.BOLD, scale);
         this.fontItalic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
@@ -806,7 +797,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (tileP == null) return null;
         int labelX = tileP.x + this.tileWidth / 2 - unitLabel.getWidth() / 2;
         int labelY = tileP.y + this.tileHeight / 2 - unitLabel.getHeight() / 2
-            - (int)(UNIT_OFFSET * getScale());
+            - this.lib.scaleInt(UNIT_OFFSET);
         return new Point(labelX, labelY);
     }
 
@@ -1616,23 +1607,19 @@ public final class MapViewer extends FreeColClientHolder {
                 }
             }
             
-            int width = (int)((nameImage.getWidth() * getScale())
-                + ((leftImage != null)
-                    ? (leftImage.getWidth() * getScale()) + spacing
-                    : 0)
-                + ((rightImage != null)
-                    ? (rightImage.getWidth() * getScale()) + spacing
-                    : 0));
-            int labelOffset = (this.tileWidth - width)/2;
-            yOffset -= (nameImage.getHeight() * getScale())/2;
+            int width = this.lib.scaleInt(nameImage.getWidth()
+                + ((leftImage == null) ? 0 : leftImage.getWidth() + spacing)
+                + ((rightImage == null) ? 0 : rightImage.getWidth() + spacing));
+            int xOffset = (this.tileWidth - width)/2;
+            yOffset -= this.lib.scaleInt(nameImage.getHeight())/2;
             if (leftImage != null) {
-                g2d.drawImage(leftImage, rop, labelOffset, yOffset);
-                labelOffset += (leftImage.getWidth() * getScale()) + spacing;
+                g2d.drawImage(leftImage, rop, xOffset, yOffset);
+                xOffset += this.lib.scaleInt(leftImage.getWidth() + spacing);
             }
-            g2d.drawImage(nameImage, rop, labelOffset, yOffset);
+            g2d.drawImage(nameImage, rop, xOffset, yOffset);
             if (rightImage != null) {
-                labelOffset += (nameImage.getWidth() * getScale()) + spacing;
-                g2d.drawImage(rightImage, rop, labelOffset, yOffset);
+                xOffset += this.lib.scaleInt(nameImage.getWidth() + spacing);
+                g2d.drawImage(rightImage, rop, xOffset, yOffset);
             }
             break;
         }
@@ -1886,8 +1873,7 @@ public final class MapViewer extends FreeColClientHolder {
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
         g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
-                    (int)(TileViewer.STATE_OFFSET_X * getScale()), 0,
-                    null);
+                      this.lib.scaleInt(TileViewer.STATE_OFFSET_X), 0, null);
 
         // Draw one small line for each additional unit (like in civ3).
         int unitsOnTile = 0;
@@ -1901,10 +1887,10 @@ public final class MapViewer extends FreeColClientHolder {
         if (unitsOnTile > 1) {
             g2d.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
-            int x1 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
-                * getScale());
-            int x2 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
-                    + OTHER_UNITS_WIDTH) * getScale());
+            int x1 = this.lib.scaleInt(TileViewer.STATE_OFFSET_X
+                + OTHER_UNITS_OFFSET_X);
+            int x2 = this.lib.scaleInt(TileViewer.STATE_OFFSET_X
+                + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH);
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                 g2d.drawLine(x1, unitLinesY, x2, unitLinesY);
                 unitLinesY += 2;
@@ -1940,8 +1926,8 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
         int unitX = (this.tileWidth - unitImage.getWidth()) / 2;
-        int unitY = (this.tileHeight - unitImage.getHeight()) / 2 -
-                    (int)(UNIT_OFFSET * getScale());
+        int unitY = (this.tileHeight - unitImage.getHeight()) / 2
+            - this.lib.scaleInt(UNIT_OFFSET);
         return new Point(unitX, unitY);
     }
 
