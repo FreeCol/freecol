@@ -89,9 +89,7 @@ public class ReportPanel extends FreeColPanel {
         add(scrollPane, SCROLL_PANE_SIZE);
         add(okButton, "cell 0 2, tag ok");
 
-        final float scale = getGUI().getMapScale();
-        getGUI().restoreSavedSize(this,
-            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
+        getGUI().restoreSavedSize(this, new Dimension(1050, 725));
     }
 
 

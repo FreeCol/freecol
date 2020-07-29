@@ -96,9 +96,7 @@ public final class ColopediaPanel extends FreeColPanel
 
         add(okButton, "newline 20, span, tag ok");
 
-        final float scale = getGUI().getMapScale();
-        getGUI().restoreSavedSize(this,
-            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
+        getGUI().restoreSavedSize(this, new Dimension(1050, 725));
         tree = buildTree();
 
         select(id);
