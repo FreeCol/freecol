@@ -269,20 +269,28 @@ public final class FreeColClient {
                 };
             } else {
                 start = () -> {
+                    gui.playSound("sound.intro.general");
                     gui.closeStatusPanel();
                     gui.showMainPanel(userMsg);
                 };
             }
         } else if (spec != null) { // Debug or fast start
             start = () -> {
+                gui.playSound("sound.intro.general");
                 if (!connectController.startSinglePlayerGame(spec)) {
                     gui.showMainPanel(userMsg);
                 }
             };
         } else if (showOpeningVideo) { // Video first
-            gui.showOpeningVideo(userMsg, () -> gui.showMainPanel(userMsg));
+            gui.showOpeningVideo(userMsg, () -> {
+                    gui.playSound("sound.intro.general");
+                    gui.showMainPanel(userMsg);
+                });
         } else { // Start main panel
-            start = () -> gui.showMainPanel(userMsg);
+            start = () -> {
+                gui.playSound("sound.intro.general");
+                gui.showMainPanel(userMsg);
+            };
         }
 
         // All resources mappings should be queued by now
@@ -291,10 +299,7 @@ public final class FreeColClient {
         // is done
         ResourceManager.finishPreloading();
         
-        if (start != null) {
-            gui.playSound("sound.intro.general");
-            gui.invokeNowOrLater(start);
-        }
+        if (start != null) gui.invokeNowOrLater(start);
         
         String quitName = FreeCol.CLIENT_THREAD + "Quit Game";
         Runtime.getRuntime().addShutdownHook(new Thread(quitName) {
