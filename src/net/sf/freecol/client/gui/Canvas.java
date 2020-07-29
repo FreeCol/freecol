@@ -824,6 +824,7 @@ public final class Canvas extends JDesktopPane {
         if (fcd.isModal() && none(dialogs, FreeColDialog::isModal)) {
             this.mapViewer.startCursorBlinking();
         }
+        if (dialogs.isEmpty()) updateMenuBar();
     }
 
     /**
@@ -1350,7 +1351,5 @@ public final class Canvas extends JDesktopPane {
     @Override
     public void remove(Component comp) {
         removeFromCanvas(comp);
-        // Always update menus as some items are disabled by dialogs and panels
-        updateMenuBar();
     }
 }
