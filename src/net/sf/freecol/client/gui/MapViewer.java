@@ -201,7 +201,9 @@ public final class MapViewer extends FreeColClientHolder {
      * There are special cases handled in getLeft/RightColumns().
      */
     private int centerColumns;    
-
+    /** Special y-odd/even offsets to centerColumns. FIXME: explain! */
+    private int columnEvenYOffset, columnOddYOffset;
+    
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
 
@@ -371,7 +373,12 @@ public final class MapViewer extends FreeColClientHolder {
         } else {
             this.centerRows = this.vSpace / this.halfHeight + 1;
         }
+        // Calculate the number of columns that will be drawn to the
+        // left of the central tile
         this.centerColumns = this.hSpace / this.tileWidth + 1;
+        // Special y-coordinate-dependent offset to centerColumns
+        this.columnEvenYOffset = ((this.hSpace % this.tileWidth) > 32) ? 1 : 0;
+        this.columnOddYOffset = ((this.hSpace % this.tileWidth) == 0) ? -1 : 0;
     }
 
 
@@ -416,30 +423,22 @@ public final class MapViewer extends FreeColClientHolder {
      * @return The number of columns.
      */
     private int getLeftColumns(int y) {
-        int ret = this.centerColumns;
-        if ((y & 1) == 0) {
-            if ((this.hSpace % this.tileWidth) > 32) ret++;
-        } else {
-            if ((this.hSpace % this.tileWidth) == 0) ret--;
-        }
-        return ret;
+        return this.centerColumns
+            + (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
     }
 
     /**
      * Get the number of columns that are to the right of the center tile
      * with the given y-coordinate.
      *
+     * Note: same as getLeftColumns except the offset is subtracted.
+     *
      * @param y The y-coordinate of the tile in question.
      * @return The number of columns.
      */
     private int getRightColumns(int y) {
-        int ret = this.centerColumns;
-        if ((y & 1) == 0) {
-            if ((this.hSpace % this.tileWidth) == 0) ret--;
-        } else {
-            if ((this.hSpace % this.tileWidth) > 32) ret++;
-        }
-        return ret;
+        return this.centerColumns
+            - (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
     }
 
     /**
