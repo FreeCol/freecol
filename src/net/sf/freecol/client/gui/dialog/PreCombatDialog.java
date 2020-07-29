@@ -135,8 +135,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             }
         }
 
-        Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                              Size.SMALLER, Font.BOLD);
+        Font bigFont = FontLibrary.getUnscaledFont("normal-bold-smaller");
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
         JLabel finalLabel = Utility.localizedLabel("finalResult");

@@ -118,8 +118,7 @@ public class FreeColProgressBar extends JPanel {
             : (freeColClient.getGUI().getFixedImageLibrary()
                 .getGoodsTypeImage(goodsType,
                     new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2)));
-        this.font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                           Size.TINY);
+        this.font = FontLibrary.getUnscaledFont("simple-plain-tiny");
 
         setBorder(Utility.PROGRESS_BORDER);
         setPreferredSize(new Dimension(200, 20));

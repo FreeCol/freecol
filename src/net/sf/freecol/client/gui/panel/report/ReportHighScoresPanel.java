@@ -61,8 +61,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                             "span, wrap 10");
         }
 
-        Font font = FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                                           Size.SMALL);
+        Font font = FontLibrary.getUnscaledFont("header-plain-small");
         for (HighScore highScore : highScores) {
             JLabel scoreValue
                 = new JLabel(String.valueOf(highScore.getScore()));

@@ -76,8 +76,7 @@ public class BuildingToolTip extends JToolTip {
         setLayout(layout);
 
         JLabel buildingName = new JLabel(Messages.getName(building));
-        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                           Size.SMALLER, Font.BOLD);
+        Font font = FontLibrary.getUnscaledFont("simple-bold-smaller");
         buildingName.setFont(font);
         add(buildingName, "span");
 
@@ -90,8 +89,7 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(), "span");
         } else {
             JLabel arrow = new JLabel(ResourceManager.getString("arrow.E"));
-            arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                                 Size.SMALL, Font.BOLD));
+            arrow.setFont(FontLibrary.getUnscaledFont("simple-bold-small"));
             AbstractGoods maxProduction = (info == null) ? null
                 : first(info.getMaximumProduction());
             ProductionLabel productionOutput

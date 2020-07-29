@@ -116,8 +116,7 @@ public class NationTypeDetailPanel
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType,
                                                JPanel panel) {
-        Font boldFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                               Size.SMALLER, Font.BOLD);
+        Font boldFont = FontLibrary.getUnscaledFont("simple-bold-smaller");
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 

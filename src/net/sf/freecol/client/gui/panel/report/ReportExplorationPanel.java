@@ -60,8 +60,7 @@ public final class ReportExplorationPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 5, fillx", "", ""));
 
         // Header Row
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                           Size.TINY, Font.BOLD);
+        Font font = FontLibrary.getUnscaledFont("normal-bold-tiny");
         JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
         nameOfRegion.setFont(font);
         reportPanel.add(nameOfRegion);

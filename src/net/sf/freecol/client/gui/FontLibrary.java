@@ -21,10 +21,12 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Font;
 import java.util.logging.Logger;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -69,6 +71,9 @@ public class FontLibrary {
     
     /** Cache for the (optional) custom main Font. */
     private static Font mainFont = null;
+
+    /** The font cache. */
+    private static final Map<String, Font> fontCache = new HashMap<>();
 
 
     /**
@@ -250,5 +255,41 @@ public class FontLibrary {
             font = mainFont;
         }
         return font.deriveFont(style, getScaledSize(fontSize, scaleFactor));
+    }
+
+    /**
+     * Get an unscaled font with a simple text specification.
+     *
+     * The spec is a '-' delimited string with three parts.
+     *   1. The type, a case-independent value of the FontType enum.
+     *   2. The style, '+' delimited strings in ["plain", "bold", "italic"]
+     *   3. The (absolute) size, a case-independent value of the Size enum.
+     *
+     * Synchronized so as to be able to use a cache.
+     *
+     * @param spec The font specification.
+     * @return The {@code Font} found.
+     */
+    public static synchronized Font getUnscaledFont(String spec) {
+        Font ret = FontLibrary.fontCache.get(spec);
+        if (ret != null) return ret;
+        
+        String[] a = spec.split("-");
+        if (a.length != 3) throw new RuntimeException("Bad font spec: " + spec);
+        FontType type = Enum.valueOf(FontType.class, upCase(a[0]));
+        String[] styles = upCase(a[1]).split("\\+");
+        int style = 0;
+        for (String s : styles) {
+            int x = ("PLAIN".equals(s)) ? Font.PLAIN
+                : ("BOLD".equals(s)) ? Font.BOLD
+                : ("ITALIC".equals(s)) ? Font.ITALIC
+                : -1;
+            if (x < 0) throw new RuntimeException("Bad font style: " + s);
+            style |= x;
+        }
+        Size size = Enum.valueOf(Size.class, upCase(a[2]));
+        ret = createFont(type, size, style, DEFAULT_SCALE);
+        FontLibrary.fontCache.put(spec, ret);
+        return ret;
     }
 }

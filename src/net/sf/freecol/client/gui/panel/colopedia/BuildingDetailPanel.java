@@ -210,9 +210,7 @@ public class BuildingDetailPanel
                 if (input != null) {
                     panel.add(getGoodsButton(input), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
-                    Font font
-                        = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                                 Size.SMALL, Font.BOLD);
+                    Font font = FontLibrary.getUnscaledFont("simple-bold-small");
                     arrow.setFont(font);
                     panel.add(arrow);
                 }

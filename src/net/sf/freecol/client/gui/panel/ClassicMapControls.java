@@ -63,8 +63,7 @@ public final class ClassicMapControls extends MapControls {
     public ClassicMapControls(final FreeColClient freeColClient) {
         super(freeColClient, false);
 
-        this.arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                                Size.SMALL, Font.BOLD);
+        this.arrowFont = FontLibrary.getUnscaledFont("simple-bold-small");
 
         this.panel = new MigPanel(new MigLayout("wrap 3"));
         this.panel.add(this.miniMap, "span, width " + MINI_MAP_WIDTH

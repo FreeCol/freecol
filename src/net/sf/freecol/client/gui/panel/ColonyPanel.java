@@ -331,8 +331,7 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
-        Font nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                                                  Size.SMALL);
+        Font nameBoxFont = FontLibrary.getUnscaledFont("header-plain-small");
         boolean incompatibleFont = false;
         if (editable) {
             for (Colony c : player.getColonyList()) {
@@ -348,8 +347,7 @@ public final class ColonyPanel extends PortPanel
                 incompatibleFont = true;
         }
         if(incompatibleFont) {
-            nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                 Size.SMALL);
+            nameBoxFont = FontLibrary.getUnscaledFont("normal-plain-small");
         }
         this.nameBox.setFont(nameBoxFont);
         this.nameBox.setSelectedItem(colony);
@@ -1182,8 +1180,7 @@ public final class ColonyPanel extends PortPanel
             final Colony colony = getColony();
             if (colony == null) return;
             final ImageLibrary lib = getImageLibrary();
-            final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                     Size.SMALLER);
+            final Font font = FontLibrary.getUnscaledFont("normal-plain-smaller");
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
             final int rebels = Colony.calculateRebels(uc, solPercent);

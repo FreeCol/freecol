@@ -106,6 +106,9 @@ public final class UnitLabel extends FreeColLabel
      */
     private boolean ignoreLocation;
 
+    /** Font for labels. */
+    private final Font tinyFont;
+
 
     /**
      * Creates a JLabel to display a unit.
@@ -146,6 +149,7 @@ public final class UnitLabel extends FreeColLabel
         this.selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
+        this.tinyFont = FontLibrary.getUnscaledFont("normal-plain-tiny");
 
         updateIcon();
     }
@@ -420,10 +424,10 @@ public final class UnitLabel extends FreeColLabel
                 int idx = underRepair.indexOf('(');
                 String underRepair1 = underRepair.substring(0, idx).trim();
                 String underRepair2 = underRepair.substring(idx).trim();
-                Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                   Size.TINY);
-                Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);
-                Image repairImage2 = lib.getStringImage(g, underRepair2, Color.RED, font);
+                Image repairImage1 = lib.getStringImage(g, underRepair1,
+                    Color.RED, this.tinyFont);
+                Image repairImage2 = lib.getStringImage(g, underRepair2,
+                    Color.RED, this.tinyFont);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
                 int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(null),
                                                       getWidth() - repairImage2.getWidth(null)));

@@ -52,8 +52,7 @@ public final class ReportReligiousPanel extends ReportPanel {
     public ReportReligiousPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportReligionAction");
 
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                 Size.SMALLER, Font.BOLD);
+        final Font font = FontLibrary.getUnscaledFont("normal-bold-smaller");
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
 

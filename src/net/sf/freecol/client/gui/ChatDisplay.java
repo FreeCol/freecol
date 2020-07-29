@@ -68,8 +68,7 @@ public class ChatDisplay {
      */
     public ChatDisplay(FreeColClient freeColClient) {
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
-        this.font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                           Size.TINY);
+        this.font = FontLibrary.getUnscaledFont("normal-plain-tiny");
         this.messages = new ArrayList<>(MESSAGE_COUNT);
         this.decorationS = ImageLibrary.getUnscaledImage("image.menuborder.shadow.s");
         this.decorationSW = ImageLibrary.getUnscaledImage("image.menuborder.shadow.sw");
@@ -125,8 +124,6 @@ public class ChatDisplay {
         List<GUIMessage> msgs = prepareMessages();
         if (msgs.isEmpty()) return;
         
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                 Size.TINY);
         int yy = -1;
         final int xx = LEFT_MARGIN;
         for (GUIMessage m : msgs) {

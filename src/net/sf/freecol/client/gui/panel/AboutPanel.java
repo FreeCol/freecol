@@ -105,11 +105,8 @@ public final class AboutPanel extends FreeColPanel {
         add(apLogoLabel, "center");
 
         // Create available Font choices
-        final float mapScale = getGUI().getMapScale();
-        Font fontBold = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                               Size.TINY, Font.BOLD);
-        Font fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                                 Size.TINY);
+        Font fontBold = FontLibrary.getUnscaledFont("normal-bold-tiny");
+        Font fontNormal = FontLibrary.getUnscaledFont("normal-plain-tiny");
 
         // Version
         JLabel apVersion = Utility.localizedLabel("aboutPanel.version");
