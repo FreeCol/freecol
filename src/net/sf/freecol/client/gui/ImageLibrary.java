@@ -1635,20 +1635,7 @@ public final class ImageLibrary {
 
 
     // Get special images for strings with particular color and font
-    
-    public BufferedImage getStringImage(Graphics g, String text, String color,
-                                        FontLibrary.FontType type,
-                                        Size size, int style) {
-        return getStringImage(g, text, getColor(color), type, size, style);
-    }
-    
-    public BufferedImage getStringImage(Graphics g, String text, Color color,
-                                        FontLibrary.FontType type,
-                                        Size size, int style) {
-        return getStringImage(g, text, color,
-            FontLibrary.createFont(type, size, style, getScaleFactor()));
-    }
-    
+
     /**
      * Gets an image with a string of a given color and with
      * a black border around the glyphs.
@@ -1662,7 +1649,7 @@ public final class ImageLibrary {
     public BufferedImage getStringImage(Graphics g, String text, Color color,
                                         Font font) {
         if (color == null) {
-            logger.warning("getStringImage called with color null");
+            logger.warning("getStringImage(" + text + ") called with color null");
             color = Color.WHITE;
         }
 

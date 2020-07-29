@@ -590,17 +590,18 @@ public final class TileViewer extends FreeColClientHolder {
             if (withNumber) {
                 String populationString
                     = Integer.toString(colony.getApparentUnitCount());
-                String bonusString = "color.map.productionBonus."
+                String colorString = "color.map.productionBonus."
                     + colony.getProductionBonus();
                 // If more units can be added, go larger and use italic
+                float scale = this.lib.getScaleFactor();
+                Font font = (colony.getPreferredSizeChange() > 0)
+                    ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                        Size.SMALLER, Font.BOLD|Font.ITALIC, scale)
+                    : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                        Size.TINY, Font.BOLD, scale);
                 BufferedImage stringImage
-                    = (colony.getPreferredSizeChange() > 0)
-                    ? this.lib.getStringImage(g2d, populationString, bonusString,
-                        FontLibrary.FontType.SIMPLE,
-                        Size.SMALLER, Font.BOLD|Font.ITALIC)
-                    : this.lib.getStringImage(g2d, populationString, bonusString,
-                        FontLibrary.FontType.SIMPLE,
-                        Size.TINY, Font.BOLD);
+                    = this.lib.getStringImage(g2d, populationString,
+                        this.lib.getColor(colorString), font);
                 displayCenteredImage(g2d, stringImage, rop);
             }
 

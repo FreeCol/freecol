@@ -250,6 +250,9 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         /** The base image to display. */
         private final int number;
 
+        /** The font for the label. */
+        private final Font font;
+
         /**
          * Create an upkeep label.
          *
@@ -259,6 +262,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             super(new ImageIcon(getImageLibrary()
                 .getScaledImage(ImageLibrary.ICON_COIN)));
             this.number = number;
+            this.font = FontLibrary.getUnscaledFont("simple-bold-tiny");
         }
 
         /**
@@ -269,8 +273,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             getIcon().paintIcon(null, g, 0, 0);
             ImageLibrary lib = getImageLibrary();
             BufferedImage img = lib.getStringImage(g, Integer.toString(number),
-                getForeground(),
-                FontLibrary.FontType.SIMPLE, Size.TINY, Font.BOLD);
+                getForeground(), this.font);
             g.drawImage(img,
                 (getIcon().getIconWidth() - img.getWidth(null))/2,
                 (getIcon().getIconHeight() - img.getHeight(null))/2, null);
