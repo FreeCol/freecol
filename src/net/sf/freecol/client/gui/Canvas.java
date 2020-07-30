@@ -393,6 +393,15 @@ public final class Canvas extends JDesktopPane {
         return (JInternalFrame) temp;
     }
 
+    /**
+     * Is nothing showing?
+     *
+     * @return True if no dialog or panel is being shown.
+     */
+    private boolean nothingShowing() {
+        return this.dialogs.isEmpty() && getShowingPanel() == null;
+    }
+
 
     // Location, choice and persistence
 
@@ -645,6 +654,8 @@ public final class Canvas extends JDesktopPane {
             
             savePosition(fcp, jif.getLocation());
             saveSize(fcp, fcp.getSize());
+
+            if (nothingShowing()) updateMenuBar();
         }
     }
 
@@ -824,7 +835,7 @@ public final class Canvas extends JDesktopPane {
         if (fcd.isModal() && none(dialogs, FreeColDialog::isModal)) {
             this.mapViewer.startCursorBlinking();
         }
-        if (dialogs.isEmpty()) updateMenuBar();
+        if (nothingShowing()) updateMenuBar();
     }
 
     /**
@@ -919,9 +930,6 @@ public final class Canvas extends JDesktopPane {
 
         final Rectangle updateBounds = comp.getBounds();
         final JInternalFrame jif = getInternalFrame(comp);
-        if (jif != null) {
-            notifyClose(comp, jif);
-        }
         if (jif != null && jif != comp) {
             jif.dispose();
         } else {
@@ -934,6 +942,9 @@ public final class Canvas extends JDesktopPane {
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Java crash", e);
             }
+        }
+        if (jif != null) { // Notify close after removing from Canvas
+            notifyClose(comp, jif);
         }
         repaint(updateBounds.x, updateBounds.y,
                 updateBounds.width, updateBounds.height);
