@@ -409,6 +409,18 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Get the map scale.
+     *
+     * Used by:
+     *
+     * @return The scale for the (rescalable) map.
+     */
+    private final float getMapScale() {
+        ImageLibrary lib = this.scaledImageLibrary;
+        return (lib == null) ? 1.0f : lib.getScaleFactor();
+    }
+
+    /**
      * Get a rough position to place a dialog given a tile which we wish
      * to remain visible.
      *

@@ -999,16 +999,6 @@ public class GUI extends FreeColClientHolder {
         showNewPanel(null);
     }
 
-    /**
-     * Get the map scale.
-     *
-     * @return The scale for the (rescalable) map.
-     */
-    public final float getMapScale() {
-        ImageLibrary lib = getScaledImageLibrary();
-        return (lib == null) ? 1.0f : lib.getScaleFactor();
-    }
-
 
     // Sound routines, delegated to the SoundController, only useful
     // for GUI classes in need of sound

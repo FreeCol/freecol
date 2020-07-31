@@ -309,24 +309,22 @@ public class InGameMenuBar extends FreeColMenuBar {
         if (this.freeColClient == null) return; // Fail fast
         final Player player = this.freeColClient.getMyPlayer();
         if (player == null) return;
-        final GUI gui = this.freeColClient.getGUI();
-        final float scale = gui.getFixedImageLibrary().getScaleFactor();
 
+        final String text = Messages.message(StringTemplate
+            .template("menuBar.statusLine")
+            .addAmount("%gold%", player.getGold())
+            .addAmount("%tax%", player.getTax())
+            .addAmount("%score%", player.getScore())
+            .addStringTemplate("%year%", this.freeColClient.getGame()
+                .getTurn().getLabel()));
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                              RenderingHints.VALUE_RENDER_QUALITY);
-        StringTemplate y = this.freeColClient.getGame().getTurn().getLabel();
-        StringTemplate t = StringTemplate.template("menuBar.statusLine")
-            .addAmount("%gold%", player.getGold())
-            .addAmount("%tax%", player.getTax())
-            .addAmount("%score%", player.getScore())
-            .addStringTemplate("%year%", y);
-        String displayString = Messages.message(t);
-        int w = (int)g2d.getFontMetrics().getStringBounds(displayString, g)
+        final int w = (int)g2d.getFontMetrics().getStringBounds(text, g2d)
             .getWidth();
-        g2d.drawString(displayString, getWidth() - 10 - w,
-                       Math.round(12f * scale) + 3 + getInsets().top);
+        // FIXME: Magic#
+        g2d.drawString(text, getWidth() - 10 - w, 15 + getInsets().top);
     }
 }
