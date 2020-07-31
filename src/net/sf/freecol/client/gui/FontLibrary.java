@@ -97,7 +97,7 @@ public class FontLibrary {
     private static float getScaledSize(Size fontSize, float scaleFactor) {
         return fontSize.forFont() * scaleFactor;
     }
-
+    
     /**
      * Create a default {@code Font} set on initialization of the GUI.
      * 
@@ -114,58 +114,18 @@ public class FontLibrary {
     }
 
     /**
-     * Create a font of given type and size.
-     *
-     * @param fontType How the font should look like.
-     * @param fontSize Its size.
-     * @return The font created.
-     */
-    public static Font createFont(FontType fontType, Size fontSize) {
-        return createFont(fontType, fontSize, Font.PLAIN, DEFAULT_SCALE);
-    }
-
-    /**
-     * Create a font of given type, size and style.
-     * 
-     * @param fontType How the font should look like.
-     * @param fontSize Its size.
-     * @param style The font style for choosing plain, bold or italic.
-     * @return The created Font.
-     */
-    public static Font createFont(FontType fontType, Size fontSize,
-                                  int style) {
-        return createFont(fontType, fontSize, style, DEFAULT_SCALE);
-    }
-
-    /**
-     * Create a font of given type, size and scale factor.
-     * 
-     * @param fontType How the font should look like.
-     * @param fontSize Its size.
-     * @param scaleFactor The applied scale factor.
-     * @return The created Font.
-     */
-    public static Font createFont(FontType fontType, Size fontSize,
-                                  float scaleFactor) {
-        return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
-    }
-
-    /**
      * Create a font of given type, size, style and scale factor.
      * 
      * @param fontType How the font should look like.
      * @param fontSize Its relative size.
      * @param style The font style for choosing plain, bold or italic.
-     * @param scaleFactor The applied scale factor.
      * @return The created Font.
      */
-    public static Font createFont(FontType fontType, Size fontSize,
-                                  int style, float scaleFactor) {
-        float scaledSize = getScaledSize(fontSize, scaleFactor);
+    public static Font createFont(FontType fontType, Size fontSize, int style) {
         String fontKey = getFontKey(fontType);
         Font font = (fontKey == null) ? mainFont
             : ResourceManager.getFont(fontKey);
-        return font.deriveFont(style, scaledSize);
+        return font.deriveFont(style, fontSize.forFont());
     }
 
     /**
@@ -265,6 +225,10 @@ public class FontLibrary {
      *   2. The style, '+' delimited strings in ["plain", "bold", "italic"]
      *   3. The (absolute) size, a case-independent value of the Size enum.
      *
+     * This routine *should* always return a font, but it is allowed to
+     * throw exceptions if the font spec is bad.  It should not take too
+     * long to find bad font specs.
+     *
      * Synchronized so as to be able to use a cache.
      *
      * @param spec The font specification.
@@ -288,8 +252,27 @@ public class FontLibrary {
             style |= x;
         }
         Size size = Enum.valueOf(Size.class, upCase(a[2]));
-        ret = createFont(type, size, style, DEFAULT_SCALE);
+        ret = createFont(type, size, style);
         FontLibrary.fontCache.put(spec, ret);
         return ret;
+    }
+
+    /**
+     * Get a scaled font with a simple text specification.
+     *
+     * Beware the null return here.  Callers need to handle potential failure.
+     *
+     * @param spec The font specification.
+     * @param scale The font scale (in addition to that in the specification).
+     * @return The {@code Font} found, or null if scaling fails.
+     */
+    public static Font getScaledFont(String spec, float scale) {
+        String[] a = spec.split("-");
+        if (a.length != 3) throw new RuntimeException("Bad font spec: " + spec);
+        Size size = Enum.valueOf(Size.class, upCase(a[2]));
+        Size newSize = size.scaled(scale);
+        if (newSize == null) return null;
+        String newSpec = join("-", a[0], a[1], downCase(newSize.toString()));
+        return getUnscaledFont(newSpec);
     }
 }

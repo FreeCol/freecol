@@ -143,6 +143,9 @@ public final class TileViewer extends FreeColClientHolder {
     /** Font for tile text. */
     private Font tinyFont;
 
+    /** Fonts for the colony population chip. */
+    private Font emphFont, normFont;
+
 
     /**
      * The constructor to use.
@@ -170,9 +173,10 @@ public final class TileViewer extends FreeColClientHolder {
         this.tileWidth = tileSize.width;
         this.halfHeight = tileHeight/2;
         this.halfWidth = tileWidth/2;
-        this.tinyFont
-            = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                     Size.TINY, this.lib.getScaleFactor());
+        // Allow fonts to disappear if too small
+        this.tinyFont = this.lib.getScaledFont("normal-plain-tiny");
+        this.emphFont = this.lib.getScaledFont("simple-bold+italic-smaller");
+        this.normFont = this.lib.getScaledFont("simple-bold-tiny");
     }
         
     /**
@@ -499,7 +503,7 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public void displayOptionalTileText(Graphics2D g2d, Tile tile) {
         // Do not bother when the text gets very small
-        if (this.lib.getScaleFactor() <  1f) return;
+        if (this.tinyFont == null) return;
 
         String text = null;
         int op = getClientOptions().getInteger(ClientOptions.DISPLAY_TILE_TEXT);
@@ -588,21 +592,19 @@ public final class TileViewer extends FreeColClientHolder {
         if (settlement instanceof Colony) {
             final Colony colony = (Colony)settlement;
             if (withNumber) {
-                String populationString
-                    = Integer.toString(colony.getApparentUnitCount());
-                String colorString = "color.map.productionBonus."
-                    + colony.getProductionBonus();
-                // If more units can be added, go larger and use italic
-                float scale = this.lib.getScaleFactor();
                 Font font = (colony.getPreferredSizeChange() > 0)
-                    ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                        Size.SMALLER, Font.BOLD|Font.ITALIC, scale)
-                    : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                        Size.TINY, Font.BOLD, scale);
-                BufferedImage stringImage
-                    = this.lib.getStringImage(g2d, populationString,
-                        this.lib.getColor(colorString), font);
-                displayCenteredImage(g2d, stringImage, rop);
+                    ? this.emphFont : this.normFont;
+                if (font != null) {
+                    String populationString
+                        = Integer.toString(colony.getApparentUnitCount());
+                    String colorString = "color.map.productionBonus."
+                        + colony.getProductionBonus();
+                    // If more units can be added, go larger and use italic
+                    BufferedImage stringImage
+                        = this.lib.getStringImage(g2d, populationString,
+                            this.lib.getColor(colorString), font);
+                    displayCenteredImage(g2d, stringImage, rop);
+                }
             }
 
         } else if (settlement instanceof IndianSettlement) {

@@ -290,16 +290,17 @@ public final class MapViewer extends FreeColClientHolder {
         this.fog.lineTo(0, this.halfHeight);
         this.fog.closePath();
 
-        final float scale = this.lib.getScaleFactor();
-        this.fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            Size.SMALLER, Font.BOLD, scale);
-        this.fontItalic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            Size.SMALLER, Font.BOLD|Font.ITALIC, scale);
-        this.fontProduction = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            Size.TINY, Font.BOLD, scale);
-        this.fontTiny = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            Size.TINY, Font.PLAIN, scale);
-            
+        // Update fonts, make sure font{Normal,Italic} are non-null but
+        // allow the others to disappear if they get too small
+        this.fontNormal = this.lib.getScaledFont("normal-bold-smaller");
+        this.fontItalic = this.lib.getScaledFont("normal-bold+italic-smaller");
+        this.fontProduction = this.lib.getScaledFont("normal-bold-tiny");
+        this.fontTiny = this.lib.getScaledFont("normal-plain-tiny");
+        if (this.fontNormal == null && this.lib.getScaleFactor() < 1f) {
+            this.fontNormal = FontLibrary.getUnscaledFont("normal-bold-tiny");
+        }
+        if (this.fontItalic == null) this.fontItalic = this.fontNormal;
+        
         final int dx = this.tileWidth / 16;
         final int dy = this.tileHeight / 16;
         final int ddx = dx + dx / 2;
@@ -342,7 +343,7 @@ public final class MapViewer extends FreeColClientHolder {
             new Point2D.Float(dx + ddx, this.halfHeight + ddy));
 
         this.borderStroke = new BasicStroke(dy);
-        this.gridStroke = new BasicStroke(scale);
+        this.gridStroke = new BasicStroke(this.lib.getScaleFactor());
 
         updateSizeVariables();
     }
@@ -1558,7 +1559,7 @@ public final class MapViewer extends FreeColClientHolder {
                 && settlement.getOwner() == player) {
                 Colony colony = (Colony) settlement;
                 BuildableType buildable = colony.getCurrentlyBuilding();
-                if (buildable != null) {
+                if (buildable != null && this.fontProduction != null) {
                     specs = new TextSpecification[2];
                     String t = Messages.getName(buildable) + " " +
                         Turn.getTurnsText(colony.getTurnsToComplete(buildable));
@@ -1822,18 +1823,23 @@ public final class MapViewer extends FreeColClientHolder {
                 ? ImageLibrary.getPathImage(this.activeUnit)
                 : null;
 
-            BufferedImage turns = (p.getTurns() <= 0) ? null
-                : this.lib.getStringImage(g2d, Integer.toString(p.getTurns()),
-                                          Color.WHITE, this.fontTiny);
-            g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
-
-            if (debug) { // More detailed display
-                if (this.activeUnit != null) {
-                    image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
+            BufferedImage turns = null;
+            if (this.fontTiny != null) {
+                if (debug) { // More detailed display
+                    if (this.activeUnit != null) {
+                        image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
+                    }
+                    turns = this.lib.getStringImage(g2d,
+                        Integer.toString(p.getTurns())
+                        + "/" + Integer.toString(p.getMovesLeft()),
+                        Color.WHITE, this.fontTiny);
+                } else {
+                    turns = (p.getTurns() <= 0) ? null
+                        : this.lib.getStringImage(g2d,
+                            Integer.toString(p.getTurns()),
+                            Color.WHITE, this.fontTiny);
                 }
-                turns = this.lib.getStringImage(g2d, Integer.toString(p.getTurns())
-                    + "/" + Integer.toString(p.getMovesLeft()),
-                    Color.WHITE, this.fontTiny);
+                g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
             }
 
             g2d.translate(point.x, point.y);

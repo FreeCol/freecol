@@ -451,6 +451,19 @@ public final class ImageLibrary {
     }
 
 
+    // Scaled font wrapper
+
+    /**
+     * Get a scaled font with a simple text specification.
+     *
+     * @param spce The font specification.
+     * @return The {@code Font} found.
+     */
+    public Font getScaledFont(String spec) {
+        return FontLibrary.getScaledFont(spec, this.scaleFactor);
+    }
+
+
     // Fundamental image retrieval
 
     /**
