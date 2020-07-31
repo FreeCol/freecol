@@ -87,8 +87,44 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * This class is responsible for drawing the map/background on the
  * {@code Canvas}.
  *
- * In addition, the graphical state of the map (focus, active unit..)
- * is currently handled by this class.
+ * The map projection has some interesting properties.  Here is the top
+ * left corner of the map (truncated, aspect ratio very wrong) containing
+ * x,y "map" coordinates.
+ *
+ *  /\  /\  /\    
+ * /0 \/1 \/2 \   
+ * \ 0/\ 0/\ 0/  
+ *  \/0 \/1 \/    
+ *  /\ 1/\ 1/\  
+ * /0 \/1 \/2 \ 
+ * \ 2/\ 2/\ 2/ 
+ *  \/0 \/1 \/   
+ *  /\ 3/\ 3/   
+ * /0 \/1 \/     
+ * \ 4/\ 4/
+ *  \/  \/ 
+ *
+ * We distinguish ordinary "map" coordinates from the pixel
+ * coordinates in the frame, which we will denote P(x,y).
+ *
+ * Pixel coordinates are measureed from the top left corner of the
+ * frame to minimal extent of the rectangle containing the tile
+ * (note: not actually inside the tile graphic).
+ *
+ * Let a general tile with map coordinates (x,y) have pixel coordinates
+ * P(px,py)
+ * Let tiles have width tw and height th.
+ *
+ * - Property #1:  Tile (x,0) borders the top of the window at P(?,0)
+ * - Property #2:  Tile (x,1) is inset by one half tile height at P(?,th/2)
+ * - Property #3:  Tile (0,y) borders the left of the window if y is even,
+ *   and is thus at P(0,?), otherwise it is inset one half tile width
+ *   at P(tw/2,?)
+ * - Property #4:  Within a horizontal row, the tile directly to the 
+ *   right of T0 is tile (x+1,y) at P(px+tw,py)
+ * - Property #5:  Within a vertical column, the tile directly below
+ *   tile T0 is tile (x,y+2) at P(px,py+th)
+ *
  */
 public final class MapViewer extends FreeColClientHolder {
 
@@ -200,7 +236,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Almost the number of columns to the left/right of the center tile.
      * There are special cases handled in getLeft/RightColumns().
      */
-    private int centerColumns;    
+    private int centerColumns;
     /** Special y-odd/even offsets to centerColumns. FIXME: explain! */
     private int columnEvenYOffset, columnOddYOffset;
     
@@ -358,19 +394,36 @@ public final class MapViewer extends FreeColClientHolder {
         this.vSpace = (this.size.height - this.tileHeight) / 2;
         this.hSpace = (this.size.width - this.tileWidth) / 2;
 
-        // Calculate the number of rows that will be drawn above the
-        // central tile
-        if ((this.vSpace % this.halfHeight) != 0) {
-            this.centerRows = this.vSpace / this.halfHeight + 2;
-        } else {
-            this.centerRows = this.vSpace / this.halfHeight + 1;
-        }
-        // Calculate the number of columns that will be drawn to the
-        // left of the central tile
+        // Calculate the number of map rows to the center tile.
+        // Note use of halfHeight, because (x,y) -> (x,y+1) corresponds to:
+        //   P(px,py) -> P(px+tw/2,py+th/2) (y even)
+        //            -> P(px-tw/2,py+th/2) (y odd)
+        // thus there is always a step of th/2.
+        // We add 1 to include the center tile
+        this.centerRows = (this.vSpace / this.halfHeight) + 1;
+        // If there is extra vertical space then another row can be
+        // partially drawn
+        int vExtra = this.vSpace % this.tileHeight;
+        if (vExtra != 0) this.centerRows++;
+
+        // Calculate the number of map columns to the center tile.
+        // This time we divide by the full width of the tile because
+        // (x,y) -> (x+1,y) corresponds to:
+        //   P(px,py) -> P(px+tw,ty)  ; #4
+        // Again add 1 to include the center tile
         this.centerColumns = this.hSpace / this.tileWidth + 1;
+
+        // If there extra horizontal space?
+        int hExtra = this.hSpace % this.tileWidth;
         // Special y-coordinate-dependent offset to centerColumns
-        this.columnEvenYOffset = ((this.hSpace % this.tileWidth) > 32) ? 1 : 0;
-        this.columnOddYOffset = ((this.hSpace % this.tileWidth) == 0) ? -1 : 0;
+        // If the row to display borders the left of the window
+        // (i.e. y is even by Property#3) then if there is more than half
+        // a tile width left over we display another column before
+        // the center tile
+        this.columnEvenYOffset = (hExtra > this.halfWidth) ? 1 : 0;
+        // If the row to display is inset (y odd) and there is no
+        // extra space we display one fewer column before the center tile
+        this.columnOddYOffset = (hExtra == 0) ? -1 : 0;
     }
 
 
