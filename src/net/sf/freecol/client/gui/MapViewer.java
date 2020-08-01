@@ -416,7 +416,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         // If there extra horizontal space?
         int hExtra = this.hSpace % this.tileWidth;
-        // Special y-coordinate-dependent offset to centerColumns
+        // Special y-coordinate-dependent offsets to centerColumns.
         // If the row to display borders the left of the window
         // (i.e. y is even by Property#3) then if there is more than half
         // a tile width left over we display another column before
@@ -730,12 +730,12 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         int topOffset;
-        if (fy < this.centerRows) {
+        if (isMapNearTop(fy)) {
             // we are at the top of the map
             topOffset = (fy + 1) * this.halfHeight;
         } else {
             final int mapHeight = map.getHeight();
-            if (fy >= mapHeight - this.centerRows) {
+            if (isMapNearBottom(fy, mapHeight)) {
                 // we are at the bottom of the map
                 topOffset = this.size.height - this.halfHeight * (mapHeight - fy);
             } else {
@@ -1157,7 +1157,7 @@ public final class MapViewer extends FreeColClientHolder {
         */
         alignedTop = false;
         alignedBottom = false;
-        if (y < this.centerRows) {
+        if (isMapNearTop(y)) {
             alignedTop = true;
             // We are at the top of the map
             bottomRow = (this.size.height / this.halfHeight) - 1;
@@ -1167,25 +1167,28 @@ public final class MapViewer extends FreeColClientHolder {
             topRow = 0;
             bottomRowY = bottomRow * this.halfHeight;
             topRowY = 0;
-        } else if (y >= (getMap().getHeight() - this.centerRows)) {
-            alignedBottom = true;
-            // We are at the bottom of the map
-            bottomRow = getMap().getHeight() - 1;
-
-            topRow = this.size.height / this.halfHeight;
-            if ((this.size.height % this.halfHeight) > 0) {
-                topRow++;
-            }
-            topRow = getMap().getHeight() - topRow;
-
-            bottomRowY = this.size.height - this.tileHeight;
-            topRowY = bottomRowY - (bottomRow - topRow) * this.halfHeight;
         } else {
-            // We are not at the top of the map and not at the bottom
-            bottomRow = y + this.centerRows - 1;
-            topRow = y - this.centerRows;
-            bottomRowY = this.vSpace + this.centerRows * this.halfHeight;
-            topRowY = this.vSpace - this.centerRows * this.halfHeight;
+            final int mapHeight = getMap().getHeight();
+            if (isMapNearBottom(y, mapHeight)) {
+                alignedBottom = true;
+                // We are at the bottom of the map
+                bottomRow = mapHeight - 1;
+
+                topRow = this.size.height / this.halfHeight;
+                if ((this.size.height % this.halfHeight) > 0) {
+                    topRow++;
+                }
+                topRow = mapHeight - topRow;
+                
+                bottomRowY = this.size.height - this.tileHeight;
+                topRowY = bottomRowY - (bottomRow - topRow) * this.halfHeight;
+            } else {
+                // We are not at the top of the map and not at the bottom
+                bottomRow = y + this.centerRows - 1;
+                topRow = y - this.centerRows;
+                bottomRowY = this.vSpace + this.centerRows * this.halfHeight;
+                topRowY = this.vSpace - this.centerRows * this.halfHeight;
+            }
         }
 
         /*
