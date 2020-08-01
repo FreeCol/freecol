@@ -595,7 +595,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         // Create the components
         JLabel header
             = Utility.localizedHeaderLabel("buildQueuePanel.buildQueue",
-                                           SwingConstants.LEADING, Size.BIG);
+                                           SwingConstants.LEADING,
+                                           "header-plain-big");
         
         // JLabel SubHeads
         JLabel bqpUnits = Utility.localizedLabel("buildQueuePanel.units");

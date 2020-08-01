@@ -130,8 +130,7 @@ public class FatherDetailPanel
         String type = Messages.message(father.getTypeKey());
         String text = name + " (" + type + ")";
         JLabel header = new JLabel(text);
-        header.setFont(FontLibrary.createCompatibleFont(text,
-            FontLibrary.FontType.HEADER, Size.SMALL));
+        header.setFont(FontLibrary.getUnscaledFont("header-plain-small", text));
 
         Image image = getImageLibrary().getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));

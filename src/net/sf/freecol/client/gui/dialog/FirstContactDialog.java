@@ -71,7 +71,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
         String headerKey = BASE_KEY + other.getNation().getSuffix();
         if (!Messages.containsKey(headerKey)) headerKey = BASE_KEY + NATIVES;
         JLabel header = Utility.localizedHeaderLabel(headerKey,
-            SwingConstants.LEADING, Size.NORMAL);
+            SwingConstants.LEADING, "header-plain-normal");
         JLabel image = new JLabel(new ImageIcon(ImageLibrary
                 .getMeetingImage(other)));
         image.setOpaque(false);

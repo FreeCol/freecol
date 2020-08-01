@@ -333,7 +333,8 @@ public final class MapViewer extends FreeColClientHolder {
         this.fontProduction = this.lib.getScaledFont("normal-bold-tiny");
         this.fontTiny = this.lib.getScaledFont("normal-plain-tiny");
         if (this.fontNormal == null && this.lib.getScaleFactor() < 1f) {
-            this.fontNormal = FontLibrary.getUnscaledFont("normal-bold-tiny");
+            this.fontNormal = FontLibrary.getUnscaledFont("normal-bold-tiny",
+                                                          null);
         }
         if (this.fontItalic == null) this.fontItalic = this.fontNormal;
         

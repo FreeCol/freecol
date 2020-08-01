@@ -135,7 +135,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
                     JLabel headline = Utility.localizedHeaderLabel(type,
-                        Size.SMALL);
+                        "header-plain-small");
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
                 break;
@@ -288,8 +288,7 @@ public final class ReportTurnPanel extends ReportPanel {
             text = source.toString();
         }
 
-        Font font = FontLibrary.createCompatibleFont(text,
-            FontLibrary.FontType.HEADER, Size.SMALL);
+        Font font = FontLibrary.getUnscaledFont("header-plain-small", text);
         JComponent headline;
         if (commandId != null) {
             JButton button = new JButton(text);

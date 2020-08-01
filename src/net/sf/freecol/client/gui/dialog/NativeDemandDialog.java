@@ -96,7 +96,7 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
         JLabel header = Utility.localizedHeaderLabel(StringTemplate
                 .template("nativeDemandDialog.name")
                 .addName("%colony%", colony.getName()),
-            SwingConstants.LEADING, Size.BIG);
+            SwingConstants.LEADING, "header-plain-big");
         panel.add(header);
         JTextArea text = Utility.localizedTextArea(template);
         panel.add(text);

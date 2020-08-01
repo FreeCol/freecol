@@ -489,8 +489,9 @@ public final class Utility {
      * @return A suitable {@code JLabel}.
      */
     public static JLabel localizedHeader(String key, boolean small) {
+        String fontSpec = (small) ? "header-plain-small" : "header-plain-big";
         JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
-                                             (small) ? Size.SMALL : Size.BIG);
+                                             fontSpec);
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
@@ -500,34 +501,32 @@ public final class Utility {
      *
      * @param key The message key to use.
      * @param alignment The alignment.
-     * @param size The font size.
+     * @param fontSpec A font specification.
      * @return A suitable {@code JLabel}.
      */
     public static JLabel localizedHeaderLabel(String key, int alignment,
-                                              Size size) {
+                                              String fontSpec) {
         String text = Messages.message(key);
         JLabel header = new JLabel(text, alignment);
-        header.setFont(FontLibrary.createCompatibleFont(
-            text, FontLibrary.FontType.HEADER, size));
+        header.setFont(FontLibrary.getUnscaledFont(fontSpec, text));
         header.setOpaque(false);
         return header;
     }
 
     public static JLabel localizedHeaderLabel(StringTemplate template,
                                               int alignment,
-                                              Size size) {
+                                              String fontSpec) {
         String text = Messages.message(template);
         JLabel header = new JLabel(text, alignment);
-        header.setFont(FontLibrary.createCompatibleFont(
-            text, FontLibrary.FontType.HEADER, size));
+        header.setFont(FontLibrary.getUnscaledFont(fontSpec, text));
         header.setOpaque(false);
         return header;
     }
 
     public static JLabel localizedHeaderLabel(Named named,
-                                              Size size) {
+                                              String fontSpec) {
         return localizedHeaderLabel(named.getNameKey(),
-                                    SwingConstants.LEADING, size);
+                                    SwingConstants.LEADING, fontSpec);
     }
 
     /**

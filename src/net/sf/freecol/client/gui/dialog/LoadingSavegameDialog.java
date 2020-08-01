@@ -75,7 +75,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
 
         JLabel header = Utility.localizedHeaderLabel(
             Messages.nameKey("loadingSavegameDialog"), JLabel.CENTER,
-            Size.NORMAL);
+            "header-plain-normal");
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING));

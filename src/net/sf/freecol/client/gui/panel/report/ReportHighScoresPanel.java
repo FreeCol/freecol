@@ -75,7 +75,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 .addName("%name%", highScore.getPlayerName())
                 .addName("%nation%", highScore.getNewLandName());
             JLabel headline = Utility.localizedHeaderLabel(template,
-                SwingConstants.LEADING, Size.SMALL);
+                SwingConstants.LEADING, "header-plain-small");
             reportPanel.add(headline,
                             "span, wrap 10");
 

@@ -1620,7 +1620,7 @@ public final class ImageLibrary {
                                      double amount, Color fill,
                                      Color foreground,
                                      boolean filled) {
-        Font font = FontLibrary.getUnscaledFont("simple-bold-tiny");
+        Font font = FontLibrary.getUnscaledFont("simple-bold-tiny", null);
         FontMetrics fm = g.getFontMetrics(font);
         int padding = scaleInt(6);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,

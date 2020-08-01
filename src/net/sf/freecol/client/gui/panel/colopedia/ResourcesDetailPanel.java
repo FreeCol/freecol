@@ -83,7 +83,7 @@ public class ResourcesDetailPanel
         ResourceType type = spec.getResourceType(id);
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
-        JLabel name = Utility.localizedHeaderLabel(type, Size.SMALL);
+        JLabel name = Utility.localizedHeaderLabel(type, "header-plain-small");
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(Utility.localizedLabel("colopedia.resource.bonusProduction"));
