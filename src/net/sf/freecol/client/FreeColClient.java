@@ -165,12 +165,8 @@ public final class FreeColClient {
         }
         mapEditor = false;
 
-        // Get the splash screen up early on to show activity.
-        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
-                                      : new SwingGUI(this, scale);
-        gui.displaySplashScreen(splashStream);
-
-        // Look for base data directory.  Failure is fatal.
+        // Look for base data directory and get base resources loaded.
+        // Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();
         FreeColDataFile baseData = null;
         String ioeMessage = null;
@@ -188,6 +184,12 @@ public final class FreeColClient {
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
         ResourceManager.addMapping("base", baseData.getResourceMapping());
+
+        // Now we have at least the base resources, get the GUI up (it
+        // needs font resources) and show the splash screen
+        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
+                                      : new SwingGUI(this, scale);
+        gui.displaySplashScreen(splashStream);
 
         // Once the basic resources are in place construct other things.
         this.serverAPI = new UserServerAPI();
