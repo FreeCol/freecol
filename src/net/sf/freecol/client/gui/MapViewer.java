@@ -651,7 +651,6 @@ public final class MapViewer extends FreeColClientHolder {
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
         int moveX = -1;
-        setFocus(tile);
         positionMap(tile);
         if (leftColumn <= 0) { // At left edge already
             if (tx <= width / 4) {
@@ -677,8 +676,9 @@ public final class MapViewer extends FreeColClientHolder {
         }
         if (moveX >= 0) {
             Tile other = map.getTile(moveX, ty);
-            setFocus(other);
-            positionMap(other);
+            changeFocus(other);
+        } else {
+            changeFocus(tile);
         }
         return where;
     }
@@ -1142,9 +1142,8 @@ public final class MapViewer extends FreeColClientHolder {
      * @param pos The {@code Tile} to center at.
      */
     private void positionMap(Tile pos) {
-        int x = pos.getX(), y = pos.getY();
-        int leftColumns = getLeftColumns(this.focus.getY()),
-            rightColumns = getRightColumns(this.focus.getY());
+        final int x = pos.getX(), y = pos.getY();
+        int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
 
         /*
           PART 1
