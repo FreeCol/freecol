@@ -71,12 +71,19 @@ public final class InfoPanel extends FreeColPanel
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InfoPanel.class.getName());
 
-    private static final int SLACK = 5; // Small gap
-    private static final int PRODUCTION = 4;
 
     private static enum InfoPanelMode {
         NONE, END, MAP, TILE, UNIT;
     }
+
+    /** Pixel width of text area beside icon. */
+    private static final int TEXT_WIDTH = 150;
+
+    /** A small pixel gap. */
+    private static final int SLACK = 5;
+
+    /** Number of goods/production items to show. */
+    private static final int PRODUCTION = 4;
 
     /** Preferred size for non-skinned panel. */
     public static final Dimension PREFERRED_SIZE = new Dimension(260, 130);
@@ -90,9 +97,6 @@ public final class InfoPanel extends FreeColPanel
     /** An optional background image (the standard one has shape). */
     private final Image skin;
 
-    /** Placement of the internal panel. */
-    private int internalTop = 0, internalHeight = 128;
-    
     /** The panel mode. */
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
@@ -125,20 +129,18 @@ public final class InfoPanel extends FreeColPanel
         super(freeColClient, null, null);
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
-        this.font = FontLibrary.getUnscaledFont("normal-plain-tiny");
-        this.skin = (!useSkin) ? null
-            : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
+        this.font = this.lib.getScaledFont("normal-plain-tiny");
+        this.skin = (useSkin) ? this.lib.getScaledImage("image.skin.InfoPanel")
+            : null;
 
         if (this.skin != null) {
             setBorder(null);
             setSize(this.skin.getWidth(null), this.skin.getHeight(null));
-            // skin is output in overridden paintComponent which calls
-            // its parent which will display panels added here
+            // skin is output in overridden paintComponent(), which calls
+            // its parent, which will display panels added here
             setOpaque(false);
-            this.internalTop = 75;
-            this.internalHeight = 128;
         } else {
-            setSize(PREFERRED_SIZE);
+            setSize(this.lib.scale(PREFERRED_SIZE));
         }
         // No layout manager!  Panels will be sized and placed explicitly
 
@@ -160,9 +162,7 @@ public final class InfoPanel extends FreeColPanel
         panel.setSize(new Dimension((int)(this.getWidth() * 0.75),
                 (int)(this.getHeight() * 0.6)));
         panel.setLocation((this.getWidth() - panel.getWidth()) / 2,
-            internalTop + (internalHeight - panel.getHeight()) / 2
-            //(this.getHeight() - panel.getHeight()) / 2
-            );
+                          (this.getHeight() - panel.getHeight()) / 2);
         if (this.skin != null) panel.setOpaque(false);
         this.removeAll();
         this.add(panel);
@@ -223,18 +223,21 @@ public final class InfoPanel extends FreeColPanel
      * Fill in an end turn message into a new panel and add it.
      */
     private void fillEndPanel() {
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center", "[center]", ""));
+        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center",
+                                                    "[center]", ""));
         
         String labelString = Messages.message("infoPanel.endTurn");
+        final int width = (int)(0.3 * this.getWidth());
+        panel.add(new JLabel("")); // hack, one blank entry at top
         for (String s : splitText(labelString, " /",
-                                  getFontMetrics(font), 150)) {
+                                  getFontMetrics(this.font), width)) {
             JLabel label = new JLabel(s);
-            label.setFont(font);
+            label.setFont(this.font);
             panel.add(label);
         }
         JButton button = new JButton(getFreeColClient().getActionManager()
             .getFreeColAction(EndTurnAction.id));
-        button.setFont(font);
+        button.setFont(this.font);
         panel.add(button);
 
         setPanel(panel);
@@ -280,9 +283,9 @@ public final class InfoPanel extends FreeColPanel
                 final int width = panel.getWidth() - SLACK;
                 String text = Messages.message(tile.getLabel());
                 for (String s : splitText(text, " /",
-                                          getFontMetrics(font), width)) {
+                                          getFontMetrics(this.font), width)) {
                     JLabel label = new JLabel(s);
-                    //itemLabel.setFont(font);
+                    label.setFont(this.font);
                     panel.add(label, "span, align center");
                 }
                 panel.add(new JLabel(new ImageIcon(image)), "spany");
@@ -291,19 +294,21 @@ public final class InfoPanel extends FreeColPanel
                     panel.add(new JLabel(), "span " + PRODUCTION);
                 } else {
                     StringTemplate t = owner.getNationLabel();
-                    panel.add(Utility.localizedLabel(t), "span " + PRODUCTION);
+                    JLabel label = Utility.localizedLabel(t);
+                    label.setFont(this.font);
+                    panel.add(label, "span " + PRODUCTION);
                 }
 
                 JLabel defenceLabel = Utility.localizedLabel(StringTemplate
                     .template("infoPanel.defenseBonus")
                     .addAmount("%bonus%", tile.getDefenceBonusPercentage()));
-                //defenceLabel.setFont(font);
+                defenceLabel.setFont(this.font);
                 panel.add(defenceLabel, "span " + PRODUCTION);
 
                 JLabel moveLabel = Utility.localizedLabel(StringTemplate
                     .template("infoPanel.movementCost")
                     .addAmount("%cost%", tile.getType().getBasicMoveCost()/3));
-                //moveLabel.setFont(font);
+                moveLabel.setFont(this.font);
                 add(moveLabel, "span " + PRODUCTION);
 
                 List<AbstractGoods> produce
@@ -319,7 +324,7 @@ public final class InfoPanel extends FreeColPanel
                             new ImageIcon(lib.getSmallGoodsTypeImage(type)),
                             JLabel.RIGHT);
                         label.setToolTipText(Messages.getName(type));
-                        label.setFont(font);
+                        label.setFont(this.font);
                         panel.add(label);
                     }
                 }
@@ -352,9 +357,9 @@ public final class InfoPanel extends FreeColPanel
             int width = panel.getWidth() - ii.getIconWidth() - SLACK;
             text = unit.getDescription(Unit.UnitLabelType.FULL);
             for (String s : splitText(text, " /",
-                                      getFontMetrics(font), width)) {
+                                      getFontMetrics(this.font), width)) {
                 textLabel = new JLabel(s);
-                textLabel.setFont(font);
+                textLabel.setFont(this.font);
                 panel.add(textLabel, "span 5");
             }
 
@@ -363,7 +368,7 @@ public final class InfoPanel extends FreeColPanel
                 : Messages.message("infoPanel.moves")
                     + " " + unit.getMovesAsString();
             textLabel = new JLabel(text);
-            textLabel.setFont(font);
+            textLabel.setFont(this.font);
             panel.add(textLabel, "span 5");
 
             if (unit.isCarrier()) {
@@ -382,7 +387,7 @@ public final class InfoPanel extends FreeColPanel
                                            icon, JLabel.RIGHT);
                     }
                     text = Messages.message(goods.getLabel(true));
-                    label.setFont(font);
+                    label.setFont(this.font);
                     label.setToolTipText(text);
                     panel.add(label);
                 }
@@ -390,7 +395,7 @@ public final class InfoPanel extends FreeColPanel
                     icon = new ImageIcon(lib.getSmallerUnitImage(carriedUnit));
                     label = new JLabel(icon);
                     text = carriedUnit.getDescription(Unit.UnitLabelType.NATIONAL);
-                    label.setFont(font);
+                    label.setFont(this.font);
                     label.setToolTipText(text);
                     panel.add(label);
                 }

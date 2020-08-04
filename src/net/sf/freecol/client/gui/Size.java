@@ -25,13 +25,13 @@ package net.sf.freecol.client.gui;
 public enum Size {
 
     TINY   (0.25f, 12f),
-    SMALLER(0.5f,  16f),
-    SMALL  (0.75f, 24f),
-    NORMAL (1.0f,  36f),
-    LARGE  (1.25f, 48f),
-    BIG    (1.5f,  48f),
-    HUGE   (1.75f, 48f),
-    MAX    (2.0f,  48f);
+    SMALLER(0.5f,  14f),
+    SMALL  (0.75f, 16f),
+    NORMAL (1.0f,  18f),
+    LARGE  (1.25f, 20f),
+    BIG    (1.5f,  24f),
+    HUGE   (1.75f, 28f),
+    MAX    (2.0f,  32f);
 
     /** The scaling value to use for images. */
     private final float image;
