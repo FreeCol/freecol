@@ -247,10 +247,6 @@ public final class MapViewer extends FreeColClientHolder {
     private int topRow;
 
     // The y-coordinate on the screen (in pixels) of the images of the
-    // Tiles that will be drawn at the bottom
-    private int bottomRowY;
-
-    // The y-coordinate on the screen (in pixels) of the images of the
     // Tiles that will be drawn at the top
     private int topRowY;
 
@@ -1149,11 +1145,9 @@ public final class MapViewer extends FreeColClientHolder {
         /*
           PART 1
           ======
-          Calculate: bottomRow, topRow, bottomRowY, topRowY
+          Calculate: bottomRow, topRow, topRowY
           This will tell us which rows need to be drawn on the screen (from
           bottomRow until and including topRow).
-          bottomRowY will tell us at which height the bottom row needs to be
-          drawn.
         */
         alignedTop = false;
         alignedBottom = false;
@@ -1165,7 +1159,6 @@ public final class MapViewer extends FreeColClientHolder {
                 bottomRow++;
             }
             topRow = 0;
-            bottomRowY = bottomRow * this.halfHeight;
             topRowY = 0;
         } else {
             final int mapHeight = getMap().getHeight();
@@ -1180,13 +1173,12 @@ public final class MapViewer extends FreeColClientHolder {
                 }
                 topRow = mapHeight - topRow;
                 
-                bottomRowY = this.size.height - this.tileHeight;
-                topRowY = bottomRowY - (bottomRow - topRow) * this.halfHeight;
+                topRowY = (size.height - this.tileHeight)
+                    - (bottomRow - topRow) * this.halfHeight;
             } else {
                 // We are not at the top of the map and not at the bottom
                 bottomRow = y + this.centerRows - 1;
                 topRow = y - this.centerRows;
-                bottomRowY = this.vSpace + this.centerRows * this.halfHeight;
                 topRowY = this.vSpace - this.centerRows * this.halfHeight;
             }
         }
