@@ -95,7 +95,11 @@ public final class Utility {
     /** A style context to use for panels and dialogs. */
     private static StyleContext STYLE_CONTEXT = null;
 
-
+    /** Font specification for panel titles. */
+    public static String FONTSPEC_TITLE = "header-plain-max";
+    /** Font specification for panel subtitles. */
+    public static String FONTSPEC_SUBTITLE = "header-plain-large";
+    
     public static void initStyleContext(Font font) {
         Style defaultStyle = StyleContext.getDefaultStyleContext()
             .getStyle(StyleContext.DEFAULT_STYLE);
@@ -485,11 +489,10 @@ public final class Utility {
      * Gets a default header for panels containing a localized message.
      *
      * @param key The message key to use.
-     * @param small If true, use a smaller font.
+     * @param fontSpec A font-specification for the font to use.
      * @return A suitable {@code JLabel}.
      */
-    public static JLabel localizedHeader(String key, boolean small) {
-        String fontSpec = (small) ? "header-plain-small" : "header-plain-big";
+    public static JLabel localizedHeader(String key, String fontSpec) {
         JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
                                              fontSpec);
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));

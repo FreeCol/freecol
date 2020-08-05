@@ -82,7 +82,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             hdrKey = "monarchDialog.default";
         }
         JLabel header = Utility.localizedHeaderLabel(hdrKey,
-            SwingConstants.LEADING, "header-plain-normal");
+            SwingConstants.LEADING, Utility.FONTSPEC_SUBTITLE);
 
         JPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
                                                   "[]20[]"));

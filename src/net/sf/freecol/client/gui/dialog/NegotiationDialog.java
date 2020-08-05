@@ -957,7 +957,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                                                   "[30%|40%|30%]", ""));
         // Main Panel Header
         panel.add(Utility.localizedHeader("negotiationDialog.title."
-                        + agreement.getContext().getKey(), false),
+                                          + agreement.getContext().getKey(),
+                                          Utility.FONTSPEC_TITLE),
                 "span 3, center");
 
         // Panel contents Header row

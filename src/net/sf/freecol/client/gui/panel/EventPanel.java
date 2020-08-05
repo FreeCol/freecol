@@ -54,7 +54,7 @@ public final class EventPanel extends FreeColPanel {
               new MigLayout("wrap 1", "[center]", "[]20"));
 
         JLabel headerLabel = new JLabel(header);
-        headerLabel.setFont(FontLibrary.getUnscaledFont("header-plain-normal",
+        headerLabel.setFont(FontLibrary.getUnscaledFont(Utility.FONTSPEC_TITLE,
                                                         header));
 
         JLabel imageLabel

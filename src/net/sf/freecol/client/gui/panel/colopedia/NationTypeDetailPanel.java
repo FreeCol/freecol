@@ -121,7 +121,7 @@ public class NationTypeDetailPanel
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
         JLabel label = Utility.localizedHeaderLabel(nationType,
-                                                    "header-plain-small");
+                                                    Utility.FONTSPEC_SUBTITLE);
         panel.add(label, "span, align center, wrap 40");
 
         label = Utility.localizedLabel("colopedia.nationType.units");
@@ -177,7 +177,7 @@ public class NationTypeDetailPanel
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
         JLabel name = Utility.localizedHeaderLabel(nationType,
-                                                   "header-plain-small");
+                                                   Utility.FONTSPEC_SUBTITLE);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(Utility.localizedLabel("colopedia.nationType.aggression"));

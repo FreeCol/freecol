@@ -109,7 +109,7 @@ public class TerrainDetailPanel
         }
 
         JLabel nameLabel = Utility.localizedHeaderLabel(tileType,
-                                                        "header-plain-small");
+            Utility.FONTSPEC_SUBTITLE);
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");

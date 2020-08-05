@@ -61,7 +61,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                             "span, wrap 10");
         }
 
-        Font font = FontLibrary.getUnscaledFont("header-plain-small");
+        Font font = FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE);
         for (HighScore highScore : highScores) {
             JLabel scoreValue
                 = new JLabel(String.valueOf(highScore.getScore()));
@@ -75,9 +75,8 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 .addName("%name%", highScore.getPlayerName())
                 .addName("%nation%", highScore.getNewLandName());
             JLabel headline = Utility.localizedHeaderLabel(template,
-                SwingConstants.LEADING, "header-plain-small");
-            reportPanel.add(headline,
-                            "span, wrap 10");
+                SwingConstants.LEADING, Utility.FONTSPEC_SUBTITLE);
+            reportPanel.add(headline, "span, wrap 10");
 
             reportPanel.add(Utility.localizedLabel("report.highScores.turn"),
                             "skip");

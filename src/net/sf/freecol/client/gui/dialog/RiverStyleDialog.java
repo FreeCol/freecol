@@ -57,7 +57,8 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
         super(freeColClient, frame);
 
         JPanel panel = new JPanel();
-        panel.add(Utility.localizedHeader("riverStyleDialog.text", false),
+        panel.add(Utility.localizedHeader("riverStyleDialog.text",
+                                          Utility.FONTSPEC_TITLE),
                   "span, align center");
 
         List<ChoiceItem<String>> c = FreeColDialog.choices();

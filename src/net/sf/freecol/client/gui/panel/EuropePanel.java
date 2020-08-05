@@ -720,7 +720,8 @@ public final class EuropePanel extends PortPanel {
         initialize(europe);
 
         if(header) {
-            add(Utility.localizedHeader(europe.getNameKey(), false),
+            add(Utility.localizedHeader(europe.getNameKey(),
+                                        Utility.FONTSPEC_TITLE),
                 "span, top, center");
         }
         add(toAmericaScroll, "sg, height 15%:, grow");

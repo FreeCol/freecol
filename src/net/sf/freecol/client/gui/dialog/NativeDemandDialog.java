@@ -93,10 +93,10 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
 
         JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                   "[400, align center]"));
-        JLabel header = Utility.localizedHeaderLabel(StringTemplate
-                .template("nativeDemandDialog.name")
-                .addName("%colony%", colony.getName()),
-            SwingConstants.LEADING, "header-plain-big");
+        StringTemplate t = StringTemplate.template("nativeDemandDialog.name")
+            .addName("%colony%", colony.getName());
+        JLabel header = Utility.localizedHeaderLabel(t, SwingConstants.LEADING,
+                                                     Utility.FONTSPEC_TITLE);
         panel.add(header);
         JTextArea text = Utility.localizedTextArea(template);
         panel.add(text);

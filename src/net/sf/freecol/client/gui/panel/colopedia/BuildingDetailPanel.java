@@ -137,7 +137,8 @@ public class BuildingDetailPanel
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedHeaderLabel(buildingType, "header-plain-small");
+        JLabel name = Utility.localizedHeaderLabel(buildingType,
+                                                   Utility.FONTSPEC_SUBTITLE);
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build

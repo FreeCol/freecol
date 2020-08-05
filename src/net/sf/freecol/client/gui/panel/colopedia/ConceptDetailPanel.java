@@ -160,7 +160,7 @@ public class ConceptDetailPanel extends FreeColPanel
         panel.setLayout(new MigLayout("wrap 1, center"));
 
         JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
-            SwingConstants.LEADING, "header-plain-small");
+            SwingConstants.LEADING, Utility.FONTSPEC_SUBTITLE);
         panel.add(header, "align center, wrap 20");
 
         JEditorPane editorPane

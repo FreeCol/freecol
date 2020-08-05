@@ -75,7 +75,8 @@ public class ReportPanel extends FreeColPanel {
         super(freeColClient, "ReportPanelUI",
               new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 
-        header = Utility.localizedHeader(Messages.nameKey(key), false);
+        header = Utility.localizedHeader(Messages.nameKey(key),
+                                         Utility.FONTSPEC_TITLE);
         add(header, "cell 0 0, align center");
 
         reportPanel = new MigPanel("ReportPanelUI");

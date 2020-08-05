@@ -392,7 +392,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         String text = colony.getName() + info;
         JButton button = Utility.getLinkButton(text, null, colony.getId());
         if (headline) {
-            button.setFont(FontLibrary.getUnscaledFont("header-plain-small",
+            button.setFont(FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE,
                                                        text));
         }
         button.addActionListener(this);

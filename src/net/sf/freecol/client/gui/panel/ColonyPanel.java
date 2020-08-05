@@ -330,24 +330,19 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
-        Font nameBoxFont = FontLibrary.getUnscaledFont("header-plain-small");
-        boolean incompatibleFont = false;
+        StringBuilder sb = new StringBuilder(32);
+        String compat = colony.getName();
         if (editable) {
             for (Colony c : player.getColonyList()) {
                 this.nameBox.addItem(c);
-                if(!incompatibleFont &&
-                    nameBoxFont.canDisplayUpTo(c.getName()) != -1) {
-                    incompatibleFont = true;
-                }
+                sb.append(c.getName());
             }
-        } else { // When spying, only add the given colony.
+        } else {
             this.nameBox.addItem(colony);
-            if(nameBoxFont.canDisplayUpTo(colony.getName()) != -1)
-                incompatibleFont = true;
+            sb.append(colony.getName());
         }
-        if(incompatibleFont) {
-            nameBoxFont = FontLibrary.getUnscaledFont("normal-plain-small");
-        }
+        Font nameBoxFont = FontLibrary.getUnscaledFont("header-plain-big",
+                                                       compat);
         this.nameBox.setFont(nameBoxFont);
         this.nameBox.setSelectedItem(colony);
         this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),

@@ -180,7 +180,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                 || this.unit.getTradeRoute() == null) ? null
             : unit.getTradeRoute());
 
-        add(Utility.localizedHeader(Messages.nameKey("tradeRoutePanel"), false),
+        add(Utility.localizedHeader(Messages.nameKey("tradeRoutePanel"),
+                                    Utility.FONTSPEC_TITLE),
             "span, align center");
         if (this.unit != null && this.unit.getLocation() != null) {
             JLabel unitLabel = new JLabel(this.unit.getDescription(Unit.UnitLabelType.NATIONAL));
