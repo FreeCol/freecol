@@ -1140,6 +1140,8 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void positionMap(Tile pos) {
         final int x = pos.getX(), y = pos.getY();
+        final Map map = getMap();
+        final int mapWidth = map.getWidth(), mapHeight = map.getHeight();
         int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
 
         /*
@@ -1152,35 +1154,31 @@ public final class MapViewer extends FreeColClientHolder {
         alignedTop = false;
         alignedBottom = false;
         if (isMapNearTop(y)) {
-            alignedTop = true;
-            // We are at the top of the map
+            alignedTop = true; // We are at the top of the map
             bottomRow = (this.size.height / this.halfHeight) - 1;
             if ((this.size.height % this.halfHeight) != 0) {
                 bottomRow++;
             }
             topRow = 0;
-            topRowY = 0;
-        } else {
-            final int mapHeight = getMap().getHeight();
-            if (isMapNearBottom(y, mapHeight)) {
-                alignedBottom = true;
-                // We are at the bottom of the map
-                bottomRow = mapHeight - 1;
 
-                topRow = this.size.height / this.halfHeight;
-                if ((this.size.height % this.halfHeight) > 0) {
-                    topRow++;
-                }
-                topRow = mapHeight - topRow;
-                
-                topRowY = (size.height - this.tileHeight)
-                    - (bottomRow - topRow) * this.halfHeight;
-            } else {
-                // We are not at the top of the map and not at the bottom
-                bottomRow = y + this.centerRows - 1;
-                topRow = y - this.centerRows;
-                topRowY = this.vSpace - this.centerRows * this.halfHeight;
+            topRowY = 0;
+        } else if (isMapNearBottom(y, mapHeight)) {
+            alignedBottom = true; // We are at the bottom of the map
+            bottomRow = mapHeight - 1;
+
+            topRow = this.size.height / this.halfHeight;
+            if ((this.size.height % this.halfHeight) > 0) {
+                topRow++;
             }
+            topRow = mapHeight - topRow;
+                
+            topRowY = (size.height - this.tileHeight)
+                - (bottomRow - topRow) * this.halfHeight;
+        } else { // We are not at the top of the map and not at the bottom
+            bottomRow = y + this.centerRows - 1;
+            topRow = y - this.centerRows;
+
+            topRowY = this.vSpace - this.centerRows * this.halfHeight;
         }
 
         /*
@@ -1193,37 +1191,31 @@ public final class MapViewer extends FreeColClientHolder {
           column needs to be drawn (this is for the Tiles where y&1 == 0;
           the others should be halfWidth more to the right).
         */
-
         alignedLeft = false;
         alignedRight = false;
         if (x < leftColumns) {
-            // We are at the left side of the map
+            alignedLeft = true; // We are at the left side of the map
             leftColumn = 0;
-
             rightColumn = this.size.width / this.tileWidth - 1;
             if ((this.size.width % this.tileWidth) > 0) {
                 rightColumn++;
             }
 
             leftColumnX = 0;
-            alignedLeft = true;
-        } else if (x >= (getMap().getWidth() - rightColumns)) {
-            // We are at the right side of the map
-            rightColumn = getMap().getWidth() - 1;
-
+        } else if (x >= mapWidth - rightColumns) {
+            alignedRight = true; // We are at the right side of the map
+            rightColumn = mapWidth - 1;
             leftColumn = this.size.width / this.tileWidth;
             if ((this.size.width % this.tileWidth) > 0) {
                 leftColumn++;
             }
-
             leftColumnX = this.size.width - this.tileWidth - this.halfWidth
                 - leftColumn * this.tileWidth;
             leftColumn = rightColumn - leftColumn;
-            alignedRight = true;
-        } else {
-            // We are not at the left side of the map and not at the right side
+        } else { // We are not at the left of the map and not at the right
             leftColumn = x - leftColumns;
             rightColumn = x + rightColumns;
+
             leftColumnX = (this.size.width - this.tileWidth) / 2
                 - leftColumns * this.tileWidth;
         }
