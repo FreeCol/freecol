@@ -33,8 +33,10 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -45,11 +47,11 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ClassicMapControls extends MapControls {
 
-    /** A font for the buttons. */
-    private final Font arrowFont;
-
     /** The main panel. */
     private final JPanel panel;
+
+    /** A font for the buttons. */
+    private final Font arrowFont;
 
     /** Helper container for the abstract API functions. */
     private final List<Component> componentList = new ArrayList<>();
@@ -63,25 +65,36 @@ public final class ClassicMapControls extends MapControls {
     public ClassicMapControls(final FreeColClient freeColClient) {
         super(freeColClient, false);
 
-        this.arrowFont = FontLibrary.getUnscaledFont("simple-bold-small");
+        final ImageLibrary lib = freeColClient.getGUI().getFixedImageLibrary();
 
         this.panel = new MigPanel(new MigLayout("wrap 3"));
-        this.panel.add(this.miniMap, "span, width " + MINI_MAP_WIDTH
-                                     + ", height " + MINI_MAP_HEIGHT);
+        this.panel.add(this.miniMap, "span"
+            + ", width " + lib.scaleInt(MINI_MAP_WIDTH)
+            + ", height " + lib.scaleInt(MINI_MAP_HEIGHT));
         this.panel.add(this.miniMapZoomInButton, "newline 10");
         this.panel.add(this.miniMapZoomOutButton, "skip");
 
-        this.panel.add(makeButton("NW", ResourceManager.getString("arrow.NW")),
-                       "newline 20");
-        this.panel.add(makeButton("N",  ResourceManager.getString("arrow.N")));
-        this.panel.add(makeButton("NE", ResourceManager.getString("arrow.NE")));
-        this.panel.add(makeButton("W",  ResourceManager.getString("arrow.W")));
-        this.panel.add(makeButton("E",  ResourceManager.getString("arrow.E")),
-                       "skip");
-        this.panel.add(makeButton("SW", ResourceManager.getString("arrow.SW")));
-        this.panel.add(makeButton("S",  ResourceManager.getString("arrow.S")));
-        this.panel.add(makeButton("SE", ResourceManager.getString("arrow.SE")),
-                       "wrap 20");
+        String[] arrows = {
+            ResourceManager.getString("arrow.NW"),
+            ResourceManager.getString("arrow.N"),
+            ResourceManager.getString("arrow.NE"),
+            ResourceManager.getString("arrow.W"),
+            ResourceManager.getString("arrow.E"),
+            ResourceManager.getString("arrow.SW"),
+            ResourceManager.getString("arrow.S"),
+            ResourceManager.getString("arrow.SE"),
+        };
+
+        this.arrowFont = lib.getScaledFont("simple-bold-small",
+                                           join("", arrows));
+        this.panel.add(makeButton("NW", arrows[0]), "newline 20");
+        this.panel.add(makeButton("N",  arrows[1]));
+        this.panel.add(makeButton("NE", arrows[2]));
+        this.panel.add(makeButton("W",  arrows[3]));
+        this.panel.add(makeButton("E",  arrows[4]), "skip");
+        this.panel.add(makeButton("SW", arrows[5]));
+        this.panel.add(makeButton("S",  arrows[6]));
+        this.panel.add(makeButton("SE", arrows[7]), "wrap 20");
         // initialization completes in initializeUnitButtons
         
         this.componentList.add(this.panel);

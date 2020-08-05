@@ -546,6 +546,10 @@ public final class ImageLibrary {
         return getUnscaledImage("image.background.ColorCellRenderer");
     }
     
+    public JLabel getCompassRose() {
+        return new JLabel(new ImageIcon(getScaledImage("image.skin.compass")));
+    }
+
     /**
      * Get the standard cursor.
      *
@@ -619,10 +623,10 @@ public final class ImageLibrary {
         return getUnscaledImage("image.background.MiniMap");
     }
 
-    public static BufferedImage getMiniMapSkin() {
+    public BufferedImage getMiniMapSkin() {
         final String key = "image.skin.MiniMap";
         return (ResourceManager.getImageResource(key, false) == null) ? null
-            : getUnscaledImage(key);
+            : getScaledImage(key);
     }
 
     /**

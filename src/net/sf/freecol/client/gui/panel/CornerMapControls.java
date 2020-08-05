@@ -65,6 +65,9 @@ public final class CornerMapControls extends MapControls {
         }
     }
 
+    /** The image library. */
+    private final ImageLibrary lib;
+    
     /** The compass rose graphic. */
     private final JLabel compassRose;
 
@@ -83,11 +86,11 @@ public final class CornerMapControls extends MapControls {
     public CornerMapControls(final FreeColClient freeColClient) {
         super(freeColClient, true);
 
+        this.lib = freeColClient.getGUI().getFixedImageLibrary();
         final boolean rose = getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
         if (rose) {
-            this.compassRose = new JLabel(new ImageIcon(ImageLibrary
-                    .getUnscaledImage("image.skin.compass")));
+            this.compassRose = this.lib.getCompassRose();
             this.compassRose.setFocusable(false);
             this.compassRose.setSize(compassRose.getPreferredSize());
             this.compassRose.addMouseListener(new MouseAdapter() {
@@ -119,7 +122,10 @@ public final class CornerMapControls extends MapControls {
          * and then its location.
          */
         this.miniMapPanel.setLayout(null);
-        this.miniMap.setSize(MINI_MAP_WIDTH, MINI_MAP_HEIGHT);
+        int width = this.lib.scaleInt(MINI_MAP_WIDTH),
+            height = this.lib.scaleInt(MINI_MAP_HEIGHT);
+        this.miniMap.setSize(width, height);
+                             
         // Add buttons:
         this.miniMapPanel.add(this.miniMapToggleBorders);
         this.miniMapPanel.add(this.miniMapToggleFogOfWarButton);
@@ -127,30 +133,29 @@ public final class CornerMapControls extends MapControls {
         this.miniMapPanel.add(this.miniMapZoomOutButton);
         this.miniMapPanel.add(this.miniMap);
 
-        if ((this.miniMapSkin = ImageLibrary.getMiniMapSkin()) != null) {
+        if ((this.miniMapSkin = this.lib.getMiniMapSkin()) != null) {
+            width = this.miniMapSkin.getWidth(null);
+            height = this.miniMapSkin.getHeight(null);
             this.miniMapPanel.setBorder(null);
-            this.miniMapPanel.setSize(this.miniMapSkin.getWidth(null),
-                                      this.miniMapSkin.getHeight(null));
+            this.miniMapPanel.setSize(width, height);
             this.miniMapPanel.setOpaque(false);
-            // FIXME: LATER: The values below should be specified by a
-            // skin-configuration-file.
-            this.miniMap.setLocation(38, 75);
-            this.miniMapToggleBorders.setLocation(4,114);
-            this.miniMapToggleFogOfWarButton.setLocation(4, 144);
-            this.miniMapZoomInButton.setLocation(4, 174);
-            this.miniMapZoomOutButton.setLocation(264, 174);
         } else {
-            int width = this.miniMapZoomOutButton.getWidth()
-                + this.miniMapZoomInButton.getWidth() + 4 * GAP;
             this.miniMapPanel.setOpaque(true);
             this.miniMap.setBorder(new BevelBorder(BevelBorder.RAISED));
-            this.miniMap.setLocation(width/2, GAP);
-            this.miniMapZoomInButton.setLocation(GAP, 
-                MINI_MAP_HEIGHT + GAP - this.miniMapZoomInButton.getHeight());
-            this.miniMapZoomOutButton.setLocation(MINI_MAP_WIDTH + 3 * GAP
-                | this.miniMapZoomInButton.getWidth(),
-                MINI_MAP_HEIGHT + GAP - this.miniMapZoomOutButton.getHeight());
         }
+        int x = GAP;
+        int y = height - this.miniMapZoomInButton.getHeight() - 2 * GAP;
+        this.miniMapZoomInButton.setLocation(x, y);
+        y -= this.miniMapZoomInButton.getHeight() -  2 * GAP;
+        this.miniMapToggleFogOfWarButton.setLocation(x, y);
+        y -= this.miniMapToggleFogOfWarButton.getHeight() - 2 * GAP;
+        this.miniMapToggleBorders.setLocation(x, y);
+        x += this.miniMapZoomInButton.getWidth() + GAP;
+        y = height - 2 * GAP - this.miniMap.getHeight();
+        this.miniMap.setLocation(x, y);
+        x += this.miniMap.getWidth() + GAP;
+        y = height - this.miniMapZoomOutButton.getHeight() - 2 * GAP;
+        this.miniMapZoomOutButton.setLocation(x, y);
     }
 
             
