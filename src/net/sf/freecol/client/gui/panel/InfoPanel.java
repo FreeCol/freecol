@@ -129,7 +129,7 @@ public final class InfoPanel extends FreeColPanel
         super(freeColClient, null, null);
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
-        this.font = this.lib.getScaledFont("normal-plain-tiny");
+        this.font = this.lib.getScaledFont("normal-plain-tiny", null);
         this.skin = (useSkin) ? this.lib.getScaledImage("image.skin.InfoPanel")
             : null;
 

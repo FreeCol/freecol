@@ -324,10 +324,10 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Update fonts, make sure font{Normal,Italic} are non-null but
         // allow the others to disappear if they get too small
-        this.fontNormal = this.lib.getScaledFont("normal-bold-smaller");
-        this.fontItalic = this.lib.getScaledFont("normal-bold+italic-smaller");
-        this.fontProduction = this.lib.getScaledFont("normal-bold-tiny");
-        this.fontTiny = this.lib.getScaledFont("normal-plain-tiny");
+        this.fontNormal = this.lib.getScaledFont("normal-bold-smaller", null);
+        this.fontItalic = this.lib.getScaledFont("normal-bold+italic-smaller", null);
+        this.fontProduction = this.lib.getScaledFont("normal-bold-tiny", null);
+        this.fontTiny = this.lib.getScaledFont("normal-plain-tiny", null);
         if (this.fontNormal == null) {
             this.fontNormal = (this.lib.getScaleFactor() < 1f)
                 ? FontLibrary.getUnscaledFont("normal-bold-tiny", null)

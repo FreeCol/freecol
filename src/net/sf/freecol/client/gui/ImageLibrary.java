@@ -457,10 +457,11 @@ public final class ImageLibrary {
      * Get a scaled font with a simple text specification.
      *
      * @param spce The font specification.
+     * @param text Optional text that the font must be able to represent.
      * @return The {@code Font} found.
      */
-    public Font getScaledFont(String spec) {
-        return FontLibrary.getScaledFont(spec, this.scaleFactor);
+    public Font getScaledFont(String spec, String text) {
+        return FontLibrary.getScaledFont(spec, this.scaleFactor, text);
     }
 
 

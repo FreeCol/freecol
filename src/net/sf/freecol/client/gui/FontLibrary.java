@@ -128,7 +128,7 @@ public class FontLibrary {
      * Try to find a basic font that of a given type that can display some text.
      *
      * @param type The {@code FontType} to try.
-     * @param text Optional text to that the font must be able to represent.
+     * @param text Optional text that the font must be able to represent.
      * @return The {@code Font} found.
      */
     private static Font tryFont(FontType type, String text) {        
@@ -228,15 +228,16 @@ public class FontLibrary {
      *
      * @param spec The font specification.
      * @param scale The font scale (in addition to that in the specification).
+     * @param text Optional text that the font must be able to represent.
      * @return The {@code Font} found, or null if scaling fails.
      */
-    public static Font getScaledFont(String spec, float scale) {
+    public static Font getScaledFont(String spec, float scale, String text) {
         String[] a = spec.split("-");
         if (a.length != 3) throw new RuntimeException("Bad font spec: " + spec);
         Size size = Enum.valueOf(Size.class, upCase(a[2]));
         Size newSize = size.scaled(scale);
         if (newSize == null) return null;
         String newSpec = join("-", a[0], a[1], downCase(newSize.toString()));
-        return getUnscaledFont(newSpec, null);
+        return getUnscaledFont(newSpec, text);
     }
 }

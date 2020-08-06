@@ -174,9 +174,9 @@ public final class TileViewer extends FreeColClientHolder {
         this.halfHeight = tileHeight/2;
         this.halfWidth = tileWidth/2;
         // Allow fonts to disappear if too small
-        this.tinyFont = this.lib.getScaledFont("normal-plain-tiny");
-        this.emphFont = this.lib.getScaledFont("simple-bold+italic-smaller");
-        this.normFont = this.lib.getScaledFont("simple-bold-tiny");
+        this.tinyFont = this.lib.getScaledFont("normal-plain-tiny", null);
+        this.emphFont = this.lib.getScaledFont("simple-bold+italic-smaller", null);
+        this.normFont = this.lib.getScaledFont("simple-bold-tiny", null);
     }
         
     /**
