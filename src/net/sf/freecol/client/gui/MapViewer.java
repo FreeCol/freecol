@@ -528,6 +528,22 @@ public final class MapViewer extends FreeColClientHolder {
         return x >= mapWidth - getRightColumns(y);
     }
 
+    /**
+     * Convert tile coordinates to pixel coordinates.
+     *
+     * Beware:  Only safe to call if the tile is known non-null and
+     * currently visible.
+     *
+     * @param tile The {@code Tile} to convert coordinates.
+     * @param a An array to pass back the x,y pixel coordinates.
+     */
+    private void tileToPixelXY(Tile tile, int[] a) {
+        final int x = tile.getX(), y = tile.getY();
+        a[0] = leftColumnX + this.tileWidth * (x - leftColumn); // Property#4
+        if ((y & 1) != 0) a[0] += this.halfWidth; // Property#2
+        a[1] = topRowY + this.halfHeight * (y - topRow); // Property#5
+    }
+
 
     // Public API
 
@@ -697,56 +713,16 @@ public final class MapViewer extends FreeColClientHolder {
         final Map map = getMap();
         if (map == null || this.focus == null) return null;
 
-        final int fx = this.focus.getX(), fy = this.focus.getY();
-        int leftOffset;
-        if (fx < getLeftColumns(fy)) {
-            // we are at the left side of the map
-            if ((fy & 1) == 0) {
-                leftOffset = this.tileWidth * fx + this.halfWidth;
-            } else {
-                leftOffset = this.tileWidth * (fx + 1);
-            }
-        } else {
-            final int mapWidth = map.getWidth();
-            if (fx >= mapWidth - getRightColumns(fy)) {
-                // we are at the right side of the map
-                if ((fy & 1) == 0) {
-                    leftOffset = this.size.width
-                        - this.tileWidth * (mapWidth - fx);
-                } else {
-                    leftOffset = this.size.width - this.halfWidth
-                        - this.tileWidth * (mapWidth - fx - 1);
-                }
-            } else {
-                if ((fy & 1) == 0) {
-                    leftOffset = (this.size.width / 2);
-                } else {
-                    leftOffset = (this.size.width / 2) + this.halfWidth;
-                }
-            }
-        }
-
-        int topOffset;
-        if (isMapNearTop(fy)) {
-            // we are at the top of the map
-            topOffset = (fy + 1) * this.halfHeight;
-        } else {
-            final int mapHeight = map.getHeight();
-            if (isMapNearBottom(fy, mapHeight)) {
-                // we are at the bottom of the map
-                topOffset = this.size.height - this.halfHeight * (mapHeight - fy);
-            } else {
-                topOffset = this.size.height / 2;
-            }
-        }
-
-        // At this point (leftOffset, topOffset) is the center pixel
-        // of the Tile that was on focus (= the Tile that should have
-        // been drawn at the center of the screen if possible).
+        // Set (leftOffset, topOffset) to the center of the focus tile
+        int[] a = new int[2]; tileToPixelXY(this.focus, a);
+        int leftOffset = a[0] + this.halfWidth;
+        int topOffset = a[1] + this.halfHeight;
 
         // Next, we can calculate the center pixel of the tile-sized
         // rectangle that was clicked. First, we calculate the
         // difference in units of rows and columns.
+        final int fx = this.focus.getX(), fy = this.focus.getY(),
+            mapWidth = map.getWidth(), mapHeight = map.getHeight();
         int dcol = (x - leftOffset + (x > leftOffset ? this.halfWidth : -this.halfWidth))
             / this.tileWidth;
         int drow = (y - topOffset + (y > topOffset ? this.halfHeight : -this.halfHeight))
@@ -793,48 +769,39 @@ public final class MapViewer extends FreeColClientHolder {
 
     /**
      * Calculate the bounds of the rectangle containing a Tile on the
-     * screen, and return it.  If the Tile is not on-screen a maximal
-     * rectangle is returned.  The bounds includes a one-tile padding
-     * area above the Tile, to include the space needed by any units
-     * in the Tile.
+     * screen.
+     *
+     * If the Tile is not on-screen a maximal rectangle is returned.
+     * The bounds includes a one-tile padding area above the Tile, to
+     * include the space needed by any units in the Tile.
      *
      * @param tile The {@code Tile} on the screen.
      * @return The bounds {@code Rectangle}.
      */
     public Rectangle calculateTileBounds(Tile tile) {
-        Rectangle result
-            = new Rectangle(0, 0, this.size.width, this.size.height);
-        if (isTileVisible(tile)) {
-            result.x = ((tile.getX() - leftColumn) * this.tileWidth)
-                + leftColumnX;
-            result.y = ((tile.getY() - topRow) * this.halfHeight)
-                + topRowY - this.tileHeight;
-            if ((tile.getY() & 1) != 0) {
-                result.x += this.halfWidth;
-            }
-            result.width = this.tileWidth;
-            result.height = this.tileHeight * 2;
+        if (!isTileVisible(tile)) {
+            return new Rectangle(0, 0, this.size.width, this.size.height);
         }
-        return result;
+            
+        int[] a = new int[2]; tileToPixelXY(tile, a);
+        return new Rectangle(a[0], a[1], this.tileWidth, this.tileHeight * 2);
     }
 
     /**
      * Gets the position of the given {@code Tile} on the visible map.
      *
-     * @param t The {@code Tile} to check.
+     * @param tile The {@code Tile} to check.
      * @param rhs If true, find the right edge of the tile, otherwise
      *     the left edge.
      * @return The position of the given {@code Tile}, or {@code null}
      *     if the {@code Tile} is not visible.
      */
-    public Point calculateTilePosition(Tile t, boolean rhs) {
-        if (!isTileVisible(t)) return null;
+    public Point calculateTilePosition(Tile tile, boolean rhs) {
+        if (!isTileVisible(tile)) return null;
 
-        int x = ((t.getX() - leftColumn) * this.tileWidth) + leftColumnX;
-        int y = ((t.getY() - topRow) * this.halfHeight) + topRowY;
-        if ((t.getY() & 1) != 0) x += this.halfWidth;
-        if (rhs) x += this.tileWidth;
-        return new Point(x, y);
+        int[] a = new int[2]; tileToPixelXY(tile, a);
+        if (rhs) a[0] += this.tileWidth;
+        return new Point(a[0], a[1]);
     }
 
     /**
@@ -860,26 +827,29 @@ public final class MapViewer extends FreeColClientHolder {
      * @return True if the tile is visible.
      */
     public boolean isTileVisible(Tile tile) {
+        if (tile == null) return false;
         repositionMapIfNeeded();
-        return tile != null
-            && tile.getY() >= topRow     && tile.getY() <= bottomRow
-            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
+        final int x = tile.getX(), y = tile.getY();
+        return y >= topRow     && y <= bottomRow
+            && x >= leftColumn && x <= rightColumn;
     }
 
     /**
      * Checks if a tile is displayed on the screen but not too close
-     * to the edges.  The intent appears to be to have a two tile thick
-     * boundary.
+     * to the edges.
+     *
+     * FIXME: The intent appears to be to have a two tile thick boundary?
      *
      * @param tile The {@code Tile} to check.
      * @return True if the tile is roughly on screen.
      */
     public boolean onScreen(Tile tile) {
         repositionMapIfNeeded();
-        return (tile.getY() - 2 > topRow || alignedTop)
-            && (tile.getY() + 3 < bottomRow || alignedBottom)
-            && (tile.getX() - 1 > leftColumn || alignedLeft)
-            && (tile.getX() + 2 < rightColumn || alignedRight);
+        final int x = tile.getX(), y = tile.getY();
+        return (y - 2 > topRow || alignedTop)
+            && (y + 3 < bottomRow || alignedBottom)
+            && (x - 1 > leftColumn || alignedLeft)
+            && (x + 2 < rightColumn || alignedRight);
     }
 
 
@@ -1193,7 +1163,7 @@ public final class MapViewer extends FreeColClientHolder {
         */
         alignedLeft = false;
         alignedRight = false;
-        if (x < leftColumns) {
+        if (isMapNearLeft(x, y)) {
             alignedLeft = true; // We are at the left side of the map
             leftColumn = 0;
             rightColumn = this.size.width / this.tileWidth - 1;
@@ -1202,7 +1172,7 @@ public final class MapViewer extends FreeColClientHolder {
             }
 
             leftColumnX = 0;
-        } else if (x >= mapWidth - rightColumns) {
+        } else if (isMapNearRight(x, y, mapWidth)) {
             alignedRight = true; // We are at the right side of the map
             rightColumn = mapWidth - 1;
             leftColumn = this.size.width / this.tileWidth;
