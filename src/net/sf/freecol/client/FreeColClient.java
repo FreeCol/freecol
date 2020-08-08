@@ -515,6 +515,14 @@ public final class FreeColClient {
     }
 
     /**
+     * Toggle the value of a boolean client option.
+     */
+    public void toggleClientOption(String op) {
+        boolean value = this.clientOptions.getBoolean(op);
+        this.clientOptions.setBoolean(op, !value);
+    }
+
+    /**
      * Convenience accessor for checking whether to display tutorial messages.
      *
      * @return True if tutorial messages should be displayed.

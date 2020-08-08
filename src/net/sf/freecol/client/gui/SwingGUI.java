@@ -877,7 +877,8 @@ public class SwingGUI extends GUI {
     @Override
     public void miniMapToggleViewControls() {
         if (this.mapControls == null) return;
-        this.mapControls.toggleView();
+        getFreeColClient().toggleClientOption(ClientOptions.MINIMAP_TOGGLE_BORDERS);
+        this.mapControls.repaint();
     }
 
     /**
@@ -886,7 +887,8 @@ public class SwingGUI extends GUI {
     @Override
     public void miniMapToggleFogOfWarControls() {
         if (this.mapControls == null) return;
-        this.mapControls.toggleFogOfWar();
+        getFreeColClient().toggleClientOption(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR);
+        this.mapControls.repaint();
     }
 
     /**

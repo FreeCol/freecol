@@ -143,18 +143,6 @@ public abstract class MapControls extends FreeColClientHolder {
         }
     }
 
-    public void toggleView() {
-        this.miniMap.setToggleBordersOption(!getClientOptions()
-            .getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS));
-        repaint();
-    }
-    
-    public void toggleFogOfWar() {
-        this.miniMap.setToggleFogOfWarOption(!getClientOptions()
-            .getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR));
-        repaint();
-    }
-
     /**
      * Updates this {@code MapControls}.
      *
