@@ -659,33 +659,33 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public int setOffsetFocus(Tile tile) {
         if (tile == null) return 0;
-        int where;
+        positionMap(tile);
+
+        int ret = 0, moveX = -1;
         final Map map = getMap();
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
-        int moveX = -1;
-        positionMap(tile);
         if (leftColumn <= 0) { // At left edge already
             if (tx <= width / 4) {
-                where = -1;
+                ret = -1;
             } else if (tx >= 3 * width / 4) {
-                where = 1;
+                ret = 1;
             } else {
                 moveX = tx + width / 4;
-                where = -1;
+                ret = -1;
             }
         } else if (rightColumn >= width - 1) { // At right edge
             if (tx >= rightColumn - width / 4) {
-                where = 1;
+                ret = 1;
             } else if (tx <= rightColumn - 3 * width / 4) {
-                where = -1;
+                ret = -1;
             } else {
                 moveX = tx - width / 4;
-                where = 1;
+                ret = 1;
             }
         } else { // Move focus left 1/4 screen
             moveX = tx - width / 4;
-            where = 1;
+            ret = 1;
         }
         if (moveX >= 0) {
             Tile other = map.getTile(moveX, ty);
@@ -693,7 +693,7 @@ public final class MapViewer extends FreeColClientHolder {
         } else {
             changeFocus(tile);
         }
-        return where;
+        return ret;
     }
 
 
