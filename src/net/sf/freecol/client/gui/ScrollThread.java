@@ -48,7 +48,7 @@ public class ScrollThread extends Thread {
     /**
      * The constructor to use.
      * 
-     * @param canvas The Canvas containing the map to scroll.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      */
     public ScrollThread(FreeColClient freeColClient) {
         super(FreeCol.CLIENT_THREAD + "Mouse scroller");

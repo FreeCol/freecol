@@ -142,7 +142,6 @@ public class FontLibrary {
      * Get an unscaled font with a simple text specification.
      *
      * @param spec The font specification.
-     * @param text Optional text that the font must be able to represent.
      * @return The {@code Font} found.
      */
     public static Font getUnscaledFont(String spec) {

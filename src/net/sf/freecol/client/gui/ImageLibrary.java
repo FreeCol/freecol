@@ -456,7 +456,7 @@ public final class ImageLibrary {
     /**
      * Get a scaled font with a simple text specification.
      *
-     * @param spce The font specification.
+     * @param spec The font specification.
      * @param text Optional text that the font must be able to represent.
      * @return The {@code Font} found.
      */

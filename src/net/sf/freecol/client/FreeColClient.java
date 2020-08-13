@@ -516,6 +516,8 @@ public final class FreeColClient {
 
     /**
      * Toggle the value of a boolean client option.
+     *
+     * @param op The name of the option to toggle.
      */
     public void toggleClientOption(String op) {
         boolean value = this.clientOptions.getBoolean(op);

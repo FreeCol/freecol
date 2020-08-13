@@ -2924,7 +2924,8 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Special handling when we close a colony panel.
      *
-     * @param abandon An optional {@code Colony} to abandon.
+     * @param colony The {@code Colony} to close.
+     * @param abandon True if abandoning, otherwise just update.
      */
     public void closeColony(Colony colony, boolean abandon) {
         if (abandon) {

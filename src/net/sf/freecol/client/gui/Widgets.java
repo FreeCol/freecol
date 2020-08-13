@@ -1295,6 +1295,7 @@ public final class Widgets {
      * Show the turn report.
      *
      * @param messages The {@code ModelMessage}s to show.
+     * @return The {@code FreeColPanel} displayed.
      */
     public FreeColPanel showReportTurnPanel(List<ModelMessage> messages) {
         ReportTurnPanel panel

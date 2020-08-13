@@ -151,6 +151,7 @@ public final class TileViewer extends FreeColClientHolder {
      * The constructor to use.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
+     * @param lib The (appropriately scaled) {@code ImageLibrary} to use.
      */
     public TileViewer(FreeColClient freeColClient, ImageLibrary lib) {
         super(freeColClient);
@@ -498,8 +499,8 @@ public final class TileViewer extends FreeColClientHolder {
      * Displays the Tile text for a Tile.
      * Shows tile names, coordinates and colony values.
      *
-     * @param g The Graphics2D object on which the text gets drawn.
-     * @param tile The Tile to draw the text on.
+     * @param g2d The {@code Graphics2D} object on which the text gets drawn.
+     * @param tile The {@code Tile} to draw the text on.
      */
     public void displayOptionalTileText(Graphics2D g2d, Tile tile) {
         // Do not bother when the text gets very small
@@ -574,7 +575,7 @@ public final class TileViewer extends FreeColClientHolder {
      * location specified by the coordinates. Settlements and Lost
      * City Rumours will be shown.
      *
-     * @param g The Graphics2D object on which to draw the Tile.
+     * @param g2d The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      * @param withNumber Whether to display the number of units present.
      * @param rop An optional RescaleOp for fog of war.

@@ -932,7 +932,7 @@ public class GUI extends FreeColClientHolder {
      * as we have already defined a callback.
      *
      * @param ex An optional {@code Exception} to display.
-     * @param tmpl A {@code StringTemplate} for the message.
+     * @param template A {@code StringTemplate} for the message.
      */
     public final void showErrorPanel(Exception ex, StringTemplate template) {
         final StringTemplate t = (ex == null) ? template
@@ -1783,6 +1783,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param x The x coordinate.
      * @param y The y coordinate.
+     * @return The {@code Tile} found.
      */
     public Tile tileAt(int x, int y) { return null; }
 
@@ -2023,7 +2024,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show a panel for a native settlement.
      *
-     * @param indianSettlement The {@code IndianSettlement} to display.
+     * @param is The {@code IndianSettlement} to display.
      * @return The panel shown.
      */
     public FreeColPanel showIndianSettlementPanel(IndianSettlement is) { return null; }

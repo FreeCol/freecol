@@ -521,7 +521,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param x The x-coordinate.
      * @param y The y-coordinate.
-     * @param width The map tile width.
+     * @param mapWidth The map tile width.
      * @return True if near the right.
      */
     private boolean isMapNearRight(int x, int y, int mapWidth) {

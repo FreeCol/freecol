@@ -296,6 +296,8 @@ public final class ResourceMapping {
 
     /**
      * Preload all resources in this mapping.
+     *
+     * @return The number of resources loaded.
      */
     public int preload() {
         int ret = 0;
