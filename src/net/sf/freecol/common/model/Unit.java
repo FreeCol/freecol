@@ -586,9 +586,16 @@ public class Unit extends GoodsLocation
             setMovesLeft(getInitialMovesLeft());
         }
         this.hitPoints = unitType.getHitPoints();
-        if (getTeacher() != null && !canBeStudent(getTeacher())) {
-            getTeacher().setStudent(null);
-            setTeacher(null);
+        if (getTeacher() != null) {
+            if (!canBeStudent(getTeacher())) {
+                getTeacher().setStudent(null);
+                setTeacher(null);
+            }
+        } else if (getStudent() != null) {
+            if (!getStudent().canBeStudent(this)) {
+                getStudent().setTeacher(null);
+                setStudent(null);
+            }
         }
         return true;
     }
