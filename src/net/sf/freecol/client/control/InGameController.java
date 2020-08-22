@@ -2590,7 +2590,7 @@ public final class InGameController extends FreeColClientHolder {
         if (ret) {
             sound("sound.event.loadCargo");
             europeWas.fireChanges();
-            marketWas.fireChanges(type, amount);
+            marketWas.fireChanges(type, -amount);
             unitWas.fireChanges();
             updateGUI(null, false);
         }
