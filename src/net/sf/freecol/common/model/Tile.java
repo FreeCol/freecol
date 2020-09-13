@@ -1954,7 +1954,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         Colony colony = getColony();
         if (colony != null) {
             tile.getColony()
-                .setDisplayUnitCount(Math.min(1, colony.getUnitCount()));
+                .setDisplayUnitCount(Math.max(1, colony.getUnitCount()));
         }
         return tile;
     }
