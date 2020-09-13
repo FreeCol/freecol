@@ -41,7 +41,7 @@ public class SoundController {
 
     private static final Logger logger = Logger.getLogger(SoundController.class.getName());
 
-
+    /** The internal sound player. */
     private SoundPlayer soundPlayer;
 
 
@@ -53,8 +53,8 @@ public class SoundController {
      */
     public SoundController(FreeColClient freeColClient, boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
+        this.soundPlayer = null;
         if (sound) {
-            this.soundPlayer = null;
             AudioMixerOption amo = null;
             try {
                 amo = opts.getOption(ClientOptions.AUDIO_MIXER,
@@ -70,27 +70,22 @@ public class SoundController {
                 logger.warning(ex.getMessage());
             }
             if (amo == null || vo == null) return;
-            try {
-                logger.log(Level.INFO, "Create sound controller with "
-                    + amo + "/" + vo);
-                this.soundPlayer = new SoundPlayer(amo, vo);
-            } catch (Exception e) {
-                // #3168279 reports an undocumented NPE thrown by
-                // AudioSystem.getMixer(null).  Workaround this and other
-                // such failures by just disabling sound.
-                this.soundPlayer = null;
-                logger.log(Level.WARNING, "Sound disabled", e);
-            }
+            // Unless totally disabled, the sound player is always
+            // created, but if it has a bad mixer sound output will be
+            // suspended.  The hope is that the user will change the
+            // mixer option to one that works.
+            logger.info("Create sound player with " + amo + "/" + vo);
+            this.soundPlayer = new SoundPlayer(amo, vo);
         }
     }
 
     /**
      * Can this client play sounds?
      *
-     * @return True if there is a sound player present.
+     * @return True if there is a sound player with a valid mixer present.
      */
     public boolean canPlaySound() {
-        return soundPlayer != null;
+        return this.soundPlayer != null && this.soundPlayer.getMixer() != null;
     }
 
     /**
@@ -100,19 +95,13 @@ public class SoundController {
      */
     public void playSound(String sound) {
         if (!canPlaySound()) return;
-        if (sound == null) {
-            soundPlayer.stop();
-        } else {
-            File file = ResourceManager.getAudio(sound);
-            if (file == null) {
-                logger.finest("Cound not load sound: " + sound);
-            } else {
-                soundPlayer.stop();
-                boolean playing = soundPlayer.playOnce(file);
-                logger.finest(((playing) ? "Queued" : "Fail on")
-                    + " sound: " + sound);
-            }
-        }
+        this.soundPlayer.stop(); // Always stop, including sound==null
+        if (sound == null) return;
+        File file = ResourceManager.getAudio(sound);
+        if (file == null) return;
+        boolean playing = soundPlayer.playOnce(file);
+        logger.finest(((playing) ? "Queued" : "Fail on")
+            + " sound: " + sound);
     }
 
     /**
@@ -124,9 +113,9 @@ public class SoundController {
      */
     public String getSoundMixerLabelText() {
         Mixer mixer;
-        String text = (soundPlayer == null)
+        String text = (this.soundPlayer == null)
             ? Messages.message("nothing")
-            : ((mixer = soundPlayer.getMixer()) == null)
+            : ((mixer = this.soundPlayer.getMixer()) == null)
                 ? Messages.message("none")
                 : mixer.getMixerInfo().getName();
         return Messages.message("current") + ":  " + text;
