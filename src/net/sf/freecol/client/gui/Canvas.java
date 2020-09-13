@@ -81,6 +81,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
 import net.sf.freecol.client.gui.panel.FreeColPanel;
@@ -371,8 +372,10 @@ public final class Canvas extends JDesktopPane {
         try {
             add(comp, layer);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + layer
-                + ") failed.", e);
+            logger.log(Level.WARNING, "addToCanvas("
+                + comp.getClass().getSimpleName()
+                + " at " + comp.getX() + "," + comp.getY()
+                + " on layer " + layer + ") failed.", e);
         }
     }
 
