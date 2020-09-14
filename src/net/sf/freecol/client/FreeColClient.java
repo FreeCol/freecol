@@ -143,7 +143,7 @@ public final class FreeColClient {
      * @param splashStream A stream to read the splash image from.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
-     * @param size An optional window size.
+     * @param windowSize An optional window size.
      * @param userMsg An optional message key to be displayed early.
      * @param sound True if sounds should be played
      * @param showOpeningVideo Display the opening video.
@@ -154,7 +154,7 @@ public final class FreeColClient {
     public FreeColClient(final InputStream splashStream,
                          final String fontName,
                          final float scale,
-                         final Dimension size,
+                         final Dimension windowSize,
                          final String userMsg,
                          final boolean sound,
                          final boolean showOpeningVideo,
@@ -245,7 +245,7 @@ public final class FreeColClient {
 
         // Start the GUI (headless-safe)
         gui.hideSplashScreen();
-        gui.startGUI(size);
+        gui.startGUI(windowSize);
 
         // Update the actions with the running GUI, resources may have changed.
         if (this.actionManager != null) updateActions();

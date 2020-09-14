@@ -194,7 +194,6 @@ public final class Canvas extends JDesktopPane {
             getActionMap().put(action.getId(), action);
         }
 
-        this.parentFrame.setVisible(true);
         logger.info("Canvas created with bounds: " + windowBounds);
     }
 
@@ -224,6 +223,7 @@ public final class Canvas extends JDesktopPane {
             = new FreeColFrame(this.freeColClient, this.graphicsDevice,
                                menuBar, isWindowed(), windowBounds);
         fcf.getContentPane().add(this);
+        fcf.setVisible(true);
         return fcf;
     }
 
@@ -244,8 +244,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param gd The {@code GraphicsDevice} to display to.
      * @param desiredSize An optional window {@code Dimension}.
-     * @return Null if full screen is to be used, otherwise a window
-     *     bounds {@code Rectangle}
+     * @return True if windowed mode is to be used, false for full screen.
      */
     private static boolean checkWindowed(GraphicsDevice gd,
                                          Dimension desiredSize) {

@@ -83,20 +83,23 @@ public class FreeColFrame extends JFrame {
         setMinimumSize(new Dimension(656 + insets.left + insets.right,
                                      480 + insets.top + insets.bottom));
 
+        // Use default bounds if not windowed or (possibly deliberately)
+        // invalid bounds specified
         if (!windowed || bounds==null || bounds.width<=0 || bounds.height<=0) {
             bounds = gd.getDefaultConfiguration().getBounds();
             if (windowed) {
                 Insets screenInsets = Toolkit.getDefaultToolkit()
                         .getScreenInsets(gd.getDefaultConfiguration());
-                bounds = new Rectangle(
-                    bounds.x + screenInsets.left,
-                    bounds.y + screenInsets.top,
-                    bounds.width - screenInsets.right,
-                    bounds.height - screenInsets.bottom);
+                bounds = new Rectangle(bounds.x + screenInsets.left,
+                                       bounds.y + screenInsets.top,
+                                       bounds.width - screenInsets.right,
+                                       bounds.height - screenInsets.bottom);
             }
         }
         setBounds(bounds);
-        logger.info("Frame created in size " + bounds.width + "x" + bounds.height);
+        logger.info(((windowed) ? "Windowed" : "Full screen")
+            + " frame created with size " + bounds.width
+            + "x" + bounds.height);
         /* TODO: this should do something useful!
         if (windowed) {
             addComponentListener(new ComponentAdapter() {
