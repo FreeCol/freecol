@@ -1417,7 +1417,7 @@ public final class FreeCol {
     private static void setWindowSize(String arg) {
         windowSize = WINDOWSIZE_FALLBACK; // Set fallback up front
         if (arg != null) {
-            String[] xy =arg.split("[^0-9]");
+            String[] xy = arg.split("[^0-9]");
             if (xy.length == 2) {
                 try {
                     windowSize = new Dimension(Integer.parseInt(xy[0]),
