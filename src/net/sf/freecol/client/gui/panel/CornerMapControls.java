@@ -87,33 +87,27 @@ public final class CornerMapControls extends MapControls {
         super(freeColClient, true);
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
-        final boolean rose = getClientOptions()
-            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
-        if (rose) {
-            this.compassRose = this.lib.getCompassRose();
-            this.compassRose.setFocusable(false);
-            this.compassRose.setSize(compassRose.getPreferredSize());
-            this.compassRose.addMouseListener(new MouseAdapter() {
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        Unit unit = getGUI().getActiveUnit();
-                        if (unit == null) return;
-                        int x = e.getX() - compassRose.getWidth()/2;
-                        int y = e.getY() - compassRose.getHeight()/2;
-                        double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
-                        if (theta < 0) {
-                            theta += 2*Math.PI;
-                        }
-                        igc().moveUnit(unit, Direction.angleToDirection(theta));
+        this.compassRose = this.lib.getCompassRose();
+        this.compassRose.setFocusable(false);
+        this.compassRose.setSize(this.compassRose.getPreferredSize());
+        this.compassRose.addMouseListener(new MouseAdapter() {
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Unit unit = getGUI().getActiveUnit();
+                    if (unit == null) return;
+                    int x = e.getX() - compassRose.getWidth()/2;
+                    int y = e.getY() - compassRose.getHeight()/2;
+                    double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
+                    if (theta < 0) {
+                        theta += 2*Math.PI;
                     }
-                });
-        } else {
-            this.compassRose = null;
-        }
-
+                    igc().moveUnit(unit, Direction.angleToDirection(theta));
+                }
+            });
+    
         this.miniMapPanel = new MiniMapPanel();
         this.miniMapPanel.setFocusable(false);
         /**
@@ -184,7 +178,9 @@ public final class CornerMapControls extends MapControls {
             ret.add(this.miniMapPanel);
         }
 
-        if (this.compassRose != null && !this.compassRose.isShowing()) {
+        final boolean rose = getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
+        if (rose && !this.compassRose.isShowing()) {
             this.compassRose.setLocation(cw - this.compassRose.getWidth() - 20, 20);
             ret.add(this.compassRose);
         }
@@ -222,8 +218,9 @@ public final class CornerMapControls extends MapControls {
         List<Component> ret = new ArrayList<>();
         if (this.infoPanel.isShowing()) ret.add(this.infoPanel);
         if (this.miniMapPanel.isShowing()) ret.add(this.miniMapPanel);
-        if (this.compassRose != null
-            && this.compassRose.isShowing()) ret.add(this.compassRose);
+        final boolean rose = getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
+        if (rose && this.compassRose.isShowing()) ret.add(this.compassRose);
         for (UnitButton ub : this.unitButtons) {
             if (ub.isShowing()) ret.add(ub);
         }
