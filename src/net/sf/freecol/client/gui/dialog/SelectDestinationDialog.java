@@ -301,7 +301,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             label.setText(value.text);
             String key = value.location.getLocationImageKey();
             label.setIcon(new ImageIcon(this.lib.getSizedImage(key,
-                        new Dimension(-1, CELL_HEIGHT), false)));
+                        new Dimension(-1, CELL_HEIGHT))));
         }
     }
 
@@ -390,7 +390,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                   "[align center]", ""));
-        panel.add(Utility.localizedHeader("selectDestinationDialog.text", true));
+        panel.add(Utility.localizedHeader("selectDestinationDialog.text",
+                                          Utility.FONTSPEC_SUBTITLE));
 
         panel.add(listScroller, "newline 30, growx, growy");
         panel.add(this.onlyMyColoniesBox, "left");

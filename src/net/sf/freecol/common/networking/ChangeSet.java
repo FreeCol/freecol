@@ -608,6 +608,7 @@ public class ChangeSet {
          */
         @Override
         public boolean isNotifiable(Player player) {
+            if (player.isAI()) return false;
             switch (check(player)) {
             case VISIBLE: return true;
             case INVISIBLE: return false;

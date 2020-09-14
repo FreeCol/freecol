@@ -87,7 +87,8 @@ public final class ChooseFoundingFatherDialog
         tb.setSelectedIndex(0);
 
         JPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
-        panel.add(Utility.localizedHeader("chooseFoundingFatherDialog.title", false));
+        panel.add(Utility.localizedHeader("chooseFoundingFatherDialog.title",
+                                          Utility.FONTSPEC_TITLE));
         panel.add(helpButton, "tag help");
         panel.add(tb, "width 100%");
 

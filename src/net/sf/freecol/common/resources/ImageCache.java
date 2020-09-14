@@ -60,9 +60,9 @@ public class ImageCache {
      * @return The {@code ImageResource} found.
      */
     private ImageResource getImageResource(final String key) {
-        ImageResource r = ResourceManager.getImageResource(key);
+        ImageResource r = ResourceManager.getImageResource(key, false);
         if (r == null) {
-            r = ResourceManager.getImageResource(REPLACEMENT_IMAGE);
+            r = ResourceManager.getImageResource(REPLACEMENT_IMAGE, false);
             if (r == null) {
                 FreeCol.fatal(logger, "Replacement image not found: "
                     + REPLACEMENT_IMAGE);

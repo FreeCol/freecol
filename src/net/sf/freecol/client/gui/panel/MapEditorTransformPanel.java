@@ -319,38 +319,38 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                             ImageLibrary.SMALLER_SCALE);
 
         for (TileType type : spec.getTileTypeList()) {
-            BufferedImage tileImage = ImageLibrary
+            BufferedImage tileImage = getImageLibrary()
                 .getTileImageWithOverlayAndForest(type, terrainSize);
             listPanel.add(buildButton(tileImage, Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
 
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", riverSize),
+        listPanel.add(buildButton(getImageLibrary().getRiverImage("0101", riverSize),
                 Messages.message("mapEditorTransformPanel.minorRiver"),
                 new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
+        listPanel.add(buildButton(getImageLibrary().getRiverImage("0202", riverSize),
                 Messages.message("mapEditorTransformPanel.majorRiver"),
                 new RiverTransform(TileImprovement.LARGE_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("2022", riverSize),
+        listPanel.add(buildButton(getImageLibrary().getRiverImage("2022", riverSize),
                 Messages.message("mapEditorTransformPanel.changeRiverConnections"),
                 new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
+        listPanel.add(buildButton(getImageLibrary().getRiverImage("1022", riverSize),
                 Messages.message("mapEditorTransformPanel.setRiverStyle"),
                 new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
 
         final ResourceType rt = first(spec.getResourceTypeList());
-        listPanel.add(buildButton(ImageLibrary.getResourceTypeImage(rt,
+        listPanel.add(buildButton(getImageLibrary().getResourceTypeImage(rt,
                     riverSize, false),
                 Messages.message("mapEditorTransformPanel.resource"),
                 new ResourceTransform()));
 
-        listPanel.add(buildButton(ImageLibrary.getLCRImage(riverSize),
+        listPanel.add(buildButton(getImageLibrary().getLCRImage(riverSize),
                 Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
                 new LostCityRumourTransform()));
 
         SettlementType settlementType = getNativeNation().getType()
             .getCapitalType();
-        listPanel.add(buildButton(ImageLibrary.getSettlementTypeImage(settlementType, riverSize),
+        listPanel.add(buildButton(getImageLibrary().getSettlementTypeImage(settlementType, riverSize),
                 Messages.message("settlement"),
                 new SettlementTransform()));
     }

@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.InputStream;
+import java.util.function.Predicate;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -78,6 +79,7 @@ import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -108,6 +110,7 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ImageCache;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -119,6 +122,14 @@ import net.sf.freecol.common.util.Utils;
  */
 public class SwingGUI extends GUI {
 
+    /** A rough position to place dialogs and panels on the canvas. */
+    public static enum PopupPosition {
+        ORIGIN,
+        CENTERED,
+        CENTERED_LEFT,
+        CENTERED_RIGHT,
+    }
+
     /** European subpanel classes. */
     private static final List<Class<? extends FreeColPanel>> EUROPE_CLASSES
         = makeUnmodifiableList(RecruitPanel.class,
@@ -128,16 +139,21 @@ public class SwingGUI extends GUI {
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
-    /** The generally use scaled image library. */
-    private ImageLibrary imageLibrary;
-    
     /** The graphics device to display to. */
     private final GraphicsDevice graphicsDevice;
 
+    /** A persistent image cache. */
+    private final ImageCache imageCache;
+
+    /** The fixed/unscaled image library used by panels et al. */
+    private ImageLibrary fixedImageLibrary;
+    
+   /** The scaled image library used by the map. */
+    private ImageLibrary scaledImageLibrary;
+
     /**
-     * This is the TileViewer instance used to paint the map tiles
-     * in the ColonyPanel and other panels.  It should not be scaled
-     * along with the default MapViewer.
+     * This is the TileViewer instance used for tiles in panels.
+     * It uses the fixed ImageLibrary.
      */
     private TileViewer tileViewer;
 
@@ -159,6 +175,9 @@ public class SwingGUI extends GUI {
     /** Where the map was drag-clicked. */
     private Point dragPoint;
 
+    /** Has a goto operation started? */
+    private boolean gotoStarted = false;
+
     /** The splash screen. */
     private SplashScreen splash;
 
@@ -172,12 +191,14 @@ public class SwingGUI extends GUI {
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient, scaleFactor);
 
-        this.imageLibrary = new ImageLibrary(scaleFactor);
         this.graphicsDevice = Utils.getGoodGraphicsDevice();
         if (this.graphicsDevice == null) {
             FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         }
-        this.tileViewer = new TileViewer(freeColClient, new ImageLibrary());
+        this.imageCache = new ImageCache();
+        this.scaledImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
+        this.fixedImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
+        this.tileViewer = new TileViewer(freeColClient, fixedImageLibrary);
         // Defer remaining initializations, possibly to startGUI
         this.mapViewer = null;
         this.mapControls = null;
@@ -294,6 +315,21 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Is mouse movement differnce above the drag threshold?
+     *
+     * @param x The new mouse x position.
+     * @param y The new mouse y position.
+     * @return True if the mouse has been dragged.
+     */
+    public boolean isDrag(int x, int y) {
+        final Point drag = getDragPoint();
+        if (drag == null) return false;
+        int deltaX = Math.abs(x - drag.x);
+        int deltaY = Math.abs(y - drag.y);
+        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
+    }
+
+    /**
      * Change the view mode.
      *
      * Always stop the blinking cursor if leaving MOVE_UNITS mode,
@@ -373,6 +409,33 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Get the map scale.
+     *
+     * Used by:
+     *
+     * @return The scale for the (rescalable) map.
+     */
+    private final float getMapScale() {
+        ImageLibrary lib = this.scaledImageLibrary;
+        return (lib == null) ? 1.0f : lib.getScaleFactor();
+    }
+
+    /**
+     * Get a rough position to place a dialog given a tile which we wish
+     * to remain visible.
+     *
+     * @param tile The {@code Tile} to expose.
+     * @return A suitable {@code PopupPosition}.
+     */
+    private PopupPosition getPopupPosition(Tile tile) {
+        if (tile == null) return PopupPosition.CENTERED;
+        int where = this.mapViewer.setOffsetFocus(tile);
+        return (where > 0) ? PopupPosition.CENTERED_LEFT
+            : (where < 0) ? PopupPosition.CENTERED_RIGHT
+            : PopupPosition.CENTERED;
+    }
+    
+    /**
      * Update the path for the active unit.
      */
     private void updateUnitPath() {
@@ -395,18 +458,25 @@ public class SwingGUI extends GUI {
     }
 
     /**
-     * Is mouse movement differnce above the drag threshold?
-     *
-     * @param x The new mouse x position.
-     * @param y The new mouse y position.
-     * @return True if the mouse has been dragged.
+     * Starts a goto operation.
      */
-    public boolean isDrag(int x, int y) {
-        final Point drag = getDragPoint();
-        if (drag == null) return false;
-        int deltaX = Math.abs(x - drag.x);
-        int deltaY = Math.abs(y - drag.y);
-        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
+    private void startGoto() {
+        this.gotoStarted = true;
+        this.canvas.setCursor(Canvas.GO_CURSOR);
+        this.mapViewer.changeGotoPath(null);
+    }
+
+    /**
+     * Stops any ongoing goto operation.
+     *
+     * @return The old goto path if any.
+     */
+    private PathNode stopGoto() {
+        PathNode ret = (this.gotoStarted) ? this.mapViewer.getGotoPath() : null;
+        this.gotoStarted = false;
+        this.canvas.setCursor(null);
+        this.mapViewer.changeGotoPath(null);
+        return ret;
     }
 
     /**
@@ -418,7 +488,7 @@ public class SwingGUI extends GUI {
         final Unit unit = getActiveUnit();
         if (tile == null || unit == null) {
             clearGotoPath();
-        } else if (this.canvas.isGotoStarted()) {
+        } else if (isGotoStarted()) {
             // Do nothing if the tile has not changed.
             PathNode oldPath = this.mapViewer.getGotoPath();
             Tile lastTile = (oldPath == null) ? null
@@ -457,8 +527,11 @@ public class SwingGUI extends GUI {
      * Reset the map zoom and refresh the canvas.
      */
     private void resetMapZoom() {
-        this.mapViewer.resetMapScale();
-        refresh();
+        if (this.scaledImageLibrary.getScaleFactor()
+            != ImageLibrary.NORMAL_SCALE) {
+            this.mapViewer.changeScale(ImageLibrary.NORMAL_SCALE);
+            refresh();
+        }
     }
    
 
@@ -470,16 +543,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public ImageLibrary getImageLibrary() {
-        return this.imageLibrary;
+    public ImageLibrary getFixedImageLibrary() {
+        return this.fixedImageLibrary;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ImageLibrary getTileImageLibrary() {
-        return this.tileViewer.getImageLibrary();
+    public ImageLibrary getScaledImageLibrary() {
+        return this.scaledImageLibrary;
     }
 
     /**
@@ -566,7 +639,7 @@ public class SwingGUI extends GUI {
     public void installLookAndFeel(String fontName) throws FreeColException {
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
-        Font font = FontLibrary.createMainFont(fontName, getMapScale());
+        Font font = FontLibrary.createMainFont(fontName);
         if (font == null) {
             throw new FreeColException("Unable to create main font: "
                 + fontName);
@@ -643,10 +716,10 @@ public class SwingGUI extends GUI {
     public void startGUI(final Dimension desiredWindowSize) {
         final FreeColClient fcc = getFreeColClient();
         final ClientOptions opts = getClientOptions();
-        final ActionListener al = (ActionEvent ae) ->
-            this.refreshTile(this.mapViewer.getActiveTile());
-        this.mapViewer = new MapViewer(fcc, al);
         this.mapControls = MapControls.newInstance(fcc);
+        final ActionListener al = (ActionEvent ae) ->
+            this.refreshTile(this.mapViewer.getCursorTile());
+        this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
                                  this.mapControls);
@@ -671,6 +744,7 @@ public class SwingGUI extends GUI {
         // No longer doing anything special for pmoffscreen et al as
         // changing these in-game does not change the now initialized
         // graphics pipeline.
+        this.mapViewer.startCursorBlinking();
         logger.info("GUI started.");
     }
 
@@ -718,7 +792,8 @@ public class SwingGUI extends GUI {
     @Override
     public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey) {
-        return this.widgets.confirm(tile, tmpl, icon, okKey, cancelKey);
+        return this.widgets.confirm(tmpl, icon, okKey, cancelKey,
+                                    getPopupPosition(tile));
     }
 
     /**
@@ -727,7 +802,8 @@ public class SwingGUI extends GUI {
     @Override
     protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
                               String cancelKey, List<ChoiceItem<T>> choices) {
-        return this.widgets.getChoice(tile, tmpl, icon, cancelKey, choices);
+        return this.widgets.getChoice(tmpl, icon, cancelKey, choices,
+                                      getPopupPosition(tile));
     }
 
     /**
@@ -736,7 +812,8 @@ public class SwingGUI extends GUI {
     @Override
     public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
                            String okKey, String cancelKey) {
-        return this.widgets.getInput(tile, tmpl, defaultValue, okKey, cancelKey);
+        return this.widgets.getInput(tmpl, defaultValue, okKey, cancelKey,
+                                     getPopupPosition(tile));
     }
 
 
@@ -800,7 +877,8 @@ public class SwingGUI extends GUI {
     @Override
     public void miniMapToggleViewControls() {
         if (this.mapControls == null) return;
-        this.mapControls.toggleView();
+        getFreeColClient().toggleClientOption(ClientOptions.MINIMAP_TOGGLE_BORDERS);
+        this.mapControls.repaint();
     }
 
     /**
@@ -809,7 +887,8 @@ public class SwingGUI extends GUI {
     @Override
     public void miniMapToggleFogOfWarControls() {
         if (this.mapControls == null) return;
-        this.mapControls.toggleFogOfWar();
+        getFreeColClient().toggleClientOption(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR);
+        this.mapControls.repaint();
     }
 
     /**
@@ -887,10 +966,10 @@ public class SwingGUI extends GUI {
         if (unit == null) return;
 
         // Enter "goto mode" if not already activated; otherwise cancel it
-        if (this.canvas.isGotoStarted()) {
+        if (isGotoStarted()) {
             clearGotoPath();
         } else {
-            this.canvas.startGoto();
+            startGoto();
             
             // Draw the path to the current mouse position, if the
             // mouse is over the screen; see also
@@ -907,7 +986,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void clearGotoPath() {
-        this.canvas.stopGoto();
+        stopGoto();
         updateUnitPath();
         refresh();
     }
@@ -917,7 +996,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean isGotoStarted() {
-        return this.canvas.isGotoStarted();
+        return this.gotoStarted;
     }
 
     /**
@@ -925,12 +1004,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void performGoto(Tile tile) {
-        if (this.canvas.isGotoStarted()) this.canvas.stopGoto();
+        if (isGotoStarted()) stopGoto();
 
         final Unit active = getActiveUnit();
         if (active != null) {
             if (tile != null && active.getTile() != tile) {
-                this.canvas.startGoto();
+                startGoto();
                 updateGotoTile(tile);
                 traverseGotoPath();
             }
@@ -953,9 +1032,9 @@ public class SwingGUI extends GUI {
     @Override
     public void traverseGotoPath() {
         final Unit unit = getActiveUnit();
-        if (unit == null || !this.canvas.isGotoStarted()) return;
+        if (unit == null || !isGotoStarted()) return;
 
-        final PathNode path = this.canvas.stopGoto();
+        final PathNode path = stopGoto();
         if (path == null) {
             igc().clearGotoOrders(unit);
         } else {
@@ -972,9 +1051,9 @@ public class SwingGUI extends GUI {
     @Override
     public void updateGoto(int x, int y, boolean start) {
         if (start && isDrag(x, y)) {
-            this.canvas.startGoto();
+            startGoto();
         }
-        if (this.canvas.isGotoStarted()) {
+        if (isGotoStarted()) {
             updateGotoTile(tileAt(x, y));
         }
         refresh();
@@ -985,15 +1064,61 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void prepareDrag(int x, int y) {
-        if (this.canvas.isGotoStarted()) {
-            this.canvas.stopGoto();
+        if (isGotoStarted()) {
+            stopGoto();
             refresh();
         }
         setDragPoint(x, y);
         this.canvas.requestFocus();
     }
     
+
+    // Scrolling
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Direction getScrollDirection(int x, int y, int scrollSpace,
+                                        boolean ignoreTop) {
+        Direction ret;
+        final Dimension size = this.canvas.getSize();
+        if (x < scrollSpace && y < scrollSpace) { // Upper-Left
+            ret = !ignoreTop ? Direction.NW : Direction.W;
+        } else if (x >= size.width - scrollSpace
+            && y < scrollSpace) { // Upper-Right
+            ret = !ignoreTop ? Direction.NE : Direction.E;
+        } else if (x >= size.width - scrollSpace
+            && y >= size.height - scrollSpace) { // Bottom-Right
+            ret = Direction.SE;
+        } else if (x < scrollSpace
+            && y >= size.height - scrollSpace) { // Bottom-Left
+            ret = Direction.SW;
+        } else if (y < scrollSpace) { // Top
+            ret = !ignoreTop ? Direction.N : null;
+        } else if (x >= size.width - scrollSpace) { // Right
+            ret = Direction.E;
+        } else if (y >= size.height - scrollSpace) { // Bottom
+            ret = Direction.S;
+        } else if (x < scrollSpace) { // Left
+            ret = Direction.W;
+        } else {
+            ret = null;
+        }
+        return ret;
+    }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean scrollMap(Direction direction) {
+        boolean ret = this.mapViewer.scrollMap(direction);
+        refresh();
+        return ret;
+    }
+
+
     // Tile image manipulation
 
     /**
@@ -1024,8 +1149,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
-        tileViewer.displayColonyTiles(g, tiles, colony);
+    public void displayColonyTiles(Graphics2D g2d, Tile[][] tiles,
+                                   Colony colony) {
+        this.tileViewer.displayColonyTiles(g2d, tiles, colony);
     }
 
 
@@ -1111,7 +1237,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomInMap() {
-        return !this.mapViewer.isAtMaxMapScale();
+        return this.scaledImageLibrary.getScaleFactor() < ImageLibrary.MAX_SCALE;
     }
 
     /**
@@ -1119,7 +1245,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomOutMap() {
-        return !this.mapViewer.isAtMinMapScale();
+        return this.scaledImageLibrary.getScaleFactor() > ImageLibrary.MIN_SCALE;
     }
 
     /**
@@ -1127,8 +1253,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomInMap() {
-        this.mapViewer.increaseMapScale();
-        refresh();
+        float scale = this.scaledImageLibrary.getScaleFactor();
+        float newScale = scale + ImageLibrary.SCALE_STEP;
+        if (scale < newScale && newScale <= ImageLibrary.MAX_SCALE) {
+            this.mapViewer.changeScale(newScale);
+            refresh();
+        }
     }
 
     /**
@@ -1136,8 +1266,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void zoomOutMap() {
-        this.mapViewer.decreaseMapScale();
-        refresh();
+        float scale = this.scaledImageLibrary.getScaleFactor();
+        float newScale = scale - ImageLibrary.SCALE_STEP;
+        if (ImageLibrary.MIN_SCALE <= newScale && newScale < scale) {
+            this.mapViewer.changeScale(newScale);
+            refresh();
+        }
     }
 
 
@@ -1470,9 +1604,12 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public FreeColPanel showColonyPanel(Colony colony, Unit unit) {
+    public FreeColPanel showColonyPanel(final Colony colony, Unit unit) {
         if (colony == null) return null;
-        ColonyPanel panel = this.canvas.getColonyPanel(colony);
+        final Predicate<Component> pred = (c) ->
+            (c instanceof ColonyPanel
+                && ((ColonyPanel)c).getColony() == colony);
+        ColonyPanel panel = (ColonyPanel)this.canvas.getMatchingComponent(pred);
         if (panel == null) {
             try {
                 panel = new ColonyPanel(getFreeColClient(), colony);
@@ -1481,7 +1618,8 @@ public class SwingGUI extends GUI {
                     + colony.getId(), e);
                 return null;
             }
-            this.canvas.showFreeColPanel(panel, colony.getTile(), true);
+            this.canvas.showFreeColPanel(panel,
+                getPopupPosition(colony.getTile()), true);
         } else {
             panel.requestFocus();
         }
@@ -1556,7 +1694,8 @@ public class SwingGUI extends GUI {
     @Override
     public void showDumpCargoDialog(Unit unit,
                                     DialogHandler<List<Goods>> handler) {
-        this.widgets.showDumpCargoDialog(unit, handler);
+        this.widgets.showDumpCargoDialog(unit, getPopupPosition(unit.getTile()),
+                                         handler);
     }
 
     /**
@@ -1641,7 +1780,8 @@ public class SwingGUI extends GUI {
                                        final Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
         this.widgets.showFirstContactDialog(player, other, tile,
-                                            settlementCount, handler);
+                                            settlementCount,
+                                            getPopupPosition(tile), handler);
     }
 
     /**
@@ -1666,7 +1806,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showIndianSettlementPanel(IndianSettlement is) {
-        return this.widgets.showIndianSettlementPanel(is);
+        return this.widgets.showIndianSettlementPanel(is,
+            getPopupPosition(is.getTile()));
     }
 
     /**
@@ -1678,7 +1819,7 @@ public class SwingGUI extends GUI {
         ImageIcon icon = null;
         Tile tile = null;
         if (displayObject != null) {
-            icon = this.imageLibrary.getObjectImageIcon(displayObject);
+            icon = this.fixedImageLibrary.getObjectImageIcon(displayObject);
             tile = (displayObject instanceof Location)
                 ? ((Location)displayObject).getTile()
                 : null;
@@ -1686,7 +1827,8 @@ public class SwingGUI extends GUI {
         if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
             playSound("sound.event.alertSound");
         }
-        return this.widgets.showInformationPanel(displayObject, tile,
+        return this.widgets.showInformationPanel(displayObject,
+                                                 getPopupPosition(tile),
                                                  icon, template);
     }
 
@@ -1778,7 +1920,7 @@ public class SwingGUI extends GUI {
             ModelMessage m = modelMessages.get(i);
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
-            icons[i] = this.imageLibrary
+            icons[i] = this.fixedImageLibrary
                 .getObjectImageIcon(game.getMessageDisplay(m));
             if (tile == null && fcos[i] instanceof Location) {
                 tile = ((Location)fcos[i]).getTile();
@@ -1786,7 +1928,8 @@ public class SwingGUI extends GUI {
         }
         InformationPanel panel
             = new InformationPanel(getFreeColClient(), texts, fcos, icons);
-        return this.canvas.showFreeColPanel(panel, tile, true);
+        return this.canvas.showFreeColPanel(panel,
+            getPopupPosition(tile), true);
     }
 
     /**
@@ -1807,7 +1950,9 @@ public class SwingGUI extends GUI {
                                       final String defaultName,
                                       final Unit unit,
                                       DialogHandler<String> handler) {
-        this.widgets.showNamingDialog(template, defaultName, unit, handler);
+        this.widgets.showNamingDialog(template, defaultName,
+                                      getPopupPosition(unit.getTile()),
+                                      handler);
     }
 
     /**
@@ -1817,7 +1962,9 @@ public class SwingGUI extends GUI {
     public void showNativeDemandDialog(Unit unit, Colony colony,
                                        GoodsType type, int amount,
                                        DialogHandler<Boolean> handler) {
-        this.widgets.showNativeDemandDialog(unit, colony, type, amount, handler);
+        this.widgets.showNativeDemandDialog(unit, colony, type, amount,
+                                            getPopupPosition(unit.getTile()),
+                                            handler);
     }
 
     /**
@@ -1833,7 +1980,8 @@ public class SwingGUI extends GUI {
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        return this.widgets.showNegotiationDialog(our, other, agreement, comment);
+        return this.widgets.showNegotiationDialog(our, other, agreement,
+            comment, getPopupPosition(((Location)our).getTile()));
     }
 
     /**
@@ -1858,7 +2006,8 @@ public class SwingGUI extends GUI {
     @Override
     public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender, Tile tile) {
-        return this.widgets.showPreCombatDialog(attacker, defender, tile);
+        return this.widgets.showPreCombatDialog(attacker, defender,
+                                                getPopupPosition(tile));
     }
 
     /**
@@ -2067,7 +2216,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Location showSelectDestinationDialog(Unit unit) {
-        return this.widgets.showSelectDestinationDialog(unit);
+        return this.widgets.showSelectDestinationDialog(unit,
+            getPopupPosition(unit.getTile()));
     }
 
     /**
@@ -2106,7 +2256,8 @@ public class SwingGUI extends GUI {
                 panel = new StartGamePanel(getFreeColClient());
             }
             panel.initialize(singlePlayerMode);
-            return this.canvas.showFreeColPanel(panel, false);
+            return this.canvas.showFreeColPanel(panel,
+                PopupPosition.CENTERED, false);
         }
         return null;
     }
@@ -2133,7 +2284,8 @@ public class SwingGUI extends GUI {
             this.canvas.removeFromCanvas(panel);
         }
         panel.setStatusMessage(message);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel,
+            PopupPosition.CENTERED, true);
     }
 
     /**
@@ -2157,7 +2309,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showTradeRoutePanel(Unit unit) {
-        return this.widgets.showTradeRoutePanel(unit);
+        return this.widgets.showTradeRoutePanel(unit,
+            getPopupPosition(unit.getTile()));
     }
 
     /**

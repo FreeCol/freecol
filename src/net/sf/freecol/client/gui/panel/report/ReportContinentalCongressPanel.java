@@ -78,8 +78,9 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                 currentFather.getId());
             button.addActionListener(this);
             recruitingPanel.add(button);
-            JLabel currentFatherLabel = new JLabel(new ImageIcon(
-                ImageLibrary.getFoundingFatherImage(currentFather, false)));
+            JLabel currentFatherLabel
+                = new JLabel(new ImageIcon(getImageLibrary()
+                    .getFoundingFatherImage(currentFather, false)));
             currentFatherLabel.setToolTipText(
                 Messages.getDescription(currentFather));
             recruitingPanel.add(currentFatherLabel);
@@ -114,10 +115,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             Image image;
             Turn turn = null;
             if (player.hasFather(father)) {
-                image = ImageLibrary.getFoundingFatherImage(father, false);
+                image = getImageLibrary().getFoundingFatherImage(father, false);
                 turn = electionTurns.get(Messages.nameKey(father));
             } else {
-                image = ImageLibrary.getFoundingFatherImage(father, true);
+                image = getImageLibrary().getFoundingFatherImage(father, true);
             }
             panel.add(new JLabel(new ImageIcon(image)), "newline");
             JButton button = Utility.getLinkButton(Messages.getName(father),

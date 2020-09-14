@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.StringTemplate;
@@ -65,7 +66,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             MonarchAction action, StringTemplate template, String monarchKey) {
         super(freeColClient, frame);
 
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final String messageId = action.getTextKey();
         if (!Messages.containsKey(messageId)) {
             throw new IllegalStateException("Unrecognized monarch action: "
@@ -81,7 +82,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             hdrKey = "monarchDialog.default";
         }
         JLabel header = Utility.localizedHeaderLabel(hdrKey,
-            SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
+            SwingConstants.LEADING, Utility.FONTSPEC_SUBTITLE);
 
         JPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
                                                   "[]20[]"));

@@ -46,10 +46,9 @@ public class MenuMouseMotionListener extends AbstractCanvasListener
      * Trivial constructor.
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
-     * @param canvas The {@code Canvas} to operate on.
      */
-    public MenuMouseMotionListener(FreeColClient freeColClient, Canvas canvas) {
-        super(freeColClient, canvas);
+    public MenuMouseMotionListener(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
 

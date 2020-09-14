@@ -79,7 +79,7 @@ public class TerrainGenerator {
      * 
      * FIXME: cache or randomizer???
      *
-     * @param cache A {@code RandomIntCache} number source.
+     * @param random A pseudo-random number source.
      * @see #generateMap
      */
     public TerrainGenerator(Random random) {

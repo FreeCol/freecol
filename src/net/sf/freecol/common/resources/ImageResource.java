@@ -21,7 +21,6 @@ package net.sf.freecol.common.resources;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -38,6 +37,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**
@@ -50,7 +50,8 @@ public class ImageResource extends Resource {
 
     /** Comparator to compare buffered images by ascending size. */
     private static final Comparator<BufferedImage> biComp
-        = Comparator.<BufferedImage>comparingInt(bi -> bi.getWidth() * bi.getHeight());
+        = Comparator.<BufferedImage>comparingInt(bi ->
+            bi.getWidth() * bi.getHeight());
 
     private volatile BufferedImage image = null;
     private List<URI> alternativeLocators = null;
@@ -122,95 +123,58 @@ public class ImageResource extends Resource {
 
     /**
      * Gets the image using the specified dimension.
+     *
+     * Rescaling will be performed if necessary.
      * 
-     * @param d The {@code Dimension} of the requested image.
-     *     Rescaling will be performed if necessary.
+     * @param siz The {@code Dimension} of the requested image.
      * @return The {@code BufferedImage} with the required dimension.
      */
-    private BufferedImage getColorImage(Dimension d) {
-        BufferedImage im = getImage();
-        if (im == null) return null; // Preload failed
-        
-        int wNew = d.width;
-        int hNew = d.height;
-        if (wNew < 0 && hNew < 0) return im; // Wildcard dimensions
-
-        int w = im.getWidth();
-        int h = im.getHeight();
-        if (wNew < 0 || (!(hNew < 0) && wNew*h > w*hNew)) {
-            wNew = (2*w*hNew + (h+1)) / (2*h);
-        } else if (hNew < 0 || wNew*h < w*hNew) {
-            hNew = (2*h*wNew + (w+1)) / (2*w);
-        }
-        if (wNew == w && hNew == h) return im; // Matching dimension
+    private BufferedImage getColorImage(Dimension siz) {
+        BufferedImage img = getImage();
+        if (img == null) return null; // Preload failed
+        int w = img.getWidth();
+        int h = img.getHeight();
+        Dimension dNew = wildcardDimension(siz, new Dimension(w, h));
+        int wNew = dNew.width, hNew = dNew.height;
+        if (wNew == w && hNew == h) return img; // Matching dimension
 
         if (this.haveAlternatives()) {
             final int fwNew = wNew, fhNew = hNew;
-            final Predicate<BufferedImage> sizePred = img ->
-                img.getWidth() >= fwNew && img.getHeight() >= fhNew;
-            im = findLoadedImage(sizePred);
-            w = im.getWidth();
-            h = im.getHeight();
-            if (wNew*h > w*hNew) {
-                wNew = (2*w*hNew + (h+1)) / (2*h);
-            } else if (wNew*h < w*hNew) {
-                hNew = (2*h*wNew + (w+1)) / (2*w);
-            }
-            if (wNew == w && hNew == h) return im; // Found loaded image
+            final Predicate<BufferedImage> sizePred = i ->
+                i.getWidth() >= fwNew && i.getHeight() >= fhNew;
+            img = findLoadedImage(sizePred);
+            w = img.getWidth();
+            h = img.getHeight();
+            dNew = wildcardDimension(siz, new Dimension(w, h));
+            wNew = dNew.width;
+            hNew = dNew.height;
+            if (wNew == w && hNew == h) return img; // Found loaded image
         }
 
         // Directly scaling to less than half size would ignore some pixels.
         // Prevent that by halving the base image size as often as needed.
         while (wNew*2 <= w && hNew*2 <= h) {
-            w = (w+1)/2;
-            h = (h+1)/2;
-            BufferedImage halved = new BufferedImage(w, h,
-                BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = halved.createGraphics();
-            // For halving bilinear should most correctly average 2x2 pixels.
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.drawImage(im, 0, 0, w, h, null);
-            g.dispose();
-            im = halved;
+            img = createHalvedImage(img);
+            w = img.getWidth();
+            h = img.getHeight();
         }
 
+        // Do a final resize
         if (wNew != w || hNew != h) {
-            BufferedImage scaled = new BufferedImage(wNew, hNew,
-                BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = scaled.createGraphics();
-            // Bicubic should give best quality for odd scaling factors.
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g.drawImage(im, 0, 0, wNew, hNew, null);
-            g.dispose();
-            im = scaled;
+            img = createResizedImage(img, wNew, hNew);
         }
-        return im;
+        return img;
     }
 
     /**
      * Gets a grayscale version of the image of the given size.
      * 
-     * @param d The requested size.
+     * @param siz The {@code Dimension} of the requested image.
      * @return The {@code BufferedImage}.
      */
-    private BufferedImage getGrayscaleImage(Dimension d) {
-        final BufferedImage im = getColorImage(d); // Get the scaled image
-        if (im == null) return null;
-
-        int width = im.getWidth();
-        int height = im.getHeight();
-        // TODO: Find out why making a copy is necessary here to prevent
-        //       images from getting too dark.
-        BufferedImage srcImage = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = srcImage.createGraphics();
-        g.drawImage(im, 0, 0, null);
-        g.dispose();
-        ColorConvertOp filter = new ColorConvertOp(
-            ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-        return filter.filter(srcImage, null);
+    private BufferedImage getGrayscaleImage(Dimension siz) {
+        final BufferedImage img = getColorImage(siz); // Get the scaled image
+        return createGrayscaleImage(img);
     }
 
     /**

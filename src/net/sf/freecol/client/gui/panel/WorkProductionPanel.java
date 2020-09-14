@@ -66,7 +66,7 @@ public class WorkProductionPanel extends FreeColPanel {
               new MigLayout("wrap 3, insets 10 10 10 10",
                             "[]30:push[right][]", ""));
 
-        final ImageLibrary lib = getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final Colony colony = unit.getColony();
         final UnitType unitType = unit.getType();
         final WorkLocation wl = (WorkLocation)unit.getLocation();
@@ -110,22 +110,20 @@ public class WorkProductionPanel extends FreeColPanel {
             result = 0.0f;
         }
 
-        Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor());
+        Font bigFont = FontLibrary.getUnscaledFont("normal-bold-smaller");
         JLabel finalLabel = Utility.localizedLabel("finalResult");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
 
         JLabel finalResult = new JLabel(ModifierFormat.format(result));
         finalResult.setFont(bigFont);
-        finalResult.setBorder(Utility.PRODUCTION_BORDER);
+        finalResult.setBorder(Utility.getProductionBorder());
         add(finalResult, "wrap 30");
 
         // Is there unattended production?
         result = wl.getBaseProduction(null, workType, null);
         if (wl instanceof Building && result > 0) {
-            Font boldFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, Font.BOLD, lib.getScaleFactor());
+            Font boldFont = FontLibrary.getUnscaledFont("normal-bold-tiny");
             JLabel unattendedLabel = Utility
                 .localizedLabel("workProductionPanel.unattendedProduction");
             unattendedLabel.setFont(boldFont);

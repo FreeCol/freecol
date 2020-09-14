@@ -30,6 +30,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.model.Region;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -59,8 +60,7 @@ public final class ReportExplorationPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 5, fillx", "", ""));
 
         // Header Row
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, getGUI().getMapScale());
+        Font font = FontLibrary.getUnscaledFont("normal-bold-tiny");
         JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
         nameOfRegion.setFont(font);
         reportPanel.add(nameOfRegion);
@@ -79,7 +79,7 @@ public final class ReportExplorationPanel extends ReportPanel {
         
         // Content Rows
         // TODO: Display "None" if no contents, though this would be rare.
-        for (Region region : transform(getGame().getMap().getRegions(),
+        for (Region region : transform(getMap().getRegions(),
                                        isNotNull(Region::getDiscoveredIn),
                                        Function.<Region>identity(),
                                        regionComparator)) {

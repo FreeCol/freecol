@@ -33,6 +33,8 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
+
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
@@ -63,7 +65,6 @@ import net.sf.freecol.client.gui.dialog.FreeColStringInputDialog;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
 import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
@@ -109,6 +110,7 @@ import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.dialog.VictoryDialog;
 import net.sf.freecol.client.gui.dialog.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
@@ -164,8 +166,8 @@ public final class Widgets {
         /** The dialog to show. */
         private final FreeColDialog<T> fcd;
 
-        /** An optional tile to guide the dialog placement. */
-        private final Tile tile;
+        /** A rough position for the dialog. */
+        private final PopupPosition pos;
 
         /** The handler for the dialog response. */
         private final DialogHandler<T> handler;
@@ -175,13 +177,13 @@ public final class Widgets {
          * Constructor.
          *
          * @param fcd The parent {@code FreeColDialog}.
-         * @param tile An optional {@code Tile} to display.
+         * @param pos A {@code PopupPosition} for the dialog.
          * @param handler The {@code DialogHandler} to call when run.
          */
-        public DialogCallback(FreeColDialog<T> fcd, Tile tile,
+        public DialogCallback(FreeColDialog<T> fcd, PopupPosition pos,
                               DialogHandler<T> handler) {
             this.fcd = fcd;
-            this.tile = tile;
+            this.pos = pos;
             this.handler = handler;
             SwingUtilities.invokeLater(this);
         }
@@ -191,7 +193,7 @@ public final class Widgets {
          */
         @Override
         public void run() {
-            Widgets.this.canvas.viewFreeColDialog(fcd, tile);
+            Widgets.this.canvas.viewFreeColDialog(fcd, pos);
             // ...and use another thread to wait for a dialog response...
             new Thread(fcd.toString()) {
                 @Override
@@ -229,65 +231,63 @@ public final class Widgets {
     /**
      * Show a modal dialog with a text and a ok/cancel option.
      *
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
      * @param tmpl A {@code StringTemplate} to explain the choice.
      * @param icon An optional icon to display.
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return True if the user clicked the "ok"-button.
      */
-    public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
-                           String okKey, String cancelKey) {
+    public boolean confirm(StringTemplate tmpl, ImageIcon icon,
+                           String okKey, String cancelKey, PopupPosition pos) {
         FreeColConfirmDialog dialog
             = new FreeColConfirmDialog(this.freeColClient, getFrame(), true,
                                        tmpl, icon, okKey, cancelKey);
-        return this.canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, pos);
     }
 
     /**
      * Show a modal dialog with text and a choice of options.
      *
      * @param <T> The type to be returned from the dialog.
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
      * @param tmpl A SringTemplate that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices The {@code List} containing the ChoiceItems to
      *            create buttons for.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return The corresponding member of the values array to the selected
      *     option, or null if no choices available.
      */
-    public <T> T getChoice(Tile tile, StringTemplate tmpl,
-                           ImageIcon icon, String cancelKey,
-                           List<ChoiceItem<T>> choices) {
+    public <T> T getChoice(StringTemplate tmpl, ImageIcon icon,
+                           String cancelKey, List<ChoiceItem<T>> choices,
+                           PopupPosition pos) {
         if (choices.isEmpty()) return null;
         FreeColChoiceDialog<T> dialog
             = new FreeColChoiceDialog<>(this.freeColClient, getFrame(), true,
                                         tmpl, icon, cancelKey, choices);
-        return this.canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, pos);
     }
 
     /**
      * Show a modal dialog with a text field and a ok/cancel option.
      *
-     * @param tile An optional tile to make visible (not under the dialog).
      * @param tmpl A {@code StringTemplate} that explains the
      *     action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
      * @param cancelKey A key displayed on the optional "cancel"-button.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return The text the user entered, or null if cancelled.
      */
-    public String getInput(Tile tile, StringTemplate tmpl,
-                           String defaultValue,
-                           String okKey, String cancelKey) {
+    public String getInput(StringTemplate tmpl, String defaultValue,
+                           String okKey, String cancelKey,
+                           PopupPosition pos) {
         FreeColStringInputDialog dialog
             = new FreeColStringInputDialog(this.freeColClient, getFrame(), true,
                                            tmpl, defaultValue,
                                            okKey, cancelKey);
-        return this.canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, pos);
     }
 
 
@@ -301,7 +301,8 @@ public final class Widgets {
     public FreeColPanel showAboutPanel() {
         AboutPanel panel
             = new AboutPanel(this.freeColClient);
-        return this.canvas.showFreeColPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -315,7 +316,8 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(BuildQueuePanel.class);
         if (panel == null || panel.getColony() != colony) {
             panel = new BuildQueuePanel(this.freeColClient, colony);
-            return this.canvas.showFreeColPanel(panel, true);
+            return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                                true);
         }
         return panel;
     }
@@ -342,7 +344,7 @@ public final class Widgets {
     public FreeColPanel showChatPanel() {
         ChatPanel panel
             = new ChatPanel(this.freeColClient);
-        this.canvas.showFreeColPanel(panel, true);
+        this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         panel.requestFocus();
         return panel;
     }
@@ -369,7 +371,8 @@ public final class Widgets {
     public FreeColPanel showColopediaPanel(String nodeId) {
         ColopediaPanel panel
             = new ColopediaPanel(this.freeColClient, nodeId);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
@@ -382,7 +385,8 @@ public final class Widgets {
     public FreeColPanel showColorChooserPanel(ActionListener al) {
         FreeColPanel panel
             = new ColorChooserPanel(this.freeColClient, al);
-        return this.canvas.showFreeColPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -394,7 +398,8 @@ public final class Widgets {
         CompactLabourReport panel
             = new CompactLabourReport(this.freeColClient);
         panel.initialize();
-        return this.canvas.showFreeColPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
 
     }
 
@@ -408,7 +413,8 @@ public final class Widgets {
         CompactLabourReport panel
             = new CompactLabourReport(this.freeColClient, unitData);
         panel.initialize();
-        return this.canvas.showFreeColPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -431,8 +437,8 @@ public final class Widgets {
     public FreeColPanel showDeclarationPanel() {
         DeclarationPanel panel
             = new DeclarationPanel(this.freeColClient);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED,
-                                        false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -456,13 +462,14 @@ public final class Widgets {
      * Show the {@code DumpCargoDialog}.
      *
      * @param unit The {@code Unit} that is dumping.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
-    public void showDumpCargoDialog(Unit unit,
+    public void showDumpCargoDialog(Unit unit, PopupPosition pos,
                                     DialogHandler<List<Goods>> handler) {
         new DialogCallback<>(new DumpCargoDialog(this.freeColClient,
                                                  getFrame(), unit),
-                             unit.getTile(), handler);
+                             pos, handler);
     }
 
     /**
@@ -531,7 +538,8 @@ public final class Widgets {
         if (message == null) return null;
         ErrorPanel panel
             = new ErrorPanel(this.freeColClient, message);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
@@ -548,7 +556,7 @@ public final class Widgets {
             panel = new EuropePanel(this.freeColClient,
                                     (this.canvas.getHeight() > 780));
             if (callback != null) panel.addClosingCallback(callback);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -565,8 +573,8 @@ public final class Widgets {
                                        String footer) {
         EventPanel panel
             = new EventPanel(this.freeColClient, header, image, footer);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED,
-                                        false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -577,8 +585,8 @@ public final class Widgets {
     public FreeColPanel showFindSettlementPanel() {
         FindSettlementPanel panel
             = new FindSettlementPanel(this.freeColClient);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.ORIGIN,
-                                        true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.ORIGIN,
+                                            true);
     }
 
     /**
@@ -591,15 +599,17 @@ public final class Widgets {
      * @param settlementCount The number of settlements the other
      *     player has (from the server, other.getNumberOfSettlements()
      *     is wrong here!).
+     * @param pos A {@code PopupPosition} for the dialog.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showFirstContactDialog(Player player, Player other,
                                        Tile tile, int settlementCount,
+                                       PopupPosition pos,
                                        DialogHandler<Boolean> handler) {
         new DialogCallback<>(new FirstContactDialog(this.freeColClient,
                                                     getFrame(), player, other,
                                                     tile, settlementCount),
-                             tile, handler);
+                             pos, handler);
     }
 
     /**
@@ -625,38 +635,41 @@ public final class Widgets {
                                             List<HighScore> scores) {
         ReportHighScoresPanel panel
             = new ReportHighScoresPanel(this.freeColClient, messageId, scores);
-        return this.canvas.showFreeColPanel(panel, Canvas.PopupPosition.CENTERED, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
      * Show the panel of the given native settlement.
      *
      * @param is The {@code IndianSettlement} to display.
+     * @param pos A {@code PopupPosition} for the panel.
      * @return The panel shown.
      */
-    public FreeColPanel showIndianSettlementPanel(IndianSettlement is) {
+    public FreeColPanel showIndianSettlementPanel(IndianSettlement is,
+                                                  PopupPosition pos) {
         IndianSettlementPanel panel
             = new IndianSettlementPanel(this.freeColClient, is);
-        return this.canvas.showFreeColPanel(panel, is.getTile(), true);
+        return this.canvas.showFreeColPanel(panel, pos, true);
     }
 
     /**
      * Show a message with some information and an "OK"-button.
      *
      * @param displayObject Optional object for displaying.
-     * @param tile The Tile the object is at.
+     * @param pos A {@code PopupPosition} for the panel.
      * @param icon The icon to display for the object.
      * @param tmpl The {@code StringTemplate} to display.
      * @return The panel shown.
      */
     public FreeColPanel showInformationPanel(FreeColObject displayObject,
-                                             Tile tile, ImageIcon icon,
+                                             PopupPosition pos, ImageIcon icon,
                                              StringTemplate tmpl) {
         String text = Messages.message(tmpl);
         InformationPanel panel
             = new InformationPanel(this.freeColClient, text,
                                    displayObject, icon);
-        return this.canvas.showFreeColPanel(panel, tile, true);
+        return this.canvas.showFreeColPanel(panel, pos, true);
     }
 
     /**
@@ -668,7 +681,8 @@ public final class Widgets {
      */
     public File showLoadDialog(File directory, FileFilter[] filters) {
         LoadDialog dialog
-            = new LoadDialog(this.freeColClient, getFrame(), directory, filters);
+            = new LoadDialog(this.freeColClient, getFrame(), directory,
+                             filters);
         return this.canvas.showFreeColDialog(dialog, null);
     }        
 
@@ -699,7 +713,8 @@ public final class Widgets {
     public FreeColPanel showLogFilePanel() {
         ErrorPanel panel
             = new ErrorPanel(this.freeColClient);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
@@ -750,16 +765,17 @@ public final class Widgets {
      * @param tmpl A {@code StringTemplate} for the message
      *     to explain the dialog.
      * @param defaultName The default name.
-     * @param unit The {@code Unit} discovering it.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showNamingDialog(StringTemplate tmpl, String defaultName,
-                                 Unit unit, DialogHandler<String> handler) {
+                                 PopupPosition pos,
+                                 DialogHandler<String> handler) {
         new DialogCallback<>(new FreeColStringInputDialog(this.freeColClient,
                                                           getFrame(), false,
                                                           tmpl, defaultName,
                                                           "ok", null),
-                             unit.getTile(), handler);
+                             pos, handler);
     }
 
     /**
@@ -769,15 +785,17 @@ public final class Widgets {
      * @param colony The {@code Colony} being demanded of.
      * @param type The {@code GoodsType} demanded (null for gold).
      * @param amount The amount of goods demanded.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showNativeDemandDialog(Unit unit, Colony colony,
                                        GoodsType type, int amount,
+                                       PopupPosition pos,
                                        DialogHandler<Boolean> handler) {
         new DialogCallback<>(new NativeDemandDialog(this.freeColClient,
                                                     getFrame(), unit, colony,
                                                     type, amount),
-                             unit.getTile(), handler);
+                             pos, handler);
     }
 
     /**
@@ -788,16 +806,18 @@ public final class Widgets {
      * @param agreement The current {@code DiplomaticTrade} agreement.
      * @param comment An optional {@code StringTemplate} containing a
      *     commentary message.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return An updated agreement.
      */
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
                                                  FreeColGameObject other,
                                                  DiplomaticTrade agreement,
-                                                 StringTemplate comment) {
+                                                 StringTemplate comment,
+                                                 PopupPosition pos) {
         NegotiationDialog dialog
             = new NegotiationDialog(this.freeColClient, getFrame(),
                                     our, other, agreement, comment);
-        return this.canvas.showFreeColDialog(dialog, ((Location)our).getTile());
+        return this.canvas.showFreeColDialog(dialog, pos);
     }
 
     /**
@@ -809,7 +829,8 @@ public final class Widgets {
     public FreeColPanel showNewPanel(Specification specification) {
         NewPanel panel
             = new NewPanel(this.freeColClient, specification);
-        return this.canvas.showFreeColPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -828,16 +849,16 @@ public final class Widgets {
      *
      * @param attacker The attacker {@code Unit}.
      * @param defender The defender.
-     * @param tile A {@code Tile} to make visible.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return True if the combat is to proceed.
      */
     public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender,
-                                       Tile tile) {
+                                       PopupPosition pos) {
         PreCombatDialog dialog
             = new PreCombatDialog(this.freeColClient, getFrame(),
                                   attacker, defender);
-        return this.canvas.showFreeColDialog(dialog, tile);
+        return this.canvas.showFreeColDialog(dialog, pos);
     }
 
     /**
@@ -851,7 +872,7 @@ public final class Widgets {
         if (panel == null) {
             panel = new PurchasePanel(this.freeColClient);
             panel.update();
-            this.canvas.showFreeColPanel(panel, false);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, false);
         }
         return panel;
     }
@@ -866,7 +887,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(RecruitPanel.class);
         if (panel == null) {
             panel = new RecruitPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, false);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, false);
         }
         return panel;
     }
@@ -887,7 +908,8 @@ public final class Widgets {
             = new ReportLabourDetailPanel(this.freeColClient, unitType, data,
                                           unitCount, colonies);
         panel.initialize();
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
@@ -954,13 +976,14 @@ public final class Widgets {
      * a given unit.
      *
      * @param unit The {@code Unit} to select a destination for.
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return A destination for the unit, or null.
      */
-    public Location showSelectDestinationDialog(Unit unit) {
+    public Location showSelectDestinationDialog(Unit unit, PopupPosition pos) {
         SelectDestinationDialog dialog
             = new SelectDestinationDialog(this.freeColClient, getFrame(),
                                           unit);
-        return this.canvas.showFreeColDialog(dialog, unit.getTile());
+        return this.canvas.showFreeColDialog(dialog, pos);
     }
 
     /**
@@ -975,7 +998,8 @@ public final class Widgets {
             = new ServerListPanel(this.freeColClient,
                                   this.freeColClient.getConnectController());
         panel.initialize(serverList);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
@@ -1005,8 +1029,10 @@ public final class Widgets {
     public FreeColPanel showStatisticsPanel(Map<String, String> serverStats,
                                             Map<String, String> clientStats) {
         StatisticsPanel panel
-            = new StatisticsPanel(this.freeColClient, serverStats, clientStats);
-        return this.canvas.showFreeColPanel(panel, true);
+            = new StatisticsPanel(this.freeColClient, serverStats,
+                                  clientStats);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
@@ -1019,7 +1045,8 @@ public final class Widgets {
         if (tile == null || !tile.isExplored()) return null;
         TilePanel panel
             = new TilePanel(this.freeColClient, tile);
-        return this.canvas.showFreeColPanel(panel, false);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            false);
     }
 
     /**
@@ -1031,20 +1058,21 @@ public final class Widgets {
     public FreeColPanel showTradeRouteInputPanel(TradeRoute newRoute) {
         TradeRouteInputPanel panel
             = new TradeRouteInputPanel(this.freeColClient, newRoute);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     /**
      * Show a panel to select a trade route for a unit.
      *
      * @param unit An optional {@code Unit} to select a trade route for.
+     * @param pos A {@code PopupPosition} for the panel.
      * @return The panel shown.
      */
-    public FreeColPanel showTradeRoutePanel(Unit unit) {
+    public FreeColPanel showTradeRoutePanel(Unit unit, PopupPosition pos) {
         TradeRoutePanel panel
             = new TradeRoutePanel(this.freeColClient, unit);
-        return this.canvas.showFreeColPanel(panel, (unit == null) ? null
-            : unit.getTile(), true);
+        return this.canvas.showFreeColPanel(panel, pos, true);
     }
 
     /**
@@ -1058,7 +1086,7 @@ public final class Widgets {
         if (panel == null) {
             panel = new TrainPanel(this.freeColClient);
             panel.update();
-            this.canvas.showFreeColPanel(panel, false);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, false);
         }
         return panel;
     }
@@ -1096,7 +1124,8 @@ public final class Widgets {
     public FreeColPanel showWorkProductionPanel(Unit unit) {
         WorkProductionPanel panel
             = new WorkProductionPanel(this.freeColClient, unit);
-        return this.canvas.showFreeColPanel(panel, true);
+        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                            true);
     }
 
     
@@ -1107,7 +1136,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportCargoPanel.class);
         if (panel == null) {
             panel = new ReportCargoPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1118,13 +1147,15 @@ public final class Widgets {
             panel = this.canvas.getExistingFreeColPanel(ReportCompactColonyPanel.class);
             if (panel == null) {
                 panel = new ReportCompactColonyPanel(this.freeColClient);
-                this.canvas.showFreeColPanel(panel, true);
+                this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                             true);
             }
         } else {
             panel = this.canvas.getExistingFreeColPanel(ReportClassicColonyPanel.class);
             if (panel == null) {
                 panel = new ReportClassicColonyPanel(this.freeColClient);
-                this.canvas.showFreeColPanel(panel, true);
+                this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
+                                             true);
             }
         }
         return panel;
@@ -1135,7 +1166,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportContinentalCongressPanel.class);
         if (panel == null) {
             panel = new ReportContinentalCongressPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1145,7 +1176,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportEducationPanel.class);
         if (panel == null) {
             panel = new ReportEducationPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1155,7 +1186,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportExplorationPanel.class);
         if (panel == null) {
             panel = new ReportExplorationPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1165,7 +1196,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportForeignAffairPanel.class);
         if (panel == null) {
             panel = new ReportForeignAffairPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1175,7 +1206,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportHistoryPanel.class);
         if (panel == null) {
             panel = new ReportHistoryPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1185,7 +1216,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportIndianPanel.class);
         if (panel == null) {
             panel = new ReportIndianPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1195,7 +1226,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportLabourPanel.class);
         if (panel == null) {
             panel = new ReportLabourPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1205,7 +1236,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportMilitaryPanel.class);
         if (panel == null) {
             panel = new ReportMilitaryPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1215,7 +1246,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportNavalPanel.class);
         if (panel == null) {
             panel = new ReportNavalPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1225,7 +1256,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportProductionPanel.class);
         if (panel == null) {
             panel = new ReportProductionPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1235,7 +1266,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
         if (panel == null) {
             panel = new ReportReligiousPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1245,7 +1276,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportRequirementsPanel.class);
         if (panel == null) {
             panel = new ReportRequirementsPanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1255,7 +1286,7 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportTradePanel.class);
         if (panel == null) {
             panel = new ReportTradePanel(this.freeColClient);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;
     }
@@ -1264,13 +1295,14 @@ public final class Widgets {
      * Show the turn report.
      *
      * @param messages The {@code ModelMessage}s to show.
+     * @return The {@code FreeColPanel} displayed.
      */
     public FreeColPanel showReportTurnPanel(List<ModelMessage> messages) {
         ReportTurnPanel panel
             = this.canvas.getExistingFreeColPanel(ReportTurnPanel.class);
         if (panel == null) {
             panel = new ReportTurnPanel(this.freeColClient, messages);
-            this.canvas.showFreeColPanel(panel, true);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         } else {
             panel.setMessages(messages);
         }

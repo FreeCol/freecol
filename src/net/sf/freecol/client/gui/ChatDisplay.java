@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 
 
@@ -47,15 +48,31 @@ public class ChatDisplay {
     /** The amount of time before a message gets deleted (in milliseconds). */
     private static final int MESSAGE_AGE = 30000;
 
+    /** The image library to use to draw with. */
+    private final ImageLibrary lib;
+
+    /** The font to write with. */
+    private final Font font;
+    
     /** The messages to display. */
     private final List<GUIMessage> messages;
+
+    /** Cache the decoration images. */
+    private final Image decorationS, decorationSW, decorationSE;
 
 
     /**
      * Create the chat display/ container.
+     *
+     * @param freeColClient The enclosing {@code FreeColClient}.
      */
-    public ChatDisplay() {
+    public ChatDisplay(FreeColClient freeColClient) {
+        this.lib = freeColClient.getGUI().getFixedImageLibrary();
+        this.font = FontLibrary.getUnscaledFont("normal-plain-tiny");
         this.messages = new ArrayList<>(MESSAGE_COUNT);
+        this.decorationS = ImageLibrary.getUnscaledImage("image.menuborder.shadow.s");
+        this.decorationSW = ImageLibrary.getUnscaledImage("image.menuborder.shadow.sw");
+        this.decorationSE = ImageLibrary.getUnscaledImage("image.menuborder.shadow.se");
     }
 
     /**
@@ -99,41 +116,31 @@ public class ChatDisplay {
      * Displays the list of messages.
      * 
      * @param g The Graphics2D the messages should be displayed on.
-     * @param lib The imageLibrary to use.
      * @param size The size of the space for displaying in.
      */
-    public void display(Graphics2D g, ImageLibrary lib, Dimension size) {
+    public void display(Graphics2D g, Dimension size) {
         // Return quickly if there are no messages, which is always
         // true in single player games.
         List<GUIMessage> msgs = prepareMessages();
         if (msgs.isEmpty()) return;
         
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor());
         int yy = -1;
         final int xx = LEFT_MARGIN;
         for (GUIMessage m : msgs) {
-            Image si = lib.getStringImage(g, m.getMessage(),
-                                          m.getColor(), font);
+            Image si = this.lib.getStringImage(g, m.getMessage(),
+                                               m.getColor(), this.font);
             if (yy < 0) {
-                yy = size.height - TOP_MARGIN
-                    - msgs.size() * si.getHeight(null);
+                yy = size.height - TOP_MARGIN - msgs.size() * si.getHeight(null);
             }
             g.drawImage(si, xx, yy, null);
             yy += si.getHeight(null);
         }
-        Image decoration = ImageLibrary
-            .getUnscaledImage("image.menuborder.shadow.s");
-        int width = decoration.getWidth(null);
+        int width = this.decorationS.getWidth(null);
         for (int index = 0; index < size.width; index += width) {
-            g.drawImage(decoration, index, 0, null);
+            g.drawImage(this.decorationS, index, 0, null);
         }
-        decoration = ImageLibrary
-            .getUnscaledImage("image.menuborder.shadow.sw");
-        g.drawImage(decoration, 0, 0, null);
-        decoration = ImageLibrary
-            .getUnscaledImage("image.menuborder.shadow.se");
-        g.drawImage(decoration, size.width - decoration.getWidth(null),
-            0, null);
+        g.drawImage(this.decorationSW, 0, 0, null);
+        g.drawImage(this.decorationSE,
+                    size.width - this.decorationSE.getWidth(null), 0, null);
     }
 }

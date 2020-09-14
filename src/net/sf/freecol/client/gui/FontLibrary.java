@@ -21,10 +21,12 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Font;
 import java.util.logging.Logger;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -35,6 +37,9 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public class FontLibrary {
 
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
+
+    /** Default size, used for the main-font. */
+    public static final float DEFAULT_FONT_SIZE = 12f;
 
     /**
      * FontType is used for choosing the typeface of the {@code Font}.
@@ -53,26 +58,6 @@ public class FontLibrary {
     }
 
     /**
-     * FontSize allows for choosing the relative size of the {@code Font}.
-     * 
-     * Choices are:
-     * <ul>
-     * <li>TINY -- used for normal text</li>
-     * <li>SMALLER -- used for subsubheaders</li>
-     * <li>SMALL -- used for subheaders</li>
-     * <li>MEDIUM -- used for some headers</li>
-     * <li>BIG -- used for panel headers</li>
-     * </ul>
-     */
-    public static enum FontSize {
-        TINY,
-        SMALLER,
-        SMALL,
-        MEDIUM,
-        BIG
-    }
-
-    /**
      * Scale to use if otherwise unspecified.
      * May be redundant but we avoid magic numbers.
      */
@@ -84,14 +69,11 @@ public class FontLibrary {
                              FontType.HEADER },
             new String[] { "font.normal", "font.simple", "font.header" });
     
-    /** Conversion map for getScaledSize. */
-    private static final Map<FontSize, Float> scaleMap = makeUnmodifiableMap(
-            new FontSize[] { FontSize.TINY, FontSize.SMALLER, FontSize.SMALL,
-                             FontSize.MEDIUM, FontSize.BIG },
-            new Float[] { 12f, 16f, 24f, 36f, 48f });
-
     /** Cache for the (optional) custom main Font. */
     private static Font mainFont = null;
+
+    /** The font cache. */
+    private static final Map<String, Font> fontCache = new HashMap<>();
 
 
     /**
@@ -106,172 +88,155 @@ public class FontLibrary {
     }
 
     /**
-     * Convert a {@code FontSize} and scale factor to float.
+     * Convert a font size and scale factor to float.
      *
+     * @param fontSize The font size expressed as a {@code Size}.
+     * @param scaleFactor A secondary scaling.
      * @return The conversion result.
      */
-    private static float getScaledSize(FontSize fontSize, float scaleFactor) {
-        return FontLibrary.scaleMap.get(fontSize) * scaleFactor;
+    private static float getScaledSize(Size fontSize, float scaleFactor) {
+        return fontSize.forFont() * scaleFactor;
     }
-
+    
     /**
      * Create a default {@code Font} set on initialization of the GUI.
      * 
      * @param fontName Can be used to choose a different font from a
      *     user-provided name.
-     * @param scaleFactor The applied scale factor.
      * @return The new {@code Font}.
      */
-    public static Font createMainFont(String fontName, float scaleFactor) {
-        final float defaultSize = 12f * scaleFactor;
+    public static Font createMainFont(String fontName) {
         Font font = null;
         if (fontName != null) font = Font.decode(fontName);
         if (font == null) font = ResourceManager.getFont("font.normal");
-        mainFont = font = font.deriveFont(defaultSize);
+        mainFont = font = font.deriveFont(DEFAULT_FONT_SIZE);
         return font;
     }
 
     /**
-     * Create a font of given type and size.
+     * Is a given font non-null and is it able to display some optional text?
      *
-     * @param fontType How the font should look like.
-     * @param fontSize Its size.
-     * @return The font created.
+     * @param font The {@code Font} to check.
+     * @param text Optional text to that the font must be able to represent.
+     * @return True if the tests pass.
      */
-    public static Font createFont(FontType fontType, FontSize fontSize) {
-        return createFont(fontType, fontSize, Font.PLAIN, DEFAULT_SCALE);
+    private static boolean displayTest(Font font, String text) {
+        return font != null && (text == null || font.canDisplayUpTo(text) < 0);
     }
 
     /**
-     * Create a font of given type, size and style.
-     * 
-     * @param fontType How the font should look like.
-     * @param fontSize Its size.
-     * @param style The font style for choosing plain, bold or italic.
-     * @return The created Font.
-     */
-    public static Font createFont(FontType fontType, FontSize fontSize,
-                                  int style) {
-        return createFont(fontType, fontSize, style, DEFAULT_SCALE);
-    }
-
-    /**
-     * Create a font of given type, size and scale factor.
-     * 
-     * @param fontType How the font should look like.
-     * @param fontSize Its size.
-     * @param scaleFactor The applied scale factor.
-     * @return The created Font.
-     */
-    public static Font createFont(FontType fontType, FontSize fontSize,
-                                  float scaleFactor) {
-        return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
-    }
-
-    /**
-     * Create a font of given type, size, style and scale factor.
-     * 
-     * @param fontType How the font should look like.
-     * @param fontSize Its relative size.
-     * @param style The font style for choosing plain, bold or italic.
-     * @param scaleFactor The applied scale factor.
-     * @return The created Font.
-     */
-    public static Font createFont(FontType fontType, FontSize fontSize,
-                                  int style, float scaleFactor) {
-        float scaledSize = getScaledSize(fontSize, scaleFactor);
-        String fontKey = getFontKey(fontType);
-        Font font = (fontKey == null) ? mainFont
-            : ResourceManager.getFont(fontKey);
-        return font.deriveFont(style, scaledSize);
-    }
-
-    /**
-     * Create a scaled {@code Font} which can display all characters
-     * inside the given text string.
-     * 
-     * @param string The text to find a compatible font for.
-     * @param fontType How the font should look like.
-     * @param fontSize Its relative size.
-     * @return The created Font.
-     */
-    public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize) {
-        return createCompatibleFont(string, fontType, fontSize, Font.PLAIN,
-                                    DEFAULT_SCALE);
-    }
-
-    /**
-     * Create a scaled {@code Font} which can display all characters
-     * inside the given text string.
-     * 
-     * @param string The text to find a compatible font for.
-     * @param fontType How the font should look like.
-     * @param fontSize Its relative size.
-     * @param style The font style for choosing plain, bold or italic.
-     * @return The created Font.
-     */
-    public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize, int style) {
-        return createCompatibleFont(string, fontType, fontSize, style,
-                                    DEFAULT_SCALE);
-    }
-
-    /**
-     * Create a scaled {@code Font} which can display all characters
-     * inside the given text string.
-     * 
-     * @param string The text to find a compatible font for.
-     * @param fontType How the font should look like.
-     * @param fontSize Its relative size.
-     * @param scaleFactor The applied scale factor.
-     * @return The created Font.
-     */
-    public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize,
-                                            float scaleFactor) {
-        return createCompatibleFont(string, fontType, fontSize, Font.PLAIN,
-                                    scaleFactor);
-    }
-
-    /**
-     * Create a scaled {@code Font} which can display all characters
-     * inside the given text string.
+     * Try to find a basic font that of a given type that can display some text.
      *
-     * This is mostly necessary for the header font because the currently
-     * used ShadowedBlack is missing support for CJK and others. Even some
-     * special glyphs for European languages like the triple-dot are missing.
-     * 
-     * @param string The text to find a compatible font for.
-     * @param fontType How the font should look like.
-     * @param fontSize Its relative size.
-     * @param style The font style for choosing plain, bold or italic.
-     * @param scaleFactor The applied scale factor.
-     * @return The created Font.
+     * @param type The {@code FontType} to try.
+     * @param text Optional text that the font must be able to represent.
+     * @return The {@code Font} found.
      */
-    private static Font createCompatibleFont(String string, FontType fontType,
-                                             FontSize fontSize,
-                                             int style, float scaleFactor) {
-        // TODO: Consider testing the normal font for compatibility and try
-        //       some or all other available fonts for complete/longest match:
-        //       header/simple->main->normal->simple/header->emergency
-        Font font = null;
-        // Try testing several font types
-        for (FontType ft : new FontType[] { fontType, FontType.NORMAL,
-                                            FontType.SIMPLE }) {
-            String fontKey = getFontKey(ft);
-            if (fontKey == null) continue;
-            font = ResourceManager.getFont(fontKey);
-            // If the font was found and there are no characters in the
-            // test string that it can not display, we have succeeded
-            if (font != null && font.canDisplayUpTo(string) < 0) break;
+    private static Font tryFont(FontType type, String text) {        
+        String fontKey = getFontKey(type);
+        if (fontKey == null) return null;
+        Font ret = ResourceManager.getFont(fontKey);
+        return (displayTest(ret, text)) ? ret : null;
+    }
+
+    /**
+     * Get an unscaled font with a simple text specification.
+     *
+     * @param spec The font specification.
+     * @return The {@code Font} found.
+     */
+    public static Font getUnscaledFont(String spec) {
+        return getUnscaledFont(spec, null);
+    }
+
+    /**
+     * Get an unscaled font with a simple text specification and optional
+     * test string.
+     *
+     * The spec is a '-' delimited string with three parts.
+     *   1. The type, a case-independent value of the FontType enum.
+     *   2. The style, '+' delimited strings in ["plain", "bold", "italic"]
+     *   3. The (absolute) size, a case-independent name of a Size enum.
+     *
+     * This routine *should* always return a font, but it is allowed to
+     * throw exceptions if the font spec is bad.  It should not take too
+     * long to find bad font specs.  AFAICT the only way there can be a
+     * null result is if Font.deriveFont were to fail, which it is not
+     * documented to do.
+     *
+     * Synchronized so as to be able to use a cache.
+     *
+     * @param spec The font specification.
+     * @param text Optional text that the font must be able to represent.
+     * @return The {@code Font} found.
+     */
+    public static synchronized Font getUnscaledFont(String spec, String text) {
+        Font ret = FontLibrary.fontCache.get(spec);
+        if (ret != null) {
+            if (displayTest(ret, text)) return ret;
+            // Failed the display test.  Try to fix these by changing the
+            // spec at the call site.
+            logger.warning("Fontlibrary cached font for " + spec
+                + " failed to display: " + text);
         }
-        // Fall back to the main font, even if it is not necessarily
-        // compatible.  We are out of options here.
-        if (font == null) {
-            logger.warning("No compatible fonts found: " + string);
-            font = mainFont;
+
+        String[] a = spec.split("-");
+        if (a.length != 3) throw new RuntimeException("Bad font spec: " + spec);
+        FontType type = Enum.valueOf(FontType.class, upCase(a[0]));
+        String[] styles = upCase(a[1]).split("\\+");
+        int style = 0;
+        for (String s : styles) {
+            int x = ("PLAIN".equals(s)) ? Font.PLAIN
+                : ("BOLD".equals(s)) ? Font.BOLD
+                : ("ITALIC".equals(s)) ? Font.ITALIC
+                : -1;
+            if (x < 0) throw new RuntimeException("Bad font style: " + s);
+            style |= x;
         }
-        return font.deriveFont(style, getScaledSize(fontSize, scaleFactor));
+        Size size = Enum.valueOf(Size.class, upCase(a[2]));
+        // Try the given font type, then NORMAL and SIMPLE if distinct,
+        // finally falling back to mainFont.
+        ret = tryFont(type, text);
+        if (ret == null && type != FontType.NORMAL) {
+            ret = tryFont(FontType.NORMAL, text);
+        }
+        if (ret == null && type != FontType.SIMPLE) {
+            ret = tryFont(FontType.SIMPLE, text);
+        }
+        if (ret == null) {
+            if (text != null) {
+                // Fall back to the main font, we are out of options.
+                // This is bad, because every time we try *text* we
+                // will end up here again.  Fix this warning if it happens!
+                logger.warning("FontLibrary found no font for: " + text);
+            }
+            ret = mainFont;
+        }
+        ret = ret.deriveFont(style, size.forFont());
+        if (ret == null) {
+            logger.warning("FontLibrary could not derive font for: " + spec);
+        } else {
+            FontLibrary.fontCache.put(spec, ret);
+        }
+        return ret;
+    }
+
+    /**
+     * Get a scaled font with a simple text specification.
+     *
+     * Beware the null return here.  Callers need to handle potential failure.
+     *
+     * @param spec The font specification.
+     * @param scale The font scale (in addition to that in the specification).
+     * @param text Optional text that the font must be able to represent.
+     * @return The {@code Font} found, or null if scaling fails.
+     */
+    public static Font getScaledFont(String spec, float scale, String text) {
+        String[] a = spec.split("-");
+        if (a.length != 3) throw new RuntimeException("Bad font spec: " + spec);
+        Size size = Enum.valueOf(Size.class, upCase(a[2]));
+        Size newSize = size.scaled(scale);
+        if (newSize == null) return null;
+        String newSpec = join("-", a[0], a[1], downCase(newSize.toString()));
+        return getUnscaledFont(newSpec, text);
     }
 }

@@ -430,8 +430,8 @@ public class ServerGame extends Game implements TurnTaker {
                 tiles.add(is.getTile());
                 is.setContacted(strongAI);//-til
                 ServerUnit missionary = (ServerUnit)is.getMissionary();
-                if (weakest.csChangeOwner(missionary, strongAI,//-vis(both),-til
-                                          UnitChangeType.CAPTURE, null, cs)) {
+                if (weakest.csChangeOwner(missionary, strongAI, null, null,
+                                          cs)) { //-vis(both),-til
                     is.getTile().updateIndianSettlement(strongAI);
                     cs.add(See.perhaps().always(strongAI), is);
                 }
@@ -440,7 +440,7 @@ public class ServerGame extends Game implements TurnTaker {
         Set<Unit> contacts = new HashSet<>(cl.size());
         for (Colony c : cl) {
             updated.addAll(c.getOwnedTiles());
-            ((ServerColony)c).csChangeOwner(strongAI, false, cs);//-vis(both),-til
+            ((ServerColony)c).csChangeOwner(strongAI, false, null, cs);//-vis(both),-til
             lb.add(" ", c.getName());
             contacts.add(c.getFirstUnit());
         }
@@ -448,8 +448,8 @@ public class ServerGame extends Game implements TurnTaker {
             lb.add(" ", unit.getId());
             if (unit.isOnCarrier()) {
                 ; // Allow carrier to handle
-            } else if (!weakest.csChangeOwner(unit, strongAI, //-vis(both)
-                    UnitChangeType.CAPTURE, null, cs)) {
+            } else if (!weakest.csChangeOwner(unit, strongAI, null, null,
+                                              cs)) { //-vis(both)
                 logger.warning("Owner change failed for " + unit);
             } else {
                 unit.setMovesLeft(0);
@@ -608,7 +608,8 @@ public class ServerGame extends Game implements TurnTaker {
             }
             Colony colony = tradeItem.getColony(getGame());
             if (colony != null) {
-                ((ServerColony)colony).csChangeOwner(dest, false, cs);//-vis(both),-til
+                ((ServerColony)colony).csChangeOwner(dest, false, null,
+                                                     cs);//-vis(both),-til
                 visibilityChange = true;
             }
             int gold = tradeItem.getGold();
@@ -673,8 +674,8 @@ public class ServerGame extends Game implements TurnTaker {
                 } else {
                     newLoc = settlement.getTile();
                 }
-                if (((ServerPlayer)source).csChangeOwner(newUnit, dest,
-                        UnitChangeType.CAPTURE, newLoc, cs)) {//-vis(both)
+                if (((ServerPlayer)source).csChangeOwner(newUnit, dest, null,
+                                                         newLoc, cs)) {//-vis(both)
                     newUnit.setMovesLeft(0);
                     cs.add(See.perhaps().always(former), oldTile);
                 }

@@ -30,10 +30,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -86,7 +87,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedHeaderLabel(nation, FontLibrary.FontSize.SMALL);
+        JLabel name = Utility.localizedHeaderLabel(nation, Utility.FONTSPEC_SUBTITLE);
         panel.add(name, "span, align center, wrap 40");
 
         JLabel artLabel = new JLabel(new ImageIcon(ImageLibrary.getMonarchImage(nation)));

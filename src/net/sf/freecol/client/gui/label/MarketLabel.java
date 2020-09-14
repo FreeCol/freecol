@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -42,7 +43,7 @@ import net.sf.freecol.common.model.Unit;
  * This label represents a cargo type on the European market.
  */
 public final class MarketLabel extends AbstractGoodsLabel
-        implements CargoLabel, Draggable, PropertyChangeListener {
+    implements CargoLabel, Draggable, PropertyChangeListener {
 
     /** The enclosing market. */
     private final Market market;
@@ -51,12 +52,13 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Initializes this FreeColLabel with the given goods type.
      *
-     * @param lib The {@code ImageLibrary} to display with.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param type The {@code GoodsType} to represent.
      * @param market The {@code Market} in which to trade the goods.
      */
-    public MarketLabel(ImageLibrary lib, GoodsType type, Market market) {
-        super(lib, new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
+    public MarketLabel(FreeColClient freeColClient, GoodsType type,
+                       Market market) {
+        super(freeColClient, new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
 
         if (market == null) {
             throw new RuntimeException("Null market for " + this);
@@ -94,7 +96,7 @@ public final class MarketLabel extends AbstractGoodsLabel
      * @return This {@code MarketLabel}.
      */
     public MarketLabel addBorder() {
-        setBorder(Utility.TOPCELLBORDER);
+        setBorder(Utility.getTopCellBorder());
         setVerticalTextPosition(JLabel.BOTTOM);
         setHorizontalTextPosition(JLabel.CENTER);
         return this;

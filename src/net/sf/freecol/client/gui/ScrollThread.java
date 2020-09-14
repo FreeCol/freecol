@@ -23,9 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Direction;
 
 
@@ -39,8 +38,8 @@ public class ScrollThread extends Thread {
     /** Delay between scroll steps. */
     private static final int SCROLL_DELAY = 100; // ms
 
-    /** The Canvas containing the map to scroll. */
-    private final Canvas canvas;
+    /** The enclosing client. */
+    private final FreeColClient freeColClient;
 
     /** The direction to scroll in. */
     private Direction direction = null;
@@ -49,11 +48,11 @@ public class ScrollThread extends Thread {
     /**
      * The constructor to use.
      * 
-     * @param canvas The Canvas containing the map to scroll.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      */
-    public ScrollThread(Canvas canvas) {
+    public ScrollThread(FreeColClient freeColClient) {
         super(FreeCol.CLIENT_THREAD + "Mouse scroller");
-        this.canvas = canvas;
+        this.freeColClient = freeColClient;
     }
 
     /**
@@ -72,23 +71,18 @@ public class ScrollThread extends Thread {
      */
     @Override
     public void run() {
-        while (direction != null) {
-            try {
-                SwingUtilities.invokeAndWait(() -> {
-                        if (!canvas.scrollMap(direction)) direction = null;
-                    });
-            } catch (InvocationTargetException e) {
-                logger.log(Level.WARNING, "Scroll thread caught error", e);
-                break;
-            } catch (InterruptedException e) {
-                break; // It is normal for AbstractCanvasListener to interrupt.
-            }
-
-            try {
-                sleep(SCROLL_DELAY);
-            } catch (InterruptedException e) {
-                break;
-            }
-        }
+        final GUI gui = this.freeColClient.getGUI();
+        final Direction dirn = this.direction;
+        gui.invokeNowOrWait(() -> {
+                Direction d = dirn;
+                while (d != null) {
+                    if (!gui.scrollMap(d)) d = null;
+                    try {
+                        sleep(SCROLL_DELAY);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            });
     }
 }

@@ -286,7 +286,7 @@ public final class InGameController extends Controller {
                                  ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
         final Player owner = colony.getOwner();
-        colony.csChangeOwner(serverPlayer, false, cs);//-vis(serverPlayer,owner)
+        colony.csChangeOwner(serverPlayer, false, null, cs);//-vis(serverPlayer,owner)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
         getGame().sendToAll(cs);
@@ -303,7 +303,7 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         ((ServerPlayer)owner).csChangeOwner(unit, serverPlayer, null, null,
-            cs);//-vis(serverPlayer,owner)
+                                            cs);//-vis(serverPlayer,owner)
         cs.add(See.perhaps().always(owner), unit.getTile());
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)

@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.ImageUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -179,7 +180,7 @@ public final class UnitImageAnimation extends Animation {
                 Image image = ievent.getImage();
                 if (mirror) {
                     // FIXME: Add mirroring functionality to SimpleZippedAnimation
-                    image = ImageLibrary.createMirroredImage(image);
+                    image = createMirroredImage(image);
                 }
                 icon.setImage(image);
                 paintCallback.execute(); // paint now

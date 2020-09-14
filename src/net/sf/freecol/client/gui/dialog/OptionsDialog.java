@@ -159,7 +159,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         
         this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
         this.panel.add(Utility.localizedHeader(Messages.nameKey(headerKey),
-                                               false), "span, center");
+                                               Utility.FONTSPEC_TITLE),
+                       "span, center");
     }
 
     /**

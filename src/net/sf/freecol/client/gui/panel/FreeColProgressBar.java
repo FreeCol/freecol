@@ -32,9 +32,11 @@ import javax.swing.JPanel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -113,11 +115,10 @@ public class FreeColProgressBar extends JPanel {
         this.step = step;
         this.goodsType = goodsType;
         this.image = (goodsType == null) ? null
-            : (freeColClient.getGUI().getImageLibrary()
+            : (freeColClient.getGUI().getFixedImageLibrary()
                 .getGoodsTypeImage(goodsType,
                     new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2)));
-        this.font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                                           FontLibrary.FontSize.TINY);
+        this.font = FontLibrary.getUnscaledFont("simple-plain-tiny");
 
         setBorder(Utility.PROGRESS_BORDER);
         setPreferredSize(new Dimension(200, 20));
@@ -167,8 +168,8 @@ public class FreeColProgressBar extends JPanel {
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
         if (isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColProgressBar",
-                                        g, this, getInsets());
+            ImageUtils.drawTiledImage(ImageLibrary.getProgressBarBackground(),
+                                      g, this, getInsets());
         }
 
         int dvalue = 0;

@@ -57,24 +57,11 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * The constructor to use.
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
-     * @param canvas The component this object gets created for.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient,
-                                        Canvas canvas) {
-        super(freeColClient, canvas);
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
-
-    /**
-     * This method can be called to make sure the map is loaded.
-     *
-     * There is no point executing mouse events if the map is not loaded.
-     *
-     * @return The associated game {@code Map}.
-     */
-    private Map getMap() {
-        return (getGame() == null) ? null : getGame().getMap();
-    }
 
     /**
      * Draw a box on screen.
@@ -113,8 +100,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             if (e.getClickCount() > 1) {
                 Tile t = getGUI().tileAt(e.getX(), e.getY());
                 if (t != null) getGUI().showTilePanel(t);
-            } else {
-                canvas.requestFocus();
+            //} else { Disabled:  TODO, is this necessary?
+                //canvas.requestFocus();
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseClicked!", ex);
@@ -215,7 +202,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             }
         }
         getGUI().refresh();
-        canvas.requestFocus();
+        // Disabled: Is this needed? canvas.requestFocus();
     }
 
     /**

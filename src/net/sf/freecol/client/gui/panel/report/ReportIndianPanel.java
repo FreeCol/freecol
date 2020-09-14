@@ -36,6 +36,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.GoodsType;
@@ -105,12 +106,10 @@ public final class ReportIndianPanel extends ReportPanel {
                 .getScaledSettlementTypeImage(opponent.getNationType().getCapitalType())));
         reportPanel.add(villageLabel, SPAN_SPLIT_2);
         JLabel headline = Utility.localizedLabel(opponent.getNationLabel());
-        headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
+        headline.setFont(FontLibrary.getUnscaledFont("normal-bold-small"));
         reportPanel.add(headline, "wrap 20, aligny center");
         JLabel label = Utility.localizedLabel("report.indian.chieftain");
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScaleFactor());
+        Font font = FontLibrary.getUnscaledFont("normal-bold-tiny");
         label.setFont(font);
         reportPanel.add(label);
         reportPanel.add(Utility.localizedLabel(opponent.getName()), "left, wrap");

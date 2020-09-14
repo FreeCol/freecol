@@ -36,6 +36,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
@@ -92,15 +93,15 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
 
         JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                   "[400, align center]"));
-        JLabel header = Utility.localizedHeaderLabel(StringTemplate
-                .template("nativeDemandDialog.name")
-                .addName("%colony%", colony.getName()),
-            SwingConstants.LEADING, FontLibrary.FontSize.BIG);
+        StringTemplate t = StringTemplate.template("nativeDemandDialog.name")
+            .addName("%colony%", colony.getName());
+        JLabel header = Utility.localizedHeaderLabel(t, SwingConstants.LEADING,
+                                                     Utility.FONTSPEC_TITLE);
         panel.add(header);
         JTextArea text = Utility.localizedTextArea(template);
         panel.add(text);
 
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         ImageIcon icon = new ImageIcon(lib.getSmallSettlementImage(colony));
 
         initializeConfirmDialog(frame, true, panel, icon, yes, no);

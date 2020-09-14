@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -88,7 +89,7 @@ public class FatherDetailPanel
         for (FoundingFather foundingFather : spec.getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
-        ImageIcon icon = new ImageIcon(ImageLibrary.getLibertyImage());
+        ImageIcon icon = new ImageIcon(getImageLibrary().getLibertyImage());
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = fatherType.getTypeKey();
             String typeName = Messages.message(id);
@@ -129,10 +130,9 @@ public class FatherDetailPanel
         String type = Messages.message(father.getTypeKey());
         String text = name + " (" + type + ")";
         JLabel header = new JLabel(text);
-        header.setFont(FontLibrary.createCompatibleFont(text,
-            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
+        header.setFont(FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE, text));
 
-        Image image = ImageLibrary.getFoundingFatherImage(father, false);
+        Image image = getImageLibrary().getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));
 
         StringTemplate template = StringTemplate.label("")

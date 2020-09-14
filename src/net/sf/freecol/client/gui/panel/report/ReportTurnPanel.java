@@ -45,6 +45,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -134,7 +135,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
                     JLabel headline = Utility.localizedHeaderLabel(type,
-                        FontLibrary.FontSize.SMALL);
+                        Utility.FONTSPEC_SUBTITLE);
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
                 break;
@@ -287,15 +288,14 @@ public final class ReportTurnPanel extends ReportPanel {
             text = source.toString();
         }
 
-        Font font = FontLibrary.createCompatibleFont(text,
-            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL);
+        Font font = FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE, text);
         JComponent headline;
         if (commandId != null) {
             JButton button = new JButton(text);
             button.addActionListener(this);
             button.setActionCommand(commandId);
             headline = button;
-            headline.setForeground(Utility.LINK_COLOR);
+            headline.setForeground(Utility.getLinkColor());
         } else {
             headline = new JLabel(text);
         }

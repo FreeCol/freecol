@@ -65,7 +65,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             Unit attacker, FreeColGameObject defender) {
         super(freeColClient, frame);
         
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final Game game = attacker.getGame();
         final CombatModel combatModel = game.getCombatModel();
         final Turn turn = game.getTurn();
@@ -135,8 +135,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             }
         }
 
-        Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor());
+        Font bigFont = FontLibrary.getUnscaledFont("normal-bold-smaller");
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
         JLabel finalLabel = Utility.localizedLabel("finalResult");

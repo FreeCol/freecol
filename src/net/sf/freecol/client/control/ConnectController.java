@@ -276,7 +276,7 @@ public final class ConnectController extends FreeColClientHolder {
         if (fcc.isInGame()) { // Joining existing game or possibly reconnect
             fcc.restoreGUI(player);
             igc().nextModelMessage();
-        } else if (game.getMap() != null
+        } else if (getMap() != null
             && game.allPlayersReadyToLaunch()) { // Ready to launch!
             pgc().requestLaunch();
         } else { // More parameters need to be set or players to become ready

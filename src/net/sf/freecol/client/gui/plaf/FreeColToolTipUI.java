@@ -35,6 +35,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -72,8 +73,8 @@ public class FreeColToolTipUI extends BasicToolTipUI {
     @Override
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColToolTip",
-                                        g, c, null);
+            ImageUtils.drawTiledImage(ImageLibrary.getToolTipBackground(),
+                                      g, c, null);
         }
 
         g.setColor(Color.BLACK); // FIXME: find out why this is necessary

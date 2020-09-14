@@ -25,6 +25,7 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
@@ -47,17 +48,17 @@ import net.sf.freecol.common.option.GameOptions;
  * makes it ideal to use for drag and drop purposes.
  */
 public final class GoodsLabel extends AbstractGoodsLabel
-        implements CargoLabel, Draggable {
+    implements CargoLabel, Draggable {
 
 
     /**
      * Initializes this FreeColLabel with the given goods data.
      *
-     * @param gui The {@code GUI} to display on.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param goods The {@code Goods} that this label will represent.
      */
-    public GoodsLabel(GUI gui, Goods goods) {
-        super(gui.getImageLibrary(), goods);
+    public GoodsLabel(FreeColClient freeColClient, Goods goods) {
+        super(freeColClient, goods);
 
         initialize();
     }

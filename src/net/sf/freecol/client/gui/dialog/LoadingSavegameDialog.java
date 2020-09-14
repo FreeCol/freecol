@@ -37,6 +37,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.LoadingSavegameInfo;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 
 
@@ -72,9 +73,9 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
-        JLabel header = Utility.localizedHeaderLabel(
-            Messages.nameKey("loadingSavegameDialog"), JLabel.CENTER,
-            FontLibrary.FontSize.MEDIUM);
+        JLabel header = Utility.localizedHeaderLabel("loadingSavegameDialog",
+                                                     JLabel.CENTER,
+                                                     Utility.FONTSPEC_SUBTITLE);
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING));

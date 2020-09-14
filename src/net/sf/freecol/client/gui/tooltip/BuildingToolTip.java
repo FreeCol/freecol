@@ -59,7 +59,7 @@ public class BuildingToolTip extends JToolTip {
      * @param building The building to display information from.
      */
     public BuildingToolTip(FreeColClient freeColClient, Building building) {
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary lib = freeColClient.getGUI().getFixedImageLibrary();
         final Game game = building.getGame();
         final int workplaces = building.getUnitCapacity();
         // FIXME: consider several outputs
@@ -76,8 +76,8 @@ public class BuildingToolTip extends JToolTip {
         setLayout(layout);
 
         JLabel buildingName = new JLabel(Messages.getName(building));
-        buildingName.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor()));
+        Font font = FontLibrary.getUnscaledFont("simple-bold-smaller");
+        buildingName.setFont(font);
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();
@@ -89,8 +89,7 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(), "span");
         } else {
             JLabel arrow = new JLabel(ResourceManager.getString("arrow.E"));
-            arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
+            arrow.setFont(FontLibrary.getUnscaledFont("simple-bold-small"));
             AbstractGoods maxProduction = (info == null) ? null
                 : first(info.getMaximumProduction());
             ProductionLabel productionOutput

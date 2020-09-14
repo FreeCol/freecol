@@ -46,6 +46,11 @@ import static net.sf.freecol.common.util.Utils.*;
 
 /**
  * Stripped down class for playing sound.
+ *
+ * The sound player depends on getting a usable value for its mixer, which
+ * does not necessarily happen.  It has been hacked to just refuse to play
+ * anything in this case, in the hope that a valid mixer will eventually be
+ * specified.
  */
 public final class SoundPlayer {
 
@@ -187,9 +192,6 @@ public final class SoundPlayer {
     public SoundPlayer(AudioMixerOption mixerOption,
                        PercentageOption volumeOption) {
         setMixer(mixerOption.getValue());
-        if (getMixer() == null) {
-            throw new RuntimeException("Mixer unavailable: " + mixerOption);
-        }
         mixerOption.addPropertyChangeListener((PropertyChangeEvent e) -> {
                 setMixer((MixerWrapper)e.getNewValue());
             });
@@ -213,17 +215,20 @@ public final class SoundPlayer {
     /**
      * Sets the mixer.
      *
+     * Note: This can throw SecurityException and IllegalArgumentException
+     * in various circumstances.  We used to catch this in the constructor
+     * above, but now we let it go through to the caller.
+     *
      * @param mw The new mixer.
      */
     private void setMixer(MixerWrapper mw) {
         try {
             this.mixer = AudioSystem.getMixer(mw.getMixerInfo());
-        } catch (SecurityException se) {
-            logger.log(Level.WARNING, "Access to mixer denied: " + mw, se);
+            logger.info("Mixer " + mw + " selected");
+        } catch (Exception e) {
             this.mixer = null;
-        } catch (IllegalArgumentException ie) {
-            logger.log(Level.WARNING, "Not a recognized mixer: " + mw, ie);
-            this.mixer = null;
+            logger.log(Level.WARNING, "Bad mixer: " + mw
+                + ", sound suspended", e);
         }
     }
 
@@ -369,6 +374,10 @@ public final class SoundPlayer {
                                            Mixer mixer, int len) {
         DataLine.Info info = new DataLine.Info(SourceDataLine.class,
             audioFormat);
+        if (mixer == null) {
+            logger.log(Level.WARNING, "Null mixer");
+            return null;
+        }
         if (!mixer.isLineSupported(info)) {
             logger.log(Level.WARNING, "Mixer does not support " + info);
             return null;

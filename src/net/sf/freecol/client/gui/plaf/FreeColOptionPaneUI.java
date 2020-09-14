@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -247,8 +248,8 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     @Override
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColOptionPane",
-                                        g, c, null);
+            ImageUtils.drawTiledImage(ImageLibrary.getOptionPaneBackground(),
+                                      g, c, null);
         }
     }
 }

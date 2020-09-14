@@ -39,8 +39,6 @@ public class AbstractCanvasListener extends FreeColClientHolder {
     /** Space to drag-scroll. */
     private static final int DRAG_SCROLL_SPACE = 100;
 
-    protected final Canvas canvas;
-
     /** The scroll thread itself. */
     protected ScrollThread scrollThread = null;
 
@@ -49,13 +47,10 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      * Create a new AbstractCanvasListener.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param canvas The {@code Canvas} to listen on.
      */
-    protected AbstractCanvasListener(FreeColClient freeColClient,
-                                     Canvas canvas) {
+    protected AbstractCanvasListener(FreeColClient freeColClient) {
         super(freeColClient);
 
-        this.canvas = canvas;
         this.scrollThread = null;
     }
 
@@ -110,35 +105,13 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      * @param ignoreTop If the top should be ignored
      */
     private void scroll(int x, int y, int scrollSpace, boolean ignoreTop) {
-        Direction direction;
-        Dimension size = canvas.getSize();
-        if (x < scrollSpace && y < scrollSpace) { // Upper-Left
-            direction = !ignoreTop ? Direction.NW : Direction.W;
-        } else if (x >= size.width - scrollSpace
-            && y < scrollSpace) { // Upper-Right
-            direction = !ignoreTop ? Direction.NE : Direction.E;
-        } else if (x >= size.width - scrollSpace
-            && y >= size.height - scrollSpace) { // Bottom-Right
-            direction = Direction.SE;
-        } else if (x < scrollSpace
-            && y >= size.height - scrollSpace) { // Bottom-Left
-            direction = Direction.SW;
-        } else if (y < scrollSpace) { // Top
-            direction = !ignoreTop ? Direction.N : null;
-        } else if (x >= size.width - scrollSpace) { // Right
-            direction = Direction.E;
-        } else if (y >= size.height - scrollSpace) { // Bottom
-            direction = Direction.S;
-        } else if (x < scrollSpace) { // Left
-            direction = Direction.W;
-        } else {
-            direction = null;
-        }
+        Direction direction = getGUI()
+            .getScrollDirection(x, y, scrollSpace, ignoreTop);
 
         if (direction == null) {
             stopScrollIfScrollIsActive();
         } else if (scrollThread == null || scrollThread.isInterrupted()) {
-            scrollThread = new ScrollThread(canvas);
+            scrollThread = new ScrollThread(getFreeColClient());
             scrollThread.setDirection(direction);
             scrollThread.start();
         } else {

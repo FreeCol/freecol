@@ -82,17 +82,17 @@ public class MarketWas {
      */
     public void fireChanges(GoodsType type, int amount) {
         for (TransactionListener l : this.market.getTransactionListener()) {
-            if (amount > 0) {
+            if (amount < 0) {
                 int buy = this.costToBuy.get(type);
-                l.logPurchase(type, amount, buy);
+                l.logPurchase(type, -amount, buy);
                 int buyNow = this.market.getCostToBuy(type);
                 if (buy != buyNow) {
                     this.market.getMarketData(type)
                         .firePropertyChange(Market.PRICE_CHANGE, buy, buyNow);
                 }
-            } else if (amount < 0) {
+            } else if (amount > 0) {
                 int sell = this.paidForSale.get(type);
-                l.logSale(type, -amount, sell, this.tax);
+                l.logSale(type, amount, sell, this.tax);
                 int sellNow = this.market.getPaidForSale(type);
                 if (sell != sellNow) {
                     this.market.getMarketData(type)

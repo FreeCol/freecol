@@ -125,6 +125,47 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
     /**
+     * Set the DEFAULT_MINIMAP_ZOOM option on the basis of a tile size.
+     *
+     * @param tileSize The tile size to check.
+     */
+    private void setZoomOption(int tileSize) {
+        int zoom = tileSize / 4;
+        freeColClient.getClientOptions()
+            .setInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM, zoom);
+    }
+
+    /**
+     * Set the map focus from a mouse click location.
+     *
+     * @param e The {@code MouseEvent} containing the location.
+     */
+    private void setFocus(MouseEvent e) {
+        if (!e.getComponent().isEnabled()) return;
+        final Map map = getMap();
+        if (map == null) return;
+        final int x = e.getX(), y = e.getY();
+
+        // When focusing out on the minimap, the last available focus
+        // out takes a larger jump than previous ones.  This if
+        // statement adjusts for the last larger jump in focus out.
+        int tileX, tileY;
+        if (adjustX > 0 && adjustY > 0) {
+            tileX = ((x - adjustX) / tileSize) + firstColumn
+                + adjustX / MIN_TILE_SIZE;
+            tileY = ((y - adjustY) / tileSize * MIN_TILE_SIZE) + firstRow
+                + adjustY;
+        } else {
+            tileX = ((x - adjustX) / tileSize) + firstColumn;
+            tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
+        }
+        getGUI().setFocus(map.getTile(tileX, tileY));
+    }
+
+
+    // Public API
+
+    /**
      * Zooms in the mini map.
      */
     public void zoomIn() {
@@ -143,8 +184,28 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
     /**
+     * Return true if tile size can be decreased.
+     *
+     * @return a {@code boolean} value
+     */
+    public boolean canZoomIn() {
+        return tileSize < MAX_TILE_SIZE && getMap() != null;
+    }
+
+    /**
+     * Return true if tile size can be increased.
+     *
+     * @return a {@code boolean} value
+     */
+    public boolean canZoomOut() {
+        return tileSize > MIN_TILE_SIZE && getMap() != null;
+    }
+    
+    /**
      * Set tile size to the given value, or the minimum or maximum
      * bound of the tile size.
+     *
+     * FIXME: Public for MapEditorController.createMiniMapThumbnail.
      *
      * @param size an {@code int} value
      */
@@ -155,66 +216,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
     /**
-     * Return true if tile size can be decreased.
-     *
-     * @return a {@code boolean} value
-     */
-    public boolean canZoomIn() {
-        return tileSize < MAX_TILE_SIZE
-            && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null;
-    }
-
-    /**
-     * Return true if tile size can be increased.
-     *
-     * @return a {@code boolean} value
-     */
-    public boolean canZoomOut() {
-        return tileSize > MIN_TILE_SIZE
-            && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null;
-    }
-
-    private void setZoomOption(int tileSize) {
-        int zoom = tileSize / 4;
-        freeColClient.getClientOptions()
-            .setInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM, zoom);
-    }
-
-    public void setToggleBordersOption(boolean toggle) {
-        freeColClient.getClientOptions()
-            .setBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS, toggle);
-    }
-    
-    public void setToggleFogOfWarOption(boolean toggle) {
-        freeColClient.getClientOptions()
-            .setBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR, toggle);
-    }
-    
-    /**
-     * Paints this component.
-     * @param graphics The {@code Graphics} context in which
-     *                 to draw this component.
-     */
-    @Override
-    public void paintComponent(Graphics graphics) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
-            return;
-        }
-        graphics.drawImage(ImageLibrary.getMiniMapBackground(), 0, 0, null);
-        paintMap(graphics);
-     }
-
-    /**
      * Paints a representation of the mapboard onto this component.
-     * @param graphics The {@code Graphics} context in which
-     *                 to draw this component.
+     *
+     * FIXME: Public for MapEditorController.createMiniMapThumbnail.
+     *
+     * @param graphics The {@code Graphics} context within which to draw.
      */
     public void paintMap(Graphics graphics) {
-        int width = getWidth();
-        int height = getHeight();
         final Graphics2D g = (Graphics2D) graphics;
         final AffineTransform originTransform = g.getTransform();
 
@@ -224,56 +232,47 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                            RenderingHints.VALUE_RENDER_QUALITY);
 
         /* Fill the rectangle with background color */
+        int width = getWidth(), height = getHeight();
         g.setColor(ImageLibrary.getMinimapBackgroundColor());
         g.fillRect(0, 0, width, height);
 
-        if (getGUI().getFocus() == null) {
-            return;
-        }
+        Tile focus = getGUI().getFocus();
+        if (focus == null) return;
 
         /* xSize and ySize represent how many tiles can be represented on the
            mini map at the current zoom level */
-        int xSize = width / tileSize;
-        int ySize = (height / tileSize) * 4;
+        int xSize = width / this.tileSize;
+        int ySize = (height / this.tileSize) * 4;
 
         /* Center the mini map correctly based on the map's focus */
-        firstColumn = getGUI().getFocus().getX() - (xSize / 2);
-        firstRow = getGUI().getFocus().getY() - (ySize / 2);
+        firstColumn = focus.getX() - (xSize / 2);
+        firstRow = focus.getY() - (ySize / 2);
 
         /* Make sure the mini map won't try to display tiles off the
          * bounds of the world map */
+        final Map map = getMap();
+        final int mWidth = map.getWidth(), mHeight = map.getHeight();
+        firstColumn = Math.max(0, Math.min(mWidth - xSize - 1, firstColumn));
+        firstRow = Math.max(0, Math.min(mHeight - ySize - 1, firstRow));
 
-        final Map map = freeColClient.getGame().getMap();
-
-        if (firstColumn < 0) {
+        if (mWidth <= xSize) {
             firstColumn = 0;
-        } else if (firstColumn + xSize + 1 > map.getWidth()) {
-            firstColumn = map.getWidth() - xSize - 1;
-        }
-        if (firstRow < 0) {
-            firstRow = 0;
-        } else if (firstRow + ySize + 1> map.getHeight()) {
-            firstRow = map.getHeight() - ySize - 1;
-        }
-
-        if (map.getWidth() <= xSize) {
-            firstColumn = 0;
-            adjustX = ((xSize - map.getWidth()) * tileSize)/2;
-            width = map.getWidth() * tileSize;
+            adjustX = ((xSize - mWidth) * tileSize)/2;
+            width = mWidth * tileSize;
         } else {
             adjustX = 0;
         }
 
-        if (map.getHeight() <= ySize) {
+        if (mHeight <= ySize) {
             firstRow = 0;
-            adjustY = ((ySize - map.getHeight()) * tileSize)/MIN_TILE_SIZE;
-            height = map.getHeight() * (tileSize/4);
+            adjustY = ((ySize - mHeight) * tileSize)/MIN_TILE_SIZE;
+            height = mHeight * (tileSize/4);
         } else {
             adjustY = 0;
         }
 
-        int lastRow = Math.min(firstRow + ySize, map.getHeight() - 1);
-        int lastColumn = Math.min(firstColumn + xSize, map.getWidth() - 1);
+        int lastRow = Math.min(firstRow + ySize, mHeight - 1);
+        int lastColumn = Math.min(firstColumn + xSize, mWidth - 1);
         int tileWidth = tileSize;
         int tileHeight = tileSize/2;
         int halfWidth = tileSize/2;
@@ -304,7 +303,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         AffineTransform baseTransform = g.getTransform();
         AffineTransform rowTransform = null;
 
-        final ImageLibrary library = getGUI().getImageLibrary();
+        final ImageLibrary library = getGUI().getFixedImageLibrary();
         final ClientOptions clientOptions = freeColClient.getClientOptions();
 
         // Row per row; start with the top modified row
@@ -325,7 +324,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                         if (tile.getOwner() != null) {
                             Color nationOwner = tile.getOwner().getNationColor();
                             Color colorTransparent =
-                                    new Color(nationOwner.getRed(), nationOwner.getGreen(), nationOwner.getBlue(), 100);
+                                new Color(nationOwner.getRed(), nationOwner.getGreen(), nationOwner.getBlue(), 100);
                             g.setColor(colorTransparent);
                             g.fill(paintFull);
                         }
@@ -409,64 +408,60 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
 
-    private void focus(int x, int y) {
-        Map map = getMap();
-        if (map == null) return;
-
-        int tileX, tileY;
-
-        // When focusing out on the minimap, the last available focus out takes a larger jump than previous ones.
-        // This if statement adjusts for the last larger jump in focus out.
-        if (adjustX > 0 && adjustY > 0) {
-            tileX = ((x - adjustX) / tileSize) + firstColumn + adjustX / MIN_TILE_SIZE;
-            tileY = ((y - adjustY) / tileSize * MIN_TILE_SIZE) + firstRow + adjustY;
-        } else {
-            tileX = ((x - adjustX) / tileSize) + firstColumn;
-            tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
-        }
-
-        getGUI().setFocus(map.getTile(tileX,tileY));
-    }
-
-    private void focus(MouseEvent e) {
-        if (e.getComponent().isEnabled()) {
-            focus(e.getX(), e.getY());
-        }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
+    // Implement MouseInputListener
 
     /**
-     * If the user clicks on the mini map, refocus the map
-     * to center on the tile that he clicked on
-     * @param e a {@code MouseEvent} value
+     * {@inheritDoc}
      */
     @Override
-    public void mousePressed(MouseEvent e) {
-        focus(e);
-    }
+    public void mouseClicked(MouseEvent e) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void mouseReleased(MouseEvent e) {
-    }
+    public void mousePressed(MouseEvent e) { setFocus(e); }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void mouseEntered(MouseEvent e) {
-    }
+    public void mouseReleased(MouseEvent e) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void mouseExited(MouseEvent e) {
-    }
+    public void mouseEntered(MouseEvent e) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void mouseDragged(MouseEvent e) {
-        focus(e);
-    }
+    public void mouseExited(MouseEvent e) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void mouseMoved(MouseEvent e) {
-    }
+    public void mouseDragged(MouseEvent e) { setFocus(e); }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mouseMoved(MouseEvent e) {}
+
+
+    // Override JComponent
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void paintComponent(Graphics graphics) {
+        if (getMap() == null) return;
+        graphics.drawImage(ImageLibrary.getMiniMapBackground(), 0, 0, null);
+        paintMap(graphics);
+    }
 }

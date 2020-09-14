@@ -338,9 +338,10 @@ public class ServerColony extends Colony implements TurnTaker {
      *
      * @param newOwner The new owning {@code Player}.
      * @param reassign If true, reassign the colony tiles.
+     * @param change An optional accompanying change type for the units.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csChangeOwner(Player newOwner, boolean reassign,
+    public void csChangeOwner(Player newOwner, boolean reassign, String change,
                               ChangeSet cs) {
         final Player oldOwner = getOwner();
         final Tile tile = getTile();
@@ -351,8 +352,6 @@ public class ServerColony extends Colony implements TurnTaker {
         for (Tile t : owned) t.cacheUnseen(newOwner);//+til
         changeOwner(newOwner);//-vis(both),-til
 
-        String change = (newOwner.isUndead()) ? UnitChangeType.UNDEAD
-            : UnitChangeType.CAPTURE;
         List<Unit> units = getAllUnitsList();
         for (Unit u : units) {//-vis(both)
             ((ServerPlayer)oldOwner).csChangeOwner(u, newOwner, change, null, cs);

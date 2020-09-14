@@ -96,10 +96,10 @@ public final class MapEditorController extends FreeColClientHolder {
     private BufferedImage createMiniMapThumbNail() {
         MiniMap miniMap = new MiniMap(getFreeColClient());
         miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        Game game = getGame();
-        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
+        final Map map = getMap();
+        int width = map.getWidth() * MiniMap.MAX_TILE_SIZE
             + MiniMap.MAX_TILE_SIZE / 2;
-        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
+        int height = map.getHeight() * MiniMap.MAX_TILE_SIZE / 4;
         miniMap.setSize(width, height);
         BufferedImage image = new BufferedImage(
             width, height, BufferedImage.TYPE_INT_ARGB);

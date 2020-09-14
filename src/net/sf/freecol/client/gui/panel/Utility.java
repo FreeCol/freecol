@@ -50,6 +50,7 @@ import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
@@ -66,71 +67,24 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class Utility {
 
-
-    /** The color to use for borders. */
-    public static final Color BORDER_COLOR
-        = ImageLibrary.getColor("color.border.LookAndFeel", Color.BLACK);
-
-    /** The color to use for links. */
-    public static final Color LINK_COLOR
-        = ImageLibrary.getColor("color.link.LookAndFeel", Color.BLUE);
-
-    /** The color to use for things the player probably should not do. */
-    public static final Color WARNING_COLOR
-        = ImageLibrary.getColor("color.warning.LookAndFeel", Color.RED);
-
-
     /** Useful static borders. */
-    public static final Border TRIVIAL_LINE_BORDER
-        = BorderFactory.createLineBorder(BORDER_COLOR);
-
     public static final Border BEVEL_BORDER
         = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
-
-    public static final Border COLOR_CELL_BORDER = BorderFactory
-        .createCompoundBorder(
-            BorderFactory.createMatteBorder(5, 10, 5, 10,
-                new ImageIcon(ImageLibrary.getColorCellRendererBackground())),
-            BorderFactory.createLineBorder(BORDER_COLOR));
-
-    public static final Border DIALOG_BORDER = BorderFactory
-        .createCompoundBorder(TRIVIAL_LINE_BORDER, blankBorder(10, 20, 10, 20));
 
     public static final Border ETCHED_BORDER
         = BorderFactory.createEtchedBorder();
 
-    public static final Border PRODUCTION_BORDER = BorderFactory
-        .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0,
-                                                              BORDER_COLOR),
-                              blankBorder(2, 2, 2, 2));
-
+    // FIXME: color should be a Resource
     public static final Border PROGRESS_BORDER = BorderFactory
         .createLineBorder(new Color(122, 109, 82));
 
-    public static final Border SIMPLE_LINE_BORDER = BorderFactory
-        .createCompoundBorder(TRIVIAL_LINE_BORDER, blankBorder(5, 5, 5, 5));
-
-    // The borders to use for table cells
-    public static final Border TOPCELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border CELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border LEFTCELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border TOPLEFTCELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
+    private static Border COLOR_CELL_BORDER = null,
+        DIALOG_BORDER = null,
+        SIMPLE_LINE_BORDER = null,
+        TOPCELLBORDER = null,
+        CELLBORDER = null,
+        LEFTCELLBORDER = null,
+        TOPLEFTCELLBORDER = null;
 
     /** How many columns (em-widths) to use in the text area. */
     private static final int DEFAULT_TEXT_COLUMNS = 20;
@@ -141,6 +95,11 @@ public final class Utility {
     /** A style context to use for panels and dialogs. */
     private static StyleContext STYLE_CONTEXT = null;
 
+    /** Font specification for panel titles. */
+    public static String FONTSPEC_TITLE = "header-plain-max";
+    /** Font specification for panel subtitles. */
+    public static String FONTSPEC_SUBTITLE = "header-plain-large";
+    
     public static void initStyleContext(Font font) {
         Style defaultStyle = StyleContext.getDefaultStyleContext()
             .getStyle(StyleContext.DEFAULT_STYLE);
@@ -151,13 +110,125 @@ public final class Utility {
         StyleConstants.setFontSize(regular, font.getSize());
 
         Style buttonStyle = STYLE_CONTEXT.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
+        StyleConstants.setForeground(buttonStyle, getLinkColor());
 
         Style right = STYLE_CONTEXT.addStyle("right", regular);
         StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
     }
 
+    /** 
+     * Get the standard border color.
+     *
+     * @return The border {@code Color}.
+     */
+    public static Color getBorderColor() {
+        return ImageLibrary.getColor("color.border.LookAndFeel",
+                                     Color.BLACK);
+    }
+    
+    /** 
+     * Get the color to use for links.
+     *
+     * @return The link {@code Color}.
+     */
+    public static Color getLinkColor() {
+        return ImageLibrary.getColor("color.link.LookAndFeel", Color.BLUE);
+    }
 
+    /** 
+     * Get the color to use for things the player probably should not do.
+     *
+     * @return The warning {@code Color}.
+     */
+    public static Color getWarningColor() {
+        return ImageLibrary.getColor("color.warning.LookAndFeel", Color.RED);
+    }
+
+    // Borders that depend on Resources
+    
+    public static synchronized Border getColorCellBorder() {
+        if (COLOR_CELL_BORDER == null) {
+            ImageIcon icon = new ImageIcon(ImageLibrary
+                .getColorCellRendererBackground());
+            COLOR_CELL_BORDER = BorderFactory
+                .createCompoundBorder(BorderFactory
+                    .createMatteBorder(5, 10, 5, 10, icon),
+                    BorderFactory.createLineBorder(getBorderColor()));
+        }
+        return COLOR_CELL_BORDER;
+    }
+    
+    public static synchronized Border getDialogBorder() {
+        if (DIALOG_BORDER == null) {
+            DIALOG_BORDER = BorderFactory
+                .createCompoundBorder(getTrivialLineBorder(),
+                                      blankBorder(10, 20, 10, 20));
+        }
+        return DIALOG_BORDER;
+    }
+
+    public static synchronized Border getProductionBorder() {
+        return BorderFactory.createCompoundBorder(BorderFactory
+            .createMatteBorder(1, 0, 0, 0, getBorderColor()),
+                               blankBorder(2, 2, 2, 2));
+    }
+    
+    public static synchronized Border getSimpleLineBorder() {
+        if (SIMPLE_LINE_BORDER == null) {
+            SIMPLE_LINE_BORDER = BorderFactory
+                .createCompoundBorder(getTrivialLineBorder(),
+                                      blankBorder(5, 5, 5, 5));
+        }
+        return SIMPLE_LINE_BORDER;
+    }
+
+    public static synchronized Border getTrivialLineBorder() {
+        return BorderFactory.createLineBorder(getBorderColor());
+    }
+
+    // The borders to use for table cells
+
+    public static synchronized Border getTopCellBorder() {
+        if (TOPCELLBORDER == null) {
+            TOPCELLBORDER = BorderFactory
+                .createCompoundBorder(BorderFactory
+                    .createMatteBorder(1, 0, 1, 1, getBorderColor()),
+                    BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        }
+        return TOPCELLBORDER;
+    }
+
+    public static synchronized Border getCellBorder() {
+        if (CELLBORDER == null) {
+            CELLBORDER = BorderFactory
+                .createCompoundBorder(BorderFactory
+                    .createMatteBorder(0, 0, 1, 1, getBorderColor()),
+                    BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        }
+        return CELLBORDER;
+    }
+
+    public static synchronized Border getLeftCellBorder() {
+        if (LEFTCELLBORDER == null) {
+            LEFTCELLBORDER = BorderFactory
+                .createCompoundBorder(BorderFactory
+                    .createMatteBorder(0, 1, 1, 1, getBorderColor()),
+                    BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        }
+        return LEFTCELLBORDER;
+    }
+
+    public static synchronized Border getTopLeftCellBorder() {
+        if (TOPLEFTCELLBORDER == null) {
+            TOPLEFTCELLBORDER = BorderFactory
+                .createCompoundBorder(BorderFactory
+                    .createMatteBorder(1, 1, 1, 1, getBorderColor()),
+                    BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        }
+        return TOPLEFTCELLBORDER;
+    }
+
+    
     /**
      * Return a button suitable for linking to another panel
      * (e.g. ColopediaPanel).
@@ -171,7 +242,7 @@ public final class Utility {
         JButton button = new JButton(text, icon);
         button.setMargin(EMPTY_MARGIN);
         button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
+        button.setForeground(getLinkColor());
         button.setAlignmentY(0.8f);
         button.setBorder(blankBorder(0, 0, 0, 0));
         button.setActionCommand(action);
@@ -418,12 +489,12 @@ public final class Utility {
      * Gets a default header for panels containing a localized message.
      *
      * @param key The message key to use.
-     * @param small If true, use a smaller font.
+     * @param fontSpec A font-specification for the font to use.
      * @return A suitable {@code JLabel}.
      */
-    public static JLabel localizedHeader(String key, boolean small) {
+    public static JLabel localizedHeader(String key, String fontSpec) {
         JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
-            (small ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
+                                             fontSpec);
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
@@ -433,34 +504,32 @@ public final class Utility {
      *
      * @param key The message key to use.
      * @param alignment The alignment.
-     * @param size The font size.
+     * @param fontSpec A font specification.
      * @return A suitable {@code JLabel}.
      */
     public static JLabel localizedHeaderLabel(String key, int alignment,
-                                              FontLibrary.FontSize size) {
+                                              String fontSpec) {
         String text = Messages.message(key);
         JLabel header = new JLabel(text, alignment);
-        header.setFont(FontLibrary.createCompatibleFont(
-            text, FontLibrary.FontType.HEADER, size));
+        header.setFont(FontLibrary.getUnscaledFont(fontSpec, text));
         header.setOpaque(false);
         return header;
     }
 
     public static JLabel localizedHeaderLabel(StringTemplate template,
                                               int alignment,
-                                              FontLibrary.FontSize size) {
+                                              String fontSpec) {
         String text = Messages.message(template);
         JLabel header = new JLabel(text, alignment);
-        header.setFont(FontLibrary.createCompatibleFont(
-            text, FontLibrary.FontType.HEADER, size));
+        header.setFont(FontLibrary.getUnscaledFont(fontSpec, text));
         header.setOpaque(false);
         return header;
     }
 
     public static JLabel localizedHeaderLabel(Named named,
-                                              FontLibrary.FontSize size) {
+                                              String fontSpec) {
         return localizedHeaderLabel(named.getNameKey(),
-                                    SwingConstants.LEADING, size);
+                                    SwingConstants.LEADING, fontSpec);
     }
 
     /**
@@ -640,7 +709,7 @@ public final class Utility {
         JPanel panel = new JPanel(new GridLayout(0, 2));
         panel.add(new JLabel(icon));
         panel.add(Utility.localizedTextArea(template));
-        panel.setBorder(DIALOG_BORDER);
+        panel.setBorder(getDialogBorder());
         return panel;
     }
         

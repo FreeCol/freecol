@@ -32,6 +32,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
@@ -51,9 +52,8 @@ public final class ReportForeignAffairPanel extends ReportPanel {
     public ReportForeignAffairPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportForeignAction");
 
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor());
+        final ImageLibrary lib = getImageLibrary();
+        final Font font = FontLibrary.getUnscaledFont("normal-bold-small");
         final String stance = Messages.message(
             StringTemplate.key("report.foreignAffair.stance"));
         final String numberOfColonies = Messages.message(

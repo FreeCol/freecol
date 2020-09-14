@@ -37,6 +37,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.*;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Modifier;
@@ -75,7 +76,7 @@ public class TerrainDetailPanel
                                          getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
             BufferedImage tileImage
-                = ImageLibrary.getTileImageWithOverlayAndForest(t,
+                = getImageLibrary().getTileImageWithOverlayAndForest(t,
                     new Dimension(-1, ImageLibrary.ICON_SIZE.height));
             BufferedImage image = new BufferedImage(tileImage.getWidth(null),
                 ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
@@ -107,11 +108,12 @@ public class TerrainDetailPanel
             defenseBonus = ModifierFormat.getModifierAsString(defenceModifier);
         }
 
-        JLabel nameLabel = Utility.localizedHeaderLabel(tileType, FontLibrary.FontSize.SMALL);
+        JLabel nameLabel = Utility.localizedHeaderLabel(tileType,
+            Utility.FONTSPEC_SUBTITLE);
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = ImageLibrary
+        Image terrainImage = getImageLibrary()
             .getTileImageWithOverlayAndForest(tileType,
                 ImageLibrary.TILE_OVERLAY_SIZE);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");

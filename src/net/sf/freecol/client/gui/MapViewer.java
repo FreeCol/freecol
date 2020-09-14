@@ -87,8 +87,44 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * This class is responsible for drawing the map/background on the
  * {@code Canvas}.
  *
- * In addition, the graphical state of the map (focus, active unit..)
- * is currently handled by this class.
+ * The map projection has some interesting properties.  Here is the top
+ * left corner of the map (truncated, aspect ratio very wrong) containing
+ * x,y "map" coordinates.
+ *
+ *  /\  /\  /\    
+ * /0 \/1 \/2 \   
+ * \ 0/\ 0/\ 0/  
+ *  \/0 \/1 \/    
+ *  /\ 1/\ 1/\  
+ * /0 \/1 \/2 \ 
+ * \ 2/\ 2/\ 2/ 
+ *  \/0 \/1 \/   
+ *  /\ 3/\ 3/   
+ * /0 \/1 \/     
+ * \ 4/\ 4/
+ *  \/  \/ 
+ *
+ * We distinguish ordinary "map" coordinates from the pixel
+ * coordinates in the frame, which we will denote P(x,y).
+ *
+ * Pixel coordinates are measureed from the top left corner of the
+ * frame to minimal extent of the rectangle containing the tile
+ * (note: not actually inside the tile graphic).
+ *
+ * Let a general tile with map coordinates (x,y) have pixel coordinates
+ * P(px,py)
+ * Let tiles have width tw and height th.
+ *
+ * - Property #1:  Tile (x,0) borders the top of the window at P(?,0)
+ * - Property #2:  Tile (x,1) is inset by one half tile height at P(?,th/2)
+ * - Property #3:  Tile (0,y) borders the left of the window if y is even,
+ *   and is thus at P(0,?), otherwise it is inset one half tile width
+ *   at P(tw/2,?)
+ * - Property #4:  Within a horizontal row, the tile directly to the 
+ *   right of T0 is tile (x+1,y) at P(px+tw,py)
+ * - Property #5:  Within a vertical column, the tile directly below
+ *   tile T0 is tile (x,y+2) at P(px,py+th)
+ *
  */
 public final class MapViewer extends FreeColClientHolder {
 
@@ -119,33 +155,17 @@ public final class MapViewer extends FreeColClientHolder {
         }
     }
 
-    /** The internal tile viewer to use. */
-    private TileViewer tv;
+    /** Scaled image library to use only for map operations. */
+    private final ImageLibrary lib;
 
-    /** Scaled ImageLibrary only used for map painting. */
-    private ImageLibrary lib;
+    /** The internal scaled tile viewer to use. */
+    private final TileViewer tv;
 
     /** The map size. */
     private Dimension size = null;
 
     /** The current focus Tile. */
     private Tile focus = null;
-
-    /** The view mode in use. */
-    private ViewMode viewMode = ViewMode.MOVE_UNITS;
-    /** The selected tile. */
-    private Tile selectedTile;
-    /** The active unit. */
-    private Unit activeUnit;
-
-    /** The cursor for the selected tile. */
-    private TerrainCursor cursor;
-
-    /** A path for the active unit. */
-    private PathNode unitPath;
-
-    /** A path for a current goto order. */
-    private PathNode gotoPath = null;
 
     /** The units that are being animated and an associated reference count. */
     private final java.util.Map<Unit, Integer> unitsOutForAnimation
@@ -154,28 +174,77 @@ public final class MapViewer extends FreeColClientHolder {
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels
         = new HashMap<>();
 
+    /** The cursor for the selected tile. */
+    private TerrainCursor cursor;
+
+    /** A path for a current goto order. */
+    private PathNode gotoPath = null;
+
+    /** A path for the active unit. */
+    private PathNode unitPath = null;
+
+    /** The view mode in use. */
+    private ViewMode viewMode = ViewMode.MOVE_UNITS;
+    /** The selected tile, for ViewMode.TERRAIN. */
+    private Tile selectedTile;
+    /** The active unit, for ViewMode.MOVE_UNITS. */
+    private Unit activeUnit;
+
+    /** The chat message area. */
+    private final ChatDisplay chatDisplay;
+
+    /*
+     * These variables are directly dependent on the map scale, which
+     * changes in changeScale().
+     * Their consistency is maintained by calling updateScaledVariables().
+     */
+
+    /** Tile width and height, and half values thereof. */
+    private int tileHeight, tileWidth, halfHeight, halfWidth;
+
     /** Fog of war area. */
     private final GeneralPath fog = new GeneralPath();
 
     /** Fonts (scaled). */
     private Font fontNormal, fontItalic, fontProduction, fontTiny;
         
-    /** The chat message area. */
-    private final ChatDisplay chatDisplay;
+    /** Points to use to draw the borders. */
+    private final EnumMap<Direction, Point2D.Float> borderPoints
+        = new EnumMap<>(Direction.class);
+    /** Support points for quadTo calls when drawing borders. */
+    private final EnumMap<Direction, Point2D.Float> controlPoints
+        = new EnumMap<>(Direction.class);
 
-    // Helper variables for displaying the map.
-    private int tileHeight, tileWidth, halfHeight, halfWidth,
-        topSpace, topRows, /*bottomSpace,*/ bottomRows, leftSpace, rightSpace;
+    /** Stroke to draw the borders with. */
+    private Stroke borderStroke = new BasicStroke(4);
 
+    /** Stroke to draw the grid with. */
+    private Stroke gridStroke = new BasicStroke(1);
+
+    /*
+     * These variables depend on the map scale and also the map pixel size,
+     * which changes in changeSize().
+     * Their consistency is maintained by calling updateSizedVariables().
+     */
+
+    /** Horizonal and vertical pixel distance to the center tile. */
+    private int hSpace, vSpace;
+
+    /** Number of rows above/below the center tile. */
+    private int centerRows;
+    /**
+     * Almost the number of columns to the left/right of the center tile.
+     * There are special cases handled in getLeft/RightColumns().
+     */
+    private int centerColumns;
+    /** Special y-odd/even offsets to centerColumns. FIXME: explain! */
+    private int columnEvenYOffset, columnOddYOffset;
+    
     // The y-coordinate of the Tiles that will be drawn at the bottom
     private int bottomRow = -1;
 
     // The y-coordinate of the Tiles that will be drawn at the top
     private int topRow;
-
-    // The y-coordinate on the screen (in pixels) of the images of the
-    // Tiles that will be drawn at the bottom
-    private int bottomRowY;
 
     // The y-coordinate on the screen (in pixels) of the images of the
     // Tiles that will be drawn at the top
@@ -196,166 +265,32 @@ public final class MapViewer extends FreeColClientHolder {
         alignedLeft = false, alignedRight = false;
 
 
-    // borders
-    private final EnumMap<Direction, Point2D.Float> borderPoints =
-        new EnumMap<>(Direction.class);
-
-    private final EnumMap<Direction, Point2D.Float> controlPoints =
-        new EnumMap<>(Direction.class);
-
-    private Stroke borderStroke = new BasicStroke(4);
-
-    private Stroke gridStroke = new BasicStroke(1);
-
-
     /**
      * The constructor to use.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
+     * @param lib An {@code ImageLibrary} to use for drawing to the map
+     *     (and this is subject to the map scaling).
      * @param al An {@code ActionListener} for the cursor.
      */
-    public MapViewer(FreeColClient freeColClient, ActionListener al) {
+    public MapViewer(FreeColClient freeColClient, ImageLibrary lib,
+                     ActionListener al) {
         super(freeColClient);
         
-        changeImageLibrary(new ImageLibrary());
+        this.lib = lib;
+        this.tv = new TileViewer(freeColClient, lib);
+        this.size = new Dimension(0, 0); // Start empty, update is coming
         this.cursor = new TerrainCursor();
         this.cursor.addActionListener(al);
-        this.chatDisplay = new ChatDisplay();
+        this.chatDisplay = new ChatDisplay(freeColClient);
+
+        updateScaledVariables();
     }
 
-   
-    // Critical internals
+
+    // Internals
     
-    /**
-     * Change the internal image libraries.
-     *
-     * Update several internal variables that depend directly on the
-     * tile size in the image library.
-     *
-     * @param lib The new {@code ImageLibrary} to use.
-     */
-    private void changeImageLibrary(ImageLibrary lib) {
-        this.lib = lib;
-        this.tv = new TileViewer(getFreeColClient(), this.lib);
-
-        // ATTENTION: we assume that all base tiles have the same size
-        final Dimension tileSize = lib.tileSize;
-        this.tileHeight = tileSize.height;
-        this.tileWidth = tileSize.width;
-        this.halfHeight = this.tileHeight/2;
-        this.halfWidth = this.tileWidth/2;
-
-        this.fog.reset();
-        this.fog.moveTo(this.halfWidth, 0);
-        this.fog.lineTo(this.tileWidth, this.halfHeight);
-        this.fog.lineTo(this.halfWidth, this.tileHeight);
-        this.fog.lineTo(0, this.halfHeight);
-        this.fog.closePath();
-
-        this.fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD,
-            getScale());
-        this.fontItalic = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD|Font.ITALIC,
-            getScale());
-        this.fontProduction = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD,
-            getScale());
-        this.fontTiny = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.PLAIN,
-            getScale());
-            
-        final int dx = this.tileWidth/16;
-        final int dy = this.tileHeight/16;
-        final int ddx = dx + dx/2;
-        final int ddy = dy + dy/2;
-
-        // small corners
-        controlPoints.put(Direction.N,
-                          new Point2D.Float(this.halfWidth, dy));
-        controlPoints.put(Direction.E,
-                          new Point2D.Float(this.tileWidth - dx, this.halfHeight));
-        controlPoints.put(Direction.S,
-                          new Point2D.Float(this.halfWidth, this.tileHeight - dy));
-        controlPoints.put(Direction.W,
-                          new Point2D.Float(dx, this.halfHeight));
-        // big corners
-        controlPoints.put(Direction.SE,
-                          new Point2D.Float(this.halfWidth, this.tileHeight));
-        controlPoints.put(Direction.NE,
-                          new Point2D.Float(this.tileWidth, this.halfHeight));
-        controlPoints.put(Direction.SW,
-                          new Point2D.Float(0, this.halfHeight));
-        controlPoints.put(Direction.NW,
-                          new Point2D.Float(this.halfWidth, 0));
-        // small corners
-        borderPoints.put(Direction.NW,
-                         new Point2D.Float(dx + ddx, this.halfHeight - ddy));
-        borderPoints.put(Direction.N,
-                         new Point2D.Float(this.halfWidth - ddx, dy + ddy));
-        borderPoints.put(Direction.NE,
-                         new Point2D.Float(this.halfWidth + ddx, dy + ddy));
-        borderPoints.put(Direction.E,
-                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight - ddy));
-        borderPoints.put(Direction.SE,
-                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight + ddy));
-        borderPoints.put(Direction.S,
-                         new Point2D.Float(this.halfWidth + ddx, this.tileHeight - dy - ddy));
-        borderPoints.put(Direction.SW,
-                         new Point2D.Float(this.halfWidth - ddx, this.tileHeight - dy - ddy));
-        borderPoints.put(Direction.W,
-                         new Point2D.Float(dx + ddx, this.halfHeight + ddy));
-
-        borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(getScale());
-    }
-
-    // Accessors
-
-    /**
-     * Gets the contained {@code ImageLibrary}.
-     *
-     * @return The image library;
-     */
-    public ImageLibrary getImageLibrary() {
-        return this.lib;
-    }
-
-    /**
-     * Get the scale factor for the image library.
-     *
-     * @return The scale factor.
-     */
-    private float getScale() {
-        return this.lib.getScaleFactor();
-    }
-
-    /**
-     * Get the displayed map width.
-     *
-     * @return The width.
-     */
-    private int getScreenWidth() {
-        return this.size.width;
-    }
-    
-    /**
-     * Get the displayed map height.
-     *
-     * @return The width.
-     */
-    private int getScreenHeight() {
-        return this.size.height;
-    }
-    
-    /**
-     * Gets the focus tile, that is, the center tile of the displayed map.
-     *
-     * @return The center {@code Tile}.
-     */
-    public Tile getFocus() {
-        return this.focus;
-    }
+    // Trivial
 
     /**
      * Sets the focus tile.
@@ -366,102 +301,251 @@ public final class MapViewer extends FreeColClientHolder {
         this.focus = focus;
     }
 
-    /**
-     * Get the view mode.
-     *
-     * @return The view mode.
-     */
-    public ViewMode getViewMode() {
-        return this.viewMode;
-    }
 
-    /**
-     * Set the view mode.
-     *
-     * @param vm The new {@code ViewMode}.
-     */
-    public void setViewMode(ViewMode vm) {
-        this.viewMode = vm;
-    }
+    // Critical internals for consistency maintenance
     
     /**
-     * Gets the active unit.
-     *
-     * @return The {@code Unit}.
+     * Update the variables that depend on the image library scale.
      */
-    public Unit getActiveUnit() {
-        return this.activeUnit;
-    }
+    private void updateScaledVariables() {
+        // ATTENTION: we assume that all base tiles have the same size
+        final Dimension tileSize = this.lib.getTileSize();
+        this.tileHeight = tileSize.height;
+        this.tileWidth = tileSize.width;
+        this.halfHeight = tileSize.height / 2;
+        this.halfWidth = tileSize.width / 2;
 
-    /**
-     * Sets the active unit.
-     *
-     * @param activeUnit The new active {@code Unit}.
-     */
-    public void setActiveUnit(Unit activeUnit) {
-        this.activeUnit = activeUnit;
-    }
+        this.fog.reset();
+        this.fog.moveTo(this.halfWidth, 0);
+        this.fog.lineTo(this.tileWidth, this.halfHeight);
+        this.fog.lineTo(this.halfWidth, this.tileHeight);
+        this.fog.lineTo(0, this.halfHeight);
+        this.fog.closePath();
 
-    /**
-     * Gets the selected tile.
-     *
-     * @return The {@code Tile} selected.
-     */
-    public Tile getSelectedTile() {
-        return this.selectedTile;
-    }
-
-    /**
-     * Sets the selected tile.
-     *
-     * @param tile The new selected {@code Tile}.
-     */
-    public void setSelectedTile(Tile tile) {
-        this.selectedTile = tile;
-    }
-
-    /**
-     * Get either the tile with the active unit or the selected tile,
-     * but only if it is visible.
-     *
-     * Used to determine where to display the cursor.
-     *
-     * @return The {@code Tile} found or null.
-     */
-    public Tile getActiveTile() {
-        Tile ret = null;
-        switch (getViewMode()) {
-        case MOVE_UNITS:
-            final Unit unit = getActiveUnit();
-            if (unit != null) ret = unit.getTile();
-            break;
-        case TERRAIN:
-            ret = getSelectedTile();
-            break;
-        default:
-            break;
+        // Update fonts, make sure font{Normal,Italic} are non-null but
+        // allow the others to disappear if they get too small
+        this.fontNormal = this.lib.getScaledFont("normal-bold-smaller", null);
+        this.fontItalic = this.lib.getScaledFont("normal-bold+italic-smaller", null);
+        this.fontProduction = this.lib.getScaledFont("normal-bold-tiny", null);
+        this.fontTiny = this.lib.getScaledFont("normal-plain-tiny", null);
+        if (this.fontNormal == null) {
+            this.fontNormal = (this.lib.getScaleFactor() < 1f)
+                ? FontLibrary.getUnscaledFont("normal-bold-tiny", null)
+                : FontLibrary.getUnscaledFont("normal-bold-max", null);
         }
-        return (isTileVisible(ret)) ? ret : null;
+        if (this.fontItalic == null) this.fontItalic = this.fontNormal;
+        
+        final int dx = this.tileWidth / 16;
+        final int dy = this.tileHeight / 16;
+        final int ddx = dx + dx / 2;
+        final int ddy = dy + dy / 2;
+
+        // small corners
+        this.controlPoints.put(Direction.N,
+            new Point2D.Float(this.halfWidth, dy));
+        this.controlPoints.put(Direction.E,
+            new Point2D.Float(this.tileWidth - dx, this.halfHeight));
+        this.controlPoints.put(Direction.S,
+            new Point2D.Float(this.halfWidth, this.tileHeight - dy));
+        this.controlPoints.put(Direction.W,
+            new Point2D.Float(dx, this.halfHeight));
+        // big corners
+        this.controlPoints.put(Direction.SE,
+            new Point2D.Float(this.halfWidth, this.tileHeight));
+        this.controlPoints.put(Direction.NE,
+            new Point2D.Float(this.tileWidth, this.halfHeight));
+        this.controlPoints.put(Direction.SW,
+            new Point2D.Float(0, this.halfHeight));
+        this.controlPoints.put(Direction.NW,
+            new Point2D.Float(this.halfWidth, 0));
+        // small corners
+        this.borderPoints.put(Direction.NW,
+            new Point2D.Float(dx + ddx, this.halfHeight - ddy));
+        this.borderPoints.put(Direction.N,
+            new Point2D.Float(this.halfWidth - ddx, dy + ddy));
+        this.borderPoints.put(Direction.NE,
+            new Point2D.Float(this.halfWidth + ddx, dy + ddy));
+        this.borderPoints.put(Direction.E,
+            new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight - ddy));
+        this.borderPoints.put(Direction.SE,
+            new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight + ddy));
+        this.borderPoints.put(Direction.S,
+            new Point2D.Float(this.halfWidth + ddx, this.tileHeight - dy - ddy));
+        this.borderPoints.put(Direction.SW,
+            new Point2D.Float(this.halfWidth - ddx, this.tileHeight - dy - ddy));
+        this.borderPoints.put(Direction.W,
+            new Point2D.Float(dx + ddx, this.halfHeight + ddy));
+
+        this.borderStroke = new BasicStroke(dy);
+        this.gridStroke = new BasicStroke(this.lib.getScaleFactor());
+
+        updateSizeVariables();
     }
 
     /**
-     * Set the current active unit path.
-     *
-     * @param path The new {@code PathNode}.
+     * Update the variables that depend on the screen size (and scale).
      */
-    public void setUnitPath(PathNode path) {
-        this.unitPath = path;
+    private void updateSizeVariables() {
+        // If we draw a tile in the center of the frame, then there is
+        // vSpace pixels above and below it, and hSpace pixels to the
+        // left and right.
+        this.vSpace = (this.size.height - this.tileHeight) / 2;
+        this.hSpace = (this.size.width - this.tileWidth) / 2;
+
+        // Calculate the number of map rows to the center tile.
+        // Note use of halfHeight, because (x,y) -> (x,y+1) corresponds to:
+        //   P(px,py) -> P(px+tw/2,py+th/2) (y even)
+        //            -> P(px-tw/2,py+th/2) (y odd)
+        // thus there is always a step of th/2.
+        // We add 1 to include the center tile
+        this.centerRows = (this.vSpace / this.halfHeight) + 1;
+        // If there is extra vertical space then another row can be
+        // partially drawn
+        int vExtra = this.vSpace % this.tileHeight;
+        if (vExtra != 0) this.centerRows++;
+
+        // Calculate the number of map columns to the center tile.
+        // This time we divide by the full width of the tile because
+        // (x,y) -> (x+1,y) corresponds to:
+        //   P(px,py) -> P(px+tw,ty)  ; #4
+        // Again add 1 to include the center tile
+        this.centerColumns = this.hSpace / this.tileWidth + 1;
+
+        // If there extra horizontal space?
+        int hExtra = this.hSpace % this.tileWidth;
+        // Special y-coordinate-dependent offsets to centerColumns.
+        // If the row to display borders the left of the window
+        // (i.e. y is even by Property#3) then if there is more than half
+        // a tile width left over we display another column before
+        // the center tile
+        this.columnEvenYOffset = (hExtra > this.halfWidth) ? 1 : 0;
+        // If the row to display is inset (y odd) and there is no
+        // extra space we display one fewer column before the center tile
+        this.columnOddYOffset = (hExtra == 0) ? -1 : 0;
+    }
+
+
+    // Other internals
+
+    /**
+     * Create a label to use for animating a unit.
+     *
+     * @param unit The {@code Unit} to animate.
+     * @return A {@code JLabel} to use in animation.
+     */
+    private JLabel createUnitAnimationLabel(Unit unit) {
+        final BufferedImage unitImg = this.lib.getScaledUnitImage(unit);
+        final int width = this.halfWidth + unitImg.getWidth()/2;
+        final int height = unitImg.getHeight();
+
+        BufferedImage img = new BufferedImage(width, height,
+                                              BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
+
+        final int unitX = (width - unitImg.getWidth()) / 2;
+        g2d.drawImage(unitImg, unitX, 0, null);
+
+        final Player player = getMyPlayer();
+        String text = Messages.message(unit.getOccupationLabel(player, false));
+        g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
+                      0, 0, null);
+
+        final JLabel label = new JLabel(new ImageIcon(img));
+        label.setSize(width, height);
+        g2d.dispose();
+        return label;
+    }
+
+    // There is no getTop/BottomRows(), this.centerRows is sufficient
+    
+    /**
+     * Get the number of columns that are to the left of the center tile
+     * with the given y-coordinate.
+     *
+     * @param y The y-coordinate of the tile in question.
+     * @return The number of columns.
+     */
+    private int getLeftColumns(int y) {
+        return this.centerColumns
+            + (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
     }
 
     /**
-     * Get the current goto path.
+     * Get the number of columns that are to the right of the center tile
+     * with the given y-coordinate.
      *
-     * @return The goto {@code PathNode}.
+     * Note: same as getLeftColumns except the offset is subtracted.
+     *
+     * @param y The y-coordinate of the tile in question.
+     * @return The number of columns.
      */
-    public PathNode getGotoPath() {
-        return this.gotoPath;
+    private int getRightColumns(int y) {
+        return this.centerColumns
+            - (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
     }
 
+    /**
+     * Is a tile with given y-coordinate near the top?
+     *
+     * @param y The y-coordinate.
+     * @return True if near the top.
+     */
+    private boolean isMapNearTop(int y) {
+        return y < this.centerRows;
+    }
+
+    /**
+     * Is a tile with given y-coordinate near the bottom?
+     *
+     * @param y The y-coordinate.
+     * @param mapHeight The map tile height.
+     * @return True if near the bottom.
+     */
+    private boolean isMapNearBottom(int y, int mapHeight) {
+        return y >= mapHeight - this.centerRows;
+    }
+
+    /**
+     * Is a tile with given x,y coordinates near the left?
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return True if near the left.
+     */
+    private boolean isMapNearLeft(int x, int y) {
+        return x < getLeftColumns(y);
+    }
+
+    /**
+     * Is a tile with given x,y coordinates near the right?
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @param mapWidth The map tile width.
+     * @return True if near the right.
+     */
+    private boolean isMapNearRight(int x, int y, int mapWidth) {
+        return x >= mapWidth - getRightColumns(y);
+    }
+
+    /**
+     * Convert tile coordinates to pixel coordinates.
+     *
+     * Beware:  Only safe to call if the tile is known non-null and
+     * currently visible.
+     *
+     * @param tile The {@code Tile} to convert coordinates.
+     * @param a An array to pass back the x,y pixel coordinates.
+     */
+    private void tileToPixelXY(Tile tile, int[] a) {
+        final int x = tile.getX(), y = tile.getY();
+        a[0] = leftColumnX + this.tileWidth * (x - leftColumn); // Property#4
+        if ((y & 1) != 0) a[0] += this.halfWidth; // Property#2
+        a[1] = topRowY + this.halfHeight * (y - topRow); // Property#5
+    }
+
+
+    // Public API
 
     // Animation support
 
@@ -524,66 +608,9 @@ public final class MapViewer extends FreeColClientHolder {
             calculateTilePosition(tile, false));
     }
 
-    /**
-     * Create a label to use for animating a unit.
-     *
-     * @param unit The {@code Unit} to animate.
-     * @return A {@code JLabel} to use in animation.
-     */
-    private JLabel createUnitAnimationLabel(Unit unit) {
-        final BufferedImage unitImg = this.lib.getScaledUnitImage(unit);
-        final int width = this.halfWidth + unitImg.getWidth()/2;
-        final int height = unitImg.getHeight();
 
-        BufferedImage img = new BufferedImage(width, height,
-                                              BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = img.createGraphics();
+    // Cursor blinking
 
-        final int unitX = (width - unitImg.getWidth()) / 2;
-        g2d.drawImage(unitImg, unitX, 0, null);
-
-        final Player player = getMyPlayer();
-        String text = Messages.message(unit.getOccupationLabel(player, false));
-        g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
-                      0, 0, null);
-
-        final JLabel label = new JLabel(new ImageIcon(img));
-        label.setSize(width, height);
-        g2d.dispose();
-        return label;
-    }
-
-
-   // Higher level public routines
-
-    /**
-     * Change the displayed map size.
-     *
-     * @param size The new map size.
-     */
-    public void changeSize(Dimension size) {
-        this.size = size;
-        updateMapDisplayVariables();
-        forceReposition();
-    }
-
-    /**
-     * Change the focus tile.
-     *
-     * @param tile The new focus {@code Tile}.
-     */
-    public void changeFocus(Tile tile) {
-        setFocus(tile);
-        forceReposition();
-    }
-
-    /**
-     * Force the next screen repaint to reposition the tiles on the window.
-     */
-    public void forceReposition() {
-        bottomRow = -1;
-    }
-    
     /**
      * Start the cursor blink.
      */
@@ -598,31 +625,81 @@ public final class MapViewer extends FreeColClientHolder {
         this.cursor.stopBlinking();
     }
 
-    /**
-     * Change the goto path.
-     * 
-     * @param gotoPath The new goto {@code PathNode}.
-     * @return True if the goto path was changed.
-     */
-    public boolean changeGotoPath(PathNode gotoPath) {
-        if (this.gotoPath == gotoPath) return false;
-        this.gotoPath = gotoPath;
-        forceReposition();
-        return true;
-    }
+
+    // Focus
 
     /**
-     * Tells that a chat message was received.
+     * Change the focus tile.
      *
-     * @param message The chat message.
+     * @param tile The new focus {@code Tile}.
      */
-    public void displayChat(GUIMessage message) {
-        this.chatDisplay.addMessage(message);
+    public void changeFocus(Tile tile) {
+        setFocus(tile);
+        forceReposition();
+    }
+
+    /**
+     * Gets the focus tile, that is, the center tile of the displayed map.
+     *
+     * @return The center {@code Tile}.
+     */
+    public Tile getFocus() {
+        return this.focus;
+    }
+
+    /**
+     * Sets the focus of the map but offset to the left or right so
+     * that the focus position can still be visible when a popup is
+     * raised.  If successful, the supplied position will either be at
+     * the center of the left or right half of the map.
+     *
+     * @param tile The {@code Tile} to display.
+     * @return Positive if the focus is on the right hand side, negative
+     *     if on the left, zero on failure.
+     */
+    public int setOffsetFocus(Tile tile) {
+        if (tile == null) return 0;
+        positionMap(tile);
+
+        int ret = 0, moveX = -1;
+        final Map map = getMap();
+        final int tx = tile.getX(), ty = tile.getY(),
+            width = rightColumn - leftColumn;
+        if (leftColumn <= 0) { // At left edge already
+            if (tx <= width / 4) {
+                ret = -1;
+            } else if (tx >= 3 * width / 4) {
+                ret = 1;
+            } else {
+                moveX = tx + width / 4;
+                ret = -1;
+            }
+        } else if (rightColumn >= width - 1) { // At right edge
+            if (tx >= rightColumn - width / 4) {
+                ret = 1;
+            } else if (tx <= rightColumn - 3 * width / 4) {
+                ret = -1;
+            } else {
+                moveX = tx - width / 4;
+                ret = 1;
+            }
+        } else { // Move focus left 1/4 screen
+            moveX = tx - width / 4;
+            ret = 1;
+        }
+        if (moveX >= 0) {
+            Tile other = map.getTile(moveX, ty);
+            changeFocus(other);
+        } else {
+            changeFocus(tile);
+        }
+        return ret;
     }
 
 
-    // Cleanup underway below
-
+    // Map wrangling, conversions between pixel coordinates, map coordinates,
+    // and the tile/s thereat.
+    
     /**
      * Converts the given screen coordinates to Map coordinates.
      * It checks to see to which Tile the given pixel 'belongs'.
@@ -633,66 +710,25 @@ public final class MapViewer extends FreeColClientHolder {
      *     on the screen.
      */
     public Tile convertToMapTile(int x, int y) {
-        final Game game = getGame();
-        if (game == null || game.getMap() == null
-            || this.focus == null) return null;
+        final Map map = getMap();
+        if (map == null || this.focus == null) return null;
 
-        final int fx = this.focus.getX(), fy = this.focus.getY();
-        int leftOffset;
-        if (fx < getLeftColumns()) {
-            // we are at the left side of the map
-            if ((fy & 1) == 0) {
-                leftOffset = tileWidth * fx + halfWidth;
-            } else {
-                leftOffset = tileWidth * (fx + 1);
-            }
-        } else {
-            final int mapWidth = game.getMap().getWidth();
-            if (fx >= mapWidth - getRightColumns()) {
-                // we are at the right side of the map
-                if ((fy & 1) == 0) {
-                    leftOffset = getScreenWidth()
-                        - tileWidth * (mapWidth - fx);
-                } else {
-                    leftOffset = getScreenWidth() - halfWidth
-                        - tileWidth * (mapWidth - fx - 1);
-                }
-            } else {
-                if ((fy & 1) == 0) {
-                    leftOffset = (getScreenWidth() / 2);
-                } else {
-                    leftOffset = (getScreenWidth() / 2) + halfWidth;
-                }
-            }
-        }
-
-        int topOffset;
-        if (fy < topRows) {
-            // we are at the top of the map
-            topOffset = (fy + 1) * halfHeight;
-        } else {
-            final int mapHeight = game.getMap().getHeight();
-            if (fy >= mapHeight - bottomRows) {
-                // we are at the bottom of the map
-                topOffset = getScreenHeight() - halfHeight * (mapHeight - fy);
-            } else {
-                topOffset = getScreenHeight() / 2;
-            }
-        }
-
-        // At this point (leftOffset, topOffset) is the center pixel
-        // of the Tile that was on focus (= the Tile that should have
-        // been drawn at the center of the screen if possible).
+        // Set (leftOffset, topOffset) to the center of the focus tile
+        int[] a = new int[2]; tileToPixelXY(this.focus, a);
+        int leftOffset = a[0] + this.halfWidth;
+        int topOffset = a[1] + this.halfHeight;
 
         // Next, we can calculate the center pixel of the tile-sized
         // rectangle that was clicked. First, we calculate the
         // difference in units of rows and columns.
-        int dcol = (x - leftOffset + (x > leftOffset ? halfWidth : -halfWidth))
-            / tileWidth;
-        int drow = (y - topOffset + (y > topOffset ? halfHeight : -halfHeight))
-            / tileHeight;
-        int px = leftOffset + dcol * tileWidth;
-        int py = topOffset + drow * tileHeight;
+        final int fx = this.focus.getX(), fy = this.focus.getY(),
+            mapWidth = map.getWidth(), mapHeight = map.getHeight();
+        int dcol = (x - leftOffset + (x > leftOffset ? this.halfWidth : -this.halfWidth))
+            / this.tileWidth;
+        int drow = (y - topOffset + (y > topOffset ? this.halfHeight : -this.halfHeight))
+            / this.tileHeight;
+        int px = leftOffset + dcol * this.tileWidth;
+        int py = topOffset + drow * this.tileHeight;
         // Since rows are shifted, we need to correct.
         int newCol = fx + dcol;
         int newRow = fy + drow * 2;
@@ -700,30 +736,23 @@ public final class MapViewer extends FreeColClientHolder {
         // rectangle was clicked, and adjust rows and columns
         // accordingly. See Direction.
         Direction direction = null;
-        if (x > px) {
-            // right half of the rectangle
-            if (y > py) {
-                // bottom right
-                if ((y - py) > halfHeight - (x - px)/2) {
+        if (x > px) { // right half of the rectangle
+            if (y > py) { // bottom right
+                if ((y - py) > this.halfHeight - (x - px)/2) {
                     direction = Direction.SE;
                 }
-            } else {
-                // top right
-                if ((y - py) < (x - px)/2 - halfHeight) {
+            } else { // top right
+                if ((y - py) < (x - px)/2 - this.halfHeight) {
                     direction = Direction.NE;
                 }
-
             }
-        } else {
-            // left half of the rectangle
-            if (y > py) {
-                // bottom left
-                if ((y - py) > (x - px)/2 + halfHeight) {
+        } else { // left half of the rectangle
+            if (y > py) { // bottom left
+                if ((y - py) > (x - px)/2 + this.halfHeight) {
                     direction = Direction.SW;
                 }
-            } else {
-                // top left
-                if ((y - py) < (px - x)/2 - halfHeight) {
+            } else { // top left
+                if ((y - py) < (px - x)/2 - this.halfHeight) {
                     direction = Direction.NW;
                 }
             }
@@ -735,56 +764,44 @@ public final class MapViewer extends FreeColClientHolder {
             col = step.x;
             row = step.y;
         }
-        logger.finest("Direction is " + direction
-                      + ", new focus is " + col + ", " + row);
-        return game.getMap().getTile(col, row);
-
+        return map.getTile(col, row);
     }
 
     /**
      * Calculate the bounds of the rectangle containing a Tile on the
-     * screen, and return it.  If the Tile is not on-screen a maximal
-     * rectangle is returned.  The bounds includes a one-tile padding
-     * area above the Tile, to include the space needed by any units
-     * in the Tile.
+     * screen.
+     *
+     * If the Tile is not on-screen a maximal rectangle is returned.
+     * The bounds includes a one-tile padding area above the Tile, to
+     * include the space needed by any units in the Tile.
      *
      * @param tile The {@code Tile} on the screen.
      * @return The bounds {@code Rectangle}.
      */
     public Rectangle calculateTileBounds(Tile tile) {
-        Rectangle result
-            = new Rectangle(0, 0, getScreenWidth(), getScreenHeight());
-        if (isTileVisible(tile)) {
-            result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
-            result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
-            if ((tile.getY() & 1) != 0) {
-                result.x += halfWidth;
-            }
-            result.width = tileWidth;
-            result.height = tileHeight * 2;
+        if (!isTileVisible(tile)) {
+            return new Rectangle(0, 0, this.size.width, this.size.height);
         }
-        return result;
+            
+        int[] a = new int[2]; tileToPixelXY(tile, a);
+        return new Rectangle(a[0], a[1], this.tileWidth, this.tileHeight * 2);
     }
 
     /**
-     * Gets the position of the given {@code Tile}
-     * on the drawn map.
+     * Gets the position of the given {@code Tile} on the visible map.
      *
-     * @param t The {@code Tile} to check.
+     * @param tile The {@code Tile} to check.
      * @param rhs If true, find the right edge of the tile, otherwise
      *     the left edge.
-     * @return The position of the given {@code Tile}, or
-     *     {@code null} if the {@code Tile} is not drawn on
-     *     the mapboard.
+     * @return The position of the given {@code Tile}, or {@code null}
+     *     if the {@code Tile} is not visible.
      */
-    public Point calculateTilePosition(Tile t, boolean rhs) {
-        if (!isTileVisible(t)) return null;
+    public Point calculateTilePosition(Tile tile, boolean rhs) {
+        if (!isTileVisible(tile)) return null;
 
-        int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
-        int y = ((t.getY() - topRow) * halfHeight) + topRowY;
-        if ((t.getY() & 1) != 0) x += halfWidth;
-        if (rhs) x += this.tileWidth;
-        return new Point(x, y);
+        int[] a = new int[2]; tileToPixelXY(tile, a);
+        if (rhs) a[0] += this.tileWidth;
+        return new Point(a[0], a[1]);
     }
 
     /**
@@ -797,26 +814,10 @@ public final class MapViewer extends FreeColClientHolder {
     public Point calculateUnitLabelPositionInTile(JLabel unitLabel,
                                                   Point tileP) {
         if (tileP == null) return null;
-        int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
-        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2
-            - (int) (UNIT_OFFSET * getScale());
+        int labelX = tileP.x + this.tileWidth / 2 - unitLabel.getWidth() / 2;
+        int labelY = tileP.y + this.tileHeight / 2 - unitLabel.getHeight() / 2
+            - this.lib.scaleInt(UNIT_OFFSET);
         return new Point(labelX, labelY);
-    }
-
-    /**
-     * Checks if a tile is displayed on the screen but not too close
-     * to the edges.  The intent appears to be to have a two tile thick
-     * boundary.
-     *
-     * @param tile The {@code Tile} to check.
-     * @return True if the tile is roughly on screen.
-     */
-    public boolean onScreen(Tile tile) {
-        repositionMapIfNeeded();
-        return (tile.getY() - 2 > topRow || alignedTop)
-            && (tile.getY() + 3 < bottomRow || alignedBottom)
-            && (tile.getX() - 1 > leftColumn || alignedLeft)
-            && (tile.getX() + 2 < rightColumn || alignedRight);
     }
 
     /**
@@ -825,317 +826,48 @@ public final class MapViewer extends FreeColClientHolder {
      * @param tile The {@code Tile} to check.
      * @return True if the tile is visible.
      */
-    private boolean isTileVisible(Tile tile) {
+    public boolean isTileVisible(Tile tile) {
+        if (tile == null) return false;
         repositionMapIfNeeded();
-        return tile != null
-            && tile.getY() >= topRow     && tile.getY() <= bottomRow
-            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
+        final int x = tile.getX(), y = tile.getY();
+        return y >= topRow     && y <= bottomRow
+            && x >= leftColumn && x <= rightColumn;
     }
 
     /**
-     * Sets the focus of the map but offset to the left or right so
-     * that the focus position can still be visible when a popup is
-     * raised.  If successful, the supplied position will either be at
-     * the center of the left or right half of the map.
+     * Checks if a tile is displayed on the screen but not too close
+     * to the edges.
      *
-     * @param tile The {@code Tile} to display.
-     * @return Positive if the focus is on the right hand side, negative
-     *     if on the left, zero on failure.
-     * @see #getFocus
+     * FIXME: The intent appears to be to have a two tile thick boundary?
+     *
+     * @param tile The {@code Tile} to check.
+     * @return True if the tile is roughly on screen.
      */
-    int setOffsetFocus(Tile tile) {
-        if (tile == null) return 0;
-        int where;
-        final Map map = getGame().getMap();
-        final int tx = tile.getX(), ty = tile.getY(),
-            width = rightColumn - leftColumn;
-        int moveX = -1;
-        getGUI().setFocus(tile);
-        positionMap(tile);
-        if (leftColumn <= 0) { // At left edge already
-            if (tx <= width / 4) {
-                where = -1;
-            } else if (tx >= 3 * width / 4) {
-                where = 1;
-            } else {
-                moveX = tx + width / 4;
-                where = -1;
-            }
-        } else if (rightColumn >= width - 1) { // At right edge
-            if (tx >= rightColumn - width / 4) {
-                where = 1;
-            } else if (tx <= rightColumn - 3 * width / 4) {
-                where = -1;
-            } else {
-                moveX = tx - width / 4;
-                where = 1;
-            }
-        } else { // Move focus left 1/4 screen
-            moveX = tx - width / 4;
-            where = 1;
-        }
-        if (moveX >= 0) {
-            Tile other = map.getTile(moveX, ty);
-            getGUI().setFocus(other);
-            positionMap(other);
-        }
-        return where;
+    public boolean onScreen(Tile tile) {
+        repositionMapIfNeeded();
+        final int x = tile.getX(), y = tile.getY();
+        return (y - 2 > topRow || alignedTop)
+            && (y + 3 < bottomRow || alignedBottom)
+            && (x - 1 > leftColumn || alignedLeft)
+            && (x + 2 < rightColumn || alignedRight);
     }
 
-    private void repositionMapIfNeeded() {
-        if (bottomRow < 0 && this.focus != null) positionMap(this.focus);
-    }
+
+    // Miscellaneous
 
     /**
-     * Position the map so that the supplied tile is displayed at the center.
+     * Add a chat message.
      *
-     * @param pos The {@code Tile} to center at.
+     * @param message The chat message.
      */
-    private void positionMap(Tile pos) {
-        final Game game = getGame();
-        int x = pos.getX(), y = pos.getY();
-        int leftColumns = getLeftColumns(), rightColumns = getRightColumns();
-
-        /*
-          PART 1
-          ======
-          Calculate: bottomRow, topRow, bottomRowY, topRowY
-          This will tell us which rows need to be drawn on the screen (from
-          bottomRow until and including topRow).
-          bottomRowY will tell us at which height the bottom row needs to be
-          drawn.
-        */
-        alignedTop = false;
-        alignedBottom = false;
-        if (y < topRows) {
-            alignedTop = true;
-            // We are at the top of the map
-            bottomRow = (getScreenHeight() / (halfHeight)) - 1;
-            if ((getScreenHeight() % (halfHeight)) != 0) {
-                bottomRow++;
-            }
-            topRow = 0;
-            bottomRowY = bottomRow * (halfHeight);
-            topRowY = 0;
-        } else if (y >= (game.getMap().getHeight() - bottomRows)) {
-            alignedBottom = true;
-            // We are at the bottom of the map
-            bottomRow = game.getMap().getHeight() - 1;
-
-            topRow = getScreenHeight() / (halfHeight);
-            if ((getScreenHeight() % (halfHeight)) > 0) {
-                topRow++;
-            }
-            topRow = game.getMap().getHeight() - topRow;
-
-            bottomRowY = getScreenHeight() - tileHeight;
-            topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
-        } else {
-            // We are not at the top of the map and not at the bottom
-            bottomRow = y + bottomRows - 1;
-            topRow = y - topRows;
-            bottomRowY = topSpace + (halfHeight) * bottomRows;
-            topRowY = topSpace - topRows * (halfHeight);
-        }
-
-        /*
-          PART 2
-          ======
-          Calculate: leftColumn, rightColumn, leftColumnX
-          This will tell us which columns need to be drawn on the screen (from
-          leftColumn until and including rightColumn).
-          leftColumnX will tell us at which x-coordinate the left
-          column needs to be drawn (this is for the Tiles where y&1 == 0;
-          the others should be halfWidth more to the right).
-        */
-
-        alignedLeft = false;
-        alignedRight = false;
-        if (x < leftColumns) {
-            // We are at the left side of the map
-            leftColumn = 0;
-
-            rightColumn = getScreenWidth() / tileWidth - 1;
-            if ((getScreenWidth() % tileWidth) > 0) {
-                rightColumn++;
-            }
-
-            leftColumnX = 0;
-            alignedLeft = true;
-        } else if (x >= (game.getMap().getWidth() - rightColumns)) {
-            // We are at the right side of the map
-            rightColumn = game.getMap().getWidth() - 1;
-
-            leftColumn = getScreenWidth() / tileWidth;
-            if ((getScreenWidth() % tileWidth) > 0) {
-                leftColumn++;
-            }
-
-            leftColumnX = getScreenWidth() - tileWidth - halfWidth -
-                leftColumn * tileWidth;
-            leftColumn = rightColumn - leftColumn;
-            alignedRight = true;
-        } else {
-            // We are not at the left side of the map and not at the right side
-            leftColumn = x - leftColumns;
-            rightColumn = x + rightColumns;
-            leftColumnX = (getScreenWidth() - tileWidth) / 2
-                - leftColumns * tileWidth;
-        }
-    }
-
-    /**
-     * Scroll the map in the given direction.
-     *
-     * @param direction The {@code Direction} to scroll in.
-     * @return True if scrolling occurred.
-     */
-    boolean scrollMap(Direction direction) {
-        Tile t = getFocus();
-        if (t == null) return false;
-        int fx = t.getX(), fy = t.getY();
-        if ((t = t.getNeighbourOrNull(direction)) == null) return false;
-        int tx = t.getX(), ty = t.getY();
-        int x, y;
-
-        // When already close to an edge, resist moving the focus closer,
-        // but if moving away immediately jump out of the `nearTo' area.
-        if (isMapNearTop(ty) && isMapNearTop(fy)) {
-            y = (ty <= fy) ? fy : topRows;
-        } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : getGame().getMap().getWidth()
-                - bottomRows;
-        } else {
-            y = ty;
-        }
-        if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
-            x = (tx <= fx) ? fx : getLeftColumns(ty);
-        } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
-            x = (tx >= fx) ? fx : getGame().getMap().getWidth()
-                - getRightColumns(ty);
-        } else {
-            x = tx;
-        }
-
-        if (x == fx && y == fy) return false;
-        getGUI().setFocus(getGame().getMap().getTile(x,y));
-        return true;
-    }
-
-    /**
-     * Is a y-coordinate near the bottom?
-     *
-     * @param y The y-coordinate.
-     * @return True if near the bottom.
-     */
-    private boolean isMapNearBottom(int y) {
-        return y >= getGame().getMap().getHeight() - bottomRows;
-    }
-
-    /**
-     * Is an x,y coordinate near the left?
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @return True if near the left.
-     */
-    private boolean isMapNearLeft(int x, int y) {
-        return x < getLeftColumns(y);
-    }
-
-    /**
-     * Is an x,y coordinate near the right?
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @return True if near the right.
-     */
-    private boolean isMapNearRight(int x, int y) {
-        return x >= getGame().getMap().getWidth() - getRightColumns(y);
-    }
-
-    /**
-     * Returns the amount of columns that are to the left of the Tile
-     * that is displayed in the center of the Map.
-     *
-     * @return The amount of columns that are to the left of the Tile
-     *     that is displayed in the center of the Map.
-     */
-    private int getLeftColumns() {
-        return getLeftColumns(getFocus().getY());
-    }
-
-    /**
-     * Returns the amount of columns that are to the left of the Tile
-     * with the given y-coordinate.
-     *
-     * @param y The y-coordinate of the Tile in question.
-     * @return The amount of columns that are to the left of the Tile
-     *     with the given y-coordinate.
-     */
-    private int getLeftColumns(int y) {
-        int leftColumns = leftSpace / tileWidth + 1;
-
-        if ((y & 1) == 0) {
-            if ((leftSpace % tileWidth) > 32) {
-                leftColumns++;
-            }
-        } else {
-            if ((leftSpace % tileWidth) == 0) {
-                leftColumns--;
-            }
-        }
-
-        return leftColumns;
-    }
-
-    /**
-     * Returns the amount of columns that are to the right of the Tile
-     * that is displayed in the center of the Map.
-     *
-     * @return The amount of columns that are to the right of the Tile
-     *     that is displayed in the center of the Map.
-     */
-    private int getRightColumns() {
-        return getRightColumns(getFocus().getY());
-    }
-
-    /**
-     * Returns the amount of columns that are to the right of the Tile
-     * with the given y-coordinate.
-     *
-     * @param y The y-coordinate of the Tile in question.
-     * @return The amount of columns that are to the right of the Tile
-     *     with the given y-coordinate.
-     */
-    private int getRightColumns(int y) {
-        int rightColumns = rightSpace / tileWidth + 1;
-
-        if ((y & 1) == 0) {
-            if ((rightSpace % tileWidth) == 0) {
-                rightColumns--;
-            }
-        } else {
-            if ((rightSpace % tileWidth) > 32) {
-                rightColumns++;
-            }
-        }
-
-        return rightColumns;
-    }
-
-    /**
-     * Is a y-coordinate near the top?
-     *
-     * @param y The y-coordinate.
-     * @return True if near the top.
-     */
-    private boolean isMapNearTop(int y) {
-        return y < topRows;
+    public void displayChat(GUIMessage message) {
+        this.chatDisplay.addMessage(message);
     }
 
     /**
      * Gets the unit that should be displayed on the given tile.
+     *
+     * Used mostly by displayMap, but public for SwingGUI.clickAt.
      *
      * @param unitTile The {@code Tile} to check.
      * @return The {@code Unit} to display or null if none found.
@@ -1177,55 +909,288 @@ public final class MapViewer extends FreeColClientHolder {
         return result;
     }
 
-
     /**
-     * Reset the scale of the map to the default.
+     * Scroll the map in the given direction.
+     *
+     * @param direction The {@code Direction} to scroll in.
+     * @return True if scrolling occurred.
      */
-    void resetMapScale() {
-        this.changeImageLibrary(new ImageLibrary());
-        updateMapDisplayVariables();
-    }
+    public boolean scrollMap(Direction direction) {
+        Tile t = getFocus();
+        if (t == null) return false;
+        final int fx = t.getX(), fy = t.getY();
+        if ((t = t.getNeighbourOrNull(direction)) == null) return false;
+        final int tx = t.getX(), ty = t.getY();
 
-    boolean isAtMaxMapScale() {
-        return getScale() >= MAP_SCALE_MAX;
-    }
-
-    boolean isAtMinMapScale() {
-        return getScale() <= MAP_SCALE_MIN;
-    }
-
-    void increaseMapScale() {
-        float newScale = getScale() + MAP_SCALE_STEP;
-        if (newScale >= MAP_SCALE_MAX)
-            newScale = MAP_SCALE_MAX;
-        this.changeImageLibrary(new ImageLibrary(newScale));
-        updateMapDisplayVariables();
-    }
-
-    void decreaseMapScale() {
-        float newScale = getScale() - MAP_SCALE_STEP;
-        if (newScale <= MAP_SCALE_MIN)
-            newScale = MAP_SCALE_MIN;
-        this.changeImageLibrary(new ImageLibrary(newScale));
-        updateMapDisplayVariables();
-    }
-
-    /**
-     * Update the *Space variables.
-     */
-    private void updateMapDisplayVariables() {
-        // Calculate the number of rows that will be drawn above the
-        // central tile
-        topSpace = (getScreenHeight() - tileHeight) / 2;
-        if ((topSpace % (halfHeight)) != 0) {
-            topRows = topSpace / (halfHeight) + 2;
+        final Map map = getMap();
+        final int mapHeight = map.getHeight(), mapWidth = map.getWidth();
+        int x, y;
+        // When already close to an edge, resist moving the focus closer,
+        // but if moving away immediately jump out of the `nearTo' area.
+        if (isMapNearTop(ty) && isMapNearTop(fy)) {
+            y = (ty <= fy) ? fy : this.centerRows;
+        } else if (isMapNearBottom(ty, mapHeight)
+            && isMapNearBottom(fy, mapHeight)) {
+            y = (ty >= fy) ? fy : mapHeight - this.centerRows;
         } else {
-            topRows = topSpace / (halfHeight) + 1;
+            y = ty;
         }
-        bottomRows = topRows;
-        leftSpace = (getScreenWidth() - tileWidth) / 2;
-        rightSpace = leftSpace;
+        if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
+            x = (tx <= fx) ? fx : getLeftColumns(ty);
+        } else if (isMapNearRight(tx, ty, mapWidth)
+            && isMapNearRight(fx, fy, mapWidth)) {
+            x = (tx >= fx) ? fx : mapWidth - getRightColumns(ty);
+        } else {
+            x = tx;
+        }
+
+        if (x == fx && y == fy) return false;
+        changeFocus(map.getTile(x, y));
+        return true;
     }
+
+
+    // Path wrangling, path variables are in MapViewer for displayMap
+    
+    /**
+     * Change the goto path.
+     * 
+     * @param gotoPath The new goto {@code PathNode}.
+     * @return True if the goto path was changed.
+     */
+    public boolean changeGotoPath(PathNode gotoPath) {
+        if (this.gotoPath == gotoPath) return false;
+        this.gotoPath = gotoPath;
+        forceReposition();
+        return true;
+    }
+
+    /**
+     * Get the current goto path.
+     *
+     * @return The goto {@code PathNode}.
+     */
+    public PathNode getGotoPath() {
+        return this.gotoPath;
+    }
+
+    /**
+     * Set the current active unit path.
+     *
+     * @param path The new {@code PathNode}.
+     */
+    public void setUnitPath(PathNode path) {
+        this.unitPath = path;
+    }
+
+
+    // Scale and size
+
+    /**
+     * Change the scale of the map.
+     *
+     * @param newScale The new map scale.
+     */
+    public void changeScale(float newScale) {
+        this.lib.changeScaleFactor(newScale);
+        this.tv.updateScaledVariables();
+        updateScaledVariables();
+    }
+
+    /**
+     * Change the displayed map size.
+     *
+     * @param size The new map size.
+     */
+    public void changeSize(Dimension size) {
+        this.size = size;
+        updateSizeVariables();
+        forceReposition(); // TODO: needed?
+    }
+
+
+    // View Mode and associates
+
+    /**
+     * Get the view mode.
+     *
+     * @return The view mode.
+     */
+    public ViewMode getViewMode() {
+        return this.viewMode;
+    }
+
+    /**
+     * Set the view mode.
+     *
+     * @param vm The new {@code ViewMode}.
+     */
+    public void setViewMode(ViewMode vm) {
+        this.viewMode = vm;
+    }
+    
+    /**
+     * Gets the active unit.
+     *
+     * @return The {@code Unit}.
+     */
+    public Unit getActiveUnit() {
+        return this.activeUnit;
+    }
+
+    /**
+     * Sets the active unit.
+     *
+     * @param activeUnit The new active {@code Unit}.
+     */
+    public void setActiveUnit(Unit activeUnit) {
+        this.activeUnit = activeUnit;
+    }
+
+    /**
+     * Gets the selected tile.
+     *
+     * @return The {@code Tile} selected.
+     */
+    public Tile getSelectedTile() {
+        return this.selectedTile;
+    }
+
+    /**
+     * Sets the selected tile.
+     *
+     * @param tile The new selected {@code Tile}.
+     */
+    public void setSelectedTile(Tile tile) {
+        this.selectedTile = tile;
+    }
+
+    /**
+     * Get either the tile with the active unit or the selected tile,
+     * but only if it is visible.
+     *
+     * Used to determine where to display the cursor, for displayMap and
+     * and the cursor action listener.
+     *
+     * @return The {@code Tile} found or null.
+     */
+    public Tile getCursorTile() {
+        Tile ret = null;
+        switch (this.viewMode) {
+        case MOVE_UNITS:
+            if (this.activeUnit != null) ret = this.activeUnit.getTile();
+            break;
+        case TERRAIN:
+            ret = this.selectedTile;
+            break;
+        default:
+            break;
+        }
+        return (isTileVisible(ret)) ? ret : null;
+    }
+
+
+    // TODO below
+
+    /**
+     * Force the next screen repaint to reposition the tiles on the window.
+     */
+    public void forceReposition() {
+        bottomRow = -1;
+    }
+    
+    private void repositionMapIfNeeded() {
+        if (bottomRow < 0 && this.focus != null) positionMap(this.focus);
+    }
+
+    /**
+     * Position the map so that the supplied tile is displayed at the center.
+     *
+     * @param pos The {@code Tile} to center at.
+     */
+    private void positionMap(Tile pos) {
+        final int x = pos.getX(), y = pos.getY();
+        final Map map = getMap();
+        final int mapWidth = map.getWidth(), mapHeight = map.getHeight();
+        int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
+
+        /*
+          PART 1
+          ======
+          Calculate: bottomRow, topRow, topRowY
+          This will tell us which rows need to be drawn on the screen (from
+          bottomRow until and including topRow).
+        */
+        alignedTop = false;
+        alignedBottom = false;
+        if (isMapNearTop(y)) {
+            alignedTop = true; // We are at the top of the map
+            bottomRow = (this.size.height / this.halfHeight) - 1;
+            if ((this.size.height % this.halfHeight) != 0) {
+                bottomRow++;
+            }
+            topRow = 0;
+
+            topRowY = 0;
+        } else if (isMapNearBottom(y, mapHeight)) {
+            alignedBottom = true; // We are at the bottom of the map
+            bottomRow = mapHeight - 1;
+
+            topRow = this.size.height / this.halfHeight;
+            if ((this.size.height % this.halfHeight) > 0) {
+                topRow++;
+            }
+            topRow = mapHeight - topRow;
+                
+            topRowY = (size.height - this.tileHeight)
+                - (bottomRow - topRow) * this.halfHeight;
+        } else { // We are not at the top of the map and not at the bottom
+            bottomRow = y + this.centerRows - 1;
+            topRow = y - this.centerRows;
+
+            topRowY = this.vSpace - this.centerRows * this.halfHeight;
+        }
+
+        /*
+          PART 2
+          ======
+          Calculate: leftColumn, rightColumn, leftColumnX
+          This will tell us which columns need to be drawn on the screen (from
+          leftColumn until and including rightColumn).
+          leftColumnX will tell us at which x-coordinate the left
+          column needs to be drawn (this is for the Tiles where y&1 == 0;
+          the others should be halfWidth more to the right).
+        */
+        alignedLeft = false;
+        alignedRight = false;
+        if (isMapNearLeft(x, y)) {
+            alignedLeft = true; // We are at the left side of the map
+            leftColumn = 0;
+            rightColumn = this.size.width / this.tileWidth - 1;
+            if ((this.size.width % this.tileWidth) > 0) {
+                rightColumn++;
+            }
+
+            leftColumnX = 0;
+        } else if (isMapNearRight(x, y, mapWidth)) {
+            alignedRight = true; // We are at the right side of the map
+            rightColumn = mapWidth - 1;
+            leftColumn = this.size.width / this.tileWidth;
+            if ((this.size.width % this.tileWidth) > 0) {
+                leftColumn++;
+            }
+            leftColumnX = this.size.width - this.tileWidth - this.halfWidth
+                - leftColumn * this.tileWidth;
+            leftColumn = rightColumn - leftColumn;
+        } else { // We are not at the left of the map and not at the right
+            leftColumn = x - leftColumns;
+            rightColumn = x + rightColumns;
+
+            leftColumnX = (this.size.width - this.tileWidth) / 2
+                - leftColumns * this.tileWidth;
+        }
+    }
+
 
     /**
      * Displays the Map.
@@ -1235,12 +1200,11 @@ public final class MapViewer extends FreeColClientHolder {
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
     public void displayMap(Graphics2D g2d) {
-        //final long now = now();
         final ClientOptions options = getClientOptions();
         final int colonyLabels
             = options.getInteger(ClientOptions.COLONY_LABELS);
-        final Game game = getGame();
-        final Map map = game.getMap();
+        final boolean revengeMode = getGame().isInRevengeMode();
+        final Map map = getMap();
         final Player player = getMyPlayer(); // Check, can be null in map editor
 
         // Remember transform
@@ -1251,17 +1215,17 @@ public final class MapViewer extends FreeColClientHolder {
         repositionMapIfNeeded();
 
         // Determine which tiles need to be redrawn
-        int firstRow = (clipBounds.y - topRowY) / (halfHeight) - 1;
-        int clipTopY = topRowY + firstRow * (halfHeight);
+        int firstRow = (clipBounds.y - topRowY) / this.halfHeight - 1;
+        int clipTopY = topRowY + firstRow * this.halfHeight;
         firstRow = topRow + firstRow;
-        int firstColumn = (clipBounds.x - leftColumnX) / tileWidth - 1;
-        int clipLeftX = leftColumnX + firstColumn * tileWidth;
+        int firstColumn = (clipBounds.x - leftColumnX) / this.tileWidth - 1;
+        int clipLeftX = leftColumnX + firstColumn * this.tileWidth;
         firstColumn = leftColumn + firstColumn;
         int lastRow = (clipBounds.y + clipBounds.height - topRowY)
-            / (halfHeight);
+            / this.halfHeight;
         lastRow = topRow + lastRow;
         int lastColumn = (clipBounds.x + clipBounds.width - leftColumnX)
-            / tileWidth;
+            / this.tileWidth;
         lastColumn = leftColumn + lastColumn;
 
         // Clear background
@@ -1287,8 +1251,9 @@ public final class MapViewer extends FreeColClientHolder {
         for (Tile t : baseTiles) {
             final int x = t.getX();
             final int y = t.getY();
-            final int xt = (x-x0) * tileWidth + (((y&1)==1) ? halfWidth : 0);
-            final int yt = (y-y0) * halfHeight;
+            final int xt = (x-x0) * this.tileWidth
+                + (((y&1)==1) ? this.halfWidth : 0);
+            final int yt = (y-y0) * this.halfHeight;
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
@@ -1302,22 +1267,22 @@ public final class MapViewer extends FreeColClientHolder {
             // Generate a zigzag GeneralPath
             GeneralPath gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
-            int nextX = halfWidth;
-            int nextY = -halfHeight;
+            int nextX = this.halfWidth;
+            int nextY = -this.halfHeight;
             for (int i = 0; i <= ((lastColumn - firstColumn) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
-                nextX += halfWidth;
-                nextY = (nextY == 0 ? -halfHeight : 0);
+                nextX += this.halfWidth;
+                nextY = (nextY == 0) ? -this.halfHeight : 0;
             }
 
             // Display the grid
-            g2d.setStroke(gridStroke);
+            g2d.setStroke(this.gridStroke);
             g2d.setColor(Color.BLACK);
             for (int row = firstRow; row <= lastRow; row++) {
-                g2d.translate(0, halfHeight);
+                g2d.translate(0, this.halfHeight);
                 AffineTransform rowTransform = g2d.getTransform();
                 if ((row & 1) == 1) {
-                    g2d.translate(halfWidth, 0);
+                    g2d.translate(this.halfWidth, 0);
                 }
                 g2d.draw(gridPath);
                 g2d.setTransform(rowTransform);
@@ -1337,8 +1302,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
                 displayTerritorialBorders(g2d, t, BorderType.REGION, true);
@@ -1357,8 +1323,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
                 displayTerritorialBorders(g2d, t, BorderType.COUNTRY, true);
@@ -1388,7 +1355,8 @@ public final class MapViewer extends FreeColClientHolder {
                 if (!t.isExplored() || player.canSee(t)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth + (y&1) * this.halfWidth;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
                 final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
@@ -1399,20 +1367,19 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display the Tile overlays
-        Set<String> overlayCache = ImageLibrary.createOverlayCache();
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
         xt0 = yt0 = 0;
         for (Tile t : baseTiles) {
             if (!t.isExplored()) continue;
             final int x = t.getX();
             final int y = t.getY();
-            final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-            final int yt = (y-y0) * halfHeight;
+            final int xt = (x-x0) * this.tileWidth
+                + (y&1) * this.halfWidth;
+            final int yt = (y-y0) * this.halfHeight;
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
             
-            BufferedImage overlayImage
-                = lib.getScaledOverlayImage(t, overlayCache);
+            BufferedImage overlayImage = this.lib.getScaledOverlayImage(t);
             RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
             this.tv.displayTileItems(g2d, t, rop, overlayImage);
             this.tv.displaySettlementWithChipsOrPopulationNumber(g2d, t,
@@ -1435,8 +1402,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1456,8 +1424,9 @@ public final class MapViewer extends FreeColClientHolder {
             for (Tile t : extendedTiles) {
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1467,15 +1436,16 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display cursor for selected tile or active unit
-        final Tile cursorTile = getActiveTile();
+        final Tile cursorTile = getCursorTile();
         if (cursorTile != null && this.cursor.isActive()) {
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
             if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt, yt);
-                g2d.drawImage(lib.getScaledImage(ImageLibrary.UNIT_SELECT),
+                g2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT),
                               0, 0, null);
                 g2d.translate(-xt, -yt);
             }
@@ -1483,7 +1453,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display units
         g2d.setColor(Color.BLACK);
-        if (!game.isInRevengeMode()) {
+        if (!revengeMode) {
             xt0 = yt0 = 0;
             for (Tile t : baseTiles) {
                 // check for units
@@ -1491,8 +1461,9 @@ public final class MapViewer extends FreeColClientHolder {
                 if (unit == null || isOutForAnimation(unit)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1502,7 +1473,8 @@ public final class MapViewer extends FreeColClientHolder {
         } else {
             /* Add extra rows and colums, as the dark halo is huge to enable
                a very slow fade into transparency, see BR#2580 */
-            BufferedImage darkness = lib.getScaledImage(ImageLibrary.DARKNESS);
+            BufferedImage darkness
+                = this.lib.getScaledImage(ImageLibrary.DARKNESS);
             xt0 = yt0 = 0;
             for (Tile t : map.subMap(x0-2, y0-4, lastColumn-firstColumn+1+4,
                                                  lastRow-firstRow+1+8)) {
@@ -1511,8 +1483,9 @@ public final class MapViewer extends FreeColClientHolder {
                 if (unit == null || isOutForAnimation(unit)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
 
@@ -1539,8 +1512,9 @@ public final class MapViewer extends FreeColClientHolder {
                 if (settlement == null) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g2d.translate(xt - xt0, yt - yt0); 
                 xt0 = xt; yt0 = yt;
                 RescaleOp rop = (player == null || player.canSee(t))
@@ -1560,15 +1534,7 @@ public final class MapViewer extends FreeColClientHolder {
         else if (this.gotoPath != null) displayPath(g2d, this.gotoPath);
 
         // Draw the chat
-        this.chatDisplay.display(g2d, this.lib, this.size);
-
-        // Timing log
-        //final long gap = now() - now;
-        //logger.finest("displayMap time = " + gap
-        //    + " for " + firstColumn + " " + firstRow
-        //    + " to " + lastColumn + " " + lastRow
-        //    + " average "
-        //    + ((double)gap) / ((lastRow-firstRow) * (lastColumn-firstColumn)));
+        this.chatDisplay.display(g2d, this.size);
     }
 
     private void displaySettlementLabels(Graphics2D g2d, Settlement settlement,
@@ -1584,13 +1550,14 @@ public final class MapViewer extends FreeColClientHolder {
 
         Color backgroundColor = settlement.getOwner().getNationColor();
         if (backgroundColor == null) backgroundColor = Color.WHITE;
-        // int yOffset = lib.getSettlementImage(settlement).getHeight() + 1;
-        int yOffset = tileHeight;
+        // int yOffset = this.lib.getSettlementImage(settlement).getHeight() + 1;
+        int yOffset = this.tileHeight;
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
-            BufferedImage img = lib.getStringImage(g2d, name, backgroundColor,
-                                                   this.fontNormal);
-            g2d.drawImage(img, rop, (tileWidth - img.getWidth())/2 + 1, yOffset);
+            BufferedImage img = this.lib.getStringImage(g2d, name, backgroundColor,
+                                                        this.fontNormal);
+            g2d.drawImage(img, rop, (this.tileWidth - img.getWidth())/2 + 1,
+                          yOffset);
             break;
 
         case ClientOptions.COLONY_LABELS_MODERN:
@@ -1603,7 +1570,7 @@ public final class MapViewer extends FreeColClientHolder {
                 && settlement.getOwner() == player) {
                 Colony colony = (Colony) settlement;
                 BuildableType buildable = colony.getCurrentlyBuilding();
-                if (buildable != null) {
+                if (buildable != null && this.fontProduction != null) {
                     specs = new TextSpecification[2];
                     String t = Messages.getName(buildable) + " " +
                         Turn.getTurnsText(colony.getTurnsToComplete(buildable));
@@ -1652,23 +1619,19 @@ public final class MapViewer extends FreeColClientHolder {
                 }
             }
             
-            int width = (int)((nameImage.getWidth() * getScale())
-                + ((leftImage != null)
-                    ? (leftImage.getWidth() * getScale()) + spacing
-                    : 0)
-                + ((rightImage != null)
-                    ? (rightImage.getWidth() * getScale()) + spacing
-                    : 0));
-            int labelOffset = (tileWidth - width)/2;
-            yOffset -= (nameImage.getHeight() * getScale())/2;
+            int width = this.lib.scaleInt(nameImage.getWidth()
+                + ((leftImage == null) ? 0 : leftImage.getWidth() + spacing)
+                + ((rightImage == null) ? 0 : rightImage.getWidth() + spacing));
+            int xOffset = (this.tileWidth - width)/2;
+            yOffset -= this.lib.scaleInt(nameImage.getHeight())/2;
             if (leftImage != null) {
-                g2d.drawImage(leftImage, rop, labelOffset, yOffset);
-                labelOffset += (leftImage.getWidth() * getScale()) + spacing;
+                g2d.drawImage(leftImage, rop, xOffset, yOffset);
+                xOffset += this.lib.scaleInt(leftImage.getWidth() + spacing);
             }
-            g2d.drawImage(nameImage, rop, labelOffset, yOffset);
+            g2d.drawImage(nameImage, rop, xOffset, yOffset);
             if (rightImage != null) {
-                labelOffset += (nameImage.getWidth() * getScale()) + spacing;
-                g2d.drawImage(rightImage, rop, labelOffset, yOffset);
+                xOffset += this.lib.scaleInt(nameImage.getWidth() + spacing);
+                g2d.drawImage(rightImage, rop, xOffset, yOffset);
             }
             break;
         }
@@ -1871,25 +1834,30 @@ public final class MapViewer extends FreeColClientHolder {
                 ? ImageLibrary.getPathImage(this.activeUnit)
                 : null;
 
-            BufferedImage turns = (p.getTurns() <= 0) ? null
-                : lib.getStringImage(g2d, Integer.toString(p.getTurns()),
-                                     Color.WHITE, this.fontTiny);
-            g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
-
-            if (debug) { // More detailed display
-                if (this.activeUnit != null) {
-                    image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
+            BufferedImage turns = null;
+            if (this.fontTiny != null) {
+                if (debug) { // More detailed display
+                    if (this.activeUnit != null) {
+                        image = ImageLibrary.getPathNextTurnImage(this.activeUnit);
+                    }
+                    turns = this.lib.getStringImage(g2d,
+                        Integer.toString(p.getTurns())
+                        + "/" + Integer.toString(p.getMovesLeft()),
+                        Color.WHITE, this.fontTiny);
+                } else {
+                    turns = (p.getTurns() <= 0) ? null
+                        : this.lib.getStringImage(g2d,
+                            Integer.toString(p.getTurns()),
+                            Color.WHITE, this.fontTiny);
                 }
-                turns = lib.getStringImage(g2d, Integer.toString(p.getTurns())
-                    + "/" + Integer.toString(p.getMovesLeft()),
-                    Color.WHITE, this.fontTiny);
+                g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
             }
 
             g2d.translate(point.x, point.y);
             if (image == null) {
-                g2d.fillOval(halfWidth, halfHeight, 10, 10);
+                g2d.fillOval(this.halfWidth, this.halfHeight, 10, 10);
                 g2d.setColor(Color.BLACK);
-                g2d.drawOval(halfWidth, halfHeight, 10, 10);
+                g2d.drawOval(this.halfWidth, this.halfHeight, 10, 10);
             } else {
                 this.tv.displayCenteredImage(g2d, image);
                 if (turns != null) {
@@ -1915,15 +1883,14 @@ public final class MapViewer extends FreeColClientHolder {
         boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
             || (unit.hasTile()
                 && player != null && !player.canSee(unit.getTile()));
-        BufferedImage image = lib.getScaledUnitImage(unit, fade);
+        BufferedImage image = this.lib.getScaledUnitImage(unit, fade);
         Point p = calculateUnitImagePositionInTile(image);
         g2d.drawImage(image, p.x, p.y, null);
 
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
-        g2d.drawImage(lib.getOccupationIndicatorChip(g2d, unit, text),
-                    (int)(TileViewer.STATE_OFFSET_X * getScale()), 0,
-                    null);
+        g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
+                      this.lib.scaleInt(TileViewer.STATE_OFFSET_X), 0, null);
 
         // Draw one small line for each additional unit (like in civ3).
         int unitsOnTile = 0;
@@ -1937,10 +1904,10 @@ public final class MapViewer extends FreeColClientHolder {
         if (unitsOnTile > 1) {
             g2d.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
-            int x1 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
-                * getScale());
-            int x2 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
-                    + OTHER_UNITS_WIDTH) * getScale());
+            int x1 = this.lib.scaleInt(TileViewer.STATE_OFFSET_X
+                + OTHER_UNITS_OFFSET_X);
+            int x2 = this.lib.scaleInt(TileViewer.STATE_OFFSET_X
+                + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH);
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                 g2d.drawLine(x1, unitLinesY, x2, unitLinesY);
                 unitLinesY += 2;
@@ -1975,10 +1942,9 @@ public final class MapViewer extends FreeColClientHolder {
      * @return The coordinates where the unit should be drawn on screen
      */
     private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
-        int unitX = (tileWidth - unitImage.getWidth()) / 2;
-        int unitY = (tileHeight - unitImage.getHeight()) / 2 -
-                    (int) (UNIT_OFFSET * getScale());
-
+        int unitX = (this.tileWidth - unitImage.getWidth()) / 2;
+        int unitY = (this.tileHeight - unitImage.getHeight()) / 2
+            - this.lib.scaleInt(UNIT_OFFSET);
         return new Point(unitX, unitY);
     }
 
@@ -1998,7 +1964,7 @@ public final class MapViewer extends FreeColClientHolder {
         if ((type == BorderType.COUNTRY && owner != null)
             || (type == BorderType.REGION && region != null)) {
             Stroke oldStroke = g2d.getStroke();
-            g2d.setStroke(borderStroke);
+            g2d.setStroke(this.borderStroke);
             Color oldColor = g2d.getColor();
             Color c = null;
             if (type == BorderType.COUNTRY)
@@ -2009,8 +1975,8 @@ public final class MapViewer extends FreeColClientHolder {
                                  (opaque) ? 255 : 100);
             g2d.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            path.moveTo(borderPoints.get(Direction.longSides.get(0)).x,
-                        borderPoints.get(Direction.longSides.get(0)).y);
+            path.moveTo(this.borderPoints.get(Direction.longSides.get(0)).x,
+                        this.borderPoints.get(Direction.longSides.get(0)).y);
             for (Direction d : Direction.longSides) {
                 Tile otherTile = tile.getNeighbourOrNull(d);
                 Direction next = d.getNextDirection();
@@ -2024,51 +1990,51 @@ public final class MapViewer extends FreeColClientHolder {
                         || (type == BorderType.COUNTRY && !owner.owns(tile2))
                         || (type == BorderType.REGION && tile2.getRegion() != region)) {
                         // small corner
-                        path.lineTo(borderPoints.get(next).x,
-                                    borderPoints.get(next).y);
-                        path.quadTo(controlPoints.get(next).x,
-                                    controlPoints.get(next).y,
-                                    borderPoints.get(next2).x,
-                                    borderPoints.get(next2).y);
+                        path.lineTo(this.borderPoints.get(next).x,
+                                    this.borderPoints.get(next).y);
+                        path.quadTo(this.controlPoints.get(next).x,
+                                    this.controlPoints.get(next).y,
+                                    this.borderPoints.get(next2).x,
+                                    this.borderPoints.get(next2).y);
                     } else {
                         int dx = 0, dy = 0;
                         switch(d) {
-                        case NW: dx = halfWidth; dy = -halfHeight; break;
-                        case NE: dx = halfWidth; dy = halfHeight; break;
-                        case SE: dx = -halfWidth; dy = halfHeight; break;
-                        case SW: dx = -halfWidth; dy = -halfHeight; break;
+                        case NW: dx = this.halfWidth; dy = -this.halfHeight; break;
+                        case NE: dx = this.halfWidth; dy = this.halfHeight; break;
+                        case SE: dx = -this.halfWidth; dy = this.halfHeight; break;
+                        case SW: dx = -this.halfWidth; dy = -this.halfHeight; break;
                         default: break;
                         }
                         if (tile1 != null
                             && ((type == BorderType.COUNTRY && owner.owns(tile1))
                                 || (type == BorderType.REGION && tile1.getRegion() == region))) {
                             // short straight line
-                            path.lineTo(borderPoints.get(next).x,
-                                        borderPoints.get(next).y);
+                            path.lineTo(this.borderPoints.get(next).x,
+                                        this.borderPoints.get(next).y);
                             // big corner
                             Direction previous = d.getPreviousDirection();
                             Direction previous2 = previous.getPreviousDirection();
                             int ddx = 0, ddy = 0;
                             switch(d) {
-                            case NW: ddy = -tileHeight; break;
-                            case NE: ddx = tileWidth; break;
-                            case SE: ddy = tileHeight; break;
-                            case SW: ddx = -tileWidth; break;
+                            case NW: ddy = -this.tileHeight; break;
+                            case NE: ddx = this.tileWidth; break;
+                            case SE: ddy = this.tileHeight; break;
+                            case SW: ddx = -this.tileWidth; break;
                             default: break;
                             }
-                            path.quadTo(controlPoints.get(previous).x + dx,
-                                        controlPoints.get(previous).y + dy,
-                                        borderPoints.get(previous2).x + ddx,
-                                        borderPoints.get(previous2).y + ddy);
+                            path.quadTo(this.controlPoints.get(previous).x + dx,
+                                        this.controlPoints.get(previous).y + dy,
+                                        this.borderPoints.get(previous2).x + ddx,
+                                        this.borderPoints.get(previous2).y + ddy);
                         } else {
                             // straight line
-                            path.lineTo(borderPoints.get(d).x + dx,
-                                        borderPoints.get(d).y + dy);
+                            path.lineTo(this.borderPoints.get(d).x + dx,
+                                        this.borderPoints.get(d).y + dy);
                         }
                     }
                 } else {
-                    path.moveTo(borderPoints.get(next2).x,
-                                borderPoints.get(next2).y);
+                    path.moveTo(this.borderPoints.get(next2).x,
+                                this.borderPoints.get(next2).y);
                 }
             }
             g2d.draw(path);

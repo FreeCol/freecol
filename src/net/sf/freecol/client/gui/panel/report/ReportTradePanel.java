@@ -84,12 +84,9 @@ public final class ReportTradePanel extends ReportPanel {
         reportPanel.removeAll();
         goodsHeader.removeAll();
 
-        ImageLibrary lib = getImageLibrary();
-
         String layoutConstraints = "insets 0, gap 0 0";
         String columnConstraints = "[25%!, fill]["
-            + Math.round(lib.getScaleFactor()
-                * (ImageLibrary.ICON_SIZE.width * 1.25f))
+            + (int)Math.round(ImageLibrary.ICON_SIZE.width * 1.25)
             + "!, fill]";
         String rowConstraints = "[fill]";
 
@@ -100,14 +97,14 @@ public final class ReportTradePanel extends ReportPanel {
         goodsHeader.setOpaque(true);
 
         JLabel emptyLabel = new JLabel();
-        emptyLabel.setBorder(Utility.TOPLEFTCELLBORDER);
+        emptyLabel.setBorder(Utility.getTopLeftCellBorder());
         goodsHeader.add(emptyLabel, "cell 0 0");
         
         /**
          * Total Units Sold by Player
          */
         JLabel jl = createLeftLabel("report.trade.unitsSold");
-        jl.setBorder(Utility.TOPLEFTCELLBORDER);
+        jl.setBorder(Utility.getTopLeftCellBorder());
         reportPanel.add(jl, "cell 0 0");
         reportPanel.add(createLeftLabel("report.trade.beforeTaxes"), "cell 0 1");
         reportPanel.add(createLeftLabel("report.trade.afterTaxes"), "cell 0 2");
@@ -132,11 +129,11 @@ public final class ReportTradePanel extends ReportPanel {
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            goodsHeader.add(new MarketLabel(lib, goodsType, market)
+            goodsHeader.add(new MarketLabel(freeColClient, goodsType, market)
                 .addBorder());
 
             jl = createNumberLabel(sales);
-            jl.setBorder(Utility.TOPCELLBORDER);
+            jl.setBorder(Utility.getTopCellBorder());
             reportPanel.add(jl, "cell " + column + " 0");
             reportPanel.add(createNumberLabel(beforeTaxes),
                             "cell " + column + " 1");
@@ -159,8 +156,8 @@ public final class ReportTradePanel extends ReportPanel {
             if (colony.hasAbility(Ability.EXPORT)) {
                 colonyButton.setText(colonyButton.getText() + "*");
             }
-            colonyButton.setBorder((first) ? Utility.TOPLEFTCELLBORDER
-                : Utility.LEFTCELLBORDER);
+            colonyButton.setBorder((first) ? Utility.getTopLeftCellBorder()
+                : Utility.getLeftCellBorder());
             reportPanel.add(colonyButton, "cell 0 " + row + " 1 2");
 
             column = 0;
@@ -169,8 +166,8 @@ public final class ReportTradePanel extends ReportPanel {
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount),
                                                JLabel.TRAILING);
-                goodsLabel.setBorder((first) ? Utility.TOPCELLBORDER
-                    : Utility.CELLBORDER);
+                goodsLabel.setBorder((first) ? Utility.getTopCellBorder()
+                    : Utility.getCellBorder());
                 goodsLabel.setForeground(ImageLibrary.getGoodsColor(goodsType, amount,
                                                              colony));
                 ExportData ed = colony.getExportData(goodsType);
@@ -221,7 +218,7 @@ public final class ReportTradePanel extends ReportPanel {
 
     private JLabel createLeftLabel(String key) {
         JLabel result = Utility.localizedLabel(key);
-        result.setBorder(Utility.LEFTCELLBORDER);
+        result.setBorder(Utility.getLeftCellBorder());
         return result;
     }
 
@@ -231,7 +228,7 @@ public final class ReportTradePanel extends ReportPanel {
 
     private JLabel createNumberLabel(int value, boolean alwaysAddSign) {
         JLabel result = new JLabel(String.valueOf(value), JLabel.TRAILING);
-        result.setBorder(Utility.CELLBORDER);
+        result.setBorder(Utility.getCellBorder());
         if (value < 0) {
             result.setForeground(Color.RED);
         } else if (alwaysAddSign && value > 0) {

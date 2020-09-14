@@ -69,6 +69,7 @@ import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -471,7 +472,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
             }
 
-            JLabel imageLabel = new JLabel(new ImageIcon(ImageLibrary
+            JLabel imageLabel = new JLabel(new ImageIcon(getImageLibrary()
                     .getBuildableTypeImage(value, buildingDimension)));
             JLabel nameLabel = new JLabel(Messages.getName(value));
             String reason = lockReasons.get(value);
@@ -589,13 +590,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             };
 
         // Create Font choice
-        Font fontSubHead = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, getGUI().getMapScale());
+        Font fontSubHead = FontLibrary.getUnscaledFont("normal-bold-smaller");
         
         // Create the components
-        JLabel header = Utility.localizedHeaderLabel(
-            "buildQueuePanel.buildQueue",
-            SwingConstants.LEADING, FontLibrary.FontSize.BIG);
+        JLabel header
+            = Utility.localizedHeaderLabel("buildQueuePanel.buildQueue",
+                                           SwingConstants.LEADING,
+                                           Utility.FONTSPEC_TITLE);
         
         // JLabel SubHeads
         JLabel bqpUnits = Utility.localizedLabel("buildQueuePanel.units");

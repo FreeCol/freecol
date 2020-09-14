@@ -107,9 +107,10 @@ public class CargoPanel extends FreeColPanel
         removeAll();
 
         if (carrier != null) {
-            DragListener dl = new DragListener(getFreeColClient(), this);
+            final FreeColClient fcc = getFreeColClient();
+            DragListener dl = new DragListener(fcc, this);
             for (Unit unit : carrier.getUnitList()) {
-                UnitLabel label = new UnitLabel(getFreeColClient(), unit);
+                UnitLabel label = new UnitLabel(fcc, unit);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(dl);
@@ -118,7 +119,7 @@ public class CargoPanel extends FreeColPanel
             }
 
             for (Goods g : carrier.getGoodsList()) {
-                GoodsLabel label = new GoodsLabel(getGUI(), g);
+                GoodsLabel label = new GoodsLabel(fcc, g);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(dl);

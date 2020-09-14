@@ -41,6 +41,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,23 +68,22 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 // Special case panels, TODO: can we move these to Widgets?
-import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
@@ -99,18 +99,11 @@ public final class Canvas extends JDesktopPane {
 
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
-    public static enum PopupPosition {
-        ORIGIN,
-        CENTERED,
-        CENTERED_LEFT,
-        CENTERED_RIGHT,
-    }
-
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
     /** The cursor to show for goto operations. */
-    private static final java.awt.Cursor GO_CURSOR
+    public static final java.awt.Cursor GO_CURSOR
         = (java.awt.Cursor)UIManager.get("cursor.go");
     
     /** A class for frames being used as tool boxes. */
@@ -131,20 +124,21 @@ public final class Canvas extends JDesktopPane {
     /** Remember the current size (from getSize()), check for changes. */
     private Dimension oldSize;
 
-    /** The component that displays the map. */
+    /**
+     * The component that displays the map.
+     * Ideally this would be completely separate, but the displayMap
+     * (and possibly changeSize) call/s means we must retain a reference
+     * to the map viewer.
+     * We also use it for the Cursor, which remains in MapViewer so
+     * that displayMap can draw it when active needed.
+     */
     private final MapViewer mapViewer;
 
     /** The various sorts of map controls. */
     private MapControls mapControls;
 
-    /** Has a goto operation started? */
-    private boolean gotoStarted = false;
-
     /** The special overlay used when it is not the player turn. */
     private GrayLayer greyLayer;
-
-    /** The chat message area. */
-    private final ChatDisplay chatDisplay;
 
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
@@ -187,7 +181,6 @@ public final class Canvas extends JDesktopPane {
         this.mapViewer = mapViewer;
         this.mapControls = mapControls;
         this.greyLayer = new GrayLayer(freeColClient);
-        this.chatDisplay = new ChatDisplay();
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -202,7 +195,6 @@ public final class Canvas extends JDesktopPane {
         }
 
         this.parentFrame.setVisible(true);
-        this.mapViewer.startCursorBlinking();
         logger.info("Canvas created with bounds: " + windowBounds);
     }
 
@@ -245,26 +237,6 @@ public final class Canvas extends JDesktopPane {
             this.parentFrame.dispose();
             this.parentFrame = null;
         }
-    }
-
-    /**
-     * If the canvas been resized, resize the map and reposition the
-     * map controls.
-     *
-     * @return The {@code Dimension} for the canvas.
-     */
-    private Dimension checkResize() {
-        Dimension newSize = getSize();
-        if (this.oldSize.width != newSize.width
-            || this.oldSize.height != newSize.height) {
-            logger.info("Canvas resize from " + this.oldSize
-                + " to " + newSize);
-            this.oldSize = newSize;
-            boolean add = removeMapControls();
-            mapViewer.changeSize(newSize);
-            if (add) addMapControls();
-        }
-        return newSize;
     }
 
     /**
@@ -364,7 +336,6 @@ public final class Canvas extends JDesktopPane {
         try {
             f.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {}
-
         return f;
     }
 
@@ -401,10 +372,41 @@ public final class Canvas extends JDesktopPane {
         try {
             add(comp, layer);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + layer
-                + ") failed.", e);
+            logger.log(Level.WARNING, "addToCanvas("
+                + comp.getClass().getSimpleName()
+                + " at " + comp.getX() + "," + comp.getY()
+                + " on layer " + layer + ") failed.", e);
         }
     }
+
+    /**
+     * Gets the internal frame for the given component.
+     *
+     * @param c The {@code Component}.
+     * @return The given component if this is an internal frame or the
+     *     first parent that is an internal frame.  Returns
+     *     {@code null} if no internal frame is found.
+     */
+    private JInternalFrame getInternalFrame(final Component c) {
+        Component temp = c;
+
+        while (temp != null && !(temp instanceof JInternalFrame)) {
+            temp = temp.getParent();
+        }
+        return (JInternalFrame) temp;
+    }
+
+    /**
+     * Is nothing showing?
+     *
+     * @return True if no dialog or panel is being shown.
+     */
+    private boolean nothingShowing() {
+        return this.dialogs.isEmpty() && getShowingPanel() == null;
+    }
+
+
+    // Location, choice and persistence
 
     /**
      * Choose a location for a component.
@@ -546,38 +548,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Gets the internal frame for the given component.
-     *
-     * @param c The {@code Component}.
-     * @return The given component if this is an internal frame or the
-     *     first parent that is an internal frame.  Returns
-     *     {@code null} if no internal frame is found.
-     */
-    private JInternalFrame getInternalFrame(final Component c) {
-        Component temp = c;
-
-        while (temp != null && !(temp instanceof JInternalFrame)) {
-            temp = temp.getParent();
-        }
-        return (JInternalFrame) temp;
-    }
-
-    /**
-     * Make a tile visible, then determine corresponding position to popup
-     * a panel.
-     *
-     * @param tile A {@code Tile} to be made visible.
-     * @return A {@code PopupPosition} for a panel to be displayed.
-     */
-    private PopupPosition setOffsetFocus(Tile tile) {
-        if (tile == null) return PopupPosition.CENTERED;
-        int where = mapViewer.setOffsetFocus(tile);
-        return (where > 0) ? PopupPosition.CENTERED_LEFT
-            : (where < 0) ? PopupPosition.CENTERED_RIGHT
-            : PopupPosition.CENTERED;
-    }
-
-    /**
      * Gets the saved position of a component.
      *
      * @param comp The {@code Component} to use.
@@ -585,7 +555,7 @@ public final class Canvas extends JDesktopPane {
      *     saved position is found.
      */
     private Point getSavedPosition(Component comp) {
-        final ClientOptions co = freeColClient.getClientOptions();
+        final ClientOptions co = this.freeColClient.getClientOptions();
         if (co == null) return null;
         try {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
@@ -603,7 +573,7 @@ public final class Canvas extends JDesktopPane {
      *     no saved size is found.
      */
     private Dimension getSavedSize(Component comp) {
-        final ClientOptions co = freeColClient.getClientOptions();
+        final ClientOptions co = this.freeColClient.getClientOptions();
         if (co == null) return null;
         try {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) {
@@ -611,23 +581,6 @@ public final class Canvas extends JDesktopPane {
             }
         } catch (Exception e) {}
         return co.getPanelSize(comp.getClass().getName());
-    }
-
-    /**
-     * A component is closing.  Some components need position and size
-     * to be saved.
-     *
-     * @param c The closing {@code Component}.
-     * @param jif The enclosing {@code JInternalFrame}.
-     */
-    private void notifyClose(Component c, JInternalFrame jif) {
-        if (c instanceof FreeColPanel) {
-            FreeColPanel fcp = (FreeColPanel)c;
-            fcp.firePropertyChange("closing", false, true);
-            
-            savePosition(fcp, jif.getLocation());
-            saveSize(fcp, fcp.getSize());
-        }
     }
 
     /**
@@ -640,16 +593,16 @@ public final class Canvas extends JDesktopPane {
      * @param value The value to save.
      */
     private void saveInteger(String className, String key, int value) {
-        if (freeColClient == null) return;
-        final ClientOptions co = freeColClient.getClientOptions();
+        if (this.freeColClient == null) return;
+        final ClientOptions co = this.freeColClient.getClientOptions();
         if (co == null) return;
         final OptionGroup etc = co.getOptionGroup(ClientOptions.ETC);
         if (etc == null) return;
         
         // Insist the option is present
         if (!etc.hasOption(className + key, IntegerOption.class)) {
-            Specification specification = (freeColClient.getGame() == null)
-                ? null : freeColClient.getGame().getSpecification();
+            Specification specification = (this.freeColClient.getGame() == null)
+                ? null : this.freeColClient.getGame().getSpecification();
             etc.add(new IntegerOption(className + key, specification));
         }
         // Set the value
@@ -664,7 +617,7 @@ public final class Canvas extends JDesktopPane {
      */
     private void savePosition(Component comp, Point position) {
         try {
-            if (!freeColClient.getClientOptions()
+            if (!this.freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) return;
         } catch (Exception e) {}
 
@@ -681,7 +634,7 @@ public final class Canvas extends JDesktopPane {
      */
     private void saveSize(Component comp, Dimension size) {
         try {
-            if (!freeColClient.getClientOptions()
+            if (!this.freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) return;
         } catch (Exception e) {}
 
@@ -691,46 +644,212 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Restart blinking on the map.  Switching it on again needs to check
-     * for the presence of other dialogs.
+     * A component is closing.  Some components need position and size
+     * to be saved.
+     *
+     * @param c The closing {@code Component}.
+     * @param jif The enclosing {@code JInternalFrame}.
      */
-    private void restartBlinking() {
-        if (mapViewer.getViewMode() != GUI.ViewMode.MOVE_UNITS) return;
-        for (FreeColDialog<?> f : dialogs) {
-            if (f.isModal()) return;
+    private void notifyClose(Component c, JInternalFrame jif) {
+        if (c instanceof FreeColPanel) {
+            FreeColPanel fcp = (FreeColPanel)c;
+            fcp.firePropertyChange("closing", false, true);
+            
+            savePosition(fcp, jif.getLocation());
+            saveSize(fcp, fcp.getSize());
+
+            if (nothingShowing()) updateMenuBar();
         }
-        mapViewer.startCursorBlinking();
+    }
+
+
+    // Public routines follow
+
+    // Initialization and teardown
+
+    /**
+     * Removes components that is only used when in game.
+     */
+    public void removeInGameComponents() {
+        // remove listeners, they will be added when launching the new game...
+        KeyListener[] keyListeners = getKeyListeners();
+        for (KeyListener keyListener : keyListeners) {
+            removeKeyListener(keyListener);
+        }
+
+        MouseListener[] mouseListeners = getMouseListeners();
+        for (MouseListener mouseListener : mouseListeners) {
+            removeMouseListener(mouseListener);
+        }
+
+        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
+        for (MouseMotionListener mouseMotionListener : mouseMotionListeners) {
+            removeMouseMotionListener(mouseMotionListener);
+        }
+
+        for (Component c : getComponents()) {
+            removeFromCanvas(c);
+        }
     }
 
     /**
-     * Stop blinking on the map.
+     * Map editor initialization.
      */
-    private void stopBlinking() {
-        mapViewer.stopCursorBlinking();
+    public void startMapEditorGUI() {
+        this.parentFrame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
+                new MenuMouseMotionListener(this.freeColClient)));
+        CanvasMapEditorMouseListener listener
+            = new CanvasMapEditorMouseListener(this.freeColClient);
+        addMouseListener(listener);
+        addMouseMotionListener(listener);
     }
 
-    // Dialog display, only public for Widgets
+    /**
+     * In game initializations.
+     */
+    public void initializeInGame() {
+        this.parentFrame.setMenuBar(new InGameMenuBar(this.freeColClient,
+                new MenuMouseMotionListener(this.freeColClient)));
+        addMouseListener(new CanvasMouseListener(this.freeColClient));
+        addMouseMotionListener(new CanvasMouseMotionListener(this.freeColClient, this));
+    }
+
+    /**
+     * Quit the canvas.
+     */
+    public void quit() {
+        destroyFrame();
+    }
+
+    /**
+     * Set preferred size to saved size, or to the given
+     * {@code Dimension} if no saved size was found. Call this
+     * method in the constructor of a FreeColPanel in order to
+     * remember its size and position.
+     *
+     * @param comp The {@code Component} to use.
+     * @param d The {@code Dimension} to use as default.
+     */
+    public void restoreSavedSize(Component comp, Dimension d) {
+        final Dimension pref = comp.getPreferredSize();
+        final Dimension sugg = (d == null) ? pref : d;
+        boolean save = false;
+
+        Dimension size = getSavedSize(comp);
+        if (size == null) {
+            size = new Dimension(pref);
+            save = true;
+        }
+
+        // Fix up broken/outdated saved sizes
+        if(size.width < sugg.width) {
+            size.width = sugg.width;
+            save = true;
+        }
+        if(size.height < sugg.height) {
+            size.height = sugg.height;
+            save = true;
+        }
+        if(size.width < pref.width) {
+            size.width = pref.width;
+            save = true;
+        }
+        if(size.height < pref.height) {
+            size.height = pref.height;
+            save = true;
+        }
+
+        if(save) {
+            saveSize(comp, size);
+        }
+
+        if (!pref.equals(size)) {
+            comp.setPreferredSize(size);
+        }
+    }
+
+
+    // Animation handling
     
     /**
-     * Gets any currently displayed colony panel for the specified colony.
+     * Add and remove animation labels.
      *
-     * This is distinct from {@link #getExistingFreeColPanel} because
-     * there can be multiple ColonyPanels.
-     *
-     * @param colony The {@code Colony} to check.
-     * @return A currently displayed colony panel, or null if not found.
+     * @param label A {@code JLabel} for an animation.
+     * @param add If true, add the label, else remove it.
      */
-    public ColonyPanel getColonyPanel(Colony colony) {
-        for (Component c1 : getComponents()) {
-            if (c1 instanceof JInternalFrame) {
-                for (Component c2 : ((JInternalFrame) c1).getContentPane()
-                         .getComponents()) {
-                    if (c2 instanceof ColonyPanel
-                        && ((ColonyPanel)c2).getColony() == colony) {
-                        return (ColonyPanel)c2;
+    public void animationLabel(JLabel label, boolean add) {
+        if (add) {
+            addToCanvas(label, JLayeredPane.DEFAULT_LAYER);
+        } else {
+            removeFromCanvas(label);
+        }
+    }
+
+    // Dialog and panel primitives, several only public for Widgets
+    
+    /**
+     * Close a panel by class name.
+     *
+     * @param panel The panel to close.
+     */
+    public void closePanel(String panel) {
+        if (panel.endsWith("Panel")) {
+            for (Component c1 : getComponents()) {
+                if (c1 instanceof JInternalFrame) {
+                    for (Component c2 : ((JInternalFrame)c1).getContentPane()
+                             .getComponents()) {
+                        if (panel.equals(c2.getClass().getName())) {
+                            notifyClose(c2, (JInternalFrame)c1);
+                            return;
+                        }
                     }
                 }
             }
+        } else if (panel.endsWith("Dialog")) {
+            for (FreeColDialog<?> fcd : new ArrayList<>(dialogs)) {
+                if (panel.equals(fcd.getClass().getName())) {
+                    dialogs.remove(fcd);
+                    fcd.dispose();
+                    return;
+                }
+            }
+        }        
+    }
+
+    /**
+     * Add a dialog to the current dialog list.
+     *
+     * @param fcd The dialog to add.
+     */
+    public void dialogAdd(FreeColDialog<?> fcd) {
+        if (fcd.isModal()) {
+            this.mapViewer.stopCursorBlinking();
+        }
+        dialogs.add(fcd);
+    }
+
+    /**
+     * Remove a dialog from the current dialog list.
+     *
+     * @param fcd The dialog to remove.
+     */
+    public void dialogRemove(FreeColDialog<?> fcd) {
+        dialogs.remove(fcd);
+        if (fcd.isModal() && none(dialogs, FreeColDialog::isModal)) {
+            this.mapViewer.startCursorBlinking();
+        }
+        if (nothingShowing()) updateMenuBar();
+    }
+
+    /**
+     * Get a currentlydisplayed FreeColDialog of a given type.
+     *
+     * @param type The class of dialog to look for.
+     * @return The {@code FreeColDialog} found, or null if none present.
+     */
+    public FreeColDialog<?> getExistingFreeColDialog(Class<?> type) {
+        for (FreeColDialog<?> d : dialogs) {
+            if (d.getClass() == type) return d;
         }
         return null;
     }
@@ -766,96 +885,89 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Get a currentlydisplayed FreeColDialog of a given type.
+     * Gets any currently displayed component matching a predicate.
      *
-     * @param type The class of dialog to look for.
-     * @return The {@code FreeColDialog} found, or null if none present.
+     * @param pred The predicate to apply.
+     * @return The first match for the predicate, or null if none found.
      */
-    public FreeColDialog<?> getExistingFreeColDialog(Class<?> type) {
-        for (FreeColDialog<?> d : dialogs) {
-            if (d.getClass() == type) return d;
+    public Component getMatchingComponent(Predicate<Component> pred) {
+        for (Component c1 : getComponents()) {
+            if (c1 instanceof JInternalFrame) {
+                for (Component c2 : ((JInternalFrame) c1).getContentPane()
+                         .getComponents()) {
+                    if (pred.test(c2)) return c2;
+                }
+            }
         }
         return null;
     }
 
     /**
+     * Get any panel this {@code Canvas} is displaying.
+     *
+     * @return A {@code Component} the {@code Canvas} is
+     *     displaying, or null if none found.
+     */
+    public Component getShowingPanel() {
+        for (Component c : getComponents()) {
+            if (c instanceof ToolBoxFrame) {
+                continue;
+            }
+            if (c instanceof JInternalFrame) {
+                return c;
+            } else if (c instanceof JInternalFrame.JDesktopIcon) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Removes the given component from this canvas without
+     * updating the menu bar.
+     *
+     * @param comp The {@code Component} to remove.
+     */
+    public void removeFromCanvas(Component comp) {
+        if (comp == null) return;
+
+        final Rectangle updateBounds = comp.getBounds();
+        final JInternalFrame jif = getInternalFrame(comp);
+        if (jif != null && jif != comp) {
+            jif.dispose();
+        } else {
+            // Java 1.7.0 as seen on Fedora with:
+            //   Java version: 1.7.0_40
+            //   Java WM version: 24.0-b56
+            // crashes here deep in the java libraries.
+            try {
+                super.remove(comp);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Java crash", e);
+            }
+        }
+        if (jif != null) { // Notify close after removing from Canvas
+            notifyClose(comp, jif);
+        }
+        repaint(updateBounds.x, updateBounds.y,
+                updateBounds.width, updateBounds.height);
+    }
+
+    /**
      * Displays the given dialog, optionally making sure a tile is visible.
      *
      * @param <T> The type to be returned from the dialog.
-     * @param freeColDialog The dialog to be displayed
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
+     * @param dialog The {@code FreeColDialog} to be displayed
+     * @param pos A {@code PopupPosition} for the dialog.
      * @return The {@link FreeColDialog#getResponse reponse} returned by
      *     the dialog.
      */
-    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog,
-                                   Tile tile) {
-        viewFreeColDialog(freeColDialog, tile);
-        T response = freeColDialog.getResponse();
-        remove(freeColDialog);
-        dialogRemove(freeColDialog);
-        if (freeColDialog.isModal()) restartBlinking();
+    public <T> T showFreeColDialog(FreeColDialog<T> dialog, PopupPosition pos) {
+        viewFreeColDialog(dialog, pos);
+        T response = dialog.getResponse();
+        remove(dialog);
+        dialogRemove(dialog);
         return response;
-    }
-
-    /**
-     * Displays the given dialog, optionally making sure a tile is visible.
-     *
-     * @param <T> The type to be returned from the dialog.
-     * @param freeColDialog The dialog to be displayed
-     * @param tile An optional {@code Tile} to make visible (not
-     *     under the dialog!)
-     */
-    public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
-                                      Tile tile) {
-        PopupPosition pp = setOffsetFocus(tile);
-
-        // TODO: Remove compatibility code when all non-modal dialogs
-        //       have been converted into panels.
-        if (!freeColDialog.isModal()) {
-            int canvasWidth = getWidth();
-            int dialogWidth = freeColDialog.getWidth();
-            if(dialogWidth*2 <= canvasWidth) {
-                Point location = freeColDialog.getLocation();
-                if(pp == PopupPosition.CENTERED_LEFT) {
-                    freeColDialog.setLocation(location.x - canvasWidth/4,
-                                              location.y);
-                } else if(pp == PopupPosition.CENTERED_RIGHT) {
-                    freeColDialog.setLocation(location.x + canvasWidth/4,
-                                              location.y);
-                }
-            }
-        }
-
-        dialogAdd(freeColDialog);
-        if (freeColDialog.isModal()) stopBlinking();
-        freeColDialog.requestFocus();
-        freeColDialog.setVisible(true);
-    }
-
-    /**
-     * Displays a {@code FreeColPanel}.
-     *
-     * @param panel {@code FreeColPanel}, panel to show
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showFreeColPanel(FreeColPanel panel,
-                                         boolean resizable) {
-        return showFreeColPanel(panel, PopupPosition.CENTERED, resizable);
-    }
-
-    /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A {@code Tile} to make visible (not under the panel!)
-     * @param resizable Should the panel be resizable?
-     * @return The panel.
-     */
-    public FreeColPanel showFreeColPanel(FreeColPanel panel, Tile tile,
-                                         boolean resizable) {
-        return showFreeColPanel(panel, setOffsetFocus(tile), resizable);
     }
 
     /**
@@ -874,6 +986,37 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();
         return panel;
+    }
+
+    /**
+     * Displays the given dialog, optionally making sure a tile is visible.
+     *
+     * @param <T> The type to be returned from the dialog.
+     * @param freeColDialog The dialog to be displayed
+     * @param pos A {@code PopupPosition} for the dialog.
+     */
+    public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
+                                      PopupPosition pos) {
+        // TODO: Remove compatibility code when all non-modal dialogs
+        //       have been converted into panels.
+        if (!freeColDialog.isModal()) {
+            int canvasWidth = getWidth();
+            int dialogWidth = freeColDialog.getWidth();
+            if (dialogWidth*2 <= canvasWidth) {
+                Point location = freeColDialog.getLocation();
+                if (pos == PopupPosition.CENTERED_LEFT) {
+                    freeColDialog.setLocation(location.x - canvasWidth/4,
+                                              location.y);
+                } else if (pos == PopupPosition.CENTERED_RIGHT) {
+                    freeColDialog.setLocation(location.x + canvasWidth/4,
+                                              location.y);
+                }
+            }
+        }
+
+        dialogAdd(freeColDialog);
+        freeColDialog.requestFocus();
+        freeColDialog.setVisible(true);
     }
 
 
@@ -951,66 +1094,42 @@ public final class Canvas extends JDesktopPane {
     }
 
 
-    // Map viewer
-    
+    // Menus
+
     /**
-     * Scroll the map in the given direction.
-     *
-     * Called from ScrollThread.
-     *
-     * @param direction The {@code Direction} to scroll in.
-     * @return True if scrolling occurred.
+     * Closes all the menus that are currently open.
      */
-    public boolean scrollMap(Direction direction) {
-        return mapViewer.scrollMap(direction);
+    public void closeMenus() {
+        for (JInternalFrame jif : getAllFrames()) {
+            for (Component c : jif.getContentPane().getComponents()) {
+                notifyClose(c, jif);
+            }
+            jif.dispose();
+        }
+        while (!dialogs.isEmpty()) {
+            FreeColDialog<?> dialog = dialogs.remove(0);
+            dialog.dispose();
+        }
     }
 
     /**
-     * Converts the given screen coordinates to Map coordinates.
-     * It checks to see to which Tile the given pixel 'belongs'.
-     *
-     * @param x The x-coordinate in pixels.
-     * @param y The y-coordinate in pixels.
-     * @return The Tile that is located at the given position on the screen.
+     * Reset the menu bar.
      */
-    public Tile convertToMapTile(int x, int y) {
-        return mapViewer.convertToMapTile(x, y);
-    }
-
-    // Gotos
-    
-    /**
-     * Checks if there is currently a goto operation on the mapboard.
-     *
-     * @return True if a goto operation is in progress.
-     */
-    public boolean isGotoStarted() {
-        return this.gotoStarted;
+    public void resetMenuBar() {
+        this.freeColClient.updateActions();
+        this.parentFrame.resetMenuBar();
     }
 
     /**
-     * Starts a goto operation.
+     * Update the menu bar.
      */
-    public void startGoto() {
-        this.gotoStarted = true;
-        setCursor(GO_CURSOR);
-        mapViewer.changeGotoPath(null);
+    public void updateMenuBar() {
+        this.freeColClient.updateActions();
+        this.parentFrame.updateMenuBar();
     }
 
-    /**
-     * Stops any ongoing goto operation.
-     *
-     * @return The old goto path if any.
-     */
-    public PathNode stopGoto() {
-        PathNode ret = (this.gotoStarted) ? mapViewer.getGotoPath() : null;
-        this.gotoStarted = false;
-        setCursor(null);
-        mapViewer.changeGotoPath(null);
-        return ret;
-    }
 
-    // Startup
+    // Video
 
     /**
      * Play the opening video.
@@ -1109,252 +1228,8 @@ public final class Canvas extends JDesktopPane {
         vc.play();
     }
 
-    /**
-     * Map editor initialization.
-     */
-    public void startMapEditorGUI() {
-        this.parentFrame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
-                new MenuMouseMotionListener(this.freeColClient, this)));
-        CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(freeColClient, this);
-        addMouseListener(listener);
-        addMouseMotionListener(listener);
-    }
-
-    /**
-     * In game initializations.
-     */
-    public void initializeInGame() {
-        this.parentFrame.setMenuBar(new InGameMenuBar(this.freeColClient,
-                new MenuMouseMotionListener(this.freeColClient, this)));
-        addMouseListener(new CanvasMouseListener(this.freeColClient));
-        addMouseMotionListener(new CanvasMouseMotionListener(this.freeColClient, this));
-    }
-
-    /**
-     * Reset the menu bar.
-     */
-    public void resetMenuBar() {
-        this.freeColClient.updateActions();
-        this.parentFrame.resetMenuBar();
-    }
-
-    /**
-     * Update the menu bar.
-     */
-    public void updateMenuBar() {
-        this.freeColClient.updateActions();
-        this.parentFrame.updateMenuBar();
-    }
-
-    /**
-     * Quit the canvas.
-     */
-    public void quit() {
-        destroyFrame();
-    }
-
-    /**
-     * Closes all the menus that are currently open.
-     */
-    public void closeMenus() {
-        for (JInternalFrame jif : getAllFrames()) {
-            for (Component c : jif.getContentPane().getComponents()) {
-                notifyClose(c, jif);
-            }
-            jif.dispose();
-        }
-        while (!dialogs.isEmpty()) {
-            FreeColDialog<?> dialog = dialogs.remove(0);
-            dialog.dispose();
-        }
-    }
-
-    /**
-     * Close a panel by class name.
-     *
-     * @param panel The panel to close.
-     */
-    public void closePanel(String panel) {
-        if (panel.endsWith("Panel")) {
-            for (Component c1 : getComponents()) {
-                if (c1 instanceof JInternalFrame) {
-                    for (Component c2 : ((JInternalFrame)c1).getContentPane()
-                             .getComponents()) {
-                        if (panel.equals(c2.getClass().getName())) {
-                            notifyClose(c2, (JInternalFrame)c1);
-                            return;
-                        }
-                    }
-                }
-            }
-        } else if (panel.endsWith("Dialog")) {
-            for (FreeColDialog<?> fcd : new ArrayList<>(dialogs)) {
-                if (panel.equals(fcd.getClass().getName())) {
-                    dialogs.remove(fcd);
-                    fcd.dispose();
-                    return;
-                }
-            }
-        }        
-    }
-
-    /**
-     * Add a dialog to the current dialog list.
-     *
-     * @param fcd The dialog to add.
-     */
-    private void dialogAdd(FreeColDialog<?> fcd) {
-        dialogs.add(fcd);
-    }
-
-    /**
-     * Remove a dialog from the current dialog list.
-     *
-     * @param fcd The dialog to remove.
-     */
-    public void dialogRemove(FreeColDialog<?> fcd) {
-        dialogs.remove(fcd);
-    }
-
-    /**
-     * Get any panel this {@code Canvas} is displaying.
-     *
-     * @return A {@code Component} the {@code Canvas} is
-     *         displaying, or null if none found.
-     */
-    public Component getShowingPanel() {
-        for (Component c : getComponents()) {
-            if (c instanceof ToolBoxFrame) {
-                continue;
-            }
-            if (c instanceof JInternalFrame) {
-                return c;
-            } else if (c instanceof JInternalFrame.JDesktopIcon) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Removes the given component from this canvas without
-     * updating the menu bar.
-     *
-     * @param comp The {@code Component} to remove.
-     */
-    public void removeFromCanvas(Component comp) {
-        if (comp == null) return;
-
-        final Rectangle updateBounds = comp.getBounds();
-        final JInternalFrame jif = getInternalFrame(comp);
-        if (jif != null) {
-            notifyClose(comp, jif);
-        }
-        if (jif != null && jif != comp) {
-            jif.dispose();
-        } else {
-            // Java 1.7.0 as seen on Fedora with:
-            //   Java version: 1.7.0_40
-            //   Java WM version: 24.0-b56
-            // crashes here deep in the java libraries.
-            try {
-                super.remove(comp);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Java crash", e);
-            }
-        }
-        repaint(updateBounds.x, updateBounds.y,
-                updateBounds.width, updateBounds.height);
-    }
-
-    /**
-     * Removes components that is only used when in game.
-     */
-    public void removeInGameComponents() {
-        // remove listeners, they will be added when launching the new game...
-        KeyListener[] keyListeners = getKeyListeners();
-        for (KeyListener keyListener : keyListeners) {
-            removeKeyListener(keyListener);
-        }
-
-        MouseListener[] mouseListeners = getMouseListeners();
-        for (MouseListener mouseListener : mouseListeners) {
-            removeMouseListener(mouseListener);
-        }
-
-        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
-        for (MouseMotionListener mouseMotionListener : mouseMotionListeners) {
-            removeMouseMotionListener(mouseMotionListener);
-        }
-
-        for (Component c : getComponents()) {
-            removeFromCanvas(c);
-        }
-    }
-
-    /**
-     * Set preferred size to saved size, or to the given
-     * {@code Dimension} if no saved size was found. Call this
-     * method in the constructor of a FreeColPanel in order to
-     * remember its size and position.
-     *
-     * @param comp The {@code Component} to use.
-     * @param d The {@code Dimension} to use as default.
-     */
-    public void restoreSavedSize(Component comp, Dimension d) {
-        final Dimension pref = comp.getPreferredSize();
-        final Dimension sugg = (d == null) ? pref : d;
-        boolean save = false;
-
-        Dimension size = getSavedSize(comp);
-        if (size == null) {
-            size = new Dimension(pref);
-            save = true;
-        }
-
-        // Fix up broken/outdated saved sizes
-        if(size.width < sugg.width) {
-            size.width = sugg.width;
-            save = true;
-        }
-        if(size.height < sugg.height) {
-            size.height = sugg.height;
-            save = true;
-        }
-        if(size.width < pref.width) {
-            size.width = pref.width;
-            save = true;
-        }
-        if(size.height < pref.height) {
-            size.height = pref.height;
-            save = true;
-        }
-
-        if(save) {
-            saveSize(comp, size);
-        }
-
-        if (!pref.equals(size)) {
-            comp.setPreferredSize(size);
-        }
-    }
 
     // Special dialogs and panels
-
-    /**
-     * Add and remove animation labels.
-     *
-     * @param label A {@code JLabel} for an animation.
-     * @param add If true, add the label, else remove it.
-     */
-    public void animationLabel(JLabel label, boolean add) {
-        if (add) {
-            addToCanvas(label, JLayeredPane.DEFAULT_LAYER);
-        } else {
-            removeFromCanvas(label);
-        }
-    }
 
     /**
      * Closes the {@link MainPanel}.
@@ -1367,23 +1242,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Tells that a chat message was received.
-     *
-     * @param message The chat message.
-     */
-    public void displayChat(GUIMessage message) {
-        this.chatDisplay.addMessage(message);
-        repaint(0, 0, getWidth(), getHeight());
-    }
-
-    /**
      * Closes all panels, changes the background and shows the main menu.
      */
     public void mainTitle() {
-        // FIXME: check if the GUI object knows that we're not
-        // inGame. (Retrieve value of GUI::inGame.)  If GUI thinks
-        // we're still in the game then log an error because at this
-        // point the GUI should have been informed.
         removeInGameComponents();
         showMainPanel();
         repaint();
@@ -1397,7 +1258,7 @@ public final class Canvas extends JDesktopPane {
     public FreeColPanel showMainPanel() {
         closeMenus();
         this.parentFrame.removeMenuBar();
-        this.mainPanel = new MainPanel(freeColClient);
+        this.mainPanel = new MainPanel(this.freeColClient);
         addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
         this.mainPanel.requestFocus();
         return this.mainPanel;
@@ -1408,10 +1269,10 @@ public final class Canvas extends JDesktopPane {
      */
     public void showMapEditorTransformPanel() {
         MapEditorTransformPanel panel
-            = new MapEditorTransformPanel(freeColClient);
+            = new MapEditorTransformPanel(this.freeColClient);
         JInternalFrame f = addAsFrame(panel, true, PopupPosition.CENTERED,
                                       false);
-        f.setLocation(f.getX(), 50);
+        f.setLocation(f.getX(), 50); // move up to near the top
         repaint();
     }
 
@@ -1423,32 +1284,42 @@ public final class Canvas extends JDesktopPane {
      */
     @Override
     public void paintComponent(Graphics g) {
-        Dimension size = checkResize();
+        Dimension size = getSize();
+        if (this.oldSize.width != size.width
+            || this.oldSize.height != size.height) {
+            logger.info("Canvas resize from " + this.oldSize
+                + " to " + size);
+            this.oldSize = size;
+            boolean add = removeMapControls();
+            this.mapViewer.changeSize(size);
+            if (add) addMapControls();
+        }
         boolean hasMap = this.freeColClient != null
             && this.freeColClient.getGame() != null
             && this.freeColClient.getGame().getMap() != null;
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D)g;
 
-        if (freeColClient.isMapEditor()) {
+        if (this.freeColClient.isMapEditor()) {
             if (hasMap) {
-                mapViewer.displayMap(g2d);
+                this.mapViewer.displayMap(g2d);
             } else {
                 g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, 0, size.width, size.height);
             }
 
-        } else if (freeColClient.isInGame() && hasMap) {
+        } else if (this.freeColClient.isInGame() && hasMap) {
             // draw the map
-            mapViewer.displayMap(g2d);
+            this.mapViewer.displayMap(g2d);
 
             // toggle grey layer if needed
-            if (freeColClient.currentPlayerIsMyPlayer()) {
+            if (this.freeColClient.currentPlayerIsMyPlayer()) {
                 if (greyLayer.getParent() != null) {
                     removeFromCanvas(greyLayer);
                 }
             } else {
                 greyLayer.setBounds(0, 0, size.width, size.height);
-                greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
+                greyLayer.setPlayer(this.freeColClient.getGame()
+                    .getCurrentPlayer());
                 if (greyLayer.getParent() == null) {
                     addToCanvas(greyLayer, JLayeredPane.DRAG_LAYER);
                 }
@@ -1494,6 +1365,5 @@ public final class Canvas extends JDesktopPane {
     @Override
     public void remove(Component comp) {
         removeFromCanvas(comp);
-        updateMenuBar();
     }
 }

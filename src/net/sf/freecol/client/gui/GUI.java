@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants.*; // Imports all ENUMS.
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -163,7 +164,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template,
                                  GoodsType goodsType,
                                  String okKey, String cancelKey) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
         return confirm(tile, template, icon, okKey, cancelKey);
     }
@@ -181,7 +182,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(Tile tile, StringTemplate template,
                                  Settlement settlement,
                                  String okKey, String cancelKey) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
         return confirm(tile, template, icon, okKey, cancelKey);
     }
@@ -198,7 +199,7 @@ public class GUI extends FreeColClientHolder {
      */
     public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
                                  String okKey, String cancelKey) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
         return confirm(tile, template, icon, okKey, cancelKey);
     }
@@ -519,7 +520,7 @@ public class GUI extends FreeColClientHolder {
      */
     public final <T> T getChoice(StringTemplate explain, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getPlaceholderImage());
         return getChoice(null, explain, icon, cancelKey, choices);
     }
@@ -539,7 +540,7 @@ public class GUI extends FreeColClientHolder {
     private final <T> T getChoice(Tile tile, StringTemplate template,
                                   GoodsType goodsType, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -559,7 +560,7 @@ public class GUI extends FreeColClientHolder {
     private final <T> T getChoice(Tile tile, StringTemplate template,
                                   Nation nation, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledNationImage(nation));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -579,7 +580,7 @@ public class GUI extends FreeColClientHolder {
     public final <T> T getChoice(Tile tile, StringTemplate template,
                                  Settlement settlement, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -599,7 +600,7 @@ public class GUI extends FreeColClientHolder {
     public final <T> T getChoice(Tile tile, StringTemplate template,
                                  Unit unit, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        ImageIcon icon = new ImageIcon(getImageLibrary()
+        ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
         return getChoice(tile, template, icon, cancelKey, choices);
     }
@@ -931,7 +932,7 @@ public class GUI extends FreeColClientHolder {
      * as we have already defined a callback.
      *
      * @param ex An optional {@code Exception} to display.
-     * @param tmpl A {@code StringTemplate} for the message.
+     * @param template A {@code StringTemplate} for the message.
      */
     public final void showErrorPanel(Exception ex, StringTemplate template) {
         final StringTemplate t = (ex == null) ? template
@@ -998,16 +999,6 @@ public class GUI extends FreeColClientHolder {
         showNewPanel(null);
     }
 
-    /**
-     * Get the map scale.
-     *
-     * @return The scale for the (rescalable) map.
-     */
-    public final float getMapScale() {
-        ImageLibrary lib = getImageLibrary();
-        return (lib == null) ? 1.0f : lib.getScaleFactor();
-    }
-
 
     // Sound routines, delegated to the SoundController, only useful
     // for GUI classes in need of sound
@@ -1040,20 +1031,20 @@ public class GUI extends FreeColClientHolder {
     // Simple accessors
 
     /**
-     * Get the image library.
-     *
-     * @return Null here, real implementations will override.
-     */
-    public ImageLibrary getImageLibrary() { return null; }
-
-    /**
-     * Get the tile image library.
+     * Get the fixed image library for use on panels.
      *
      * Used by: ColonyPanel, ConstructionPanel, InfoPanel, certain UnitLabels.
      *
      * @return Null here, real implementations will override.
      */
-    public ImageLibrary getTileImageLibrary() { return null; }
+    public ImageLibrary getFixedImageLibrary() { return null; }
+
+    /**
+     * Get the scaled image library for use on the map.
+     *
+     * @return Null here, real implementations will override.
+     */
+    public ImageLibrary getScaledImageLibrary() { return null; }
 
     /**
      * Is this GUI in windowed mode?
@@ -1465,6 +1456,30 @@ public class GUI extends FreeColClientHolder {
     public void showPopupMenu(JPopupMenu menu, int x, int y) {}
 
 
+    // Scrolling
+
+    /**
+     * Work out what direction to scroll the map if a coordinate is close
+     * to an edge.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param scrollSpace The clearance from the relevant edge
+     * @param ignoreTop If the top should be ignored
+     * @return The {@code Direction} to scroll, or null if not.
+     */
+    public Direction getScrollDirection(int x, int y, int scrollSpace,
+                                        boolean ignoreTop) { return null; }
+
+    /**
+     * Scroll the map in a given direction.
+     *
+     * @param direction The {@code Direction} to scroll.
+     * @return True if scrolling can continue.
+     */
+    public boolean scrollMap(Direction direction) { return false; }
+
+
     // Tile image manipulation
 
     // Used by: InfoPanel
@@ -1476,8 +1491,17 @@ public class GUI extends FreeColClientHolder {
     // Used by: WorkProductionPanel
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) { return null; }
 
-    // Used by: ColonyPanel.TilesPanel
-    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {}
+    /**
+     * Display the ColonyTiles of a Colony.
+     *
+     * Used by: ColonyPanel.TilesPanel
+     *
+     * @param g2d A {@code Graphics2D} to draw to.
+     * @param tiles The {@code Tile}s to display.
+     * @param colony The enclosing {@code Colony}.
+     */
+    public void displayColonyTiles(Graphics2D g2d, Tile[][] tiles,
+                                   Colony colony) {}
 
 
     // View mode handling, including accessors for the active unit for
@@ -1664,6 +1688,7 @@ public class GUI extends FreeColClientHolder {
     public void displayStartChat(String sender, String message,
                                  boolean privateChat) {}
 
+
     /**
      * Checks if a client options dialog is present.
      *
@@ -1758,6 +1783,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param x The x coordinate.
      * @param y The y coordinate.
+     * @return The {@code Tile} found.
      */
     public Tile tileAt(int x, int y) { return null; }
 
@@ -1998,7 +2024,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show a panel for a native settlement.
      *
-     * @param indianSettlement The {@code IndianSettlement} to display.
+     * @param is The {@code IndianSettlement} to display.
      * @return The panel shown.
      */
     public FreeColPanel showIndianSettlementPanel(IndianSettlement is) { return null; }

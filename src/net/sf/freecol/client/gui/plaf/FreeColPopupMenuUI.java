@@ -24,6 +24,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicPopupMenuUI;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -44,8 +45,8 @@ public class FreeColPopupMenuUI extends BasicPopupMenuUI {
     @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColPopupMenu",
-                                        g, c, null);
+            ImageUtils.drawTiledImage(ImageLibrary.getPopupMenuBackground(),
+                                      g, c, null);
         }
     }
 

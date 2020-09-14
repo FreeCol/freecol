@@ -52,6 +52,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -170,7 +171,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.getName("model.tradeItem.colony"));
             this.allColonies = source.getColonyList();
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(this.label);
             add(this.colonyBox);
@@ -273,7 +274,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                                                  .getTextField()
                                                  .setColumns(5);
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(Utility.localizedLabel(Messages.getName("model.tradeItem.gold")));
             add(Utility.localizedLabel(StringTemplate
@@ -374,7 +375,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.goods"));
             this.allGoods = allGoods;
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(this.label);
             add(this.goodsBox);
@@ -502,7 +503,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.setActionCommand(ADD);
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.incite"));
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             available.clear();
             final Predicate<Player> incitablePred = p ->
@@ -622,7 +623,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(Utility.localizedLabel(Messages.nameKey("model.tradeItem.stance")));
             add(this.stanceBox);
@@ -742,7 +743,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.unit"));
             this.allUnits = allUnits;
 
-            setBorder(Utility.SIMPLE_LINE_BORDER);
+            setBorder(Utility.getSimpleLineBorder());
 
             add(this.label);
             add(this.unitBox);
@@ -956,13 +957,13 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                                                   "[30%|40%|30%]", ""));
         // Main Panel Header
         panel.add(Utility.localizedHeader("negotiationDialog.title."
-                        + agreement.getContext().getKey(), false),
+                                          + agreement.getContext().getKey(),
+                                          Utility.FONTSPEC_TITLE),
                 "span 3, center");
 
         // Panel contents Header row
         JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, getGUI().getMapScale());
+        Font font = FontLibrary.getUnscaledFont("normal-bold-tiny");
         labelDemandMessage.setFont(font);
         panel.add(labelDemandMessage);
         JTextArea blank = new JTextArea(" ");
@@ -1161,7 +1162,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         
         button.setMargin(Utility.EMPTY_MARGIN);
         button.setOpaque(false);
-        button.setForeground(Utility.LINK_COLOR);
+        button.setForeground(Utility.getLinkColor());
         button.setBorder(Utility.blankBorder(0, 0, 0, 0));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;

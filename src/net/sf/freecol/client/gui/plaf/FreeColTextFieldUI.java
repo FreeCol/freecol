@@ -26,6 +26,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextFieldUI;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -56,8 +57,8 @@ public class FreeColTextFieldUI extends BasicTextFieldUI {
         JComponent c = getComponent();
 
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColTextField",
-                                        g, c, null);
+            ImageUtils.drawTiledImage(ImageLibrary.getTextFieldBackground(),
+                                      g, c, null);
         }
     }
 

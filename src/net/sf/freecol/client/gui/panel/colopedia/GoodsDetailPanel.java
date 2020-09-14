@@ -33,6 +33,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.*;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -84,7 +85,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         GoodsType type = getSpecification().getGoodsType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]"));
 
-        JLabel name = Utility.localizedHeaderLabel(type, FontLibrary.FontSize.SMALL);
+        JLabel name = Utility.localizedHeaderLabel(type, Utility.FONTSPEC_SUBTITLE);
         panel.add(name, "span, align center, wrap 40");
 
         if (type.isFarmed()) {

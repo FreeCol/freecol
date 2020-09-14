@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.client.gui.tooltip.*;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -85,6 +86,10 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         setToolTipText(" ");
     }
 
+
+    private ImageLibrary getImageLibrary() {
+        return this.freeColClient.getGUI().getFixedImageLibrary();
+    }
 
     /**
      * Initialize this building panel.
@@ -170,7 +175,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             add(unitLabel);
         }
 
-        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        ImageLibrary lib = getImageLibrary();
         Image buildingImage = lib.getScaledBuildingImage(building);
         setPreferredSize(new Dimension(buildingImage.getWidth(null), 
                                        buildingImage.getHeight(null)));
@@ -232,7 +237,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
+        ImageLibrary lib = getImageLibrary();
         g.drawImage(lib.getScaledBuildingImage(building), 0, 0, this);
     }
 
@@ -245,15 +250,19 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         /** The base image to display. */
         private final int number;
 
+        /** The font for the label. */
+        private final Font font;
+
         /**
          * Create an upkeep label.
          *
          * @param number The upkeep cost.
          */
         public UpkeepLabel(int number) {
-            super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
+            super(new ImageIcon(getImageLibrary()
                 .getScaledImage(ImageLibrary.ICON_COIN)));
             this.number = number;
+            this.font = FontLibrary.getUnscaledFont("simple-bold-tiny");
         }
 
         /**
@@ -262,11 +271,9 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         @Override
         public void paintComponent(Graphics g) {
             getIcon().paintIcon(null, g, 0, 0);
-            GUI gui = freeColClient.getGUI();
-            ImageLibrary lib = gui.getImageLibrary();
+            ImageLibrary lib = getImageLibrary();
             BufferedImage img = lib.getStringImage(g, Integer.toString(number),
-                getForeground(),
-                FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD);
+                getForeground(), this.font);
             g.drawImage(img,
                 (getIcon().getIconWidth() - img.getWidth(null))/2,
                 (getIcon().getIconHeight() - img.getHeight(null))/2, null);

@@ -53,8 +53,7 @@ public class DetermineHighSeasAction extends FreeColAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && freeColClient.isMapEditor()
-            && getGame() != null
-            && getGame().getMap() != null;
+            && getMap() != null;
     }
 
 
@@ -65,7 +64,7 @@ public class DetermineHighSeasAction extends FreeColAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        final Map map = getGame().getMap();
+        final Map map = getMap();
         
         Parameters p = getGUI().showParametersDialog();
         if (p != null) {

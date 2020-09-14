@@ -3032,16 +3032,17 @@ public class Colony extends Settlement implements TradeLocation {
             xw.writeAttribute(PRODUCTION_BONUS_TAG, productionBonus);
 
         } else {
-
             int uc = getApparentUnitCount();
-            if (uc <= 0) {
+            if (uc > 0) { // Valid if above zero
+                xw.writeAttribute(UNIT_COUNT_TAG, uc);
+            } else if (uc == 0) { // Zero is an error!  Find that bug
                 FreeCol.trace(logger, "Unit count fail: " + uc
-                    + " id=" + getId()
+                    + " id=" + getId() + " name=" + getName()
                     + " unitCount=" + getUnitCount()
+                    + " displayUnitCount=" + this.displayUnitCount
                     + " scope=" + xw.getWriteScope()
                     + "/" + xw.getClientPlayer());
-            }
-            xw.writeAttribute(UNIT_COUNT_TAG, uc);
+            } // else do nothing, negative means no value set
         }
     }
 
