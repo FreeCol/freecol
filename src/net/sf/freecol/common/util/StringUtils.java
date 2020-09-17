@@ -207,7 +207,9 @@ public class StringUtils {
                 top = t;
             }
             if (i >= len) {
-                if (!top.isEmpty()) result.add(top);
+                if (!top.isEmpty()) {
+                    result.add(top);
+                }
                 break;
             }
             d = text.charAt(i);

@@ -30,6 +30,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -160,16 +161,29 @@ public final class InfoPanel extends FreeColPanel
     }
 
     /**
+     * Get a new MigPanel with specified layout and size it to fit neatly.
+     *
+     * @param layout The {@code LayoutManager} for the panel.
+     * @return The new {@code MigPanel}.
+     */
+    private MigPanel newPanel(LayoutManager layout) {
+        MigPanel panel = new MigPanel(layout);
+        panel.setSize(new Dimension((int)(this.getWidth() * 0.8),
+                (int)(this.getHeight() * 0.6)));
+        return panel;
+    }
+    
+    /**
      * Size, place and request redraw of the given panel.
      *
      * @param panel The new panel to display.
      */
     private void setPanel(MigPanel panel) {
-        panel.setSize(new Dimension((int)(this.getWidth() * 0.75),
-                (int)(this.getHeight() * 0.6)));
-        panel.setLocation((this.getWidth() - panel.getWidth()) / 2,
-                          (this.getHeight() - panel.getHeight()) / 2);
         panel.addMouseListener(this.mouseAdapter);
+        // Center the panel but push down a bit vertically to allow for
+        // the ragged top border
+        final int y = (this.getHeight() - panel.getHeight()/2) / 2;
+        panel.setLocation((this.getWidth() - panel.getWidth()) / 2, y);
         if (this.skin != null) panel.setOpaque(false);
         this.removeAll();
         this.add(panel);
@@ -230,8 +244,8 @@ public final class InfoPanel extends FreeColPanel
      * Fill in an end turn message into a new panel and add it.
      */
     private void fillEndPanel() {
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center",
-                                                    "[center]", ""));
+        MigPanel panel = newPanel(new MigLayout("wrap 1, center",
+                                                "[center]", ""));
         
         String labelString = Messages.message("infoPanel.endTurn");
         final int width = (int)(0.3 * this.getWidth());
@@ -257,7 +271,7 @@ public final class InfoPanel extends FreeColPanel
      * @return The {@code MapTransform}.
      */
     private MapTransform fillMapPanel(MapTransform mapTransform) {
-        MigPanel panel = new MigPanel(new BorderLayout());
+        MigPanel panel = newPanel(new BorderLayout());
         
         final JPanel p = (mapTransform == null) ? null
             : mapTransform.getDescriptionPanel();
@@ -280,7 +294,7 @@ public final class InfoPanel extends FreeColPanel
      * @return The {@code Tile}.
      */
     private Tile fillTilePanel(Tile tile) {
-        MigPanel panel = new MigPanel(new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1",
+        MigPanel panel = newPanel(new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1",
                 "", ""));
 
         if (tile != null) {
@@ -347,68 +361,87 @@ public final class InfoPanel extends FreeColPanel
     }
 
     /**
+     * Add labels to a panel with MigLayout, on one line.
+     *
+     * @param panel The {@code JPanel} to add to.
+     * @param labels A list of {@code JLabel}s to add.
+     * @param max The maximum number of labels to put on a line
+     */
+    private static void addLabels(JPanel panel, List<JLabel> labels, int max) {
+        for (;;) {
+            int n = Math.min(max, labels.size());
+            if (n <= 0) {
+                break;
+            } else if (n == 1) {
+                panel.add(labels.get(0));
+                break;
+            } else {
+                panel.add(labels.remove(0), "split " + n);
+                for (int i = 1; i < n; i++) panel.add(labels.remove(0));
+            }            
+        }
+    }
+    
+    /**
      * Fill unit information into a new panel and add it.
      *
      * @param unit The {@code Unit} to display.
      * @return The {@code Unit}.
      */
     private Unit fillUnitPanel(Unit unit) {
-        MigPanel panel = new MigPanel(new MigLayout("wrap 5, fill, gap 0 0", "", ""));
-
-        if (unit != null) {
-            String text;
-            JLabel textLabel;
-            ImageIcon ii = new ImageIcon(lib.getScaledUnitImage(unit));
-            JLabel imageLabel = new JLabel(ii);
-            panel.add(imageLabel, "spany, gapafter 5px");
-            int width = panel.getWidth() - ii.getIconWidth() - SLACK;
-            text = unit.getDescription(Unit.UnitLabelType.FULL);
-            for (String s : splitText(text, " /",
-                                      getFontMetrics(this.font), width)) {
-                textLabel = new JLabel(s);
-                textLabel.setFont(this.font);
-                panel.add(textLabel, "span 5");
-            }
-
-            text = (unit.isInEurope())
-                ? Messages.getName(unit.getOwner().getEurope())
-                : Messages.message("infoPanel.moves")
-                    + " " + unit.getMovesAsString();
-            textLabel = new JLabel(text);
+        ImageIcon ii = new ImageIcon(lib.getScaledUnitImage(unit));
+        final int width = ii.getIconWidth();
+        // Two columns filling whole space with no gaps
+        //   1. Icon of fixed width spanning full height
+        //   2. Text/icon fields filling the remaining horizontal space
+        MigPanel panel = newPanel(new MigLayout("wrap 2, fill, gap 0 0",
+                                               "[" + width + "][fill]", ""));
+        panel.add(new JLabel(ii), "spany, center");
+        String text = unit.getDescription(Unit.UnitLabelType.FULL);
+        JLabel textLabel;
+        for (String s : splitText(text, " /", getFontMetrics(this.font),
+                                  panel.getWidth() - width)) {
+            textLabel = new JLabel(s);
             textLabel.setFont(this.font);
-            panel.add(textLabel, "span 5");
-
-            if (unit.isCarrier()) {
-                ImageIcon icon;
-                JLabel label;
-                for (Goods goods : unit.getGoodsList()) {
-                    int amount = goods.getAmount();
-                    GoodsType gt = goods.getType();
-                    // FIXME: Get size of full stack from appropriate place.
-                    if (amount == GoodsContainer.CARGO_SIZE) {
-                        icon = new ImageIcon(lib.getScaledGoodsTypeImage(gt));
-                        label = new JLabel(icon);
-                    } else {
-                        icon = new ImageIcon(lib.getSmallGoodsTypeImage(gt));
-                        label = new JLabel(String.valueOf(amount),
-                                           icon, JLabel.RIGHT);
-                    }
-                    text = Messages.message(goods.getLabel(true));
-                    label.setFont(this.font);
-                    label.setToolTipText(text);
-                    panel.add(label);
-                }
-                for (Unit carriedUnit : unit.getUnitList()) {
-                    icon = new ImageIcon(lib.getSmallerUnitImage(carriedUnit));
-                    label = new JLabel(icon);
-                    text = carriedUnit.getDescription(Unit.UnitLabelType.NATIONAL);
-                    label.setFont(this.font);
-                    label.setToolTipText(text);
-                    panel.add(label);
-                }
-            }
+            panel.add(textLabel);
         }
+        
+        text = (unit.isInEurope())
+            ? Messages.getName(unit.getOwner().getEurope())
+            : Messages.message("infoPanel.moves")
+            + " " + unit.getMovesAsString();
+        textLabel = new JLabel(text);
+        textLabel.setFont(this.font);
+        panel.add(textLabel);
+        
+        if (unit.isCarrier()) {
+            List<JLabel> labels = new ArrayList<>();
+            ImageIcon icon;
+            JLabel label;
+            for (Unit carriedUnit : unit.getUnitList()) {
+                icon = new ImageIcon(lib.getSmallerUnitImage(carriedUnit));
+                label = new JLabel(icon);
+                text = carriedUnit.getDescription(Unit.UnitLabelType.NATIONAL);
+                label.setFont(this.font);
+                label.setToolTipText(text);
+                labels.add(label);
+            }
+            addLabels(panel, labels, 6); // 6 units fit well enough
 
+            labels.clear();
+            for (Goods goods : unit.getGoodsList()) {
+                int amount = goods.getAmount();
+                GoodsType gt = goods.getType();
+                icon = new ImageIcon(lib.getSmallerGoodsTypeImage(gt));
+                label = new JLabel(String.valueOf(amount), icon, JLabel.CENTER);
+                text = Messages.message(goods.getLabel(true));
+                label.setFont(this.font);
+                label.setToolTipText(text);
+                labels.add(label);
+            }
+            addLabels(panel, labels, 3); // goods icon+number is fits less well
+        }
+        panel.add(new JLabel(""), "growy"); // fill up remaining vertical space
         setPanel(panel);
         return unit;
     }
