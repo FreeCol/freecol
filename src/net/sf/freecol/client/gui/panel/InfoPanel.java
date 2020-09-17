@@ -97,6 +97,9 @@ public final class InfoPanel extends FreeColPanel
     /** An optional background image (the standard one has shape). */
     private final Image skin;
 
+    /** The mouse listener for the various subpanels. */
+    private final MouseAdapter mouseAdapter;
+    
     /** The panel mode. */
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
@@ -144,13 +147,16 @@ public final class InfoPanel extends FreeColPanel
         }
         // No layout manager!  Panels will be sized and placed explicitly
 
-        addMouseListener(new MouseAdapter() {
+        this.mouseAdapter = new MouseAdapter() {
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public void mousePressed(MouseEvent e) {
                     Tile tile = InfoPanel.this.getTile();
                     if (tile != null) getGUI().setFocus(tile);
                 }
-            });
+            };
     }
 
     /**
@@ -163,6 +169,7 @@ public final class InfoPanel extends FreeColPanel
                 (int)(this.getHeight() * 0.6)));
         panel.setLocation((this.getWidth() - panel.getWidth()) / 2,
                           (this.getHeight() - panel.getHeight()) / 2);
+        panel.addMouseListener(this.mouseAdapter);
         if (this.skin != null) panel.setOpaque(false);
         this.removeAll();
         this.add(panel);
