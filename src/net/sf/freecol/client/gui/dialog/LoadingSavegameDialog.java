@@ -73,7 +73,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
-        JLabel header = Utility.localizedHeaderLabel("loadingSavegameDialog",
+        JLabel header = Utility.localizedHeaderLabel("Load Saved Game",
                                                      JLabel.CENTER,
                                                      Utility.FONTSPEC_SUBTITLE);
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
@@ -86,8 +86,12 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         p2.add(Utility.localizedLabel("loadingSavegameDialog.port"));
 
-        portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),
+        JSpinner portSpinner = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),
                                                         1, 65536, 1));
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(portSpinner, "#");
+        portSpinner.setEditor(editor);
+        portField = portSpinner;
+        
         ButtonGroup bg = new ButtonGroup();
         String str = Messages.message("loadingSavegameDialog.singlePlayer");
         singlePlayer = new JRadioButton(str);
