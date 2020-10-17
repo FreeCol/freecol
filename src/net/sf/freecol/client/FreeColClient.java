@@ -54,6 +54,7 @@ import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -955,6 +956,8 @@ public final class FreeColClient {
             final Player player = getMyPlayer();
             player.changePlayerType(Player.PlayerType.RETIRED);
             getInGameController().highScore(null);
+            final Map map = getGame().getMap();
+            player.revealMap(player, map);
             askServer().retire();
         }
     }

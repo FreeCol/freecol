@@ -716,7 +716,7 @@ public class SimpleCombatModel extends CombatModel {
             }
             if (great || loserMustDie
                 || loser.getRepairLocation() == null
-                || loser.isBeached()) {
+                || loser.isBeached()) { 
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
                 crs.add(CombatResult.DAMAGE_SHIP_ATTACK);

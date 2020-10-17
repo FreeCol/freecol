@@ -2973,6 +2973,17 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
 
+    public void revealMap(Player player, Map map)
+    {
+     	for(int i = 0; i < map.getWidth(); i++)
+     	{
+     		for(int j = 0; j <map.getHeight(); j++)
+     		{
+     			map.getTile(i,j).setExplored(player, true);
+     		}
+     	}
+     
+     }
     //
     // Foreign relations
     //

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -116,7 +117,10 @@ public class HighScore extends FreeColObject {
 
     /** The high score. */
     private int score;
-
+  
+    /** The game id. */
+    private UUID gameID;
+    
     /** The ScoreLevel/title for this score. */
     private ScoreLevel level;
 
@@ -143,7 +147,7 @@ public class HighScore extends FreeColObject {
 
 
     /**
-     * Trivial constructor, for Game.newInstance.
+     * Trivial construc1tor, for Game.newInstance.
      */
     public HighScore() {}
 
@@ -157,6 +161,7 @@ public class HighScore extends FreeColObject {
         this.date = new Date();
         this.retirementTurn = game.getTurn().getNumber();
         this.score = player.getScore();
+        this.gameID = game.getUUID();
         this.level = find(ScoreLevel.values(),
                           sl -> sl.getMinimumScore() <= this.score,
                           ScoreLevel.PARASITIC_WORM);
@@ -236,6 +241,15 @@ public class HighScore extends FreeColObject {
      */
     public final int getScore() {
         return score;
+    }
+    
+    /**
+     * Get the game id.
+     * 
+     * @return The game id.
+     */
+    public final UUID getGameID() {
+    	return gameID;
     }
 
     /**
@@ -335,7 +349,11 @@ public class HighScore extends FreeColObject {
      * @param scores The list of {@code HighScore}s to operate on.
      */
     private static void tidyScores(List<HighScore> scores) {
-        if (scores.size() > NUMBER_OF_HIGH_SCORES) {
+        for (int i = 0; i < scores.size(); i++) {
+        	
+        }
+    	
+    	if (scores.size() > NUMBER_OF_HIGH_SCORES) {
             scores = scores.subList(0, NUMBER_OF_HIGH_SCORES - 1);
         }
         scores.sort(descendingScoreComparator);
@@ -348,10 +366,18 @@ public class HighScore extends FreeColObject {
      * @param scores A list of {@code HighScore} to check against.
      * @return True if the given score can be added to the list.
      */
-    public static boolean checkHighScore(int score, List<HighScore> scores) {
-        return /*!FreeColDebugger.isInDebugMode() && */score >= 0
-            && (scores.size() < NUMBER_OF_HIGH_SCORES
-                || score > scores.get(scores.size()-1).getScore());
+    public static boolean checkHighScore(HighScore score, List<HighScore> scores) {
+        boolean sameGameandScore = false;
+        for (int i = 0; i < scores.size(); i++) {
+        	if (scores.get(i).getGameID().compareTo(score.getGameID()) == 0 
+        			&& scores.get(i).getScore() >= score.getScore()) {
+        		sameGameandScore = true;
+        	}
+        }
+    	return /*!FreeColDebugger.isInDebugMode() && */
+    		!sameGameandScore && score.getScore() >= 0
+    		&& (scores.size() < NUMBER_OF_HIGH_SCORES
+    		|| score.getScore() > scores.get(scores.size()-1).getScore());
     }
 
     /**
@@ -363,9 +389,16 @@ public class HighScore extends FreeColObject {
      */
     public static boolean newHighScore(Player player) {
         List<HighScore> scores = loadHighScores();
-        if (!checkHighScore(player.getScore(), scores)) return false;
+        if (!checkHighScore(new HighScore(player), scores)) return false;
         HighScore hs = new HighScore(player);
-        scores.add(hs);
+        boolean replaceOldScore = false;
+        for (int i = 0; i < scores.size(); i++) {
+        	if (scores.get(i).getGameID().compareTo(hs.getGameID()) == 0) {
+        		scores.set(i, hs);
+        		replaceOldScore = true;
+        	}
+        }
+        if (!replaceOldScore) scores.add(hs);
         tidyScores(scores);
         return saveHighScores(scores);
     }
@@ -446,7 +479,7 @@ public class HighScore extends FreeColObject {
     }
 
 
-    // Overide FreeColObject
+    // Override FreeColObject
 
     /**
      * {@inheritDoc}

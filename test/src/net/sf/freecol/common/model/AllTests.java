@@ -39,6 +39,7 @@ public class AllTests {
         suite.addTestSuite(FoundingFatherTest.class);
         suite.addTestSuite(GameTest.class);
         suite.addTestSuite(GoodsTest.class);
+        suite.addTestSuite(HighScoreTest.class);
         suite.addTestSuite(GoodsContainerTest.class);
         suite.addTestSuite(IndianSettlementTest.class);
         suite.addTestSuite(IndividualFatherTest.class);
@@ -53,11 +54,13 @@ public class AllTests {
         suite.addTestSuite(PlayerTest.class);
         suite.addTestSuite(ProductionTypeTest.class);
         suite.addTestSuite(RandomRangeTest.class);
+        suite.addTestSuite(RevealMapTest.class);
         suite.addTestSuite(RoleTest.class);
         suite.addTestSuite(SchoolTest.class);
         suite.addTestSuite(ScopeTest.class);
         suite.addTestSuite(SerializationTest.class);
         suite.addTestSuite(SettlementTest.class);
+        suite.addTestSuite(SinkTest.class);
         suite.addTestSuite(SoLTest.class);
         suite.addTestSuite(TileImprovementTest.class);
         suite.addTestSuite(TileItemContainerTest.class);

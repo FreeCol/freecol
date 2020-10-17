@@ -221,6 +221,7 @@ public class Unit extends GoodsLocation
     /** Current unit role. */
     protected Role role;
 
+    protected int RepairNum;
     /**
      * The amount of role-equipment this unit carries, subject to
      * role.getMaximumCount().  Currently zero or one except for pioneers.
@@ -705,7 +706,7 @@ public class Unit extends GoodsLocation
     public UnitState getState() {
         return state;
     }
-
+   
     /**
      * Checks if a {@code Unit} can get the given state set.
      *
@@ -2045,12 +2046,31 @@ public class Unit extends GoodsLocation
     public Location getRepairLocation() {
         final Player player = getOwner();
         final Colony notHere = getTile().getColony();
+        if (IncRepair(this) == 3)
+        {
+        	return null;
+        }
         final Predicate<Colony> repairPred = c ->
             c != notHere && c.hasAbility(Ability.REPAIR_UNITS);
         Location loc = getClosestColony(transform(player.getColonies(), repairPred));
         return (loc != null) ? loc : player.getEurope();
     }
-
+    
+    /** 
+     * 
+     * @param unit
+     * @return Returns the number of times a ship has gotten repaired
+     */
+    public int IncRepair(Unit unit)
+    {
+    	return RepairNum++;
+    }
+    
+    
+    public void setRepairNum(int RepairNum)
+    {
+    	this.RepairNum = RepairNum;
+    }
     /**
      * Damage this unit (which should be a ship).
      *
@@ -2063,8 +2083,6 @@ public class Unit extends GoodsLocation
         setState(Unit.UnitState.ACTIVE);
         setMovesLeft(0);
     }
-
-
     // Movement handling
 
     /**
