@@ -72,9 +72,12 @@ public abstract class Settlement extends GoodsLocation
 
     /** Contains the abilities and modifiers of this Settlement. */
     private final FeatureContainer featureContainer = new FeatureContainer();
-
-
-    /**
+    
+    /** All settlement names that all players have owned. */
+    protected final List<String> allSettlements = new ArrayList<>();
+    
+    
+    /************************************************************************************************************************************
      * Create a new {@code Settlement}.
      *
      * @param game The enclosing {@code Game}.
@@ -84,9 +87,8 @@ public abstract class Settlement extends GoodsLocation
      */
     protected Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
-
         this.owner = owner;
-        this.name = name;
+        this.name = compareNames(name);
         this.tile = tile;
         changeType(owner.getNationType().getSettlementType(false));
     }
@@ -103,7 +105,26 @@ public abstract class Settlement extends GoodsLocation
         super(game, id);
     }
 
-
+    
+    /**
+     * Recursively adds "New " onto the given name of a settlement to avoid
+     * repeating settlement names.
+     * @param name The name given to recurse.
+     * @return name The new name.
+     */
+    protected String compareNames(String name)
+    {
+    	if(!allSettlements.contains(name)){
+    		allSettlements.add(name);
+    		return name;
+    	}
+    	else{
+    		compareNames("New " + name);
+    	}
+    	return name;
+    }
+    
+    
     /**
      * Get the type of this settlement.
      *

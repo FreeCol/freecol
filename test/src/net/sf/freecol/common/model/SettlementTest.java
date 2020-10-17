@@ -23,6 +23,8 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.server.model.ServerBuilding;
+import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -41,7 +43,9 @@ public class SettlementTest extends FreeColTestCase {
         = spec().getRole("model.role.nativeDragoon");
     private static final Role soldierRole
         = spec().getRole("model.role.soldier");
-
+    private static final UnitType soldierType
+    = spec().getUnitType("model.unit.veteranSoldier");
+    
 
     public void testSettlementRadius() throws FreeColException {
         Game game = getStandardGame();
@@ -216,4 +220,40 @@ public class SettlementTest extends FreeColTestCase {
         assertTrue(is.equipForRole(brave, nativeDragoonRole, 1));
         assertNull(is.canImproveUnitMilitaryRole(brave));
     }
+    
+    public void testCompareNames()
+    {
+    	String set1 = "Seattle";
+        Game game = getGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+        
+        map.getTile(4, 8).setType(spec().getTileType("model.tile.canSettle"));
+        Player inca = game.getPlayerByNationId("model.nation.inca");
+        
+        ServerUnit soldier = new ServerUnit(game, 
+        		map.getTile(6, 8), inca, soldierType);
+        ServerColony colony = new ServerColony(game, 
+        		inca, set1, soldier.getTile());
+        
+        assertEquals("Seattle", colony.getSettlement().getName());
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
