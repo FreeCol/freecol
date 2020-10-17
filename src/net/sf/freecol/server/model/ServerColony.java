@@ -105,7 +105,7 @@ public class ServerColony extends Colony implements TurnTaker {
             colonyTiles.add(new ServerColonyTile(game, this, t));
         }
 
-        Building building;
+        //Building building;
         List<BuildingType> buildingTypes = spec.getBuildingTypeList();
         for (BuildingType buildingType : transform(buildingTypes, bt ->
                 bt.isAutomaticBuild() || isAutomaticBuild(bt))) {
@@ -331,7 +331,7 @@ public class ServerColony extends Colony implements TurnTaker {
         cs.add(See.perhaps(), getTile()); // Colony size might have changed
     }
 
-    /**
+    /*********************************************************************************************************************************
      * Change the owner of this colony.
      *
      * -vis: Owner and new owner

@@ -39,6 +39,7 @@ public class AllTests {
         suite.addTestSuite(FoundingFatherTest.class);
         suite.addTestSuite(GameTest.class);
         suite.addTestSuite(GoodsTest.class);
+        suite.addTestSuite(HighScoreTest.class);
         suite.addTestSuite(GoodsContainerTest.class);
         suite.addTestSuite(IndianSettlementTest.class);
         suite.addTestSuite(IndividualFatherTest.class);

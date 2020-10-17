@@ -1,0 +1,4 @@
+<highScores>
+  <highScore date="1602533834788" retirementTurn="1" independenceTurn="-1" playerName="William I" nationId="model.nation.dutch" nationTypeId="model.nationType.trade" score="100" level="PARASITIC_WORM" nationName="Dutch" newLandName="New World" difficulty="model.difficulty.medium" units="0" colonies="0"/>
+  <highScore date="1602533834805" retirementTurn="1" independenceTurn="-1" playerName="William I" nationId="model.nation.dutch" nationTypeId="model.nationType.trade" score="100" level="PARASITIC_WORM" nationName="Dutch" difficulty="model.difficulty.medium" units="0" colonies="0"/>
+</highScores>
