@@ -2710,6 +2710,17 @@ public class Unit extends GoodsLocation
             && getDestination() == null
             && getTradeRoute() == null;
     }
+    
+    /**
+     * Can this unit move and was it skipped?
+     * 
+     * Used in determining whether to show end turn dialog.
+     * 
+     * @return True if the unit could still move and wasn't skipped.
+     */
+    public boolean couldMoveandWasntSkipped() {
+    	return couldMove() && getState() != UnitState.SKIPPED;
+    }
 
     /**
      * Is this unit a suitable `going-to unit', that is, the unit

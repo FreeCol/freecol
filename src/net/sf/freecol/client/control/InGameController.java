@@ -841,7 +841,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean doEndTurn(boolean showDialog) {
         final Player player = getMyPlayer();
         if (showDialog) {
-            List<Unit> units = transform(player.getUnits(), Unit::couldMove);
+            List<Unit> units = transform(player.getUnits(), Unit::couldMoveandWasntSkipped);
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 getGUI().showEndTurnDialog(units,
