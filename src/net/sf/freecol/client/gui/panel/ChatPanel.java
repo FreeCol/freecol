@@ -38,7 +38,7 @@ public final class ChatPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(ChatPanel.class.getName());
 
-    public static final int CHAT = 1;
+    public static final int NOTE = 1;
 
     private final JTextField field;
 
@@ -56,7 +56,7 @@ public final class ChatPanel extends FreeColPanel {
         label.setFocusable(false);
 
         this.field = new JTextField("", 40);
-        this.field.setActionCommand(String.valueOf(CHAT));
+        this.field.setActionCommand(String.valueOf(NOTE));
         this.field.addActionListener(this);
         add(this.field, BorderLayout.CENTER);
         this.field.setFocusable(true);
@@ -79,7 +79,7 @@ public final class ChatPanel extends FreeColPanel {
      *
      * @return The chat message.
      */
-    public String getChatText() {
+    public String getNote() {
         String message = this.field.getText();
         this.field.setText("");
         return message;
@@ -96,8 +96,8 @@ public final class ChatPanel extends FreeColPanel {
         final String command = ae.getActionCommand();
         try {
             switch (Integer.parseInt(command)) {
-            case CHAT:
-                String message = getChatText();
+            case NOTE:
+                String message = getNote();
                 igc().chat(message);
                 getGUI().removeComponent(this);
                 break;

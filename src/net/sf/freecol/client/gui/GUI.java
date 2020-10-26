@@ -1828,6 +1828,13 @@ public class GUI extends FreeColClientHolder {
      * @return The panel shown.
      */
     public FreeColPanel showChatPanel() { return null; }
+    
+    /**
+     * Show the ToDo panel.
+     *
+     * @return The panel shown.
+     */
+    public FreeColPanel showToDoPanel() { return null; }
 
     /**
      * Show the founding father choice panel.
