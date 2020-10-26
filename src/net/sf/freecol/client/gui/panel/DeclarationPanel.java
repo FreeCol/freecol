@@ -35,11 +35,13 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
 import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -60,7 +62,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
     private final int START_DELAY = 2000; // 2s before signing
     private final int ANIMATION_DELAY = 50; // 50ms between signature steps
-    private final int FINISH_DELAY = 5000; // 5s before closing
+    private final int FINISH_DELAY = 100000; // 1min before closing
 
 
     /**
@@ -75,6 +77,7 @@ public final class DeclarationPanel extends FreeColPanel {
         setSize(image.getWidth(null), image.getHeight(null));
         setOpaque(false);
         setBorder(null);
+        JButton okbutton = new JButton("OK");
         addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent k) {
@@ -95,6 +98,7 @@ public final class DeclarationPanel extends FreeColPanel {
         signaturePanel.addActionListener(this);
 
         add(signaturePanel);
+        add(okButton, "newline, span, split 2, tag ok");
     
         Timer t = new Timer(START_DELAY, (ActionEvent ae) -> {
                 signaturePanel.startAnimation();
@@ -105,14 +109,20 @@ public final class DeclarationPanel extends FreeColPanel {
 
 
     // Interface ActionListener
-
+    // command2 checks if the player has clicked ok if not then close
+    // the panel after 30s.
     /**
      * {@inheritDoc}
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
-        if (ANIMATION_STOPPED.equals(command)) {
+        final String command2= ae.getActionCommand();
+        if (OK.equals(command2))
+        	{
+        		getGUI().removeComponent(DeclarationPanel.this);
+        	}
+        else if (ANIMATION_STOPPED.equals(command)) {
             Timer t = new Timer(FINISH_DELAY, (x) -> {
                     getGUI().removeComponent(DeclarationPanel.this);
                 });

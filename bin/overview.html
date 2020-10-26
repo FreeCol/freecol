@@ -1,0 +1,58 @@
+<html>
+<body>
+<br>This is the javadoc generated code documentation for FreeCol.
+<p>
+<h4>Overview</h4>
+The {@link net.sf.freecol main package} contains the class 
+{@link net.sf.freecol.FreeCol} which is responsible for handling 
+the command-line arguments and starting either 
+a stand-alone server or a client-GUI.
+<p>
+The rest of the program has been divided into three separate packages:
+{@link net.sf.freecol.client client},
+{@link net.sf.freecol.common common} and
+{@link net.sf.freecol.server server}.
+<p>
+You might have noticed a fourth package named
+{@link net.sf.freecol.metaserver metaserver}, but this is a separate
+program. The metaserver is running on <code>meta.freecol.org:3540</code> 
+in order to maintain a central list of public servers. 
+
+<br>&nbsp;
+<h4>Client/server-architecture</h4>
+We use a client/server-architecture. That is: a group of clients connects 
+to the server in order to play a game. We are also using this approach 
+even when a singleplayer game has been chosen (then there is only one 
+client connected to the server).
+<p>
+The client and the server are really two different programs, even though 
+it is possible to start the server from the client GUI, and all interaction 
+between the client and the server, after the creation of the server, 
+should be done by communicating through the network.
+<p>
+Both the clients and the server has a game model, but only the server has 
+the complete game model containing all the information. The client model 
+only contains the information being visible to the player using the client.
+<p>
+One important point here is: You will need to update all the clients' models 
+as well as the server model if you want perform an action (like building 
+a colony, moving a unit etc).
+<p>
+<i>Read more at: 
+<a href="http://www.freecol.org/index.php?section=15">
+Overview of the client/server-architecture</a>
+</i>
+
+<br>&nbsp;
+<h4>The game model</h4>
+The <code>common</code> package contains everything being shared between 
+the client and the server. One of these things is the 
+{@link net.sf.freecol.common.model game model} which is best described as 
+being a model of the imaginary world we are creating. 
+<p>
+The model should only contain the information needed to model the imaginary world. 
+That is; it should not contain information on how the map should be displayed etc.
+
+
+</body>
+</html>

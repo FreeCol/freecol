@@ -97,6 +97,7 @@ import net.sf.freecol.client.gui.panel.report.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.report.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.report.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.report.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.report.ToDoPanel;
 import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.client.gui.dialog.SaveDialog;
 import net.sf.freecol.client.gui.dialog.ScaleMapSizeDialog;
@@ -1266,6 +1267,16 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
         if (panel == null) {
             panel = new ReportReligiousPanel(this.freeColClient);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
+        }
+        return panel;
+    }
+    
+    public FreeColPanel showToDoPanel() {
+        ToDoPanel panel
+            = this.canvas.getExistingFreeColPanel(ToDoPanel.class);
+        if (panel == null) {
+            panel = new ToDoPanel(this.freeColClient);
             this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;

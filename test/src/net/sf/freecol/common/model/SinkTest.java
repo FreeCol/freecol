@@ -18,7 +18,9 @@ public class SinkTest extends FreeColTestCase {
     
     private static final UnitType privateerType
     = spec().getUnitType("model.unit.privateer");
-	public void testAddSink() {
+    
+	public void testAddSink() 
+	{
 		final Game game =  ServerTestHelper.startServerGame(getTestMap(ocean));
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();

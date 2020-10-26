@@ -86,6 +86,7 @@ import net.sf.freecol.client.gui.action.ShowMainAction;
 import net.sf.freecol.client.gui.action.ShowMapGeneratorOptionsAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.TilePopupAction;
+import net.sf.freecol.client.gui.action.ToDoAction;
 import net.sf.freecol.client.gui.action.ToggleViewModeAction;
 import net.sf.freecol.client.gui.action.TradeRouteAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
@@ -292,6 +293,11 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ShowDifficultyAction.id));
         menu.add(getMenuItem(ShowGameOptionsAction.id));
         menu.add(getMenuItem(ShowMapGeneratorOptionsAction.id));
+        
+        menu.addSeparator();
+        
+        menu.add(getMenuItem(ToDoAction.id));
+        
 
         add(menu);
     }
