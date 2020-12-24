@@ -1802,8 +1802,8 @@ ok:     while (!openMap.isEmpty()) {
                 if (lb != null) lb.add(" ***goal(",
                     currentNode.getCost(), ")***");
                 best = goalDecider.getGoal();
+                if (best == null || !goalDecider.hasSubGoals()) break ok;
                 bestScore = best.getCost();
-                if (!goalDecider.hasSubGoals()) break ok;
                 continue;
             }
 

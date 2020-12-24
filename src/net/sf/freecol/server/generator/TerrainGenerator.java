@@ -261,7 +261,8 @@ public class TerrainGenerator {
         }
 
         // Filter the candidates by forest presence.
-        boolean forested = this.cache.nextInt(100) < forestChance;
+        boolean forested = this.cache.nextInt(100) < forestChance
+            && any(candidateTileTypes, TileType::isForested);
         i = 0;
         while (i < candidateTileTypes.size()) {
             TileType type = candidateTileTypes.get(i);
