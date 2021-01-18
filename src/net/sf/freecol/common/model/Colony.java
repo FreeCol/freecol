@@ -2981,6 +2981,8 @@ public class Colony extends Settlement implements TradeLocation {
         this.displayUnitCount = o.getDisplayUnitCount();
 
         for (WorkLocation wl : getAllWorkLocationsList()) wl.setColony(this);
+
+        invalidateCache(); // Almost any change will break the cache
         return true;
     }
 
