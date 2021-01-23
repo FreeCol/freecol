@@ -2310,7 +2310,7 @@ public class SwingGUI extends GUI {
     @Override
     public FreeColPanel showTradeRoutePanel(Unit unit) {
         return this.widgets.showTradeRoutePanel(unit,
-            getPopupPosition(unit.getTile()));
+            getPopupPosition((unit == null) ? null : unit.getTile()));
     }
 
     /**
