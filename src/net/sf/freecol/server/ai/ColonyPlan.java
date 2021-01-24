@@ -871,8 +871,11 @@ public class ColonyPlan {
                     int i = produce.indexOf(gt);
                     return (i < 0 && !gt.isFoodType()) ? 99999 : i;
                 })
-            .thenComparingInt((WorkLocationPlan wp) ->
-                wp.getWorkLocation().getGenericPotential(wp.getGoodsType()))
+            // Should be in reverse order (highest value first)
+            .thenComparingInt((WorkLocationPlan wp) -> {
+                return wp.getWorkLocation().getGenericPotential(wp.getGoodsType()) * -1;
+                })
+
             .thenComparing(WorkLocationPlan::getGoodsType,
                            GoodsType.goodsTypeComparator);
         workPlans.sort(comp);
@@ -1485,6 +1488,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             " ", colony.getTile(),
             "\nProfile: ", profileType, "\nPreferred production:");
         FreeColObject.logFreeColObjects(getPreferredProduction(), lb);
+        lb.add("\n");
         lb.add(getBuildableReport(), "Food Plans:\n");
         for (WorkLocationPlan wlp : getFoodPlans()) {
             WorkLocation wl = wlp.getWorkLocation();
