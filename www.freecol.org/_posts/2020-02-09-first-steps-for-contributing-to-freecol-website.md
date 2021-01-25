@@ -2,7 +2,7 @@
   title: First Steps For Contributing To FreeCol Website
   author: Sebastian Zhorel
 ---
-*Sunday, 2020-07-05:
+*Sunday, 2021-07-05:
 This is a repost from the FreeCol forum to preserve this guide. It includes
 a few additional improvements.  
 Many thanks to Blake for initially having me write this, trying everything out
