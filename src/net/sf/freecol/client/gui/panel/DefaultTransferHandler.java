@@ -331,6 +331,25 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     /**
+     * Import goods type specified by label to a component.
+     *
+     * @param comp The component to import to.
+     * @param label The {@code GoodsTypeLabel} specifying the goods.
+     * @return True if the import succeeds.
+     */
+    private boolean importGoodsType(JComponent comp, GoodsTypeLabel label) {
+        if (comp instanceof GoodsTypePanel) {
+            GoodsTypePanel gtp = (GoodsTypePanel)comp;
+            GoodsType gt = label.getType();
+            if (!gtp.accepts(gt)) {
+                return importFail(gtp, "unacceptable goods type: " + gt);
+            }
+            return gtp.add(label, false) != null;
+        }
+        return false;
+    }
+            
+    /**
      * Import goods specified by label to a component.
      *
      * @param comp The component to import to.
@@ -565,6 +584,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             ret = (data.getParent() == comp)
                 ? importFail(comp, "data-already-present")
+                : (data instanceof GoodsTypeLabel)
+                ? importGoodsType(comp, (GoodsTypeLabel)data)
                 : (data instanceof GoodsLabel)
                 ? importGoods(comp, (GoodsLabel)data, oldSelectedUnit)
                 : (data instanceof MarketLabel)
