@@ -802,7 +802,7 @@ public class ClientOptions extends OptionGroup {
                 : new Point(etc.getInteger(className + ".x"),
                     etc.getInteger(className + ".y"));
         } catch (Exception ex) {
-            logger.log(Level.FINEST, "Missing position option", ex);
+            logger.finest("Missing position option for " + className);
             return null;
         }
     }
@@ -821,7 +821,7 @@ public class ClientOptions extends OptionGroup {
                 : new Dimension(etc.getInteger(className + ".w"),
                                 etc.getInteger(className + ".h"));
         } catch (Exception ex) {
-            logger.log(Level.FINEST, "Missing size option", ex);
+            logger.finest("Missing size option for " + className);
             return null;
         }
     }

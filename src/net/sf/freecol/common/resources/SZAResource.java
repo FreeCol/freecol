@@ -38,7 +38,7 @@ public class SZAResource extends Resource {
     
     private static final Logger logger = Logger.getLogger(SZAResource.class.getName());
 
-    private static final Float DEFAULT_SCALE = new Float(1f);
+    private static final Float DEFAULT_SCALE = 1f;
     
     private final HashMap<Float, SimpleZippedAnimation> cache
         = new HashMap<>();
@@ -64,7 +64,7 @@ public class SZAResource extends Resource {
             try {
                 SimpleZippedAnimation sza
                     = new SimpleZippedAnimation(getResourceLocator().toURL());
-                this.cache.put(new Float(DEFAULT_SCALE), sza);
+                this.cache.put(DEFAULT_SCALE, sza);
             } catch (IOException e) {
                 logger.log(Level.WARNING,
                     "Could not load SimpleZippedAnimation: "

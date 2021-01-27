@@ -665,10 +665,11 @@ public final class Widgets {
     public FreeColPanel showInformationPanel(FreeColObject displayObject,
                                              PopupPosition pos, ImageIcon icon,
                                              StringTemplate tmpl) {
-        String text = Messages.message(tmpl);
         InformationPanel panel
-            = new InformationPanel(this.freeColClient, text,
-                                   displayObject, icon);
+            = new InformationPanel(this.freeColClient,
+                                   new String[] { Messages.message(tmpl) },
+                                   new FreeColObject[] { displayObject },
+                                   new ImageIcon[] { icon });
         return this.canvas.showFreeColPanel(panel, pos, true);
     }
 

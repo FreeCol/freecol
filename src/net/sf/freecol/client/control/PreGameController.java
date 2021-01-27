@@ -313,7 +313,7 @@ public final class PreGameController extends FreeColClientHolder {
             return false;
         }
         
-        // Tutorial message if needed
+        // Starting message if needed
         if (getGame().getTurn().getNumber() == 1) {
             player.addStartGameMessage();
         }

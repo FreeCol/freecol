@@ -891,8 +891,8 @@ public final class ColonyPanel extends PortPanel
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
-                netProductionPanel.add(new ProductionLabel(freeColClient,
-                        new AbstractGoods(goodsType, amount)));
+                AbstractGoods ag = new AbstractGoods(goodsType, amount);
+                netProductionPanel.add(new ProductionLabel(freeColClient, ag));
             }
         }
         netProductionPanel.revalidate();
