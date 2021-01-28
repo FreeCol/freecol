@@ -3183,7 +3183,11 @@ public final class InGameController extends FreeColClientHolder {
         if (ret) {
             if (colonyWas != null) colonyWas.fireChanges();
             if (europeWas != null) europeWas.fireChanges();
-            if (marketWas != null) marketWas.fireChanges(req);
+            if (marketWas != null) {
+            	// Change sign due to mixup buy/sell
+            	for (AbstractGoods ag : req) ag.setAmount(-ag.getAmount());
+            	marketWas.fireChanges(req);
+            }
             unitWas.fireChanges();
             updateGUI(null, false);
         }
