@@ -1340,16 +1340,24 @@ public final class ColonyPanel extends PortPanel
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Unit unit) {
-            return !unit.isCarrier();
+        public boolean accepts(Goods goods) {
+            return false;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Goods goods) {
+        public boolean accepts(GoodsType goodsType) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean accepts(Unit unit) {
+            return !unit.isCarrier();
         }
 
         /**
@@ -1568,7 +1576,15 @@ public final class ColonyPanel extends PortPanel
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Unit unit) {
+        public boolean accepts(Goods goods) {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean accepts(GoodsType goodsType) {
             return false;
         }
 
@@ -1576,8 +1592,8 @@ public final class ColonyPanel extends PortPanel
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Goods goods) {
-            return true;
+        public boolean accepts(Unit unit) {
+            return false;
         }
 
         /**
@@ -1807,16 +1823,24 @@ public final class ColonyPanel extends PortPanel
              * {@inheritDoc}
              */
             @Override
-            public boolean accepts(Unit unit) {
-                return unit.isPerson();
+            public boolean accepts(Goods goods) {
+                return false;
             }
 
             /**
              * {@inheritDoc}
              */
             @Override
-            public boolean accepts(Goods goods) {
+            public boolean accepts(GoodsType goodsType) {
                 return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean accepts(Unit unit) {
+                return unit.isPerson();
             }
 
             /**
@@ -2202,25 +2226,26 @@ public final class ColonyPanel extends PortPanel
 
             /**
              * {@inheritDoc}
-             *
-             * @return - <b>true</b> if the specified {@code Unit} is a person,
-             *           <b>false</b> otherwise
-             *
-             * @see net.sf.freecol.common.model.Ability#PERSON
-             */
-            @Override
-            public boolean accepts(Unit unit) {
-                return unit.isPerson();
-            }
-
-            /**
-             * {@inheritDoc}
-             *
-             * @return <b>false</b>, always
              */
             @Override
             public boolean accepts(Goods goods) {
                 return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean accepts(GoodsType goodsType) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean accepts(Unit unit) {
+                return unit.isPerson();
             }
 
             /**

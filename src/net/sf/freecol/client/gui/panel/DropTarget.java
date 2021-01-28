@@ -29,22 +29,28 @@ import net.sf.freecol.common.model.Unit;
 public interface DropTarget {
 
     /**
-     * Returns {@code true} if the given Unit could be dropped on
-     * this target.
+     * Can the given goods be dropped on this target?
      *
-     * @param unit an {@code Unit} value
-     * @return a {@code boolean} value
-     */
-    public boolean accepts(Unit unit);
-
-    /**
-     * Returns {@code true} if the given Goods could be dropped on
-     * this target.
-     *
-     * @param goods a {@code Goods} value
-     * @return a {@code boolean} value
+     * @param goods The {@code Goods} to check.
+     * @return True if the goods are acceptable.
      */
     public boolean accepts(Goods goods);
+
+    /**
+     * Can the given type of goods be dropped on this target?
+     *
+     * @param goodsType The {@code GoodsType} to check.
+     * @return True if the goods type is acceptable.
+     */
+    public boolean accepts(GoodsType goodsType);
+
+    /**
+     * Can the given unit be dropped on this target?
+     *
+     * @param unit The {@code Unit} to check.
+     * @return True if the unit is acceptable.
+     */
+    public boolean accepts(Unit unit);
 
     /**
      * Adds a component to this container and makes sure that the unit or

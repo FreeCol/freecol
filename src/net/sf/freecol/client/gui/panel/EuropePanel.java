@@ -148,16 +148,24 @@ public final class EuropePanel extends PortPanel {
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Unit unit) {
-            return unit.isNaval() && !unit.isDamaged();
+        public boolean accepts(Goods goods) {
+            return false;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Goods goods) {
+        public boolean accepts(GoodsType goodsType) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean accepts(Unit unit) {
+            return unit.isNaval() && !unit.isDamaged();
         }
 
         /**
@@ -259,13 +267,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        public boolean accepts(Unit unit) {
-            return !unit.isNaval();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
         public void selectLabel() {
             // do nothing
         }
@@ -278,6 +279,20 @@ public final class EuropePanel extends PortPanel {
         @Override
         public boolean accepts(Goods goods) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(GoodsType goodsType) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            return !unit.isNaval();
         }
 
         /**
@@ -414,7 +429,15 @@ public final class EuropePanel extends PortPanel {
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Unit unit) {
+        public boolean accepts(Goods goods) {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean accepts(GoodsType goodsType) {
             return false;
         }
 
@@ -422,8 +445,8 @@ public final class EuropePanel extends PortPanel {
          * {@inheritDoc}
          */
         @Override
-        public boolean accepts(Goods goods) {
-            return true;
+        public boolean accepts(Unit unit) {
+            return false;
         }
 
         /**

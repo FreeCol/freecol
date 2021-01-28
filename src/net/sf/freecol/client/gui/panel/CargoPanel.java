@@ -183,16 +183,24 @@ public class CargoPanel extends FreeColPanel
      * {@inheritDoc}
      */
     @Override
-    public boolean accepts(Unit unit) {
-        return carrier != null && carrier.canAdd(unit);
+    public boolean accepts(Goods goods) {
+        return carrier != null && carrier.canAdd(goods);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean accepts(Goods goods) {
-        return carrier != null && carrier.canAdd(goods);
+    public boolean accepts(GoodsType goodsType) {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean accepts(Unit unit) {
+        return carrier != null && carrier.canAdd(unit);
     }
 
     /**
