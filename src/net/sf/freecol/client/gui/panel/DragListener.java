@@ -32,8 +32,8 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
+import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.panel.TradeRouteInputPanel.TradeRouteCargoLabel;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.OSUtils;
 
@@ -164,7 +164,7 @@ public final class DragListener extends MouseAdapter {
                 && this.parentPanel instanceof PortPanel) {
                 ((PortPanel)this.parentPanel).setSelectedUnitLabel(label);
             }
-        } else if (comp instanceof TradeRouteCargoLabel) {
+        } else if (comp instanceof GoodsTypeLabel) {
             ; // Do nothing, TradeRouteInputPanel handles this
         } else {
             System.err.println("DragListener did not recognize:" + comp);

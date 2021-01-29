@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
 import net.sf.freecol.client.gui.label.Draggable;
 import net.sf.freecol.client.gui.label.GoodsLabel;
+import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.model.Ability;
@@ -68,9 +69,9 @@ import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**
- * The TransferHandler that is capable of creating ImageSelection objects.
- * Those ImageSelection objects are Transferable.  The DefaultTransferHandler
- * should be attached to JPanels or custom JLabels.
+ * A {@code TransferHandler} for {@code ImageSelection} {@code Transferable}s.
+ *
+ * The DefaultTransferHandler should be attached to JPanels or custom JLabels.
  */
 public final class DefaultTransferHandler extends TransferHandler {
 
@@ -482,8 +483,8 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public Transferable createTransferable(JComponent comp) {
-        return (comp instanceof JLabel && comp instanceof Draggable)
-            ? new ImageSelection((JLabel) comp)
+        return (comp instanceof JLabel)
+            ? new ImageSelection((JLabel)comp)
             : null;
     }
 
