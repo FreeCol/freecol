@@ -296,7 +296,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.setFont(list.getFont());
             Location location = value.getLocation();
             ImageLibrary lib = getImageLibrary();
-            JLabel icon, name;
+            ImageIcon ii;
+            JLabel name;
 
             if (location instanceof TradeLocation) {
                 TradeLocation tl = (TradeLocation) location;
@@ -310,20 +311,19 @@ public final class TradeRouteInputPanel extends FreeColPanel
             }
 
             if (location instanceof Europe) {
-                Europe europe = (Europe) location;
-                Image image = lib.getSmallerNationImage(europe.getOwner().getNation());
-                icon = new JLabel(new ImageIcon(image));
+                Player owner = ((Europe)location).getOwner();
+                ii = new ImageIcon(lib.getSmallerNationImage(owner.getNation()));
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
-                icon = new JLabel(new ImageIcon(lib.getSmallerSettlementImage(colony)));
+                ii = new ImageIcon(lib.getSmallerSettlementImage(colony));
             } else {
                 throw new IllegalStateException("Bogus location: " + location);
             }
-            panel.add(icon, "spany");
+            panel.add(new JLabel(ii), "spany");
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
-                panel.add(new JLabel(new ImageIcon(
-                    lib.getSmallerGoodsTypeImage(cargo))));
+                ii = new ImageIcon(lib.getSmallerGoodsTypeImage(cargo));
+                panel.add(new JLabel(ii));
             }
             return panel;
         }
@@ -417,14 +417,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.stopList.addListSelectionListener(this);
         JScrollPane tradeRouteView = new JScrollPane(stopList);
 
-        JLabel nameLabel = Utility.localizedLabel("tradeRouteInputPanel.nameLabel");
+        JLabel nameLabel
+            = Utility.localizedLabel("tradeRouteInputPanel.nameLabel");
         this.tradeRouteName = new JTextField(tradeRoute.getName());
 
         JLabel destinationLabel
             = Utility.localizedLabel("tradeRouteInputPanel.destinationLabel");
         this.destinationSelector = new JComboBox<>();
         this.destinationSelector.setRenderer(new DestinationCellRenderer());
-        StringTemplate template = StringTemplate.template("tradeRouteInputPanel.allColonies");
+        StringTemplate template
+            = StringTemplate.template("tradeRouteInputPanel.allColonies");
         this.destinationSelector.addItem(Messages.message(template));
         if (player.getEurope() != null) {
             this.destinationSelector.addItem(player.getEurope().getId());
@@ -440,12 +442,14 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 tradeRoute.setSilent(messagesBox.isSelected());
             });
 
-        this.addStopButton = Utility.localizedButton("tradeRouteInputPanel.addStop");
+        this.addStopButton
+            = Utility.localizedButton("tradeRouteInputPanel.addStop");
         this.addStopButton.addActionListener((ActionEvent ae) -> {
                 addSelectedStops();
             });
 
-        this.removeStopButton = Utility.localizedButton("tradeRouteInputPanel.removeStop");
+        this.removeStopButton
+            = Utility.localizedButton("tradeRouteInputPanel.removeStop");
         this.removeStopButton.addActionListener((ActionEvent ae) -> {
                 deleteCurrentlySelectedStops();
             });

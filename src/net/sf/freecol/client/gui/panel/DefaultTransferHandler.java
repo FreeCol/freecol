@@ -180,15 +180,17 @@ public final class DefaultTransferHandler extends TransferHandler {
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
-
-            if (dsde.getDropSuccess()) {
-                ((DefaultTransferHandler)c.getTransferHandler()).exportDone(c,
-                    dsc.getTransferable(), dsde.getDropAction());
-            } else {
-                ((DefaultTransferHandler)c.getTransferHandler()).exportDone(c,
-                    null, NONE);
+            if (c.getTransferHandler() instanceof DefaultTransferHandler) {
+                DefaultTransferHandler dth
+                    = (DefaultTransferHandler)(c.getTransferHandler());
+                if (dsde.getDropSuccess()) {
+                    dth.exportDone(c, dsc.getTransferable(),
+                                   dsde.getDropAction());
+                } else {
+                    dth.exportDone(c, null, NONE);
+                }
+                c.setAutoscrolls(this.scrolls);
             }
-            c.setAutoscrolls(scrolls);
         }
 
         /**
@@ -550,20 +552,21 @@ public final class DefaultTransferHandler extends TransferHandler {
             // Do not allow a transferable to be dropped upon itself:
             if (comp == data) return false;
 
-            // Make sure we don't drop onto other Labels.
-            if (comp instanceof AbstractGoodsLabel) {
+            // Special cases when dropping onto other labels.
+            if (comp instanceof AbstractGoodsLabel
+                || comp instanceof GoodsTypeLabel) {
+                // We probably intended to drop on the enclosing parent panel
                 comp = getDropTarget(comp);
             } else if (comp instanceof UnitLabel) {
                 UnitLabel unitLabel = (UnitLabel)comp;
                 /**
-                 * If the unit/cargo is dropped on a carrier in port
-                 * then the ship is selected and the unit is added to
-                 * its cargo.  If the unit is not a carrier, but can
-                 * be equipped, and the goods can be converted to
-                 * equipment, equip the unit.
-                 *
-                 * If not, assume that the user wished to drop the
-                 * unit/cargo on the panel below.
+                 * 1. If a unit or goods are dropped onto a carrier in port
+                 *    then the unit/goods is added and the carrier selected.
+                 * 2. If goods are dropped onto a non-carrier unit
+                 *    and it can be equipped
+                 *    and the goods can be converted to equipment
+                 *    then equip the unit.
+                 * 3. Otherwise assume the parent panel is the target
                  */
                 if (unitLabel.getUnit().isCarrier()
                     && unitLabel.getParent() instanceof InPortPanel
@@ -575,7 +578,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
                     portPanel.setSelectedUnitLabel(unitLabel);
                     comp = portPanel.getCargoPanel();
-                } else if (unitLabel.canUnitBeEquippedWith(data)) {
+                } else if (data instanceof AbstractGoodsLabel
+                    && unitLabel.getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     // don't do anything before partial amount has been checked
                 } else {
                     comp = getDropTarget(comp);
@@ -594,7 +598,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                 ? importUnit(comp, (UnitLabel)data, oldSelectedUnit)
                 : importFail(comp, data.toString());
         } catch (Exception e) { // FIXME: Suggest a reconnect?
-            logger.log(Level.WARNING, "Import fail", e);
             ret = importFail(comp, "crash: " + e);
         }
         return ret;
