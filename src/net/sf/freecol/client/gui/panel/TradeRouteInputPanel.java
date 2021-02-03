@@ -129,7 +129,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         private List<GoodsTypeLabel> labels;
         
         public AllGoodsTypesPanel(List<GoodsTypeLabel> labels) {
-            super(new GridLayout(0, 4, MARGIN, MARGIN));
+            super(new GridLayout(0, 4, MARGIN, MARGIN), true);
 
             this.labels = labels;
             setOpaque(false);
@@ -176,7 +176,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private class StopGoodsTypesPanel extends GoodsTypePanel {
 
-        public StopGoodsTypesPanel() {}
+        public StopGoodsTypesPanel() {
+            super(false);
+        }
 
         // Interface DropTarget
 
@@ -579,7 +581,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * @param gt The {@code GoodsType} to stop importing.
      */
     private void cancelImport(GoodsType gt) {
-        this.stopGoodsTypesPanel.removeType(gt);
+        this.stopGoodsTypesPanel.removeGoodsType(gt);
         for (int stopIndex : this.stopList.getSelectedIndices()) {
             TradeRouteStop stop = this.stopListModel.get(stopIndex);
             List<GoodsType> cargo = new ArrayList<>(stop.getCargo());

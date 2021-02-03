@@ -45,21 +45,31 @@ import net.sf.freecol.common.model.Unit;
  */
 public class GoodsTypePanel extends MigPanel implements DropTarget {
 
+    /** Are duplicate entries allowed? */
+    private boolean unique;
+    
+
     /**
      * Build a new cargo panel.
+     *
+     * @param unique Should the goods types be unique or are
+     *     duplicates allowed?
      */
-    public GoodsTypePanel() {
-        this(new MigLayout());
+    public GoodsTypePanel(boolean unique) {
+        this(new MigLayout(), unique);
     }
 
     /**
      * Build a new goods type panel.
      *
      * @param layout The {@code LayoutManager} to use for this panel.
+     * @param unique Should the goods types be unique or are
+     *     duplicates allowed?
      */
-    public GoodsTypePanel(LayoutManager layout) {
+    public GoodsTypePanel(LayoutManager layout, boolean unique) {
         super(layout);
 
+        this.unique = unique;
         setOpaque(false);
         setBorder(Utility.localizedBorder("cargoOnCarrier"));
     }
@@ -79,6 +89,20 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
     }
 
     /**
+     * Find the sub-component goods type label for a given goods type.
+     *
+     * @param gt The {@code GoodsType} to find.
+     * @return The existing subcomponent for that goods type, or null.
+     */
+    private Component findLabel(GoodsType gt) {
+        for (Component child : getComponents()) {
+            if (child instanceof GoodsTypeLabel
+                && ((GoodsTypeLabel)child).getType() == gt) return child;
+        }
+        return null;
+    }
+        
+    /**
      * Add a single label.
      *
      * Do not repaint, that will be done top down.
@@ -86,7 +110,8 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
      * @param label The {@code GoodsTypeLabel} to add.
      */
     public void addLabel(GoodsTypeLabel label) {
-        if (label != null) {
+        if (label != null
+            && (!this.unique || findLabel(label.getType()) == null)) {
             add(label);
             revalidate();
         }
@@ -97,15 +122,12 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
      *
      * @param gt The {@code GoodsType} to remove.
      */
-    public void removeType(GoodsType gt) {
-        for (Component child : getComponents()) {
-            if (child instanceof GoodsTypeLabel) {
-                if (((GoodsTypeLabel)child).getType() == gt) {
-                    remove(child);
-                }
-            }
+    public void removeGoodsType(GoodsType gt) {
+        Component child = findLabel(gt);
+        if (child != null) {
+            remove(child);
+            revalidate();
         }
-        revalidate();
     }
 
     // Implement DropTarget
