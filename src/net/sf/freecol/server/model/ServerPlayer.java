@@ -3977,7 +3977,7 @@ outer:  for (Effect effect : effects) {
             Modifier tpm = makeTeaPartyModifier();
             cs.addModifier(this, colony, tpm, true);
             cs.add(See.only(this), colony.getGoodsContainer());
-            cs.add(See.only(this), market.getMarketData(goodsType));
+            cs.add(See.only(this), market);
             
             String messageId = "model.player.colonyGoodsParty."
                 + goodsType.getSuffix();
