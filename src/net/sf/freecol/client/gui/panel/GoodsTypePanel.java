@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.event.MouseListener;
+import java.awt.LayoutManager;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -48,7 +49,16 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
      * Build a new cargo panel.
      */
     public GoodsTypePanel() {
-        super(new MigLayout());
+        this(new MigLayout());
+    }
+
+    /**
+     * Build a new goods type panel.
+     *
+     * @param layout The {@code LayoutManager} to use for this panel.
+     */
+    public GoodsTypePanel(LayoutManager layout) {
+        super(layout);
 
         setOpaque(false);
         setBorder(Utility.localizedBorder("cargoOnCarrier"));
