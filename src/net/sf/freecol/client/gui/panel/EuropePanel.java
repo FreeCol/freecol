@@ -489,14 +489,6 @@ public final class EuropePanel extends PortPanel {
             return comp;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int suggested(GoodsType type) {
-            return -1; // No good choice
-        }
-
 
         // Override Container
 

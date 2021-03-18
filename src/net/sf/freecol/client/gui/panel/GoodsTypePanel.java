@@ -103,17 +103,7 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
     /**
      * {@inheritDoc}
      */
-    public boolean accepts(Goods goods) { return false; }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean accepts(GoodsType goodsType) { return true; }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean accepts(Unit unit) { return false; }
 
     /**
      * {@inheritDoc}
@@ -125,9 +115,4 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
         }
         return null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-   public int suggested(GoodsType goodsType) { return 0; }
 }

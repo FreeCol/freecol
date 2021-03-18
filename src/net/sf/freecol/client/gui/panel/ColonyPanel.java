@@ -2228,22 +2228,6 @@ public final class ColonyPanel extends PortPanel
              * {@inheritDoc}
              */
             @Override
-            public boolean accepts(Goods goods) {
-                return false;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean accepts(GoodsType goodsType) {
-                return false;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
@@ -2268,12 +2252,6 @@ public final class ColonyPanel extends PortPanel
                 update();
                 return comp;
             }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public int suggested(GoodsType type) { return -1; } // N/A
 
 
             // Interface PropertyChangeListener

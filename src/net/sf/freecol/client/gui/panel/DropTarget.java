@@ -34,7 +34,9 @@ public interface DropTarget {
      * @param goods The {@code Goods} to check.
      * @return True if the goods are acceptable.
      */
-    public boolean accepts(Goods goods);
+    public default boolean accepts(Goods goods) {
+        return false;
+    }
 
     /**
      * Can the given type of goods be dropped on this target?
@@ -42,7 +44,9 @@ public interface DropTarget {
      * @param goodsType The {@code GoodsType} to check.
      * @return True if the goods type is acceptable.
      */
-    public boolean accepts(GoodsType goodsType);
+    public default boolean accepts(GoodsType goodsType) {
+        return false;
+    }
 
     /**
      * Can the given unit be dropped on this target?
@@ -50,7 +54,9 @@ public interface DropTarget {
      * @param unit The {@code Unit} to check.
      * @return True if the unit is acceptable.
      */
-    public boolean accepts(Unit unit);
+    public default boolean accepts(Unit unit) {
+        return false;
+    }
 
     /**
      * Adds a component to this container and makes sure that the unit or
@@ -74,5 +80,7 @@ public interface DropTarget {
      * @param goodsType The {@code GoodsType} proposed to add.
      * @return A good amount of goods to add.
      */
-    public int suggested(GoodsType goodsType);
+    public default int suggested(GoodsType goodsType) {
+        return -1; // Not applicable
+    }
 }
