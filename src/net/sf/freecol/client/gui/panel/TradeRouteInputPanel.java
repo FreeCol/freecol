@@ -119,15 +119,26 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
     /**
      * Panel for all types of goods that can be loaded onto a carrier.
+     * This should *not* change under drag/drop, but a drop indicates
+     * that the dropped goods type is no longer needed to be loaded
+     * at the currently selected stop.
      */
-    private static class TradeRouteGoodsPanel extends MigPanel {
+    private class AllGoodsTypesPanel extends GoodsTypePanel {
 
-        public TradeRouteGoodsPanel(List<GoodsTypeLabel> labels) {
+        /** The currently selected goods types. */
+        private List<GoodsTypeLabel> labels;
+        
+        public AllGoodsTypesPanel(List<GoodsTypeLabel> labels) {
             super(new GridLayout(0, 4, MARGIN, MARGIN));
 
-            for (GoodsTypeLabel label : labels) add(label);
+            this.labels = labels;
             setOpaque(false);
             setBorder(Utility.localizedBorder("goods"));
+            reset();
+        }
+
+        public void reset() {
+            setLabels(this.labels);
         }
 
         /**
@@ -139,6 +150,21 @@ public final class TradeRouteInputPanel extends FreeColPanel
             for (Component child : getComponents()) {
                 if (child instanceof GoodsTypeLabel) child.setEnabled(enable);
             }
+        }
+
+        // Interface DropTarget
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component add(Component comp, boolean editState) {
+            Component ret = super.add(comp);
+            if (comp instanceof GoodsTypeLabel) {
+                GoodsTypeLabel gtl = (GoodsTypeLabel)comp;
+                cancelImport(gtl.getType());
+            }
+            return ret;
         }
     }
 
@@ -363,8 +389,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /** A button to remove stops with. */
     private JButton removeStopButton;
 
-    /** The panel displaying the goods that could be transported. */
-    private final TradeRouteGoodsPanel goodsPanel;
+    /** The panel displaying all goods types that could be transported. */
+    private AllGoodsTypesPanel allGoodsTypesPanel;
 
     /** The panel displaying the cargo at the selected stop. */
     private GoodsTypePanel goodsTypePanel;
@@ -455,10 +481,10 @@ public final class TradeRouteInputPanel extends FreeColPanel
             });
 
         final List<GoodsType> gtl = getSpecification().getGoodsTypeList();
-        this.goodsPanel = new TradeRouteGoodsPanel(transform(gtl,
+        this.allGoodsTypesPanel = new AllGoodsTypesPanel(transform(gtl,
                 GoodsType::isStorable, gt -> buildCargoLabel(gt)));
-        this.goodsPanel.setTransferHandler(this.cargoHandler);
-        this.goodsPanel.setEnabled(false);
+        this.allGoodsTypesPanel.setTransferHandler(this.cargoHandler);
+        this.allGoodsTypesPanel.setEnabled(false);
 
         this.goodsTypePanel = new GoodsTypePanel() {
                 /**
@@ -491,7 +517,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         add(this.messagesBox);
         add(this.addStopButton);
         add(this.removeStopButton, "span");
-        add(this.goodsPanel, "span");
+        add(this.allGoodsTypesPanel, "span");
         add(this.goodsTypePanel, "span, height 80:, growy");
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
@@ -708,9 +734,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
         int[] idx = this.stopList.getSelectedIndices();
         if (idx.length > 0) {
             updateCargoPanel(this.stopListModel.get(idx[0]));
-            this.goodsPanel.setEnabled(true);
+            this.allGoodsTypesPanel.setEnabled(true);
         } else {
-            this.goodsPanel.setEnabled(false);
+            this.allGoodsTypesPanel.setEnabled(false);
         }
         updateButtons();
     }
@@ -733,7 +759,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.messagesBox = null;
         this.addStopButton = null;
         this.removeStopButton = null;
-        this.goodsTypePanel = null;
+        this.allGoodsTypesPanel = null;
 
         super.removeNotify();
     }
