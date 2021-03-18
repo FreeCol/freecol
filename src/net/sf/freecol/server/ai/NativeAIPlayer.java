@@ -628,7 +628,8 @@ public final class NativeAIPlayer extends MissionAIPlayer {
                 int defence = c.getUnitCount() + ((c.getStockade() == null) ? 1
                     : (c.getStockade().getLevel() * 10));
                 int weight = 1 + alarm * (1000000 / defence
-                                                  / path.getTotalTurns());
+                                                  / (path.getTotalTurns() == 0 ? 1
+                                                		  : path.getTotalTurns()));
                 nearbyColonies.add(new RandomChoice<>(c, weight));
             }
             // If there are any suitable colonies, pick one to demand from.
