@@ -390,8 +390,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private final TradeRoute newRoute;
 
-    /** A TransferHandler for the cargo labels. */
-    private TransferHandler cargoHandler;
+    /** The TransferHandler for the cargo labels. */
+    private TransferHandler transferHandler;
 
     /** Mouse listener to use throughout. */
     private transient MouseListener dragListener;
@@ -440,7 +440,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         final TradeRoute tradeRoute = newRoute.copy(game);
 
         this.newRoute = newRoute;
-        this.cargoHandler = new DefaultTransferHandler(freeColClient, this);
+        this.transferHandler = new DefaultTransferHandler(freeColClient, this);
         this.dragListener = new DragListener(freeColClient, this);
 
         this.stopListModel = new DefaultListModel<>();
@@ -511,11 +511,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
         final List<GoodsType> gtl = getSpecification().getGoodsTypeList();
         this.allGoodsTypesPanel = new AllGoodsTypesPanel(transform(gtl,
                 GoodsType::isStorable, gt -> buildCargoLabel(gt)));
-        this.allGoodsTypesPanel.setTransferHandler(this.cargoHandler);
+        this.allGoodsTypesPanel.setTransferHandler(this.transferHandler);
         this.allGoodsTypesPanel.setEnabled(false);
 
         this.stopGoodsTypesPanel = new StopGoodsTypesPanel();
-        this.stopGoodsTypesPanel.setTransferHandler(this.cargoHandler);
+        this.stopGoodsTypesPanel.setTransferHandler(this.transferHandler);
 
         JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
@@ -639,7 +639,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private GoodsTypeLabel buildCargoLabel(GoodsType gt) {
         GoodsTypeLabel label = new GoodsTypeLabel(getFreeColClient(), gt);
-        label.setTransferHandler(this.cargoHandler);
+        label.setTransferHandler(this.transferHandler);
         label.addMouseListener(this.dragListener);
         return label;
     }
@@ -766,7 +766,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     @Override
     public void removeNotify() {
-        this.cargoHandler = null;
+        this.transferHandler = null;
         this.dragListener = null;
         this.stopListModel.clear();
         this.stopListModel = null;
