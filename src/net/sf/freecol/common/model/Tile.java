@@ -42,6 +42,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.IndianSettlement.ContactLevel;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1902,9 +1903,71 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The view of this {@code Tile}.
      */
     private Tile getCachedTile(Player player) {
+    	
+    	workAroundSettlementUnknownBug(player);
+        
         return (cachedTiles == null) ? null
             : (player.isEuropean()) ? cachedTiles.get(player)
             : this;
+    }
+    /**
+     * work around br3128 villages revert to unknown after load saved game 
+     * essentially - rebuild cachedTile if contactLevel differ between tile and cachedTile
+     *
+     * @param player the {@code player} who owns the view.
+     *
+     */
+    private void workAroundSettlementUnknownBug(Player player) {
+        Boolean fix_tile = false;
+        if (player.isEuropean()) {
+            if (cachedTiles != null) {
+                if (settlement != null) {
+                    Tile c_t = cachedTiles.get(player);
+                    if (c_t != null) {
+                        try {
+                            if (this.settlement instanceof IndianSettlement) {
+                                IndianSettlement c_is = (IndianSettlement) c_t.settlement;
+                                ContactLevel c_cls = c_is.contactLevels.get(player);
+                                String c_cl = null;
+
+                                if (c_cls != null)
+                                    c_cl = c_cls.toString();
+
+                                IndianSettlement is = (IndianSettlement) this.settlement;
+                                ContactLevel cls = is.contactLevels.get(player);
+                                if (cls != null) {
+                                    String cl = cls.toString();
+                                    if (cl != null && (c_cl == null || cl != c_cl)) {
+                                        fix_tile = true;
+                                    }
+                                }
+                                Tension c_tension = c_is.getAlarm(player);
+                                Tension tension = is.getAlarm(player);
+                                if (tension != null && (c_tension == null || tension.toString() != c_tension.toString())) {
+                                    fix_tile = true;
+                                }
+                                if (fix_tile) {
+                                    logger.log(Level.FINEST, "Cached tile differ: " + this.toString());
+                                    if (c_is.getName() == null)
+                                        c_is.setName(is.getName());
+                                    c_is.learnableSkill = is.getLearnableSkill();
+                                    c_is.setWantedGoods(is.getWantedGoods());
+                                    c_is.setMostHated(is.getMostHated());
+                                    c_is.alarm.put(player, is.getAlarm(player));
+                                    c_t.settlement = c_is;
+                                    c_cls = cls;
+                                    c_is.contactLevels.put(player, c_cls);
+                                    setCachedTile(player, c_t);
+                                }
+                            }
+                        } catch (Exception e) {
+                            logger.log(Level.FINEST, "Exception when fix cached tile: " + this.toString() + " " + e);
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     /**
