@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -183,16 +183,16 @@ public class CargoPanel extends FreeColPanel
      * {@inheritDoc}
      */
     @Override
-    public boolean accepts(Unit unit) {
-        return carrier != null && carrier.canAdd(unit);
+    public boolean accepts(Goods goods) {
+        return carrier != null && carrier.canAdd(goods);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean accepts(Goods goods) {
-        return carrier != null && carrier.canAdd(goods);
+    public boolean accepts(Unit unit) {
+        return carrier != null && carrier.canAdd(unit);
     }
 
     /**

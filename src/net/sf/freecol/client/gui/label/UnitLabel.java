@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -240,17 +240,6 @@ public final class UnitLabel extends FreeColLabel
         setSmall(this.isSmall);
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();
-    }
-
-    /**
-     * Can a unit be equipped with a particular label.
-     *
-     * @param data The label to add.
-     * @return True if the label refers to suitable equipment.
-     */
-    public boolean canUnitBeEquippedWith(JLabel data) {
-        return getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)
-                && data instanceof AbstractGoodsLabel;
     }
 
 

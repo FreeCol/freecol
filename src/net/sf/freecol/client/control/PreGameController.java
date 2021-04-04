@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -313,7 +313,7 @@ public final class PreGameController extends FreeColClientHolder {
             return false;
         }
         
-        // Tutorial message if needed
+        // Starting message if needed
         if (getGame().getTurn().getNumber() == 1) {
             player.addStartGameMessage();
         }

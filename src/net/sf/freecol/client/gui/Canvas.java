@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -369,6 +369,8 @@ public final class Canvas extends JDesktopPane {
      */
     private void addToCanvas(Component comp, Integer layer) {
         try {
+        	// To avoid illegal component position exception - remove the component first
+            remove(comp);
             add(comp, layer);
         } catch (Exception e) {
             logger.log(Level.WARNING, "addToCanvas("

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -212,7 +212,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param colony The {@code Colony} to display.
      * @param unit An optional {@code Unit} to select.
      */
-    private void colonyPanel(Colony colony, Unit unit) {
+    private void dispColonyPanel(Colony colony, Unit unit) {
         getGUI().showColonyPanel(colony, (unit.isCarrier()) ? unit : null);
     }
 
@@ -934,7 +934,9 @@ public final class InGameController extends FreeColClientHolder {
                 Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
                     : null;
                 if (colony != null) {
-                    if (!checkCashInTreasureTrain(unit)) colonyPanel(colony, unit);
+                    if (!checkCashInTreasureTrain(unit)) {
+                        dispColonyPanel(colony, unit);
+                    }
                     return false;
                 }
             }
@@ -1289,7 +1291,7 @@ public final class InGameController extends FreeColClientHolder {
                 askServer().attack(unit, direction);
                 Colony col = target.getColony();
                 if (col != null && unit.getOwner().owns(col)) {
-                    colonyPanel(col, unit);
+                    dispColonyPanel(col, unit);
                 }
                 // Immediately display resulting message, allowing
                 // next updateGUI to select another unit.
@@ -1621,7 +1623,7 @@ public final class InGameController extends FreeColClientHolder {
                 // Bring up colony panel if non-trade-route carrier
                 // unit just arrived at a destination colony.
                 // Automatic movement should stop.
-                colonyPanel(tile.getColony(), unit);
+                dispColonyPanel(tile.getColony(), unit);
                 ret = false;
             } else {
                 ; // Automatic movement can continue after successful move.
@@ -2557,7 +2559,7 @@ public final class InGameController extends FreeColClientHolder {
                 // Check units present for treasure cash-in as they are now
                 // at a colony.
                 for (Unit u : tile.getUnitList()) checkCashInTreasureTrain(u);
-                colonyPanel((Colony)tile.getSettlement(), unit);
+                dispColonyPanel((Colony)tile.getSettlement(), unit);
             }
             updateGUI(null, false);
         }
@@ -3521,7 +3523,7 @@ public final class InGameController extends FreeColClientHolder {
             && unit.getState() == UnitState.IN_COLONY;
         if (ret) {
             updateGUI(null, false);
-            colonyPanel(colony, unit);
+            dispColonyPanel(colony, unit);
         }
         return ret;
     }
@@ -3785,7 +3787,7 @@ public final class InGameController extends FreeColClientHolder {
             && !unit.isDisposed() && unit.hasTile()) {
             // Show colony panel if unit moved and is now out of moves
             Colony colony = unit.getTile().getColony();
-            if (colony != null) colonyPanel(colony, unit);
+            if (colony != null) dispColonyPanel(colony, unit);
         }
         return ret;
     }

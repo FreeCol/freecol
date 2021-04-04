@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -2981,6 +2981,8 @@ public class Colony extends Settlement implements TradeLocation {
         this.displayUnitCount = o.getDisplayUnitCount();
 
         for (WorkLocation wl : getAllWorkLocationsList()) wl.setColony(this);
+
+        invalidateCache(); // Almost any change will break the cache
         return true;
     }
 

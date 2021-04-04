@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
 import net.sf.freecol.client.gui.label.Draggable;
 import net.sf.freecol.client.gui.label.GoodsLabel;
+import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.model.Ability;
@@ -68,9 +69,9 @@ import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**
- * The TransferHandler that is capable of creating ImageSelection objects.
- * Those ImageSelection objects are Transferable.  The DefaultTransferHandler
- * should be attached to JPanels or custom JLabels.
+ * A {@code TransferHandler} for {@code ImageSelection} {@code Transferable}s.
+ *
+ * The DefaultTransferHandler should be attached to JPanels or custom JLabels.
  */
 public final class DefaultTransferHandler extends TransferHandler {
 
@@ -179,15 +180,17 @@ public final class DefaultTransferHandler extends TransferHandler {
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
-
-            if (dsde.getDropSuccess()) {
-                ((DefaultTransferHandler)c.getTransferHandler()).exportDone(c,
-                    dsc.getTransferable(), dsde.getDropAction());
-            } else {
-                ((DefaultTransferHandler)c.getTransferHandler()).exportDone(c,
-                    null, NONE);
+            if (c.getTransferHandler() instanceof DefaultTransferHandler) {
+                DefaultTransferHandler dth
+                    = (DefaultTransferHandler)(c.getTransferHandler());
+                if (dsde.getDropSuccess()) {
+                    dth.exportDone(c, dsc.getTransferable(),
+                                   dsde.getDropAction());
+                } else {
+                    dth.exportDone(c, null, NONE);
+                }
+                c.setAutoscrolls(this.scrolls);
             }
-            c.setAutoscrolls(scrolls);
         }
 
         /**
@@ -329,6 +332,25 @@ public final class DefaultTransferHandler extends TransferHandler {
         return false;
     }
 
+    /**
+     * Import goods type specified by label to a component.
+     *
+     * @param comp The component to import to.
+     * @param label The {@code GoodsTypeLabel} specifying the goods.
+     * @return True if the import succeeds.
+     */
+    private boolean importGoodsType(JComponent comp, GoodsTypeLabel label) {
+        if (comp instanceof GoodsTypePanel) {
+            GoodsTypePanel gtp = (GoodsTypePanel)comp;
+            GoodsType gt = label.getType();
+            if (!gtp.accepts(gt)) {
+                return importFail(gtp, "unacceptable goods type: " + gt);
+            }
+            return gtp.add(label, false) != null;
+        }
+        return false;
+    }
+            
     /**
      * Import goods specified by label to a component.
      *
@@ -482,8 +504,8 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public Transferable createTransferable(JComponent comp) {
-        return (comp instanceof JLabel && comp instanceof Draggable)
-            ? new ImageSelection((JLabel) comp)
+        return (comp instanceof JLabel)
+            ? new ImageSelection((JLabel)comp)
             : null;
     }
 
@@ -530,20 +552,21 @@ public final class DefaultTransferHandler extends TransferHandler {
             // Do not allow a transferable to be dropped upon itself:
             if (comp == data) return false;
 
-            // Make sure we don't drop onto other Labels.
-            if (comp instanceof AbstractGoodsLabel) {
+            // Special cases when dropping onto other labels.
+            if (comp instanceof AbstractGoodsLabel
+                || comp instanceof GoodsTypeLabel) {
+                // We probably intended to drop on the enclosing parent panel
                 comp = getDropTarget(comp);
             } else if (comp instanceof UnitLabel) {
                 UnitLabel unitLabel = (UnitLabel)comp;
                 /**
-                 * If the unit/cargo is dropped on a carrier in port
-                 * then the ship is selected and the unit is added to
-                 * its cargo.  If the unit is not a carrier, but can
-                 * be equipped, and the goods can be converted to
-                 * equipment, equip the unit.
-                 *
-                 * If not, assume that the user wished to drop the
-                 * unit/cargo on the panel below.
+                 * 1. If a unit or goods are dropped onto a carrier in port
+                 *    then the unit/goods is added and the carrier selected.
+                 * 2. If goods are dropped onto a non-carrier unit
+                 *    and it can be equipped
+                 *    and the goods can be converted to equipment
+                 *    then equip the unit.
+                 * 3. Otherwise assume the parent panel is the target
                  */
                 if (unitLabel.getUnit().isCarrier()
                     && unitLabel.getParent() instanceof InPortPanel
@@ -555,7 +578,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
                     portPanel.setSelectedUnitLabel(unitLabel);
                     comp = portPanel.getCargoPanel();
-                } else if (unitLabel.canUnitBeEquippedWith(data)) {
+                } else if (data instanceof AbstractGoodsLabel
+                    && unitLabel.getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     // don't do anything before partial amount has been checked
                 } else {
                     comp = getDropTarget(comp);
@@ -564,6 +588,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             ret = (data.getParent() == comp)
                 ? importFail(comp, "data-already-present")
+                : (data instanceof GoodsTypeLabel)
+                ? importGoodsType(comp, (GoodsTypeLabel)data)
                 : (data instanceof GoodsLabel)
                 ? importGoods(comp, (GoodsLabel)data, oldSelectedUnit)
                 : (data instanceof MarketLabel)
@@ -572,7 +598,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                 ? importUnit(comp, (UnitLabel)data, oldSelectedUnit)
                 : importFail(comp, data.toString());
         } catch (Exception e) { // FIXME: Suggest a reconnect?
-            logger.log(Level.WARNING, "Import fail", e);
             ret = importFail(comp, "crash: " + e);
         }
         return ret;

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -2310,7 +2310,7 @@ public class SwingGUI extends GUI {
     @Override
     public FreeColPanel showTradeRoutePanel(Unit unit) {
         return this.widgets.showTradeRoutePanel(unit,
-            getPopupPosition(unit.getTile()));
+            getPopupPosition((unit == null) ? null : unit.getTile()));
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,42 +32,34 @@ import javax.swing.JLabel;
  */
 public final class ImageSelection implements Transferable {
     
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ImageSelection.class.getName());
-
-    //private static final DataFlavor[] flavors = {DataFlavor.imageFlavor};
-
+    /** The {@code JLabel} to transfer. */
     private final JLabel label;
 
+
     /**
-     * The constructor to use.
+     * Create a new image selection.
      *
-     * @param label The data that this ImageSelection should hold.
+     * @param label The {@code JLabel} that this selection should hold.
      */
     public ImageSelection(JLabel label) {
         this.label = label;
     }
 
+
+    // Implement Transferable
+    // This Transferable is only intended to work with our
+    // DefaultTransferHandler flavor.
+
     /**
-     * Get the data that this Transferable represents or null if
-     * the data is not of the given flavor.
-     *
-     * @param flavor The flavor that the data should have.
-     * @return The data that this Transferable represents, or null if
-     *     the data is not of the given flavor.
+     * {@inheritDoc}
      */
     @Override
     public Object getTransferData(DataFlavor flavor) {
-        if (isDataFlavorSupported(flavor)) {
-            return label;
-        }
-        return null;
+        return (isDataFlavorSupported(flavor)) ? this.label : null;
     }
 
     /**
-     * Get the flavors that are supported by this Transferable.
-     *
-     * @return The flavors that are supported by this Transferable.
+     * {@inheritDoc}
      */
     @Override
     public DataFlavor[] getTransferDataFlavors() {
@@ -75,11 +67,7 @@ public final class ImageSelection implements Transferable {
     }
 
     /**
-     * Checks if the given data flavor is supported by this Transferable.
-     *
-     * @param flavor The data flavor to check.
-     * @return True if the given data flavor is supported by this Transferable.
-     * 'false' otherwise.
+     * {@inheritDoc}
      */
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {

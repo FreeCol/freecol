@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -29,22 +29,34 @@ import net.sf.freecol.common.model.Unit;
 public interface DropTarget {
 
     /**
-     * Returns {@code true} if the given Unit could be dropped on
-     * this target.
+     * Can the given goods be dropped on this target?
      *
-     * @param unit an {@code Unit} value
-     * @return a {@code boolean} value
+     * @param goods The {@code Goods} to check.
+     * @return True if the goods are acceptable.
      */
-    public boolean accepts(Unit unit);
+    public default boolean accepts(Goods goods) {
+        return false;
+    }
 
     /**
-     * Returns {@code true} if the given Goods could be dropped on
-     * this target.
+     * Can the given type of goods be dropped on this target?
      *
-     * @param goods a {@code Goods} value
-     * @return a {@code boolean} value
+     * @param goodsType The {@code GoodsType} to check.
+     * @return True if the goods type is acceptable.
      */
-    public boolean accepts(Goods goods);
+    public default boolean accepts(GoodsType goodsType) {
+        return false;
+    }
+
+    /**
+     * Can the given unit be dropped on this target?
+     *
+     * @param unit The {@code Unit} to check.
+     * @return True if the unit is acceptable.
+     */
+    public default boolean accepts(Unit unit) {
+        return false;
+    }
 
     /**
      * Adds a component to this container and makes sure that the unit or
@@ -68,5 +80,7 @@ public interface DropTarget {
      * @param goodsType The {@code GoodsType} proposed to add.
      * @return A good amount of goods to add.
      */
-    public int suggested(GoodsType goodsType);
+    public default int suggested(GoodsType goodsType) {
+        return -1; // Not applicable
+    }
 }

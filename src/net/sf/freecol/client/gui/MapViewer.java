@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2020   The FreeCol Team
+ *  Copyright (C) 2002-2021   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.Utils.*;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -1200,6 +1201,7 @@ public final class MapViewer extends FreeColClientHolder {
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
     public void displayMap(Graphics2D g2d) {
+        final long now = now();
         final ClientOptions options = getClientOptions();
         final int colonyLabels
             = options.getInteger(ClientOptions.COLONY_LABELS);
@@ -1535,6 +1537,21 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Draw the chat
         this.chatDisplay.display(g2d, this.size);
+
+        // Timing log
+        if (logger.isLoggable(Level.FINEST)) {
+            final long gap = now() - now;
+            double avg = ((double)gap)
+                / ((lastRow-firstRow) * (lastColumn-firstColumn));
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("displayMap time = ").append(gap)
+                .append(" for ").append(firstColumn)
+                .append(" ").append(firstRow)
+                .append(" to ").append(lastColumn)
+                .append(" ").append(lastRow)
+                .append(" average ").append(avg);
+            logger.finest(sb.toString());
+        }
     }
 
     private void displaySettlementLabels(Graphics2D g2d, Settlement settlement,
