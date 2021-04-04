@@ -42,6 +42,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.IndianSettlement.ContactLevel;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1908,6 +1910,136 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * work around BR#3128 villages revert to unknown after load saved game 
+     * essentially - rebuild cachedTile if contactLevel or alarm differ between tile and cachedTile
+     *
+     * @param player the {@code player} who owns the view.
+     *
+     */
+    private void fixInvalidCachedTile(Player player, Tile tile) {
+        Boolean fix_tile = false;
+        if (player.isEuropean()) {
+            if (cachedTiles != null) {
+                if (settlement != null) {
+                    Tile c_t = cachedTiles.get(player);
+                    if (c_t != null) {
+                        try {
+                            if (tile.settlement instanceof IndianSettlement) {
+                                IndianSettlement c_is = (IndianSettlement) c_t.settlement;
+                                ContactLevel c_contactLevel = c_is.contactLevels.get(player);
+                                String c_contactLevelString = null;
+                                if (c_contactLevel != null)
+                                    c_contactLevelString = c_contactLevel.toString();
+
+                                IndianSettlement is = (IndianSettlement) tile.settlement;
+                                ContactLevel contactLevel = is.contactLevels.get(player);
+                                String contactLevelString = null;
+                                if (contactLevel != null) {
+                                    contactLevelString = contactLevel.toString();
+                                    if (contactLevelString != null && (c_contactLevelString == null
+                                            || !contactLevelString.equals(c_contactLevelString))) {
+                                        fix_tile = true;
+                                    }
+                                }
+                                Tension c_tension = c_is.getAlarm(player);
+                                Tension tension = is.getAlarm(player);
+                                if (tension != null
+                                        && (c_tension == null || tension.getValue() != c_tension.getValue())) {
+                                    fix_tile = true;
+                                }
+                                if (fix_tile) {
+                                    logger.log(Level.FINEST,
+                                            "Cached tile fixed: " + tile.toString() + " " + player.toString() + " ");
+                                    if (c_is.getName() == null)
+                                        c_is.setName(is.getName());
+                                    c_is.setLearnableSkill(is.getLearnableSkill());
+                                    c_is.setWantedGoods(is.getWantedGoods());
+                                    c_is.setMostHated(is.getMostHated());
+                                    c_is.setAlarm(player, is.getAlarm(player));
+                                    c_t.setSettlement(c_is);
+                                    if (contactLevel != null) {
+                                        if (contactLevel == ContactLevel.CONTACTED)
+                                            c_is.setContacted(player);
+                                        if (contactLevel.ordinal() >= ContactLevel.VISITED.ordinal())
+                                            c_is.setVisited(player);
+                                        if (contactLevel == ContactLevel.SCOUTED)
+                                            c_is.setScouted(player);
+                                    }
+                                    setCachedTile(player, c_t);
+                                }
+                            }
+                        } catch (Exception e) {
+                            logger.log(Level.FINEST, "Exception when fix cached tile: " + tile.toString() + " " + e);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    /**
+    * Detect BR#3128 villages revert to unknown after load saved game 
+    * essentially - contactLevel/alarm differ between tile and cachedTile
+    *
+    * @param player the {@code player} who owns the view.
+    *
+    */
+    public boolean isCachedTileInvalid(Player player, Tile tile) {
+        boolean fix_tile = false;
+        if (player != null && player.isEuropean()) {
+            if (cachedTiles != null) {
+                if (settlement != null) {
+                    Tile c_t = cachedTiles.get(player);
+                    if (c_t != null) {
+                        try {
+                            if (tile.settlement instanceof IndianSettlement) {
+                                IndianSettlement c_is = (IndianSettlement) c_t.settlement;
+                                ContactLevel c_contactLevel = c_is.contactLevels.get(player);
+                                String c_contactLevelString = null;
+                                if (c_contactLevel != null)
+                                    c_contactLevelString = c_contactLevel.toString();
+
+                                IndianSettlement is = (IndianSettlement) tile.settlement;
+                                ContactLevel contactLevel = is.contactLevels.get(player);
+                                String contactLevelString = null;
+                                if (contactLevel != null) {
+                                    contactLevelString = contactLevel.toString();
+                                    if (contactLevelString != null && (c_contactLevelString == null
+                                            || !contactLevelString.equals(c_contactLevelString))) {
+                                        fix_tile = true;
+                                    }
+                                }
+                                Tension tension = is.getAlarm(player);
+                                Tension c_tension = c_is.getAlarm(player);
+                                Tension.Level tensionLevel = null;
+                                Tension.Level c_tensionLevel = null;
+                                if (c_tension != null) {
+                                    c_tensionLevel = c_tension.getLevel();
+                                }
+
+                                if (tension != null) {
+                                    tensionLevel = tension.getLevel();
+                                }
+
+                                if (tensionLevel != null && c_tensionLevel == null) {
+                                    fix_tile = true;
+                                }
+                                
+                            }
+                        } catch (Exception e) {
+                            logger.log(Level.FINEST, "Exception when validating cached tile: " + tile.toString() + " "
+                                    + player.toString() + " " + e);
+                        }
+                    }
+
+                }
+            }
+        }
+        return fix_tile;
+    }
+   
+    /**
      * Set a players view of this tile.
      *
      * @param player The {@code Player} who owns the view.
@@ -2724,6 +2856,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         settlement = null;
 
         super.readChildren(xr);
+        
+        // Workaround/fix BR#3128
+        // Savegame may have invalid contactlevels/alarm, fix this
+        for (Player p : getGame().getLiveEuropeanPlayerList()) {
+            if (isCachedTileInvalid(p, this)) {
+                logger.log(Level.FINEST, "Cached tile is invalid: " + this.toString() + " " + p.toString());
+                fixInvalidCachedTile(p, this);
+            }
+        }
+        // End workaround
+
+        
     }
 
     /**
