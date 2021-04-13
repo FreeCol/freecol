@@ -548,7 +548,10 @@ public final class Market extends FreeColGameObject implements Ownable {
         Market o = copyInCast(other, Market.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        setMarketData(o.getMarketData());
+        this.marketData.clear();
+        for (MarketData md : game.update(o.getMarketDataValues(), true)) {
+            this.marketData.put(md.getGoodsType(), md);
+        }
         this.owner = game.updateRef(o.getOwner());
         return true;
     }
