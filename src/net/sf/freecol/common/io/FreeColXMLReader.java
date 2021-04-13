@@ -106,7 +106,12 @@ public class FreeColXMLReader extends StreamReaderDelegate
     /** The read scope to apply. */
     private ReadScope readScope;
 
-    /** A cache of uninterned objects. */
+    /**
+     * A cache of uninterned objects.  Uninterned reads add to this list
+     * so that they can refer to sub-objects correctly.  However there is no
+     * obvious place to clear this cache, so we do that in replaceScope
+     * as you can not expect to reference the same object across scopes.
+     */
     private Map<String, FreeColObject> uninterned
         = new HashMap<String, FreeColObject>();
 
@@ -241,6 +246,12 @@ public class FreeColXMLReader extends StreamReaderDelegate
      */
     public ReadScope replaceScope(ReadScope newReadScope) {
         ReadScope ret = this.readScope;
+        
+        if (this.readScope != newReadScope) {
+            // Take the opportunity to clear the uninterned object cache
+            // as they can not be the same across scopes
+            this.uninterned.clear();
+        }
         this.readScope = newReadScope;
         return ret;
     }
