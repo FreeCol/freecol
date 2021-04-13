@@ -3159,6 +3159,14 @@ public final class InGameController extends FreeColClientHolder {
             } catch (FreeColException fce) {
                 return false;
             }
+            // Reverse the sense of the transaction.  It is currently
+            // relative to the unit (positive amount => unit gains
+            // goods/equipment) but if the server interaction
+            // succeeds, we want to log the transaction with respect
+            // to the market (using the MarketWas and req) where we
+            // want a positive amount => unit gave up (sold)
+            // goods/equipment.
+            for (AbstractGoods ag : req) ag.setAmount(-ag.getAmount());
         } else if (colony != null) {
             colonyWas = new ColonyWas(colony);
             for (AbstractGoods ag : req) {
