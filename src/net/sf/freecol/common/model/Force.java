@@ -64,6 +64,8 @@ public class Force extends FreeColSpecObject {
      */
     public Force(Specification specification) {
         super(specification);
+
+        this.capacity = this.spaceRequired = 0;
     }
 
     /**
@@ -77,7 +79,6 @@ public class Force extends FreeColSpecObject {
     public Force(Specification spec, List<AbstractUnit> units, String ability) {
         this(spec);
 
-        this.capacity = this.spaceRequired = 0;
         for (AbstractUnit au : units) {
             if (ability == null || au.getType(spec).hasAbility(ability)) {
                 add(au);
@@ -197,20 +198,20 @@ public class Force extends FreeColSpecObject {
             AbstractUnit refUnit = find(this.navalUnits, matchPred);
             if (refUnit != null) {
                 refUnit.addToNumber(n);
-                if (unitType.canCarryUnits()) {
-                    this.capacity += unitType.getSpace() * n;
-                }
             } else {
                 this.navalUnits.add(au);
+            }
+            if (unitType.canCarryUnits()) {
+                this.capacity += unitType.getSpace() * n;
             }
         } else {
             AbstractUnit refUnit = find(this.landUnits, matchPred);
             if (refUnit != null) {
                 refUnit.addToNumber(n);
-                this.spaceRequired += unitType.getSpaceTaken() * n;
             } else {
                 this.landUnits.add(au);
             }
+            this.spaceRequired += unitType.getSpaceTaken() * n;
         }
     }
 
