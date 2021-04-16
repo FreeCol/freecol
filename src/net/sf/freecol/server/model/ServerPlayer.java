@@ -1135,6 +1135,13 @@ public class ServerPlayer extends Player implements TurnTaker {
                 leftOver.add(unit);
             }
         }
+        if (leftOver.isEmpty()) {
+            lb.add("no leftovers.");
+        } else {
+            lb.add("leftover");
+            for (Unit u: leftOver) lb.add(" ", u);
+            lb.add(".");
+        }
         lb.log(logger, Level.FINEST);
         return leftOver;
     }

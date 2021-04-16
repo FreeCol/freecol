@@ -230,21 +230,26 @@ public class Force extends FreeColSpecObject {
     /**
      * Defend against underprovisioned navies.
      *
-     * @return True if the navy can carry the army.
+     * @param shipType Optional ship {@code UnitType} to create.
+     * @return The amount of extra capacity.
      */
-    public boolean prepareToBoard() {
-        final Specification spec = getSpecification();
-        AbstractUnit ship0 = find(this.navalUnits,
-            au -> au.getType(spec).getSpace() > 0);
-        if (ship0 != null) {
-            int sp = ship0.getType(spec).getSpace(),
+    public int prepareToBoard(UnitType shipType) {
+        if (this.spaceRequired > this.capacity) {
+            if (shipType == null) {
+                final Specification spec = getSpecification();
+                AbstractUnit ship0 = find(this.navalUnits,
+                    au -> au.getType(spec).getSpace() > 0);
+                if (ship0 == null) return this.capacity - this.spaceRequired;
+                shipType = ship0.getType(spec);
+            }
+            int sp = shipType.getSpace(),
                 more = (this.spaceRequired - this.capacity) / sp + 1;
             if (more > 0) {
-                ship0.setNumber(ship0.getNumber() + more);
-                this.capacity += sp * more;
+                add(new AbstractUnit(shipType,
+                        Specification.DEFAULT_ROLE_ID, more));
             }
         }
-        return this.spaceRequired <= this.capacity;
+        return this.capacity - this.spaceRequired;
     }
 
     /**
@@ -344,7 +349,8 @@ public class Force extends FreeColSpecObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("<Force");
+        sb.append("<Force ").append(this.spaceRequired)
+            .append('/').append(this.capacity);
         for (AbstractUnit au : this.landUnits) sb.append(' ').append(au);
         for (AbstractUnit au : this.navalUnits) sb.append(' ').append(au);
         sb.append('>');

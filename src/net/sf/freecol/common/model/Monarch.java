@@ -582,7 +582,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 ivf.add(new AbstractUnit(au.getType(spec), au.getRoleId(),
                                          updates));
             }
-            ivf.prepareToBoard();
+            ivf.prepareToBoard(null);
         }
     }
 

@@ -373,7 +373,7 @@ public final class InGameController extends Controller {
 
         // Instantiate the REF in Europe
         Force exf = monarch.getExpeditionaryForce();
-        if (!exf.prepareToBoard()) {
+        if (exf.prepareToBoard(monarch.getNavalREFUnitType()) < 0) {
             logger.warning("Unable to ensure space for the REF land units.");
             // For now, do not fail completely
         }
