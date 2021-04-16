@@ -4109,7 +4109,7 @@ public class Player extends FreeColGameObject implements Nameable {
         this.tax = o.getTax();
         // Usually no map yet for the user
         this.entryTile = game.update(o.getEntryTile(), true);
-        this.market = game.update(o.getMarket(), false);
+        this.market = game.update(o.getMarket(), true); // new market on declare
         this.europe = game.update(o.getEurope(), false);
         this.monarch = game.update(o.getMonarch(), false);
         this.highSeas = game.update(o.getHighSeas(), false);
@@ -4242,7 +4242,6 @@ public class Player extends FreeColGameObject implements Nameable {
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
-
 
         if (xw.validFor(this)) {
 
