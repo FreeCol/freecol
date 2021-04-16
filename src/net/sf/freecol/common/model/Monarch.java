@@ -512,6 +512,19 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
+     * Should we add a naval unit to the REF next?
+     * 
+     * Expand royal navy to +10% of required size to transport the land units.
+     *
+     * @return True if a naval unit should be added next.
+     */
+    public boolean shouldAddNavalUnit() {
+        Force ref = getExpeditionaryForce();
+        // FIXME: Magic number
+        return (double)ref.getCapacity() < ref.getSpaceRequired() * 1.1;
+    }
+        
+    /**
      * Add units to the Royal Expeditionary Force.
      *
      * @param random The {@code Random} number source to use.
@@ -521,11 +534,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         initializeCaches();
 
         final Specification spec = getSpecification();
-        Force ref = getExpeditionaryForce();
         AbstractUnit result;
-        if ((double)ref.getCapacity() < ref.getSpaceRequired() * 1.1) {
-            // Expand navy to +10% of required size to transport the land units
-            // FIXME: Magic number
+        if (shouldAddNavalUnit()) {
             List<UnitType> types = navalREFUnitTypes;
             if (types.isEmpty()) return null;
             result = new AbstractUnit(getRandomMember(logger, "Naval REF unit",
@@ -544,6 +554,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             int number = randomInt(logger, "Choose land#", random, 3) + 1;
             result = new AbstractUnit(unitType, role.getId(), number);
         }
+
+        Force ref = getExpeditionaryForce();
         ref.add(result);
         logger.info("Add to " + player.getDebugName()
             + " REF: capacity=" + ref.getCapacity()

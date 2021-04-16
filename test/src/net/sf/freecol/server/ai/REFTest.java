@@ -99,7 +99,7 @@ public class REFTest extends FreeColTestCase {
         final Force exf = monarch.getExpeditionaryForce();
         int done = 0;
         while (done != 3) {
-            boolean naval = exf.getCapacity() < exf.getSpaceRequired();
+            boolean naval = monarch.shouldAddNavalUnit();
             AbstractUnit au = monarch.addToREF(random);
             assertNotNull("REF add", au);
             if (naval) {
