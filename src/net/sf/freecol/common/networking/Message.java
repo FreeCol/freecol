@@ -79,6 +79,7 @@ public abstract class Message {
         ATTRIBUTE(-1), // N/A
         ANIMATION(0),  // Do animations first
         REMOVE(100),   // Do removes last
+        ADDPLAYER(4),  // Do add player before stance
         STANCE(5),     // Do stance before updates
         OWNED(20),     // Do owned changes after updates
         PARTIAL(9),    // There are a lot of partial updates

@@ -106,7 +106,7 @@ public class AddPlayerMessage extends ObjectMessage {
      */
     @Override
     public MessagePriority getPriority() {
-        return Message.MessagePriority.LATE;
+        return Message.MessagePriority.ADDPLAYER;
     }
 
     /**
