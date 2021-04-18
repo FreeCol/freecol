@@ -326,7 +326,13 @@ public final class FreeColServer {
         // NationOptions will be read from the saved game.
         Session.clearAll();
 
+        if (FreeColSeed.hasFreeColSeed()) {
+            // A seed has been specified on the command line, so override
+            // the PRNG from savegame.            
+            this.random = new Random(FreeColSeed.getFreeColSeed());
+        }
         this.inGameController.setRandom(this.random);
+            
         this.mapGenerator = null;
         registerWithMetaServer();
     }

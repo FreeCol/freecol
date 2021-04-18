@@ -29,8 +29,12 @@ public class FreeColSeed {
 
     public static final long DEFAULT_SEED = 0L;
 
+    /** The seed to use for pseudo-random number generators. */
     private static long freeColSeed = DEFAULT_SEED;
-    
+
+    /** Has a seed been set? */
+    private static boolean seeded = false;
+
 
     /**
      * Gets the seed for the PRNG.
@@ -41,6 +45,15 @@ public class FreeColSeed {
         return FreeColSeed.freeColSeed;
     }
 
+    /**
+     * Has the game been seeded?
+     *
+     * @return True if a seed has been set.
+     */
+    public static boolean hasFreeColSeed() {
+        return FreeColSeed.seeded;
+    }
+    
     /**
      * Generate a new seed.
      */
@@ -57,6 +70,7 @@ public class FreeColSeed {
     public static boolean setFreeColSeed(String arg) {
         try {
             FreeColSeed.freeColSeed = Long.parseLong(arg);
+            FreeColSeed.seeded = true;
             return true;
         } catch (NumberFormatException nfe) {}
         return false;
