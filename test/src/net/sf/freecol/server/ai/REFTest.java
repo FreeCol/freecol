@@ -61,7 +61,7 @@ public class REFTest extends FreeColTestCase {
         final ServerPlayer player1 = getServerPlayer(game, "model.nation.dutch");
         final Force exf = player1.getMonarch().getExpeditionaryForce();
         // Update to have full naval capacity
-        exf.prepareToBoard();
+        exf.prepareToBoard(null);
         List<AbstractUnit> refBeforeIndependence = exf.getUnitList();
         
         ServerPlayer refPlayer = igc.createREFPlayer(player1);
@@ -99,7 +99,7 @@ public class REFTest extends FreeColTestCase {
         final Force exf = monarch.getExpeditionaryForce();
         int done = 0;
         while (done != 3) {
-            boolean naval = exf.getCapacity() < exf.getSpaceRequired();
+            boolean naval = monarch.shouldAddNavalUnit();
             AbstractUnit au = monarch.addToREF(random);
             assertNotNull("REF add", au);
             if (naval) {

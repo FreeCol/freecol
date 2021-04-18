@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.UUID;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -53,6 +54,9 @@ public class HighScore extends FreeColObject {
 
     public static final String TAG = "highScore";
 
+    /** Trivial UUID to used when it is not present in the high score file. */
+    private static final UUID nullUUID = new UUID(0L, 0L);
+    
     /** A comparator by ascending AI object value. */
     public static final Comparator<? super HighScore> descendingScoreComparator
         = Comparator.comparingInt(HighScore::getScore).reversed();
@@ -114,6 +118,9 @@ public class HighScore extends FreeColObject {
     /** The nation type that retired. */
     private String nationTypeId;
 
+    /** The game UUID. */
+    private UUID gameUUID;
+    
     /** The high score. */
     private int score;
 
@@ -150,12 +157,15 @@ public class HighScore extends FreeColObject {
     /**
      * Create a new high score record.
      *
+     * Public for the test suite.
+     *
      * @param player The {@code Player} the score is for.
      */
-    private HighScore(Player player) {
+    public HighScore(Player player) {
         Game game = player.getGame();
         this.date = new Date();
         this.retirementTurn = game.getTurn().getNumber();
+        this.gameUUID = game.getUUID();
         this.score = player.getScore();
         this.level = find(ScoreLevel.values(),
                           sl -> sl.getMinimumScore() <= this.score,
@@ -190,7 +200,7 @@ public class HighScore extends FreeColObject {
      * @return The independence turn.
      */
     public final int getIndependenceTurn() {
-        return independenceTurn;
+        return this.independenceTurn;
     }
 
     /**
@@ -199,7 +209,7 @@ public class HighScore extends FreeColObject {
      * @return The retirement turn.
      */
     public final int getRetirementTurn() {
-        return retirementTurn;
+        return this.retirementTurn;
     }
 
     /**
@@ -208,7 +218,7 @@ public class HighScore extends FreeColObject {
      * @return The player name.
      */
     public final String getPlayerName() {
-        return playerName;
+        return this.playerName;
     }
 
     /**
@@ -217,7 +227,7 @@ public class HighScore extends FreeColObject {
      * @return The nation identifier.
      */
     public final String getNationId() {
-        return nationId;
+        return this.nationId;
     }
 
     /**
@@ -230,12 +240,21 @@ public class HighScore extends FreeColObject {
     }
 
     /**
+     * Get the game UUID.
+     *
+     * @return The UUID for the game with this score.
+     */
+    public final UUID getGameUUID() {
+        return this.gameUUID;
+    }
+
+    /**
      * Get the final score.
      *
      * @return The score.
      */
     public final int getScore() {
-        return score;
+        return this.score;
     }
 
     /**
@@ -244,7 +263,7 @@ public class HighScore extends FreeColObject {
      * @return The score level.
      */
     public final ScoreLevel getLevel() {
-        return level;
+        return this.level;
     }
 
     /**
@@ -262,7 +281,7 @@ public class HighScore extends FreeColObject {
      * @return The independent nation name.
      */
     public final String getNationName() {
-        return nationName;
+        return this.nationName;
     }
 
     /**
@@ -271,7 +290,7 @@ public class HighScore extends FreeColObject {
      * @return The new land name.
      */
     public final String getNewLandName() {
-        return newLandName;
+        return this.newLandName;
     }
 
     /**
@@ -280,7 +299,7 @@ public class HighScore extends FreeColObject {
      * @return The game difficulty key.
      */
     public final String getDifficulty() {
-        return difficulty;
+        return this.difficulty;
     }
 
     /**
@@ -289,7 +308,7 @@ public class HighScore extends FreeColObject {
      * @return The number of units.
      */
     public final int getUnitCount() {
-        return nUnits;
+        return this.nUnits;
     }
 
     /**
@@ -298,7 +317,7 @@ public class HighScore extends FreeColObject {
      * @return The number of colonies.
      */
     public final int getColonyCount() {
-        return nColonies;
+        return this.nColonies;
     }
 
     /**
@@ -308,7 +327,7 @@ public class HighScore extends FreeColObject {
      */
     public final Date getDate() {
         // findbugs says not to expose this.date directly
-        return new Date(date.getTime());
+        return new Date(this.date.getTime());
     }
 
     /**
@@ -319,7 +338,7 @@ public class HighScore extends FreeColObject {
     public final String getDateString() {
         DateFormat format = DateFormat
             .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-        return format.format(date);
+        return format.format(this.date);
     }
 
 
@@ -344,14 +363,27 @@ public class HighScore extends FreeColObject {
     /**
      * Can a given score be added to a high score list.
      *
-     * @param score The score to check.
+     * @param highScore The {@code HighScore} to check.
      * @param scores A list of {@code HighScore} to check against.
-     * @return True if the given score can be added to the list.
+     * @return The index of a score to replace, or negative if no replacement.
      */
-    public static boolean checkHighScore(int score, List<HighScore> scores) {
-        return /*!FreeColDebugger.isInDebugMode() && */score >= 0
-            && (scores.size() < NUMBER_OF_HIGH_SCORES
-                || score > scores.get(scores.size()-1).getScore());
+    public static int checkHighScore(HighScore highScore,
+                                     List<HighScore> scores) {
+        final int nScores = scores.size();
+        final int score = highScore.getScore();
+        final UUID uuid = highScore.getGameUUID();
+        if (uuid.compareTo(nullUUID) != 0) {
+            // UUID is valid, check for duplicate games
+            for (int i = nScores-1; i >= 0; i--) {
+                HighScore hs = scores.get(i);
+                if (uuid.compareTo(hs.getGameUUID()) == 0
+                    && score > hs.getScore()) return i; // Replace score i
+            }
+        }
+        return (score >= 0
+            && (nScores < NUMBER_OF_HIGH_SCORES
+                || score > scores.get(nScores-1).getScore())) ? nScores-1
+            : -1;
     }
 
     /**
@@ -363,9 +395,14 @@ public class HighScore extends FreeColObject {
      */
     public static boolean newHighScore(Player player) {
         List<HighScore> scores = loadHighScores();
-        if (!checkHighScore(player.getScore(), scores)) return false;
         HighScore hs = new HighScore(player);
-        scores.add(hs);
+        int idx = checkHighScore(hs, scores);
+        if (idx < 0) return false;
+        if (idx < scores.size()) {
+            scores.set(idx, hs);
+        } else {
+            scores.add(hs);
+        }
         tidyScores(scores);
         return saveHighScores(scores);
     }
@@ -459,6 +496,7 @@ public class HighScore extends FreeColObject {
         this.playerName = o.getPlayerName();
         this.nationId = o.getNationId();
         this.nationTypeId = o.getNationTypeId();
+        this.gameUUID = o.getGameUUID();
         this.score = o.getScore();
         this.level = o.getLevel();
         this.nationName = o.getNationName();
@@ -480,6 +518,7 @@ public class HighScore extends FreeColObject {
     private static final String COLONIES_TAG = "colonies";
     private static final String DATE_TAG = "date";
     private static final String DIFFICULTY_TAG = "difficulty";
+    private static final String GAMEUUID_TAG = "gameUUID";
     private static final String INDEPENDENCE_TURN_TAG = "independenceTurn";
     private static final String LEVEL_TAG = "level";
     private static final String NATION_ID_TAG = "nationId";
@@ -511,6 +550,8 @@ public class HighScore extends FreeColObject {
         xw.writeAttribute(NATION_ID_TAG, nationId);
 
         xw.writeAttribute(NATION_TYPE_ID_TAG, nationTypeId);
+
+        xw.writeAttribute(GAMEUUID_TAG, gameUUID);
 
         xw.writeAttribute(SCORE_TAG, score);
 
@@ -570,6 +611,13 @@ public class HighScore extends FreeColObject {
 
         nationTypeId = xr.getAttribute(NATION_TYPE_ID_TAG, (String)null);
 
+        String str = xr.getAttribute(GAMEUUID_TAG, (String)null);
+        try {
+            gameUUID = UUID.fromString(str);
+        } catch (Exception e) {
+            gameUUID = nullUUID;
+        }
+        
         score = xr.getAttribute(SCORE_TAG, 0);
 
         level = xr.getAttribute(LEVEL_TAG, ScoreLevel.class,

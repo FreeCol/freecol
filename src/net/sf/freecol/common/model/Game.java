@@ -735,7 +735,7 @@ public class Game extends FreeColGameObject {
      * @return The game {@code UUID}.
      */
     public UUID getUUID () {
-       return this.uuid;
+        return this.uuid;
     }
 
     /**

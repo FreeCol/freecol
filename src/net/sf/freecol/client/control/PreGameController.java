@@ -23,7 +23,8 @@ import java.awt.Color;
 
 import java.util.List;
 import java.util.logging.Logger;
-
+import javax.swing.SwingUtilities;
+    
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -258,7 +259,8 @@ public final class PreGameController extends FreeColClientHolder {
                     logger.info("Client starting game");
                     for (int tries = 50; tries >= 0; tries--) {
                         if (fcc.isReadyToStart()) {
-                            gui.invokeNowOrLater(() -> {
+                            // invokeLater is required in headless mode
+                            SwingUtilities.invokeLater(() -> {
                                     startGameInternal();
                                 });
                             return;

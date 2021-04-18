@@ -2641,16 +2641,26 @@ public class Unit extends GoodsLocation
      */
     public Location resolveDestination() {
         if (!isAtSea()) throw new RuntimeException("Not at sea: " + this);
+        Tile ret = null;
+        // Is there a destination, either explicit or by trade route?
         TradeRouteStop stop = getStop();
         Location dst = (TradeRoute.isStopValid(this, stop))
             ? stop.getLocation()
             : getDestination();
-        Tile best;
-        return (dst == null) ? getFullEntryLocation()
-            : (dst instanceof Europe) ? dst
-            : (dst.getTile() != null
-                && (best = getBestEntryTile(dst.getTile())) != null) ? best
+        // If the destination is Europe, we are done
+        if (dst instanceof Europe) return dst;
+        // If there is a destination with an associated tile, get a
+        // nearby best entry tile.  Otherwise use the fallback entry
+        // location for the owner player.
+        ret = (dst != null && dst.getTile() != null)
+            ? getBestEntryTile(dst.getTile())
             : getFullEntryLocation();
+        // Apparently this can still be null!?!  At least log such cases
+        if (ret == null) {
+            logger.warning("resolveDestination(" + dst
+                + ") is null for: " + this);
+        }
+        return ret;
     }
 
     /**

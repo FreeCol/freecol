@@ -88,6 +88,8 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
 
         portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),
                                                         1, 65536, 1));
+        portField.setEditor(new JSpinner.NumberEditor(portField, "#"));
+        
         ButtonGroup bg = new ButtonGroup();
         String str = Messages.message("loadingSavegameDialog.singlePlayer");
         singlePlayer = new JRadioButton(str);
