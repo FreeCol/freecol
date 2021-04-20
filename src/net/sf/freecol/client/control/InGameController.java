@@ -311,7 +311,12 @@ public final class InGameController extends FreeColClientHolder {
             ; // If messages are displayed they probably refer to the
               // current unit, so do not update it.
         } else {
-            if (updateUnit || active == null || !active.couldMove()
+            // Update the unit if asked to, or none present, or the
+            // current one is out of moves (but not in Europe or newly
+            // bought/trained units get immediately deselected), or has
+            // been captured.
+            if (updateUnit || active == null
+                || (!active.couldMove() && !active.isInEurope())
                 || !getMyPlayer().owns(active)) {
                 // Tile is displayed if no new active unit is found,
                 // useful when the last unit might have died
