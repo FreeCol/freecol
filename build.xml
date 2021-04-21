@@ -3,13 +3,13 @@
 <!-- This file includes targets for building FreeCol,
      the metaserver, distribution packages, running tests
      and creating documentation. -->
-<project name="FreeCol" default="package">
+<project name="FreeCol" default="package" basedir="." xmlns:sonar="antlib:org.sonar.ant" xmlns:jacoco="antlib:org.jacoco.ant">
     <description>
         This file includes targets for building FreeCol,
         the metaserver, distribution packages, running tests
         and creating documentation.
     </description>
-    <property name="java.target.version" value="1.8"/>
+    <property name="java.target.version" value="11"/>
     <property name="freecol.name" value="freecol"/>
     <property environment="env"/>
     <property name="freecol.data.dir" value="${basedir}/data"/>
@@ -18,6 +18,7 @@
     <property name="freecol.build.dir" value="${basedir}/build"/>
     <property name="freecol.packaging.dir" value="${basedir}/packaging"/>
     <property name="freecol.release.dir" value="${basedir}/dist"/>
+    <property name="freecol.doc.dir" value="${basedir}/doc"/>
     <property name="freecol.doc.dir" value="${basedir}/doc"/>
     <property name="freecol.javadoc.dir" value="${freecol.doc.dir}/javadoc"/>
     <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
@@ -34,6 +35,18 @@
     <property name="cli.jar" value="jars/commons-cli-1.4.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 
+
+    <property name="sonar.java.source" value="${java.target.version}"/>
+    <property name="sonar.host.url" value="https://sonarcloud.io" />
+    <property name="sonar.projectKey" value="colonization" />
+    <property name="sonar.sources" value="src" />
+    <property name="sonar.organization" value="itskohut" />
+    <property name="sonar.projectName" value="colonization" />
+    <property name="sonar.projectVersion" value="1.0" />
+    <property name="sonar.sources" value="src" />
+    <property name="sonar.java.binaries" value="build" />
+    <property name="sonar.java.libraries" value="build/jars/*.jar" />
+    <property name="sonar.java.coveragePlugin" value="jacoco" />
 
     <path id="libraries.classpath">
         <!-- MigLayout manager -->
@@ -58,7 +71,7 @@
     <path id="test.build.classpath">
         <path refid="junit.classpath"/>
         <path refid="libraries.classpath" />
-     </path>
+    </path>
     <path id="test.run.classpath">
         <pathelement location="${freecol.build.dir}" />
         <path refid="junit.classpath"/>
@@ -70,7 +83,7 @@
     </condition>
 
     <condition property="isOsWindows">
-            <os family="windows" />
+        <os family="windows" />
     </condition>
     <condition property="isOsMac">
         <os family="mac" />
@@ -232,18 +245,18 @@
     </target>
 
     <target name="nightly-release" description="Creates nightly build distribution.">
-      <property name="print.manual.is.up.to.date" value="true"/>
-      <property name="print.devmanual.is.up.to.date" value="true"/>
-      <property name="nightly.version" value="true" />
-      <property name="skip.dist.source" value="true" />
+        <property name="print.manual.is.up.to.date" value="true"/>
+        <property name="print.devmanual.is.up.to.date" value="true"/>
+        <property name="nightly.version" value="true" />
+        <property name="skip.dist.source" value="true" />
 
-      <antcall target="distclean" />
-      <antcall target="dist" />
+        <antcall target="distclean" />
+        <antcall target="dist" />
 
-      <mkdir dir="${freecol.release.dir}/releases"/>
-      <copy todir="${freecol.release.dir}/releases">
-          <fileset dir="${freecol.release.dir}" includes="freecol-git-*"/>
-      </copy>
+        <mkdir dir="${freecol.release.dir}/releases"/>
+        <copy todir="${freecol.release.dir}/releases">
+            <fileset dir="${freecol.release.dir}" includes="freecol-git-*"/>
+        </copy>
     </target>
 
     <!--
@@ -387,7 +400,7 @@
                         <authors>
                             <author name="The FreeCol Team" email="developers@freecol.org" />
                         </authors>
-                        <javaversion>1.8</javaversion>
+                        <javaversion>11</javaversion>
                     </info>
                     <guiprefs width="640" height="480" resizable="no">
                         <laf name="looks">
@@ -1005,4 +1018,20 @@
                           destdir="cobertura/report"/>
     </target>
 
+    <target name="jacoco">
+        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+            <classpath path="jacocoant.jar"/>
+        </taskdef>
+    </target>
+
+    <target name="sonar">
+
+        <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+            <!-- Update the following line, or put the "sonarqube-ant-task-*.jar" file in your "$HOME/.ant/lib" folder -->
+            <classpath path="sonarqube-ant-task-2.7.0.1612.jar" />
+        </taskdef>
+
+        <!-- Execute SonarScanner for Ant Analysis -->
+        <sonar:sonar />
+    </target>
 </project>
