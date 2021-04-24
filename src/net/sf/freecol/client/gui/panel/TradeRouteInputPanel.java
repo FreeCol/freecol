@@ -177,7 +177,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     private class StopGoodsTypesPanel extends GoodsTypePanel {
 
         public StopGoodsTypesPanel() {
-            super(false);
+            super(new MigLayout("wrap 10"), false);
         }
 
         // Interface DropTarget
