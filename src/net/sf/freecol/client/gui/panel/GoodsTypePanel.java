@@ -108,26 +108,34 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
      * Do not repaint, that will be done top down.
      *
      * @param label The {@code GoodsTypeLabel} to add.
+     * @return True if the label was added.
      */
-    public void addLabel(GoodsTypeLabel label) {
+    public boolean addLabel(GoodsTypeLabel label) {
         if (label != null
             && (!this.unique || findLabel(label.getType()) == null)) {
-            add(label);
+            Component ret = super.add(label);
             revalidate();
+            repaint();
+            return ret != null;
         }
+        return false;
     }
 
     /**
      * Remove labels that correspond to a given goods type.
      *
      * @param gt The {@code GoodsType} to remove.
+     * @return True if the goods were removed.
      */
-    public void removeGoodsType(GoodsType gt) {
+    public boolean removeGoodsType(GoodsType gt) {
         Component child = findLabel(gt);
         if (child != null) {
-            remove(child);
+            super.remove(child);
             revalidate();
+            repaint();
+            return true;
         }
+        return false;
     }
 
     // Implement DropTarget
@@ -141,10 +149,8 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
      * {@inheritDoc}
      */
     public Component add(Component comp, boolean editState) {
-        if (comp instanceof GoodsTypeLabel) {
-            addLabel((GoodsTypeLabel)comp);
-            return comp;
-        }
+        if (comp instanceof GoodsTypeLabel
+            && addLabel((GoodsTypeLabel)comp)) return comp;
         return null;
     }
 }
