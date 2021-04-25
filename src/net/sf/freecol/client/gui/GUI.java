@@ -1560,8 +1560,10 @@ public class GUI extends FreeColClientHolder {
      *   MapEditorController, TilePopup, QuickActionMenu, UnitLabel
      *
      * @param unit The {@code Unit} to select.
+     * @param force Set true if the unit is the same, but *has*
+     *     changed in some way (e.g. moves left).
      */
-    public void changeView(Unit unit) {}
+    public void changeView(Unit unit, boolean force) {}
 
     /**
      * Change to map transform mode, and select a transform.

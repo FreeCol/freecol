@@ -218,7 +218,7 @@ public final class TilePopup extends JPopupMenu {
                 .template("activateAllUnits"));
             activateAllItem.addActionListener((ActionEvent ae) -> {
                     for (Unit unit : tile.getUnitList()) igc.clearOrders(unit);
-                    gui.changeView(tile.getFirstUnit());
+                    gui.changeView(tile.getFirstUnit(), false);
                 });
             add(activateAllItem);
         }
@@ -370,6 +370,7 @@ public final class TilePopup extends JPopupMenu {
 
     /**
      * Adds a unit entry to this popup.
+     *
      * @param menu a {@code Container} value
      * @param unit The unit that will be represented on the popup.
      * @param enabled The initial state for the menu item.
@@ -387,7 +388,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.setFont(this.font);
         menuItem.addActionListener((ActionEvent ae) -> {
-                gui.changeView(unit);
+                gui.changeView(unit, false);
             });
         if (indent) {
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));

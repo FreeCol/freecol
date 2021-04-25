@@ -59,7 +59,7 @@ public class ToggleViewModeAction extends MapboardAction {
             gui.changeView(gui.getSelectedTile());
             break;
         case TERRAIN:
-            gui.changeView(gui.getActiveUnit());
+            gui.changeView(gui.getActiveUnit(), false);
             break;
         default:
             break;

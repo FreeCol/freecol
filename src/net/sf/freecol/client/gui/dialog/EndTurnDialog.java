@@ -212,7 +212,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             if (wrapper.unit.isInEurope()) {
                 getGUI().showEuropePanel();
             } else {
-                getGUI().changeView(wrapper.unit);
+                getGUI().changeView(wrapper.unit, false);
                 if (wrapper.unit.getColony() != null) {
                     getGUI().showColonyPanel(wrapper.unit.getColony(),
                                              wrapper.unit);

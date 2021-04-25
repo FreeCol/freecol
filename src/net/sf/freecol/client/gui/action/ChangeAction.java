@@ -94,7 +94,7 @@ public class ChangeAction extends UnitAction {
         if (tile.getColony() != null) {
             getGUI().showColonyPanel(tile.getColony(), unit);
         } else if (unit.isOnCarrier()) {
-            getGUI().changeView(unit.getCarrier());
+            getGUI().changeView(unit.getCarrier(), false);
         } else {
             boolean activeUnitFound = false;
             for (Unit u : tile.getUnitList()) {
@@ -103,7 +103,7 @@ public class ChangeAction extends UnitAction {
                 } else if (activeUnitFound
                     && u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    getGUI().changeView(u);
+                    getGUI().changeView(u, false);
                     return;
                 }
             }
@@ -111,7 +111,7 @@ public class ChangeAction extends UnitAction {
                                u -> (u != unit
                                    && u.getState() == Unit.UnitState.ACTIVE
                                    && u.getMovesLeft() > 0));
-            if (active != null) getGUI().changeView(active);
+            if (active != null) getGUI().changeView(active, false);
         }
     }
 }

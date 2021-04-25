@@ -506,13 +506,21 @@ public final class InfoPanel extends FreeColPanel
         
         boolean updated = false;
         InfoPanelMode oldMode = changeMode(InfoPanelMode.UNIT);
-        if (oldMode != InfoPanelMode.UNIT || unit != this.unit) {
+        if (unit != this.unit) {
+            // Only update the PCLs when the unit changes
+            if (this.unit != null) {
+                this.unit.removePropertyChangeListener(this);
+                GoodsContainer gc = this.unit.getGoodsContainer();
+                if (gc != null) gc.removePropertyChangeListener(this);
+            }
             unit.addPropertyChangeListener(this);
             GoodsContainer gc = unit.getGoodsContainer();
             if (gc != null) gc.addPropertyChangeListener(this);
-            this.unit = fillUnitPanel(unit);
-            updated = true;
         }
+        // Always call fillUnitPanel because while the unit may not
+        // change, its annotations (such as moves left) might
+        this.unit = fillUnitPanel(unit);
+        updated = true;
         logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with unit " + unit);
     }
