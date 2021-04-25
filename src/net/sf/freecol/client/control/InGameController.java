@@ -826,14 +826,21 @@ public final class InGameController extends FreeColClientHolder {
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             getGUI().changeView(unit);
-            // Move the unit as much as possible
-            if (!moveToDestination(unit, null)) {
+            // Move the unit as much as possible, leave it as the active
+            // unit if there was a movement issue, or it arrives at the
+            // destination with moves left
+            Location destination = unit.getDestination();
+            if (!moveToDestination(unit, null)
+                || (unit.isAtLocation(destination)
+                    && unit.getMovesLeft() > 0)) {
                 ret = false;
                 break;
             }
         }
-        // Might have LCR messages to display
-        nextModelMessage();
+        nextModelMessage(); // Might have LCR messages to display
+        if (ret) { // If no unit issues, restore previously active unit 
+            getGUI().changeView(active);
+        }
         return ret;
     }
 
@@ -898,7 +905,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to move.
      * @param messages An optional list in which to retain any
      *     trade route {@code ModelMessage}s generated.
-     * @return True if automatic movement can proceed.
+     * @return True if automatic movement of the unit can proceed.
      */
     private boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
         final Player player = getMyPlayer();
@@ -930,7 +937,6 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         } else {
             // Clear ordinary destinations if arrived.
-            getGUI().changeView(unit);
             if (!movePath(unit, path)) return false;
         
             if (unit.isAtLocation(destination)) {
