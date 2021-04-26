@@ -787,7 +787,7 @@ public final class InGameController extends FreeColClientHolder {
         if (getGUI().isPanelShowing()) return false; // Clear the panel first
 
         final Player player = getMyPlayer();
-        final Unit active = getGUI().getActiveUnit();
+        Unit active = getGUI().getActiveUnit();
         boolean ret = true;
 
         // Ensure the goto mode sticks.
@@ -826,16 +826,14 @@ public final class InGameController extends FreeColClientHolder {
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             getGUI().changeView(unit, false);
-            // Move the unit as much as possible, leave it as the active
-            // unit if there was a movement issue, or it arrives at the
-            // destination with moves left
-            Location destination = unit.getDestination();
-            if (!moveToDestination(unit, null)
-                || (unit.isAtLocation(destination)
-                    && unit.getMovesLeft() > 0)) {
+            // Move the unit as much as possible
+            if (!moveToDestination(unit, null)) {
                 ret = false;
                 break;
             }
+            // This was the active unit, but we are confident it can not
+            // do anything else useful, so do not reselect it below
+            if (active == unit) active = null;
         }
         nextModelMessage(); // Might have LCR messages to display
         if (ret) { // If no unit issues, restore previously active unit 
@@ -905,24 +903,29 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to move.
      * @param messages An optional list in which to retain any
      *     trade route {@code ModelMessage}s generated.
-     * @return True if automatic movement of the unit can proceed.
+     * @return True if all is well with the unit, false if the unit
+     *     should be selected and examined by the user.
      */
     private boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
         final Player player = getMyPlayer();
-        Location destination;
+        Location destination = unit.getDestination();
         PathNode path;
+        boolean ret;
         if (!requireOurTurn()
             || unit.isAtSea()
             || unit.getMovesLeft() <= 0
             || unit.getState() == UnitState.SKIPPED) {
-            return true;
+            ret = true; // invalid, should not be here
         } else if (unit.getTradeRoute() != null) {
-            return followTradeRoute(unit, messages);
-        } else if ((destination = unit.getDestination()) == null) {
-            return true;
+            ret = followTradeRoute(unit, messages);
+        } else if (destination == null) {
+            ret = true; // also invalid, but trade route check needed first
         } else if (!changeState(unit, UnitState.ACTIVE)) {
-            return true;
+            ret = true; // another error case
         } else if ((path = unit.findPath(destination)) == null) {
+            // No path to destination. Give the player a chance to do
+            // something about it, but default to skipping this unit as
+            // the path blockage is most likely just transient
             StringTemplate src = unit.getLocation()
                 .getLocationLabelFor(player);
             StringTemplate dst = destination.getLocationLabelFor(player);
@@ -934,25 +937,34 @@ public final class InGameController extends FreeColClientHolder {
                 .addStringTemplate("%destination%", dst);
             getGUI().showInformationPanel(unit, template);
             changeState(unit, UnitState.SKIPPED);
-            return false;
-        } else {
+            ret = false;
+        } else if (!movePath(unit, path)) {
+            ret = false; // ask the player to resolve the movePath problem
+        } if (unit.isAtLocation(destination)) {
+            final Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
+                : null;
             // Clear ordinary destinations if arrived.
-            if (!movePath(unit, path)) return false;
-        
-            if (unit.isAtLocation(destination)) {
-                if (!askClearGotoOrders(unit)) return false;
-
-                Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
-                    : null;
-                if (colony != null) {
-                    if (!checkCashInTreasureTrain(unit)) {
-                        dispColonyPanel(colony, unit);
-                    }
-                    return false;
+            if (!askClearGotoOrders(unit)) {
+                ret = false; // Should not happen.  Desync?  Ask the user.
+            } else if (colony != null) {
+                // Always ask to be selected if arriving at a colony
+                // unless the unit cashed in (and thus gone), and bring
+                // up the colony panel so something can be done with the
+                // unit
+                if (checkCashInTreasureTrain(unit)) {
+                    ret = true;
+                } else {
+                    dispColonyPanel(colony, unit);
+                    ret = false;
                 }
+            } else {
+                // If the unit has moves left, select it
+                ret = unit.getMovesLeft() == 0;
             }
-            return true;
+        } else { // Still in transit, do not select         
+            ret = true;
         }
+        return ret;
     }
 
     /**
