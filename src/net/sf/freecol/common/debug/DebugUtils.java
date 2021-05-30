@@ -379,7 +379,7 @@ public class DebugUtils {
         // Note "game" is no longer valid after reconnect.
         Unit unit = freeColClient.getGame()
             .getFreeColGameObject(sUnit.getId(), Unit.class);
-        if (unit != null) gui.changeView(unit);
+        if (unit != null) gui.changeView(unit, false);
     }
 
     /**
@@ -538,7 +538,7 @@ public class DebugUtils {
         server.getInGameController().debugChangeOwner(sUnit, sPlayer);
 
         Player myPlayer = freeColClient.getMyPlayer();
-        if (myPlayer.owns(unit)) gui.changeView(unit);
+        if (myPlayer.owns(unit)) gui.changeView(unit, true);
     }
 
     /**
@@ -917,8 +917,7 @@ public class DebugUtils {
             }
         }
         Unit unit = units.get(0);
-        gui.changeView(); // force active unit update
-        gui.changeView(unit);
+        gui.changeView(unit, true);
     }
 
     /**

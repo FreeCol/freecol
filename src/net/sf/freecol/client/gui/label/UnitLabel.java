@@ -333,7 +333,7 @@ public final class UnitLabel extends FreeColLabel
                 break;
             case ACTIVATE_UNIT:
                 igc.changeState(this.unit, UnitState.ACTIVE);
-                getGUI().changeView(this.unit);
+                getGUI().changeView(this.unit, false);
                 break;
             case FORTIFY:
                 igc.changeState(this.unit, UnitState.FORTIFYING);

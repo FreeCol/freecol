@@ -674,7 +674,7 @@ public class SwingGUI extends GUI {
         // Update the view, somehow.  Try really hard to find a tile
         // to focus on
         if (active != null) {
-            changeView(active);
+            changeView(active, false);
             if (tile == null) {
                 tile = active.getTile();
                 if (tile == null) {
@@ -684,7 +684,7 @@ public class SwingGUI extends GUI {
         } else if (tile != null) {
             changeView(tile);
         } else {
-            changeView((Unit)null);
+            changeView((Unit)null, false);
         }
         this.mapViewer.changeFocus(tile);
     }
@@ -1197,14 +1197,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void changeView(Unit unit) {
+    public void changeView(Unit unit, boolean force) {
         boolean change = changeViewMode(ViewMode.MOVE_UNITS);
         change |= changeActiveUnit(unit);
         if (unit != null) {
             // Bring the selected tile along with the unit.
             change |= changeSelectedTile(unit.getTile(), true);
         }
-        changeDone(change);
+        changeDone(change || force);
     }
 
     /**
@@ -1326,7 +1326,7 @@ public class SwingGUI extends GUI {
                         }
                     }
                 }
-                changeView(other);
+                changeView(other, false);
             } else { // Select the tile under the unit if it is not ours
                 changeView(tile);
             }
