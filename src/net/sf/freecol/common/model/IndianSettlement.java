@@ -1720,8 +1720,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        clearContactLevels();
-        clearAlarm();
+    	
+		// Only clear ContactLevels and alarm for intern. Fix for BR#3128
+		if (xr.shouldIntern()) {
+			clearContactLevels();
+			clearAlarm();
+		}
+    	 
+    	
         missionary = null;
         clearOwnedUnits();
 
