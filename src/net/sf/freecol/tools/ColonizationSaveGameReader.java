@@ -22,10 +22,17 @@ package net.sf.freecol.tools;
 import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
 
 public class ColonizationSaveGameReader {
+
+    private static class Utilities {
+
+        public static String getString ( byte[] data, int start, int length) {
+            String value = new String(data, start, length, StandardCharsets.UTF_8);
+            int index = value.indexOf(0);
+            return (index < 0) ? value : value.substring(0, index);
+        }
+    }
 
     private final static int PLAYER_DATA = 0x9e;
     private final static int COLONY_DATA = 0x186;
@@ -63,8 +70,8 @@ public class ColonizationSaveGameReader {
         public static final int LENGTH = 52;
 
         public static void print(byte[] data, int offset) {
-            String playerName = getString(data, offset, 23);
-            String newLandName = getString(data, offset + 24, 23);
+            String playerName = Utilities.getString(data, offset, 23);
+            String newLandName = Utilities.getString(data, offset + 24, 23);
             boolean isHuman = data[offset + 49] == 0;
 
             System.out.println("Player name is " + playerName
@@ -84,7 +91,7 @@ public class ColonizationSaveGameReader {
         public static void print(byte[] data, int offset) {
             int x = data[offset];
             int y = data[offset + 1];
-            String name = getString(data, offset + 2, offset + 25);
+            String name = Utilities.getString(data, offset + 2, offset + 25);
             int numberOfColonists = data[offset + 0x1f];
             System.out.println(name + " [" + x + ", " + y + "], "
                     + numberOfColonists + " colonists");
@@ -104,7 +111,7 @@ public class ColonizationSaveGameReader {
         }
     }
 
-    public static class Colonist {
+    private static class Colonist {
 
         public static final String[] OCCUPATION = {
             "Farmer",
@@ -183,10 +190,4 @@ public class ColonizationSaveGameReader {
 
     }
 
-    public static String getString(byte[] data, int start, int length) {
-        byte[] bytes = Arrays.copyOfRange(data, start, start + length);
-        String value = new String(bytes, StandardCharsets.UTF_8);
-        int index = value.indexOf(0);
-        return (index < 0) ? value : value.substring(0, index);
-    }
 }
