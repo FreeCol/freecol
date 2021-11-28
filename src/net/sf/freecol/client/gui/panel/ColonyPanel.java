@@ -19,6 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.dump;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -57,7 +61,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
@@ -66,9 +69,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.tooltip.*;
-import net.sf.freecol.client.gui.Size;
+import net.sf.freecol.client.gui.tooltip.RebelToolTip;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -95,7 +96,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -253,13 +253,14 @@ public final class ColonyPanel extends PortPanel
      * @param colony The {@code Colony} to display in this panel.
      */
     public ColonyPanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient,
-            new MigLayout("fill, wrap 2, insets 2",
-                          "[390!][fill]",
-                          "[growprio 100,shrinkprio 10][]0[]0[]"
-                          + "[growprio 150,shrinkprio 50]"
-                          + "[growprio 150,shrinkprio 50][]"));
+        super(freeColClient, new MigLayout());
 
+        getMigLayout().setLayoutConstraints("fill, wrap 2, insets 2");
+        getMigLayout().setColumnConstraints("[" + getTilesScrollGuiScaledDimension().width + "!][fill]");
+        getMigLayout().setRowConstraints("[growprio 100,shrinkprio 10][]0[]0[]"
+                + "[growprio 150,shrinkprio 50]"
+                + "[growprio 150,shrinkprio 50][]");
+        
         final Player player = getMyPlayer();
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
@@ -415,6 +416,12 @@ public final class ColonyPanel extends PortPanel
     private synchronized void setColony(Colony colony) {
         this.colony = colony;
     }
+    
+    private Dimension getTilesScrollGuiScaledDimension() {
+        final int tilesScrollWidth = (int) (238 * getImageLibrary().getScaleFactor());
+        final int tilesScrollHeight = (int) (120 * getImageLibrary().getScaleFactor());
+        return new Dimension(tilesScrollWidth, tilesScrollHeight);
+    }
 
     /**
      * Initialize the entire panel.
@@ -479,9 +486,11 @@ public final class ColonyPanel extends PortPanel
 
         add(this.nameBox, "height 42:, grow");
         int tmp = ImageLibrary.ICON_SIZE.height;
+        
+        final Dimension tilesScrollDimension = getTilesScrollGuiScaledDimension();
         add(netProductionPanel,
-            "grow, height " + (tmp+10) + ":" + (2*tmp+10) + ":" + (2*tmp+10));
-        add(tilesScroll, "width 390!, height 200!, top");
+            "grow, height " + (tmp+10) + ":" + (tmp+10) + ":" + (2*tmp+10));
+        add(tilesScroll, "width " + tilesScrollDimension.width + "!, height " + tilesScrollDimension.height +"!, top");
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
         add(constructionPanel, "grow, top");

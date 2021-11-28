@@ -23,6 +23,8 @@ import java.awt.LayoutManager;
 
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * A panel that clears its layout on close, working around a bug in
@@ -51,6 +53,10 @@ public class MigPanel extends JPanel {
 
 
     // Override JPanel
+    
+    public MigLayout getMigLayout() {
+    	return (MigLayout) getLayout();
+    }
 
     /**
      * {@inheritDoc}
