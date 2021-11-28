@@ -19,18 +19,19 @@
 
 package net.sf.freecol.client.gui.menu;
 
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.CenterAction;
@@ -322,9 +323,13 @@ public class InGameMenuBar extends FreeColMenuBar {
                              RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                              RenderingHints.VALUE_RENDER_QUALITY);
-        final int w = (int)g2d.getFontMetrics().getStringBounds(text, g2d)
-            .getWidth();
-        // FIXME: Magic#
-        g2d.drawString(text, getWidth() - 10 - w, 15 + getInsets().top);
+        
+        final FontMetrics fm = g2d.getFontMetrics();
+        final Rectangle2D d  = fm.getStringBounds(text, g2d);
+        final int textWidth = (int) d.getWidth();
+        final int textHeight = (int) d.getHeight();
+
+        final int rightSidePaddingInPx = 10;
+        g2d.drawString(text, getWidth() - rightSidePaddingInPx - textWidth, (getHeight() - textHeight) / 2 + fm.getAscent());
     }
 }
