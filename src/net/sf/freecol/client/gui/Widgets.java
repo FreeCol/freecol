@@ -432,13 +432,11 @@ public final class Widgets {
      * Show a panel showing the declaration of independence with
      * animated signature.
      *
-     * @return The panel shown.
+     * @param afterClosing A callback that is executed after the panel closes.
      */
-    public FreeColPanel showDeclarationPanel() {
-        DeclarationPanel panel
-            = new DeclarationPanel(this.freeColClient);
-        return this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED,
-                                            false);
+    public void showDeclarationPanel(Runnable afterClosing) {
+        final DeclarationPanel panel = new DeclarationPanel(this.freeColClient, afterClosing);
+        this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, false);
     }
 
     /**

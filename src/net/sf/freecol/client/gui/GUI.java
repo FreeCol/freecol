@@ -1894,11 +1894,11 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the declaration panel with the declaration of independence and
-     * an animated signature. * * @return The panel shown.
-     *
-     * @return The panel shown.
+     * an animated signature.
+     * 
+     * @param afterClosing A callback that is executed after the panel closes.
      */
-    public FreeColPanel showDeclarationPanel() { return null; }
+    public void showDeclarationPanel(Runnable afterClosing) { }
 
     /**
      * Show a dialog for a difficulty option group.

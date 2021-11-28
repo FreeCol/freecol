@@ -3003,14 +3003,11 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
-        // Ask server.
-        boolean ret = askServer().declareIndependence(names.get(0), names.get(1))
-            && player.isRebel();
-        if (ret) {
-            getGUI().showDeclarationPanel();
+        getGUI().showDeclarationPanel(() -> {
+            askServer().declareIndependence(names.get(0), names.get(1));
             updateGUI(null, false);
-        }
-        return ret;
+        });
+        return true;
     }
 
     /**

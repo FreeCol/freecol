@@ -1671,8 +1671,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public FreeColPanel showDeclarationPanel() {
-        return this.widgets.showDeclarationPanel();
+    public void showDeclarationPanel(Runnable afterClosing) {
+        this.widgets.showDeclarationPanel(afterClosing);
     }
 
     /**
