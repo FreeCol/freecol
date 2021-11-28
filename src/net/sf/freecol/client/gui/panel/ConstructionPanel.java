@@ -88,7 +88,7 @@ public class ConstructionPanel extends MigPanel
         this.colony = colony;
         this.openBuildQueue = openBuildQueue;
 
-        setOpaque(openBuildQueue);
+        setOpaque(false);
     }
 
 
