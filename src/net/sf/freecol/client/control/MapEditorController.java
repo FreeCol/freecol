@@ -225,8 +225,10 @@ public final class MapEditorController extends FreeColClientHolder {
         serverGame.setMapGeneratorOptions(mgo);
         freeColServer.generateMap();
         requireNativeNations(serverGame);
+        
         getGUI().setFocus(serverGame.getMap().getTile(1,1));
         getGUI().updateMenuBar();
+        getGUI().startMapEditorGUI();
         getGUI().refresh();
     }
 
