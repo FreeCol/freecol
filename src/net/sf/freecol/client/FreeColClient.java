@@ -943,6 +943,7 @@ public final class FreeColClient {
                 quit();
             } else {
                 getConnectController().requestLogout(LogoutReason.QUIT);
+                quit();
             }
         }
     }
