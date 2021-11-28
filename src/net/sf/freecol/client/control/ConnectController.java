@@ -19,12 +19,18 @@
 
 package net.sf.freecol.client.control;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -44,7 +50,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -148,7 +153,9 @@ public final class ConnectController extends FreeColClientHolder {
         switch (reason) {
         case DEFEATED: case QUIT:
             fcc.logout(false);
-            fcc.quit();
+            SwingUtilities.invokeLater(() -> {
+                mainTitle();
+            });
             break;
         case LOGIN: // FIXME: This should not happen, drop when convinced
             FreeCol.trace(logger, "logout(LOGIN) detected");
@@ -156,31 +163,43 @@ public final class ConnectController extends FreeColClientHolder {
             break;
         case MAIN_TITLE: // All the way back to the MainPanel
             fcc.logout(false);
-            mainTitle();
+            /*
+             * This should not be needed as it was mainTitle that
+             * initiated the logout.
+             * 
+             * mainTitle();
+             */
             break;
         case NEW_GAME: // Back to the NewPanel
             fcc.logout(false);
-            newGame();
+            /*
+             * This should not be needed as it was mainTitle that
+             * initiated the logout.
+             *
+             * newGame();
+             */
             break;
         case RECONNECT:
         default: // default "can not happen", but if so, reconnect is safest
             fcc.logout(false);
-            final String name = player.getName();
-            try {
-                if (askServer().reconnect() != null
-                    && askServer().login(name, FreeCol.getVersion(),
-                                         fcc.getSinglePlayer(),
-                                         fcc.currentPlayerIsMyPlayer())) {
-                    logger.info("Reconnected for client " + name);
-                } else {
-                    logger.severe("Reconnect failed for client " + name);
-                    fcc.askToQuit();
+            SwingUtilities.invokeLater(() -> {
+                final String name = player.getName();
+                try {
+                    if (askServer().reconnect() != null
+                        && askServer().login(name, FreeCol.getVersion(),
+                                             fcc.getSinglePlayer(),
+                                             fcc.currentPlayerIsMyPlayer())) {
+                        logger.info("Reconnected for client " + name);
+                    } else {
+                        logger.severe("Reconnect failed for client " + name);
+                        fcc.askToQuit();
+                    }
+                } catch (IOException ioe) {
+                    logger.log(Level.SEVERE, "Reconnect exception for client "
+                        + name, ioe);
+                    fcc.quit();
                 }
-            } catch (IOException ioe) {
-                logger.log(Level.SEVERE, "Reconnect exception for client "
-                    + name, ioe);
-                fcc.quit();
-            }
+            });
             break;
         }
         return true;
@@ -526,19 +545,21 @@ public final class ConnectController extends FreeColClientHolder {
      */
     public void mainTitle() {
         final FreeColClient fcc = getFreeColClient();
-        
-        if (fcc.isMapEditor()) fcc.setMapEditor(false);
-
-        if (fcc.isLoggedIn()) {
-            if (getGUI().confirmStopGame()) {
-                requestLogout(LogoutReason.MAIN_TITLE);
-            }
+        if ((fcc.isLoggedIn() || fcc.isMapEditor()) && !getGUI().confirmStopGame()) {
             return;
         }
-            
-        fcc.stopServer();
-        getGUI().removeInGameComponents();
+        
+        if (fcc.isMapEditor()) {
+            fcc.setMapEditor(false);
+        }
+        
         getGUI().showMainTitle();
+
+        if (fcc.isLoggedIn()) {
+            requestLogout(LogoutReason.MAIN_TITLE);
+        }
+        
+        fcc.stopServer();
     }
     
     /**
@@ -547,20 +568,22 @@ public final class ConnectController extends FreeColClientHolder {
     public void newGame() {
         final FreeColClient fcc = getFreeColClient();
 
+        if (fcc.isLoggedIn() && !getGUI().confirmStopGame()) {
+            return;
+        }
+        
         if (fcc.isMapEditor()) {
             fcc.getMapEditorController().newMap();
             return;
         }
 
+        getGUI().removeInGameComponents();
+        getGUI().showNewPanel(null);
+        
         if (fcc.isLoggedIn()) {
-            if (getGUI().confirmStopGame()) {
                 requestLogout(LogoutReason.NEW_GAME);
-            }
-            return;
         }
 
         fcc.stopServer();
-        getGUI().removeInGameComponents();
-        getGUI().showNewPanel(null);
     }
 }

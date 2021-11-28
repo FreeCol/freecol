@@ -1248,6 +1248,7 @@ public final class Canvas extends JDesktopPane {
     public void mainTitle() {
         removeInGameComponents();
         showMainPanel();
+        revalidate();
         repaint();
     }
 
