@@ -203,6 +203,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
      * Updates this {@code FreeColMenuBar}.
      */
     public void update() {
+        revalidate();
         repaint();
     }
 
