@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.video;
 
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.MouseListener;
 import java.util.logging.Level;
@@ -52,7 +53,7 @@ public class VideoComponent extends JPanel {
      *
      * @param mute boolean silence
      */
-    public VideoComponent(Video video, boolean mute) {
+    public VideoComponent(Video video, boolean mute, Dimension maximumSize) {
         final String url = video.getURL().toExternalForm();
 
         setOpaque(false);
@@ -60,7 +61,8 @@ public class VideoComponent extends JPanel {
         final Insets insets = getInsets();
 
         applet = new Cortado();
-        applet.setSize(655, 480);
+        applet.setSize(determineAppletSize(maximumSize));
+        
         // FIXME: -1 avoids transparent part of border.
         applet.setLocation(insets.left - 1, insets.top - 1);
 
@@ -92,6 +94,18 @@ public class VideoComponent extends JPanel {
         // FIXME: -2 avoids transparent part of border.
         setSize(applet.getWidth() + insets.left + insets.right - 2,
                 applet.getHeight() + insets.top + insets.bottom - 2);
+    }
+
+
+    private Dimension determineAppletSize(Dimension maximumSize) {
+        int x = 655;
+        int y = 480;
+        while (x * 2 < maximumSize.width && y * 2 < maximumSize.height) {
+            x *= 2;
+            y *= 2;
+        }
+        final Dimension appletSize = new Dimension(x, y);
+        return appletSize;
     }
 
 

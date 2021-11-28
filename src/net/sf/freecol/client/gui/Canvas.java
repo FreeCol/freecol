@@ -1142,7 +1142,7 @@ public final class Canvas extends JDesktopPane {
     public void playVideo(String videoId, boolean muteAudio,
                           final Runnable runnable) {
         final Video video = ImageLibrary.getVideo(videoId);        
-        final VideoComponent vc = new VideoComponent(video, muteAudio);
+        final VideoComponent vc = new VideoComponent(video, muteAudio, getSize());
 
         final class AbortListener implements ActionListener, KeyListener,
             MouseListener, VideoListener {
