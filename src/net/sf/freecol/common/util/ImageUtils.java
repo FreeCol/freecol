@@ -94,8 +94,7 @@ public class ImageUtils {
                                                  BufferedImage.TYPE_INT_ARGB);
         // For halving bilinear should most correctly average 2x2 pixels.
         Graphics2D g2d = result.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                             RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(image, 0, 0, w, h, null);
         g2d.dispose();
         return result;
@@ -135,8 +134,15 @@ public class ImageUtils {
         BufferedImage result = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = result.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                             RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        /*
+         * Tileable images should not be scaled with interpolation, as this will produce
+         * partially transparent pixels. These pixels will overlap and make visible
+         * seams when tiling images.
+         * 
+         * Do NOT use:
+         * g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+         */
+
         g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
         return result;

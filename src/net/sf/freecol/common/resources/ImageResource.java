@@ -19,11 +19,14 @@
 
 package net.sf.freecol.common.resources;
 
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.ImageUtils.createGrayscaleImage;
+import static net.sf.freecol.common.util.ImageUtils.createResizedImage;
+import static net.sf.freecol.common.util.ImageUtils.wildcardDimension;
+
 import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -35,9 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**
@@ -151,13 +151,20 @@ public class ImageResource extends Resource {
             if (wNew == w && hNew == h) return img; // Found loaded image
         }
 
-        // Directly scaling to less than half size would ignore some pixels.
-        // Prevent that by halving the base image size as often as needed.
-        while (wNew*2 <= w && hNew*2 <= h) {
-            img = createHalvedImage(img);
-            w = img.getWidth();
-            h = img.getHeight();
-        }
+        /*
+         * Tileable images should not be scaled with interpolation, as this will produce
+         * partially transparent pixels. These pixels will overlap and make visible
+         * seams when tiling images.
+         * 
+         * Do NOT use:
+         *  // Directly scaling to less than half size would ignore some pixels.
+         *  // Prevent that by halving the base image size as often as needed.
+         *  while (wNew*2 <= w && hNew*2 <= h) {
+         *      img = createHalvedImage(img);
+         *      w = img.getWidth();
+         *      h = img.getHeight();
+         *  }
+         */
 
         // Do a final resize
         if (wNew != w || hNew != h) {
