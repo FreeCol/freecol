@@ -259,7 +259,7 @@ public final class ColonyPanel extends PortPanel
         getMigLayout().setColumnConstraints("[" + getTilesScrollGuiScaledDimension().width + "!][fill]");
         getMigLayout().setRowConstraints("[growprio 100,shrinkprio 10][]0[]0[]"
                 + "[growprio 150,shrinkprio 50]"
-                + "[growprio 150,shrinkprio 50][]");
+                + "[][]");
         
         final Player player = getMyPlayer();
         // Do not just use colony.getOwner() == getMyPlayer() because
