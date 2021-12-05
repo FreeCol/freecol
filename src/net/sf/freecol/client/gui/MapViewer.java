@@ -1259,7 +1259,23 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
-            this.tv.displayTileWithBeachAndBorder(g2d, t);
+            this.tv.displayTileWithBeach(g2d, t);
+        }
+        g2d.translate(-xt0, -yt0);
+        
+        // Display the borders
+        xt0 = 0;
+        yt0 = 0;
+        for (Tile t : baseTiles) {
+            final int x = t.getX();
+            final int y = t.getY();
+            final int xt = (x-x0) * this.tileWidth
+                + (((y&1)==1) ? this.halfWidth : 0);
+            final int yt = (y-y0) * this.halfHeight;
+            g2d.translate(xt - xt0, yt - yt0);
+            xt0 = xt; yt0 = yt;
+
+            this.tv.drawBaseTileTransitions(g2d, t);
         }
         g2d.translate(-xt0, -yt0);
 

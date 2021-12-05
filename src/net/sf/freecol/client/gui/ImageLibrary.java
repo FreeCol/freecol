@@ -109,7 +109,7 @@ public final class ImageLibrary {
         SMALL_SCALE = 0.75f,
         NORMAL_SCALE = 1f,
         MIN_SCALE = 0.25f,    // Minimum of the above
-        MAX_SCALE = 2.0f,     // Maximum of the above
+        MAX_SCALE = 4.0f,     // Maximum of the above
         SCALE_STEP = 0.25f;   // Steps between scales
 
     // TODO: should these be hidden?
@@ -961,6 +961,11 @@ public final class ImageLibrary {
             + ".r"+ ((shouldUseAlternateVersion(x, y)) ? "0" : "1");
         return this.imageCache.getSizedImage(key, this.tileSize, false);
     }
+    
+    public BufferedImage getBeachCenterImage() {
+        final String key = "image.tile.model.tile.beach";
+        return this.imageCache.getSizedImage(key, this.tileSize, false);
+    }
 
     /**
      * Returns the border terrain-image for the given type.
@@ -1290,6 +1295,10 @@ public final class ImageLibrary {
                                                   Dimension size) {
         return this.imageCache.getSizedImage(getTerrainImageKey(type, x, y),
                                              size, false);
+    }
+    
+    public BufferedImage getTerrainMask(Direction direction) {
+        return this.imageCache.getSizedImage("image.mask." + direction.toString().toLowerCase(), this.tileSize, false);
     }
     
     public BufferedImage getTerrainImage(TileType type, int x, int y,

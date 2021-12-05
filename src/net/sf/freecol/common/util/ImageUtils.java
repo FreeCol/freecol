@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.awt.color.ColorSpace;
+import java.awt.AlphaComposite;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Graphics;
@@ -260,5 +261,22 @@ public class ImageUtils {
         g.drawImage(bi, rop, 0, 0);
         g.dispose();
         return bi;
+    }
+    
+    /**
+     * Returns the result where the given mask has been applied to the given image.
+     * 
+     * @param image The image.
+     * @param mask The mask. Only the alpha channel from the mask is used.
+     * @return An image with the opacity from the mask.
+     */
+    public static BufferedImage imageWithAlphaFromMask(BufferedImage image, BufferedImage mask) {
+        final BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g2d = result.createGraphics();
+        g2d.drawImage(image, 0, 0, null);
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN, 1.0F));
+        g2d.drawImage(mask, 0, 0, null);
+        g2d.dispose();
+        return result;
     }
 }

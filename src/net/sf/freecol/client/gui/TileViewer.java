@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.StringUtils.getBreakingPoint;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -26,9 +28,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.ClientOptions;
@@ -52,10 +52,7 @@ import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.Utils;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -81,49 +78,6 @@ public final class TileViewer extends FreeColClientHolder {
                         new float[] { 0, 0, 0, 0 },
                         null);
 
-    private static class SortableImage implements Comparable<SortableImage> {
-
-        public final BufferedImage image;
-        public final int index;
-
-        public SortableImage(BufferedImage image, int index) {
-            this.image = image;
-            this.index = index;
-        }
-
-
-        // Implement Comparable<SortableImage>
-
-        @Override
-        public int compareTo(SortableImage other) {
-            return other.index - this.index;
-        }
-
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object other) {
-            if (other instanceof SortableImage) {
-                return this.compareTo((SortableImage)other) == 0;
-            }
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int hash = super.hashCode();
-            hash = 37 * hash + Utils.hashCode(image);
-            return 37 * hash + index;
-        }
-    }
-
     /** The offset to paint the occupation indicator (in pixels). */
     public static final int STATE_OFFSET_X = 25, STATE_OFFSET_Y = 10;
 
@@ -138,7 +92,7 @@ public final class TileViewer extends FreeColClientHolder {
     private RoadPainter rp;
 
     /** Helper variables for displaying tiles. */
-    private int tileHeight, tileWidth, halfHeight, halfWidth;
+    private int tileHeight, tileWidth, halfHeight;
 
     /** Font for tile text. */
     private Font tinyFont;
@@ -173,7 +127,6 @@ public final class TileViewer extends FreeColClientHolder {
         this.tileHeight = tileSize.height;
         this.tileWidth = tileSize.width;
         this.halfHeight = tileHeight/2;
-        this.halfWidth = tileWidth/2;
         // Allow fonts to disappear if too small
         this.tinyFont = this.lib.getScaledFont("normal-plain-tiny", null);
         this.emphFont = this.lib.getScaledFont("simple-bold+italic-smaller", null);
@@ -203,7 +156,7 @@ public final class TileViewer extends FreeColClientHolder {
                                                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
         g2d.translate(0, compoundHeight - this.tileHeight);
-        displayTileWithBeachAndBorder(g2d, tile);
+        displayTileWithBeach(g2d, tile);
         displayTileItems(g2d, tile, null, overlayImage);
         g2d.dispose();
         return image;
@@ -352,8 +305,9 @@ public final class TileViewer extends FreeColClientHolder {
      */
     private void displayTile(Graphics2D g2d, Tile tile, Player player,
                              BufferedImage overlayImage) {
-        displayTileWithBeachAndBorder(g2d, tile);
+        displayTileWithBeach(g2d, tile);
         if (!tile.isExplored()) return;
+        drawBaseTileTransitions(g2d, tile);
         
         RescaleOp rop = (player.canSee(tile)) ? null : standardRescale;
         displayTileItems(g2d, tile, rop, overlayImage);
@@ -408,7 +362,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param g2d The {@code Graphics2D} object on which to draw the tile.
      * @param tile The {@code Tile} to draw.
      */
-    public void displayTileWithBeachAndBorder(Graphics2D g2d, Tile tile) {
+    public void displayTileWithBeach(Graphics2D g2d, Tile tile) {
         final TileType tileType = tile.getType();
         final int x = tile.getX();
         final int y = tile.getY();
@@ -430,55 +384,88 @@ public final class TileViewer extends FreeColClientHolder {
                               0, 0, null);
             }
         }
-
-        List<SortableImage> imageBorders
-            = new ArrayList<>(Direction.NUMBER_OF_DIRECTIONS);
+    }
+    
+    void drawBaseTileTransitions(Graphics2D g2d, Tile tile) {
+        /*
+         * We are using masks for creating transitions between base tiles. Please note
+         * that corners have not yet been implemented, but the result look good enough
+         * for now.
+         */
+        
+        drawBaseTileTransitionAtDirection(g2d, tile, Direction.NE);
+        drawBaseTileTransitionAtDirection(g2d, tile, Direction.SW);
+        
+        /*
+         * How to implement corners: When doing the transitions for NW and SE, the base
+         * terrain should be the blended version of the neighbouring tiles. That is,
+         * the result after applying the transitions for NE and SW.
+         */
+        drawBaseTileTransitionAtDirection(g2d, tile, Direction.NW);
+        drawBaseTileTransitionAtDirection(g2d, tile, Direction.SE);
+        
+        drawRiverMouth(g2d, tile);
+    }
+    
+    private void drawBaseTileTransitionAtDirection(Graphics2D g2d, Tile tile, Direction direction) {
+        final Tile borderingTile = tile.getNeighbourOrNull(direction);
+        
+        if (borderingTile == null
+                || !borderingTile.isExplored()
+                || !tile.isExplored()
+                || tile.getType() == borderingTile.getType()) {
+            // No transition needed in these cases.
+            return;
+        }
+        
+        /*
+         * We need a workaround since greatRiver and ocean have the same graphics and should not have a
+         * transition. It would not work if they had different graphics either as different coastal base
+         * graphics is not supported right now as the transition would be overlapping with the beaches.
+         * 
+         * If different graphics are required later, beaches need to be drawn in a separate stage.
+         * 
+         * We are abusing the fact that highSeas don't have any resources in order to detect them:
+         */
+        if (tile.getType().isWater()
+                && borderingTile.getType().isWater()
+                && !tile.getType().getResourceTypeValues().isEmpty()
+                && !borderingTile.getType().getResourceTypeValues().isEmpty()) {
+            return;
+        }
+                       
+        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
+        final BufferedImage terrainImage;
+        if (notABeachTransition) {
+            terrainImage = this.lib.getScaledTerrainImage(borderingTile.getType(), borderingTile.getX(), borderingTile.getY());
+        } else {
+            terrainImage = this.lib.getBeachCenterImage();
+        }
+        
+        final BufferedImage transitionImage = ImageUtils.imageWithAlphaFromMask(terrainImage, this.lib.getTerrainMask(direction));
+        g2d.drawImage(transitionImage, 0, 0, null);
+    }
+    
+    private void drawRiverMouth(Graphics2D g2d, Tile tile) {
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
-            TileType borderingTileType;
-            SortableImage si;
-            if (borderingTile == null
-                || !borderingTile.isExplored()
-                || (borderingTileType = borderingTile.getType()) == tileType)
+            if (borderingTile == null || tile.isLand() || !borderingTile.isLand()) {
                 continue;
-            if (!tile.isLand() && borderingTile.isLand()) {
-                // If there is a Coast image (eg. beach) defined, use
-                // it, otherwise skip Draw the grass from the
-                // neighboring tile, spilling over on the side of this tile
-                BufferedImage bi = this.lib.getBorderImage(borderingTileType,
-                                                           direction, x, y);
-                imageBorders.add(new SortableImage(bi,
-                        borderingTileType.getIndex()));
-                TileImprovement river = borderingTile.getRiver();
-                if (river != null) {
-                    Direction dr = direction.getReverseDirection();
-                    int magnitude = river.getRiverConnection(dr);
-                    if (magnitude > 0) {
-                        BufferedImage ri
-                            = this.lib.getRiverMouthImage(direction,
-                                                          magnitude, x, y);
-                        imageBorders.add(new SortableImage(ri, -1));
-                    }
-                }
-            } else if (!tile.isLand() || borderingTile.isLand()) {
-                final int bTIndex = borderingTileType.getIndex();
-                final String tik1 = ImageLibrary
-                    .getTerrainImageKey(tileType, 0, 0);
-                final String tik2 = ImageLibrary
-                    .getTerrainImageKey(borderingTileType, 0, 0);
-                if (bTIndex < tileType.getIndex() && !tik1.equals(tik2)) {
-                    // Draw land terrain with bordering land type, or
-                    // ocean/high seas limit, if the tiles do not
-                    // share same graphics (ocean & great river)
-                    BufferedImage bi
-                        = this.lib.getBorderImage(borderingTileType,
-                                                  direction, x, y);
-                    imageBorders.add(new SortableImage(bi, bTIndex));
-                }
             }
-        }
-        for (SortableImage si : sort(imageBorders)) {
-            g2d.drawImage(si.image, 0, 0, null);
+            
+            final TileImprovement river = borderingTile.getRiver();
+            if (river == null) {
+                continue;
+            }
+            
+            final Direction reverseDirection = direction.getReverseDirection();
+            final int magnitude = river.getRiverConnection(reverseDirection);
+            if (magnitude <= 0) {
+                continue;
+            }
+            
+            final BufferedImage ri = this.lib.getRiverMouthImage(direction, magnitude, tile.getX(), tile.getY());
+            g2d.drawImage(ri, 0, 0, null);
         }
     }
 
@@ -603,7 +590,7 @@ public final class TileViewer extends FreeColClientHolder {
                     // If more units can be added, go larger and use italic
                     BufferedImage stringImage
                         = this.lib.getStringImage(g2d, populationString,
-                            this.lib.getColor(colorString), font);
+                            ImageLibrary.getColor(colorString), font);
                     displayCenteredImage(g2d, stringImage, rop);
                 }
             }
