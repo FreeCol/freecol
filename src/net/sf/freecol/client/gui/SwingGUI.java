@@ -19,6 +19,11 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -33,17 +38,17 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.InputStream;
-import java.util.function.Predicate;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 
-import javax.swing.filechooser.FileFilter;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -56,28 +61,24 @@ import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.InformationPanel;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.PurchasePanel;
 import net.sf.freecol.client.gui.panel.RecruitPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
-
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
@@ -92,28 +93,23 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ImageCache;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -764,6 +760,11 @@ public class SwingGUI extends GUI {
         // graphics pipeline.
         this.mapViewer.startCursorBlinking();
         logger.info("GUI started.");
+    }
+    
+    @Override
+    public Dimension getMapViewDimension() {
+        return canvas.getSize();
     }
 
     /**

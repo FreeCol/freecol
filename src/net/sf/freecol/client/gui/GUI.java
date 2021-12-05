@@ -1154,6 +1154,10 @@ public class GUI extends FreeColClientHolder {
     public void startGUI(final Dimension desiredWindowSize) {
         logger.info("It seems that the GraphicsEnvironment is headless!");
     }
+    
+    public Dimension getMapViewDimension() {
+        return null;
+    }
 
     /**
      * Start the GUI for the map editor.
