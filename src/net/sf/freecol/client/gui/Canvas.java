@@ -697,6 +697,7 @@ public final class Canvas extends JDesktopPane {
      * Map editor initialization.
      */
     public void startMapEditorGUI() {
+        freeColClient.updateActions();
         this.parentFrame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
                 new MenuMouseMotionListener(this.freeColClient)));
         CanvasMapEditorMouseListener listener
