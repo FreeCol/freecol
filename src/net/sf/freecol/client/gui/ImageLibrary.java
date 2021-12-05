@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.StringUtils.getEnumKey;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -27,38 +30,30 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.logging.Level;
+import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -77,12 +72,8 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageCache;
-import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.Video;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.ImageUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -330,8 +321,14 @@ public final class ImageLibrary {
      * @param y The tile y coordinate.
      * @return True if the tile should be considered even.
      */
-    private static boolean isSpecialEven(int x, int y) {
-        return ((y % 8 <= 2) || ((x + y) % 2 == 0));
+    private static boolean shouldUseAlternateVersion(int x, int y) {
+        /*
+         * Please note that this function should always return the same
+         * "random" number given the same x and y.
+         * 
+         * Using two primes in order to get a good seed. 
+         */
+        return new Random(x * 6841 + y * 7919).nextInt(2) == 0;
     }
 
     // Animation handling
@@ -947,7 +944,7 @@ public final class ImageLibrary {
      */
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
         final String key = "image.tile.model.tile.beach.corner" + index
-            + ".r" + ((isSpecialEven(x, y)) ? "0" : "1");
+            + ".r" + ((shouldUseAlternateVersion(x, y)) ? "0" : "1");
         return this.imageCache.getSizedImage(key, this.tileSize, false);
     }
 
@@ -961,7 +958,7 @@ public final class ImageLibrary {
      */
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
         final String key = "image.tile.model.tile.beach.edge" + index
-            + ".r"+ ((isSpecialEven(x, y)) ? "0" : "1");
+            + ".r"+ ((shouldUseAlternateVersion(x, y)) ? "0" : "1");
         return this.imageCache.getSizedImage(key, this.tileSize, false);
     }
 
@@ -979,7 +976,7 @@ public final class ImageLibrary {
         final String key = "image.tile."
             + ((type==null) ? "model.tile.unexplored" : type.getId())
             + ".border." + direction
-            + ".r" + ((isSpecialEven(x, y)) ?  "0" : "1");
+            + ".r" + ((shouldUseAlternateVersion(x, y)) ?  "0" : "1");
         return this.imageCache.getSizedImage(key, this.tileSize, false);
     }
 
@@ -1274,7 +1271,7 @@ public final class ImageLibrary {
     public static String getTerrainImageKey(TileType type, int x, int y) {
         return "image.tile."
             + ((type == null) ? "model.tile.unexplored" : type.getId())
-            + ".center.r" + (isSpecialEven(x, y) ? "0" : "1");
+            + ".center.r" + (shouldUseAlternateVersion(x, y) ? "0" : "1");
     }
         
     /**
