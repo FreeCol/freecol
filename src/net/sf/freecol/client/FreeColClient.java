@@ -220,7 +220,7 @@ public final class FreeColClient {
         // Swing system and look-and-feel initialization.
         if (!FreeCol.getHeadless()) {
             try {
-                gui.installLookAndFeel(fontName);
+                gui.installLookAndFeel(fontName, scale);
             } catch (Exception e) {
                 FreeCol.fatal(logger,
                     Messages.message("client.laf") + "\n" + e.getMessage());

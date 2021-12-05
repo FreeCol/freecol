@@ -1106,7 +1106,7 @@ public class GUI extends FreeColClientHolder {
      * @param fontName An optional font name to be used.
      * @exception FreeColException if the LAF is incompatible with the GUI.
      */
-    public void installLookAndFeel(String fontName) throws FreeColException {}
+    public void installLookAndFeel(String fontName, float scale) throws FreeColException {}
 
     /**
      * Quit the GUI.  All that is required is to exit the full screen.

@@ -527,9 +527,8 @@ public class SwingGUI extends GUI {
      * Reset the map zoom and refresh the canvas.
      */
     private void resetMapZoom() {
-        if (this.scaledImageLibrary.getScaleFactor()
-            != ImageLibrary.NORMAL_SCALE) {
-            this.mapViewer.changeScale(ImageLibrary.NORMAL_SCALE);
+        if (this.scaledImageLibrary.getScaleFactor() != fixedImageLibrary.getScaleFactor()) {
+            this.mapViewer.changeScale(fixedImageLibrary.getScaleFactor());
             refresh();
         }
     }
@@ -636,7 +635,26 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void installLookAndFeel(String fontName) throws FreeColException {
+    public void installLookAndFeel(String fontName, float scale) throws FreeColException {
+        /*
+         * Quick (and dirty) fix for font scaling until this can be adjusted in-game.
+         * 
+         * The scale factor should default to a value based on the DPI of the screen,
+         * but an even better approach would be determining it using the font size.
+         * 
+         * We should have the option of specifying the font size in the client
+         * options dialog.
+         */
+        if (scale >= 1.999) {
+            FontLibrary.DEFAULT_FONT_SIZE = 18F;
+        } else if  (scale >= 1.749) {
+            FontLibrary.DEFAULT_FONT_SIZE = 16F;
+        } else if (scale >= 1.499) {
+            FontLibrary.DEFAULT_FONT_SIZE = 14F;
+        } else if (scale >= 1.499) {
+            FontLibrary.DEFAULT_FONT_SIZE = 14F;
+        }
+        
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
         Font font = FontLibrary.createMainFont(fontName);

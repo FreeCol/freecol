@@ -39,7 +39,7 @@ public class FontLibrary {
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
 
     /** Default size, used for the main-font. */
-    public static final float DEFAULT_FONT_SIZE = 12f;
+    public static float DEFAULT_FONT_SIZE = 12f;
 
     /**
      * FontType is used for choosing the typeface of the {@code Font}.
