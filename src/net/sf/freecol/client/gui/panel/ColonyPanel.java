@@ -256,7 +256,7 @@ public final class ColonyPanel extends PortPanel
         super(freeColClient, new MigLayout());
 
         getMigLayout().setLayoutConstraints("fill, wrap 2, insets 2");
-        getMigLayout().setColumnConstraints("[" + getTilesScrollGuiScaledDimension().width + "!][fill]");
+        getMigLayout().setColumnConstraints("[" + getTilesScrollGuiScaledDimension().width + "px!][fill]");
         getMigLayout().setRowConstraints("[growprio 100,shrinkprio 10][]0[]0[]"
                 + "[growprio 150,shrinkprio 50]"
                 + "[][]");
@@ -418,8 +418,8 @@ public final class ColonyPanel extends PortPanel
     }
     
     private Dimension getTilesScrollGuiScaledDimension() {
-        final int tilesScrollWidth = (int) (238 * getImageLibrary().getScaleFactor());
-        final int tilesScrollHeight = (int) (120 * getImageLibrary().getScaleFactor());
+        final int tilesScrollWidth = 3 * getImageLibrary().getTileSize().width;
+        final int tilesScrollHeight = 3 * getImageLibrary().getTileSize().height;
         return new Dimension(tilesScrollWidth, tilesScrollHeight);
     }
 
@@ -490,7 +490,7 @@ public final class ColonyPanel extends PortPanel
         final Dimension tilesScrollDimension = getTilesScrollGuiScaledDimension();
         add(netProductionPanel,
             "grow, height " + (tmp+10) + ":" + (tmp+10) + ":" + (2*tmp+10));
-        add(tilesScroll, "width " + tilesScrollDimension.width + "!, height " + tilesScrollDimension.height +"!, top");
+        add(tilesScroll, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top");
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
         add(constructionPanel, "grow, top");
