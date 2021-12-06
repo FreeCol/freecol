@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 
@@ -60,17 +61,10 @@ import net.sf.freecol.common.model.Unit;
  *
  * Each group of images[i], texts[i] and the accompanying button (if
  * needed) is contained within an inner layout, wrapped in a layout
- * created by {@link #createLayout(FreeColClient)} which contains the
- * skin background image with the person at the top as well as the
- * okButton at the bottom.
+ * which contains the skin background image with the person at the top
+ * as well as the okButton at the bottom.
  */
 public class InformationPanel extends FreeColPanel {
-
-    /** Standard dimensions for the inner panel. */
-    private static final int BASE_WIDTH = 470, BASE_HEIGHT = 75;
-
-    /** Number of text columns in the messages. */
-    private static final int COLUMNS = 40;
     
     /** The skin for this panel. */
     private BufferedImage skin = null;
@@ -89,37 +83,43 @@ public class InformationPanel extends FreeColPanel {
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
                             FreeColObject[] fcos, ImageIcon[] images) {
-        this(freeColClient, texts, fcos, images,
-            ImageLibrary.getInformationPanelSkin(freeColClient.getMyPlayer()));
+        super(freeColClient, null, new MigLayout());
+        
+        final ImageLibrary fixedImageLibrary = freeColClient.getGUI().getFixedImageLibrary();
+        
+        this.skin = fixedImageLibrary.getInformationPanelSkin(freeColClient.getMyPlayer());
+        
+        final float scaleFactor = fixedImageLibrary.getScaleFactor();
+        final int topInset = fixedImageLibrary.getInformationPanelSkinTopInset(freeColClient.getMyPlayer());
+        final int scaledTopInset = (int) (topInset * scaleFactor);
+        final int gap = (int) (10 * scaleFactor);
+        
+        getMigLayout().setLayoutConstraints("fill, wrap 1, insets 0 0 0 0");
+        getMigLayout().setColumnConstraints(gap + "[grow]" + gap);
+        getMigLayout().setRowConstraints(scaledTopInset + "px[grow]" + gap + "[]" + gap);
+
+        final JPanel textPanel = createPanelWithAllContent(texts, fcos, images, gap);
+        final JScrollPane scrollPane = new JScrollPane(textPanel,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+        add(scrollPane, "grow");
+        add(okButton, "tag ok");
+        setPreferredSize(new Dimension(skin.getWidth(), skin.getHeight()));
+        setBorder(null);
     }
 
-    /**
-     * Creates an information panel that shows the given texts and
-     * images, and an "OK" button.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     * @param texts The texts to be displayed in the panel.
-     * @param fcos The source {@code FreeColObject}s for the text.
-     * @param images The images to be displayed in the panel.
-     * @param skin The background skin for the panel.
-     */
-    private InformationPanel(FreeColClient freeColClient, String[] texts,
-                             FreeColObject[] fcos, ImageIcon[] images,
-                             BufferedImage skin) {
-        super(freeColClient, null, createLayout(skin));
-
-        final GUI gui = getGUI();
-        this.skin = skin;
-        
-        JPanel textPanel = new MigPanel(new MigLayout("wrap 2"));
+    private JPanel createPanelWithAllContent(String[] texts, FreeColObject[] fcos, ImageIcon[] images, final int gap) {
+        JPanel textPanel = new MigPanel(new MigLayout("fill, wrap 2"));
         textPanel.setOpaque(false);
         for (int i = 0; i < texts.length; i++) {
-            JTextArea txt = Utility.getDefaultTextArea(texts[i], COLUMNS);
+            JTextArea txt = Utility.getDefaultTextArea(texts[i]);
             if (images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
-                textPanel.add(txt);
+                textPanel.add(txt, "gapleft " + gap + ", growx");
             } else {
-                textPanel.add(txt, "skip");
+                textPanel.add(txt, "skip, growx");
             }
             StringTemplate disp = displayLabel(fcos[i]);
             if (disp != null) {
@@ -128,7 +128,7 @@ public class InformationPanel extends FreeColPanel {
                     .addStringTemplate("%object%", disp));
                 final FreeColObject fco = fcos[i];
                 button.addActionListener((ActionEvent ae) -> {
-                        gui.displayObject(fco);
+                        getGUI().displayObject(fco);
                     });
                 /*
                   If there is another text to display, we need to add
@@ -142,32 +142,7 @@ public class InformationPanel extends FreeColPanel {
                 }
             }
         }
-
-        JScrollPane scrollPane = new JScrollPane(textPanel,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        // make scroll pane opaque
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(null);
-
-        this.add(scrollPane);
-        this.add(okButton, "tag ok");
-        this.setPreferredSize(new Dimension(skin.getWidth(), skin.getHeight()));
-        this.setBorder(null);
-    }
-
-    /**
-     * Creates the outer layout of the Information Panel.
-     *
-     * @param skin The skin to use for the panel.
-     * @return A new {@code MigLayout} containing the outer layout.
-     */
-    private static MigLayout createLayout(BufferedImage skin) {
-        // FIXME: 290 is magic
-        // insets are the outer gaps top/left/bottom/right
-        // h-290 skips over the image at the top of the standard skin
-        int h = skin.getHeight();
-        return new MigLayout("wrap 1, insets " + (h-290) + " 0 10 0");
+        return textPanel;
     }
 
     /**

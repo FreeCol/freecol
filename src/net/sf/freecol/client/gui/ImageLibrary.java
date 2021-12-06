@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageCache;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.StringResource;
 import net.sf.freecol.common.resources.Video;
 
 
@@ -575,14 +576,25 @@ public final class ImageLibrary {
         return this.imageCache.getScaledImage(key, NORMAL_SCALE, grayscale);
     }
 
-    public static BufferedImage getInformationPanelSkin(Player player) {
+    public BufferedImage getInformationPanelSkin(Player player) {
+        String key = determineInformationPanelSkinKey(player);
+        return getScaledImage(key);
+    }
+
+    private String determineInformationPanelSkinKey(Player player) {
         String key = (player == null) ? "image.skin.InformationPanel"
             : (player.isRebel()) ? "image.skin.InformationPanel.rebel"
             : "image.skin.InformationPanel." + player.getNationResourceKey();
         if (ResourceManager.getImageResource(key, false) == null) {
             key = "image.skin.InformationPanel";
         }
-        return getUnscaledImage(key);
+        return key;
+    }
+    
+    public int getInformationPanelSkinTopInset(Player player) {
+        final String key = determineInformationPanelSkinKey(player) + ".insets.top";
+        final StringResource s = ResourceManager.getStringResource(key, false);
+        return (s != null) ? Integer.parseInt(s.getString()) : 0;
     }
 
     public BufferedImage getLCRImage(Dimension size) {
