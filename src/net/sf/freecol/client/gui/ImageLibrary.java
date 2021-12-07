@@ -895,6 +895,10 @@ public final class ImageLibrary {
     public BufferedImage getSmallerNationImage(Nation nation) {
         return getNationImage(nation, this.scaleFactor * SMALLER_SCALE);
     }
+    
+    public BufferedImage getUnscaledSmallerNationImage(Nation nation) {
+        return getNationImage(nation, SMALLER_SCALE);
+    }
 
 
     // Path type image handling
