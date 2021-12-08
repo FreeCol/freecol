@@ -497,7 +497,9 @@ public class SwingGUI extends GUI {
                 || !tile.isExplored()
                 || !unit.getSimpleMoveType(tile).isLegal()) ? null
                 : unit.findPath(tile);
-            this.mapViewer.changeGotoPath(newPath);
+            if (this.mapViewer.changeGotoPath(newPath)) {
+                refresh();
+            }
         }
     }
 
@@ -996,7 +998,6 @@ public class SwingGUI extends GUI {
             Point pt = this.canvas.getMousePosition();
             updateGotoTile((pt == null) ? null
                 : tileAt(pt.x, pt.y));
-            refresh();
         }
     }
 
@@ -1069,13 +1070,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateGoto(int x, int y, boolean start) {
-        if (start && isDrag(x, y)) {
+        if (!isGotoStarted() && start && isDrag(x, y)) {
             startGoto();
         }
         if (isGotoStarted()) {
             updateGotoTile(tileAt(x, y));
         }
-        refresh();
     }
 
     /**
