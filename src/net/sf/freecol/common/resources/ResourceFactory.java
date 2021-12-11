@@ -160,9 +160,19 @@ public class ResourceFactory {
      * @param output Where a previously created instance of {@code Resource}
      *      with the given {@code URI} is put if such an object has
      *      already been created, or a new instance if not.
+     * @return The <code>Resource</code> if created.     
      */
-    public static void createResource(URI uri, ResourceSink output) {
-        if (findResource(uri, output)) return;
+    public static Resource createResource(URI uri, ResourceSink output) {
+        if (findResource(uri, output)) return null;
+
+        final String pathPart;
+        if (uri.getPath() != null) {
+            pathPart = uri.getPath();
+        } else if (uri.toString().indexOf("!/") >= 0) {
+            pathPart = uri.toString().substring(uri.toString().indexOf("!/") + 2);
+        } else {
+            pathPart = null;
+        }
 
         try {
             if ("urn".equals(uri.getScheme())) {
@@ -170,50 +180,60 @@ public class ResourceFactory {
                     ColorResource cr = new ColorResource(uri);
                     output.add(cr);
                     colorResources.put(uri, new WeakReference<>(cr));
+                    return cr;
                 } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
                     FontResource fr = new FontResource(uri);
                     output.add(fr);
                     fontResources.put(uri, new WeakReference<>(fr));
+                    return fr;
                 }
-            } else if (uri.getPath().endsWith("\"")
-                && uri.getPath().lastIndexOf('"',
-                    uri.getPath().length()-1) >= 0) {
+            } else if (pathPart.endsWith("\"") && pathPart.lastIndexOf('"', pathPart.length()-1) >= 0) {
                 StringResource sr = new StringResource(uri);
                 output.add(sr);
                 stringResources.put(uri, new WeakReference<>(sr));
-            } else if (uri.getPath().endsWith(".faf")) {
+                return sr;
+            } else if (pathPart.endsWith(".faf")) {
                 FAFileResource far = new FAFileResource(uri);
                 output.add(far);
                 fafResources.put(uri, new WeakReference<>(far));
-            } else if (uri.getPath().endsWith(".sza")) {
+                return far;
+            } else if (pathPart.endsWith(".sza")) {
                 SZAResource szr = new SZAResource(uri);
                 output.add(szr);
                 szaResources.put(uri, new WeakReference<>(szr));
-            } else if (uri.getPath().endsWith(".ttf")) {
+                return szr;
+            } else if (pathPart.endsWith(".ttf")) {
                 FontResource fr = new FontResource(uri);
                 output.add(fr);
                 fontResources.put(uri, new WeakReference<>(fr));
-            } else if (uri.getPath().endsWith(".wav")) {
+                return fr;
+            } else if (pathPart.endsWith(".wav")) {
                 AudioResource ar = new AudioResource(uri);
                 output.add(ar);
                 audioResources.put(uri, new WeakReference<>(ar));
-            } else if (uri.getPath().endsWith(".ogg")) {
-                if (uri.getPath().endsWith(".video.ogg")) {
+                return ar;
+            } else if (pathPart.endsWith(".ogg")) {
+                if (pathPart.endsWith(".video.ogg")) {
                     VideoResource vr = new VideoResource(uri);
                     output.add(vr);
                     videoResources.put(uri, new WeakReference<>(vr));
+                    return vr;
                 } else {
                     AudioResource ar = new AudioResource(uri);
                     output.add(ar);
                     audioResources.put(uri, new WeakReference<>(ar));
+                    return ar;
                 }
             } else {
                 ImageResource ir = new ImageResource(uri);
                 output.add(ir);
                 imageResources.put(uri, new WeakReference<>(ir));
+                return ir;
             }
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Failed to create " + uri, ioe);
+            return null;
         }
+        return null;
     }
 }

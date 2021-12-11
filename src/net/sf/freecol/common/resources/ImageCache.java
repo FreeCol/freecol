@@ -108,6 +108,7 @@ public class ImageCache {
                                          final String key,
                                          final Dimension size,
                                          final boolean grayscale) {
+
         // TODO: add logging but probably in a branch for now
         // until we understand the performance issue better
         final long hashKey = imageHash(key, size, grayscale);
@@ -158,7 +159,32 @@ public class ImageCache {
     public BufferedImage getSizedImage(final String key,
                                        final Dimension size,
                                        final boolean grayscale) {
-        return getCachedImage(getImageResource(key), key, size, grayscale);
+        return getSizedImage(key, size, grayscale, 0);
+    }
+    
+    /**
+     * Get the image specified by the given name, size and grayscale.
+     *
+     * Please, avoid using too many different sizes!
+     * For each is a scaled image cached here for a long time,
+     * which wastes memory if you are not careful.
+     *
+     * @param key The name of the resource to return.
+     * @param size The size of the requested image.
+     * @param grayscale If true return a grayscale image.
+     * @param seed A seed used for getting the same "random" picture every
+     *      time.
+     * @return The image found.
+     */
+    public BufferedImage getSizedImage(final String key,
+                                       final Dimension size,
+                                       final boolean grayscale,
+                                       final int seed) {
+        final ImageResource ir = getImageResource(key);
+        if (grayscale) {
+            return getCachedImage(ir, key, size, grayscale);
+        }
+        return ir.getVariation(seed).getImage(size, grayscale);
     }
 
     /**

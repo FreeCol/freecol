@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,6 +57,7 @@ public class ImageResource extends Resource {
     private volatile BufferedImage image = null;
     private List<URI> alternativeLocators = null;
     private List<BufferedImage> loadedImages = null;
+    private List<ImageResource> variations = new ArrayList<>();
 
 
     /**
@@ -79,6 +81,22 @@ public class ImageResource extends Resource {
             this.alternativeLocators = new ArrayList<>();
         this.alternativeLocators.add(uri);
     }
+    
+    public synchronized void addVariation(ImageResource imageResource) {
+        this.variations.add(imageResource);
+    }
+    
+    /**
+     * Adds another URIs for loading a differently sized version of the image.
+     * Only use before preload got called!
+     *
+     * @param uris A {@code List} of {@code URI}s used when loading.
+     */
+    public synchronized void addAlternativeResourceLocators(List<URI> uris) {
+        if (this.alternativeLocators == null)
+            this.alternativeLocators = new ArrayList<>();
+        this.alternativeLocators.addAll(uris);
+    }
 
     /**
      * Gets the {@code Image} represented by this resource.
@@ -91,6 +109,18 @@ public class ImageResource extends Resource {
             preload();
         }
         return this.image;
+    }
+    
+    public synchronized ImageResource getVariation(int seed) {
+        if (variations.isEmpty()) {
+            return this;
+        }
+        
+        final int value = new Random(seed).nextInt(variations.size() + 1);
+        if (value >= variations.size()) {
+            return this;
+        }
+        return variations.get(value);
     }
 
     /**
@@ -202,6 +232,9 @@ public class ImageResource extends Resource {
                 if (this.image == null && !this.loadedImages.isEmpty()) {
                     this.image = first(this.loadedImages);
                 }
+            }
+            for (ImageResource variation : variations) {
+                variation.preload();
             }
         }
     }

@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageCache;
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.StringResource;
 import net.sf.freecol.common.resources.Video;
@@ -329,7 +330,21 @@ public final class ImageLibrary {
          * 
          * Using two primes in order to get a good seed. 
          */
-        return new Random(x * 6841 + y * 7919).nextInt(2) == 0;
+        return new Random(variationSeedUsing(x, y)).nextInt(2) == 0;
+    }
+    
+    /**
+     * Calculates a seed for reliably generating the same "random" number.
+     *
+     * This is useful to select different images for the same tile
+     * type in order to prevent big stripes or a checker-board effect.
+     *
+     * @param x The tile x coordinate.
+     * @param y The tile y coordinate.
+     * @return The seed.
+     */
+    private static int variationSeedUsing(int x, int y) {
+        return x * 6841 + y * 7919;
     }
 
     // Animation handling
@@ -959,9 +974,8 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
-        final String key = "image.tile.model.tile.beach.corner" + index
-            + ".r" + ((shouldUseAlternateVersion(x, y)) ? "0" : "1");
-        return this.imageCache.getSizedImage(key, this.tileSize, false);
+        final String key = "image.tile.model.tile.beach.corner" + index;
+        return this.imageCache.getSizedImage(key, this.tileSize, false, variationSeedUsing(x, y));
     }
 
     /**
@@ -973,9 +987,8 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
-        final String key = "image.tile.model.tile.beach.edge" + index
-            + ".r"+ ((shouldUseAlternateVersion(x, y)) ? "0" : "1");
-        return this.imageCache.getSizedImage(key, this.tileSize, false);
+        final String key = "image.tile.model.tile.beach.edge" + index;
+        return this.imageCache.getSizedImage(key, this.tileSize, false, variationSeedUsing(x, y));
     }
     
     public BufferedImage getBeachCenterImage() {
@@ -996,9 +1009,8 @@ public final class ImageLibrary {
                                         int x, int y) {
         final String key = "image.tile."
             + ((type==null) ? "model.tile.unexplored" : type.getId())
-            + ".border." + direction
-            + ".r" + ((shouldUseAlternateVersion(x, y)) ?  "0" : "1");
-        return this.imageCache.getSizedImage(key, this.tileSize, false);
+            + ".border." + direction;
+        return this.imageCache.getSizedImage(key, this.tileSize, false, variationSeedUsing(x, y));
     }
 
 
@@ -1053,23 +1065,12 @@ public final class ImageLibrary {
      */
     private BufferedImage getOverlayImageInternal(TileType type, String id,
                                                   Dimension size) {
-        List<String> keys = this.tileKeyListCache.get(type);
-        if (keys == null) {
-            final String prefix = "image.tileoverlay." + type.getId() + ".r";
-            keys = ResourceManager.getImageKeys(prefix);
-            keys.sort(Comparator.naturalOrder());
-            this.tileKeyListCache.put(type, keys);
-        }
-        final int count = keys.size();
-        switch (count) {
-        case 0:
+        final String key = "image.tileoverlay." + type.getId();
+        final ImageResource ir = ResourceManager.getImageResource(key, false);
+        if (ir == null) {
             return null;
-        case 1:
-            return this.imageCache.getSizedImage(keys.get(0), size, false);
-        default:
-            String key = keys.get(Math.abs(id.hashCode() % count));
-            return this.imageCache.getSizedImage(key, size, false);
         }
+        return ir.getVariation(id.hashCode()).getImage(size, false);
     }
 
     public BufferedImage getScaledOverlayImage(Tile tile) {
@@ -1289,10 +1290,10 @@ public final class ImageLibrary {
     }
     
 
-    public static String getTerrainImageKey(TileType type, int x, int y) {
+    public static String getTerrainImageKey(TileType type) {
         return "image.tile."
             + ((type == null) ? "model.tile.unexplored" : type.getId())
-            + ".center.r" + (shouldUseAlternateVersion(x, y) ? "0" : "1");
+            + ".center";
     }
         
     /**
@@ -1309,8 +1310,8 @@ public final class ImageLibrary {
     private BufferedImage getTerrainImageInternal(TileType type,
                                                   int x, int y,
                                                   Dimension size) {
-        return this.imageCache.getSizedImage(getTerrainImageKey(type, x, y),
-                                             size, false);
+        return this.imageCache.getSizedImage(getTerrainImageKey(type),
+                                             size, false, variationSeedUsing(x, y));
     }
     
     public BufferedImage getTerrainMask(Direction direction) {

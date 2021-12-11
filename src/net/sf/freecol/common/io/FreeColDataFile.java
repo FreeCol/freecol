@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.io;
 
+import static net.sf.freecol.common.util.StringUtils.join;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,26 +29,33 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.resources.ImageResource;
+import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapper;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.common.util.LogBuilder;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -166,10 +175,118 @@ public class FreeColDataFile {
      *     there is no resource mapping file.
      */
     public ResourceMapping getResourceMapping() {
-        final Properties properties = new Properties();
-        LogBuilder lb = new LogBuilder(64);
+        final LogBuilder lb = new LogBuilder(64);
         lb.add("Resource mappings:");
         lb.mark();
+        final Properties properties = readResourcesProperties(lb);
+        if (properties == null) {
+            return null;
+        }
+
+        final ResourceMapping rc = new ResourceMapping();
+        final List<String> virtualResources = handleResources(properties, rc);
+        handleVirtualResources(virtualResources, lb, properties, rc);
+        
+        if (lb.grew()) lb.log(logger, Level.FINE);
+        return rc;
+    }
+
+    /**
+     * Handles loading of all resources defined in {@code properties}.
+     * 
+     * This method also handles alternate variations and sizes.
+     *  
+     * @param properties The resources to be loaded.
+     * @param rc The output object where resolved resources should be placed.
+     * @return A list of keys that are virtual resources, that is a link to
+     *      another resource. Virtual resources are used by mods when the
+     *      author wants to reuse graphics that are defined in other FreeCol
+     *      data files.
+     */
+    private List<String> handleResources(final Properties properties, ResourceMapping rc) {
+        List<String> virtualResources = new ArrayList<>();
+        Enumeration<?> pn = properties.propertyNames();
+        while (pn.hasMoreElements()) {
+            final String key = (String) pn.nextElement();
+            
+            /*
+             * We are stripping ".r0" from the end of keys in order to
+             * support old keys where the variant was listed in
+             * resources.properties.
+             */
+            final String updatedKey = stripEnding(key, ".r0");
+            final String value = properties.getProperty(key);
+            
+            if (value.startsWith(resourceScheme)) {
+                virtualResources.add(updatedKey);
+            } else {
+                handleNormalResource(rc, key, value);
+            }
+        }
+        return virtualResources;
+    }
+
+    private void handleNormalResource(ResourceMapping rc, final String key, final String value) {
+        final URI uri = getURI(value);
+        if (uri == null) {
+            return;
+        }
+        final ResourceMapper rm = new ResourceMapper(rc);
+        rm.setKey(key);
+        final Resource resource = ResourceFactory.createResource(uri, rm);
+        
+        /*
+         * Rivers need new keys in order to support variations.
+         */
+        final boolean supportsVariations = !key.contains(".improvement.river.");
+        
+        if (resource instanceof ImageResource && supportsVariations) {
+            final ImageResource imageResource = (ImageResource) resource;
+            extendWithAdditionalSizesAndVariations(imageResource, rm, value);
+        }
+    }
+
+    private void handleVirtualResources(List<String> virtualResources, final LogBuilder lb, final Properties properties, ResourceMapping rc) {
+        boolean progress = true;
+        List<String> miss = new ArrayList<>();
+        while (progress && !virtualResources.isEmpty()) {
+            miss.clear();
+            progress = false;
+            while (!virtualResources.isEmpty()) {
+                final String key = virtualResources.remove(0);
+                /*
+                 * We are stripping ".r0" from the end of keys in order to
+                 * support old keys where the variant was listed in
+                 * resources.properties.
+                 */
+                final String updatedKey = stripEnding(key, ".r0");
+                
+                final String value = properties.getProperty(key)
+                    .substring(resourceScheme.length());
+                if (!rc.duplicateResource(value, updatedKey)) {
+                    miss.add(key);
+                } else {
+                    progress = true;
+                }
+            }
+            virtualResources.addAll(miss);
+        }
+        if (!virtualResources.isEmpty()) {
+            lb.add(", could not resolve virtual resource/s: ",
+                   join(" ", virtualResources));
+        }
+    }
+
+    /**
+     * Reads "resources.properties". We support localized versions of this
+     * file, so that localized images can be provided.
+     * 
+     * @param lb Just used for logging.
+     * @return The read properties, or {@code null} if an error occured while
+     *      reading the file(s).
+     */
+    private Properties readResourcesProperties(final LogBuilder lb) {
+        final Properties properties = new Properties();
         for (String fileName : FreeColDirectories.getResourceFileNames()) {
             try (
                 final InputStream is = getInputStream(fileName);
@@ -184,70 +301,94 @@ public class FreeColDataFile {
                 return null;
             }
         }
+        return properties;
+    }
+    
+    private String stripEnding(String key, String ending) {
+        return (key.endsWith(ending)) ? key.substring(0, key.length() - 3) : key;
+    }
+    
+    private void extendWithAdditionalSizesAndVariations(ImageResource imageResource, ResourceMapper rm, String value) {
+        Map<URI, List<URI>> alternativeSizes = findAlternativeSizes(value);
+        imageResource.addAlternativeResourceLocators(alternativeSizes.get(null));
+        
+        alternativeSizes.entrySet()
+            .stream()
+            .filter(entry -> entry.getKey() != null)
+            .forEach(entry -> {
+                final ImageResource variationResource = (ImageResource) ResourceFactory.createResource(entry.getKey(), rm);
+                if (variationResource != null) {
+                    variationResource.addAlternativeResourceLocators(entry.getValue());
+                    imageResource.addVariation(variationResource);
+                }
+            });
+    }
 
-        ResourceMapping rc = new ResourceMapping();
-        List<String> todo = new ArrayList<>();
-        List<String> alternatives = new ArrayList<>();
-        Enumeration<?> pn = properties.propertyNames();
-        ResourceMapper rm = new ResourceMapper(rc);
-        while (pn.hasMoreElements()) {
-            final String key = (String) pn.nextElement();
-            int split = key.lastIndexOf('.');
-            if(split != -1 && split+2 < key.length()
-                && key.charAt(split+1) == 'a'
-                && key.charAt(split+2) >= '0' && key.charAt(split+2) <= '9'
-                && key.startsWith("image.")) {
-                alternatives.add(key);
+    private Map<URI, List<URI>> findAlternativeSizes(String name) {
+        if (name.indexOf(".") <= 0) {
+            return Map.of();
+        }
+
+        FileSystem fileSystem = null;
+        try {
+            final Path filePath;
+            if (file.isDirectory()) {
+                filePath = new File(file, name).toPath();
             } else {
-                final String value = properties.getProperty(key);
-                if (value.startsWith(resourceScheme)) {
-                    todo.add(key);
-                } else {
-                    URI uri = getURI(value);
-                    if (uri != null) {
-                        rm.setKey(key);
-                        ResourceFactory.createResource(uri, rm);
-                    }
-                }
+                /*
+                 * We can use JarEntry instead, if this solution causes problems. 
+                 */
+                fileSystem = FileSystems.newFileSystem(new URI("jar:file", file.getAbsolutePath(), null), Map.of());
+                filePath = fileSystem.getPath(jarDirectory + name);
+            }
+            
+            final Map<URI, List<URI>> result = new HashMap<>();
+            result.put(null, findFilesWithRegexBeforeSuffixAsUri(filePath, false));
+            
+            final List<Path> variations = findFilesWithRegexBeforeSuffix(filePath, true);
+            for (Path variationPath : variations) {
+                result.put(variationPath.toUri(), findFilesWithRegexBeforeSuffixAsUri(variationPath, false));
+            }
+            
+            return result;
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Failed to read directory from jar/zip file: " + file + " jarDirectory" + jarDirectory, e);
+            return Map.of();
+        } catch (URISyntaxException e) {
+            logger.log(Level.WARNING, "Failed to read directory from jar/zip file: " + file + " jarDirectory" + jarDirectory, e);
+            return Map.of();
+        } finally {
+            if (fileSystem != null) {
+                try {
+                    fileSystem.close();
+                } catch (IOException e) {}
             }
         }
-        boolean progress = true;
-        List<String> miss = new ArrayList<>();
-        while (progress && !todo.isEmpty()) {
-            miss.clear();
-            progress = false;
-            while (!todo.isEmpty()) {
-                final String key = todo.remove(0);
-                final String value = properties.getProperty(key)
-                    .substring(resourceScheme.length());
-                if (!rc.duplicateResource(value, key)) {
-                    miss.add(key);
-                } else {
-                    progress = true;
-                }
-            }
-            todo.addAll(miss);
+    }
+
+    private List<URI> findFilesWithRegexBeforeSuffixAsUri(final Path filePath, boolean findVariation) throws IOException {
+        return findFilesWithRegexBeforeSuffix(filePath, findVariation)
+                .stream()
+                .map(p -> p.toUri())
+                .collect(Collectors.toList());
+    }
+    
+    private List<Path> findFilesWithRegexBeforeSuffix(final Path filePath, boolean findVariation) throws IOException {
+        //final String variationFileRegex = "\\.var[0-9][0-9]*";
+        final String variationFileRegex = "[0-9][0-9]?";
+        final String sizeFileRegex = "\\.size[0-9][0-9]*";
+        
+        final String regex = (findVariation) ? variationFileRegex : sizeFileRegex;       
+        final String resourceFilename = filePath.getFileName().toString();
+        String prefix = resourceFilename.substring(0, resourceFilename.lastIndexOf("."));
+        if (findVariation) {
+            prefix = prefix.replaceAll("[0-9]*$", "");
         }
-        if (!todo.isEmpty()) {
-            lb.add(", could not resolve virtual resource/s: ",
-                   join(" ", todo));
-        }
-        for (String key : alternatives) {
-            final String value = properties.getProperty(key);
-            URI uri = getURI(value);
-            if (uri != null) {
-                int split = key.lastIndexOf('.');
-                ImageResource ir = rc.getImageResource(key.substring(0, split));
-                if (ir != null) {
-                    ir.addAlternativeResourceLocator(uri);
-                } else {
-                    logger.warning("Missing resource when adding alternative: "
-                        + key);
-                }
-            }
-        }
-        if (lb.grew()) lb.log(logger, Level.FINE);
-        return rc;
+        final String suffix = resourceFilename.substring(resourceFilename.lastIndexOf("."));
+        final String completeRegex = Pattern.quote(prefix) + regex + Pattern.quote(suffix);
+        
+        final List<Path> alternativeSizes = Files.list(filePath.getParent()).filter(p -> p.getFileName().toString().matches(completeRegex)).collect(Collectors.toList());
+        return alternativeSizes;
     }
 
     /**
