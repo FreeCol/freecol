@@ -28,7 +28,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.ClientOptions;
@@ -100,6 +102,11 @@ public final class TileViewer extends FreeColClientHolder {
     /** Fonts for the colony population chip. */
     private Font emphFont, normFont;
 
+    /**
+     * Caches transitions (image with applied alpha) since applying the alpha-channel
+     * is oddly slow on some system.
+     */
+    private static final Map<String, BufferedImage> transitionCache = new HashMap<>();
 
     /**
      * The constructor to use.
@@ -433,7 +440,14 @@ public final class TileViewer extends FreeColClientHolder {
                 && !borderingTile.getType().getResourceTypeValues().isEmpty()) {
             return;
         }
-                       
+
+        final String hash = tile.getType().getId() + "," + borderingTile.getType().getId() + "," + direction.getKey() + "," + ((int) (lib.getScaleFactor() * 1000));
+        final BufferedImage cachedTransitionImage = transitionCache.get(hash);
+        if (cachedTransitionImage != null) {
+            g2d.drawImage(cachedTransitionImage, 0, 0, null);
+            return;
+        }
+        
         final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
         final BufferedImage terrainImage;
         if (notABeachTransition) {
@@ -443,6 +457,7 @@ public final class TileViewer extends FreeColClientHolder {
         }
         
         final BufferedImage transitionImage = ImageUtils.imageWithAlphaFromMask(terrainImage, this.lib.getTerrainMask(direction));
+        transitionCache.put(hash, transitionImage);
         g2d.drawImage(transitionImage, 0, 0, null);
     }
     
