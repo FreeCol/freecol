@@ -451,7 +451,7 @@ public final class TileViewer extends FreeColClientHolder {
         final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
         final BufferedImage terrainImage;
         if (notABeachTransition) {
-            terrainImage = this.lib.getScaledTerrainImage(borderingTile.getType(), borderingTile.getX(), borderingTile.getY());
+            terrainImage = this.lib.getScaledTerrainImage(borderingTile.getType(), 0, 0); // Using 0,0 to get the same variation every time.
         } else {
             terrainImage = this.lib.getBeachCenterImage();
         }
