@@ -146,18 +146,19 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (map == null) return;
         final int x = e.getX(), y = e.getY();
 
-        // When focusing out on the minimap, the last available focus
-        // out takes a larger jump than previous ones.  This if
-        // statement adjusts for the last larger jump in focus out.
-        int tileX, tileY;
-        if (adjustX > 0 && adjustY > 0) {
-            tileX = ((x - adjustX) / tileSize) + firstColumn
-                + adjustX / MIN_TILE_SIZE;
-            tileY = ((y - adjustY) / tileSize * MIN_TILE_SIZE) + firstRow
-                + adjustY;
-        } else {
-            tileX = ((x - adjustX) / tileSize) + firstColumn;
-            tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
+        int tileX = ((x - adjustX) / tileSize) + firstColumn;
+        int tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
+        if (tileX >= map.getWidth()) {
+            tileX = map.getWidth() - 1;
+        }
+        if (tileY >= map.getHeight()) {
+            tileY = map.getHeight() - 1;
+        }
+        if (tileX < 0) {
+            tileX = 0;
+        }
+        if (tileY < 0) {
+            tileY = 0;
         }
         getGUI().setFocus(map.getTile(tileX, tileY));
     }
@@ -257,7 +258,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         if (mWidth <= xSize) {
             firstColumn = 0;
-            adjustX = ((xSize - mWidth) * tileSize)/2;
+            adjustX = (minimapWidth - mWidth * tileSize) / 2;
             minimapWidth = mWidth * tileSize;
         } else {
             adjustX = 0;
@@ -265,7 +266,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         if (mHeight <= ySize) {
             firstRow = 0;
-            adjustY = ((ySize - mHeight) * tileSize)/MIN_TILE_SIZE;
+            adjustY = (minimapHeight - mHeight * (tileSize/4)) / 2;
             minimapHeight = mHeight * (tileSize/4);
         } else {
             adjustY = 0;
@@ -300,6 +301,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         
         g.setStroke(new BasicStroke(1f));
 
+        g.translate(adjustX, adjustY);
         AffineTransform baseTransform = g.getTransform();
         AffineTransform rowTransform = null;
 
@@ -361,6 +363,16 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
         g.setTransform(baseTransform);
         paintActualMapWhiteRectangle(g, minimapWidth, minimapHeight);
+        
+        /* 
+         * Code for drawing a border around the minimap if the entire map is shown below.
+         * I am thinking it might look better without the border.
+         * 
+        if (adjustX > 0 || adjustY > 0) {
+            g.setColor(ImageLibrary.getMinimapBorderColor());
+            g.drawRect(0, 0, minimapWidth - 1, minimapHeight - 1);
+        }*/
+        
         g.setTransform(originTransform);
     }
 
@@ -406,11 +418,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
         // Draw the rect.
         g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
-        // Draw an additional rect, if the whole map is shown on the minimap
-        if (adjustX > 0 && adjustY > 0) {
-            g.setColor(ImageLibrary.getMinimapBorderColor());
-            g.drawRect(0, 0, minimapWidth - 1, minimapHeight - 1);
-        }
     }
 
 
