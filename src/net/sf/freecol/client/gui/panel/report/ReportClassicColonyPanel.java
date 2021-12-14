@@ -19,9 +19,10 @@
 
 package net.sf.freecol.client.gui.panel.report;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionListener;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
 
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,12 +34,11 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -145,7 +144,7 @@ public final class ReportClassicColonyPanel extends ReportPanel {
                     ProductionLabel productionLabel
                         = new ProductionLabel(getFreeColClient(),
                             new AbstractGoods(gt, newValue),
-                            maxProduction, stockValue);
+                                    maxProduction, stockValue, true);
                     if (count % GOODS_PER_ROW == 0) {
                         reportPanel.add(productionLabel,
                             "newline, split " + GOODS_PER_ROW);
