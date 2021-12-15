@@ -63,6 +63,7 @@ public final class DeclarationPanel extends FreeColPanel {
     private final int FINISH_DELAY = 5000; // 5s before closing
     
     private final Runnable afterClosing;
+    private boolean closed = false;
 
 
     /**
@@ -84,15 +85,13 @@ public final class DeclarationPanel extends FreeColPanel {
         addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent k) {
-                    getGUI().removeComponent(DeclarationPanel.this);
-                    afterClosing.run();
+                    closePanel();
                 }
             });
         addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    getGUI().removeComponent(DeclarationPanel.this);
-                    afterClosing.run();
+                    closePanel();
                 }
             });
 
@@ -121,13 +120,22 @@ public final class DeclarationPanel extends FreeColPanel {
         final String command = ae.getActionCommand();
         if (ANIMATION_STOPPED.equals(command)) {
             Timer t = new Timer(FINISH_DELAY, (x) -> {
-                    getGUI().removeComponent(DeclarationPanel.this);
-                    afterClosing.run();
+                    closePanel();
                 });
             t.setRepeats(false);
             t.start();
         } else {
             super.actionPerformed(ae);
+        }
+    }
+    
+    private void closePanel() {
+        final boolean oldClosed = closed;
+        closed = true;
+        
+        if (!oldClosed) {
+            getGUI().removeComponent(DeclarationPanel.this);
+            afterClosing.run();
         }
     }
 
