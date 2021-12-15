@@ -785,7 +785,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
             
         int[] a = new int[2]; tileToPixelXY(tile, a);
-        return new Rectangle(a[0], a[1], this.tileWidth, this.tileHeight * 2);
+        return new Rectangle(a[0] - this.halfWidth, a[1] - this.tileHeight / 2, this.tileWidth * 2, this.tileHeight * 2);
     }
 
     /**
