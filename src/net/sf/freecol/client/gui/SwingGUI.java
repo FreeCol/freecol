@@ -1219,7 +1219,7 @@ public class SwingGUI extends GUI {
     public void changeView(Unit unit, boolean force) {
         boolean change = changeViewMode(ViewMode.MOVE_UNITS);
         change |= changeActiveUnit(unit);
-        if (unit != null) {
+        if (unit != null && unit.hasTile()) {
             // Bring the selected tile along with the unit.
             change |= changeSelectedTile(unit.getTile(), true);
         }
