@@ -1470,7 +1470,11 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display cursor for selected tile or active unit
         final Tile cursorTile = getCursorTile();
-        if (cursorTile != null && this.cursor.isActive()) {
+        if (cursorTile != null && this.cursor.isActive() && unitsOutForAnimation.isEmpty()) {
+            /*
+             * The cursor is hidden when units are animated. 
+             */
+            
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
             if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
