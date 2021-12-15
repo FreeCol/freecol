@@ -997,8 +997,11 @@ public final class InGameController extends FreeColClientHolder {
                         + path.fullPathToString());
                     return false;
                 }
-                if (!moveDirection(unit, path.getDirection(), false))
-                    return false;
+                if (!moveDirection(unit, path.getDirection(), false)) {
+                    // Lack of moves is an expected non-failure condition
+                    return unit.getMoveType(path.getDirection())
+                        == Unit.MoveType.MOVE_NO_MOVES;
+                }
 
             } else if (path.getLocation() instanceof Unit) {
                 return moveEmbark(unit, path.getDirection());
