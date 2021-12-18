@@ -193,6 +193,10 @@ public class GameOptions {
     public static final String ALLOW_STUDENT_SELECTION
         = "model.option.allowStudentSelection";
 
+    /** Claim all possible surrounding tiles when founding a colony? */
+    public static final String CLAIM_ALL_TILES
+        = "model.option.claimAllTiles";
+
     /** Enable upkeep requirement on buildings. */
     public static final String ENABLE_UPKEEP
         = "model.option.enableUpkeep";

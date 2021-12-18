@@ -4660,6 +4660,9 @@
         <!-- Whether to educate the least skilled unit first -->
         <booleanOption id="model.option.allowStudentSelection"
                        defaultValue="false"/>
+        <!-- Claim all available tiles on colony foundation. -->
+        <booleanOption id="model.option.claimAllTiles"
+                       defaultValue="true" />
         <!-- Enable upkeep requirement on buildings. -->
         <booleanOption id="model.option.enableUpkeep"
                        defaultValue="false"/>

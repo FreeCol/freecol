@@ -3003,6 +3003,9 @@ public final class Specification implements OptionContainer {
         ret |= checkOp(GameOptions.ALARM_BONUS_GIFT,
                        GameOptions.GAMEOPTIONS_MAP,
                        40, PercentageOption.class);
+        ret |= checkOp(GameOptions.CLAIM_ALL_TILES,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       Boolean.FALSE, BooleanOption.class);
         // end @compat 0.11.6
 
         // SAVEGAME_VERSION == 14

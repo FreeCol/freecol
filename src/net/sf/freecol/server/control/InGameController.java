@@ -974,7 +974,8 @@ public final class InGameController extends Controller {
 
             // Place settlement
             serverPlayer.addSettlement(settlement);
-            settlement.placeSettlement(false);//-vis(serverPlayer,?),-til
+            boolean claimAllTiles = spec.getBoolean(GameOptions.CLAIM_ALL_TILES);
+            settlement.placeSettlement(claimAllTiles);//-vis(serverPlayer,?),-til
             cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
                     HistoryEvent.HistoryEventType.FOUND_COLONY, serverPlayer)
                 .addName("%colony%", settlement.getName()));
