@@ -2046,6 +2046,7 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         for (;;) {
+            current.csEndTurn(cs);
             logger.finest("Ending turn for " + current.getName());
             current.clearModelMessages();
 

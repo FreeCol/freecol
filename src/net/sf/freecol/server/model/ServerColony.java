@@ -366,10 +366,8 @@ public class ServerColony extends Colony implements TurnTaker {
         // Clear the build queue
         buildQueue.clear();
 
-        // Add free buildings from new owner
-        for (BuildingType bt : ((ServerPlayer)newOwner).getFreeBuildingTypes()) {
-            csFreeBuilding(bt, cs);
-        }
+        // Used to add free buildings here, but now doing it at the end
+        // of the turn
 
         // Changing the owner might alter bonuses applied by founding fathers:
         updateSoL();
@@ -403,8 +401,7 @@ public class ServerColony extends Colony implements TurnTaker {
     /**
      * Add a free building to this colony.
      *
-     * Triggered by election of laSalle and colony capture by a player
-     * with laSalle.
+     * Triggered directly by election of laSalle, or at end of turn.
      *
      * @param type The {@code BuildingType} to add.
      * @param cs A {@code ChangeSet} to update.

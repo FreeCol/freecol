@@ -4375,6 +4375,32 @@ outer:  for (Effect effect : effects) {
         }
     }
 
+    /**
+     * Things to do just before ending the turn for a player.
+     *
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csEndTurn(ChangeSet cs) {
+        // Add free buildings.  LaSalle grants these directly, but
+        // colonies can become eligible for a free building when
+        // captured, or the building is destroyed by natives,
+        // disasters, pirates?, etc.  We decided this was best done at
+        // the end of turn:
+        //   * Col1 allows you to remove units from a freshly captured
+        //     colony so it is *not* eligible for a stockade, allowing
+        //     you to sidestep the abandonment restriction.  The stockade
+        //     appears after you close the colony panel that pops up on
+        //     capture, but that level of GUI coupling is undesirable.
+        //   * A bit of delay seems sensible, as it allows the colonists
+        //     some time to do the building
+        //
+        for (BuildingType bt : getFreeBuildingTypes()) {
+            for (Colony c : getColonyList()) {
+                ((ServerColony)c).csFreeBuilding(bt, cs);
+            }
+        }
+    }
+
 
     // Implement TurnTaker
 
