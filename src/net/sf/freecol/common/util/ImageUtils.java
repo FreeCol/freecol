@@ -130,19 +130,30 @@ public class ImageUtils {
      * @param height The desired height.
      * @return The new resized {@code BufferedImage} object.
      */ 
-    public static BufferedImage createResizedImage(Image image,
-                                                   int width, int height) {
+    public static BufferedImage createResizedImage(Image image, int width, int height) {
+        return createResizedImage(image, width, height, false);
+    }
+                                                   
+    /**
+     * Create a buffered image resized from a plain {@code Image}.
+     *
+     * Note that while the result will fit in width x height, it
+     * tends to retain its original aspect ratio.
+     *
+     * @param image The {@code Image} object.
+     * @param width The desired width.
+     * @param height The desired height.
+     * @param interpolation Use interpolation while resizing.
+     * @return The new resized {@code BufferedImage} object.
+     */ 
+    public static BufferedImage createResizedImage(Image image, int width, int height, boolean interpolation) {
         BufferedImage result = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = result.createGraphics();
-        /*
-         * Tileable images should not be scaled with interpolation, as this will produce
-         * partially transparent pixels. These pixels will overlap and make visible
-         * seams when tiling images.
-         * 
-         * Do NOT use:
-         * g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-         */
+        
+        if (interpolation) {
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        }
 
         g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
