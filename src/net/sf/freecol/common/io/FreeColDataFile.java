@@ -35,7 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -342,7 +342,10 @@ public class FreeColDataFile {
                 filePath = fileSystem.getPath(jarDirectory + name);
             }
             
-            final Map<URI, List<URI>> result = new HashMap<>();
+            /*
+             * Using LinkedHashMap to ensure we keep the variations in order.
+             */
+            final Map<URI, List<URI>> result = new LinkedHashMap<>();
             result.put(null, findFilesWithRegexBeforeSuffixAsUri(filePath, false));
             
             final List<Path> variations = findFilesWithRegexBeforeSuffix(filePath, true);
@@ -374,7 +377,6 @@ public class FreeColDataFile {
     }
     
     private List<Path> findFilesWithRegexBeforeSuffix(final Path filePath, boolean findVariation) throws IOException {
-        //final String variationFileRegex = "\\.var[0-9][0-9]*";
         final String variationFileRegex = "[0-9][0-9]?";
         final String sizeFileRegex = "\\.size[0-9][0-9]*";
         
@@ -387,7 +389,11 @@ public class FreeColDataFile {
         final String suffix = resourceFilename.substring(resourceFilename.lastIndexOf("."));
         final String completeRegex = Pattern.quote(prefix) + regex + Pattern.quote(suffix);
         
-        final List<Path> alternativeSizes = Files.list(filePath.getParent()).filter(p -> p.getFileName().toString().matches(completeRegex)).collect(Collectors.toList());
+        final List<Path> alternativeSizes = Files.list(filePath.getParent())
+                .sorted()
+                .filter(p -> p.getFileName().toString().matches(completeRegex))
+                .collect(Collectors.toList());
+        
         return alternativeSizes;
     }
 

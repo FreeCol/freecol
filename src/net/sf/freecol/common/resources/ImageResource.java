@@ -26,6 +26,9 @@ import static net.sf.freecol.common.util.ImageUtils.createResizedImage;
 import static net.sf.freecol.common.util.ImageUtils.wildcardDimension;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
@@ -117,6 +120,18 @@ public class ImageResource extends Resource {
         }
         
         final int value = new Random(seed).nextInt(variations.size() + 1);
+        if (value >= variations.size()) {
+            return this;
+        }
+        return variations.get(value);
+    }
+    
+    public synchronized ImageResource getAnimatedVariation(long ticks) {
+        if (variations.isEmpty()) {
+            return this;
+        }
+        
+        final int value = (int) (ticks % (variations.size() + 1));
         if (value >= variations.size()) {
             return this;
         }
@@ -249,12 +264,33 @@ public class ImageResource extends Resource {
         try {
             URL url = uri.toURL();
             BufferedImage image = ImageIO.read(url);
-            if (image != null) return image;
-            logger.log(Level.WARNING, "Failed to read image from: " + uri);
+            
+            if (image == null) {
+                logger.log(Level.WARNING, "Failed to read image from: " + uri);
+                return null;
+            }
+
+            if (canUseBitmask(uri)) {
+                final BufferedImage compatibleImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
+                        .createCompatibleImage(image.getWidth(), image.getHeight(), Transparency.BITMASK);
+                final Graphics2D g = compatibleImage.createGraphics();
+                g.drawImage(image, 0, 0, null);
+                g.dispose();
+                return compatibleImage;
+            } else {
+                return image;
+            }
+
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Exception to loading image from: "
                 + uri, ioe);
         }
         return null;
+    }
+
+
+    private static boolean canUseBitmask(URI uri) {
+        /* TODO: Better method for determining images that can use a bitmask. */
+        return uri.toString().contains("center") && !uri.toString().contains("mask");
     }
 }

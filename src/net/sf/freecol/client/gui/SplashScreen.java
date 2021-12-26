@@ -23,18 +23,19 @@ import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JWindow;
 
 
 /**
  * Class to contain the splash screen.
  */
-public final class SplashScreen extends JWindow {
+public final class SplashScreen extends JFrame {
 
     /**
      * Initialize the splash screen.
@@ -49,8 +50,8 @@ public final class SplashScreen extends JWindow {
         
         BufferedImage im = ImageIO.read(splashStream);
         this.getContentPane().add(new JLabel(new ImageIcon(im)));
+        setUndecorated(true);
         this.pack();
-        this.setVisible(false);
 
         Point start = this.getLocation();
         DisplayMode dm = gd.getDisplayMode();

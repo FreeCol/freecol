@@ -107,7 +107,7 @@ public final class TileViewer extends FreeColClientHolder {
      * is oddly slow on some system.
      */
     private static final Map<String, BufferedImage> transitionCache = new HashMap<>();
-
+    
     /**
      * The constructor to use.
      *
@@ -138,6 +138,9 @@ public final class TileViewer extends FreeColClientHolder {
         this.tinyFont = this.lib.getScaledFont("normal-plain-tiny", null);
         this.emphFont = this.lib.getScaledFont("simple-bold+italic-smaller", null);
         this.normFont = this.lib.getScaledFont("simple-bold-tiny", null);
+        
+        // Not necessary, but saves memory:
+        transitionCache.clear();
     }
         
     /**
@@ -163,7 +166,7 @@ public final class TileViewer extends FreeColClientHolder {
                                                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
         g2d.translate(0, compoundHeight - this.tileHeight);
-        displayTileWithBeach(g2d, tile);
+        displayTileWithBeach(g2d, tile, false);
         displayTileItems(g2d, tile, null, overlayImage);
         g2d.dispose();
         return image;
@@ -312,7 +315,7 @@ public final class TileViewer extends FreeColClientHolder {
      */
     private void displayTile(Graphics2D g2d, Tile tile, Player player,
                              BufferedImage overlayImage) {
-        displayTileWithBeach(g2d, tile);
+        displayTileWithBeach(g2d, tile, false);
         if (!tile.isExplored()) return;
         drawBaseTileTransitions(g2d, tile);
         
@@ -363,20 +366,41 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
+     * Draw animated ocean.
+     *
+     * @param g2d The {@code Graphics2D} object on which to draw the tile.
+     * @param tile The {@code Tile} to draw if it is ocean.
+     */
+    public void displayAnimatedBaseTiles(Graphics2D g2d, Tile tile) {
+        final TileType tileType = tile.getType();
+        if (tileType != null && tileType.isWater()) { // TODO: And animation enabled
+            /* 
+             * TODO: Add a single shared clock for MapViewer and TileViewer.
+             *       For now, just support water with 125ms frames.
+             */
+            final long ticks = System.currentTimeMillis() / 125;
+            
+            g2d.drawImage(this.lib.getAnimatedScaledTerrainImage(tileType, ticks), 0, 0, null);
+        }
+    }
+    
+    /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Only base terrain will be drawn.
      *
      * @param g2d The {@code Graphics2D} object on which to draw the tile.
      * @param tile The {@code Tile} to draw.
      */
-    public void displayTileWithBeach(Graphics2D g2d, Tile tile) {
+    public void displayTileWithBeach(Graphics2D g2d, Tile tile, boolean useAnimation) {
         final TileType tileType = tile.getType();
         final int x = tile.getX();
         final int y = tile.getY();
 
-        // ATTENTION: we assume that all base tiles have the same size
-        g2d.drawImage(this.lib.getScaledTerrainImage(tileType, x, y),
-                      0, 0, null);
+        final boolean outForBaseTileAnimation = useAnimation && (tileType != null) && tileType.isWater();
+        if (!outForBaseTileAnimation) {
+            // ATTENTION: we assume that all base tiles have the same size
+            g2d.drawImage(this.lib.getScaledTerrainImage(tileType, x, y), 0, 0, null);
+        }
 
         if (!tile.isExplored()) return;
         if (!tile.isLand() && tile.getStyle() > 0) {

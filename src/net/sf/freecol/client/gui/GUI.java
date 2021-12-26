@@ -22,17 +22,15 @@ package net.sf.freecol.client.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.awt.Graphics2D;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
@@ -42,13 +40,10 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.InformationPanel;
-import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -56,7 +51,16 @@ import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants.*; // Imports all ENUMS.
+// Imports all ENUMS.
+import net.sf.freecol.common.model.Constants.ArmedUnitSettlementAction;
+import net.sf.freecol.common.model.Constants.BoycottAction;
+import net.sf.freecol.common.model.Constants.ClaimAction;
+import net.sf.freecol.common.model.Constants.MissionaryAction;
+import net.sf.freecol.common.model.Constants.ScoutColonyAction;
+import net.sf.freecol.common.model.Constants.ScoutIndianSettlementAction;
+import net.sf.freecol.common.model.Constants.TradeAction;
+import net.sf.freecol.common.model.Constants.TradeBuyAction;
+import net.sf.freecol.common.model.Constants.TradeSellAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
@@ -82,7 +86,6 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -1081,22 +1084,6 @@ public class GUI extends FreeColClientHolder {
      * Used by: ChangeWindowedModeAction
      */
     public void changeWindowedMode() {}
-
-    /**
-     * Display the splash screen.
-     *
-     * Used by: FreeColClient
-     *
-     * @param splashStream A stream to find the image in.
-     */
-    public void displaySplashScreen(final InputStream splashStream) {}
-
-    /**
-     * Hide the splash screen.
-     *
-     * Used by: FreeColClient
-     */
-    public void hideSplashScreen() {}
 
     /** 
      * Swing system and look-and-feel initialization.

@@ -1326,6 +1326,15 @@ public final class ImageLibrary {
     public BufferedImage getScaledTerrainImage(TileType type, int x, int y) {
         return getTerrainImageInternal(type, x, y, this.tileSize);
     }
+    
+    public BufferedImage getAnimatedScaledTerrainImage(TileType type, long ticks) {
+        final ImageResource imageResource = ImageCache.getImageResource(getTerrainImageKey(type));
+        if (imageResource == null) {
+            return null;
+        }
+        
+        return imageResource.getAnimatedVariation(ticks).getImage(this.tileSize, false);
+    }
 
 
     /**

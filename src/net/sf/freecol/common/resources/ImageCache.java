@@ -59,7 +59,7 @@ public class ImageCache {
      * @param key The key to look up.
      * @return The {@code ImageResource} found.
      */
-    private ImageResource getImageResource(final String key) {
+    public static ImageResource getImageResource(final String key) {
         ImageResource r = ResourceManager.getImageResource(key, false);
         if (r == null) {
             r = ResourceManager.getImageResource(REPLACEMENT_IMAGE, false);

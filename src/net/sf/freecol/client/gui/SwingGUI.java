@@ -37,7 +37,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -174,9 +173,6 @@ public class SwingGUI extends GUI {
     /** Has a goto operation started? */
     private boolean gotoStarted = false;
 
-    /** The splash screen. */
-    private SplashScreen splash;
-
 
     /**
      * Create the GUI.
@@ -201,7 +197,6 @@ public class SwingGUI extends GUI {
         this.canvas = null;
         this.widgets = null;
         this.dragPoint = null;
-        this.splash = null;
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
@@ -600,33 +595,6 @@ public class SwingGUI extends GUI {
     @Override
     public void changeWindowedMode() {
         this.canvas.toggleFrame();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void displaySplashScreen(final InputStream splashStream) {
-        if (splashStream != null) {
-            try {
-                this.splash = new SplashScreen(this.graphicsDevice,
-                                               splashStream);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Splash screen failure", e);
-            }
-            this.splash.setVisible(true);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void hideSplashScreen() {
-        if (this.splash != null) {
-            this.splash.setVisible(false);
-            this.splash = null;
-        }
     }
 
     /** 

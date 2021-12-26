@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -28,6 +27,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.Player;
  * Currently the component darken out background using alpha channel and
  * then paints the player's icon and wait message.
  */
-public class GrayLayer extends Component {
+public class GrayLayer extends JComponent {
 
     /** Color for graying out background component */
     private static final Color MASK_COLOR = new Color(0f, 0f, 0f, .6f);
@@ -70,6 +70,7 @@ public class GrayLayer extends Component {
      */
     public GrayLayer(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
+        setOpaque(false);
     }
 
 
@@ -80,7 +81,7 @@ public class GrayLayer extends Component {
      * @param g The {@code Graphics} to paint on.
      */
     @Override
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         Rectangle clipArea = g.getClipBounds();
         if (clipArea == null) {
             clipArea = getBounds();

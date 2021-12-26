@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.LayoutManager;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -36,17 +37,23 @@ public class MigPanel extends JPanel {
 
 
     public MigPanel(String uiClassId) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         this.uiClassId = uiClassId;
     }
 
     public MigPanel(LayoutManager layout) {
         super(layout);
 
+        assert SwingUtilities.isEventDispatchThread();
+        
         this.uiClassId = null;
     }
 
     protected MigPanel(String uiClassId, LayoutManager layout) {
         super(layout);
+        
+        assert SwingUtilities.isEventDispatchThread();
         
         this.uiClassId = uiClassId;
     }

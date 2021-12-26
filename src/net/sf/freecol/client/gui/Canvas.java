@@ -19,30 +19,28 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Color;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.font.TextLayout;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.function.Predicate;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,40 +51,33 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
+// Special case panels, TODO: can we move these to Widgets?
+import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.Utility;
-import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
-
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
-
-// Special case panels, TODO: can we move these to Widgets?
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.MainPanel;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 
 
 /**
@@ -149,6 +140,10 @@ public final class Canvas extends JDesktopPane {
      * which makes it hard to remove.
      */
     private MainPanel mainPanel;
+    
+    private CanvasMapViewer canvasMapViewer;
+    
+    private Timer animationTimer;
 
 
     /**
@@ -165,8 +160,11 @@ public final class Canvas extends JDesktopPane {
                   final Dimension desiredSize,
                   MapViewer mapViewer,
                   MapControls mapControls) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
+        this.canvasMapViewer = new CanvasMapViewer(freeColClient, mapViewer);
 
         // Determine if windowed mode should be used and set the window size.
         this.windowed = checkWindowed(graphicsDevice, desiredSize);
@@ -178,12 +176,39 @@ public final class Canvas extends JDesktopPane {
 
         this.parentFrame = createFrame(null, windowBounds);
         this.oldSize = getSize();
+
+        add(canvasMapViewer, FRAME_CONTENT_LAYER);
+        canvasMapViewer.setSize(oldSize);
+        canvasMapViewer.setLocation(0, 0);
+        
+        addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateSize();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                updateSize();
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                updateSize();
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                updateSize();
+            }
+        });
+        
         this.mapViewer = mapViewer;
         this.mapControls = mapControls;
         this.greyLayer = new GrayLayer(freeColClient);
 
         setDoubleBuffered(true);
-        setOpaque(false);
+        setOpaque(true);
         setLayout(null);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -193,11 +218,38 @@ public final class Canvas extends JDesktopPane {
             getInputMap().put(action.getAccelerator(), action.getId());
             getActionMap().put(action.getId(), action);
         }
-
+        
+        this.parentFrame.setVisible(true);
+        
+        updateSize();
+        revalidate();
+        
+        /*
+         * TODO: Stop using hardcoded 125ms for animation. Instead, we should
+         *       define timing for every terrain animation.
+         */
+        animationTimer = new Timer(125, (event) -> {
+            paintAnimationImmediately();
+        });
+        this.animationTimer.start();
+        
         logger.info("Canvas created with bounds: " + windowBounds);
     }
 
     // Internals
+    
+    private void updateSize() {
+        Dimension size = getSize();
+        if (oldSize.width != size.width || oldSize.height != size.height) {
+            logger.info("Canvas resize from " + oldSize + " to " + size);
+            oldSize = size;
+            canvasMapViewer.changeSize(size);
+            final boolean add = removeMapControls();
+            if (add) {
+                addMapControls();
+            }
+        }
+    }
 
     // Frames and Windows
 
@@ -223,7 +275,6 @@ public final class Canvas extends JDesktopPane {
             = new FreeColFrame(this.freeColClient, this.graphicsDevice,
                                menuBar, isWindowed(), windowBounds);
         fcf.getContentPane().add(this);
-        fcf.setVisible(true);
         return fcf;
     }
 
@@ -689,6 +740,9 @@ public final class Canvas extends JDesktopPane {
         }
 
         for (Component c : getComponents()) {
+            if (c instanceof CanvasMapViewer) {
+                continue;
+            }
             removeFromCanvas(c);
         }
     }
@@ -1058,6 +1112,7 @@ public final class Canvas extends JDesktopPane {
         destroyFrame();
         toggleWindowed();
         this.parentFrame = createFrame(menuBar, windowBounds);
+        this.parentFrame.setVisible(true);
     }
 
 
@@ -1281,39 +1336,57 @@ public final class Canvas extends JDesktopPane {
 
 
     // Override JComponent
-
+    public void paintAnimationImmediately() {
+        if (this.freeColClient == null
+                || this.freeColClient.getGame() == null
+                || this.freeColClient.getGame().getMap() == null) {
+            return;
+        }
+        
+        // TODO: Allow terrain animations to be turned off.
+        
+        /*
+         * We can change to active rendering using:
+         * 
+        final Graphics2D g2d = (Graphics2D) getGraphics();
+        final Dimension size = getSize();
+        g2d.setClip(0, 0, size.width, size.height);
+        this.mapViewer.displayMapAnimationFrame(g2d, size);
+        g2d.dispose();
+        
+         * ...but then we also need to call the methods in this component,
+         * for example paintChildren.
+         */
+        
+        /*
+         * Support for partial rendering with BufferedImage as backbuffer
+         * when using passive rendering:
+         */
+        canvasMapViewer.setPartialPaint(true);
+        paintImmediately(0, 0, getWidth(), getHeight());
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public void paintComponent(Graphics g) {
-        Dimension size = getSize();
-        if (this.oldSize.width != size.width
-            || this.oldSize.height != size.height) {
-            logger.info("Canvas resize from " + this.oldSize
-                + " to " + size);
-            this.oldSize = size;
-            boolean add = removeMapControls();
-            this.mapViewer.changeSize(size);
-            if (add) addMapControls();
+        super.paintComponent(g);
+        
+        /*
+         * TODO: We should not manipulate the component tree here.
+         */
+        if (!this.freeColClient.isInGame()) {
+            return;
         }
-        boolean hasMap = this.freeColClient != null
-            && this.freeColClient.getGame() != null
-            && this.freeColClient.getGame().getMap() != null;
-        Graphics2D g2d = (Graphics2D)g;
+        
+        final boolean hasMap = this.freeColClient != null
+                && this.freeColClient.getGame() != null
+                && this.freeColClient.getGame().getMap() != null;
 
-        if (this.freeColClient.isMapEditor()) {
-            if (hasMap) {
-                this.mapViewer.displayMap(g2d);
-            } else {
-                g2d.setColor(Color.BLACK);
-                g2d.fillRect(0, 0, size.width, size.height);
-            }
-
-        } else if (this.freeColClient.isInGame() && hasMap) {
-            // draw the map
-            this.mapViewer.displayMap(g2d);
-
+        if (hasMap) {
+            final Dimension size = getSize();
+            
             // toggle grey layer if needed
             if (this.freeColClient.currentPlayerIsMyPlayer()) {
                 if (greyLayer.getParent() != null) {
@@ -1328,34 +1401,6 @@ public final class Canvas extends JDesktopPane {
                 }
             }
 
-        } else { /* main menu */
-            // Get the background without scaling, to avoid wasting
-            // memory needlessly keeping an unbounded number of rescaled
-            // versions of the largest image in FreeCol, forever.
-            final Image bgImage = ImageLibrary.getCanvasBackgroundImage();
-            if (bgImage != null) {
-                // Draw background image with scaling.
-                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g2d.drawImage(bgImage, 0, 0, size.width, size.height, this);
-                String versionStr = "v. " + FreeCol.getVersion();
-                Font oldFont = g2d.getFont();
-                Color oldColor = g2d.getColor();
-                Font newFont = oldFont.deriveFont(Font.BOLD);
-                TextLayout layout = new TextLayout(versionStr, newFont,
-                    g2d.getFontRenderContext());
-                Rectangle2D bounds = layout.getBounds();
-                float x = size.width - (float) bounds.getWidth() - 5;
-                float y = size.height - (float) bounds.getHeight();
-                g2d.setColor(Color.white);
-                layout.draw(g2d, x, y);
-                g2d.setFont(oldFont);
-                g2d.setColor(oldColor);
-            } else {
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(0, 0, size.width, size.height);
-                logger.warning("Unable to load the canvas background");
-            }
         }
     }
 

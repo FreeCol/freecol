@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+import static net.sf.freecol.common.util.Utils.now;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -30,7 +33,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
@@ -40,23 +42,19 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -64,8 +62,6 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
@@ -76,10 +72,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.StringUtils.*;
-import static net.sf.freecol.common.util.Utils.*;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -264,6 +256,11 @@ public final class MapViewer extends FreeColClientHolder {
     // Whether the map is currently aligned with the edge.
     private boolean alignedTop = false, alignedBottom = false,
         alignedLeft = false, alignedRight = false;
+    
+    private boolean backBufferIsDirty = false;
+    
+    private BufferedImage backBufferImage = null;
+    private BufferedImage nonAnimationBufferImage = null;
 
 
     /**
@@ -300,6 +297,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void setFocus(Tile focus) {
         this.focus = focus;
+        backBufferIsDirty = true;
     }
 
 
@@ -996,6 +994,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib.changeScaleFactor(newScale);
         this.tv.updateScaledVariables();
         updateScaledVariables();
+        backBufferIsDirty = true;
     }
 
     /**
@@ -1007,6 +1006,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.size = size;
         updateSizeVariables();
         forceReposition(); // TODO: needed?
+        backBufferIsDirty = true;
     }
 
 
@@ -1098,10 +1098,17 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void forceReposition() {
         bottomRow = -1;
+        backBufferIsDirty = true;
     }
     
     private void repositionMapIfNeeded() {
-        if (bottomRow < 0 && this.focus != null) positionMap(this.focus);
+        if (isRepositionNeeded()) {
+            positionMap(this.focus);
+        }
+    }
+
+    private boolean isRepositionNeeded() {
+        return bottomRow < 0 && this.focus != null;
     }
 
     /**
@@ -1110,11 +1117,13 @@ public final class MapViewer extends FreeColClientHolder {
      * @param pos The {@code Tile} to center at.
      */
     private void positionMap(Tile pos) {
+        this.backBufferIsDirty = true;
+        
         final int x = pos.getX(), y = pos.getY();
         final Map map = getMap();
         final int mapWidth = map.getWidth(), mapHeight = map.getHeight();
         int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
-
+        
         /*
           PART 1
           ======
@@ -1124,7 +1133,12 @@ public final class MapViewer extends FreeColClientHolder {
         */
         alignedTop = false;
         alignedBottom = false;
-        if (isMapNearTop(y)) {
+        if ((this.size.height / this.halfHeight) - 1 >= mapHeight) {
+            bottomRow = mapHeight - 1;
+            alignedTop = true; // We are at the top of the map
+            topRow = 0;
+            topRowY = 0;
+        } else if (isMapNearTop(y)) {
             alignedTop = true; // We are at the top of the map
             bottomRow = (this.size.height / this.halfHeight) - 1;
             if ((this.size.height % this.halfHeight) != 0) {
@@ -1164,7 +1178,12 @@ public final class MapViewer extends FreeColClientHolder {
         */
         alignedLeft = false;
         alignedRight = false;
-        if (isMapNearLeft(x, y)) {
+        if (this.size.width / (this.tileWidth - 1) >= mapWidth) {
+            alignedLeft = true; // We are at the left side of the map
+            leftColumn = 0;
+            rightColumn = mapWidth - 1;
+            leftColumnX = 0;
+        } else if (isMapNearLeft(x, y)) {
             alignedLeft = true; // We are at the left side of the map
             leftColumn = 0;
             rightColumn = this.size.width / this.tileWidth - 1;
@@ -1192,7 +1211,52 @@ public final class MapViewer extends FreeColClientHolder {
         }
     }
 
+    /**
+     * Displays the next animation frame of the map. Please note
+     * that {@link #displayMapAnimationFrame(Graphics2D, Dimension)} should be
+     * called instead if there are changes on the {@link net.sf.freecol.common.model.Map}.
+     *
+     * @param g2d The {@code Graphics2D} object on which to draw the Map.
+     */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
+                        justification="lazy load of extra tiles")
+    public void displayMapAnimationFrame(Graphics2D g2d, Dimension size) {
+        if (backBufferImage == null
+                || isRepositionNeeded()
+                || backBufferIsDirty
+                || backBufferImage.getWidth() != size.width
+                || backBufferImage.getHeight() != size.height) {
+            displayMap(g2d, size);
+            return;
+        }
+        
+        final Rectangle clipBounds = g2d.getClipBounds();
+        
+        final Graphics2D backBufferG2d = backBufferImage.createGraphics();
+        backBufferG2d.setClip(clipBounds);
+        final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
+        
+        final TileClippingBounds tcb = new TileClippingBounds(clipBounds);
 
+        // Clear background
+        paintBlackBackground(backBufferG2d, clipBounds);
+        
+        backBufferG2d.translate(tcb.clipLeftX, tcb.clipTopY);      
+
+        // Create the common tile lists
+        final Map map = getMap();
+        final List<Tile> baseTiles = map.subMap(tcb.firstColumn, tcb.firstRow,
+                tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1);
+
+        forEachTile(backBufferG2d, baseTiles, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+        
+        backBufferG2d.translate(-tcb.clipLeftX, -tcb.clipTopY);
+        backBufferG2d.setTransform(backBufferOriginTransform);
+        backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
+        
+        g2d.drawImage(backBufferImage, 0, 0, null);
+    }
+    
     /**
      * Displays the Map.
      *
@@ -1200,93 +1264,327 @@ public final class MapViewer extends FreeColClientHolder {
      */
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
-    public void displayMap(Graphics2D g2d) {
-        final long now = now();
-        final ClientOptions options = getClientOptions();
-        final int colonyLabels
-            = options.getInteger(ClientOptions.COLONY_LABELS);
-        final boolean revengeMode = getGame().isInRevengeMode();
-        final Map map = getMap();
-        final Player player = getMyPlayer(); // Check, can be null in map editor
-
-        // Remember transform
-        AffineTransform originTransform = g2d.getTransform();
+    public void displayMap(Graphics2D g2d, Dimension size) {
+        final long t0 = now();
         Rectangle clipBounds = g2d.getClipBounds();
 
-        // Position the map if it is not positioned yet
-        repositionMapIfNeeded();
+        if (isRepositionNeeded()) {
+            positionMap(this.focus);
+        }
 
-        // Determine which tiles need to be redrawn
-        int firstRow = (clipBounds.y - topRowY) / this.halfHeight - 1;
-        int clipTopY = topRowY + firstRow * this.halfHeight;
-        firstRow = topRow + firstRow;
-        int firstColumn = (clipBounds.x - leftColumnX) / this.tileWidth - 1;
-        int clipLeftX = leftColumnX + firstColumn * this.tileWidth;
-        firstColumn = leftColumn + firstColumn;
-        int lastRow = (clipBounds.y + clipBounds.height - topRowY)
-            / this.halfHeight;
-        lastRow = topRow + lastRow;
-        int lastColumn = (clipBounds.x + clipBounds.width - leftColumnX)
-            / this.tileWidth;
-        lastColumn = leftColumn + lastColumn;
+        if (backBufferIsDirty) {
+            clipBounds = new Rectangle(0, 0, size.width, size.height);
+            g2d.setClip(clipBounds);
+        }
+        
+        backBufferIsDirty = false;
+                
+        if (backBufferImage == null
+                || backBufferImage.getWidth() != size.width
+                || backBufferImage.getHeight() != size.height) {
+            
+            /*
+             * We don't really need the backBufferImage now as we have double buffering from
+             * Swing. It's required, however, if we later want to use active rendering.
+             */
+            backBufferImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+            nonAnimationBufferImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+            clipBounds = new Rectangle(0, 0, size.width, size.height);
+            g2d.setClip(clipBounds);
+        }
+        
+        final Graphics2D backBufferG2d = backBufferImage.createGraphics();
+        backBufferG2d.setClip(clipBounds);
+        final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
 
-        // Clear background
-        g2d.setColor(Color.black);
-        g2d.fillRect(clipBounds.x, clipBounds.y,
-                     clipBounds.width, clipBounds.height);
+        final TileClippingBounds tcb = new TileClippingBounds(clipBounds);
 
-        // Set and remember transform for upper left corner
-        g2d.translate(clipLeftX, clipTopY);
-        AffineTransform baseTransform = g2d.getTransform();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                             RenderingHints.VALUE_ANTIALIAS_ON);
+        paintBlackBackground(backBufferG2d, clipBounds);
 
         // Create the common tile lists
-        final int x0 = firstColumn;
-        final int y0 = firstRow;
-        final List<Tile> baseTiles = map.subMap(x0, y0,
-            lastColumn-firstColumn+1, lastRow-firstRow+1);
-        List<Tile> extendedTiles = null;
-
+        final Map map = getMap();
+        final List<Tile> baseTiles = map.subMap(tcb.firstColumn, tcb.firstRow,
+                tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1);
+        
+        // Display the animated base tiles:
+        final long t1 = now();
+        backBufferG2d.translate(tcb.clipLeftX, tcb.clipTopY);
+        forEachTile(backBufferG2d, baseTiles, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+               
         // Display the base Tiles
-        int xt0 = 0, yt0 = 0;
-        for (Tile t : baseTiles) {
-            final int x = t.getX();
-            final int y = t.getY();
-            final int xt = (x-x0) * this.tileWidth
-                + (((y&1)==1) ? this.halfWidth : 0);
-            final int yt = (y-y0) * this.halfHeight;
-            g2d.translate(xt - xt0, yt - yt0);
-            xt0 = xt; yt0 = yt;
+        final long t2 = now();
+        final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
+        displayNonAnimationImages(nonAnimationG2d, clipBounds, tcb, baseTiles);
+        nonAnimationG2d.dispose();
+        
+        final long t3 = now();   
+        backBufferG2d.setTransform(backBufferOriginTransform);
+        backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
+        backBufferG2d.dispose();
 
-            this.tv.displayTileWithBeach(g2d, t);
+        g2d.drawImage(backBufferImage, 0, 0, null);      
+        final long t4 = now();
+
+        // Timing log
+        if (logger.isLoggable(Level.FINEST)) {
+            final long gap = now() - t0;
+            double avg = ((double)gap)
+                / ((tcb.lastRow-tcb.firstRow) * (tcb.lastColumn-tcb.firstColumn));
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("displayMap time = ").append(gap)
+                .append(" for ").append(tcb.firstColumn)
+                .append(" ").append(tcb.firstRow)
+                .append(" to ").append(tcb.lastColumn)
+                .append(" ").append(tcb.lastRow)
+                .append(" average ").append(avg)
+                .append(" init=").append(t1 - t0)
+                .append(" animated=").append(t2 - t1)
+                .append(" displayNonAnimationImages=").append(t3 - t2)
+                .append(" finish=").append(t4 - t3)
+                ;
+            logger.finest(sb.toString());
         }
-        g2d.translate(-xt0, -yt0);
+    }
+
+
+    private void displayNonAnimationImages(Graphics2D nonAnimationG2d,
+            Rectangle clipBounds,
+            TileClippingBounds tcb,
+            List<Tile> baseTiles) {
+        
+        long t0 = now();
+        final Player player = getMyPlayer(); // Check, can be null in map editor
+        final Map map = getMap();
+        final ClientOptions options = getClientOptions();
+        
+        final int x0 = tcb.firstColumn;
+        final int y0 = tcb.firstRow;
+        
+        /* For settlement names and territorial borders 1 extra row needs
+        to be drawn in north to prevent missing parts on partial redraws,
+        as they can reach below their tiles, see BR#2580 */
+        final List<Tile> extendedTiles = map.subMap(x0, y0-1,
+                tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1+1);
+        
+        AffineTransform originTransform = nonAnimationG2d.getTransform();
+        nonAnimationG2d.setComposite(AlphaComposite.Clear);
+        nonAnimationG2d.fill(clipBounds);
+        nonAnimationG2d.setComposite(AlphaComposite.SrcOver);
+        nonAnimationG2d.setClip(clipBounds);
+        nonAnimationG2d.translate(tcb.clipLeftX, tcb.clipTopY);
+        
+        long t1 = now();
+        
+        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> this.tv.displayTileWithBeach(tileG2d, tile, true));
+        
+        nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Display the borders
-        xt0 = 0;
-        yt0 = 0;
-        for (Tile t : baseTiles) {
-            final int x = t.getX();
-            final int y = t.getY();
-            final int xt = (x-x0) * this.tileWidth
-                + (((y&1)==1) ? this.halfWidth : 0);
-            final int yt = (y-y0) * this.halfHeight;
-            g2d.translate(xt - xt0, yt - yt0);
-            xt0 = xt; yt0 = yt;
-
-            this.tv.drawBaseTileTransitions(g2d, t);
-        }
-        g2d.translate(-xt0, -yt0);
+        long t2 = now();
+        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> this.tv.drawBaseTileTransitions(tileG2d, tile));
 
         // Draw the grid, if needed
+        long t3 = now();
+        displayGrid(nonAnimationG2d, options, tcb);
+        
+        // Paint full region borders
+        long t4 = now();
+        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, true));
+        }
+
+        // Paint full country borders
+        long t5 = now();
+        if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, true));
+        }
+
+        // Apply fog of war to flat parts of all tiles
+        long t6 = now();
+        nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_OFF);
+        final RescaleOp fow;
+        if (player != null && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+            // Knowing that we have FOW, prepare a rescaling for the
+            // overlay step below.
+            fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
+                                new float[] { 0, 0, 0, 0 },
+                                null);
+
+            final Composite oldComposite = nonAnimationG2d.getComposite();
+            nonAnimationG2d.setColor(Color.BLACK);
+            nonAnimationG2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                                                        0.2f));
+            
+            forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+                if (!tile.isExplored() || player.canSee(tile)) {
+                    return;
+                }
+                tileG2d.fill(this.fog);
+            });
+            nonAnimationG2d.setComposite(oldComposite);
+        } else {
+            fow = null;
+        }
+        
+        // Display unknown tile borders:
+        long t7 = now();
+        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> this.tv.displayUnknownTileBorder(tileG2d, tile));
+
+        // Display the Tile overlays
+        long t8 = now();
+        final int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
+        boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
+        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+            if (!tile.isExplored()) {
+                return;
+            }
+            BufferedImage overlayImage = this.lib.getScaledOverlayImage(tile);
+            RescaleOp rop = (player == null || player.canSee(tile)) ? null : fow;
+            this.tv.displayTileItems(tileG2d, tile, rop, overlayImage);
+            this.tv.displaySettlementWithChipsOrPopulationNumber(tileG2d, tile,
+                withNumbers, rop);
+            this.tv.displayOptionalTileText(tileG2d, tile);
+        });
+
+        // Paint transparent region borders
+        long t9 = now();
+        nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, false));
+        }
+
+        // Paint transparent country borders
+        long t10 = now();
+        if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, false));
+        }
+
+        // Display cursor for selected tile or active unit
+        long t11 = now();
+        final Tile cursorTile = getCursorTile();
+        if (cursorTile != null && this.cursor.isActive() && unitsOutForAnimation.isEmpty()) {
+            /*
+             * The cursor is hidden when units are animated. 
+             */
+            
+            final int x = cursorTile.getX();
+            final int y = cursorTile.getY();
+            
+            if (x >= x0 && y >= y0 && x <= tcb.lastColumn && y <= tcb.lastRow) {
+                final int xt = (x-x0) * this.tileWidth
+                    + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
+                nonAnimationG2d.translate(xt, yt);
+                nonAnimationG2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT),
+                              0, 0, null);
+                nonAnimationG2d.translate(-xt, -yt);
+            }
+        }
+
+        // Display units
+        long t12 = now();
+        nonAnimationG2d.setColor(Color.BLACK);
+        final boolean revengeMode = getGame().isInRevengeMode();
+        if (!revengeMode) {
+            forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+                final Unit unit = findUnitInFront(tile);
+                if (unit == null || isOutForAnimation(unit)) {
+                    return;
+                }
+                displayUnit(tileG2d, unit);
+            });
+        } else {
+            /* Add extra rows and colums, as the dark halo is huge to enable
+               a very slow fade into transparency, see BR#2580 */
+            final BufferedImage darkness = this.lib.getScaledImage(ImageLibrary.DARKNESS);
+            final List<Tile> revengeModeDrawTiles = map.subMap(x0-2, y0-4, tcb.lastColumn-tcb.firstColumn+1+4,
+                    tcb.lastRow-tcb.firstRow+1+8);
+            
+            forEachTile(nonAnimationG2d, revengeModeDrawTiles, (tileG2d, tile) -> {
+                final Unit unit = findUnitInFront(tile);
+                if (unit == null || isOutForAnimation(unit)) {
+                    return;
+                }
+                
+                if (unit.isUndead()) {
+                    this.tv.displayCenteredImage(tileG2d, darkness);
+                }
+                displayUnit(tileG2d, unit);
+
+            });
+        }
+
+        // Display the colony names, if needed
+        long t13 = now();
+        if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
+            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> {
+                final Settlement settlement = tile.getSettlement();
+                if (settlement == null) {
+                    return;
+                }
+                final RescaleOp rop = (player == null || player.canSee(tile)) ? null : fow;
+                displaySettlementLabels(tileG2d, settlement, player, colonyLabels, rop);
+            });
+        }
+
+        // Display goto path
+        long t14 = now();
+        nonAnimationG2d.setTransform(originTransform);
+        if (this.unitPath != null) {
+            displayPath(nonAnimationG2d, this.unitPath);
+        } else if (this.gotoPath != null) {
+            displayPath(nonAnimationG2d, this.gotoPath);
+        }
+
+        // Draw the chat
+        this.chatDisplay.display(nonAnimationG2d, this.size);
+        
+        long t15 = now();
+        
+        if (logger.isLoggable(Level.FINEST)) {
+            final long gap = now() - t0;
+            double avg = ((double)gap)
+                / ((tcb.lastRow-tcb.firstRow) * (tcb.lastColumn-tcb.firstColumn));
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("displayNonAnimationImages time = ").append(gap)
+                .append(" for ").append(tcb.firstColumn)
+                .append(" ").append(tcb.firstRow)
+                .append(" to ").append(tcb.lastColumn)
+                .append(" ").append(tcb.lastRow)
+                .append(" average ").append(avg)
+                .append(" t1=").append(t1 - t0)
+                .append(" t2=").append(t2 - t1)
+                .append(" t3=").append(t3 - t2)
+                .append(" t4=").append(t4 - t3)
+                .append(" t5=").append(t5 - t4)
+                .append(" t6=").append(t6 - t5)
+                .append(" t7=").append(t7 - t6)
+                .append(" t8=").append(t8 - t7)
+                .append(" t9=").append(t9 - t8)
+                .append(" t10=").append(t10 - t9)
+                .append(" t11=").append(t11 - t10)
+                .append(" t12=").append(t12 - t11)
+                .append(" t13=").append(t13 - t12)
+                .append(" t14=").append(t14 - t13)
+                .append(" t15=").append(t15 - t14)
+                ;
+            logger.finest(sb.toString());
+        }
+    }
+
+
+    private void displayGrid(Graphics2D g2d, final ClientOptions options, final TileClippingBounds tcb) {
         if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
             // Generate a zigzag GeneralPath
+            final AffineTransform baseTransform = g2d.getTransform();
             GeneralPath gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
             int nextX = this.halfWidth;
             int nextY = -this.halfHeight;
-            for (int i = 0; i <= ((lastColumn - firstColumn) * 2 + 1); i++) {
+            for (int i = 0; i <= ((tcb.lastColumn - tcb.firstColumn) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
                 nextX += this.halfWidth;
                 nextY = (nextY == 0) ? -this.halfHeight : 0;
@@ -1295,7 +1593,7 @@ public final class MapViewer extends FreeColClientHolder {
             // Display the grid
             g2d.setStroke(this.gridStroke);
             g2d.setColor(Color.BLACK);
-            for (int row = firstRow; row <= lastRow; row++) {
+            for (int row = tcb.firstRow; row <= tcb.lastRow; row++) {
                 g2d.translate(0, this.halfHeight);
                 AffineTransform rowTransform = g2d.getTransform();
                 if ((row & 1) == 1) {
@@ -1306,87 +1604,49 @@ public final class MapViewer extends FreeColClientHolder {
             }
             g2d.setTransform(baseTransform);
         }
-
-        // Paint full region borders
-        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT)
-                == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            if (extendedTiles == null) {
-                extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
-                                           lastRow-firstRow+1+1);
-            }
-
-            xt0 = yt0 = 0;
-            for (Tile t : extendedTiles) {
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-                displayTerritorialBorders(g2d, t, BorderType.REGION, true);
-            }
-            g2d.translate(-xt0, -yt0);
-        }
-
-        // Paint full country borders
-        if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
-            if (extendedTiles == null) {
-                extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
-                                           lastRow-firstRow+1+1);
-            }
-
-            xt0 = yt0 = 0;
-            for (Tile t : extendedTiles) {
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-                displayTerritorialBorders(g2d, t, BorderType.COUNTRY, true);
-            }
-            g2d.translate(-xt0, -yt0);
-        }
-
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                             RenderingHints.VALUE_ANTIALIAS_OFF);
-
-        // Apply fog of war to flat parts of all tiles
-        RescaleOp fow = null;
-        if (player != null
-            && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
-            // Knowing that we have FOW, prepare a rescaling for the
-            // overlay step below.
-            fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
-                                new float[] { 0, 0, 0, 0 },
-                                null);
-
-            final Composite oldComposite = g2d.getComposite();
-            g2d.setColor(Color.BLACK);
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                                                        0.2f));
-            xt0 = yt0 = 0;
-            for (Tile t : baseTiles) {
-                if (!t.isExplored() || player.canSee(t)) continue;
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-                g2d.fill(this.fog);
-            }
-            g2d.translate(-xt0, -yt0);
-            g2d.setComposite(oldComposite);
-        }
+    }
+    
+    private final class TileClippingBounds {
+        private final int firstRow;
+        private final int firstColumn;
+        private final int lastRow;
+        private final int lastColumn;
+        private final int clipLeftX;
+        private final int clipTopY;
         
-        // Display unknown tile borders:
-        xt0 = 0;
-        yt0 = 0;
-        for (Tile t : baseTiles) {
+        private TileClippingBounds(Rectangle clipBounds) {
+            // Determine which tiles need to be redrawn
+            final int firstRowY = Math.max(0, (clipBounds.y - topRowY) / halfHeight - 1);           
+            clipTopY = topRowY + firstRowY * halfHeight;
+            firstRow = topRow + firstRowY;
+            
+            final int firstColumnY = Math.max(0, (clipBounds.x - leftColumnX) / tileWidth - 1);
+            clipLeftX = leftColumnX + firstColumnY * tileWidth;
+            firstColumn = leftColumn + firstColumnY;
+            
+            final int lastRowY = (clipBounds.y + clipBounds.height - topRowY) / halfHeight;
+            lastRow = topRow + lastRowY;
+            
+            final int lastColumnY = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
+            lastColumn = leftColumn + lastColumnY;
+        }
+    }
+    
+    private interface TileRenderingCallback {
+        void render(Graphics2D tileG2d, Tile t);
+    }
+    
+    private void forEachTile(Graphics2D g2d, List<Tile> tiles, TileRenderingCallback c) {
+        if (tiles.isEmpty()) {
+            return;
+        }
+        final Tile firstTile = tiles.get(0);
+        
+        final int x0 = firstTile.getX();
+        final int y0 = firstTile.getY();
+        
+        int xt0 = 0, yt0 = 0;
+        for (Tile t : tiles) {
             final int x = t.getX();
             final int y = t.getY();
             final int xt = (x-x0) * this.tileWidth
@@ -1395,198 +1655,14 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
-            this.tv.displayUnknownTileBorder(g2d, t);
+            c.render(g2d, t);
         }
         g2d.translate(-xt0, -yt0);
+    }
 
-        // Display the Tile overlays
-        boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
-        xt0 = yt0 = 0;
-        for (Tile t : baseTiles) {
-            if (!t.isExplored()) continue;
-            final int x = t.getX();
-            final int y = t.getY();
-            final int xt = (x-x0) * this.tileWidth
-                + (y&1) * this.halfWidth;
-            final int yt = (y-y0) * this.halfHeight;
-            g2d.translate(xt - xt0, yt - yt0);
-            xt0 = xt; yt0 = yt;
-            
-            BufferedImage overlayImage = this.lib.getScaledOverlayImage(t);
-            RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
-            this.tv.displayTileItems(g2d, t, rop, overlayImage);
-            this.tv.displaySettlementWithChipsOrPopulationNumber(g2d, t,
-                withNumbers, rop);
-            this.tv.displayOptionalTileText(g2d, t);
-        }
-        g2d.translate(-xt0, -yt0);
-        
-        // Paint transparent region borders
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                             RenderingHints.VALUE_ANTIALIAS_ON);
-        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT)
-            == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            if (extendedTiles == null) {
-                extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
-                                           lastRow-firstRow+1+1);
-            }
-
-            xt0 = yt0 = 0;
-            for (Tile t : extendedTiles) {
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-
-                displayTerritorialBorders(g2d, t, BorderType.REGION, false);
-            }
-            g2d.translate(-xt0, -yt0);
-        }
-
-        // Paint transparent country borders
-        if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
-            if (extendedTiles == null) {
-                extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
-                                           lastRow-firstRow+1+1);
-            }
-
-            xt0 = yt0 = 0;
-            for (Tile t : extendedTiles) {
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-
-                displayTerritorialBorders(g2d, t, BorderType.COUNTRY, false);
-            }
-            g2d.translate(-xt0, -yt0);
-        }
-
-        // Display cursor for selected tile or active unit
-        final Tile cursorTile = getCursorTile();
-        if (cursorTile != null && this.cursor.isActive() && unitsOutForAnimation.isEmpty()) {
-            /*
-             * The cursor is hidden when units are animated. 
-             */
-            
-            final int x = cursorTile.getX();
-            final int y = cursorTile.getY();
-            if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt, yt);
-                g2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT),
-                              0, 0, null);
-                g2d.translate(-xt, -yt);
-            }
-        }
-
-        // Display units
-        g2d.setColor(Color.BLACK);
-        if (!revengeMode) {
-            xt0 = yt0 = 0;
-            for (Tile t : baseTiles) {
-                // check for units
-                Unit unit = findUnitInFront(t);
-                if (unit == null || isOutForAnimation(unit)) continue;
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-
-                displayUnit(g2d, unit);
-            }
-            g2d.translate(-xt0, -yt0);
-        } else {
-            /* Add extra rows and colums, as the dark halo is huge to enable
-               a very slow fade into transparency, see BR#2580 */
-            BufferedImage darkness
-                = this.lib.getScaledImage(ImageLibrary.DARKNESS);
-            xt0 = yt0 = 0;
-            for (Tile t : map.subMap(x0-2, y0-4, lastColumn-firstColumn+1+4,
-                                                 lastRow-firstRow+1+8)) {
-                // check for units
-                Unit unit = findUnitInFront(t);
-                if (unit == null || isOutForAnimation(unit)) continue;
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0);
-                xt0 = xt; yt0 = yt;
-
-                if (unit.isUndead()) {
-                    this.tv.displayCenteredImage(g2d, darkness);
-                }
-                displayUnit(g2d, unit);
-            }
-            g2d.translate(-xt0, -yt0);
-        }
-
-        // Display the colony names, if needed
-        if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            if (extendedTiles == null) {
-                extendedTiles = map.subMap(x0, y0-1, lastColumn-firstColumn+1,
-                                           lastRow-firstRow+1+1);
-            }
-            /* For settlement names and territorial borders 1 extra row needs
-               to be drawn in north to prevent missing parts on partial redraws,
-               as they can reach below their tiles, see BR#2580 */
-            xt0 = yt0 = 0;
-            for (Tile t : extendedTiles) {
-                Settlement settlement = t.getSettlement();
-                if (settlement == null) continue;
-                final int x = t.getX();
-                final int y = t.getY();
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                g2d.translate(xt - xt0, yt - yt0); 
-                xt0 = xt; yt0 = yt;
-                RescaleOp rop = (player == null || player.canSee(t))
-                    ? null : fow;
-
-                displaySettlementLabels(g2d, settlement, player,
-                                        colonyLabels, rop);
-            }
-            g2d.translate(-xt0, -yt0);
-        }
-
-        // Restore original transform to allow for more drawing
-        g2d.setTransform(originTransform);
-
-        // Display goto path
-        if (this.unitPath != null) displayPath(g2d, this.unitPath);
-        else if (this.gotoPath != null) displayPath(g2d, this.gotoPath);
-
-        // Draw the chat
-        this.chatDisplay.display(g2d, this.size);
-
-        // Timing log
-        if (logger.isLoggable(Level.FINEST)) {
-            final long gap = now() - now;
-            double avg = ((double)gap)
-                / ((lastRow-firstRow) * (lastColumn-firstColumn));
-            StringBuilder sb = new StringBuilder(128);
-            sb.append("displayMap time = ").append(gap)
-                .append(" for ").append(firstColumn)
-                .append(" ").append(firstRow)
-                .append(" to ").append(lastColumn)
-                .append(" ").append(lastRow)
-                .append(" average ").append(avg);
-            logger.finest(sb.toString());
-        }
+    private void paintBlackBackground(Graphics2D g2d, final Rectangle rectangle) {
+        g2d.setColor(Color.black);
+        g2d.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
 
     private void displaySettlementLabels(Graphics2D g2d, Settlement settlement,
