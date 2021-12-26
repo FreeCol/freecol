@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -60,6 +61,7 @@ import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -663,8 +665,11 @@ public class ServerColony extends Colony implements TurnTaker {
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add("COLONY ", this);
-
-        final ServerPlayer owner = (ServerPlayer) getOwner();
+        final Specification spec = getSpecification();
+        final ServerPlayer owner = (ServerPlayer)getOwner();
+        BuildQueue<?>[] queues = new BuildQueue<?>[] { buildQueue,
+                 populationQueue };
+        final Tile tile = getTile();
 
         // The AI is prone to removing all units from a colony.
         // Clean up such cases, to avoid other players seeing the
@@ -675,235 +680,76 @@ public class ServerColony extends Colony implements TurnTaker {
             return;
         }
 
-        // save current goods state
+        boolean tileDirty = false;
+        boolean newUnitBorn = false;
         GoodsContainer container = getGoodsContainer();
         container.saveState();
 
         // Check for learning by experience
-        checkLearningByExperience(random, lb, cs);
+        for (WorkLocation wl : getCurrentWorkLocationsList()) {
+            if (wl instanceof TurnTaker) {
+                ((TurnTaker)wl).csNewTurn(random, lb, cs);
+            }
+            ProductionInfo productionInfo = getProductionInfo(wl);
+            if (productionInfo == null) continue;
+            if (!wl.isEmpty()) {
+                for (AbstractGoods goods : productionInfo.getProduction()) {
+                    UnitType expert = spec.getExpertForProducing(goods.getType());
+                    int experience = goods.getAmount() / wl.getUnitCount();
+                    for (Unit unit : transform(wl.getUnits(),
+                            u -> u.getUnitChange(UnitChangeType.EXPERIENCE,
+                                                 expert) != null)) {
+                        unit.changeExperienceType(goods.getType());
+                        unit.setExperience(unit.getExperience() + experience);
+                        cs.addPartial(See.only(owner), unit,
+                            "experience", String.valueOf(unit.getExperience()));
+                    }
+                }
+            }
+        }
 
-        boolean tileDirty = false;
-        boolean newUnitBorn = false;
-        // Check the build queues and build new stuff. If a queue
+        // Check the build queues and build new stuff.  If a queue
         // does a build add it to the built list, so that we can
         // remove the item built from it *after* applying the
         // production changes.
         List<BuildQueue<? extends BuildableType>> built = new ArrayList<>();
-        tileDirty = checkBuildQueue(cs, built);
-        newUnitBorn = checkPopulationQueue(random, cs, built);
+        for (BuildQueue<?> queue : queues) {
+            ProductionInfo info = getProductionInfo(queue);
+            if (info == null) continue;
+            if (!info.getConsumption().isEmpty()) {
+                // Ready to build something.  FIXME: OO!
+                BuildableType buildable = csNextBuildable(queue, cs);
+                if (buildable == null) {
+                    ; // It was invalid, ignore.
+                } else if (buildable instanceof UnitType) {
+                    Unit newUnit = csBuildUnit(queue, random, cs);
+                    if (newUnit.hasAbility(Ability.BORN_IN_COLONY)) {
+                        newUnitBorn = true;
+                    }
+                    built.add(queue);
+                } else if (buildable instanceof BuildingType) {
+                    int unitCount = getUnitCount();
+                    if (csBuildBuilding(queue, cs)) {
+                        built.add(queue);
+                        // Visible change if building changed the
+                        // stockade level or ejected units.
+                        tileDirty = ((BuildingType)buildable).isDefenceType()
+                            || unitCount != getUnitCount();
+                    }
+                } else {
+                    throw new IllegalStateException("Bogus buildable: "
+                                                    + buildable);
+                }
+            }
+        }
 
         // Apply the accumulated production changes.
-        // Also handles the starvation case. If the colony got disbanded caused
-        // by starvation, abort further colony actions.
-        if (!applyAccumulatedProductionChanges(random, lb, cs, newUnitBorn)) {
-            return;
-        }
-        
-        invalidateCache();
-
-        // Now that the goods have been updated it is safe to remove the
-        // built item from its build queue.
-        if (!built.isEmpty()) {
-            updateBuildQueue(random, cs, built);
-            // if new unit was born, the tile has also to be updated
-            tileDirty |= newUnitBorn;
-        }
-
-        // Export goods if custom house is built.
-        // Do not flush price changes yet, as any price change may change
-        // yet again in csYearlyGoodsAdjust.
-        if (hasAbility(Ability.EXPORT)) {
-            exportCustomHouseGoods(random, lb, cs, container);
-        }
-
-        // Check for free buildings
-        checkForFreeBuildings();
-
-        // Check build queue integrity and fix it if necessary
-        checkBuildQueueIntegrity(true, null);
-
-        // Update SoL
-        updateSonsOfLiberty(cs);
-        
-        // after SoL update, check the production bonus
-        updateProductionBonus();
-
-        // We have to wait for the production bonus to stabilize
-        // before checking for completion of training. This is a rare
-        // case so it is not worth reordering the work location calls
-        // to csNewTurn.
-        checkTeach(cs);
-
-        // Try to update minimally.
-        if (tileDirty) {
-            cs.add(See.perhaps(), getTile());
-        } else {
-            cs.add(See.only(owner), this);
-        }
-        lb.add(", ");
-    }
-    
-    /**
-     * Checks the populationQueue if a unit is getting to be built (= born).
-     * 
-     * @return <code>true</code> if a new unit (with
-     *         {@link Ability#BORN_IN_COLONY}) was "built".
-     */
-    private boolean checkPopulationQueue(Random random, ChangeSet cs, List<BuildQueue<? extends BuildableType>> built) {
-        boolean newUnitBorn = false;
-        ProductionInfo info = getProductionInfo(populationQueue);
-        if (info != null && !info.getConsumption().isEmpty()) {
-            BuildableType buildable = csNextBuildable(populationQueue, cs);
-            if (buildable instanceof UnitType) {
-                Unit newUnit = csBuildUnit(populationQueue, random, cs);
-                if (newUnit.hasAbility(Ability.BORN_IN_COLONY)) {
-                    newUnitBorn = true;
-                }
-                built.add(populationQueue);
-            }
-        }
-        return newUnitBorn;
-    }
-
-    /**
-     * Checks the (building) buildQueue if anything is to be built. If there is
-     * something to build, build it right away.
-     * 
-     * @return <code>true</code> if the colony tile needs a visible image
-     *         change. This is if a build item either changed the stockade level
-     *         or ejected units.
-     */
-    private boolean checkBuildQueue(ChangeSet cs, List<BuildQueue<? extends BuildableType>> built) {
-        boolean tileDirty = false;
-        ProductionInfo info = getProductionInfo(buildQueue);
-        if (info != null && !info.getConsumption().isEmpty()) {
-            BuildableType buildable = csNextBuildable(buildQueue, cs);
-            if (buildable != null) {
-                int unitCount = getUnitCount();
-                if (csBuildBuilding(buildQueue, cs)) {
-                    built.add(buildQueue);
-                    // Visible change if building changed the
-                    // stockade level or ejected units.
-                    tileDirty = ((BuildingType) buildable).isDefenceType() || unitCount != getUnitCount();
-                }
-            }
-        }
-
-        return tileDirty;
-    }
-
-    private void checkForFreeBuildings() {
-        for (BuildingType buildingType : transform(getSpecification().getBuildingTypeList(), this::isAutomaticBuild)) {
-            buildBuilding(new ServerBuilding(getGame(), this, buildingType));// -til
-        }
-    }
-
-    private void checkTeach(ChangeSet cs) {
-        for (WorkLocation wl : transform(getCurrentWorkLocations(), WorkLocation::canTeach)) {
-            ServerBuilding building = (ServerBuilding) wl;
-            for (Unit teacher : building.getUnitList()) {
-                building.csCheckTeach(teacher, cs);
-            }
-        }
-    }
-
-    /**
-     * Calculates the current SoL membership of the colony based on the liberty
-     * value and colonists. After calculation it updates the production bonus
-     * accordingly.
-     */
-    private void updateSonsOfLiberty(ChangeSet cs) {
-         updateSoL();
-         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
-            cs.addMessage(owner,
-                new ModelMessage(MessageType.SONS_OF_LIBERTY,
-                                 ((sonsOfLiberty > oldSonsOfLiberty)
-                                     ? "model.colony.soLIncrease"
-                                     : "model.colony.soLDecrease"),
-                                 this, getSpecification().getGoodsType("model.goods.bells"))
-                    .addAmount("%oldSoL%", oldSonsOfLiberty)
-                    .addAmount("%newSoL%", sonsOfLiberty)
-                    .addName("%colony%", getName()));
-
- 
-             ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
-             if (govMgtMessage != null) {
-                 cs.addMessage(owner, govMgtMessage);
-             }
-         }
-    }
-    
-    private void exportCustomHouseGoods(Random random, LogBuilder lb, ChangeSet cs, GoodsContainer container) {
-        LogBuilder lb2 = new LogBuilder(64);
-        lb2.add(" ");
-        lb2.mark();
-        for (Goods goods : getCompactGoodsList()) {
-            GoodsType type = goods.getType();
-            ExportData data = getExportData(type);
-            if (!data.getExported() || !owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE)) {
-                continue;
-            }
-            int amount = goods.getAmount() - data.getExportLevel();
-            if (amount <= 0) {
-                continue;
-            }
-            int oldGold = owner.getGold();
-            int marketAmount = ((ServerPlayer) owner).sellInEurope(random, container, type, amount);
-            if (marketAmount > 0) {
-                ((ServerPlayer) owner).addExtraTrade(new AbstractGoods(type, marketAmount));
-            }
-            StringTemplate st = StringTemplate.template("model.colony.customs.saleData").addAmount("%amount%", amount)
-                    .addNamed("%goods%", type).addAmount("%gold%", (owner.getGold() - oldGold));
-            lb2.add(Messages.message(st), ", ");
-        }
-        if (lb2.grew()) {
-            lb2.shrink(", ");
-            cs.addMessage(owner, new ModelMessage(MessageType.GOODS_MOVEMENT, "model.colony.customs.sale", this)
-                    .addName("%colony%", getName()).addName("%data%", lb2.toString()));
-            cs.addPartial(See.only(owner), owner, "gold", String.valueOf(owner.getGold()));
-            lb.add(lb2.toString());
-        }
-    }
-    
-    private void updateBuildQueue(Random random, ChangeSet cs, List<BuildQueue<? extends BuildableType>> built) {
-        for (BuildQueue<? extends BuildableType> queue : built) {
-            switch (queue.getCompletionAction()) {
-            case SHUFFLE:
-                if (queue.size() > 1) {
-                    randomShuffle(logger, "Build queue", queue.getValues(), random);
-                }
-                break;
-            case REMOVE_EXCEPT_LAST:
-                if (queue.size() == 1 && queue.getCurrentlyBuilding() instanceof UnitType) {
-                    // Repeat last unit
-                    break;
-                }
-                // Fall through
-            case REMOVE:
-            default:
-                queue.remove(0);
-                break;
-            }
-            csNextBuildable(queue, cs);
-        }
-    }
-
-    /**
-     * Apply the accumulated production changes. Beware that if you try to build
-     * something requiring hammers and tools, as soon as one is updated in the
-     * colony the current production cache is invalidated, and the recalculated
-     * one will see the build as incomplete due to missing the goods just
-     * updated. Hence the need for a copy of the current production map.
-     * 
-     * As this method also handles the starvation case, it disbands the colony
-     * if the last colonist starved to death. In this case it is not necessary
-     * to continue other updates in the turn for the colony so returns
-     * <code>false</code>.
-     * 
-     * @return <code>false</code> if the last colonist starved and the colony
-     *         was disbanded, <code>true</code> oherwise.
-     */
-    private boolean applyAccumulatedProductionChanges(Random random, LogBuilder lb, ChangeSet cs, boolean newUnitBorn) {
+        // Beware that if you try to build something requiring hammers
+        // and tools, as soon as one is updated in the colony the
+        // current production cache is invalidated, and the
+        // recalculated one will see the build as incomplete due to
+        // missing the goods just updated.
+        // Hence the need for a copy of the current production map.
         TypeCountMap<GoodsType> productionMap = getProductionMap();
         for (GoodsType goodsType : productionMap.keySet()) {
             int net = productionMap.getCount(goodsType);
@@ -915,75 +761,158 @@ public class ServerColony extends Colony implements TurnTaker {
             }
 
             // Handle starvation at once.
-            if (goodsType == getSpecification().getPrimaryFoodType()) {
-                return handleStarvation(random, lb, cs, newUnitBorn, net, stored);
-            }
-        }
+            if (goodsType == spec.getPrimaryFoodType()) {
+                // Check for famine when total primary food goes negative.
+                if (net + stored < 0) {
+                    if (getUnitCount() > 1) {
+                        Unit victim = getRandomMember(logger, "Starver",
+                                                      getUnits(), random);
+                        ((ServerUnit)victim).csRemove(See.only(owner), null,
+                            cs);//-vis: safe, all within colony
 
-        return true;
-    }
-
-    /**
-     * Handles starvation case for this colony. If no colonist left in this
-     * colony it is disbanded instantly.
-     * 
-     * Returns <code>false</code> if colony was disbanded,
-     * <code>true</code otherwise.
-     * 
-     * @return <code>false</code> if colony was disbanded, <code>true</code
-     * otherwise.
-     */
-    private boolean handleStarvation(Random random, LogBuilder lb, ChangeSet cs, boolean newUnitBorn, int net,
-            int stored) {
-        // Check for famine when total primary food goes negative.
-        if (net + stored < 0) {
-            if (getUnitCount() > 1) {
-                Unit victim = getRandomMember(logger, "Starver", getUnits(), random);
-                ((ServerUnit) victim).csRemove(See.only(owner), null, cs);// -vis:
-                                                                          // safe,
-                                                                          // all
-                                                                          // within
-                                                                          // colony
-
-                cs.addMessage(owner, new ModelMessage(MessageType.UNIT_LOST, "model.colony.colonistStarved", this)
-                        .addName("%colony%", getName()));
-            } else { // Its dead, Jim.
-                cs.addMessage(owner, new ModelMessage(MessageType.UNIT_LOST, "model.colony.colonyStarved", this)
-                        .addName("%colony%", getName()));
-                ((ServerPlayer) owner).csDisposeSettlement(this, cs);
-                return false;
-            }
-        } else if (net < 0) {
-            int turns = stored / -net;
-            if (turns <= Colony.FAMINE_TURNS && !newUnitBorn) {
-                cs.addMessage(owner, new ModelMessage(MessageType.WARNING, "model.colony.famineFeared", this)
-                        .addName("%colony%", getName()).addAmount("%number%", turns));
-                lb.add(" famine in ", turns, " food=", stored, " production=", net);
-            }
-        }
-        return true;
-    }
-
-    private void checkLearningByExperience(Random random, LogBuilder lb, ChangeSet cs) {
-        for (WorkLocation wl : getCurrentWorkLocationsList()) {
-            if (wl instanceof TurnTaker) {
-                ((TurnTaker) wl).csNewTurn(random, lb, cs);
-            }
-            ProductionInfo productionInfo = getProductionInfo(wl);
-            if (productionInfo == null)
-                continue;
-            if (!wl.isEmpty()) {
-                for (AbstractGoods goods : productionInfo.getProduction()) {
-                    UnitType expert = getSpecification().getExpertForProducing(goods.getType());
-                    int experience = goods.getAmount() / wl.getUnitCount();
-                    for (Unit unit : transform(wl.getUnits(),
-                            u -> u.getUnitChange(UnitChangeType.EXPERIENCE, expert) != null)) {
-                        unit.changeExperienceType(goods.getType());
-                        unit.setExperience(unit.getExperience() + experience);
-                        cs.addPartial(See.only(owner), unit, "experience", String.valueOf(unit.getExperience()));
+                        cs.addMessage(owner,
+                            new ModelMessage(MessageType.UNIT_LOST,
+                                             "model.colony.colonistStarved",
+                                             this)
+                                .addName("%colony%", getName()));
+                    } else { // Its dead, Jim.
+                        cs.addMessage(owner,
+                            new ModelMessage(MessageType.UNIT_LOST,
+                                             "model.colony.colonyStarved",
+                                             this)
+                                .addName("%colony%", getName()));
+                        owner.csDisposeSettlement(this, cs);
+                        return;
+                    }
+                } else if (net < 0) {
+                    int turns = stored / -net;
+                    if (turns <= Colony.FAMINE_TURNS && !newUnitBorn) {
+                        cs.addMessage(owner,
+                            new ModelMessage(MessageType.WARNING,
+                                "model.colony.famineFeared", this)
+                            .addName("%colony%", getName())
+                            .addAmount("%number%", turns));
+                        lb.add(" famine in ", turns,
+                            " food=", stored, " production=", net);
                     }
                 }
             }
         }
+        invalidateCache();
+
+        // Now that the goods have been updated it is safe to remove the
+        // built item from its build queue.
+        if (!built.isEmpty()) {
+            for (BuildQueue<? extends BuildableType> queue : built) {
+                switch (queue.getCompletionAction()) {
+                case SHUFFLE:
+                    if (queue.size() > 1) {
+                        randomShuffle(logger, "Build queue",
+                                      queue.getValues(), random);
+                    }
+                    break;
+                case REMOVE_EXCEPT_LAST:
+                    if (queue.size() == 1
+                        && queue.getCurrentlyBuilding() instanceof UnitType) {
+                        // Repeat last unit
+                        break;
+                    }
+                    // Fall through
+                case REMOVE:
+                default:
+                    queue.remove(0);
+                    break;
+                }
+                csNextBuildable(queue, cs);
+            }
+            tileDirty = true;
+        }
+
+        // Export goods if custom house is built.
+        // Do not flush price changes yet, as any price change may change
+        // yet again in csYearlyGoodsAdjust.
+        if (hasAbility(Ability.EXPORT)) {
+            LogBuilder lb2 = new LogBuilder(64);
+            lb2.add(" ");
+            lb2.mark();
+            for (Goods goods : getCompactGoodsList()) {
+                GoodsType type = goods.getType();
+                ExportData data = getExportData(type);
+                if (!data.getExported()
+                    || !owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE)) continue;
+                int amount = goods.getAmount() - data.getExportLevel();
+                if (amount <= 0) continue;
+                int oldGold = owner.getGold();
+                int marketAmount = owner.sellInEurope(random, container,
+                                                      type, amount);
+                if (marketAmount > 0) {
+                    owner.addExtraTrade(new AbstractGoods(type, marketAmount));
+                }
+                StringTemplate st = StringTemplate.template("model.colony.customs.saleData")
+                    .addAmount("%amount%", amount)
+                    .addNamed("%goods%", type)
+                    .addAmount("%gold%", (owner.getGold() - oldGold));
+                lb2.add(Messages.message(st), ", ");
+            }
+            if (lb2.grew()) {
+                lb2.shrink(", ");
+                cs.addMessage(owner,
+                    new ModelMessage(MessageType.GOODS_MOVEMENT,
+                                     "model.colony.customs.sale", this)
+                        .addName("%colony%", getName())
+                        .addName("%data%", lb2.toString()));
+                cs.addPartial(See.only(owner), owner,
+                    "gold", String.valueOf(owner.getGold()));
+                lb.add(lb2.toString());
+            }
+        }
+
+        // Check for free buildings
+        for (BuildingType buildingType : transform(spec.getBuildingTypeList(),
+                bt -> isAutomaticBuild(bt))) {
+            buildBuilding(new ServerBuilding(getGame(), this,
+                                             buildingType));//-til
+        }
+        checkBuildQueueIntegrity(true, null);
+
+        // Update SoL
+        updateSoL();
+        if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
+            cs.addMessage(owner,
+                new ModelMessage(MessageType.SONS_OF_LIBERTY,
+                                 ((sonsOfLiberty > oldSonsOfLiberty)
+                                     ? "model.colony.soLIncrease"
+                                     : "model.colony.soLDecrease"),
+                                 this, spec.getGoodsType("model.goods.bells"))
+                    .addAmount("%oldSoL%", oldSonsOfLiberty)
+                    .addAmount("%newSoL%", sonsOfLiberty)
+                    .addName("%colony%", getName()));
+
+            ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
+            if (govMgtMessage != null) {
+                cs.addMessage(owner, govMgtMessage);
+            }
+        }
+        updateProductionBonus();
+
+        // We have to wait for the production bonus to stabilize
+        // before checking for completion of training.  This is a rare
+        // case so it is not worth reordering the work location calls
+        // to csNewTurn.
+        for (WorkLocation wl : transform(getCurrentWorkLocations(),
+                                                   WorkLocation::canTeach)) {
+            ServerBuilding building = (ServerBuilding)wl;
+            for (Unit teacher : building.getUnitList()) {
+                building.csCheckTeach(teacher, cs);
+            }
+        }
+
+        // Try to update minimally.
+        if (tileDirty) {
+            cs.add(See.perhaps(), tile);
+        } else {
+            cs.add(See.only(owner), this);
+        }
+        lb.add(", ");
     }
 }
