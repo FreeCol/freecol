@@ -1576,7 +1576,7 @@ public final class FreeCol {
         SplashScreen splashScreen = null;
         if (splashStream != null) {
             try {
-                final GraphicsDevice defaultScreenDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                final GraphicsDevice defaultScreenDevice = Utils.getGoodGraphicsDevice();
                 splashScreen = new SplashScreen(defaultScreenDevice, splashStream);
                 splashScreen.setVisible(true);
             } catch (Exception e) {
