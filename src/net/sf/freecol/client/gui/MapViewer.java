@@ -1285,11 +1285,14 @@ public final class MapViewer extends FreeColClientHolder {
      * Displays the Map.
      *
      * @param g2d The {@code Graphics2D} object on which to draw the Map.
+     * @return {@code true} if the entire map has been repainted.
      */
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
-    public void displayMap(Graphics2D g2d, Dimension size) {
+    public boolean displayMap(Graphics2D g2d, Dimension size) {
         final long t0 = now();
+        boolean fullMapRenderedWithoutUsingBackBuffer = false;
+        
         Rectangle clipBounds = g2d.getClipBounds();
 
         if (isRepositionNeeded()) {
@@ -1299,6 +1302,11 @@ public final class MapViewer extends FreeColClientHolder {
         if (backBufferIsDirty) {
             clipBounds = new Rectangle(0, 0, size.width, size.height);
             g2d.setClip(clipBounds);
+            fullMapRenderedWithoutUsingBackBuffer = true;
+        }
+        
+        if (clipBounds.width == size.width && clipBounds.height == size.height) {
+            fullMapRenderedWithoutUsingBackBuffer = true;
         }
         
         backBufferIsDirty = false;
@@ -1319,6 +1327,7 @@ public final class MapViewer extends FreeColClientHolder {
                     .createCompatibleImage(size.width, size.height, Transparency.TRANSLUCENT);
             clipBounds = new Rectangle(0, 0, size.width, size.height);
             g2d.setClip(clipBounds);
+            fullMapRenderedWithoutUsingBackBuffer = true;
         }
         
         final Graphics2D backBufferG2d = backBufferImage.createGraphics();
@@ -1372,6 +1381,8 @@ public final class MapViewer extends FreeColClientHolder {
                 ;
             logger.finest(sb.toString());
         }
+        
+        return fullMapRenderedWithoutUsingBackBuffer;
     }
 
 
