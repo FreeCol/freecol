@@ -34,7 +34,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -528,12 +527,13 @@ public final class ImageLibrary {
      * @param key The key to look up.
      * @return The list of button images found.
      */
-    public static List<BufferedImage> getButtonImages(final String key) {
+    public List<BufferedImage> getButtonImages(final String key) {
         List<BufferedImage> ret = new ArrayList<>();
         for (String base : buttonKeys) {
             String k = base + key;
-            if (ResourceManager.getImageResource(k, false) != null) {
-                ret.add(getUnscaledImage(k));
+            final BufferedImage image = imageCache.getScaledImage(k, scaleFactor, false);
+            if (image != null) {
+                ret.add(image);
             }
         }
         return ret;
@@ -649,8 +649,7 @@ public final class ImageLibrary {
 
     public BufferedImage getMiniMapSkin() {
         final String key = "image.skin.MiniMap";
-        return (ResourceManager.getImageResource(key, false) == null) ? null
-            : getScaledImage(key);
+        return imageCache.getScaledImage(key, scaleFactor, false);
     }
 
     /**

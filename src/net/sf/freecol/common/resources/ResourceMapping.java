@@ -231,41 +231,69 @@ public final class ResourceMapping {
      *
      * @return The number of resources loaded.
      */
-    public int preload() {
+    public int preload(PreloadController preloadController) {
         int ret = 0;
         for (Resource r : colorResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
             r.preload();
             ret++;
         }
         for (Resource r : fontResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
             r.preload();
             ret++;
         }
         for (Resource r : stringResources.values()) {
-            r.preload();
-            ret++;
-        }
-        for (Resource r : fafResources.values()) {
-            r.preload();
-            ret++;
-        }
-        for (Resource r : szaResources.values()) {
-            r.preload();
-            ret++;
-        }
-        for (Resource r : audioResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
             r.preload();
             ret++;
         }
         for (Resource r : videoResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
             r.preload();
             ret++;
         }
         for (Resource r : imageResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
+            r.preload();
+            ret++;
+        }
+        for (Resource r : fafResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
+            r.preload();
+            ret++;
+        }
+        for (Resource r : szaResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
+            r.preload();
+            ret++;
+        }
+        for (Resource r : audioResources.values()) {
+            if (!preloadController.shouldContinue()) {
+                return ret;
+            }
             r.preload();
             ret++;
         }
         return ret;
+    }
+    
+    public interface PreloadController {
+        boolean shouldContinue();
     }
     
     private static final Map<Class<?>, ResourceType<?>> mapFrom(ResourceType<?>... resourceTypes) {

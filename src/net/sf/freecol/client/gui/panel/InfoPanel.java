@@ -93,10 +93,10 @@ public final class InfoPanel extends FreeColPanel
     private final ImageLibrary lib;
 
     /** The font for the end turn message. */
-    private final Font font;
+    private Font font;
 
     /** An optional background image (the standard one has shape). */
-    private final Image skin;
+    private Image skin;
 
     /** The mouse listener for the various subpanels. */
     private final MouseAdapter mouseAdapter;
@@ -112,6 +112,9 @@ public final class InfoPanel extends FreeColPanel
     
     /** The associated unit when in UNIT mode. */
     private Unit unit = null;
+    
+    /** Use the info panel skin. */
+    private boolean useSkin;
 
 
     /**
@@ -133,19 +136,8 @@ public final class InfoPanel extends FreeColPanel
         super(freeColClient, null, null);
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
-        this.font = this.lib.getScaledFont("normal-plain-tiny", null);
-        this.skin = (useSkin) ? this.lib.getScaledImage("image.skin.InfoPanel")
-            : null;
-
-        if (this.skin != null) {
-            setBorder(null);
-            setSize(this.skin.getWidth(null), this.skin.getHeight(null));
-            // skin is output in overridden paintComponent(), which calls
-            // its parent, which will display panels added here
-            setOpaque(false);
-        } else {
-            setSize(this.lib.scale(PREFERRED_SIZE));
-        }
+        this.useSkin = useSkin;
+        
         // No layout manager!  Panels will be sized and placed explicitly
 
         this.mouseAdapter = new MouseAdapter() {
@@ -158,6 +150,33 @@ public final class InfoPanel extends FreeColPanel
                     if (tile != null) getGUI().setFocus(tile);
                 }
             };
+    }
+    
+    public void updateLayoutIfNeeded() {
+        final Font newFont = this.lib.getScaledFont("normal-plain-tiny", null);
+        final Image newSkin = (useSkin) ? this.lib.getScaledImage("image.skin.InfoPanel")
+            : null;
+        
+        if (newFont == font && newSkin == skin) {
+            // No change.
+            return;
+        }
+
+        this.font = newFont;
+        this.skin = newSkin;
+        
+
+        if (this.skin != null) {
+            setBorder(null);
+            setSize(this.skin.getWidth(null), this.skin.getHeight(null));
+            // skin is output in overridden paintComponent(), which calls
+            // its parent, which will display panels added here
+            setOpaque(false);
+        } else {
+            setSize(this.lib.scale(PREFERRED_SIZE));
+            setBorder(FreeColImageBorder.imageBorder);
+            setOpaque(true);
+        }
     }
 
     /**

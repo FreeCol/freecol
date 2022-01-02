@@ -137,7 +137,7 @@ public class ImageResource extends Resource {
         }
         return variations.get(value);
     }
-
+    
     /**
      * Gets the image using the specified dimension and choice of grayscale.
      * 

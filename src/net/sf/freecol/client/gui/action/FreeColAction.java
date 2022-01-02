@@ -29,6 +29,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.xml.stream.XMLStreamException;
@@ -254,17 +255,23 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
-        List<BufferedImage> images = ImageLibrary.getButtonImages(key);
-        orderButtonImageCount = images.size();
-        if (hasOrderButtons()) {
-            putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
-            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images.remove(0)));
-            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
-            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
-        } else {
-            logger.warning("Found only " + orderButtonImageCount
-                + " order button images for " + getId() + "/" + key);
-        }
+        /*
+         * Running this method later so that we are certain images
+         * have been loaded before trying to get them.
+         */
+        SwingUtilities.invokeLater(() -> {
+            List<BufferedImage> images = getGUI().getFixedImageLibrary().getButtonImages(key);
+            orderButtonImageCount = images.size();
+            if (hasOrderButtons()) {
+                putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
+                putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images.remove(0)));
+                putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
+                putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
+            } else {
+                logger.warning("Found only " + orderButtonImageCount
+                    + " order button images for " + getId() + "/" + key);
+            }
+        });
     }
 
     /**

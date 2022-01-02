@@ -92,6 +92,13 @@ public abstract class MapControls extends FreeColClientHolder {
 
 
     /**
+     * Updates the layout with possibly a new skin and/or size.
+     */
+    public void updateLayoutIfNeeded() {
+        infoPanel.updateLayoutIfNeeded();
+    }
+    
+    /**
      * Initialize the unit buttons.
      *
      * Initialization is deferred until in-game and the action manager is
@@ -151,6 +158,8 @@ public abstract class MapControls extends FreeColClientHolder {
      * @param tile The selected {@code Tile} if any.
      */
     public void update(GUI.ViewMode viewMode, Unit active, Tile tile) {
+        updateLayoutIfNeeded();
+        
         if (active != null) {
             boolean iub = initializeUnitButtons();
             if (iub) logger.fine("Unit buttons initialized.");

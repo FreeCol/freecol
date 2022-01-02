@@ -90,7 +90,7 @@ public final class FreeColClient {
     private final ServerAPI serverAPI;
 
     /** The GUI encapsulation. */
-    private final GUI gui;
+    private GUI gui;
 
     /** The encapsulation of the actions. */
     private final ActionManager actionManager;
@@ -154,6 +154,17 @@ public final class FreeColClient {
                          final boolean showOpeningVideo,
                          final File savedGame,
                          final Specification spec) {
+        String quitName = FreeCol.CLIENT_THREAD + "Quit Game";
+        Runtime.getRuntime().addShutdownHook(new Thread(quitName) {
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void run() {
+                    stopServer();
+                }
+            });
+        
         if (FreeCol.getHeadless() && savedGame == null && spec == null) {
             FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
         }
@@ -177,14 +188,7 @@ public final class FreeColClient {
                     .addName("%dir%", baseDirectory.getName()))
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
-        ResourceManager.addMapping("base", baseData.getResourceMapping());
 
-        // Now we have at least the base resources, get the GUI up (it
-        // needs font resources) and show the splash screen
-        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
-                                      : new SwingGUI(this, scale);
-
-        // Once the basic resources are in place construct other things.
         this.serverAPI = new UserServerAPI();
 
         // Control.  Controllers expect GUI to be available.
@@ -207,18 +211,11 @@ public final class FreeColClient {
         // Not so easy, since the ActionManager also creates tile
         // improvement actions, which depend on the specification.
         // However, this step could probably be delayed.
+        ResourceManager.addMapping("base", baseData.getResourceMapping());
+        
         FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
         ResourceManager.addMapping("tc", tcData.getResourceMapping());
 
-        // Swing system and look-and-feel initialization.
-        if (!FreeCol.getHeadless()) {
-            try {
-                gui.installLookAndFeel(fontName, scale);
-            } catch (Exception e) {
-                FreeCol.fatal(logger,
-                    Messages.message("client.laf") + "\n" + e.getMessage());
-            }
-        }
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
 
@@ -232,38 +229,50 @@ public final class FreeColClient {
             ResourceManager.addMapping("mod " + f.getId(),
                                        f.getResourceMapping());
         }
+        
+        /*
+         * Please do NOT move preloading before mods are loaded -- as that
+         * might cause some images to be loaded from base and other images
+         * to be loaded from mods.
+         */
+        ResourceManager.startPreloading();
 
+        /*
+         * All mods are loaded, so the GUI can safely be created.
+         */
+        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
+                : new SwingGUI(this, scale);
+        
+        // Swing system and look-and-feel initialization.
+        if (!FreeCol.getHeadless()) {
+            try {
+                gui.installLookAndFeel(fontName, scale);
+            } catch (Exception e) {
+                FreeCol.fatal(logger,
+                        Messages.message("client.laf") + "\n" + e.getMessage());
+            }
+        }
+        
         // Initialize Sound (depends on client options)
         this.soundController = new SoundController(this, sound);
 
-        // Start the GUI (headless-safe)
-        if (splashScreen != null) {
-            splashScreen.setVisible(false);
-            splashScreen.dispose();
-        }
-        gui.startGUI(windowSize);
-
-        // Update the actions with the running GUI, resources may have changed.
-        if (this.actionManager != null) updateActions();
-
-        // All resources mappings should be queued by now
-        // (startSavedGame above should be the last source of
-        // addMapping calls), so allow preload thread to die when it
-        // is done
-        ResourceManager.finishPreloading();
-        
-        startFirstTaskInGui(userMsg, showOpeningVideo, savedGame, spec);
-        
-        String quitName = FreeCol.CLIENT_THREAD + "Quit Game";
-        Runtime.getRuntime().addShutdownHook(new Thread(quitName) {
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void run() {
-                    stopServer();
-                }
-            });
+        /*
+         * Run later on the EDT so that we ensure pending GUI actions have
+         * completed.
+         */
+        SwingUtilities.invokeLater(() -> {
+            if (splashScreen != null) {
+                splashScreen.setVisible(false);
+                splashScreen.dispose();
+            }
+            // Start the GUI (headless-safe)
+            gui.startGUI(windowSize);
+    
+            // Update the actions with the running GUI, resources may have changed.
+            if (this.actionManager != null) updateActions();
+            
+            startFirstTaskInGui(userMsg, showOpeningVideo, savedGame, spec);
+        });
     }
 
     private void startFirstTaskInGui(String userMsg, boolean showOpeningVideo, File savedGame,

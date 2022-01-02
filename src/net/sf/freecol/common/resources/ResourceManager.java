@@ -19,26 +19,20 @@
 
 package net.sf.freecol.common.resources;
 
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.join;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.AbstractQueue;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-    
+
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -47,10 +41,6 @@ import net.sf.freecol.common.util.Utils;
 public class ResourceManager {
 
     private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
-
-    /** Thread-safe queue of mappings for the preload thread to process. */
-    private static final AbstractQueue<ResourceMapping> preloadQueue
-        = new ConcurrentLinkedQueue<>();
     
     /** The thread that handles preloading of resources. */
     private static Thread preloadThread = null;
@@ -73,9 +63,11 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static void addMapping(String name, ResourceMapping mapping) {
+        if (preloadThread != null) {
+            throw new IllegalStateException("New mappings should not be added while preloading is running.");
+        }
         logger.info("Resource manager adding mapping " + name);
-        preloadQueue.add(mapping); // thread-safe
-        startPreloading();
+        mergedContainer.addAll(mapping);
     }
 
     /**
@@ -84,7 +76,7 @@ public class ResourceManager {
      * Synchronization protects preloadThread.  The thread is the only place
      * mergedContainer is written.
      */
-    private static synchronized void startPreloading() {
+    public static synchronized void startPreloading() {
         if (FreeCol.getHeadless()) return; // Do not preload in headless mode
         if (preloadThread != null) return;
 
@@ -96,19 +88,9 @@ public class ResourceManager {
                 @Override
                 public void run() {
                     logger.info("Preload thread started");
-                    int n = 0;
-                    while (true) {
-                        ResourceMapping mapping = preloadQueue.poll();
-                        if (mapping == null) { // Quit if done, else wait
-                            if (preloadDone) break;
-                            Utils.delay(10, null);
-                        } else { // Preload the mapping found
-                            mergedContainer.addAll(mapping);
-                            n += mapping.preload();
-                        }
-                    }
-                    preloadThread = null;
+                    final int n = mergedContainer.preload(() -> !preloadDone);
                     logger.info("Preload done, " + n + " resources.");
+                    preloadThread = null;
                 }
             };
         preloadThread.start();

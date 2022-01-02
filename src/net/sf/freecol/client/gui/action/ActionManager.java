@@ -72,6 +72,14 @@ public class ActionManager extends OptionGroup {
     public void initializeActions(InGameController inGameController,
                                   ConnectController connectController) {
         /**
+         * Please note: Actions should only be created and not initialized
+         * with images etc. The reason being that initialization of actions
+         * are needed for the client options ... and the client options
+         * should be loaded before images are preloaded (the reason being that
+         * mods might change the images).
+         */
+        
+        /**
          * Possible FIXME: should we put some of these, especially the
          * move and tile improvement actions, into OptionGroups of
          * their own? This would simplify the MapControls slightly.
@@ -200,6 +208,7 @@ public class ActionManager extends OptionGroup {
      *
      * @see FreeColAction
      */
+    @SuppressWarnings("rawtypes")
     public void update() {
         for (Option o : getOptions()) ((FreeColAction)o).update();
     }
