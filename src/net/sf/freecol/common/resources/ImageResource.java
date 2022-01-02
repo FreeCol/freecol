@@ -114,28 +114,35 @@ public class ImageResource extends Resource {
         return this.image;
     }
     
-    public synchronized ImageResource getVariation(int seed) {
-        if (variations.isEmpty()) {
-            return this;
-        }
-        
-        final int value = new Random(seed).nextInt(variations.size() + 1);
-        if (value >= variations.size()) {
-            return this;
-        }
-        return variations.get(value);
+    public int getVariationNumberForSeed(int seed) {
+        return new Random(seed).nextInt(variations.size() + 1);
     }
     
-    public synchronized ImageResource getAnimatedVariation(long ticks) {
+    public int getVariationNumberForTick(long ticks) {
+        return (int) (ticks % (variations.size() + 1));
+    }
+    
+    public ImageResource getVariation(int variationNumber) {
         if (variations.isEmpty()) {
             return this;
         }
         
-        final int value = (int) (ticks % (variations.size() + 1));
-        if (value >= variations.size()) {
+        if (variationNumber >= variations.size()) {
             return this;
         }
-        return variations.get(value);
+        return variations.get(variationNumber);
+    }
+    
+    
+    /**
+     * Gets the image using the specified dimension and choice of grayscale.
+     * 
+     * @param d The {@code Dimension} of the requested image.
+     * @param grayscale If true return a grayscale image.
+     * @return The scaled {@code BufferedImage}.
+     */
+    public BufferedImage getImage(int variation, Dimension d, boolean grayscale) {
+        return (grayscale) ? getVariation(variation).getGrayscaleImage(d) : getVariation(variation).getColorImage(d);
     }
     
     /**

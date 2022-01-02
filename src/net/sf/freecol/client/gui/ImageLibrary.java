@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -190,9 +189,6 @@ public final class ImageLibrary {
     /** Cache for the string images. */
     private Map<String,BufferedImage> stringImageCache;
 
-    /** Cache for the tile sets. */
-    private Map<TileType, List<String>> tileKeyListCache;
-
 
     /**
      * The constructor to use for an unscaled {@code ImageLibrary}.
@@ -220,7 +216,6 @@ public final class ImageLibrary {
     public ImageLibrary(float scaleFactor, ImageCache imageCache) {
         changeScaleFactor(scaleFactor);
         this.imageCache = imageCache;
-        this.tileKeyListCache = new HashMap<>();
     }
 
 
@@ -310,26 +305,6 @@ public final class ImageLibrary {
      */
     public Dimension getForestedTileSize() {
         return this.tileForestSize;
-    }
-    
-    /**
-     * Should the tile with the given coordinates be considered "even"?
-     *
-     * This is useful to select different images for the same tile
-     * type in order to prevent big stripes or a checker-board effect.
-     *
-     * @param x The tile x coordinate.
-     * @param y The tile y coordinate.
-     * @return True if the tile should be considered even.
-     */
-    private static boolean shouldUseAlternateVersion(int x, int y) {
-        /*
-         * Please note that this function should always return the same
-         * "random" number given the same x and y.
-         * 
-         * Using two primes in order to get a good seed. 
-         */
-        return new Random(variationSeedUsing(x, y)).nextInt(2) == 0;
     }
     
     /**
@@ -1055,7 +1030,6 @@ public final class ImageLibrary {
 
     /**
      * Get the overlay-image for the given type and scale.
-     * Currently used for hills and mountains.
      *
      * @param type The type of the terrain-image to return.
      * @param seed A seed for the tile instance that needs a random image.
@@ -1069,7 +1043,7 @@ public final class ImageLibrary {
         if (ir == null) {
             return null;
         }
-        return ir.getVariation(seed).getImage(size, false);
+        return imageCache.getSizedImage(key, size, false, seed);
     }
     
     /**
@@ -1088,7 +1062,7 @@ public final class ImageLibrary {
         if (ir == null) {
             return null;
         }
-        return ir.getVariation(seed).getImage(size, false);
+        return imageCache.getSizedImage(key, size, false, seed);
     }
 
     public BufferedImage getScaledOverlayImage(Tile tile) {
@@ -1356,7 +1330,11 @@ public final class ImageLibrary {
             return null;
         }
         
-        return imageResource.getAnimatedVariation(ticks).getImage(this.tileSize, false);
+        return imageCache.getCachedImage(imageResource,
+                getTerrainImageKey(type),
+                this.tileSize,
+                false,
+                imageResource.getVariationNumberForTick(ticks));
     }
 
 

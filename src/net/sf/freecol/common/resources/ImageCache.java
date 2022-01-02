@@ -75,8 +75,8 @@ public class ImageCache {
      * Hash function for images.
      *
      * We accept the standard 32-bit int hashCode of the key, and
-     * or it with 15 bits of the width and height, and one more bit for the
-     * grayscale boolean.
+     * or it with 12 bits of the width and height, 6 bits for variations and
+     * one more bit for the grayscale boolean.
      *
      * @param key The image key.
      * @param size The size of the image.
@@ -84,11 +84,22 @@ public class ImageCache {
      * @return A unique hash of these parameters.
      */
     public static long imageHash(final String key, final Dimension size,
-                                 final boolean grayscale) {
+                                 final boolean grayscale, final int variation) {
+        if (variation >= 64) {
+            throw new IllegalStateException("Update formula below in order to support more variations.");
+        }
+        if (size.width >= 4096) {
+            throw new IllegalStateException("Update formula below in order to support larger image width.");
+        }
+        if (size.height >= 4096) {
+            throw new IllegalStateException("Update formula below in order to support larger image heights.");
+        }
         return (key.hashCode() & 0xFFFFFFFFL)
             ^ ((size.width & 0x7FFFL) << 32)
-            ^ ((size.height & 0x7FFFL) << 47)
-            ^ ((grayscale) ? (0x1L << 62) : 0L);
+            ^ ((size.height & 0x7FFFL) << 44)
+            ^ (variation << 56)
+            ^ ((grayscale) ? (0x1L << 62) : 0L)
+            + variation;
     }
 
     /**
@@ -104,18 +115,19 @@ public class ImageCache {
      * @param grayscale If true return a grayscale image.
      * @return The image identified by {@code resource}.
      */
-    private BufferedImage getCachedImage(final ImageResource ir,
+    public BufferedImage getCachedImage(final ImageResource ir,
                                          final String key,
                                          final Dimension size,
-                                         final boolean grayscale) {
+                                         final boolean grayscale,
+                                         final int variation) {
 
         // TODO: add logging but probably in a branch for now
         // until we understand the performance issue better
-        final long hashKey = imageHash(key, size, grayscale);
+        final long hashKey = imageHash(key, size, grayscale, variation);
         final BufferedImage cached = this.cache.get(hashKey);
         if (cached != null) return cached;
 
-        BufferedImage image = ir.getImage(size, grayscale);
+        BufferedImage image = ir.getImage(variation, size, grayscale);
         if (image != null) this.cache.put(hashKey, image);
         return image;
     }
@@ -141,7 +153,7 @@ public class ImageCache {
 
         Dimension d = new Dimension(Math.round(image.getWidth() * scale),
                                     Math.round(image.getHeight() * scale));
-        return getCachedImage(ir, key, d, grayscale);
+        return getCachedImage(ir, key, d, grayscale, 0);
     }
 
     /**
@@ -181,10 +193,7 @@ public class ImageCache {
                                        final boolean grayscale,
                                        final int seed) {
         final ImageResource ir = getImageResource(key);
-        if (grayscale) {
-            return getCachedImage(ir, key, size, grayscale);
-        }
-        return ir.getVariation(seed).getImage(size, grayscale);
+        return getCachedImage(ir, key, size, grayscale, ir.getVariationNumberForSeed(seed));
     }
 
     /**
