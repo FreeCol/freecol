@@ -33,6 +33,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.Transparency;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
@@ -42,6 +43,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.awt.image.VolatileImage;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +74,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -259,7 +262,7 @@ public final class MapViewer extends FreeColClientHolder {
     
     private boolean backBufferIsDirty = false;
     
-    private BufferedImage backBufferImage = null;
+    private VolatileImage backBufferImage = null;
     private BufferedImage nonAnimationBufferImage = null;
 
 
@@ -1287,8 +1290,12 @@ public final class MapViewer extends FreeColClientHolder {
              * We don't really need the backBufferImage now as we have double buffering from
              * Swing. It's required, however, if we later want to use active rendering.
              */
-            backBufferImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-            nonAnimationBufferImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+            backBufferImage = Utils.getGoodGraphicsDevice()
+                    .getDefaultConfiguration()
+                    .createCompatibleVolatileImage(size.width, size.height, Transparency.OPAQUE);
+            nonAnimationBufferImage = Utils.getGoodGraphicsDevice()
+                    .getDefaultConfiguration()
+                    .createCompatibleImage(size.width, size.height, Transparency.TRANSLUCENT);
             clipBounds = new Rectangle(0, 0, size.width, size.height);
             g2d.setClip(clipBounds);
         }
