@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
 import net.sf.freecol.client.ClientOptions;
@@ -40,7 +39,8 @@ public class AbstractCanvasListener extends FreeColClientHolder {
     private static final int DRAG_SCROLL_SPACE = 100;
 
     /** The scroll thread itself. */
-    protected ScrollThread scrollThread = null;
+    private static volatile ScrollThread scrollThread = null;
+    private static volatile Object scrollThreadLock = new Object();;
 
 
     /**
@@ -50,8 +50,6 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      */
     protected AbstractCanvasListener(FreeColClient freeColClient) {
         super(freeColClient);
-
-        this.scrollThread = null;
     }
 
 
@@ -91,8 +89,10 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      */
     protected void stopScrollIfScrollIsActive() {
         if (scrollThread != null) {
-            scrollThread.interrupt();
-            scrollThread = null;
+            synchronized (scrollThreadLock) {
+                scrollThread.abort();
+                scrollThread = null;
+            }
         }
     }
 
@@ -105,17 +105,21 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      * @param ignoreTop If the top should be ignored
      */
     private void scroll(int x, int y, int scrollSpace, boolean ignoreTop) {
-        Direction direction = getGUI()
-            .getScrollDirection(x, y, scrollSpace, ignoreTop);
-
+        Direction direction = getGUI().getScrollDirection(x, y, scrollSpace, ignoreTop);
         if (direction == null) {
             stopScrollIfScrollIsActive();
-        } else if (scrollThread == null || scrollThread.isInterrupted()) {
+        }
+        
+        synchronized (scrollThreadLock) {
+            if (scrollThread != null && !scrollThread.isAborted()) {
+                scrollThread.setDirection(direction);
+                return;
+            }
+
+            stopScrollIfScrollIsActive();
             scrollThread = new ScrollThread(getFreeColClient());
             scrollThread.setDirection(direction);
             scrollThread.start();
-        } else {
-            scrollThread.setDirection(direction);
         }
     }
 }

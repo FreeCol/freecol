@@ -23,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Direction;
@@ -42,7 +44,9 @@ public class ScrollThread extends Thread {
     private final FreeColClient freeColClient;
 
     /** The direction to scroll in. */
-    private Direction direction = null;
+    private volatile Direction direction = null;
+    
+    private volatile boolean aborted = false;
 
 
     /**
@@ -64,6 +68,15 @@ public class ScrollThread extends Thread {
     public void setDirection(Direction d) {
         direction = d;
     }
+    
+    public boolean isAborted() {
+        return aborted;
+    }
+    
+    public void abort() {
+        aborted = true;
+        this.direction = null;
+    }
 
     /**
      * Performs the actual scrolling.
@@ -72,17 +85,40 @@ public class ScrollThread extends Thread {
     @Override
     public void run() {
         final GUI gui = this.freeColClient.getGUI();
-        final Direction dirn = this.direction;
-        gui.invokeNowOrWait(() -> {
-                Direction d = dirn;
-                while (d != null) {
-                    if (!gui.scrollMap(d)) d = null;
-                    try {
-                        sleep(SCROLL_DELAY);
-                    } catch (InterruptedException e) {
-                        break;
+        while (true) {
+            if (isAborted()) {
+                return;
+            }
+            final Direction d = this.direction;
+            if (d == null) {
+                abort();
+                return;
+            }
+            try {
+                SwingUtilities.invokeAndWait(() -> {
+                    if (!gui.scrollMap(d)) {
+                        abort();
                     }
-                }
-            });
+                });
+            } catch (InterruptedException e) {
+                abort();
+                return;
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Exception while scrolling", ex);
+                abort();
+                return;
+            }
+
+            if (isAborted()) {
+                return;
+            }
+
+            try {
+                sleep(SCROLL_DELAY);
+            } catch (InterruptedException e) {
+                abort();
+                return;
+            }
+        }
     }
 }
