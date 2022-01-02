@@ -53,7 +53,6 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
-import net.sf.freecol.common.resources.ResourceMapper;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.common.util.LogBuilder;
 
@@ -231,9 +230,7 @@ public class FreeColDataFile {
         if (uri == null) {
             return;
         }
-        final ResourceMapper rm = new ResourceMapper(rc);
-        rm.setKey(key);
-        final Resource resource = ResourceFactory.createResource(uri, rm);
+        final Resource resource = ResourceFactory.createResource(uri);
         
         /*
          * Rivers need new keys in order to support variations.
@@ -242,7 +239,11 @@ public class FreeColDataFile {
         
         if (resource instanceof ImageResource && supportsVariations) {
             final ImageResource imageResource = (ImageResource) resource;
-            extendWithAdditionalSizesAndVariations(imageResource, rm, value);
+            extendWithAdditionalSizesAndVariations(imageResource, value);
+        }
+        
+        if (resource != null) {
+            rc.add(key, resource);
         }
     }
 
@@ -308,7 +309,7 @@ public class FreeColDataFile {
         return (key.endsWith(ending)) ? key.substring(0, key.length() - 3) : key;
     }
     
-    private void extendWithAdditionalSizesAndVariations(ImageResource imageResource, ResourceMapper rm, String value) {
+    private void extendWithAdditionalSizesAndVariations(ImageResource imageResource, String value) {
         Map<URI, List<URI>> alternativeSizes = findAlternativeSizes(value);
         imageResource.addAlternativeResourceLocators(alternativeSizes.get(null));
         
@@ -316,7 +317,7 @@ public class FreeColDataFile {
             .stream()
             .filter(entry -> entry.getKey() != null)
             .forEach(entry -> {
-                final ImageResource variationResource = (ImageResource) ResourceFactory.createResource(entry.getKey(), rm);
+                final ImageResource variationResource = (ImageResource) ResourceFactory.createResource(entry.getKey());
                 if (variationResource != null) {
                     variationResource.addAlternativeResourceLocators(entry.getValue());
                     imageResource.addVariation(variationResource);

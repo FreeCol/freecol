@@ -20,10 +20,9 @@
 package net.sf.freecol.common.resources;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,129 +40,29 @@ public class ResourceFactory {
      */
     public interface ResourceSink {
 
-        void add(ColorResource r);
-        void add(FontResource r);
-        void add(StringResource r);
-        void add(FAFileResource r);
-        void add(SZAResource r);
-        void add(AudioResource r);
-        void add(VideoResource r);
-        void add(ImageResource r);
+        void add(Resource r);
 
     }
 
     /**
-     * {@code WeakHashMap}s to ensure that only one
-     * {@code Resource} is created given the same
-     * {@code URI}.
+     * Ensures that only one {@code Resource} is created given the same {@code URI}.
      */
-    private static final Map<URI, WeakReference<ColorResource>> colorResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<FontResource>> fontResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<StringResource>> stringResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<FAFileResource>> fafResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<SZAResource>> szaResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<AudioResource>> audioResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<VideoResource>> videoResources
-        = new WeakHashMap<>();
-    private static final Map<URI, WeakReference<ImageResource>> imageResources
-        = new WeakHashMap<>();
+    private static final Map<URI, Resource> resources = new HashMap<>();
 
-    /**
-     * Check for previously created resources.
-     *
-     * @param uri The {@code URI} used when creating the instance.
-     * @param output Where a previously created instance of {@code Resource}
-     *      with the given {@code URI} is put if such an object has
-     *      already been created.
-     * @return If a Resource is found.
-     */
-    private static boolean findResource(URI uri, ResourceSink output) {
-        final WeakReference<ColorResource> crwr = colorResources.get(uri);
-        if(crwr != null) {
-            final ColorResource cr = crwr.get();
-            if (cr != null) {
-                output.add(cr);
-                return true;
-            }
-        }
-        final WeakReference<FontResource> frwr = fontResources.get(uri);
-        if(frwr != null) {
-            final FontResource fr = frwr.get();
-            if (fr != null) {
-                output.add(fr);
-                return true;
-            }
-        }
-        final WeakReference<StringResource> srwr = stringResources.get(uri);
-        if(srwr != null) {
-            final StringResource sr = srwr.get();
-            if (sr != null) {
-                output.add(sr);
-                return true;
-            }
-        }
-        final WeakReference<FAFileResource> farwr = fafResources.get(uri);
-        if(farwr != null) {
-            final FAFileResource far = farwr.get();
-            if (far != null) {
-                output.add(far);
-                return true;
-            }
-        }
-        final WeakReference<SZAResource> szrwr = szaResources.get(uri);
-        if(szrwr != null) {
-            final SZAResource szr = szrwr.get();
-            if (szr != null) {
-                output.add(szr);
-                return true;
-            }
-        }
-        final WeakReference<AudioResource> arwr = audioResources.get(uri);
-        if(arwr != null) {
-            final AudioResource ar = arwr.get();
-            if (ar != null) {
-                output.add(ar);
-                return true;
-            }
-        }
-        final WeakReference<VideoResource> vrwr = videoResources.get(uri);
-        if(vrwr != null) {
-            final VideoResource vr = vrwr.get();
-            if (vr != null) {
-                output.add(vr);
-                return true;
-            }
-        }
-        final WeakReference<ImageResource> irwr = imageResources.get(uri);
-        if(irwr != null) {
-            final ImageResource ir = irwr.get();
-            if (ir != null) {
-                output.add(ir);
-                return true;
-            }
-        }
-        return false;
-    }
-
+    
     /**
      * Returns an instance of {@code Resource} with the
      * given {@code URI} as the parameter.
      *
      * @param uri The {@code URI} used when creating the
      *      instance.
-     * @param output Where a previously created instance of {@code Resource}
-     *      with the given {@code URI} is put if such an object has
-     *      already been created, or a new instance if not.
      * @return The <code>Resource</code> if created.     
      */
-    public static Resource createResource(URI uri, ResourceSink output) {
-        if (findResource(uri, output)) return null;
+    public static Resource createResource(URI uri) {
+    	final Resource r = resources.get(uri);
+    	if (r != null) { 
+    		return r;
+    	}
 
         final String pathPart;
         if (uri.getPath() != null) {
@@ -175,65 +74,40 @@ public class ResourceFactory {
         }
 
         try {
+            final Resource resource;
             if ("urn".equals(uri.getScheme())) {
                 if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
-                    ColorResource cr = new ColorResource(uri);
-                    output.add(cr);
-                    colorResources.put(uri, new WeakReference<>(cr));
-                    return cr;
+                    resource = new ColorResource(uri);
                 } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
-                    FontResource fr = new FontResource(uri);
-                    output.add(fr);
-                    fontResources.put(uri, new WeakReference<>(fr));
-                    return fr;
+                    resource = new FontResource(uri);
+                } else {
+                    logger.log(Level.WARNING, "Unknown urn part: " + uri.getSchemeSpecificPart());
+                    return null;
                 }
             } else if (pathPart.endsWith("\"") && pathPart.lastIndexOf('"', pathPart.length()-1) >= 0) {
-                StringResource sr = new StringResource(uri);
-                output.add(sr);
-                stringResources.put(uri, new WeakReference<>(sr));
-                return sr;
+                resource = new StringResource(uri);
             } else if (pathPart.endsWith(".faf")) {
-                FAFileResource far = new FAFileResource(uri);
-                output.add(far);
-                fafResources.put(uri, new WeakReference<>(far));
-                return far;
+                resource = new FAFileResource(uri);
             } else if (pathPart.endsWith(".sza")) {
-                SZAResource szr = new SZAResource(uri);
-                output.add(szr);
-                szaResources.put(uri, new WeakReference<>(szr));
-                return szr;
+                resource = new SZAResource(uri);
             } else if (pathPart.endsWith(".ttf")) {
-                FontResource fr = new FontResource(uri);
-                output.add(fr);
-                fontResources.put(uri, new WeakReference<>(fr));
-                return fr;
+                resource = new FontResource(uri);
             } else if (pathPart.endsWith(".wav")) {
-                AudioResource ar = new AudioResource(uri);
-                output.add(ar);
-                audioResources.put(uri, new WeakReference<>(ar));
-                return ar;
+                resource = new AudioResource(uri);
             } else if (pathPart.endsWith(".ogg")) {
                 if (pathPart.endsWith(".video.ogg")) {
-                    VideoResource vr = new VideoResource(uri);
-                    output.add(vr);
-                    videoResources.put(uri, new WeakReference<>(vr));
-                    return vr;
+                    resource = new VideoResource(uri);
                 } else {
-                    AudioResource ar = new AudioResource(uri);
-                    output.add(ar);
-                    audioResources.put(uri, new WeakReference<>(ar));
-                    return ar;
+                    resource = new AudioResource(uri);
                 }
             } else {
-                ImageResource ir = new ImageResource(uri);
-                output.add(ir);
-                imageResources.put(uri, new WeakReference<>(ir));
-                return ir;
+                resource = new ImageResource(uri);
             }
+            resources.put(uri, resource);
+            return resource;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Failed to create " + uri, ioe);
             return null;
         }
-        return null;
     }
 }
