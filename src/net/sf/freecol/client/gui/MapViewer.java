@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui;
 import static net.sf.freecol.common.util.StringUtils.lastPart;
 import static net.sf.freecol.common.util.Utils.now;
 
+import java.awt.image.VolatileImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -1224,6 +1225,8 @@ public final class MapViewer extends FreeColClientHolder {
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
     public void displayMapAnimationFrame(Graphics2D g2d, Dimension size) {
+    	final long t0 = now();
+    	
         if (backBufferImage == null
                 || isRepositionNeeded()
                 || backBufferIsDirty
@@ -1251,13 +1254,31 @@ public final class MapViewer extends FreeColClientHolder {
         final List<Tile> baseTiles = map.subMap(tcb.firstColumn, tcb.firstRow,
                 tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1);
 
+        final long t1 = now();
         forEachTile(backBufferG2d, baseTiles, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+        final long t2 = now();
         
         backBufferG2d.translate(-tcb.clipLeftX, -tcb.clipTopY);
         backBufferG2d.setTransform(backBufferOriginTransform);
         backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
         
+        final long t3 = now();
         g2d.drawImage(backBufferImage, 0, 0, null);
+        final long t4 = now();
+        
+        if (logger.isLoggable(Level.FINEST)) {
+            final long gap = now() - t0;
+            double avg = ((double)gap)
+                / ((tcb.lastRow-tcb.firstRow) * (tcb.lastColumn-tcb.firstColumn));
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("displayMapAnimationFrame time = ").append(gap)
+                .append(" init=").append(t1 - t0)
+                .append(" animated=").append(t2 - t1)
+                .append(" nonAnimationBufferImage=").append(t3 - t2)
+                .append(" backBufferImage=").append(t4 - t3)
+                ;
+            logger.finest(sb.toString());
+        }
     }
     
     /**
@@ -1523,9 +1544,23 @@ public final class MapViewer extends FreeColClientHolder {
 
             });
         }
+        
+        long t13 = now();
+        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+            if (!tile.isExplored()) {
+                return;
+            }
+            BufferedImage overlayImage = this.lib.getScaledAboveTileImage(tile);
+            if (overlayImage != null) {
+            	tileG2d.drawImage(overlayImage,
+            			(this.tileWidth - overlayImage.getWidth()) / 2,
+            			(this.tileHeight - overlayImage.getHeight()) / 2,
+            			null);
+            }
+        });
 
         // Display the colony names, if needed
-        long t13 = now();
+        long t14 = now();
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
             forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> {
                 final Settlement settlement = tile.getSettlement();
@@ -1538,7 +1573,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display goto path
-        long t14 = now();
+        long t15 = now();
         nonAnimationG2d.setTransform(originTransform);
         if (this.unitPath != null) {
             displayPath(nonAnimationG2d, this.unitPath);
@@ -1549,7 +1584,7 @@ public final class MapViewer extends FreeColClientHolder {
         // Draw the chat
         this.chatDisplay.display(nonAnimationG2d, this.size);
         
-        long t15 = now();
+        long t16 = now();
         
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
@@ -1577,6 +1612,7 @@ public final class MapViewer extends FreeColClientHolder {
                 .append(" t13=").append(t13 - t12)
                 .append(" t14=").append(t14 - t13)
                 .append(" t15=").append(t15 - t14)
+                .append(" t16=").append(t16 - t15)
                 ;
             logger.finest(sb.toString());
         }

@@ -449,19 +449,14 @@ public final class TileViewer extends FreeColClientHolder {
             return;
         }
         
-        /*
-         * We need a workaround since greatRiver and ocean have the same graphics and should not have a
-         * transition. It would not work if they had different graphics either as different coastal base
-         * graphics is not supported right now as the transition would be overlapping with the beaches.
-         * 
-         * If different graphics are required later, beaches need to be drawn in a separate stage.
-         * 
-         * We are abusing the fact that highSeas don't have any resources in order to detect them:
-         */
         if (tile.getType().isWater()
-                && borderingTile.getType().isWater()
-                && !tile.getType().getResourceTypeValues().isEmpty()
-                && !borderingTile.getType().getResourceTypeValues().isEmpty()) {
+                && borderingTile.getType().isWater()) {
+            /*
+             * Lake, great river, high seas and ocean have the same graphics and
+             * should not have a transition.
+             * 
+             * TODO: Use the same ImageResource and check that instead.
+             */
             return;
         }
 

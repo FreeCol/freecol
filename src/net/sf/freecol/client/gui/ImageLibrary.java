@@ -1059,27 +1059,51 @@ public final class ImageLibrary {
      * Currently used for hills and mountains.
      *
      * @param type The type of the terrain-image to return.
-     * @param id An identifier for the tile instance that needs a random image.
+     * @param seed A seed for the tile instance that needs a random image.
      * @param size The size of the image to return.
      * @return A stable (with respect to id) random overlay image.
      */
-    private BufferedImage getOverlayImageInternal(TileType type, String id,
+    private BufferedImage getOverlayImageInternal(TileType type, int seed,
                                                   Dimension size) {
         final String key = "image.tileoverlay." + type.getId();
         final ImageResource ir = ResourceManager.getImageResource(key, false);
         if (ir == null) {
             return null;
         }
-        return ir.getVariation(id.hashCode()).getImage(size, false);
+        return ir.getVariation(seed).getImage(size, false);
+    }
+    
+    /**
+     * Get the overlay-image for the given type and scale. To be
+     * placed above units.
+     *
+     * @param type The type of the terrain-image to return.
+     * @param seed A seed for the tile instance that needs a random image.
+     * @param size The size of the image to return.
+     * @return A stable (with respect to id) random overlay image.
+     */
+    private BufferedImage getAboveTileImageInternal(TileType type, int seed,
+                                                  Dimension size) {
+        final String key = "image.abovetile." + type.getId();
+        final ImageResource ir = ResourceManager.getImageResource(key, false);
+        if (ir == null) {
+            return null;
+        }
+        return ir.getVariation(seed).getImage(size, false);
     }
 
     public BufferedImage getScaledOverlayImage(Tile tile) {
-        return getOverlayImageInternal(tile.getType(), tile.getId(),
+        return getOverlayImageInternal(tile.getType(), variationSeedUsing(tile.getX(), tile.getY()),
+                                       this.tileOverlaySize);
+    }
+    
+    public BufferedImage getScaledAboveTileImage(Tile tile) {
+        return getAboveTileImageInternal(tile.getType(), variationSeedUsing(tile.getX(), tile.getY()),
                                        this.tileOverlaySize);
     }
 
     public BufferedImage getSizedOverlayImage(TileType type, Dimension size) {
-        return getOverlayImageInternal(type, type.getId(), size);
+        return getOverlayImageInternal(type, type.getId().hashCode(), size);
     }
 
     private static String getResourceTypeKey(ResourceType rt) {
