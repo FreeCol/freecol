@@ -1,6 +1,6 @@
 # FreeCol - Colonization Strategy Game
 
-[![Build Status](https://img.shields.io/travis/FreeCol/freecol/master.svg)](https://travis-ci.org/FreeCol/freecol) <!-- [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/13524.svg)](https://scan.coverity.com/projects/freecol-freecol) -->
+<!-- [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/13524.svg)](https://scan.coverity.com/projects/freecol-freecol) -->
 [![Weekly Downloads](https://img.shields.io/sourceforge/dw/freecol.svg)](https://sourceforge.net/projects/freecol/)
 [![Total Downloads](https://img.shields.io/sourceforge/dt/freecol.svg)](https://sourceforge.net/projects/freecol/)
 
@@ -69,5 +69,5 @@ Build the latest version of the code by running:
 ant
 ```
 
-Requires Java 8, Ant, and Java SDK to build.
+Requires Java 9, Ant, and Java SDK to build.
 
