@@ -233,28 +233,27 @@ public final class MapViewer extends FreeColClientHolder {
      * There are special cases handled in getLeft/RightColumns().
      */
     private int centerColumns;
+    
     /** Special y-odd/even offsets to centerColumns. FIXME: explain! */
     private int columnEvenYOffset, columnOddYOffset;
+        
+    private boolean shouldReposition = false;
     
-    // The y-coordinate of the Tiles that will be drawn at the bottom
-    private int bottomRow = -1;
-
-    // The y-coordinate of the Tiles that will be drawn at the top
-    private int topRow;
-
-    // The y-coordinate on the screen (in pixels) of the images of the
-    // Tiles that will be drawn at the top
-    private int topRowY;
-
-    // The x-coordinate of the Tiles that will be drawn at the left side
-    private int leftColumn;
-
-    // The x-coordinate of the Tiles that will be drawn at the right side
-    private int rightColumn;
-
-    // The x-coordinate on the screen (in pixels) of the images of the
-    // Tiles that will be drawn at the left (can be less than 0)
-    private int leftColumnX;
+    /**
+     * The topmost and leftmost entire tile that is displayed in the MapViewer.
+     */
+    private Map.Position topLeftVisibleTile = new Map.Position(-1, -1);
+    
+    /**
+     * The position of the top-left corner of {@link topLeftVisibleTile} when
+     * rendering.
+     */
+    private Point topLeftVisibleTilePoint = new Point(0, 0);
+    
+    /**
+     * The bottommost and rightmost entire tile that is displayed in the MapViewer.
+     */
+    private Map.Position bottomRightVisibleTile = new Map.Position(-1, -1);
 
     // Whether the map is currently aligned with the edge.
     private boolean alignedTop = false, alignedBottom = false,
@@ -299,6 +298,10 @@ public final class MapViewer extends FreeColClientHolder {
      * @param focus The new focus {@code Tile}.
      */
     private void setFocus(Tile focus) {
+        if (focus == null) {
+            return;
+        }
+        
         this.focus = focus;
         backBufferIsDirty = true;
     }
@@ -541,9 +544,9 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void tileToPixelXY(Tile tile, int[] a) {
         final int x = tile.getX(), y = tile.getY();
-        a[0] = leftColumnX + this.tileWidth * (x - leftColumn); // Property#4
+        a[0] = topLeftVisibleTilePoint.x + this.tileWidth * (x - topLeftVisibleTile.getX()); // Property#4
         if ((y & 1) != 0) a[0] += this.halfWidth; // Property#2
-        a[1] = topRowY + this.halfHeight * (y - topRow); // Property#5
+        a[1] = topLeftVisibleTilePoint.y + this.halfHeight * (y - topLeftVisibleTile.getY()); // Property#5
     }
 
 
@@ -636,6 +639,9 @@ public final class MapViewer extends FreeColClientHolder {
      * @param tile The new focus {@code Tile}.
      */
     public void changeFocus(Tile tile) {
+        if (tile == null) {
+            return;
+        }
         setFocus(tile);
         forceReposition();
     }
@@ -666,8 +672,8 @@ public final class MapViewer extends FreeColClientHolder {
         int ret = 0, moveX = -1;
         final Map map = getMap();
         final int tx = tile.getX(), ty = tile.getY(),
-            width = rightColumn - leftColumn;
-        if (leftColumn <= 0) { // At left edge already
+            width = bottomRightVisibleTile.getX() - topLeftVisibleTile.getX();
+        if (topLeftVisibleTile.getX() <= 0) { // At left edge already
             if (tx <= width / 4) {
                 ret = -1;
             } else if (tx >= 3 * width / 4) {
@@ -676,10 +682,10 @@ public final class MapViewer extends FreeColClientHolder {
                 moveX = tx + width / 4;
                 ret = -1;
             }
-        } else if (rightColumn >= width - 1) { // At right edge
-            if (tx >= rightColumn - width / 4) {
+        } else if (bottomRightVisibleTile.getX() >= width - 1) { // At right edge
+            if (tx >= bottomRightVisibleTile.getX() - width / 4) {
                 ret = 1;
-            } else if (tx <= rightColumn - 3 * width / 4) {
+            } else if (tx <= bottomRightVisibleTile.getX() - 3 * width / 4) {
                 ret = -1;
             } else {
                 moveX = tx - width / 4;
@@ -831,9 +837,8 @@ public final class MapViewer extends FreeColClientHolder {
     public boolean isTileVisible(Tile tile) {
         if (tile == null) return false;
         repositionMapIfNeeded();
-        final int x = tile.getX(), y = tile.getY();
-        return y >= topRow     && y <= bottomRow
-            && x >= leftColumn && x <= rightColumn;
+        return tile.getX() >= topLeftVisibleTile.getX() && tile.getX() <= bottomRightVisibleTile.getX()
+                && tile.getY() >= topLeftVisibleTile.getY() && tile.getY() <= bottomRightVisibleTile.getY();
     }
 
     /**
@@ -847,11 +852,10 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public boolean onScreen(Tile tile) {
         repositionMapIfNeeded();
-        final int x = tile.getX(), y = tile.getY();
-        return (y - 2 > topRow || alignedTop)
-            && (y + 3 < bottomRow || alignedBottom)
-            && (x - 1 > leftColumn || alignedLeft)
-            && (x + 2 < rightColumn || alignedRight);
+        return (tile.getX() - 1 > topLeftVisibleTile.getX() || alignedLeft)
+                && (tile.getX() + 2 < bottomRightVisibleTile.getX() || alignedRight)
+                && (tile.getY() - 2 > topLeftVisibleTile.getY() || alignedTop)
+                && (tile.getY() + 3 < bottomRightVisibleTile.getY() || alignedBottom);
     }
 
 
@@ -1101,7 +1105,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Force the next screen repaint to reposition the tiles on the window.
      */
     public void forceReposition() {
-        bottomRow = -1;
+        shouldReposition = true;
         backBufferIsDirty = true;
     }
     
@@ -1112,7 +1116,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     private boolean isRepositionNeeded() {
-        return bottomRow < 0 && this.focus != null;
+        return shouldReposition && focus != null;
     }
 
     /**
@@ -1127,6 +1131,8 @@ public final class MapViewer extends FreeColClientHolder {
         final Map map = getMap();
         final int mapWidth = map.getWidth(), mapHeight = map.getHeight();
         int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
+        
+        int leftColumn, rightColumn, topRow, bottomRow, topRowY, leftColumnX;
         
         /*
           PART 1
@@ -1213,6 +1219,12 @@ public final class MapViewer extends FreeColClientHolder {
             leftColumnX = (this.size.width - this.tileWidth) / 2
                 - leftColumns * this.tileWidth;
         }
+        
+        this.topLeftVisibleTile = new Map.Position(leftColumn, topRow);
+        this.bottomRightVisibleTile = new Map.Position(rightColumn, bottomRow);
+        this.topLeftVisibleTilePoint = new Point(leftColumnX, topRowY);
+        
+        shouldReposition = false;
     }
 
     /**
@@ -1227,7 +1239,8 @@ public final class MapViewer extends FreeColClientHolder {
     public void displayMapAnimationFrame(Graphics2D g2d, Dimension size) {
     	final long t0 = now();
     	
-        if (backBufferImage == null
+        if (focus == null
+                || backBufferImage == null
                 || isRepositionNeeded()
                 || backBufferIsDirty
                 || backBufferImage.getWidth() != size.width
@@ -1288,6 +1301,11 @@ public final class MapViewer extends FreeColClientHolder {
         boolean fullMapRenderedWithoutUsingBackBuffer = false;
         
         Rectangle clipBounds = g2d.getClipBounds();
+        
+        if (focus == null ) {
+            paintBlackBackground(g2d, clipBounds);
+            return false;
+        }
 
         if (isRepositionNeeded()) {
             positionMap(this.focus);
@@ -1356,11 +1374,11 @@ public final class MapViewer extends FreeColClientHolder {
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
             final double avg = ((double)gap)
-                / ((tcb.getLastDirtyTile().getX()-tcb.getFirstDirtyTile().getX()) * (tcb.getLastDirtyTile().getY()-tcb.getLastDirtyTile().getY()));
+                / ((tcb.getBottomRightDirtyTile().getX()-tcb.getTopLeftDirtyTile().getX()) * (tcb.getBottomRightDirtyTile().getY()-tcb.getBottomRightDirtyTile().getY()));
             final StringBuilder sb = new StringBuilder(128);
             sb.append("displayMap time = ").append(gap)
-                .append(" for ").append(tcb.getFirstDirtyTile())
-                .append(" to ").append(tcb.getLastDirtyTile())
+                .append(" for ").append(tcb.getTopLeftDirtyTile())
+                .append(" to ").append(tcb.getBottomRightDirtyTile())
                 .append(" average ").append(avg)
                 .append(" init=").append(t1 - t0)
                 .append(" animated=").append(t2 - t1)
@@ -1524,7 +1542,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         
         long t13 = now();
-        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
+        paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (!tile.isExplored()) {
                 return;
             }
@@ -1567,11 +1585,11 @@ public final class MapViewer extends FreeColClientHolder {
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
             final double avg = ((double)gap)
-                    / ((tcb.getLastDirtyTile().getX()-tcb.getFirstDirtyTile().getX()) * (tcb.getLastDirtyTile().getY()-tcb.getLastDirtyTile().getY()));
+                    / ((tcb.getBottomRightDirtyTile().getX()-tcb.getTopLeftDirtyTile().getX()) * (tcb.getBottomRightDirtyTile().getY()-tcb.getBottomRightDirtyTile().getY()));
             final StringBuilder sb = new StringBuilder(128);
             sb.append("displayNonAnimationImages time = ").append(gap)
-            .append(" for ").append(tcb.getFirstDirtyTile())
-            .append(" to ").append(tcb.getLastDirtyTile())
+            .append(" for ").append(tcb.getTopLeftDirtyTile())
+            .append(" to ").append(tcb.getBottomRightDirtyTile())
                 .append(" average ").append(avg)
                 .append(" t1=").append(t1 - t0)
                 .append(" t2=").append(t2 - t1)
@@ -1602,7 +1620,7 @@ public final class MapViewer extends FreeColClientHolder {
             gridPath.moveTo(0, 0);
             int nextX = this.halfWidth;
             int nextY = -this.halfHeight;
-            for (int i = 0; i <= ((tcb.getLastDirtyTile().getX() - tcb.getFirstDirtyTile().getX()) * 2 + 1); i++) {
+            for (int i = 0; i <= ((tcb.getBottomRightDirtyTile().getX() - tcb.getTopLeftDirtyTile().getX()) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
                 nextX += this.halfWidth;
                 nextY = (nextY == 0) ? -this.halfHeight : 0;
@@ -1611,7 +1629,7 @@ public final class MapViewer extends FreeColClientHolder {
             // Display the grid
             g2d.setStroke(this.gridStroke);
             g2d.setColor(Color.BLACK);
-            for (int row = tcb.getFirstDirtyTile().getY(); row <= tcb.getLastDirtyTile().getY(); row++) {
+            for (int row = tcb.getTopLeftDirtyTile().getY(); row <= tcb.getBottomRightDirtyTile().getY(); row++) {
                 g2d.translate(0, this.halfHeight);
                 AffineTransform rowTransform = g2d.getTransform();
                 if ((row & 1) == 1) {
@@ -1627,9 +1645,9 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Calculates the tile clipping bounds from a Graphics' clipBounds.
      * 
-     * The tiles to be redrawn is the area defined by the {@code firstDirtyTile}
+     * The tiles to be redrawn is the area defined by the {@code topLeftDirtyTile}
      * (the upper left corner of the area to be repainted)
-     * and {@code lastDirtyTile}
+     * and {@code bottomRightDirtyTile}
      * (the lower right corner of the area to be repainted).
      * 
      * The list of tiles to be repainted depends on the possible image sizes
@@ -1639,8 +1657,8 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private final class TileClippingBounds {
         
-        private final Map.Position firstDirtyTile;
-        private final Map.Position lastDirtyTile;
+        private final Map.Position topLeftDirtyTile;
+        private final Map.Position bottomRightDirtyTile;
         private final int clipLeftX;
         private final int clipTopY;
         
@@ -1650,51 +1668,51 @@ public final class MapViewer extends FreeColClientHolder {
         
         private TileClippingBounds(Map map, Rectangle clipBounds) {
             // Determine which tiles need to be redrawn          
-            final int firstRowTiles = (clipBounds.y - topRowY) / halfHeight - 1;
-            this.clipTopY = topRowY + firstRowTiles * halfHeight;
-            final int firstRow = topRow + firstRowTiles;
+            final int firstRowTiles = (clipBounds.y - topLeftVisibleTilePoint.y) / halfHeight - 1;
+            this.clipTopY = topLeftVisibleTilePoint.y + firstRowTiles * halfHeight;
+            final int firstRow = topLeftVisibleTile.getY() + firstRowTiles;
             
-            final int firstColumnTiles = (clipBounds.x - leftColumnX) / tileWidth - 1;
-            this.clipLeftX = leftColumnX + firstColumnTiles * tileWidth;
-            final int firstColumn = leftColumn + firstColumnTiles;
+            final int firstColumnTiles = (clipBounds.x - topLeftVisibleTilePoint.x) / tileWidth - 1;
+            this.clipLeftX = topLeftVisibleTilePoint.x + firstColumnTiles * tileWidth;
+            final int firstColumn = topLeftVisibleTile.getX() + firstColumnTiles;
             
-            final int lastRowTiles = (clipBounds.y + clipBounds.height - topRowY) / halfHeight;
-            final int lastRow = topRow + lastRowTiles;
+            final int lastRowTiles = (clipBounds.y + clipBounds.height - topLeftVisibleTilePoint.y) / halfHeight;
+            final int lastRow = topLeftVisibleTile.getY() + lastRowTiles;
             
-            final int lastColumnTiles = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
-            final int lastColumn = leftColumn + lastColumnTiles;
+            final int lastColumnTiles = (clipBounds.x + clipBounds.width - topLeftVisibleTilePoint.x) / tileWidth;
+            final int lastColumn = topLeftVisibleTile.getX() + lastColumnTiles;
             
-            this.firstDirtyTile = new Map.Position(firstColumn, firstRow);
-            this.lastDirtyTile = new Map.Position(lastColumn, lastRow);
+            this.topLeftDirtyTile = new Map.Position(firstColumn, firstRow);
+            this.bottomRightDirtyTile = new Map.Position(lastColumn, lastRow);
             
-            final int subMapWidth = lastDirtyTile.getX() - firstDirtyTile.getX() + 1;
-            final int subMapHeight = lastDirtyTile.getY() - firstDirtyTile.getY() + 1;
+            final int subMapWidth = bottomRightDirtyTile.getX() - topLeftDirtyTile.getX() + 1;
+            final int subMapHeight = bottomRightDirtyTile.getY() - topLeftDirtyTile.getY() + 1;
             
             baseTiles = map.subMap(
-                    firstDirtyTile.getX(),
-                    firstDirtyTile.getY(),
+                    topLeftDirtyTile.getX(),
+                    topLeftDirtyTile.getY(),
                     subMapWidth,
                     subMapHeight);
             
             extendedTiles = map.subMap(
-                    firstDirtyTile.getX(),
-                    firstDirtyTile.getY() - 1,
+                    topLeftDirtyTile.getX(),
+                    topLeftDirtyTile.getY() - 1,
                     subMapWidth,
                     subMapHeight + 1);
             
             superExtendedTiles = map.subMap(
-                    firstDirtyTile.getX() - 2,
-                    firstDirtyTile.getY() - 4,
+                    topLeftDirtyTile.getX() - 2,
+                    topLeftDirtyTile.getY() - 4,
                     subMapWidth + 4,
                     subMapHeight + 8);
         }
 
-        public Map.Position getFirstDirtyTile() {
-            return firstDirtyTile;
+        public Map.Position getTopLeftDirtyTile() {
+            return topLeftDirtyTile;
         }
         
-        public Map.Position getLastDirtyTile() {
-            return lastDirtyTile;
+        public Map.Position getBottomRightDirtyTile() {
+            return bottomRightDirtyTile;
         }
         
         /**
@@ -1751,7 +1769,7 @@ public final class MapViewer extends FreeColClientHolder {
      *      tile image (that is, outside of the tile diamond itself).
      */
     private void paintSingleTile(Graphics2D g2d, TileClippingBounds tcb, Tile tile, TileRenderingCallback c) {
-        paintEachTile(g2d, tcb.getFirstDirtyTile(), List.of(tile), c);
+        paintEachTile(g2d, tcb.getTopLeftDirtyTile(), List.of(tile), c);
     }
     
     /**
@@ -1766,7 +1784,7 @@ public final class MapViewer extends FreeColClientHolder {
      *      tile image (that is, outside of the tile diamond itself).
      */
     private void paintEachTile(Graphics2D g2d, TileClippingBounds tcb, TileRenderingCallback c) {
-        paintEachTile(g2d, tcb.getFirstDirtyTile(), tcb.getBaseTiles(), c);
+        paintEachTile(g2d, tcb.getTopLeftDirtyTile(), tcb.getBaseTiles(), c);
     }
     
     /**
@@ -1784,7 +1802,7 @@ public final class MapViewer extends FreeColClientHolder {
      *      tile image (that is, outside of the tile diamond itself).
      */
     private void paintEachTileWithExtendedImageSize(Graphics2D g2d, TileClippingBounds tcb, TileRenderingCallback c) {
-        paintEachTile(g2d, tcb.getFirstDirtyTile(), tcb.getExtendedTiles(), c);
+        paintEachTile(g2d, tcb.getTopLeftDirtyTile(), tcb.getExtendedTiles(), c);
     }
     
     /**
@@ -1802,7 +1820,7 @@ public final class MapViewer extends FreeColClientHolder {
      *      tile image (that is, outside of the tile diamond itself).
      */
     private void paintEachTileWithSuperExtendedImageSize(Graphics2D g2d, TileClippingBounds tcb, TileRenderingCallback c) {
-        paintEachTile(g2d, tcb.getFirstDirtyTile(), tcb.getSuperExtendedTiles(), c);
+        paintEachTile(g2d, tcb.getTopLeftDirtyTile(), tcb.getSuperExtendedTiles(), c);
     }
     
     private void paintEachTile(Graphics2D g2d, Map.Position firstTile, List<Tile> tiles, TileRenderingCallback c) {
