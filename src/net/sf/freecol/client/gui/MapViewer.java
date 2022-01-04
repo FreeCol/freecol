@@ -1430,13 +1430,17 @@ public final class MapViewer extends FreeColClientHolder {
         // Paint full region borders
         long t4 = now();
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            nonAnimationG2d.translate(0, -halfHeight);
             forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, true));
+            nonAnimationG2d.translate(0, halfHeight);
         }
 
         // Paint full country borders
         long t5 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+            nonAnimationG2d.translate(0, -halfHeight);
             forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, true));
+            nonAnimationG2d.translate(0, halfHeight);
         }
 
         // Apply fog of war to flat parts of all tiles
@@ -1492,13 +1496,17 @@ public final class MapViewer extends FreeColClientHolder {
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            nonAnimationG2d.translate(0, -halfHeight);
             forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, false));
+            nonAnimationG2d.translate(0, halfHeight);
         }
 
         // Paint transparent country borders
         long t10 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+            nonAnimationG2d.translate(0, -halfHeight);
             forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, false));
+            nonAnimationG2d.translate(0, halfHeight);
         }
 
         // Display cursor for selected tile or active unit
@@ -1704,7 +1712,7 @@ public final class MapViewer extends FreeColClientHolder {
             final int x = t.getX();
             final int y = t.getY();
             final int xt = (x-x0) * this.tileWidth
-                + (((y&1)==1) ? this.halfWidth : 0);
+                + (y&1) * this.halfWidth;
             final int yt = (y-y0) * this.halfHeight;
             g2d.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
