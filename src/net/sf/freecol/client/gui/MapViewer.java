@@ -997,6 +997,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib.changeScaleFactor(newScale);
         this.tv.updateScaledVariables();
         updateScaledVariables();
+        forceReposition();
         backBufferIsDirty = true;
     }
 
