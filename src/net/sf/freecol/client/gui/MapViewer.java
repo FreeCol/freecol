@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui;
 import static net.sf.freecol.common.util.StringUtils.lastPart;
 import static net.sf.freecol.common.util.Utils.now;
 
-import java.awt.image.VolatileImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -1242,20 +1241,16 @@ public final class MapViewer extends FreeColClientHolder {
         backBufferG2d.setClip(clipBounds);
         final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
         
-        final TileClippingBounds tcb = new TileClippingBounds(clipBounds);
+        final Map map = getMap();
+        final TileClippingBounds tcb = new TileClippingBounds(map, clipBounds);
 
         // Clear background
         paintBlackBackground(backBufferG2d, clipBounds);
         
         backBufferG2d.translate(tcb.clipLeftX, tcb.clipTopY);      
 
-        // Create the common tile lists
-        final Map map = getMap();
-        final List<Tile> baseTiles = map.subMap(tcb.firstColumn, tcb.firstRow,
-                tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1);
-
         final long t1 = now();
-        forEachTile(backBufferG2d, baseTiles, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+        paintEachTile(backBufferG2d, tcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
         final long t2 = now();
         
         backBufferG2d.translate(-tcb.clipLeftX, -tcb.clipTopY);
@@ -1268,9 +1263,7 @@ public final class MapViewer extends FreeColClientHolder {
         
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
-            double avg = ((double)gap)
-                / ((tcb.lastRow-tcb.firstRow) * (tcb.lastColumn-tcb.firstColumn));
-            StringBuilder sb = new StringBuilder(128);
+            final StringBuilder sb = new StringBuilder(128);
             sb.append("displayMapAnimationFrame time = ").append(gap)
                 .append(" init=").append(t1 - t0)
                 .append(" animated=").append(t2 - t1)
@@ -1334,24 +1327,20 @@ public final class MapViewer extends FreeColClientHolder {
         backBufferG2d.setClip(clipBounds);
         final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
 
-        final TileClippingBounds tcb = new TileClippingBounds(clipBounds);
+        final Map map = getMap();
+        final TileClippingBounds tcb = new TileClippingBounds(map, clipBounds);
 
         paintBlackBackground(backBufferG2d, clipBounds);
-
-        // Create the common tile lists
-        final Map map = getMap();
-        final List<Tile> baseTiles = map.subMap(tcb.firstColumn, tcb.firstRow,
-                tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1);
         
         // Display the animated base tiles:
         final long t1 = now();
         backBufferG2d.translate(tcb.clipLeftX, tcb.clipTopY);
-        forEachTile(backBufferG2d, baseTiles, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+        paintEachTile(backBufferG2d, tcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
                
         // Display the base Tiles
         final long t2 = now();
         final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
-        displayNonAnimationImages(nonAnimationG2d, clipBounds, tcb, baseTiles);
+        displayNonAnimationImages(nonAnimationG2d, clipBounds, tcb);
         nonAnimationG2d.dispose();
         
         final long t3 = now();   
@@ -1365,14 +1354,12 @@ public final class MapViewer extends FreeColClientHolder {
         // Timing log
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
-            double avg = ((double)gap)
-                / ((tcb.lastRow-tcb.firstRow) * (tcb.lastColumn-tcb.firstColumn));
-            StringBuilder sb = new StringBuilder(128);
+            final double avg = ((double)gap)
+                / ((tcb.getLastDirtyTile().getX()-tcb.getFirstDirtyTile().getX()) * (tcb.getLastDirtyTile().getY()-tcb.getLastDirtyTile().getY()));
+            final StringBuilder sb = new StringBuilder(128);
             sb.append("displayMap time = ").append(gap)
-                .append(" for ").append(tcb.firstColumn)
-                .append(" ").append(tcb.firstRow)
-                .append(" to ").append(tcb.lastColumn)
-                .append(" ").append(tcb.lastRow)
+                .append(" for ").append(tcb.getFirstDirtyTile())
+                .append(" to ").append(tcb.getLastDirtyTile())
                 .append(" average ").append(avg)
                 .append(" init=").append(t1 - t0)
                 .append(" animated=").append(t2 - t1)
@@ -1388,22 +1375,15 @@ public final class MapViewer extends FreeColClientHolder {
 
     private void displayNonAnimationImages(Graphics2D nonAnimationG2d,
             Rectangle clipBounds,
-            TileClippingBounds tcb,
-            List<Tile> baseTiles) {
+            TileClippingBounds tcb) {
         
         long t0 = now();
         final Player player = getMyPlayer(); // Check, can be null in map editor
-        final Map map = getMap();
         final ClientOptions options = getClientOptions();
-        
-        final int x0 = tcb.firstColumn;
-        final int y0 = tcb.firstRow;
         
         /* For settlement names and territorial borders 1 extra row needs
         to be drawn in north to prevent missing parts on partial redraws,
         as they can reach below their tiles, see BR#2580 */
-        final List<Tile> extendedTiles = map.subMap(x0, y0-1,
-                tcb.lastColumn-tcb.firstColumn+1, tcb.lastRow-tcb.firstRow+1+1);
         
         AffineTransform originTransform = nonAnimationG2d.getTransform();
         nonAnimationG2d.setComposite(AlphaComposite.Clear);
@@ -1414,14 +1394,14 @@ public final class MapViewer extends FreeColClientHolder {
         
         long t1 = now();
         
-        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> this.tv.displayTileWithBeach(tileG2d, tile, true));
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.displayTileWithBeach(tileG2d, tile, true));
         
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Display the borders
         long t2 = now();
-        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> this.tv.drawBaseTileTransitions(tileG2d, tile));
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.drawBaseTileTransitions(tileG2d, tile));
 
         // Draw the grid, if needed
         long t3 = now();
@@ -1430,17 +1410,13 @@ public final class MapViewer extends FreeColClientHolder {
         // Paint full region borders
         long t4 = now();
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            nonAnimationG2d.translate(0, -halfHeight);
-            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, true));
-            nonAnimationG2d.translate(0, halfHeight);
+            paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, true));
         }
 
         // Paint full country borders
         long t5 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
-            nonAnimationG2d.translate(0, -halfHeight);
-            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, true));
-            nonAnimationG2d.translate(0, halfHeight);
+            paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, true));
         }
 
         // Apply fog of war to flat parts of all tiles
@@ -1460,7 +1436,7 @@ public final class MapViewer extends FreeColClientHolder {
             nonAnimationG2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                                                         0.2f));
             
-            forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+            paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
                 if (!tile.isExplored() || player.canSee(tile)) {
                     return;
                 }
@@ -1473,13 +1449,13 @@ public final class MapViewer extends FreeColClientHolder {
         
         // Display unknown tile borders:
         long t7 = now();
-        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> this.tv.displayUnknownTileBorder(tileG2d, tile));
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.displayUnknownTileBorder(tileG2d, tile));
 
         // Display the Tile overlays
         long t8 = now();
         final int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
-        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (!tile.isExplored()) {
                 return;
             }
@@ -1490,23 +1466,19 @@ public final class MapViewer extends FreeColClientHolder {
                 withNumbers, rop);
             this.tv.displayOptionalTileText(tileG2d, tile);
         });
-
+        
         // Paint transparent region borders
         long t9 = now();
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            nonAnimationG2d.translate(0, -halfHeight);
-            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, false));
-            nonAnimationG2d.translate(0, halfHeight);
+            paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, false));
         }
 
         // Paint transparent country borders
         long t10 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
-            nonAnimationG2d.translate(0, -halfHeight);
-            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, false));
-            nonAnimationG2d.translate(0, halfHeight);
+            paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, false));
         }
 
         // Display cursor for selected tile or active unit
@@ -1517,18 +1489,9 @@ public final class MapViewer extends FreeColClientHolder {
              * The cursor is hidden when units are animated. 
              */
             
-            final int x = cursorTile.getX();
-            final int y = cursorTile.getY();
-            
-            if (x >= x0 && y >= y0 && x <= tcb.lastColumn && y <= tcb.lastRow) {
-                final int xt = (x-x0) * this.tileWidth
-                    + (y&1) * this.halfWidth;
-                final int yt = (y-y0) * this.halfHeight;
-                nonAnimationG2d.translate(xt, yt);
-                nonAnimationG2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT),
-                              0, 0, null);
-                nonAnimationG2d.translate(-xt, -yt);
-            }
+            paintSingleTile(nonAnimationG2d, tcb, cursorTile, (tileG2d, tile) -> {
+                nonAnimationG2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT), 0, 0, null);
+            });
         }
 
         // Display units
@@ -1536,7 +1499,7 @@ public final class MapViewer extends FreeColClientHolder {
         nonAnimationG2d.setColor(Color.BLACK);
         final boolean revengeMode = getGame().isInRevengeMode();
         if (!revengeMode) {
-            forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+            paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
                 final Unit unit = findUnitInFront(tile);
                 if (unit == null || isOutForAnimation(unit)) {
                     return;
@@ -1544,13 +1507,8 @@ public final class MapViewer extends FreeColClientHolder {
                 displayUnit(tileG2d, unit);
             });
         } else {
-            /* Add extra rows and colums, as the dark halo is huge to enable
-               a very slow fade into transparency, see BR#2580 */
             final BufferedImage darkness = this.lib.getScaledImage(ImageLibrary.DARKNESS);
-            final List<Tile> revengeModeDrawTiles = map.subMap(x0-2, y0-4, tcb.lastColumn-tcb.firstColumn+1+4,
-                    tcb.lastRow-tcb.firstRow+1+8);
-            
-            forEachTile(nonAnimationG2d, revengeModeDrawTiles, (tileG2d, tile) -> {
+            paintEachTileWithSuperExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
                 final Unit unit = findUnitInFront(tile);
                 if (unit == null || isOutForAnimation(unit)) {
                     return;
@@ -1565,7 +1523,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         
         long t13 = now();
-        forEachTile(nonAnimationG2d, baseTiles, (tileG2d, tile) -> {
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (!tile.isExplored()) {
                 return;
             }
@@ -1581,7 +1539,7 @@ public final class MapViewer extends FreeColClientHolder {
         // Display the colony names, if needed
         long t14 = now();
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            forEachTile(nonAnimationG2d, extendedTiles, (tileG2d, tile) -> {
+            paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
                 final Settlement settlement = tile.getSettlement();
                 if (settlement == null) {
                     return;
@@ -1607,14 +1565,12 @@ public final class MapViewer extends FreeColClientHolder {
         
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
-            double avg = ((double)gap)
-                / ((tcb.lastRow-tcb.firstRow) * (tcb.lastColumn-tcb.firstColumn));
-            StringBuilder sb = new StringBuilder(128);
+            final double avg = ((double)gap)
+                    / ((tcb.getLastDirtyTile().getX()-tcb.getFirstDirtyTile().getX()) * (tcb.getLastDirtyTile().getY()-tcb.getLastDirtyTile().getY()));
+            final StringBuilder sb = new StringBuilder(128);
             sb.append("displayNonAnimationImages time = ").append(gap)
-                .append(" for ").append(tcb.firstColumn)
-                .append(" ").append(tcb.firstRow)
-                .append(" to ").append(tcb.lastColumn)
-                .append(" ").append(tcb.lastRow)
+            .append(" for ").append(tcb.getFirstDirtyTile())
+            .append(" to ").append(tcb.getLastDirtyTile())
                 .append(" average ").append(avg)
                 .append(" t1=").append(t1 - t0)
                 .append(" t2=").append(t2 - t1)
@@ -1637,7 +1593,6 @@ public final class MapViewer extends FreeColClientHolder {
         }
     }
 
-
     private void displayGrid(Graphics2D g2d, final ClientOptions options, final TileClippingBounds tcb) {
         if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
             // Generate a zigzag GeneralPath
@@ -1646,7 +1601,7 @@ public final class MapViewer extends FreeColClientHolder {
             gridPath.moveTo(0, 0);
             int nextX = this.halfWidth;
             int nextY = -this.halfHeight;
-            for (int i = 0; i <= ((tcb.lastColumn - tcb.firstColumn) * 2 + 1); i++) {
+            for (int i = 0; i <= ((tcb.getLastDirtyTile().getX() - tcb.getFirstDirtyTile().getX()) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
                 nextX += this.halfWidth;
                 nextY = (nextY == 0) ? -this.halfHeight : 0;
@@ -1655,7 +1610,7 @@ public final class MapViewer extends FreeColClientHolder {
             // Display the grid
             g2d.setStroke(this.gridStroke);
             g2d.setColor(Color.BLACK);
-            for (int row = tcb.firstRow; row <= tcb.lastRow; row++) {
+            for (int row = tcb.getFirstDirtyTile().getY(); row <= tcb.getLastDirtyTile().getY(); row++) {
                 g2d.translate(0, this.halfHeight);
                 AffineTransform rowTransform = g2d.getTransform();
                 if ((row & 1) == 1) {
@@ -1668,41 +1623,191 @@ public final class MapViewer extends FreeColClientHolder {
         }
     }
     
+    /**
+     * Calculates the tile clipping bounds from a Graphics' clipBounds.
+     * 
+     * The tiles to be redrawn is the area defined by the {@code firstDirtyTile}
+     * (the upper left corner of the area to be repainted)
+     * and {@code lastDirtyTile}
+     * (the lower right corner of the area to be repainted).
+     * 
+     * The list of tiles to be repainted depends on the possible image sizes
+     * that can be drawn on a tile: {@link #getBaseTiles() baseTiles},
+     * {@link #getExtendedTiles()() extendedTiles} and
+     * {@link #getSuperExtendedTiles()() superExtendedTiles}.
+     */
     private final class TileClippingBounds {
-        private final int firstRow;
-        private final int firstColumn;
-        private final int lastRow;
-        private final int lastColumn;
+        
+        private final Map.Position firstDirtyTile;
+        private final Map.Position lastDirtyTile;
         private final int clipLeftX;
         private final int clipTopY;
         
-        private TileClippingBounds(Rectangle clipBounds) {
-            // Determine which tiles need to be redrawn
-            final int firstRowY = Math.max(0, (clipBounds.y - topRowY) / halfHeight - 1);           
-            clipTopY = topRowY + firstRowY * halfHeight;
-            firstRow = topRow + firstRowY;
+        private final List<Tile> baseTiles;
+        private final List<Tile> extendedTiles;
+        private final List<Tile> superExtendedTiles;
+        
+        private TileClippingBounds(Map map, Rectangle clipBounds) {
+            // Determine which tiles need to be redrawn          
+            final int firstRowTiles = (clipBounds.y - topRowY) / halfHeight - 1;
+            this.clipTopY = topRowY + firstRowTiles * halfHeight;
+            final int firstRow = topRow + firstRowTiles;
             
-            final int firstColumnY = Math.max(0, (clipBounds.x - leftColumnX) / tileWidth - 1);
-            clipLeftX = leftColumnX + firstColumnY * tileWidth;
-            firstColumn = leftColumn + firstColumnY;
+            final int firstColumnTiles = (clipBounds.x - leftColumnX) / tileWidth - 1;
+            this.clipLeftX = leftColumnX + firstColumnTiles * tileWidth;
+            final int firstColumn = leftColumn + firstColumnTiles;
             
-            final int lastRowY = (clipBounds.y + clipBounds.height - topRowY) / halfHeight;
-            lastRow = topRow + lastRowY;
+            final int lastRowTiles = (clipBounds.y + clipBounds.height - topRowY) / halfHeight;
+            final int lastRow = topRow + lastRowTiles;
             
-            final int lastColumnY = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
-            lastColumn = leftColumn + lastColumnY;
+            final int lastColumnTiles = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
+            final int lastColumn = leftColumn + lastColumnTiles;
+            
+            this.firstDirtyTile = new Map.Position(firstColumn, firstRow);
+            this.lastDirtyTile = new Map.Position(lastColumn, lastRow);
+            
+            final int subMapWidth = lastDirtyTile.getX() - firstDirtyTile.getX() + 1;
+            final int subMapHeight = lastDirtyTile.getY() - firstDirtyTile.getY() + 1;
+            
+            baseTiles = map.subMap(
+                    firstDirtyTile.getX(),
+                    firstDirtyTile.getY(),
+                    subMapWidth,
+                    subMapHeight);
+            
+            extendedTiles = map.subMap(
+                    firstDirtyTile.getX(),
+                    firstDirtyTile.getY() - 1,
+                    subMapWidth,
+                    subMapHeight + 1);
+            
+            superExtendedTiles = map.subMap(
+                    firstDirtyTile.getX() - 2,
+                    firstDirtyTile.getY() - 4,
+                    subMapWidth + 4,
+                    subMapHeight + 8);
+        }
+
+        public Map.Position getFirstDirtyTile() {
+            return firstDirtyTile;
+        }
+        
+        public Map.Position getLastDirtyTile() {
+            return lastDirtyTile;
+        }
+        
+        /**
+         * The tiles to be repainted for graphics that does not extend beyond the
+         * tile size.
+         */
+        public List<Tile> getBaseTiles() {
+            return baseTiles;
+        }
+        
+        /**
+         * The tiles to be repainted for graphics that might have double height
+         * compared to the tile size.
+         */
+        public List<Tile> getExtendedTiles() {
+            return extendedTiles;
+        }
+        
+        /**
+         * The tiles to be repainted for graphics that might extend far into other
+         * tiles in every direction (typically halos, like in revenge mode).
+         */
+        public List<Tile> getSuperExtendedTiles() {
+            return superExtendedTiles;
         }
     }
     
+    /**
+     * A callback for rendering a single tile.
+     */
     private interface TileRenderingCallback {
-        void render(Graphics2D tileG2d, Tile t);
+        
+        /**
+         * Should render a single tile.
+         * 
+         * @param tileG2d The {@code Graphics2D} that should be used when drawing
+         *      the tile. The coordinates for the {@code Graphics2D} will be
+         *      translated so that position (0, 0) is the upper left corner of
+         *      the tile image (that is, outside of the tile diamond itself).
+         * @param tile The {@code Tile} to be rendered. 
+         */
+        void render(Graphics2D tileG2d, Tile tile);
     }
     
-    private void forEachTile(Graphics2D g2d, List<Tile> tiles, TileRenderingCallback c) {
+    /**
+     * Paints a single tile using the provided callback.
+     * 
+     * @param g2d The {@code Graphics2D} that is used for rendering.
+     * @param tcb The bounds used for clipping the area to be rendered.
+     * @param tile The tile to be rendered.
+     * @param c A callback that should render the tile. The coordinates for the
+     *      {@code Graphics2D}, that's provided by the, callback will be
+     *      translated so that position (0, 0) is the upper left corner of the
+     *      tile image (that is, outside of the tile diamond itself).
+     */
+    private void paintSingleTile(Graphics2D g2d, TileClippingBounds tcb, Tile tile, TileRenderingCallback c) {
+        paintEachTile(g2d, tcb.getFirstDirtyTile(), List.of(tile), c);
+    }
+    
+    /**
+     * Paints all "dirty" tiles.
+     * 
+     * @param g2d The {@code Graphics2D} that is used for rendering.
+     * @param tcb The bounds used for clipping the area to be rendered.
+     * @param tile The tile to be rendered.
+     * @param c A callback that should render the tile. The coordinates for the
+     *      {@code Graphics2D}, that's provided by the, callback will be
+     *      translated so that position (0, 0) is the upper left corner of the
+     *      tile image (that is, outside of the tile diamond itself).
+     */
+    private void paintEachTile(Graphics2D g2d, TileClippingBounds tcb, TileRenderingCallback c) {
+        paintEachTile(g2d, tcb.getFirstDirtyTile(), tcb.getBaseTiles(), c);
+    }
+    
+    /**
+     * Paints all "dirty" tiles and includes
+     * {@link TileClippingBounds#getExtendedTiles() extra tiles} to be rendered.
+     * 
+     * This method should only be used if the rendered graphics can go beyond
+     * the tile size.
+     * 
+     * @param g2d The {@code Graphics2D} that is used for rendering.
+     * @param tcb The bounds used for clipping the area to be rendered.
+     * @param c A callback that should render the tile. The coordinates for the
+     *      {@code Graphics2D}, that's provided by the, callback will be
+     *      translated so that position (0, 0) is the upper left corner of the
+     *      tile image (that is, outside of the tile diamond itself).
+     */
+    private void paintEachTileWithExtendedImageSize(Graphics2D g2d, TileClippingBounds tcb, TileRenderingCallback c) {
+        paintEachTile(g2d, tcb.getFirstDirtyTile(), tcb.getExtendedTiles(), c);
+    }
+    
+    /**
+     * Paints all "dirty" tiles and includes
+     * {@link TileClippingBounds#getSuperExtendedTiles() many extra tiles} to be rendered.
+     * 
+     * This method should only be used if the rendered graphics can go way
+     * beyond the tile size.
+     * 
+     * @param g2d The {@code Graphics2D} that is used for rendering.
+     * @param tcb The bounds used for clipping the area to be rendered.
+     * @param c A callback that should render the tile. The coordinates for the
+     *      {@code Graphics2D}, that's provided by the, callback will be
+     *      translated so that position (0, 0) is the upper left corner of the
+     *      tile image (that is, outside of the tile diamond itself).
+     */
+    private void paintEachTileWithSuperExtendedImageSize(Graphics2D g2d, TileClippingBounds tcb, TileRenderingCallback c) {
+        paintEachTile(g2d, tcb.getFirstDirtyTile(), tcb.getSuperExtendedTiles(), c);
+    }
+    
+    private void paintEachTile(Graphics2D g2d, Map.Position firstTile, List<Tile> tiles, TileRenderingCallback c) {
         if (tiles.isEmpty()) {
             return;
         }
-        final Tile firstTile = tiles.get(0);
         
         final int x0 = firstTile.getX();
         final int y0 = firstTile.getY();
