@@ -235,43 +235,52 @@ public final class FreeColClient {
          * might cause some images to be loaded from base and other images
          * to be loaded from mods.
          */
-        ResourceManager.startPreloading();
-
-        /*
-         * All mods are loaded, so the GUI can safely be created.
-         */
-        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
-                : new SwingGUI(this, scale);
-        
-        // Swing system and look-and-feel initialization.
-        if (!FreeCol.getHeadless()) {
-            try {
-                gui.installLookAndFeel(fontName, scale);
-            } catch (Exception e) {
-                FreeCol.fatal(logger,
-                        Messages.message("client.laf") + "\n" + e.getMessage());
-            }
-        }
-        
-        // Initialize Sound (depends on client options)
-        this.soundController = new SoundController(this, sound);
-
-        /*
-         * Run later on the EDT so that we ensure pending GUI actions have
-         * completed.
-         */
-        SwingUtilities.invokeLater(() -> {
-            if (splashScreen != null) {
-                splashScreen.setVisible(false);
-                splashScreen.dispose();
-            }
-            // Start the GUI (headless-safe)
-            gui.startGUI(windowSize);
-    
-            // Update the actions with the running GUI, resources may have changed.
-            if (this.actionManager != null) updateActions();
+        ResourceManager.startPreloading(() -> {
+            /*
+             * We can allow the GUI to be constructed, and the intro movie
+             * to be displayed, while the preloading is running.
+             * 
+             * In that case we need to add that preloading gets aborted before
+             * ResourceManager.addMapping is called (which is now performed when
+             * loading a game). 
+             */
             
-            startFirstTaskInGui(userMsg, showOpeningVideo, savedGame, spec);
+            /*
+             * All mods are loaded, so the GUI can safely be created.
+             */
+            gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
+                    : new SwingGUI(this, scale);
+            
+            // Swing system and look-and-feel initialization.
+            if (!FreeCol.getHeadless()) {
+                try {
+                    gui.installLookAndFeel(fontName, scale);
+                } catch (Exception e) {
+                    FreeCol.fatal(logger,
+                            Messages.message("client.laf") + "\n" + e.getMessage());
+                }
+            }
+            
+            // Initialize Sound (depends on client options)
+            this.soundController = new SoundController(this, sound);
+    
+            /*
+             * Run later on the EDT so that we ensure pending GUI actions have
+             * completed.
+             */
+            SwingUtilities.invokeLater(() -> {
+                if (splashScreen != null) {
+                    splashScreen.setVisible(false);
+                    splashScreen.dispose();
+                }
+                // Start the GUI (headless-safe)
+                gui.startGUI(windowSize);
+        
+                // Update the actions with the running GUI, resources may have changed.
+                if (this.actionManager != null) updateActions();
+                
+                startFirstTaskInGui(userMsg, showOpeningVideo, savedGame, spec);
+            });
         });
     }
 

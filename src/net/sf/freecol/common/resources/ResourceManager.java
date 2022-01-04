@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
@@ -76,7 +78,7 @@ public class ResourceManager {
      * Synchronization protects preloadThread.  The thread is the only place
      * mergedContainer is written.
      */
-    public static synchronized void startPreloading() {
+    public static synchronized void startPreloading(Runnable afterPreloadHasCompleted) {
         if (FreeCol.getHeadless()) return; // Do not preload in headless mode
         if (preloadThread != null) return;
 
@@ -91,6 +93,9 @@ public class ResourceManager {
                     final int n = mergedContainer.preload(() -> !preloadDone);
                     logger.info("Preload done, " + n + " resources.");
                     preloadThread = null;
+                    SwingUtilities.invokeLater(() -> {
+                        afterPreloadHasCompleted.run();
+                    });
                 }
             };
         preloadThread.start();
