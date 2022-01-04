@@ -310,10 +310,10 @@ public class FreeColDataFile {
     }
     
     private void extendWithAdditionalSizesAndVariations(ImageResource imageResource, String value) {
-        Map<URI, List<URI>> alternativeSizes = findAlternativeSizes(value);
-        imageResource.addAlternativeResourceLocators(alternativeSizes.get(null));
+        Map<URI, List<URI>> variationsWithAlternateSizes = findVariationsWithAlternateSizes(value);
+        imageResource.addAlternativeResourceLocators(variationsWithAlternateSizes.get(null));
         
-        alternativeSizes.entrySet()
+        variationsWithAlternateSizes.entrySet()
             .stream()
             .filter(entry -> entry.getKey() != null)
             .forEach(entry -> {
@@ -325,7 +325,7 @@ public class FreeColDataFile {
             });
     }
 
-    private Map<URI, List<URI>> findAlternativeSizes(String name) {
+    private Map<URI, List<URI>> findVariationsWithAlternateSizes(String name) {
         if (name.indexOf(".") <= 0) {
             return Map.of();
         }
@@ -347,11 +347,11 @@ public class FreeColDataFile {
              * Using LinkedHashMap to ensure we keep the variations in order.
              */
             final Map<URI, List<URI>> result = new LinkedHashMap<>();
-            result.put(null, findFilesWithRegexBeforeSuffixAsUri(filePath, false));
+            result.put(null, findFilesWithVariationOrAlternativeSizeAsUri(filePath, false));
             
-            final List<Path> variations = findFilesWithRegexBeforeSuffix(filePath, true);
+            final List<Path> variations = findFilesWithVariationOrAlternativeSize(filePath, true);
             for (Path variationPath : variations) {
-                result.put(variationPath.toUri(), findFilesWithRegexBeforeSuffixAsUri(variationPath, false));
+                result.put(variationPath.toUri(), findFilesWithVariationOrAlternativeSizeAsUri(variationPath, false));
             }
             
             return result;
@@ -370,14 +370,14 @@ public class FreeColDataFile {
         }
     }
 
-    private List<URI> findFilesWithRegexBeforeSuffixAsUri(final Path filePath, boolean findVariation) throws IOException {
-        return findFilesWithRegexBeforeSuffix(filePath, findVariation)
+    private List<URI> findFilesWithVariationOrAlternativeSizeAsUri(final Path filePath, boolean findVariation) throws IOException {
+        return findFilesWithVariationOrAlternativeSize(filePath, findVariation)
                 .stream()
                 .map(p -> p.toUri())
                 .collect(Collectors.toList());
     }
     
-    private List<Path> findFilesWithRegexBeforeSuffix(final Path filePath, boolean findVariation) throws IOException {
+    private List<Path> findFilesWithVariationOrAlternativeSize(final Path filePath, boolean findVariation) throws IOException {
         final String variationFileRegex = "[0-9][0-9]?";
         final String sizeFileRegex = "\\.size[0-9][0-9]*";
         
@@ -390,12 +390,12 @@ public class FreeColDataFile {
         final String suffix = resourceFilename.substring(resourceFilename.lastIndexOf("."));
         final String completeRegex = Pattern.quote(prefix) + regex + Pattern.quote(suffix);
         
-        final List<Path> alternativeSizes = Files.list(filePath.getParent())
+        final List<Path> paths = Files.list(filePath.getParent())
                 .sorted()
-                .filter(p -> p.getFileName().toString().matches(completeRegex))
+                .filter(p -> p.getFileName().toString().matches(completeRegex) && (!findVariation || !p.equals(filePath)))
                 .collect(Collectors.toList());
         
-        return alternativeSizes;
+        return paths;
     }
 
     /**
