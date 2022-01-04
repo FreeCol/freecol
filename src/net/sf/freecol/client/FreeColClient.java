@@ -231,38 +231,37 @@ public final class FreeColClient {
         }
         
         /*
+         * All mods are loaded, so the GUI can safely be created.
+         */
+        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
+                : new SwingGUI(this, scale);
+        
+        // Swing system and look-and-feel initialization.
+        if (!FreeCol.getHeadless()) {
+            try {
+                gui.installLookAndFeel(fontName, scale);
+            } catch (Exception e) {
+                FreeCol.fatal(logger,
+                        Messages.message("client.laf") + "\n" + e.getMessage());
+            }
+        }
+        
+        // Initialize Sound (depends on client options)
+        this.soundController = new SoundController(this, sound);
+        
+        /*
          * Please do NOT move preloading before mods are loaded -- as that
          * might cause some images to be loaded from base and other images
          * to be loaded from mods.
          */
         ResourceManager.startPreloading(() -> {
             /*
-             * We can allow the GUI to be constructed, and the intro movie
-             * to be displayed, while the preloading is running.
+             * We can allow the GUI to be displayed while the preloading is running.
              * 
              * In that case we need to add that preloading gets aborted before
              * ResourceManager.addMapping is called (which is now performed when
              * loading a game). 
              */
-            
-            /*
-             * All mods are loaded, so the GUI can safely be created.
-             */
-            gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
-                    : new SwingGUI(this, scale);
-            
-            // Swing system and look-and-feel initialization.
-            if (!FreeCol.getHeadless()) {
-                try {
-                    gui.installLookAndFeel(fontName, scale);
-                } catch (Exception e) {
-                    FreeCol.fatal(logger,
-                            Messages.message("client.laf") + "\n" + e.getMessage());
-                }
-            }
-            
-            // Initialize Sound (depends on client options)
-            this.soundController = new SoundController(this, sound);
     
             /*
              * Run later on the EDT so that we ensure pending GUI actions have
