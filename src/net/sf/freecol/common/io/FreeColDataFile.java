@@ -355,10 +355,7 @@ public class FreeColDataFile {
             }
             
             return result;
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to read directory from jar/zip file: " + file + " jarDirectory" + jarDirectory, e);
-            return Map.of();
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             logger.log(Level.WARNING, "Failed to read directory from jar/zip file: " + file + " jarDirectory" + jarDirectory, e);
             return Map.of();
         } finally {

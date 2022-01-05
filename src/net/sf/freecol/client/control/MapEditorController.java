@@ -321,15 +321,12 @@ public final class MapEditorController extends FreeColClientHolder {
                 } catch (FileNotFoundException fnfe) {
                     gui.showErrorPanel(fnfe,
                         FreeCol.badFile("error.couldNotFind", theFile));
-                } catch (IOException ioe) {
+                } catch (IOException | FreeColException ioe) {
                     gui.showErrorPanel(ioe,
                         StringTemplate.key("server.initialize"));
                 } catch (XMLStreamException xse) {
                     gui.showErrorPanel(xse,
                         FreeCol.badFile("error.couldNotLoad", theFile));
-                } catch (FreeColException ex) {
-                    gui.showErrorPanel(ex,
-                        StringTemplate.key("server.initialize"));
                 }
             }
         }.start();
