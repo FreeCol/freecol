@@ -118,7 +118,7 @@ public class ClientOptions extends OptionGroup {
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
      *
-     * @see net.sf.freecol.client.gui.MapViewer
+     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT
         = "model.option.guiMinNumberToDisplayGoodsCount";
@@ -127,7 +127,7 @@ public class ClientOptions extends OptionGroup {
      * Used by GUI, this is the most repetitions drawn of a goods image for a
      * single goods grouping.
      *
-     * @see net.sf.freecol.client.gui.MapViewer
+     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
      */
     public static final String MAX_NUMBER_OF_GOODS_IMAGES
         = "model.option.guiMaxNumberOfGoodsImages";
@@ -292,7 +292,7 @@ public class ClientOptions extends OptionGroup {
      * Used by GUI, this defines the grouping of ModelMessages.
      * Possible values include nothing, type and source.
      *
-     * @see net.sf.freecol.client.gui.MapViewer
+     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
      * @see net.sf.freecol.common.model.ModelMessage
      */
     public static final String MESSAGES_GROUP_BY

@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.common.debug.FreeColDebugger;
 
 public class CanvasMapViewer extends JComponent {

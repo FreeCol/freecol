@@ -59,6 +59,8 @@ import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
+import net.sf.freecol.client.gui.mapviewer.MapViewer;
+import net.sf.freecol.client.gui.mapviewer.TileViewer;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
@@ -213,7 +215,7 @@ public class SwingGUI extends GUI {
         // sufficiently well that if one is good the rest will be)
         final List<Tile> tiles = a.getTiles();
         for (Tile t : tiles) {
-            if (!this.mapViewer.onScreen(t)) {
+            if (!this.mapViewer.getMapViewerBounds().onScreen(t)) {
                 this.mapViewer.changeFocus(t);
                 break;
             }
@@ -234,10 +236,10 @@ public class SwingGUI extends GUI {
         // update the animation with the locations for the label for each
         // of the animation's tiles
         final Unit unit = a.getUnit();
-        boolean newLabel = !this.mapViewer.isOutForAnimation(unit);
-        JLabel unitLabel = this.mapViewer.enterUnitOutForAnimation(unit);
+        boolean newLabel = !this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit);
+        JLabel unitLabel = this.mapViewer.getMapViewerState().getUnitAnimator().enterUnitOutForAnimation(unit);
         List<Point> points = transform(tiles, alwaysTrue(),
-            (t) -> this.mapViewer.getAnimationPosition(unitLabel, t));
+            (t) -> this.mapViewer.getMapViewerState().getUnitAnimator().getAnimationPosition(unitLabel, t));
         a.setPoints(points);
         unitLabel.setLocation(points.get(0)); // set location before adding
         if (newLabel) this.canvas.animationLabel(unitLabel, true);
@@ -255,9 +257,9 @@ public class SwingGUI extends GUI {
             a.executeWithLabel(unitLabel, painter);
             
         } finally { // Make sure we release the label again
-            this.mapViewer.releaseUnitOutForAnimation(unit);
+            this.mapViewer.getMapViewerState().getUnitAnimator().releaseUnitOutForAnimation(unit);
             
-            if (!this.mapViewer.isOutForAnimation(unit)) {
+            if (!this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit)) {
                 this.canvas.animationLabel(unitLabel, false);
             }
         }
@@ -280,12 +282,12 @@ public class SwingGUI extends GUI {
         if (center && first != getFocus()) {
             this.mapViewer.changeFocus(first);
         }
-           
+
         invokeNowOrWait(() -> {
                 for (Animation a : animations) animate(a);
             });
     }
-
+    
     /**
      * Gets the point at which the map was clicked for a drag.
      *
@@ -333,7 +335,7 @@ public class SwingGUI extends GUI {
     private boolean changeViewMode(ViewMode newViewMode) {
         ViewMode oldViewMode = getViewMode();
         if (newViewMode == oldViewMode) return false;
-        this.mapViewer.setViewMode(newViewMode);
+        this.mapViewer.getMapViewerState().setViewMode(newViewMode);
         return true;
     }
 
@@ -349,7 +351,7 @@ public class SwingGUI extends GUI {
         final Unit oldUnit = getActiveUnit();
         if (newUnit == oldUnit) return false;
         
-        this.mapViewer.setActiveUnit(newUnit);
+        this.mapViewer.getMapViewerState().setActiveUnit(newUnit);
         clearGotoPath();
         return true;
     }
@@ -373,10 +375,10 @@ public class SwingGUI extends GUI {
         refocus = newTile != null
             && newTile != oldFocus
             && (oldFocus == null || refocus
-                || !this.mapViewer.onScreen(newTile));
+                || !this.mapViewer.getMapViewerBounds().onScreen(newTile));
         if (refocus) setFocus(newTile);
         if (newTile == oldTile) return false;
-        this.mapViewer.setSelectedTile(newTile);
+        this.mapViewer.getMapViewerState().setSelectedTile(newTile);
         if (oldTile != null) refreshTile(oldTile);
         if (newTile != null) refreshTile(newTile);
         return true;
@@ -388,14 +390,12 @@ public class SwingGUI extends GUI {
      * @param update Update the map controls if true.
      */
     private void changeDone(boolean update) {
-        if (getViewMode() == ViewMode.MOVE_UNITS
-            && getActiveUnit() != null) {
-            this.mapViewer.startCursorBlinking();
-        } else {
-            this.mapViewer.stopCursorBlinking();
-        }
+        final boolean cursorShouldBlink = getViewMode() == ViewMode.MOVE_UNITS && getActiveUnit() != null;
+        mapViewer.getMapViewerState().setCursorBlinking(cursorShouldBlink);
             
-        if (update) updateMapControls();
+        if (update) {
+            updateMapControls();
+        }
         updateMenuBar();
     }
 
@@ -420,7 +420,7 @@ public class SwingGUI extends GUI {
      */
     private PopupPosition getPopupPosition(Tile tile) {
         if (tile == null) return PopupPosition.CENTERED;
-        int where = this.mapViewer.setOffsetFocus(tile);
+        int where = this.mapViewer.getMapViewerBounds().setOffsetFocus(tile);
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
@@ -463,7 +463,7 @@ public class SwingGUI extends GUI {
      * @return The old goto path if any.
      */
     private PathNode stopGoto() {
-        PathNode ret = (this.gotoStarted) ? this.mapViewer.getGotoPath() : null;
+        PathNode ret = (this.gotoStarted) ? this.mapViewer.getMapViewerState().getGotoPath() : null;
         this.gotoStarted = false;
         this.canvas.setCursor(null);
         this.mapViewer.changeGotoPath(null);
@@ -481,7 +481,7 @@ public class SwingGUI extends GUI {
             clearGotoPath();
         } else if (isGotoStarted()) {
             // Do nothing if the tile has not changed.
-            PathNode oldPath = this.mapViewer.getGotoPath();
+            PathNode oldPath = this.mapViewer.getMapViewerState().getGotoPath();
             Tile lastTile = (oldPath == null) ? null
                 : oldPath.getLastNode().getTile();
             if (lastTile == tile) return;
@@ -728,7 +728,7 @@ public class SwingGUI extends GUI {
         // No longer doing anything special for pmoffscreen et al as
         // changing these in-game does not change the now initialized
         // graphics pipeline.
-        this.mapViewer.startCursorBlinking();
+        this.mapViewer.getMapViewerState().setCursorBlinking(true);
         logger.info("GUI started.");
     }
     
@@ -943,7 +943,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void setUnitPath(PathNode path) {
-        this.mapViewer.setUnitPath(path);
+        this.mapViewer.getMapViewerState().setUnitPath(path);
     }
 
     /**
@@ -1100,7 +1100,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean scrollMap(Direction direction) {
-        boolean ret = this.mapViewer.scrollMap(direction);
+        boolean ret = this.mapViewer.getMapViewerBounds().scrollMap(direction);
         refresh();
         return ret;
     }
@@ -1149,7 +1149,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public ViewMode getViewMode() {
-        return this.mapViewer.getViewMode();
+        return this.mapViewer.getMapViewerState().getViewMode();
     }
 
     /**
@@ -1157,7 +1157,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Unit getActiveUnit() {
-        return this.mapViewer.getActiveUnit();
+        return this.mapViewer.getMapViewerState().getActiveUnit();
     }
 
     /**
@@ -1165,7 +1165,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Tile getSelectedTile() {
-        return this.mapViewer.getSelectedTile();
+        return this.mapViewer.getMapViewerState().getSelectedTile();
     }
 
     /**
@@ -1292,7 +1292,7 @@ public class SwingGUI extends GUI {
                 showIndianSettlementPanel((IndianSettlement)settlement);
             }
             changeView(tile);
-        } else if ((other = this.mapViewer.findUnitInFront(tile)) != null) {
+        } else if ((other = this.mapViewer.getMapViewerState().findUnitInFront(tile)) != null) {
             if (getMyPlayer().owns(other)) {
                 // If there is one of the player units present, select it,
                 // unless we are on the same tile as the active unit,
@@ -1357,8 +1357,7 @@ public class SwingGUI extends GUI {
     @Override
     public void displayChat(String sender, String message, Color color,
                             boolean privateChat) {
-        this.mapViewer.displayChat(new GUIMessage(sender + ": " + message,
-                                                  color));
+        this.mapViewer.getMapViewerState().displayChat(new GUIMessage(sender + ": " + message, color));
         refresh();
     }
 
@@ -1480,7 +1479,7 @@ public class SwingGUI extends GUI {
         if (tile == null || !tile.isExplored()) return;
         TilePopup tp = new TilePopup(getFreeColClient(), tile);
         if (tp.hasItem()) {
-            Point point = this.mapViewer.calculateTilePosition(tile, true);
+            Point point = this.mapViewer.getMapViewerBounds().calculateTilePosition(tile, true);
             tp.show(this.canvas, point.x, point.y);
             tp.repaint();
         }

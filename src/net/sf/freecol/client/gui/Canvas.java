@@ -61,6 +61,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
@@ -879,7 +880,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void dialogAdd(FreeColDialog<?> fcd) {
         if (fcd.isModal()) {
-            this.mapViewer.stopCursorBlinking();
+            this.mapViewer.getMapViewerState().setCursorBlinking(false);
         }
         dialogs.add(fcd);
     }
@@ -892,7 +893,7 @@ public final class Canvas extends JDesktopPane {
     public void dialogRemove(FreeColDialog<?> fcd) {
         dialogs.remove(fcd);
         if (fcd.isModal() && none(dialogs, FreeColDialog::isModal)) {
-            this.mapViewer.startCursorBlinking();
+            this.mapViewer.getMapViewerState().setCursorBlinking(true);
         }
         if (nothingShowing()) updateMenuBar();
     }
