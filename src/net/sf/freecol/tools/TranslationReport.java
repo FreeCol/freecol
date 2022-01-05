@@ -20,13 +20,11 @@
 package net.sf.freecol.tools;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FilenameFilter;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TreeSet;
 
@@ -91,9 +89,9 @@ public class TranslationReport {
             ArrayList<String> missingKeys      = new ArrayList<>();
             ArrayList<String> missingVariables = new ArrayList<>();
             ArrayList<String> copiedFromMaster = new ArrayList<>();
-            
-            for (Enumeration<Object> keys = master.keys() ; keys.hasMoreElements()  ;)  {
-                String key = (String) keys.nextElement();
+
+            for (Object o : master.keySet()) {
+                String key = (String)o;
                 String value = properties.getProperty(key, null);
                 if (value == null) {
                     missingKeys.add(key);
@@ -101,33 +99,17 @@ public class TranslationReport {
                     String masterValue = master.getProperty(key);
                     int lastIndex = 0;
                     boolean inVariable = false;
-                    
-                    if (value.equalsIgnoreCase(masterValue)){
+
+                    if (value.equalsIgnoreCase(masterValue)) {
                         // ignore some values which are most probably copies in many languages
                         if (!key.contains("newColonyName")
                                 && !(key.contains("foundingFather") && key.contains(".birthAndDeath"))
-                                && !(key.contains("foundingFather") && key.contains(".name")) ){
+                                && !(key.contains("foundingFather") && key.contains(".name"))) {
                             copiedFromMaster.add(key);
                         }
                     }
 
-                    for (int index = 0; index < masterValue.length() - 1; index++) {
-                        char current = masterValue.charAt(index);
-                        if (current == '%') {
-                            if (inVariable) {
-                                String var = masterValue.substring(lastIndex, index + 1);
-                                if (!value.contains(var)) {
-                                    missingVariables.add(key);
-                                }
-                                inVariable = false;
-                            } else {
-                                lastIndex = index;
-                                inVariable = true;
-                            }
-                        } else if (!Character.isLetterOrDigit(current)) {
-                            inVariable = false;
-                        }
-                    }
+                    isInVariable(missingVariables, key, value, masterValue, lastIndex, inVariable);
                 }
             }
             
@@ -168,8 +150,8 @@ public class TranslationReport {
 
             ArrayList<String> superfluousKeys = new ArrayList<>();
             ArrayList<String> superfluousVariables = new ArrayList<>();
-            for (Enumeration<Object> keys = properties.keys() ; keys.hasMoreElements()  ;)  {
-                String key = (String) keys.nextElement();
+            for (Object o : properties.keySet()) {
+                String key = (String)o;
                 String value = master.getProperty(key, null);
                 if (value == null) {
                     superfluousKeys.add(key);
@@ -178,23 +160,7 @@ public class TranslationReport {
                     int lastIndex = 0;
                     boolean inVariable = false;
 
-                    for (int index = 0; index < propertiesValue.length() - 1; index++) {
-                        char current = propertiesValue.charAt(index);
-                        if (current == '%') {
-                            if (inVariable) {
-                                String var = propertiesValue.substring(lastIndex, index + 1);
-                                if (!value.contains(var)) {
-                                    superfluousVariables.add(key);
-                                }
-                                inVariable = false;
-                            } else {
-                                lastIndex = index;
-                                inVariable = true;
-                            }
-                        } else if (!Character.isLetterOrDigit(current)) {
-                            inVariable = false;
-                        }
-                    }
+                    isInVariable(superfluousVariables, key, value, propertiesValue, lastIndex, inVariable);
                 }
             }
 
@@ -253,6 +219,44 @@ public class TranslationReport {
         }
     }
 
+
+    /**
+     * Sets inVariable as needed
+     *
+     * @param superfluousVariables
+     * @param key
+     * @param value
+     * @param propertiesValue
+     * @param lastIndex
+     * @param inVariable
+     */
+    private static void isInVariable(ArrayList<String> superfluousVariables, String key, String value, String propertiesValue, int lastIndex, boolean inVariable) {
+        for (int index = 0; index < propertiesValue.length() - 1; index++) {
+            char current = propertiesValue.charAt(index);
+            if (current == '%') {
+                if (inVariable) {
+                    String var = propertiesValue.substring(lastIndex, index + 1);
+                    if (!value.contains(var)) {
+                        superfluousVariables.add(key);
+                    }
+                    inVariable = false;
+                } else {
+                    lastIndex = index;
+                    inVariable = true;
+                }
+            } else if (!Character.isLetterOrDigit(current)) {
+                inVariable = false;
+            }
+        }
+    }
+
+
+    /**
+     * Produces a shorter name.
+     *
+     * @param localFile
+     * @return
+     */
     private static StringBuilder shortenName(String localFile) {
         StringBuilder out = new StringBuilder(5);
         String temp = localFile.substring(16, localFile.indexOf('.'));
@@ -262,6 +266,13 @@ public class TranslationReport {
         return out;
     }
 
+
+    /**
+     * Adds space after a number.
+     *
+     * @param number
+     * @return
+     */
     private static StringBuilder prettyPrint(int number) {
         StringBuilder output = new StringBuilder(4);
         if (number < 10) output.append(' ');
@@ -271,6 +282,11 @@ public class TranslationReport {
         return output;
     }
 
+
+    /**
+     * @param missingKeys
+     * @return
+     */
     private static TreeSet<String> sort(ArrayList<String> missingKeys) {
         TreeSet<String> sorted = new TreeSet<>();
         sorted.addAll(missingKeys);
