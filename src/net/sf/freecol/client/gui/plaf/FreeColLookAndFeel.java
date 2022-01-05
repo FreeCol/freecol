@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.plaf;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Image;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -233,9 +234,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
      */
     public static void installFont(Font defaultFont) {
         UIDefaults u = UIManager.getDefaults();
-        java.util.Enumeration<Object> keys = u.keys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
+        for (Object key : u.keySet()) {
             if (u.get(key) instanceof javax.swing.plaf.FontUIResource) {
                 u.put(key, defaultFont);
             }
