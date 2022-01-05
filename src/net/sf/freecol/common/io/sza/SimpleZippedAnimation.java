@@ -207,13 +207,13 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         // ZipFile for reading (as we should support an arbitrary stream).
         final Map<String, BufferedImage> loadingImages = new HashMap<>();
         final List<String> loadingDescriptor = new ArrayList<>();
-        try {
+        try (zipStream) {
             BufferedReader in;
             ZipEntry ze;
             while ((ze = zipStream.getNextEntry()) != null) {
                 if (ANIMATION_DESCRIPTOR_FILE.equals(ze.getName())) {
                     in = new BufferedReader(new InputStreamReader(zipStream,
-                            StandardCharsets.UTF_8));
+                                                                  StandardCharsets.UTF_8));
                     String line;
                     while ((line = in.readLine()) != null) {
                         loadingDescriptor.add(line);
@@ -223,8 +223,6 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
                 }
                 zipStream.closeEntry();
             }
-        } finally {
-            try { zipStream.close(); } catch (IOException e) {}
         }
         
         if (loadingDescriptor.isEmpty()) {
