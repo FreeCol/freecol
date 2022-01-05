@@ -92,9 +92,8 @@ public class CanvasMapViewer extends JComponent {
             if (fullMapRenderedWithoutUsingBackBuffer) {
                 lastFullMapRenderTimeInMillis = renderTime;
                 fullMapRenderNumber++;
-                averageFullMapRenderTimeInMillis = averageFullMapRenderTimeInMillis
-                        - averageFullMapRenderTimeInMillis / fullMapRenderNumber
-                        + renderTime / fullMapRenderNumber; 
+                averageFullMapRenderTimeInMillis = (averageFullMapRenderTimeInMillis * (fullMapRenderNumber - 1)
+                        + renderTime) / fullMapRenderNumber;
             }
 
             final int art = (int) averageFullMapRenderTimeInMillis;
