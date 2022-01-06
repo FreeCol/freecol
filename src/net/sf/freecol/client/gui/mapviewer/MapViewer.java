@@ -309,7 +309,7 @@ public final class MapViewer extends FreeColClientHolder {
         
         boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(size, mapViewerBounds.getFocus());
         final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();
-        if (dirtyClipBounds != null && clipBounds.equals(dirtyClipBounds)) {
+        if (rpm.isAllDirty()) {
             fullMapRenderedWithoutUsingBackBuffer = true;
         }
         

@@ -67,6 +67,15 @@ public class MapViewerRepaintManager {
         return dirtyRegion;
     }
     
+    boolean isAllDirty() {
+        return backBufferImage == null
+                || dirtyRegion != null
+                && dirtyRegion.x == 0
+                && dirtyRegion.y == 0
+                && dirtyRegion.width == backBufferImage.getWidth()
+                && dirtyRegion.height == backBufferImage.getHeight();
+    }
+    
     /**
      * Marks the given area as dirty for all layers.
      * @param bounds The bounds that should be marked dirty.
