@@ -26,7 +26,7 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 
-/*
+/**
  * Calculates what part of the {@link Map} is visible on screen. This includes handling
  * the size, scaling and focus of the map.
  * 

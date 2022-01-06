@@ -230,7 +230,7 @@ public final class Canvas extends JDesktopPane {
          *       define timing for every terrain animation.
          */
         animationTimer = new Timer(125, (event) -> {
-            paintAnimationImmediately();
+            paintJustTheMapImmediately();
         });
         this.animationTimer.start();
         
@@ -1337,7 +1337,7 @@ public final class Canvas extends JDesktopPane {
 
 
     // Override JComponent
-    public void paintAnimationImmediately() {
+    public void paintJustTheMapImmediately() {
         if (this.freeColClient == null
                 || this.freeColClient.getGame() == null
                 || this.freeColClient.getGame().getMap() == null) {
@@ -1352,19 +1352,14 @@ public final class Canvas extends JDesktopPane {
         final Graphics2D g2d = (Graphics2D) getGraphics();
         final Dimension size = getSize();
         g2d.setClip(0, 0, size.width, size.height);
-        this.mapViewer.displayMapAnimationFrame(g2d, size);
+        this.mapViewer.displayMap(g2d, size);
         g2d.dispose();
         
          * ...but then we also need to call the methods in this component,
          * for example paintChildren.
          */
         
-        /*
-         * Support for partial rendering with BufferedImage as backbuffer
-         * when using passive rendering:
-         */
-        canvasMapViewer.setPartialPaint(true);
-        paintImmediately(0, 0, getWidth(), getHeight());
+        canvasMapViewer.paintImmediately();
     }
     
     /**

@@ -24,8 +24,6 @@ public class CanvasMapViewer extends JComponent {
 
     private final FreeColClient freeColClient;
     private final MapViewer mapViewer;
-    private boolean partialPaint = false;
-    private boolean dirty = false;
     
     private double averageFullMapRenderTimeInMillis = 0;
     private long fullMapRenderNumber = 0;
@@ -47,19 +45,14 @@ public class CanvasMapViewer extends JComponent {
     public void changeSize(Dimension size) {
         setSize(size);
         mapViewer.changeSize(size);
-        this.dirty = true;
     }
     
-    protected void paintAnimationImmediately() {
+    protected void paintImmediately() {
         if (!isMapAvailable()) {
             return;
         }
         
-        final Graphics2D g2d = (Graphics2D) getGraphics();
-        final Dimension size = getSize();
-        g2d.setClip(0, 0, size.width, size.height);
-        this.mapViewer.displayMapAnimationFrame(g2d, size);
-        g2d.dispose();
+        paintImmediately(0, 0, getWidth(), getHeight());
     }
     
     @Override
@@ -73,14 +66,7 @@ public class CanvasMapViewer extends JComponent {
         boolean fullMapRenderedWithoutUsingBackBuffer = false;
         
         if (isMapAvailable()) {
-            if (partialPaint && !dirty) {
-                this.mapViewer.displayMapAnimationFrame(g2d, size);
-            } else {
-                fullMapRenderedWithoutUsingBackBuffer = this.mapViewer.displayMap(g2d, size);
-            }
-            
-            partialPaint = false;
-            dirty = false;
+            fullMapRenderedWithoutUsingBackBuffer = this.mapViewer.displayMap(g2d, size);
         } else if (this.freeColClient.isMapEditor()) {
             paintBlackBackground(g2d, size);
         } else { /* main menu */
@@ -88,23 +74,9 @@ public class CanvasMapViewer extends JComponent {
         }
         
         if (FreeColDebugger.isInDebugMode()) {
-            g.setColor(Color.white);
-            final long renderTime = System.currentTimeMillis() - startTime;
-            if (fullMapRenderedWithoutUsingBackBuffer) {
-                lastFullMapRenderTimeInMillis = renderTime;
-                fullMapRenderNumber++;
-                averageFullMapRenderTimeInMillis = (averageFullMapRenderTimeInMillis * (fullMapRenderNumber - 1)
-                        + renderTime) / fullMapRenderNumber;
-            }
-
-            final int art = (int) averageFullMapRenderTimeInMillis;
-            g.drawString("Full map (average): " + art + "ms ==> " + (1000 / (art+1)) + "fps", 50, 50);
-            g.drawString("Full map (last): " +lastFullMapRenderTimeInMillis + "ms ==> " + (1000 / (lastFullMapRenderTimeInMillis+1)) + "fps", 50, 70);
-            g.drawString("Last render: " + renderTime + "ms ==> " + (1000 / (renderTime+1)) + "fps", 50, 90);
+            drawRenderingTimeStrings(g, startTime, fullMapRenderedWithoutUsingBackBuffer);
         }
-        
     }
-
 
     private boolean isMapAvailable() {
         return this.freeColClient != null
@@ -147,8 +119,19 @@ public class CanvasMapViewer extends JComponent {
         g2d.fillRect(0, 0, size.width, size.height);
     }
 
+    private void drawRenderingTimeStrings(Graphics g, final long startTime, boolean fullMapRenderedWithoutUsingBackBuffer) {
+        g.setColor(Color.white);
+        final long renderTime = System.currentTimeMillis() - startTime;
+        if (fullMapRenderedWithoutUsingBackBuffer) {
+            lastFullMapRenderTimeInMillis = renderTime;
+            fullMapRenderNumber++;
+            averageFullMapRenderTimeInMillis = (averageFullMapRenderTimeInMillis * (fullMapRenderNumber - 1)
+                    + renderTime) / fullMapRenderNumber;
+        }
 
-    public void setPartialPaint(boolean partialPaint) {
-        this.partialPaint = partialPaint;
+        final int art = (int) averageFullMapRenderTimeInMillis;
+        g.drawString("Full map (average): " + art + "ms ==> " + (1000 / (art+1)) + "fps", 50, 50);
+        g.drawString("Full map (last): " +lastFullMapRenderTimeInMillis + "ms ==> " + (1000 / (lastFullMapRenderTimeInMillis+1)) + "fps", 50, 70);
+        g.drawString("Last render: " + renderTime + "ms ==> " + (1000 / (renderTime+1)) + "fps", 50, 90);
     }
 }

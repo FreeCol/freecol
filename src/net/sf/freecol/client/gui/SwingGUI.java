@@ -249,6 +249,7 @@ public class SwingGUI extends GUI {
         final Rectangle aBounds = bounds;
         final Animations.Procedure painter = new Animations.Procedure() {
                 public void execute() {
+                    mapViewer.getMapViewerRepaintManager().markAsDirty(aBounds);
                     can.paintImmediately(aBounds);
                 }
             };
@@ -512,7 +513,9 @@ public class SwingGUI extends GUI {
      */
     private void refreshTile(Tile tile) {
         if (tile != null) {
-            this.canvas.repaint(this.mapViewer.calculateTileBounds(tile));
+            final Rectangle tileBounds = this.mapViewer.calculateTileBounds(tile);
+            mapViewer.getMapViewerRepaintManager().markAsDirty(tileBounds);
+            this.canvas.repaint(tileBounds);
         }
     }
 
@@ -1422,6 +1425,7 @@ public class SwingGUI extends GUI {
     @Override
     public void refresh() {
         this.mapViewer.forceReposition();
+        this.mapViewer.getMapViewerRepaintManager().markAsDirty();
         this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 

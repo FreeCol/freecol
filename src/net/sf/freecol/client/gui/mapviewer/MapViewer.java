@@ -33,7 +33,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
-import java.awt.Transparency;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
@@ -57,6 +56,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapViewer;
 import net.sf.freecol.client.gui.ChatDisplay;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -73,21 +73,19 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
  * MapViewer is a private helper class of Canvas and SwingGUI.
  * 
- * This class is used by {@link CanvasMapViewer} for drawing the map on the {@link Canvas} using
- * either:
+ * This class is used by {@link CanvasMapViewer} for drawing the map on the {@link Canvas}.
  * 
- * 1. {@link #displayMap(Graphics2D, Dimension)} for repainting all layers.
- * 2. {@link #displayMapAnimationFrame(Graphics2D, Dimension)} when just repainting
- *    animated parts.
+ * The method {@link #displayMap(Graphics2D, Dimension)} renders the entire map, or just parts
+ * of it depending on clip bounds and the dirty state controlled by
+ * {@link MapViewerRepaintManager}.
  *    
  * Unit animations are still handled {@link UnitAnimator separately}, but will probably be moved
- * into {@code displayMapAnimationFrame} in the future.
+ * into {@code displayMap} in the future.
  * 
  * @see MapViewerBounds
  */
@@ -125,6 +123,11 @@ public final class MapViewer extends FreeColClientHolder {
     private final TileViewer tv;
     
     /**
+     * Holds buffers and determines the dirty state when drawing.
+     */
+    private MapViewerRepaintManager rpm;
+    
+    /**
      * Utility functions that considers the current map size and scale. 
      */
     private MapViewerScaledUtils mapViewerScaledUtils;
@@ -133,15 +136,6 @@ public final class MapViewer extends FreeColClientHolder {
      * Scaled image library to use only for map operations.
      */
     private final ImageLibrary lib;
-    
-    
-    /*
-     * The following variables should eventually be placed in their own classes:
-     */
-    
-    private boolean backBufferIsDirty = false;
-    private VolatileImage backBufferImage = null;
-    private BufferedImage nonAnimationBufferImage = null;
     
 
     /**
@@ -163,6 +157,7 @@ public final class MapViewer extends FreeColClientHolder {
         final UnitAnimator unitAnimator = new UnitAnimator(freeColClient, this, lib);
         this.mapViewerState = new MapViewerState(chatDisplay, unitAnimator, al);
         this.mapViewerScaledUtils = new MapViewerScaledUtils();
+        rpm = new MapViewerRepaintManager();
 
         updateScaledVariables();
     }
@@ -248,7 +243,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.tv.updateScaledVariables();
         updateScaledVariables();
         forceReposition();
-        backBufferIsDirty = true;
+        rpm.markAsDirty();
     }
     
     /**
@@ -270,7 +265,7 @@ public final class MapViewer extends FreeColClientHolder {
     public void changeSize(Dimension size) {
         this.tileBounds = new TileBounds(this.lib.getTileSize(), this.lib.getScaleFactor());
         mapViewerBounds.changeSize(size, this.tileBounds);
-        backBufferIsDirty = true;
+        rpm.markAsDirty();
     }
 
     /**
@@ -290,74 +285,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void forceReposition() {
         mapViewerBounds.forceReposition();
-        backBufferIsDirty = true;
-    }
-
-    /**
-     * Displays the next animation frame of the map. Please note that
-     * {@link #displayMap(Graphics2D, Dimension)} should be
-     * called instead if there are changes on the {@link net.sf.freecol.common.model.Map}.
-     *
-     * @param g2d The {@code Graphics2D} object on which to draw the Map.
-     */
-    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
-                        justification="lazy load of extra tiles")
-    public void displayMapAnimationFrame(Graphics2D g2d, Dimension size) {
-    	final long start = now();
-    	
-        if (requiresFullDisplayMap(size)) {
-            displayMap(g2d, size);
-            return;
-        }
-        
-        final Rectangle clipBounds = g2d.getClipBounds();
-        final TileClippingBounds tcb = new TileClippingBounds(getMap(), clipBounds);
-        
-        final Graphics2D backBufferG2d = backBufferImage.createGraphics();
-        backBufferG2d.setClip(clipBounds);
-        final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
-        
-        // Clear background
-        paintBlackBackground(backBufferG2d, clipBounds);
-
-        backBufferG2d.translate(tcb.clipLeftX, tcb.clipTopY);
-        
-        final long initDone = now();
-        paintEachTile(backBufferG2d, tcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
-        final long animatedDone = now();
-        
-        backBufferG2d.translate(-tcb.clipLeftX, -tcb.clipTopY);
-        backBufferG2d.setTransform(backBufferOriginTransform);
-        backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
-        
-        final long nonAnimatedDone = now();
-        g2d.drawImage(backBufferImage, 0, 0, null);
-        final long end = now();
-        
-        /*
-         * Activate this explicitly when needed: It logs several times every second.
-         */
-        boolean DEBUG_MAP_ANIMATION_FRAME = false;
-        if (DEBUG_MAP_ANIMATION_FRAME && logger.isLoggable(Level.FINEST)) {
-            final long gap = end - start;
-            final StringBuilder sb = new StringBuilder(128);
-            sb.append("displayMapAnimationFrame time = ").append(gap)
-                .append(" init=").append(initDone - start)
-                .append(" animated=").append(animatedDone - initDone)
-                .append(" nonAnimationBufferImage=").append(nonAnimatedDone - animatedDone)
-                .append(" backBufferImage=").append(end - nonAnimatedDone)
-                ;
-            logger.finest(sb.toString());
-        }
-    }
-
-    private boolean requiresFullDisplayMap(Dimension size) {
-        return mapViewerBounds.getFocus() == null
-                || backBufferImage == null
-                || mapViewerBounds.isRepositionNeeded()
-                || backBufferIsDirty
-                || backBufferImage.getWidth() != size.width
-                || backBufferImage.getHeight() != size.height;
+        rpm.markAsDirty();
     }
     
     /**
@@ -370,88 +298,74 @@ public final class MapViewer extends FreeColClientHolder {
                         justification="lazy load of extra tiles")
     public boolean displayMap(Graphics2D g2d, Dimension size) {
         final long t0 = now();
-        boolean fullMapRenderedWithoutUsingBackBuffer = false;
+        final Rectangle clipBounds = g2d.getClipBounds();
         
-        Rectangle clipBounds = g2d.getClipBounds();
-        
-        if (mapViewerBounds.getFocus() == null ) {
+        if (mapViewerBounds.getFocus() == null) {
             paintBlackBackground(g2d, clipBounds);
             return false;
         }
 
         if (mapViewerBounds.isRepositionNeeded()) {
             mapViewerBounds.positionMap();
+            rpm.markAsDirty();
         }
-
-        if (backBufferIsDirty) {
-            clipBounds = new Rectangle(0, 0, size.width, size.height);
-            g2d.setClip(clipBounds);
+        
+        boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(size);
+        final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();
+        if (dirtyClipBounds != null && clipBounds.equals(dirtyClipBounds)) {
             fullMapRenderedWithoutUsingBackBuffer = true;
         }
         
-        if (clipBounds.width == size.width && clipBounds.height == size.height) {
-            fullMapRenderedWithoutUsingBackBuffer = true;
-        }
-        
-        backBufferIsDirty = false;
-                
-        if (backBufferImage == null
-                || backBufferImage.getWidth() != size.width
-                || backBufferImage.getHeight() != size.height) {
-            
-            /*
-             * We don't really need the backBufferImage now as we have double buffering from
-             * Swing. It's required, however, if we later want to use active rendering.
-             */
-            backBufferImage = Utils.getGoodGraphicsDevice()
-                    .getDefaultConfiguration()
-                    .createCompatibleVolatileImage(size.width, size.height, Transparency.OPAQUE);
-            nonAnimationBufferImage = Utils.getGoodGraphicsDevice()
-                    .getDefaultConfiguration()
-                    .createCompatibleImage(size.width, size.height, Transparency.TRANSLUCENT);
-            clipBounds = new Rectangle(0, 0, size.width, size.height);
-            g2d.setClip(clipBounds);
-            fullMapRenderedWithoutUsingBackBuffer = true;
-        }
+        final VolatileImage backBufferImage = rpm.getBackBufferImage();
+        final BufferedImage nonAnimationBufferImage = rpm.getNonAnimationBufferImage();
         
         final Graphics2D backBufferG2d = backBufferImage.createGraphics();
-        backBufferG2d.setClip(clipBounds);
         final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
 
         final Map map = getMap();
-        final TileClippingBounds tcb = new TileClippingBounds(map, clipBounds);
 
-        paintBlackBackground(backBufferG2d, clipBounds);
+        final Rectangle allRenderingClipBounds;
+        if (dirtyClipBounds != null) {
+            allRenderingClipBounds = clipBounds.union(dirtyClipBounds);
+        } else {
+            allRenderingClipBounds = clipBounds;
+        }
+        paintBlackBackground(backBufferG2d, allRenderingClipBounds);
         
         // Display the animated base tiles:
+        final TileClippingBounds animatedBaseTileTcb = new TileClippingBounds(map, allRenderingClipBounds);
         final long t1 = now();
-        backBufferG2d.translate(tcb.clipLeftX, tcb.clipTopY);
-        paintEachTile(backBufferG2d, tcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+        backBufferG2d.setClip(allRenderingClipBounds);
+        backBufferG2d.translate(animatedBaseTileTcb.clipLeftX, animatedBaseTileTcb.clipTopY);
+        paintEachTile(backBufferG2d, animatedBaseTileTcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
                
-        // Display the base Tiles
+        // Display everything else:
         final long t2 = now();
-        final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
-        displayNonAnimationImages(nonAnimationG2d, clipBounds, tcb);
-        nonAnimationG2d.dispose();
+        if (dirtyClipBounds != null) {
+            final TileClippingBounds tcb = new TileClippingBounds(map, dirtyClipBounds);
+            final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
+            displayNonAnimationImages(nonAnimationG2d, dirtyClipBounds, tcb);
+            nonAnimationG2d.dispose();
+        }
         
         final long t3 = now();   
         backBufferG2d.setTransform(backBufferOriginTransform);
+        backBufferG2d.setClip(allRenderingClipBounds);
         backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
         backBufferG2d.dispose();
 
         g2d.drawImage(backBufferImage, 0, 0, null);      
         final long t4 = now();
 
-        // Timing log
-        if (logger.isLoggable(Level.FINEST)) {
+        /*
+         * Remove the check for "fullMapRenderedWithoutUsingBackBuffer" to get every repaint
+         * logged: This includes several animations per second.
+         */
+        if (fullMapRenderedWithoutUsingBackBuffer && logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
-            final double avg = ((double)gap)
-                / ((tcb.getBottomRightDirtyTile().getX()-tcb.getTopLeftDirtyTile().getX()) * (tcb.getBottomRightDirtyTile().getY()-tcb.getBottomRightDirtyTile().getY()));
             final StringBuilder sb = new StringBuilder(128);
-            sb.append("displayMap time = ").append(gap)
-                .append(" for ").append(tcb.getTopLeftDirtyTile())
-                .append(" to ").append(tcb.getBottomRightDirtyTile())
-                .append(" average ").append(avg)
+            sb.append("displayMap fullRendering=").append(fullMapRenderedWithoutUsingBackBuffer)
+                .append(" time= ").append(gap)
                 .append(" init=").append(t1 - t0)
                 .append(" animated=").append(t2 - t1)
                 .append(" displayNonAnimationImages=").append(t3 - t2)
@@ -459,6 +373,8 @@ public final class MapViewer extends FreeColClientHolder {
                 ;
             logger.finest(sb.toString());
         }
+        
+        rpm.markAsClean();
         
         return fullMapRenderedWithoutUsingBackBuffer;
     }
@@ -1228,16 +1144,43 @@ public final class MapViewer extends FreeColClientHolder {
         }
     }
 
+    /**
+     * Internal class for the {@link MapViewer} that handles what part of the
+     * {@link Map} is visible on screen
+     * 
+     * Methods in this class should only be used by {@link SwingGUI}, {@link Canvas}
+     * or {@link MapViewer}.
+     */
     public MapViewerBounds getMapViewerBounds() {
         return mapViewerBounds;
     }
     
+    /**
+     * Bounds of the tiles to be rendered. These bounds are scaled according to the
+     * zoom level of the map.
+     */
     public TileBounds getTileBounds() {
         return tileBounds;
     }
     
+    /**
+     * Internal state for the {@link MapViewer}.
+     * 
+     * Methods in this class should only be used by {@link SwingGUI}, {@link Canvas}
+     * or {@link MapViewer}.
+     */
     public MapViewerState getMapViewerState() {
         return mapViewerState;
+    }
+    
+    /**
+     * Gets the internal class that handles buffers and dirty state of {@link MapViewer}.
+     * 
+     * Methods in this class should only be used by {@link SwingGUI}, {@link Canvas}
+     * or {@link MapViewer}.
+     */
+    public MapViewerRepaintManager getMapViewerRepaintManager() {
+        return rpm;
     }
     
     
