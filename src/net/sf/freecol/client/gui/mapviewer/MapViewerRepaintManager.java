@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 
 import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.util.Utils;
 
 /**
@@ -21,7 +22,7 @@ public class MapViewerRepaintManager {
     private BufferedImage nonAnimationBufferImage = null;
     
     private Rectangle dirtyRegion = null;
-    
+    private Tile focus = null;
     
     MapViewerRepaintManager() {
         
@@ -35,9 +36,15 @@ public class MapViewerRepaintManager {
      * @return {@code true} if the buffers have been reset -- meaning prior content has
      *      been lost.
      */
-    boolean prepareBuffers(Dimension size) {
+    boolean prepareBuffers(Dimension size, Tile focus) {
+        final boolean focusHasChanged = (this.focus == null) || !this.focus.equals(focus);
+        if (focusHasChanged) {
+            markAsDirty();
+        }
+        
+        this.focus = focus;
+        
         if (isBuffersUninitialized(size)) {
-
             backBufferImage = Utils.getGoodGraphicsDevice()
                     .getDefaultConfiguration()
                     .createCompatibleVolatileImage(size.width, size.height, Transparency.OPAQUE);
