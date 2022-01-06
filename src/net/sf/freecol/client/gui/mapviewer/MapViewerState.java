@@ -22,11 +22,8 @@ package net.sf.freecol.client.gui.mapviewer;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import net.sf.freecol.client.gui.ChatDisplay;
 import net.sf.freecol.client.gui.GUI.ViewMode;
-import net.sf.freecol.client.gui.GUIMessage;
 import net.sf.freecol.client.gui.SwingGUI;
-import net.sf.freecol.client.gui.TerrainCursor;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;

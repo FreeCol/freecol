@@ -53,8 +53,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.CanvasMapViewer;
-import net.sf.freecol.client.gui.ChatDisplay;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -103,19 +101,13 @@ public final class MapViewer extends FreeColClientHolder {
      * requested area given by {@link Graphics2D#getClipBounds}. Translating the
      * the clip bounds into tiles is performed by {@link TileClippingBounds}.
      */
-    private MapViewerBounds mapViewerBounds = new MapViewerBounds();
-    
-    /**
-     * Bounds of the tiles to be rendered. These bounds are scaled according to the
-     * zoom level of the map.
-     */
-    private TileBounds tileBounds = new TileBounds(new Dimension(0, 0), 1f);
+    private final MapViewerBounds mapViewerBounds = new MapViewerBounds();
     
     /**
      * Holds state that is not part of the Game/Map state, but is still used when drawing
      * the map. For example the current active unit.
      */
-    private MapViewerState mapViewerState;
+    private final MapViewerState mapViewerState;
     
     /**
      * The internal scaled tile viewer to use.
@@ -125,17 +117,23 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Holds buffers and determines the dirty state when drawing.
      */
-    private MapViewerRepaintManager rpm;
+    private final MapViewerRepaintManager rpm;
     
     /**
      * Utility functions that considers the current map size and scale. 
      */
-    private MapViewerScaledUtils mapViewerScaledUtils;
+    private final MapViewerScaledUtils mapViewerScaledUtils;
     
     /**
      * Scaled image library to use only for map operations.
      */
     private final ImageLibrary lib;
+    
+    /**
+     * Bounds of the tiles to be rendered. These bounds are scaled according to the
+     * zoom level of the map.
+     */
+    private TileBounds tileBounds = new TileBounds(new Dimension(0, 0), 1f);
     
 
     /**
@@ -146,8 +144,7 @@ public final class MapViewer extends FreeColClientHolder {
      *     (and this is subject to the map scaling).
      * @param al An {@code ActionListener} for the cursor.
      */
-    public MapViewer(FreeColClient freeColClient, ImageLibrary lib,
-                     ActionListener al) {
+    public MapViewer(FreeColClient freeColClient, ImageLibrary lib, ActionListener al) {
         super(freeColClient);
         
         this.lib = lib;
@@ -157,7 +154,7 @@ public final class MapViewer extends FreeColClientHolder {
         final UnitAnimator unitAnimator = new UnitAnimator(freeColClient, this, lib);
         this.mapViewerState = new MapViewerState(chatDisplay, unitAnimator, al);
         this.mapViewerScaledUtils = new MapViewerScaledUtils();
-        rpm = new MapViewerRepaintManager();
+        this.rpm = new MapViewerRepaintManager();
 
         updateScaledVariables();
     }

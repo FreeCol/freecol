@@ -61,6 +61,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.mapviewer.CanvasMapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
@@ -142,8 +143,14 @@ public final class Canvas extends JDesktopPane {
      */
     private MainPanel mainPanel;
     
+    /**
+     * The panel used for displaying the map and drawing the background of this class.
+     */
     private CanvasMapViewer canvasMapViewer;
     
+    /**
+     * A timer triggering repaints in order to display animations on the {@link CanvasMapViewer}.
+     */
     private Timer animationTimer;
 
 

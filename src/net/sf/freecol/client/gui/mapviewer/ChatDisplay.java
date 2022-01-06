@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.mapviewer;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -28,13 +28,14 @@ import java.util.Date;
 import java.util.List;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
  * ChatDisplay manages use of {@code GUIMessage}.
  */
-public class ChatDisplay {
+class ChatDisplay {
 
     /** The number of messages getting remembered. */
     private static final int MESSAGE_COUNT = 3;
@@ -66,7 +67,7 @@ public class ChatDisplay {
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
      */
-    public ChatDisplay(FreeColClient freeColClient) {
+    ChatDisplay(FreeColClient freeColClient) {
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
         this.font = FontLibrary.getUnscaledFont("normal-plain-tiny");
         this.messages = new ArrayList<>(MESSAGE_COUNT);
@@ -81,7 +82,7 @@ public class ChatDisplay {
      *
      * @param message The message to add.
      */
-    public synchronized void addMessage(GUIMessage message) {
+    synchronized void addMessage(GUIMessage message) {
         if (this.messages.size() >= MESSAGE_COUNT) {
             this.messages.remove(0);
         }
@@ -95,7 +96,6 @@ public class ChatDisplay {
      */
     private synchronized List<GUIMessage> prepareMessages() {
         long currentTime = new Date().getTime();
-        boolean result = false;
         List<GUIMessage> ret = new ArrayList<>();
         
         int i = 0;
@@ -118,7 +118,7 @@ public class ChatDisplay {
      * @param g The Graphics2D the messages should be displayed on.
      * @param size The size of the space for displaying in.
      */
-    public void display(Graphics2D g, Dimension size) {
+    void display(Graphics2D g, Dimension size) {
         // Return quickly if there are no messages, which is always
         // true in single player games.
         List<GUIMessage> msgs = prepareMessages();

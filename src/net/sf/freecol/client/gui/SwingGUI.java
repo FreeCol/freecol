@@ -59,6 +59,7 @@ import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
+import net.sf.freecol.client.gui.mapviewer.GUIMessage;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
 import net.sf.freecol.client.gui.panel.ColonyPanel;

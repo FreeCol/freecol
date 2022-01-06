@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.mapviewer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,7 +29,7 @@ import javax.swing.event.EventListenerList;
 /**
  * The blinking cursor on the map.
  */
-public class TerrainCursor implements ActionListener  {
+class TerrainCursor implements ActionListener  {
 
     public static final int OFF = 0;
     public static final int ON = 1;
@@ -48,7 +48,7 @@ public class TerrainCursor implements ActionListener  {
     /**
      * Creates a new {@code TerrainCursor} instance.
      */
-    public TerrainCursor() {
+    TerrainCursor() {
         this.active = true;
         this.blinkTimer = new Timer(blinkDelay, this);
     }
@@ -58,7 +58,7 @@ public class TerrainCursor implements ActionListener  {
      *
      * @return True if the cursor is active.
      */
-    public boolean isActive() {
+    boolean isActive() {
         return this.active;
     }
 
@@ -67,23 +67,23 @@ public class TerrainCursor implements ActionListener  {
      *
      * @param newState a {@code boolean} value
      */
-    public void setActive(boolean newState) {
+    void setActive(boolean newState) {
         this.active = newState;
     }
 
-    public void startBlinking() {
+    void startBlinking() {
         if (!this.blinkTimer.isRunning()) this.blinkTimer.start();
     }
 
-    public void stopBlinking() {
+    void stopBlinking() {
         if (this.blinkTimer.isRunning()) this.blinkTimer.stop();
     }
 
-    public void addActionListener(ActionListener listener) {
+    void addActionListener(ActionListener listener) {
         listenerList.add(ActionListener.class, listener);
     }
 
-    public void removeActionListener(ActionListener listener) {
+    void removeActionListener(ActionListener listener) {
         listenerList.remove(ActionListener.class, listener);
     }
 

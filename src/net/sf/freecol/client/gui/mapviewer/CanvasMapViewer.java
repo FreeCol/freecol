@@ -1,4 +1,4 @@
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.mapviewer;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,9 +15,13 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.mapviewer.MapViewer;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
 
+/**
+ * A component using {@code MapViewer} to display the map, or to display
+ * various background images when the map is unavailable.
+ */
 public class CanvasMapViewer extends JComponent {
     
     private static final Logger logger = Logger.getLogger(CanvasMapViewer.class.getName());
@@ -30,7 +34,7 @@ public class CanvasMapViewer extends JComponent {
     private long lastFullMapRenderTimeInMillis = 0;
 
     
-    CanvasMapViewer(FreeColClient freeColClient, MapViewer mapViewer) {
+    public CanvasMapViewer(FreeColClient freeColClient, MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.mapViewer = mapViewer;
         setLayout(null);
@@ -47,7 +51,7 @@ public class CanvasMapViewer extends JComponent {
         mapViewer.changeSize(size);
     }
     
-    protected void paintImmediately() {
+    public void paintImmediately() {
         if (!isMapAvailable()) {
             return;
         }

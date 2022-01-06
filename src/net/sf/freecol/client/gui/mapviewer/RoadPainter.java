@@ -17,7 +17,10 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.mapviewer;
+
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -32,17 +35,17 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Predicate;
 
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
  * This class is responsible for drawing the Roads on a tile.
  */
-public final class RoadPainter {
+final class RoadPainter {
 
     /** Helper variables for displaying the map. */
     private int tileHeight, tileWidth, halfHeight, halfWidth;
@@ -60,7 +63,7 @@ public final class RoadPainter {
      *
      * @param tileSize The tile size as a {@code Dimension}.
      */
-    public RoadPainter(Dimension tileSize) {
+    RoadPainter(Dimension tileSize) {
         this.tileHeight = tileSize.height;
         this.tileWidth  = tileSize.width;
         this.halfHeight = this.tileHeight/2;
@@ -111,7 +114,7 @@ public final class RoadPainter {
      * @param g The {@code Graphics} to draw the road upon.
      * @param tile The {@code Tile} with the road.
      */
-    public void displayRoad(Graphics2D g, Tile tile) {
+    void displayRoad(Graphics2D g, Tile tile) {
         Color oldColor = g.getColor();
         g.setColor(ImageLibrary.getRoadColor());
         g.setStroke(roadStroke);
