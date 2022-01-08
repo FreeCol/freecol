@@ -1288,7 +1288,7 @@ public class SwingGUI extends GUI {
     }
 
     private void changeMapScale(float newScale) {
-        imageCache.clearLowPriorityCache();
+        imageCache.clear();
         this.mapViewer.changeScale(newScale);
         refresh();
     }
