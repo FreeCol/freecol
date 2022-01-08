@@ -21,10 +21,11 @@ package net.sf.freecol.common.resources;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-
 import java.util.HashMap;
-import java.util.logging.Logger;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 
@@ -109,27 +110,48 @@ public class ImageCache {
      * where to maintain the image cache.
      *
      * @param ir The {@code ImageResource} to load from.
-     * @param key The name of the resource to return.
      * @param size The size of the requested image.
      *     Rescaling will be performed if necessary.
      * @param grayscale If true return a grayscale image.
      * @return The image identified by {@code resource}.
      */
     public BufferedImage getCachedImage(final ImageResource ir,
-                                         final String key,
                                          final Dimension size,
                                          final boolean grayscale,
                                          final int variation) {
 
         // TODO: add logging but probably in a branch for now
         // until we understand the performance issue better
-        final long hashKey = imageHash(key, size, grayscale, variation);
+        final long hashKey = imageHash(ir.getPrimaryKey(), size, grayscale, variation);
         final BufferedImage cached = this.cache.get(hashKey);
         if (cached != null) return cached;
 
         BufferedImage image = ir.getImage(variation, size, grayscale);
         if (image != null) this.cache.put(hashKey, image);
         return image;
+    }
+    
+    public BufferedImage getCachedImageOrGenerate(final String key,
+            final Dimension size,
+            final boolean grayscale,
+            final int variation,
+            Callable<BufferedImage> imageCreator) {
+        
+        final long cacheKey = imageHash(key, size, grayscale, variation);
+        BufferedImage image = this.cache.get(cacheKey);
+        if (image != null) {
+            return image;
+        }
+        try {
+            image = imageCreator.call();
+            if (image != null) {
+                this.cache.put(cacheKey, image);
+            }
+            return image;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while producing image", e);
+            return null;
+        }
     }
 
 
@@ -153,7 +175,7 @@ public class ImageCache {
 
         Dimension d = new Dimension(Math.round(image.getWidth() * scale),
                                     Math.round(image.getHeight() * scale));
-        return getCachedImage(ir, key, d, grayscale, 0);
+        return getCachedImage(ir, d, grayscale, 0);
     }
 
     /**
@@ -193,7 +215,7 @@ public class ImageCache {
                                        final boolean grayscale,
                                        final int seed) {
         final ImageResource ir = getImageResource(key);
-        return getCachedImage(ir, key, size, grayscale, ir.getVariationNumberForSeed(seed));
+        return getCachedImage(ir, size, grayscale, ir.getVariationNumberForSeed(seed));
     }
 
     /**

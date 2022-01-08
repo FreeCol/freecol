@@ -230,7 +230,7 @@ public class FreeColDataFile {
         if (uri == null) {
             return;
         }
-        final Resource resource = ResourceFactory.createResource(uri);
+        final Resource resource = ResourceFactory.createResource(key, uri);
         
         /*
          * Rivers need new keys in order to support variations.
@@ -317,7 +317,7 @@ public class FreeColDataFile {
             .stream()
             .filter(entry -> entry.getKey() != null)
             .forEach(entry -> {
-                final ImageResource variationResource = (ImageResource) ResourceFactory.createResource(entry.getKey());
+                final ImageResource variationResource = (ImageResource) ResourceFactory.createResource(imageResource.getPrimaryKey(), entry.getKey());
                 if (variationResource != null) {
                     variationResource.addAlternativeResourceLocators(entry.getValue());
                     imageResource.addVariation(variationResource);

@@ -43,7 +43,8 @@ public class ColorResource extends Resource {
     private final Color color;
 
 
-    public ColorResource(Color color) {
+    public ColorResource(String primaryKey, Color color) {
+        super(primaryKey);
         this.color = color;
     }
 
@@ -53,8 +54,8 @@ public class ColorResource extends Resource {
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      */
-    public ColorResource(URI resourceLocator) { //throws Exception {
-        super(resourceLocator);
+    public ColorResource(String primaryKey, URI resourceLocator) { //throws Exception {
+        super(primaryKey, resourceLocator);
 
         String colorName = resourceLocator.getSchemeSpecificPart()
             .substring(SCHEME.length());

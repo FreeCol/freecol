@@ -41,8 +41,8 @@ public class VideoResource extends Resource {
      *     resource.
      * @exception IOException if the URI is malformed.
      */
-    public VideoResource(URI resourceLocator) throws IOException {
-        super(resourceLocator);
+    public VideoResource(String primaryKey, URI resourceLocator) throws IOException {
+        super(primaryKey, resourceLocator);
         
         this.video = new Video(resourceLocator.toURL());
     }

@@ -44,7 +44,8 @@ public class FontResource extends Resource {
     private Font font;
 
 
-    public FontResource(Font font) {
+    public FontResource(String primaryKey, Font font) {
+        super(primaryKey);
         this.font = font;
     }
 
@@ -55,8 +56,8 @@ public class FontResource extends Resource {
      *     resource.
      * @exception IOException if unable to read the font.
      */
-    public FontResource(URI resourceLocator) throws IOException {
-        super(resourceLocator);
+    public FontResource(String primaryKey, URI resourceLocator) throws IOException {
+        super(primaryKey, resourceLocator);
         font = null;
         try {
             if (resourceLocator.getPath() != null

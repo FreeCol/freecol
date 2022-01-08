@@ -20,6 +20,7 @@
 package net.sf.freecol.common.resources;
 
 import java.net.URI;
+import java.util.Objects;
 
 
 /**
@@ -47,25 +48,46 @@ public abstract class Resource {
      * The {@code URI} used when loading this resource.
      */
     private final URI resourceLocator;
+    
+    /**
+     * The primary key for the resource to be used for caching purposes.
+     */
+    private final String primaryKey;
 
 
     /**
      * Trivial constructor.
      */
-    protected Resource() {
-        this.resourceLocator = null;
+    protected Resource(String primaryKey) {
+        this(primaryKey, null);
     }
 
     /**
      * Do not use directly.
      *
+     * @param primaryKey The key for the primary version of the resource,
+     *      that is the key when the {@code Resource} was created.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
-    protected Resource(URI resourceLocator) {
+    protected Resource(String primaryKey, URI resourceLocator) {
+        this.primaryKey = Objects.requireNonNull(primaryKey);
         this.resourceLocator = resourceLocator;
     }
 
+    
+    /**
+     * The primary key of the resource. This key can be used for caching
+     * purposes since it will be the same for a resource no matter how
+     * many keys point to the same resource.
+     * 
+     * Beware: All variations and sizes share the same primary key.
+     * 
+     * @return The key.
+     */
+    public String getPrimaryKey() {
+        return primaryKey;
+    }
 
     /**
      * Returns the {@code URI} used for loading the resource.

@@ -58,7 +58,7 @@ public class ResourceFactory {
      *      instance.
      * @return The <code>Resource</code> if created.     
      */
-    public static Resource createResource(URI uri) {
+    public static Resource createResource(String primaryKey, URI uri) {
     	final Resource r = resources.get(uri);
     	if (r != null) { 
     		return r;
@@ -77,31 +77,31 @@ public class ResourceFactory {
             final Resource resource;
             if ("urn".equals(uri.getScheme())) {
                 if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
-                    resource = new ColorResource(uri);
+                    resource = new ColorResource(primaryKey, uri);
                 } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
-                    resource = new FontResource(uri);
+                    resource = new FontResource(primaryKey, uri);
                 } else {
                     logger.log(Level.WARNING, "Unknown urn part: " + uri.getSchemeSpecificPart());
                     return null;
                 }
             } else if (pathPart.endsWith("\"") && pathPart.lastIndexOf('"', pathPart.length()-1) >= 0) {
-                resource = new StringResource(uri);
+                resource = new StringResource(primaryKey, uri);
             } else if (pathPart.endsWith(".faf")) {
-                resource = new FAFileResource(uri);
+                resource = new FAFileResource(primaryKey, uri);
             } else if (pathPart.endsWith(".sza")) {
-                resource = new SZAResource(uri);
+                resource = new SZAResource(primaryKey, uri);
             } else if (pathPart.endsWith(".ttf")) {
-                resource = new FontResource(uri);
+                resource = new FontResource(primaryKey, uri);
             } else if (pathPart.endsWith(".wav")) {
-                resource = new AudioResource(uri);
+                resource = new AudioResource(primaryKey, uri);
             } else if (pathPart.endsWith(".ogg")) {
                 if (pathPart.endsWith(".video.ogg")) {
-                    resource = new VideoResource(uri);
+                    resource = new VideoResource(primaryKey, uri);
                 } else {
-                    resource = new AudioResource(uri);
+                    resource = new AudioResource(primaryKey, uri);
                 }
             } else {
-                resource = new ImageResource(uri);
+                resource = new ImageResource(primaryKey, uri);
             }
             resources.put(uri, resource);
             return resource;

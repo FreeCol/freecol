@@ -68,8 +68,8 @@ public class ImageResource extends Resource {
      *
      * @param resourceLocator The {@code URI} used when loading this resource.
      */
-    public ImageResource(URI resourceLocator) {
-        super(resourceLocator);
+    public ImageResource(String primaryKey, URI resourceLocator) {
+        super(primaryKey, resourceLocator);
     }
 
 

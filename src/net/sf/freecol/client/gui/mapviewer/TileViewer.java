@@ -28,9 +28,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.ClientOptions;
@@ -56,7 +54,6 @@ import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -104,12 +101,7 @@ public final class TileViewer extends FreeColClientHolder {
     /** Fonts for the colony population chip. */
     private Font emphFont, normFont;
 
-    /**
-     * Caches transitions (image with applied alpha) since applying the alpha-channel
-     * is oddly slow on some system.
-     */
-    private static final Map<String, BufferedImage> transitionCache = new HashMap<>();
-    
+
     /**
      * The constructor to use.
      *
@@ -140,9 +132,6 @@ public final class TileViewer extends FreeColClientHolder {
         this.tinyFont = this.lib.getScaledFont("normal-plain-tiny", null);
         this.emphFont = this.lib.getScaledFont("simple-bold+italic-smaller", null);
         this.normFont = this.lib.getScaledFont("simple-bold-tiny", null);
-        
-        // Not necessary, but saves memory:
-        transitionCache.clear();
     }
         
     /**
@@ -441,45 +430,10 @@ public final class TileViewer extends FreeColClientHolder {
     }
     
     private void drawBaseTileTransitionAtDirection(Graphics2D g2d, Tile tile, Direction direction) {
-        final Tile borderingTile = tile.getNeighbourOrNull(direction);
-        
-        if (borderingTile == null
-                || !borderingTile.isExplored()
-                || !tile.isExplored()
-                || tile.getType() == borderingTile.getType()) {
-            // No transition needed in these cases.
-            return;
+        final BufferedImage transitionImage = this.lib.getBaseTileTransitionImage(tile, direction);
+        if (transitionImage != null) {
+            g2d.drawImage(transitionImage, 0, 0, null);
         }
-        
-        if (tile.getType().isWater()
-                && borderingTile.getType().isWater()) {
-            /*
-             * Lake, great river, high seas and ocean have the same graphics and
-             * should not have a transition.
-             * 
-             * TODO: Use the same ImageResource and check that instead.
-             */
-            return;
-        }
-
-        final String hash = tile.getType().getId() + "," + borderingTile.getType().getId() + "," + direction.getKey() + "," + ((int) (lib.getScaleFactor() * 1000));
-        final BufferedImage cachedTransitionImage = transitionCache.get(hash);
-        if (cachedTransitionImage != null) {
-            g2d.drawImage(cachedTransitionImage, 0, 0, null);
-            return;
-        }
-        
-        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
-        final BufferedImage terrainImage;
-        if (notABeachTransition) {
-            terrainImage = this.lib.getScaledTerrainImage(borderingTile.getType(), 0, 0); // Using 0,0 to get the same variation every time.
-        } else {
-            terrainImage = this.lib.getBeachCenterImage();
-        }
-        
-        final BufferedImage transitionImage = ImageUtils.imageWithAlphaFromMask(terrainImage, this.lib.getTerrainMask(direction));
-        transitionCache.put(hash, transitionImage);
-        g2d.drawImage(transitionImage, 0, 0, null);
     }
     
     private void drawRiverMouth(Graphics2D g2d, Tile tile) {

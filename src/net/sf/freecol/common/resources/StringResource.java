@@ -38,8 +38,8 @@ public class StringResource extends Resource {
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
-    public StringResource(URI resourceLocator) {
-        super(resourceLocator);
+    public StringResource(String primaryKey, URI resourceLocator) {
+        super(primaryKey, resourceLocator);
 
         this.data = resourceLocator.getPath();
         if (this.data.endsWith("\"")) { // Should always be true

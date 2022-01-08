@@ -74,6 +74,7 @@ import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.StringResource;
 import net.sf.freecol.common.resources.Video;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -965,9 +966,69 @@ public final class ImageLibrary {
         return this.imageCache.getSizedImage(key, this.tileSize, false, variationSeedUsing(x, y));
     }
     
-    public BufferedImage getBeachCenterImage() {
+    private ImageResource getBeachCenterImageResource() {
         final String key = "image.tile.model.tile.beach";
-        return this.imageCache.getSizedImage(key, this.tileSize, false);
+        return ImageCache.getImageResource(key);
+    }
+    
+    /**
+     * Returns a transparent image for making a transition between
+     * the given tiles.
+     *  
+     * @param tile The tile that should get a transition.
+     * @param direction The direction to get the bordering tile from..
+     * @return The image, or {@code null} if there is no transition that
+     *      should be drawn.
+     */
+    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction) {
+        final Tile borderingTile = tile.getNeighbourOrNull(direction);
+        
+        if (borderingTile == null
+                || !borderingTile.isExplored()
+                || !tile.isExplored()
+                || tile.getType() == borderingTile.getType()) {
+            // No transition needed in these cases.
+            return null;
+        }
+        
+        final ImageResource terrainImageResource;
+        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
+        if (notABeachTransition) {
+            terrainImageResource = ImageCache.getImageResource(getTerrainImageKey(borderingTile.getType()));
+        } else {
+            terrainImageResource = getBeachCenterImageResource();
+        }
+        
+        if (terrainImageResource == null) {
+            return null;
+        }
+        
+        final ImageResource tileImageResource = ImageCache.getImageResource(getTerrainImageKey(tile.getType()));
+        if (tileImageResource == null
+                || terrainImageResource.getPrimaryKey().equals(tileImageResource.getPrimaryKey())) {
+            /*
+             * No reason to make transitions between tiles with the same graphics.
+             */
+            return null;
+        }
+        
+
+        final String transitionKey = terrainImageResource.getPrimaryKey() + "$gen"; 
+        
+        /*
+         * Using direction.ordinal() as the cached variation in order to get different
+         * image cache hash values.
+         */
+        final BufferedImage transitionImage = imageCache.getCachedImageOrGenerate(transitionKey, tileSize, false, direction.ordinal(), () -> {
+            /*
+             * Uses variation 0 to get the same variation every time as this reduces the amount
+             * of memory used.
+             */
+            final BufferedImage terrainImage = imageCache.getCachedImage(terrainImageResource, tileSize, false, 0);
+            return ImageUtils.imageWithAlphaFromMask(terrainImage, getTerrainMask(direction));
+        });
+
+        return transitionImage;
     }
 
     /**
@@ -1331,7 +1392,6 @@ public final class ImageLibrary {
         }
         
         return imageCache.getCachedImage(imageResource,
-                getTerrainImageKey(type),
                 this.tileSize,
                 false,
                 imageResource.getVariationNumberForTick(ticks));

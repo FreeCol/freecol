@@ -36,7 +36,8 @@ public class AudioResource extends Resource {
     private File file;
 
 
-    public AudioResource(File file) {
+    public AudioResource(String primaryKey, File file) {
+        super(primaryKey);
         this.file = file;
     }
 
@@ -46,8 +47,8 @@ public class AudioResource extends Resource {
      *      resource.
      * @exception IOException if the URI does not point to recognizable audio.
      */
-    public AudioResource(URI resourceLocator) throws IOException {
-        super(resourceLocator);
+    public AudioResource(String primaryKey, URI resourceLocator) throws IOException {
+        super(primaryKey, resourceLocator);
         File f = new File(resourceLocator);
         this.file = (SoundPlayer.getAudioInputStream(f) != null) ? f : null;
     }

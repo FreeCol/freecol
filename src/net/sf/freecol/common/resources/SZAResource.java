@@ -50,8 +50,8 @@ public class SZAResource extends Resource {
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      */
-    public SZAResource(URI resourceLocator) {
-        super(resourceLocator);
+    public SZAResource(String primaryKey, URI resourceLocator) {
+        super(primaryKey, resourceLocator);
     }
 
     /**

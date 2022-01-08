@@ -35,7 +35,8 @@ public class FAFileResource extends Resource {
     private final FAFile FAFile;
 
 
-    public FAFileResource(FAFile FAFile) {
+    private FAFileResource(String primaryKey, FAFile FAFile) {
+        super(primaryKey);
         this.FAFile = FAFile;
     }
 
@@ -47,8 +48,8 @@ public class FAFileResource extends Resource {
      *     resource.
      * @exception IOException if FAFile can not be opened.
      */
-    public FAFileResource(URI resourceLocator) throws IOException {
-        super(resourceLocator);
+    public FAFileResource(String primaryKey, URI resourceLocator) throws IOException {
+        super(primaryKey, resourceLocator);
         URL url = resourceLocator.toURL();
         FAFile = new FAFile(url.openStream());
     }
