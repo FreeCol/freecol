@@ -1105,7 +1105,7 @@ public class SwingGUI extends GUI {
     @Override
     public boolean scrollMap(Direction direction) {
         boolean ret = this.mapViewer.getMapViewerBounds().scrollMap(direction);
-        refresh();
+        paintImmediately();
         return ret;
     }
 

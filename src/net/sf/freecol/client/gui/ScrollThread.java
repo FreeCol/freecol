@@ -94,6 +94,7 @@ public class ScrollThread extends Thread {
                 abort();
                 return;
             }
+            final long start = System.currentTimeMillis();
             try {
                 SwingUtilities.invokeAndWait(() -> {
                     if (!gui.scrollMap(d)) {
@@ -114,7 +115,8 @@ public class ScrollThread extends Thread {
             }
 
             try {
-                sleep(SCROLL_DELAY);
+                final long time = System.currentTimeMillis() - start;
+                sleep(Math.max(5, SCROLL_DELAY - time));
             } catch (InterruptedException e) {
                 abort();
                 return;
