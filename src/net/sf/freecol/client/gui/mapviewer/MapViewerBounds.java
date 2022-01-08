@@ -252,6 +252,20 @@ public final class MapViewerBounds {
         if ((t = t.getNeighbourOrNull(direction)) == null) {
             return false;
         }
+        if (Direction.longSides.contains(direction)) {
+            /*
+             * We need to scroll an additional tile when moving the
+             * map diagonally in order to get the correct direction.
+             * 
+             * Please note that the tiles are diamond shapes, so that
+             * diagonally on the screen is longSide for a tile.
+             */
+            final Tile extraScrollTile = t.getNeighbourOrNull(direction);
+            if (extraScrollTile != null) {
+                t = extraScrollTile;
+            }
+        }
+
         final int tx = t.getX(), ty = t.getY();
 
         final int mapHeight = map.getHeight(), mapWidth = map.getWidth();
