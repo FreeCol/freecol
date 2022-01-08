@@ -687,11 +687,11 @@ public class SwingGUI extends GUI {
         // to focus on
         if (active != null) {
             changeView(active, false);
-            if (tile == null) {
+            if (active.hasTile()) {
                 tile = active.getTile();
-                if (tile == null) {
-                    tile = active.getOwner().getFallbackTile();
-                }
+            } else if (active.getOwner().getFallbackTile() != null) {
+                tile = active.getOwner().getFallbackTile();
+                changeView(tile);
             }
         } else if (tile != null) {
             changeView(tile);
