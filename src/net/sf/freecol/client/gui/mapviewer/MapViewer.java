@@ -211,8 +211,11 @@ public final class MapViewer extends FreeColClientHolder {
             return new Rectangle(0, 0, mapViewerBounds.getSize().width, mapViewerBounds.getSize().height);
         }
             
-        int[] a = new int[2]; mapViewerBounds.tileToPixelXY(tile, a);
-        return new Rectangle(a[0] - tileBounds.getHalfWidth(), a[1] - tileBounds.getHeight() / 2, tileBounds.getWidth() * 2, tileBounds.getHeight() * 2);
+        final Point p = mapViewerBounds.tileToPoint(tile);
+        return new Rectangle(p.x - tileBounds.getHalfWidth(),
+                p.y - tileBounds.getHeight() / 2,
+                tileBounds.getWidth() * 2,
+                tileBounds.getHeight() * 2);
     }
 
     /**
@@ -279,10 +282,10 @@ public final class MapViewer extends FreeColClientHolder {
             paintBlackBackground(g2d, clipBounds);
             return false;
         }
-
+        
         if (mapViewerBounds.isRepositionNeeded()) {
             mapViewerBounds.positionMap();
-        }
+        }  
         
         boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(size, mapViewerBounds.getFocus());
         final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();

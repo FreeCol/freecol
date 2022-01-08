@@ -252,6 +252,7 @@ public final class MapViewerBounds {
         if ((t = t.getNeighbourOrNull(direction)) == null) {
             return false;
         }
+
         if (Direction.longSides.contains(direction)) {
             /*
              * We need to scroll an additional tile when moving the
@@ -323,9 +324,11 @@ public final class MapViewerBounds {
     public Point calculateTilePosition(Tile tile, boolean rhs) {
         if (!isTileVisible(tile)) return null;
 
-        int[] a = new int[2]; tileToPixelXY(tile, a);
-        if (rhs) a[0] += tileBounds.getWidth();
-        return new Point(a[0], a[1]);
+        final Point p = tileToPoint(tile);
+        if (!rhs) {
+            return p;
+        }
+        return new Point(p.x + tileBounds.getWidth(), p.y);
     }
 
     /**
@@ -551,11 +554,15 @@ public final class MapViewerBounds {
      * @param tile The {@code Tile} to convert coordinates.
      * @param a An array to pass back the x,y pixel coordinates.
      */
-    void tileToPixelXY(Tile tile, int[] a) {
-        final int x = tile.getX(), y = tile.getY();
-        a[0] = topLeftVisibleTilePoint.x + tileBounds.getWidth() * (x - topLeftVisibleTile.getX()); // Property#4
-        if ((y & 1) != 0) a[0] += tileBounds.getHalfWidth(); // Property#2
-        a[1] = topLeftVisibleTilePoint.y + tileBounds.getHalfHeight() * (y - topLeftVisibleTile.getY()); // Property#5
+    Point tileToPoint(Tile tile) {
+        final int tileX = tile.getX(), tileY = tile.getY();
+        final int x = topLeftVisibleTilePoint.x
+                + tileBounds.getWidth() * (tileX - topLeftVisibleTile.getX())
+                + (tileY & 1) * tileBounds.getHalfWidth();
+        final int y = topLeftVisibleTilePoint.y
+                + tileBounds.getHalfHeight() * (tileY - topLeftVisibleTile.getY());
+
+        return new Point(x, y);
     }
 
     Map.Position getTopLeftVisibleTile() {
@@ -592,9 +599,9 @@ public final class MapViewerBounds {
         if (map == null || this.focus == null) return null;
 
         // Set (leftOffset, topOffset) to the center of the focus tile
-        int[] a = new int[2]; tileToPixelXY(this.focus, a);
-        int leftOffset = a[0] + tileBounds.getHalfWidth();
-        int topOffset = a[1] + tileBounds.getHalfHeight();
+        final Point p = tileToPoint(this.focus);
+        int leftOffset = p.x + tileBounds.getHalfWidth();
+        int topOffset = p.y + tileBounds.getHalfHeight();
 
         // Next, we can calculate the center pixel of the tile-sized
         // rectangle that was clicked. First, we calculate the
