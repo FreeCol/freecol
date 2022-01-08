@@ -550,8 +550,7 @@ public class SwingGUI extends GUI {
      */
     private void resetMapZoom() {
         if (this.scaledImageLibrary.getScaleFactor() != fixedImageLibrary.getScaleFactor()) {
-            this.mapViewer.changeScale(fixedImageLibrary.getScaleFactor());
-            refresh();
+            changeMapScale(fixedImageLibrary.getScaleFactor());
         }
     }
    
@@ -1272,8 +1271,7 @@ public class SwingGUI extends GUI {
         float scale = this.scaledImageLibrary.getScaleFactor();
         float newScale = scale + ImageLibrary.SCALE_STEP;
         if (scale < newScale && newScale <= ImageLibrary.MAX_SCALE) {
-            this.mapViewer.changeScale(newScale);
-            refresh();
+            changeMapScale(newScale);
         }
     }
 
@@ -1285,9 +1283,14 @@ public class SwingGUI extends GUI {
         float scale = this.scaledImageLibrary.getScaleFactor();
         float newScale = scale - ImageLibrary.SCALE_STEP;
         if (ImageLibrary.MIN_SCALE <= newScale && newScale < scale) {
-            this.mapViewer.changeScale(newScale);
-            refresh();
+            changeMapScale(newScale);
         }
+    }
+
+    private void changeMapScale(float newScale) {
+        imageCache.clearLowPriorityCache();
+        this.mapViewer.changeScale(newScale);
+        refresh();
     }
 
 
