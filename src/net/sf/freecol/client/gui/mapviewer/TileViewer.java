@@ -28,8 +28,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -371,8 +373,22 @@ public final class TileViewer extends FreeColClientHolder {
              */
             final long ticks = System.currentTimeMillis() / 125;
             
-            g2d.drawImage(this.lib.getAnimatedScaledTerrainImage(tileType, ticks), 0, 0, null);
+
+            final List<Direction> directionsWithLand = allDirectionsWithLand(tile);
+            if (directionsWithLand.isEmpty()) {
+                g2d.drawImage(this.lib.getAnimatedScaledTerrainImage(tileType, ticks), 0, 0, null);
+            } else {
+                g2d.drawImage(this.lib.getAnimatedScaledWaterAndBeachTerrainImage(tileType, directionsWithLand, ticks), 0, 0, null);
+            }
         }
+    }
+
+    private List<Direction> allDirectionsWithLand(Tile tile) {
+        final List<Direction> directionsWithLand = Arrays.asList(Direction.values()).stream().filter(d -> {
+            final Tile neighbour = tile.getNeighbourOrNull(d);
+            return neighbour != null && neighbour.isLand();
+        }).collect(Collectors.toList());
+        return directionsWithLand;
     }
     
     /**
@@ -394,6 +410,11 @@ public final class TileViewer extends FreeColClientHolder {
         }
 
         if (!tile.isExplored()) return;
+        
+        /* 
+         * This is the old beach style. We might want to keep this as an option for
+         * systems with low memory.
+         *
         if (!tile.isLand() && tile.getStyle() > 0) {
             int edgeStyle = tile.getStyle() >> 4;
             if (edgeStyle > 0) {
@@ -406,6 +427,7 @@ public final class TileViewer extends FreeColClientHolder {
                               0, 0, null);
             }
         }
+        */
     }
     
     void drawBaseTileTransitions(Graphics2D g2d, Tile tile) {
