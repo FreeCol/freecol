@@ -224,7 +224,7 @@ public final class MapViewerState {
     /**
      * For internal use in MapViewer only.
      * 
-     * @see MapViewer#getCursorTile()
+     * @see MapViewer#getVisibleCursorTile()
      */
     Tile getCursorTile() {
         Tile ret = null;

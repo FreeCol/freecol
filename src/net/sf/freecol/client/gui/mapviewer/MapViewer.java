@@ -171,31 +171,9 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @return The {@code Tile} found or null.
      */
-    public Tile getCursorTile() {
+    public Tile getVisibleCursorTile() {
         Tile ret = mapViewerState.getCursorTile();
         return (mapViewerBounds.isTileVisible(ret)) ? ret : null;
-    }
-    
-    /**
-     * Change the focus tile.
-     *
-     * @param tile The new focus {@code Tile}.
-     */
-    public void changeFocus(Tile tile) {
-        if (tile == null) {
-            return;
-        }
-        mapViewerBounds.setFocus(tile);
-        forceReposition();
-    }
-
-    /**
-     * Gets the focus tile, that is, the center tile of the displayed map.
-     *
-     * @return The center {@code Tile}.
-     */
-    public Tile getFocus() {
-        return mapViewerBounds.getFocus();
     }
     
     /**
@@ -206,7 +184,14 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public boolean changeGotoPath(PathNode gotoPath) {
         boolean result = mapViewerState.changeGotoPath(gotoPath);
-        forceReposition();
+        if (result) {
+        	/*
+        	 * TODO: Only mark changed tiles as dirty -- or even better: Always render
+        	 *       gotoPath directly without storing it to any buffer.
+        	 */
+        	rpm.markAsDirty();
+        }
+        
         return result;
     }
 
@@ -239,7 +224,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib.changeScaleFactor(newScale);
         this.tv.updateScaledVariables();
         updateScaledVariables();
-        forceReposition();
+        mapViewerBounds.forceReposition();
         rpm.markAsDirty();
     }
     
@@ -277,13 +262,6 @@ public final class MapViewer extends FreeColClientHolder {
     public Tile convertToMapTile(int x, int y) {
         return mapViewerBounds.convertToMapTile(getMap(), x, y);
     }
-    /**
-     * Force the next screen repaint to reposition the tiles on the window.
-     */
-    public void forceReposition() {
-        mapViewerBounds.forceReposition();
-        rpm.markAsDirty();
-    }
     
     /**
      * Displays the Map.
@@ -304,7 +282,6 @@ public final class MapViewer extends FreeColClientHolder {
 
         if (mapViewerBounds.isRepositionNeeded()) {
             mapViewerBounds.positionMap();
-            rpm.markAsDirty();
         }
         
         boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(size, mapViewerBounds.getFocus());
@@ -487,7 +464,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display cursor for selected tile or active unit
         long t11 = now();
-        final Tile cursorTile = getCursorTile();
+        final Tile cursorTile = getVisibleCursorTile();
         if (cursorTile != null && mapViewerState.getCursor().isActive() && !mapViewerState.getUnitAnimator().isUnitsOutForAnimation()) {
             /*
              * The cursor is hidden when units are animated. 

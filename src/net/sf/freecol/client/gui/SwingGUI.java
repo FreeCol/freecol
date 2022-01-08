@@ -217,7 +217,7 @@ public class SwingGUI extends GUI {
         final List<Tile> tiles = a.getTiles();
         for (Tile t : tiles) {
             if (!this.mapViewer.getMapViewerBounds().onScreen(t)) {
-                this.mapViewer.changeFocus(t);
+                this.mapViewer.getMapViewerBounds().setFocus(t);
                 break;
             }
         }
@@ -282,7 +282,7 @@ public class SwingGUI extends GUI {
             .getBoolean(ClientOptions.ALWAYS_CENTER);
         Tile first = animations.get(0).getTiles().get(0);
         if (center && first != getFocus()) {
-            this.mapViewer.changeFocus(first);
+            this.mapViewer.getMapViewerBounds().setFocus(first);
         }
 
         invokeNowOrWait(() -> {
@@ -674,7 +674,7 @@ public class SwingGUI extends GUI {
         } else {
             changeView((Unit)null, false);
         }
-        this.mapViewer.changeFocus(tile);
+        this.mapViewer.getMapViewerBounds().setFocus(tile);
     }
         
     /**
@@ -706,7 +706,7 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         this.mapControls = MapControls.newInstance(fcc);
         final ActionListener al = (ActionEvent ae) ->
-            this.refreshTile(this.mapViewer.getCursorTile());
+            this.refreshTile(this.mapViewer.getVisibleCursorTile());
         this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
@@ -817,7 +817,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Tile getFocus() {
-        return this.mapViewer.getFocus();
+        return this.mapViewer.getMapViewerBounds().getFocus();
     }
 
     /**
@@ -825,7 +825,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void setFocus(Tile tileToFocus) {
-        this.mapViewer.changeFocus(tileToFocus);
+        this.mapViewer.getMapViewerBounds().setFocus(tileToFocus);
         refresh();
     }
 
@@ -1425,7 +1425,6 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void refresh() {
-        this.mapViewer.forceReposition();
         this.mapViewer.getMapViewerRepaintManager().markAsDirty();
         this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }

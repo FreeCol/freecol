@@ -235,7 +235,6 @@ public final class MapViewerBounds {
         } else {
             setFocus(tile);
         }
-        forceReposition();
         return ret;
     }
     
@@ -325,12 +324,13 @@ public final class MapViewerBounds {
      *
      * @param focus The new focus {@code Tile}.
      */
-    void setFocus(Tile focus) {
+    public void setFocus(Tile focus) {
         if (focus == null) {
             return;
         }
         
         this.focus = focus;
+        forceReposition();
     }
     
     /**
@@ -559,7 +559,7 @@ public final class MapViewerBounds {
      *
      * @return The center {@code Tile}.
      */
-    Tile getFocus() {
+    public Tile getFocus() {
         return this.focus;
     }
     
@@ -631,7 +631,6 @@ public final class MapViewerBounds {
     void changeSize(Dimension size, TileBounds tileBounds) {
         this.size = size;
         updateSizeVariables(tileBounds);
-        forceReposition(); // TODO: needed?
     }
     
     /**
