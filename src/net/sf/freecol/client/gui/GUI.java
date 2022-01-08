@@ -1714,6 +1714,11 @@ public class GUI extends FreeColClientHolder {
      *   InGameController.removeHandler
      */
     public void refresh() {}
+    
+    /**
+     * Repaints map without invalidating any area.
+     */
+    public void repaint() {}
 
     /**
      * Refresh the players table in the StartGamePanel.

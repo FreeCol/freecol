@@ -221,9 +221,6 @@ public class SwingGUI extends GUI {
                 break;
             }
         }
-        // Always completely update the screen before starting the animation
-        // as focus may have changed either here or in animations()
-        paintImmediately();
 
         // Calculate the union of the bounds for all the tiles in the
         // animation, this is the area that will need to be repainted
@@ -239,6 +236,12 @@ public class SwingGUI extends GUI {
         final Unit unit = a.getUnit();
         boolean newLabel = !this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit);
         JLabel unitLabel = this.mapViewer.getMapViewerState().getUnitAnimator().enterUnitOutForAnimation(unit);
+
+        // Always completely update the screen before starting the animation
+        // as focus may have changed either here or in animations()
+        this.mapViewer.getMapViewerRepaintManager().markAsDirty();
+        paintImmediately();
+
         List<Point> points = transform(tiles, alwaysTrue(),
             (t) -> this.mapViewer.getMapViewerState().getUnitAnimator().getAnimationPosition(unitLabel, t));
         a.setPoints(points);
@@ -250,19 +253,19 @@ public class SwingGUI extends GUI {
         final Rectangle aBounds = bounds;
         final Animations.Procedure painter = new Animations.Procedure() {
                 public void execute() {
-                    mapViewer.getMapViewerRepaintManager().markAsDirty(aBounds);
                     can.paintImmediately(aBounds);
                 }
             };
 
         try { // Delegate to the animation
             a.executeWithLabel(unitLabel, painter);
-            
         } finally { // Make sure we release the label again
             this.mapViewer.getMapViewerState().getUnitAnimator().releaseUnitOutForAnimation(unit);
             
             if (!this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit)) {
                 this.canvas.animationLabel(unitLabel, false);
+                mapViewer.getMapViewerRepaintManager().markAsDirty(aBounds);
+                repaint();
             }
         }
     }
@@ -284,10 +287,24 @@ public class SwingGUI extends GUI {
         if (center && first != getFocus()) {
             this.mapViewer.getMapViewerBounds().setFocus(first);
         }
-
-        invokeNowOrWait(() -> {
-                for (Animation a : animations) animate(a);
-            });
+        
+        // Stops repaints while we are waiting for the updated tiles to arrive:
+        mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(true);
+        
+        invokeNowOrLater(() -> {
+            /*
+             * XXX: Using an extra invokeLater to ensure that the updated tiles
+             *      have arrived before we continue. A better method of solving
+             *      this would be having separate pre (before the update) and
+             *      post (after the update) events.
+             */
+        	SwingUtilities.invokeLater(() -> {
+        		mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
+        		for (Animation a : animations) {
+        			animate(a);
+        		}
+        	});
+        });
     }
     
     /**
@@ -351,6 +368,14 @@ public class SwingGUI extends GUI {
      */
     private boolean changeActiveUnit(Unit newUnit) {
         final Unit oldUnit = getActiveUnit();
+        
+        if (newUnit != null
+        		&& newUnit.hasTile()
+        		&& !mapViewer.getMapViewerBounds().onScreen(newUnit.getTile())) {
+        	this.mapViewer.getMapViewerBounds().setFocus(newUnit.getTile());
+        	repaint();
+        }
+        
         if (newUnit == oldUnit) return false;
         
         this.mapViewer.getMapViewerState().setActiveUnit(newUnit);
@@ -826,7 +851,7 @@ public class SwingGUI extends GUI {
     @Override
     public void setFocus(Tile tileToFocus) {
         this.mapViewer.getMapViewerBounds().setFocus(tileToFocus);
-        refresh();
+        repaint();
     }
 
 
@@ -1191,7 +1216,7 @@ public class SwingGUI extends GUI {
     public void changeView(Unit unit, boolean force) {
         boolean change = changeViewMode(ViewMode.MOVE_UNITS);
         change |= changeActiveUnit(unit);
-        if (unit != null && unit.hasTile()) {
+        if (unit != null && unit.hasTile() && !force) {
             // Bring the selected tile along with the unit.
             change |= changeSelectedTile(unit.getTile(), true);
         }
@@ -1427,6 +1452,11 @@ public class SwingGUI extends GUI {
     public void refresh() {
         this.mapViewer.getMapViewerRepaintManager().markAsDirty();
         this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+    
+    @Override
+    public void repaint() {
+    	this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 
     /**
