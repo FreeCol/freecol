@@ -282,6 +282,12 @@ public final class MapViewer extends FreeColClientHolder {
             paintBlackBackground(g2d, clipBounds);
             return false;
         }
+        
+        if (rpm.isRepaintsBlocked(size)) {
+            final VolatileImage backBufferImage = rpm.getBackBufferImage();
+            g2d.drawImage(backBufferImage, 0, 0, null);
+            return false;
+        }
 
         if (mapViewerBounds.isRepositionNeeded()) {
             mapViewerBounds.positionMap();

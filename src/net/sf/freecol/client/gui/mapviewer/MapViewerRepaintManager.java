@@ -29,6 +29,7 @@ public class MapViewerRepaintManager {
     private Rectangle dirtyRegion = null;
     private Tile focus = null;
     private Point focusPoint = null;
+    private boolean repaintsBlocked = false;
 
 
     MapViewerRepaintManager() {
@@ -52,6 +53,7 @@ public class MapViewerRepaintManager {
 
         this.focus = focus;
         this.focusPoint = mapViewerBounds.tileToPoint(focus);
+        this.repaintsBlocked = false;
 
         if (isBuffersUninitialized(size)) {
             initializeBuffers(size);
@@ -155,6 +157,33 @@ public class MapViewerRepaintManager {
      */
     BufferedImage getNonAnimationBufferImage() {
         return nonAnimationBufferImage;
+    }
+
+    /**
+     * Stops the map viewer from being updated in the user interface
+     * by using the backbuffer for repaint requests.
+     * 
+     * WARNING: Always secure that this value is set back to
+     *          {@code false}, in reasonable time, and repaint the
+     *          entire map after doing so.
+     * 
+     * Please note that a resized frame will still force a repaint.
+     * 
+     * @param repaintsBlocked {@code true} blocks new repaints while
+     *      {@code false} allows repaints to be made again. 
+     */
+    public void setRepaintsBlocked(boolean repaintsBlocked) {
+        this.repaintsBlocked = repaintsBlocked;
+    }
+
+    /**
+     * Checks if repaints are temporarily served using only the
+     * back buffer.
+     * 
+     * @see #setRepaintsBlocked(boolean)
+     */
+    boolean isRepaintsBlocked(Dimension size) {
+        return repaintsBlocked && !isBuffersUninitialized(size);
     }
 
     private boolean isBuffersUninitialized(Dimension size) {
