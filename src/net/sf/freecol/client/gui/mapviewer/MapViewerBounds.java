@@ -676,4 +676,8 @@ public final class MapViewerBounds {
             positionMap();
         }
     }
+    
+    TileBounds getTileBounds() {
+        return tileBounds;
+    }
 }

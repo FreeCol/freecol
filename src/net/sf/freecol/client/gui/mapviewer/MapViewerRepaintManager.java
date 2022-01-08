@@ -205,7 +205,7 @@ public class MapViewerRepaintManager {
 
         final int dx = repositionedOldFocusPoint.x - oldFocusPoint.x;
         final int dy = repositionedOldFocusPoint.y - oldFocusPoint.y;
-        updateDirtyRegion(size, dx, dy);
+        updateDirtyRegion(size, mapViewerBounds.getTileBounds(), dx, dy);
 
         if (!isAllDirty()) {
             moveContents(backBufferImage, dx, dy);
@@ -222,7 +222,7 @@ public class MapViewerRepaintManager {
      * @param dy The number of pixels to move the contents of the buffers
      *      for the y coordinate. The value can be negative.
      */
-    private void updateDirtyRegion(final Dimension size, final int dx, final int dy) {
+    private void updateDirtyRegion(final Dimension size, final TileBounds tileBounds, final int dx, final int dy) {
         if (dirtyRegion != null) {
             dirtyRegion.translate(dx, dy);
         }
@@ -232,11 +232,21 @@ public class MapViewerRepaintManager {
         
         final Area dirtyArea = new Area(new Rectangle(0, 0, size.width, size.height));
         dirtyArea.subtract(new Area(newBounds));
+        final Rectangle newDirtyBounds = dirtyArea.getBounds();
+        
+        /*
+         * TODO: Move the definition, on how far tile graphics can extend into neighbouring tiles,
+         *       from TileClippingBounds to MapViewerBounds -- and use here.
+         *       
+         *       For now, adding enough space to satisfy superExtendedTiles.
+         */
+        newDirtyBounds.grow(tileBounds.getHalfWidth(), tileBounds.getHeight());
+        
         
         if (dirtyRegion != null) {
-            dirtyRegion = dirtyRegion.union(dirtyArea.getBounds());
+            dirtyRegion = dirtyRegion.union(newDirtyBounds);
         } else {
-            dirtyRegion = dirtyArea.getBounds();
+            dirtyRegion = newDirtyBounds;
         }
     }
 
