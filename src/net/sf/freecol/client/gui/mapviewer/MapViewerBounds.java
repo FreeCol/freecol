@@ -344,14 +344,17 @@ public final class MapViewerBounds {
      * Sets the focus tile.
      *
      * @param focus The new focus {@code Tile}.
+     * @return {@code true} if the focus has changed, and
+     *      {@code false} otherwise.
      */
-    public void setFocus(Tile focus) {
-        if (focus == null) {
-            return;
+    public boolean setFocus(Tile focus) {
+        if (focus == null || this.focus == focus) {
+            return false;
         }
 
         this.focus = focus;
         forceReposition();
+        return true;
     }
 
     /**

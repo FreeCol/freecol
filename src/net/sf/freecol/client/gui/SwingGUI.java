@@ -287,10 +287,10 @@ public class SwingGUI extends GUI {
         if (center && first != getFocus()) {
             this.mapViewer.getMapViewerBounds().setFocus(first);
         }
-        
+
         // Stops repaints while we are waiting for the updated tiles to arrive:
         mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(true);
-        
+
         invokeNowOrLater(() -> {
             /*
              * XXX: Using an extra invokeLater to ensure that the updated tiles
@@ -298,12 +298,21 @@ public class SwingGUI extends GUI {
              *      this would be having separate pre (before the update) and
              *      post (after the update) events.
              */
-        	SwingUtilities.invokeLater(() -> {
-        		mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
-        		for (Animation a : animations) {
-        			animate(a);
-        		}
-        	});
+            SwingUtilities.invokeLater(() -> {
+                /*
+                 * We might have switched active unit. In that case, we have to refocus
+                 * after the animation has completed.
+                 */
+                final Tile originalFocus = mapViewer.getMapViewerBounds().getFocus();
+
+                mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
+                for (Animation a : animations) {
+                    animate(a);
+                }
+                if (originalFocus != null && mapViewer.getMapViewerBounds().setFocus(originalFocus)) {
+                    repaint();
+                }
+            });
         });
     }
     
