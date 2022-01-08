@@ -186,6 +186,8 @@ public final class MapViewerBounds {
         // If the row to display is inset (y odd) and there is no
         // extra space we display one fewer column before the center tile
         this.columnOddYOffset = (hExtra == 0) ? -1 : 0;
+
+        forceReposition();
     }
 
 

@@ -282,12 +282,12 @@ public final class MapViewer extends FreeColClientHolder {
             paintBlackBackground(g2d, clipBounds);
             return false;
         }
-        
+
         if (mapViewerBounds.isRepositionNeeded()) {
             mapViewerBounds.positionMap();
         }  
         
-        boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(size, mapViewerBounds.getFocus());
+        boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(mapViewerBounds, mapViewerBounds.getFocus());
         final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();
         if (rpm.isAllDirty()) {
             fullMapRenderedWithoutUsingBackBuffer = true;
