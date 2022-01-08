@@ -81,7 +81,7 @@ public final class MapViewerBounds {
      * as close to the center of the screen as possible.
      */
     private Tile focus = null;
-    
+
     /*
      * These variables depend on the map scale and also the map pixel size,
      * which changes in updateSizedVariables().
@@ -96,34 +96,34 @@ public final class MapViewerBounds {
      * Number of rows above/below the center tile.
      */
     private int centerRows;
-    
+
     /**
      * Almost the number of columns to the left/right of the center tile.
      * There are special cases handled in getLeft/RightColumns().
      */
     private int centerColumns;
-    
+
     /**
      * Special y-odd/even offsets to centerColumns. FIXME: explain!
      */
     private int columnEvenYOffset, columnOddYOffset;
-    
+
     /**
      * The topmost and leftmost tile that is displayed in the MapViewer.
      */
     private Map.Position topLeftVisibleTile = new Map.Position(-1, -1);
-    
+
     /**
      * The position of the top-left corner of {@link topLeftVisibleTile} when
      * rendering.
      */
     private Point topLeftVisibleTilePoint = new Point(0, 0);
-    
+
     /**
      * The bottommost and rightmost tile that is displayed in the MapViewer.
      */
     private Map.Position bottomRightVisibleTile = new Map.Position(-1, -1);
-    
+
     /**
      * Describes if repositioning needs to be performed before drawing.
      */
@@ -131,25 +131,25 @@ public final class MapViewerBounds {
 
     // Whether the map is currently aligned with the edge.
     private boolean alignedTop = false, alignedBottom = false,
-        alignedLeft = false, alignedRight = false;
-    
+            alignedLeft = false, alignedRight = false;
+
     /**
      * Scaled sizes of a tile. This is used when calculating other variables.
      */
     private TileBounds tileBounds;
-    
-    
+
+
     MapViewerBounds() {
         this.size = new Dimension(0, 0); // Start empty, update is coming
         this.tileBounds = new TileBounds(new Dimension(0, 0), 1f);
     }
-    
+
     /**
      * Update the variables that depend on the screen size (and scale).
      */
     void updateSizeVariables(TileBounds tileBounds) {
         this.tileBounds = tileBounds;
-        
+
         // If we draw a tile in the center of the frame, then there is
         // vSpace pixels above and below it, and hSpace pixels to the
         // left and right.
@@ -187,8 +187,8 @@ public final class MapViewerBounds {
         // extra space we display one fewer column before the center tile
         this.columnOddYOffset = (hExtra == 0) ? -1 : 0;
     }
-    
-    
+
+
     /**
      * Sets the focus of the map but offset to the left or right so
      * that the focus position can still be visible when a popup is
@@ -206,7 +206,7 @@ public final class MapViewerBounds {
         int ret = 0, moveX = -1;
         final Map map = tile.getMap();
         final int tx = tile.getX(), ty = tile.getY(),
-            width = bottomRightVisibleTile.getX() - topLeftVisibleTile.getX();
+                width = bottomRightVisibleTile.getX() - topLeftVisibleTile.getX();
         if (topLeftVisibleTile.getX() <= 0) { // At left edge already
             if (tx <= width / 4) {
                 ret = -1;
@@ -237,7 +237,7 @@ public final class MapViewerBounds {
         }
         return ret;
     }
-    
+
     /**
      * Scroll the map in the given direction.
      *
@@ -249,7 +249,9 @@ public final class MapViewerBounds {
         if (t == null) return false;
         final Map map = t.getMap();
         final int fx = t.getX(), fy = t.getY();
-        if ((t = t.getNeighbourOrNull(direction)) == null) return false;
+        if ((t = t.getNeighbourOrNull(direction)) == null) {
+            return false;
+        }
         final int tx = t.getX(), ty = t.getY();
 
         final int mapHeight = map.getHeight(), mapWidth = map.getWidth();
@@ -259,7 +261,7 @@ public final class MapViewerBounds {
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
             y = (ty <= fy) ? fy : this.centerRows;
         } else if (isMapNearBottom(ty, mapHeight)
-            && isMapNearBottom(fy, mapHeight)) {
+                && isMapNearBottom(fy, mapHeight)) {
             y = (ty >= fy) ? fy : mapHeight - this.centerRows;
         } else {
             y = ty;
@@ -267,7 +269,7 @@ public final class MapViewerBounds {
         if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
             x = (tx <= fx) ? fx : getLeftColumns(ty);
         } else if (isMapNearRight(tx, ty, mapWidth)
-            && isMapNearRight(fx, fy, mapWidth)) {
+                && isMapNearRight(fx, fy, mapWidth)) {
             x = (tx >= fx) ? fx : mapWidth - getRightColumns(ty);
         } else {
             x = tx;
@@ -277,7 +279,7 @@ public final class MapViewerBounds {
         setFocus(map.getTile(x, y));
         return true;
     }
-    
+
     /**
      * Checks if a tile is displayed on the screen but not too close
      * to the edges.
@@ -294,7 +296,7 @@ public final class MapViewerBounds {
                 && (tile.getY() - 2 > topLeftVisibleTile.getY() || alignedTop)
                 && (tile.getY() + 3 < bottomRightVisibleTile.getY() || alignedBottom);
     }
-    
+
     /**
      * Gets the position of the given {@code Tile} on the visible map.
      *
@@ -311,14 +313,14 @@ public final class MapViewerBounds {
         if (rhs) a[0] += tileBounds.getWidth();
         return new Point(a[0], a[1]);
     }
-    
+
     /**
      * Force the next screen repaint to reposition the tiles on the window.
      */
     void forceReposition() {
         shouldReposition = true;
     }
-    
+
     /**
      * Sets the focus tile.
      *
@@ -328,18 +330,18 @@ public final class MapViewerBounds {
         if (focus == null) {
             return;
         }
-        
+
         this.focus = focus;
         forceReposition();
     }
-    
+
     /**
      * Checks if {@code #positionMap()} needs to be called before painting.
      */
     boolean isRepositionNeeded() {
         return shouldReposition;
     }
-    
+
     /**
      * Position the map using the focus tile.
      */
@@ -348,7 +350,7 @@ public final class MapViewerBounds {
             positionMap(this.focus);
         }
     }
-    
+
     /**
      * Position the map so that the supplied tile is displayed at the center.
      * @param pos The {@code Tile} to center at.
@@ -358,16 +360,16 @@ public final class MapViewerBounds {
         final Map map = pos.getMap();
         final int mapWidth = map.getWidth(), mapHeight = map.getHeight();
         int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
-        
+
         int leftColumn, rightColumn, topRow, bottomRow, topRowY, leftColumnX;
-        
+
         /*
           PART 1
           ======
           Calculate: bottomRow, topRow, topRowY
           This will tell us which rows need to be drawn on the screen (from
           bottomRow until and including topRow).
-        */
+         */
         alignedTop = false;
         alignedBottom = false;
         if ((this.size.height / tileBounds.getHalfHeight()) - 1 >= mapHeight) {
@@ -393,9 +395,9 @@ public final class MapViewerBounds {
                 topRow++;
             }
             topRow = mapHeight - topRow;
-                
+
             topRowY = (size.height - tileBounds.getHeight())
-                - (bottomRow - topRow) * tileBounds.getHalfHeight();
+                    - (bottomRow - topRow) * tileBounds.getHalfHeight();
         } else { // We are not at the top of the map and not at the bottom
             bottomRow = y + this.centerRows - 1;
             topRow = y - this.centerRows;
@@ -412,7 +414,7 @@ public final class MapViewerBounds {
           leftColumnX will tell us at which x-coordinate the left
           column needs to be drawn (this is for the Tiles where y&1 == 0;
           the others should be halfWidth more to the right).
-        */
+         */
         alignedLeft = false;
         alignedRight = false;
         if (this.size.width / (tileBounds.getWidth() - 1) >= mapWidth) {
@@ -437,25 +439,25 @@ public final class MapViewerBounds {
                 leftColumn++;
             }
             leftColumnX = this.size.width - tileBounds.getWidth() - tileBounds.getHalfWidth()
-                - leftColumn * tileBounds.getWidth();
+                    - leftColumn * tileBounds.getWidth();
             leftColumn = rightColumn - leftColumn;
         } else { // We are not at the left of the map and not at the right
             leftColumn = x - leftColumns;
             rightColumn = x + rightColumns;
 
             leftColumnX = (this.size.width - tileBounds.getWidth()) / 2
-                - leftColumns * tileBounds.getWidth();
+                    - leftColumns * tileBounds.getWidth();
         }
-        
+
         this.topLeftVisibleTile = new Map.Position(leftColumn, topRow);
         this.bottomRightVisibleTile = new Map.Position(rightColumn, bottomRow);
         this.topLeftVisibleTilePoint = new Point(leftColumnX, topRowY);
-        
+
         shouldReposition = false;
     }
-    
+
     // There is no getTop/BottomRows(), this.centerRows is sufficient
-    
+
     /**
      * Get the number of columns that are to the left of the center tile
      * with the given y-coordinate.
@@ -465,7 +467,7 @@ public final class MapViewerBounds {
      */
     private int getLeftColumns(int y) {
         return this.centerColumns
-            + (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
+                + (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
     }
 
     /**
@@ -479,7 +481,7 @@ public final class MapViewerBounds {
      */
     private int getRightColumns(int y) {
         return this.centerColumns
-            - (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
+                - (((y & 1) == 0) ? this.columnEvenYOffset : this.columnOddYOffset);
     }
 
     /**
@@ -541,19 +543,19 @@ public final class MapViewerBounds {
         if ((y & 1) != 0) a[0] += tileBounds.getHalfWidth(); // Property#2
         a[1] = topLeftVisibleTilePoint.y + tileBounds.getHalfHeight() * (y - topLeftVisibleTile.getY()); // Property#5
     }
-    
+
     Map.Position getTopLeftVisibleTile() {
         return topLeftVisibleTile;
     }
-    
+
     Point getTopLeftVisibleTilePoint() {
         return topLeftVisibleTilePoint;
     }
-    
+
     Dimension getSize() {
         return size;
     }
-    
+
     /**
      * Gets the focus tile, that is, the center tile of the displayed map.
      *
@@ -562,7 +564,7 @@ public final class MapViewerBounds {
     public Tile getFocus() {
         return this.focus;
     }
-    
+
     /**
      * Converts the given screen coordinates to Map coordinates.
      * It checks to see to which Tile the given pixel 'belongs'.
@@ -585,9 +587,9 @@ public final class MapViewerBounds {
         // difference in units of rows and columns.
         final int fx = this.focus.getX(), fy = this.focus.getY();
         int dcol = (x - leftOffset + (x > leftOffset ? tileBounds.getHalfWidth() : -tileBounds.getHalfWidth()))
-            / tileBounds.getWidth();
+                / tileBounds.getWidth();
         int drow = (y - topOffset + (y > topOffset ? tileBounds.getHalfHeight() : -tileBounds.getHalfHeight()))
-            / tileBounds.getHeight();
+                / tileBounds.getHeight();
         int px = leftOffset + dcol * tileBounds.getWidth();
         int py = topOffset + drow * tileBounds.getHeight();
         // Since rows are shifted, we need to correct.
@@ -627,12 +629,12 @@ public final class MapViewerBounds {
         }
         return map.getTile(col, row);
     }
-    
+
     void changeSize(Dimension size, TileBounds tileBounds) {
         this.size = size;
         updateSizeVariables(tileBounds);
     }
-    
+
     /**
      * Strict check for tile visibility (unlike onScreen).
      *
@@ -645,7 +647,7 @@ public final class MapViewerBounds {
         return tile.getX() >= topLeftVisibleTile.getX() && tile.getX() <= bottomRightVisibleTile.getX()
                 && tile.getY() >= topLeftVisibleTile.getY() && tile.getY() <= bottomRightVisibleTile.getY();
     }
-    
+
     private void repositionMapIfNeeded() {
         if (isRepositionNeeded()) {
             positionMap();
