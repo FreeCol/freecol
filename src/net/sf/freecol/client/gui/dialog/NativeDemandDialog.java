@@ -19,11 +19,7 @@
 
 package net.sf.freecol.client.gui.dialog;
 
-import java.awt.event.ActionEvent;
-import java.util.List;
-
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,10 +29,8 @@ import javax.swing.SwingConstants;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
-import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;

@@ -20,20 +20,18 @@
 package net.sf.freecol.client.control;
 
 import java.awt.Color;
-
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.swing.SwingUtilities;
-    
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
@@ -42,8 +40,6 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;

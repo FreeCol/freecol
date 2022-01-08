@@ -32,7 +32,6 @@ import javax.swing.JPanel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;

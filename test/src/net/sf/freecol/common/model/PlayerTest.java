@@ -19,13 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Iterator;
+import static net.sf.freecol.common.util.CollectionUtils.count;
 
-import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 public class PlayerTest extends FreeColTestCase {

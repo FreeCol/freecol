@@ -36,8 +36,6 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -61,7 +59,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.option.OptionGroup;
 
 

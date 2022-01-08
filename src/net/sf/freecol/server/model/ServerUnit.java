@@ -69,7 +69,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.option.GameOptions;

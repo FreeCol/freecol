@@ -19,10 +19,7 @@
 
 package net.sf.freecol.client.gui.plaf;
 
-import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.Image;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

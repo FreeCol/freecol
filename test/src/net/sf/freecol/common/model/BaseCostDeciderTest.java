@@ -18,11 +18,8 @@
  */
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;

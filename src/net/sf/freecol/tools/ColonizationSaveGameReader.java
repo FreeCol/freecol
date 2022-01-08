@@ -21,7 +21,6 @@ package net.sf.freecol.tools;
 
 import java.io.EOFException;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 

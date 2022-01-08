@@ -19,7 +19,9 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.ArrayList;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.networking.ChangeSet;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

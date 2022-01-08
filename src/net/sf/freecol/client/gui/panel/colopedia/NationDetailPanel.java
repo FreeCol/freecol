@@ -31,10 +31,8 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
-import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;

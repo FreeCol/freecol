@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.LayoutManager;
 
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.common.model.Unit;
 
 

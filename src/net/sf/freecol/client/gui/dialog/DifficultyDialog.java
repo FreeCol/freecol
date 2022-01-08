@@ -32,9 +32,7 @@ import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.*;
-import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;

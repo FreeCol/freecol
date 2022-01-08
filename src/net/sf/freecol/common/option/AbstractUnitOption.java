@@ -30,9 +30,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

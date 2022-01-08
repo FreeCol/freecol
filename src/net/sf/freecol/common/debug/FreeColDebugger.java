@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.debug;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -37,7 +36,6 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

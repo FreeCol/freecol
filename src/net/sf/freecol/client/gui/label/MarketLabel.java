@@ -25,7 +25,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;

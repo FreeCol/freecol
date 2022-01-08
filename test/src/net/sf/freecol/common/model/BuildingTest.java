@@ -19,24 +19,27 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.ProductionType;
-import net.sf.freecol.common.model.Tile;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;

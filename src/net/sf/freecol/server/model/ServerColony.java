@@ -19,6 +19,11 @@
 
 package net.sf.freecol.server.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
+import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +31,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -59,9 +63,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

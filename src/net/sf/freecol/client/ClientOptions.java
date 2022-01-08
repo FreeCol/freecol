@@ -19,23 +19,26 @@
 
 package net.sf.freecol.client;
 
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableMap;
+import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.Collator;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -46,22 +49,15 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

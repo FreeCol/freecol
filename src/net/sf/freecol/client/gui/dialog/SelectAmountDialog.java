@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.logging.Logger;
 
 import javax.swing.InputVerifier;
@@ -32,12 +31,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

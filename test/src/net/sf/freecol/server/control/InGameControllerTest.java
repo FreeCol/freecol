@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;

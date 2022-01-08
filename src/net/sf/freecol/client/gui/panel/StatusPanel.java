@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.FlowLayout;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;

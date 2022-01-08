@@ -19,14 +19,8 @@
 
 package net.sf.freecol.client.gui.label;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Image;
-
-import javax.swing.ImageIcon;
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.client.gui.panel.Utility;

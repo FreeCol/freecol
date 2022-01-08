@@ -19,23 +19,23 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.function.Function;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -55,10 +55,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.label.FreeColLabel;
 import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.i18n.Messages;
@@ -73,7 +71,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeLocation;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

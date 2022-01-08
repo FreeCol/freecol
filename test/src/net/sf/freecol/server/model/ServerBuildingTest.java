@@ -19,9 +19,11 @@
 
 package net.sf.freecol.server.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
@@ -31,7 +33,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;

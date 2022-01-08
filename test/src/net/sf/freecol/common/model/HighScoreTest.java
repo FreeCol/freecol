@@ -22,8 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 

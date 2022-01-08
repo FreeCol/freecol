@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;

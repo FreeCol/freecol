@@ -29,7 +29,6 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.dialog.*;
 import net.sf.freecol.common.i18n.Messages;
 
 

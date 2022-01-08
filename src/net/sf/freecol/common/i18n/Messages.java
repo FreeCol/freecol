@@ -19,20 +19,22 @@
 
 package net.sf.freecol.common.i18n;
 
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.map;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.StringUtils.downCase;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
@@ -44,15 +46,12 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 

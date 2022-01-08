@@ -39,7 +39,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
-import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockPseudoRandom;
 

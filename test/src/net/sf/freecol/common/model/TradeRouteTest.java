@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 

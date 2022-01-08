@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.label;
 
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;

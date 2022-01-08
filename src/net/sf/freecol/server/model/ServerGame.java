@@ -19,15 +19,14 @@
 
 package net.sf.freecol.server.model;
 
-import java.lang.reflect.InvocationTargetException;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.flatten;
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -53,30 +52,23 @@ import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.SimpleCombatModel;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NewTurnMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 

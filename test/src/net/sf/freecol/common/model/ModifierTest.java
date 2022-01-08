@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;

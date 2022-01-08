@@ -19,14 +19,16 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.networking.ChangeSet;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;

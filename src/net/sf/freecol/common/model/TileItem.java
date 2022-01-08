@@ -22,8 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.common.io.FreeColXMLReader;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;

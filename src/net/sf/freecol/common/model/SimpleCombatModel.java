@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Modifier.ModifierType;
-import net.sf.freecol.common.model.UnitTypeChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;

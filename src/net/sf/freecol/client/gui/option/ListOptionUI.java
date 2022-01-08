@@ -42,7 +42,6 @@ import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
-import net.sf.freecol.common.option.Option;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

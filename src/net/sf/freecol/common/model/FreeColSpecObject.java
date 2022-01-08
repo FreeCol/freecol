@@ -19,9 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Specification;
-
 
 /**
  * A FreeColObject that also contains a Specification.

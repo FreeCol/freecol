@@ -19,11 +19,21 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,9 +42,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -42,18 +51,16 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.NationOptions.Advantages;
-import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -61,15 +68,10 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionContainer;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
-import net.sf.freecol.common.option.RangeOption;
-import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**

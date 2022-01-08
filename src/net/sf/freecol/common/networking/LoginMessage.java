@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;

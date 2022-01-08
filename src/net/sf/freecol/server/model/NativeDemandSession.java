@@ -23,14 +23,11 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.CloseMessage;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

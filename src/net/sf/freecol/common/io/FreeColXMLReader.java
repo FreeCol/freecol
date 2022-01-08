@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;

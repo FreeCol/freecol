@@ -19,8 +19,6 @@
 
 package net.sf.freecol.util.test;
 
-import java.util.Iterator;
-
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;

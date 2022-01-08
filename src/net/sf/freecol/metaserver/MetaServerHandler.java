@@ -19,7 +19,6 @@
 
 package net.sf.freecol.metaserver;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -33,7 +32,6 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
 
 

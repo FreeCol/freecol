@@ -20,8 +20,6 @@
 package net.sf.freecol.common.sound;
 
 import java.io.File;
-import java.io.IOException;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;

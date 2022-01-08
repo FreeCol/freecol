@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -33,7 +32,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

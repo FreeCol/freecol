@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -38,7 +37,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.util.OSUtils;
 
 

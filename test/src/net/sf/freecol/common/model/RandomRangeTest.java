@@ -21,8 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.Random;
 
-import net.sf.freecol.common.model.RandomRange;
-
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

@@ -40,7 +40,6 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 
 

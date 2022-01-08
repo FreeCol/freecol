@@ -25,8 +25,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
-import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

@@ -20,7 +20,6 @@
 package net.sf.freecol.client.control;
 
 import java.io.File;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.Mixer;
@@ -29,7 +28,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.AudioMixerOption;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.sound.SoundPlayer;

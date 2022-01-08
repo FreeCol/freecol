@@ -19,10 +19,16 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Dimension;
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.all;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.minimize;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -30,16 +36,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.util.LogBuilder;
 
 

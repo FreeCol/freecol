@@ -38,7 +38,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;

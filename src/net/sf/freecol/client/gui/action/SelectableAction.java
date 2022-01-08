@@ -23,7 +23,6 @@ import java.util.logging.Level;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.common.model.Player;
 
 
 /**

@@ -22,14 +22,9 @@ package net.sf.freecol.common.networking;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +38,6 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

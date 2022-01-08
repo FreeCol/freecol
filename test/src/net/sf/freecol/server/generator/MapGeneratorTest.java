@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -44,7 +43,6 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;

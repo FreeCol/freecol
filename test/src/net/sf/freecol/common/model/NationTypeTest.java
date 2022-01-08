@@ -19,10 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;

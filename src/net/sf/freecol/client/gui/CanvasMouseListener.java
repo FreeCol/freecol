@@ -19,20 +19,12 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.Point;
 import java.util.logging.Logger;
-
-import javax.swing.Timer;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 
 
 /**

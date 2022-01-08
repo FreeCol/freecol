@@ -47,7 +47,6 @@ import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

@@ -19,14 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.count;
 
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 public class UnitChangeTypeTest extends FreeColTestCase {

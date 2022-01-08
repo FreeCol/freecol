@@ -19,13 +19,17 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -42,7 +46,6 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
@@ -60,7 +63,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 
 

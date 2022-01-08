@@ -71,7 +71,6 @@ import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

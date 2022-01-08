@@ -24,12 +24,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.option.IntegerOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;

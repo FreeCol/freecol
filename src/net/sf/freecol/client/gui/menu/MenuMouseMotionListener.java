@@ -24,7 +24,6 @@ import java.awt.event.MouseMotionListener;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.AbstractCanvasListener;
-import net.sf.freecol.client.gui.Canvas;
 
 
 /**

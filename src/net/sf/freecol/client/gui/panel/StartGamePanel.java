@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -36,11 +35,9 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;

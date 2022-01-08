@@ -19,7 +19,8 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.List;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -32,7 +33,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;

@@ -46,8 +46,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.sf.freecol.common.util.CachingFunction;
-
 
 /**
  * Collection of small static helper methods using Collections.

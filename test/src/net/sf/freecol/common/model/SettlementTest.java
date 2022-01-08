@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;

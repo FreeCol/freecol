@@ -23,8 +23,6 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 

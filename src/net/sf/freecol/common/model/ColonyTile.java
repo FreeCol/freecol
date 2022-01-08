@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;

@@ -27,8 +27,6 @@ import java.util.Set;
 
 import net.sf.freecol.common.FreeColException;
 import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;

@@ -19,18 +19,17 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.StringUtils.downCase;
+import static net.sf.freecol.common.util.StringUtils.getEnumKey;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**

@@ -21,9 +21,7 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -32,7 +30,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;

@@ -19,26 +19,26 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Dimension;
+import static net.sf.freecol.common.util.CollectionUtils.concat;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

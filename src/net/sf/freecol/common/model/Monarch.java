@@ -19,9 +19,16 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
+import static net.sf.freecol.common.util.RandomUtils.randomDouble;
+import static net.sf.freecol.common.util.RandomUtils.randomInt;
+import static net.sf.freecol.common.util.StringUtils.getEnumKey;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -30,15 +37,9 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**

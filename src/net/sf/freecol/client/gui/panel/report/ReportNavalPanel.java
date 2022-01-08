@@ -18,12 +18,8 @@
  */
 package net.sf.freecol.client.gui.panel.report;
 
-import java.util.List;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;

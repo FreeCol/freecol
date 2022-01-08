@@ -19,24 +19,17 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

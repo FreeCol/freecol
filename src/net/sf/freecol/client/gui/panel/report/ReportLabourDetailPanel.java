@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel.report;
 
-import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
 import javax.swing.ImageIcon;

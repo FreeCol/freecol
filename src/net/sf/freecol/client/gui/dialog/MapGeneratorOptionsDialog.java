@@ -19,15 +19,12 @@
 
 package net.sf.freecol.client.gui.dialog;
 
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,16 +42,14 @@ import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.client.gui.option.OptionUI;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
-import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

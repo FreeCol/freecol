@@ -46,7 +46,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerGame;

@@ -19,6 +19,11 @@
 
 package net.sf.freecol.client.gui.panel.report;
 
+import static net.sf.freecol.common.util.CollectionUtils.appendToMapList;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,32 +34,26 @@ import java.util.function.Function;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

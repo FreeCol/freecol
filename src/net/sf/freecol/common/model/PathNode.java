@@ -21,7 +21,6 @@
 package net.sf.freecol.common.model;
 
 import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.util.LogBuilder;
 
 

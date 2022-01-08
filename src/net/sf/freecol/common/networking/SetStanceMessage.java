@@ -28,7 +28,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

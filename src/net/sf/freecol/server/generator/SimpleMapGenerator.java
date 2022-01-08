@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.generator;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -63,7 +61,6 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;

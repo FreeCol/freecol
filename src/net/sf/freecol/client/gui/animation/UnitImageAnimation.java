@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.animation;
 
 import java.awt.Image;
-import java.awt.Point;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;

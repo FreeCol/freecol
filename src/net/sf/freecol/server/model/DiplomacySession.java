@@ -33,8 +33,6 @@ import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.CloseMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
-import net.sf.freecol.common.networking.Message;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

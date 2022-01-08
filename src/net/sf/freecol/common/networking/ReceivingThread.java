@@ -19,24 +19,19 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.io.FreeColXMLReader;
-
 import org.xml.sax.SAXException;
+
+import net.sf.freecol.common.FreeColException;
 
 
 /**

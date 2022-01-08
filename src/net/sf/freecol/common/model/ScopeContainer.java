@@ -29,9 +29,7 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Scope;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

@@ -19,10 +19,11 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.Utils.delay;
+import static net.sf.freecol.common.util.Utils.now;
+
 import java.awt.Point;
-import java.lang.Math;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -30,8 +31,6 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.Utils.*;
 
 
 /**

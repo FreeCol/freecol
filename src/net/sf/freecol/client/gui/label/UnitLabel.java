@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.label;
 
+import static net.sf.freecol.common.util.StringUtils.upCase;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -33,7 +35,6 @@ import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
@@ -44,11 +45,9 @@ import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.InPortPanel;
-import net.sf.freecol.client.gui.panel.report.ReportPanel;
 import net.sf.freecol.client.gui.panel.Utility;
-import net.sf.freecol.client.gui.Size;
+import net.sf.freecol.client.gui.panel.report.ReportPanel;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
@@ -57,9 +56,8 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
-import static net.sf.freecol.common.model.Unit.*;
-import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.model.Unit.UnitLabelType;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 
 /**

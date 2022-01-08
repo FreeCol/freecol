@@ -30,7 +30,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.*;
-import net.sf.freecol.client.gui.Size;
 import net.sf.freecol.common.model.Region;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 

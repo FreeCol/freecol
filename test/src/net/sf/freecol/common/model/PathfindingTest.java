@@ -19,11 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.server.model.ServerUnit;

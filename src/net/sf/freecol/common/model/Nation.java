@@ -19,11 +19,14 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
+import static net.sf.freecol.common.model.Constants.UNDEFINED;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.RandomUtils.randomInt;
 
+import java.awt.Color;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import javax.xml.stream.XMLStreamException;
@@ -31,9 +34,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**

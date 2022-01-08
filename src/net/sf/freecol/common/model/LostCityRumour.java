@@ -33,7 +33,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;

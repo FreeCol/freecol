@@ -31,8 +31,6 @@ import javax.xml.validation.Validator;
 
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 

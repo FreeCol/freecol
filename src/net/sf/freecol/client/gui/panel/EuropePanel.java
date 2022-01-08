@@ -48,7 +48,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;

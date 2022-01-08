@@ -19,11 +19,9 @@
 
 package net.sf.freecol.client.gui.menu;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -36,7 +34,6 @@ import javax.swing.event.ChangeEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -47,7 +44,6 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.Utils.*;
 
 

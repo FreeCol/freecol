@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 

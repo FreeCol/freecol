@@ -19,14 +19,12 @@
 
 package net.sf.freecol.client.gui.menu;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;

@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 
@@ -35,11 +34,9 @@ import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,15 +29,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

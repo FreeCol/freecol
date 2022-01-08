@@ -19,6 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.ImageUtils.createResizedImage;
+
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -38,7 +43,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -48,8 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
 import net.sf.freecol.client.gui.label.Draggable;
 import net.sf.freecol.client.gui.label.GoodsLabel;
@@ -64,8 +66,6 @@ import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.ImageUtils.*;
 
 
 /**

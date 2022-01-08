@@ -33,7 +33,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
 import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.UnitTypeChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

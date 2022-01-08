@@ -19,19 +19,19 @@
 
 package net.sf.freecol.common.io;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.BufferedInputStream;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.dialog.*;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
 
 
 /**

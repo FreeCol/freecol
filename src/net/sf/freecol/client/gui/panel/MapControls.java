@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -29,14 +31,11 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.model.Game;
+import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Introspector;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**

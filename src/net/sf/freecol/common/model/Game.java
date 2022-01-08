@@ -41,7 +41,6 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.Introspector;

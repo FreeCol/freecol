@@ -23,7 +23,6 @@ import java.util.List;
 
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

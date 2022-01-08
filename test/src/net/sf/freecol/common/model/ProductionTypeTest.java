@@ -23,10 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.UnitType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 

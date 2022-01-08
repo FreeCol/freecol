@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 

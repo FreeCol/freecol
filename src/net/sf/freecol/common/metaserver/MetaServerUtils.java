@@ -43,11 +43,9 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.Utils.*;
-import net.sf.freecol.server.FreeColServer;
 
 
 /**

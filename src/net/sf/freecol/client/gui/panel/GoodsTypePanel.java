@@ -20,19 +20,12 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.awt.event.MouseListener;
 import java.awt.LayoutManager;
-
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.gui.label.GoodsTypeLabel;
-
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Unit;
 
 
 /**
