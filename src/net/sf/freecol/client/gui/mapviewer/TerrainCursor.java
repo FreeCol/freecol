@@ -62,21 +62,15 @@ class TerrainCursor implements ActionListener  {
         return this.active;
     }
 
-    /**
-     * Sets the active state of the TerrainCursor.
-     *
-     * @param newState a {@code boolean} value
-     */
-    void setActive(boolean newState) {
-        this.active = newState;
-    }
-
     void startBlinking() {
         if (!this.blinkTimer.isRunning()) this.blinkTimer.start();
     }
 
     void stopBlinking() {
-        if (this.blinkTimer.isRunning()) this.blinkTimer.stop();
+        if (this.blinkTimer.isRunning()) {
+            this.blinkTimer.stop();
+            this.active = true;
+        }
     }
 
     void addActionListener(ActionListener listener) {
@@ -95,6 +89,13 @@ class TerrainCursor implements ActionListener  {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
+        if (!this.blinkTimer.isRunning()) {
+            /*
+             * Avoids changing active to false after kalling
+             * this.blinkTimer.stop() 
+             */
+            return;
+        }
         this.active = !this.active;
         int eventId = (this.active) ? ON : OFF;
         ActionEvent blinkEvent = new ActionEvent(this, eventId, "blink");
