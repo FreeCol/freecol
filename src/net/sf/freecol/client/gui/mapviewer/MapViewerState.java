@@ -222,11 +222,9 @@ public final class MapViewerState {
     }
 
     /**
-     * For internal use in MapViewer only.
-     * 
-     * @see MapViewer#getVisibleCursorTile()
+     * Returns the {@code Tile} with a cursor on it.
      */
-    Tile getCursorTile() {
+    public Tile getCursorTile() {
         Tile ret = null;
         switch (this.viewMode) {
         case MOVE_UNITS:

@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.mapviewer;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map;
@@ -196,6 +197,9 @@ public final class MapViewerBounds {
      * that the focus position can still be visible when a popup is
      * raised.  If successful, the supplied position will either be at
      * the center of the left or right half of the map.
+     * 
+     * WARNING: This method changes the focus. You need to call
+     *          {@code repaint()}
      *
      * @param tile The {@code Tile} to display.
      * @return Positive if the focus is on the right hand side, negative
@@ -242,6 +246,9 @@ public final class MapViewerBounds {
 
     /**
      * Scroll the map in the given direction.
+     * 
+     * WARNING: This method changes the focus. You need to call
+     *          {@code repaint()}
      *
      * @param direction The {@code Direction} to scroll in.
      * @return True if scrolling occurred.
@@ -342,6 +349,9 @@ public final class MapViewerBounds {
 
     /**
      * Sets the focus tile.
+     * 
+     * WARNING: This method changes the focus. You need to call
+     *          {@code repaint()}
      *
      * @param focus The new focus {@code Tile}.
      * @return {@code true} if the focus has changed, and
@@ -568,6 +578,29 @@ public final class MapViewerBounds {
                 + tileBounds.getHalfHeight() * (tileY - topLeftVisibleTile.getY());
 
         return new Point(x, y);
+    }
+    
+    /**
+     * Calculate the bounds of the rectangle containing a Tile on the
+     * screen.
+     *
+     * If the Tile is not on-screen an empty rectangle is returned.
+     * The bounds includes a one-tile padding area above the Tile and
+     * half a tile padding to each side.
+     *
+     * @param tile The {@code Tile} on the screen.
+     * @return The bounds {@code Rectangle}.
+     */
+    public Rectangle calculateDrawnTileBounds(Tile tile) {
+        if (!isTileVisible(tile)) {
+            return new Rectangle(0, 0, 0, 0);
+        }
+            
+        final Point p = tileToPoint(tile);
+        return new Rectangle(p.x - tileBounds.getHalfWidth(),
+                p.y - tileBounds.getHeight() / 2,
+                tileBounds.getWidth() * 2,
+                tileBounds.getHeight() * 2);
     }
 
     Map.Position getTopLeftVisibleTile() {

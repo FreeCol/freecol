@@ -37,11 +37,14 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -211,43 +214,17 @@ public class SwingGUI extends GUI {
      *
      * @param a The {@code Animation} to perform.
      */
-    private void animate(Animation a) {
-        // Insist that tiles are visible (assume changeFocus centers
-        // sufficiently well that if one is good the rest will be)
+    private void animate(Animation a, JLabel unitLabel) {
         final List<Tile> tiles = a.getTiles();
-        for (Tile t : tiles) {
-            if (!this.mapViewer.getMapViewerBounds().onScreen(t)) {
-                this.mapViewer.getMapViewerBounds().setFocus(t);
-                break;
-            }
-        }
-
         // Calculate the union of the bounds for all the tiles in the
         // animation, this is the area that will need to be repainted
         // as the animation progresses 
         Rectangle bounds = null;
         for (Tile t : tiles) {
-            Rectangle r = this.mapViewer.calculateTileBounds(t);
+            Rectangle r = this.mapViewer.getMapViewerBounds().calculateDrawnTileBounds(t);
             bounds = (bounds == null) ? r : bounds.union(r);
         }
-        // Get the unit label, add to canvas if not already there, and
-        // update the animation with the locations for the label for each
-        // of the animation's tiles
-        final Unit unit = a.getUnit();
-        boolean newLabel = !this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit);
-        JLabel unitLabel = this.mapViewer.getMapViewerState().getUnitAnimator().enterUnitOutForAnimation(unit);
 
-        // Always completely update the screen before starting the animation
-        // as focus may have changed either here or in animations()
-        this.mapViewer.getMapViewerRepaintManager().markAsDirty();
-        paintImmediately();
-
-        List<Point> points = transform(tiles, alwaysTrue(),
-            (t) -> this.mapViewer.getMapViewerState().getUnitAnimator().getAnimationPosition(unitLabel, t));
-        a.setPoints(points);
-        unitLabel.setLocation(points.get(0)); // set location before adding
-        if (newLabel) this.canvas.animationLabel(unitLabel, true);
-            
         // Define a callback to wrap Canvas.paintImmediately(Rectangle)
         final Canvas can = this.canvas;
         final Rectangle aBounds = bounds;
@@ -257,17 +234,8 @@ public class SwingGUI extends GUI {
                 }
             };
 
-        try { // Delegate to the animation
-            a.executeWithLabel(unitLabel, painter);
-        } finally { // Make sure we release the label again
-            this.mapViewer.getMapViewerState().getUnitAnimator().releaseUnitOutForAnimation(unit);
-            
-            if (!this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit)) {
-                this.canvas.animationLabel(unitLabel, false);
-                mapViewer.getMapViewerRepaintManager().markAsDirty(aBounds);
-                repaint();
-            }
-        }
+        // Delegate to the animation
+        a.executeWithLabel(unitLabel, painter);
     }
     
     /**
@@ -288,32 +256,82 @@ public class SwingGUI extends GUI {
             this.mapViewer.getMapViewerBounds().setFocus(first);
         }
 
-        // Stops repaints while we are waiting for the updated tiles to arrive:
-        mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(true);
-
-        invokeNowOrLater(() -> {
+        invokeNowOrWait(() -> {
             /*
-             * XXX: Using an extra invokeLater to ensure that the updated tiles
-             *      have arrived before we continue. A better method of solving
-             *      this would be having separate pre (before the update) and
-             *      post (after the update) events.
+             * We might have switched active unit. In that case, we have to refocus
+             * after the animation has completed.
              */
-            SwingUtilities.invokeLater(() -> {
-                /*
-                 * We might have switched active unit. In that case, we have to refocus
-                 * after the animation has completed.
-                 */
-                final Tile originalFocus = mapViewer.getMapViewerBounds().getFocus();
-
-                mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
-                for (Animation a : animations) {
-                    animate(a);
+            final Tile originalFocus = mapViewer.getMapViewerBounds().getFocus();
+            final List<Tile> allTiles = animations
+                    .stream()
+                    .map(a -> a.getTiles())
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+            
+            // Insist that tiles are visible (assume changeFocus centers
+            // sufficiently well that if one is good the rest will be)
+            for (Tile t : allTiles) {
+                if (!this.mapViewer.getMapViewerBounds().onScreen(t)) {
+                    this.mapViewer.getMapViewerBounds().setFocus(t);
+                    break;
                 }
+            }
+            
+            final List<JLabel> animatedUnitLabels = new ArrayList<>();
+            try {
+                animatedUnitLabels.addAll(prepareUnitLabelsForAnimation(animations));
+
+                // Always completely update the screen before starting the animation
+                // as focus may have changed
+                this.mapViewer.getMapViewerRepaintManager().markAsDirty();
+                paintImmediately();
+                                
+                for (int i=0; i<animations.size(); i++) {
+                    animate(animations.get(i), animatedUnitLabels.get(i));
+                }
+            } finally {
                 if (originalFocus != null && mapViewer.getMapViewerBounds().setFocus(originalFocus)) {
                     repaint();
                 }
-            });
+                for (int i=0; i<animations.size(); i++) {
+                    final Unit unit = animations.get(i).getUnit();
+                    final JLabel unitLabel = animatedUnitLabels.get(i);
+                    releaseUnitOutForAnimation(unit, unitLabel);
+                }
+            }
         });
+    }
+
+
+    private void releaseUnitOutForAnimation(final Unit unit, final JLabel unitLabel) {
+        this.mapViewer.getMapViewerState().getUnitAnimator().releaseUnitOutForAnimation(unit);
+        if (!this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit)) {
+            this.canvas.animationLabel(unitLabel, false);
+            mapViewer.getMapViewerRepaintManager().markAsDirty();
+            repaint();
+        }
+    }
+
+    private List<JLabel> prepareUnitLabelsForAnimation(final List<Animation> animations) {
+        final List<JLabel> animatedUnitLabels = new ArrayList<>();
+        for (Animation a : animations) {
+            // Get the unit label, add to canvas if not already there, and
+            // update the animation with the locations for the label for each
+            // of the animation's tiles
+            
+            final Unit unit = a.getUnit();
+            boolean newLabel = !this.mapViewer.getMapViewerState().getUnitAnimator().isOutForAnimation(unit);
+            JLabel unitLabel = this.mapViewer.getMapViewerState().getUnitAnimator().enterUnitOutForAnimation(unit);
+            animatedUnitLabels.add(unitLabel);
+            List<Point> points = transform(a.getTiles(), alwaysTrue(),
+                    (t) -> this.mapViewer.getMapViewerState().getUnitAnimator().getAnimationPosition(unitLabel, t));
+            a.setPoints(points);
+            unitLabel.setLocation(points.get(0)); // set location before adding
+            if (newLabel) {
+                this.canvas.animationLabel(unitLabel, true);
+            }
+        }
+        return animatedUnitLabels;
     }
     
     /**
@@ -382,6 +400,7 @@ public class SwingGUI extends GUI {
         		&& newUnit.hasTile()
         		&& !mapViewer.getMapViewerBounds().onScreen(newUnit.getTile())) {
         	this.mapViewer.getMapViewerBounds().setFocus(newUnit.getTile());
+        	mapViewer.getMapViewerRepaintManager().markAsDirty(newUnit.getTile());
         	repaint();
         }
         
@@ -457,6 +476,7 @@ public class SwingGUI extends GUI {
     private PopupPosition getPopupPosition(Tile tile) {
         if (tile == null) return PopupPosition.CENTERED;
         int where = this.mapViewer.getMapViewerBounds().setOffsetFocus(tile);
+        repaint();
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
@@ -548,9 +568,8 @@ public class SwingGUI extends GUI {
      */
     private void refreshTile(Tile tile) {
         if (tile != null) {
-            final Rectangle tileBounds = this.mapViewer.calculateTileBounds(tile);
-            mapViewer.getMapViewerRepaintManager().markAsDirty(tileBounds);
-            this.canvas.repaint(tileBounds);
+            mapViewer.getMapViewerRepaintManager().markAsDirty(tile);
+            this.canvas.repaint();
         }
     }
 
@@ -708,6 +727,7 @@ public class SwingGUI extends GUI {
             changeView((Unit)null, false);
         }
         this.mapViewer.getMapViewerBounds().setFocus(tile);
+        refresh();
     }
         
     /**
@@ -739,7 +759,7 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         this.mapControls = MapControls.newInstance(fcc);
         final ActionListener al = (ActionEvent ae) ->
-            this.refreshTile(this.mapViewer.getVisibleCursorTile());
+            this.refreshTile(this.mapViewer.getMapViewerState().getCursorTile());
         this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
@@ -799,14 +819,14 @@ public class SwingGUI extends GUI {
                                          attackerTile, defenderTile,
                                          success, getMapScale()));
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         animations(Animations.unitMove(getFreeColClient(),
-                                       unit, srcTile, dstTile, getMapScale()));
+                unit, srcTile, dstTile, getMapScale()));
     }
 
 

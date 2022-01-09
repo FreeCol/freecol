@@ -9,6 +9,9 @@ import java.awt.Transparency;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.SwingGUI;
@@ -26,11 +29,11 @@ public class MapViewerRepaintManager {
     private VolatileImage backBufferImage = null;
     private BufferedImage nonAnimationBufferImage = null;
 
-    private Rectangle dirtyRegion = null;
+    private Rectangle dirtyRegion = new Rectangle(0, 0, 0, 0);
     private Tile focus = null;
     private Point focusPoint = null;
     private boolean repaintsBlocked = false;
-
+    private final Set<Tile> dirtyTiles = new HashSet<>();
 
     MapViewerRepaintManager() {
 
@@ -58,17 +61,22 @@ public class MapViewerRepaintManager {
         if (isBuffersUninitialized(size)) {
             initializeBuffers(size);
             markAsDirty();
+            dirtyTiles.clear();
             return true;
         }
 
         if (isAllDirty()) {
+            dirtyTiles.clear();
             return false;
         }
 
         if (oldFocus == null) {
             markAsDirty();
+            dirtyTiles.clear();
             return false;
         }
+        
+        updateDirtyRegionWithDirtyTiles(mapViewerBounds);
         
         if (!oldFocus.equals(focus)) {
             reuseNonDirtyAreasIfPossible(mapViewerBounds, oldFocus, oldFocusPoint);
@@ -76,6 +84,7 @@ public class MapViewerRepaintManager {
         
         return false;
     }
+
 
     private void initializeBuffers(final Dimension size) {
         backBufferImage = Utils.getGoodGraphicsDevice()
@@ -111,14 +120,23 @@ public class MapViewerRepaintManager {
     /**
      * Marks the given area as dirty for all layers.
      * 
+     * This method should only be used if {@paintImmediately} is called
+     * both before and after.
+     * 
      * @param bounds The bounds that should be marked dirty.
      */
     public void markAsDirty(Rectangle bounds) {
-        if (dirtyRegion == null) {
-            this.dirtyRegion = new Rectangle(bounds);
-            return;
-        }
         this.dirtyRegion = this.dirtyRegion.union(bounds);
+    }
+    
+    /**
+     * Marks the given {@code Tile} as dirty for all layers.
+     * 
+     * @param dirtyTile The {@code Tile} that should be repainted.
+     */
+    public void markAsDirty(Tile dirtyTile) {
+        Objects.requireNonNull(dirtyTile, "dirtyTile");
+        this.dirtyTiles.add(dirtyTile);
     }
 
     /**
@@ -141,7 +159,7 @@ public class MapViewerRepaintManager {
      *          has completed.
      */
     void markAsClean() {
-        this.dirtyRegion = null;
+        this.dirtyRegion = new Rectangle(0, 0, 0 ,0);
     }
 
     /**
@@ -200,12 +218,11 @@ public class MapViewerRepaintManager {
             final MapViewerBounds mapViewerBounds,
             final Tile oldFocus,
             final Point oldFocusPoint) {
-        final Dimension size = mapViewerBounds.getSize();
         final Point repositionedOldFocusPoint = mapViewerBounds.tileToPoint(oldFocus);
 
         final int dx = repositionedOldFocusPoint.x - oldFocusPoint.x;
         final int dy = repositionedOldFocusPoint.y - oldFocusPoint.y;
-        updateDirtyRegion(size, mapViewerBounds.getTileBounds(), dx, dy);
+        updateDirtyRegion(mapViewerBounds, dx, dy);
 
         if (!isAllDirty()) {
             moveContents(backBufferImage, dx, dy);
@@ -216,22 +233,20 @@ public class MapViewerRepaintManager {
     /**
      * Updates the dirty region by moving it in the specified direction.
      * 
-     * @param size The size of the MapViewer/buffers.
      * @param dx The number of pixels to move the contents of the buffers
      *      for the x coordinate. The value can be negative.
      * @param dy The number of pixels to move the contents of the buffers
      *      for the y coordinate. The value can be negative.
      */
-    private void updateDirtyRegion(final Dimension size, final TileBounds tileBounds, final int dx, final int dy) {
-        if (dirtyRegion != null) {
-            dirtyRegion.translate(dx, dy);
-        }
+    private void updateDirtyRegion(final MapViewerBounds mapViewerBounds, final int dx, final int dy) {
+        final Dimension size = mapViewerBounds.getSize();
+        final TileBounds tileBounds = mapViewerBounds.getTileBounds();
         
-        final Rectangle newBounds = new Rectangle(0, 0, size.width, size.height);
-        newBounds.translate(dx, dy);
+        final Rectangle alreadyPaintedBounds = new Rectangle(0, 0, size.width, size.height);
+        alreadyPaintedBounds.translate(dx, dy);
         
         final Area dirtyArea = new Area(new Rectangle(0, 0, size.width, size.height));
-        dirtyArea.subtract(new Area(newBounds));
+        dirtyArea.subtract(new Area(alreadyPaintedBounds));
         final Rectangle newDirtyBounds = dirtyArea.getBounds();
         
         /*
@@ -248,6 +263,8 @@ public class MapViewerRepaintManager {
         } else {
             dirtyRegion = newDirtyBounds;
         }
+        
+        dirtyRegion = dirtyRegion.intersection(new Rectangle(0, 0, size.width, size.height));
     }
 
     /**
@@ -274,5 +291,13 @@ public class MapViewerRepaintManager {
         g2d.drawImage(image, dx, dy, null);
         g2d.dispose();
         return result;
+    }
+    
+    private void updateDirtyRegionWithDirtyTiles(MapViewerBounds mapViewerBounds) {
+        for (Tile dirtyTile : dirtyTiles) {
+            final Rectangle dirtyTileBounds = mapViewerBounds.calculateDrawnTileBounds(dirtyTile);
+            dirtyRegion = dirtyRegion.union(dirtyTileBounds);
+        }
+        dirtyTiles.clear();
     }
 }

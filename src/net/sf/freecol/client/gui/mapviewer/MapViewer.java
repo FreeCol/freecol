@@ -158,23 +158,9 @@ public final class MapViewer extends FreeColClientHolder {
 
         updateScaledVariables();
     }
-
+    
     
     // Public API
-    
-    /**
-     * Get either the tile with the active unit or the selected tile,
-     * but only if it is visible.
-     *
-     * Used to determine where to display the cursor, for displayMap and
-     * and the cursor action listener.
-     *
-     * @return The {@code Tile} found or null.
-     */
-    public Tile getVisibleCursorTile() {
-        Tile ret = mapViewerState.getCursorTile();
-        return (mapViewerBounds.isTileVisible(ret)) ? ret : null;
-    }
     
     /**
      * Change the goto path.
@@ -193,29 +179,6 @@ public final class MapViewer extends FreeColClientHolder {
         }
         
         return result;
-    }
-
-    /**
-     * Calculate the bounds of the rectangle containing a Tile on the
-     * screen.
-     *
-     * If the Tile is not on-screen a maximal rectangle is returned.
-     * The bounds includes a one-tile padding area above the Tile, to
-     * include the space needed by any units in the Tile.
-     *
-     * @param tile The {@code Tile} on the screen.
-     * @return The bounds {@code Rectangle}.
-     */
-    public Rectangle calculateTileBounds(Tile tile) {
-        if (!mapViewerBounds.isTileVisible(tile)) {
-            return new Rectangle(0, 0, mapViewerBounds.getSize().width, mapViewerBounds.getSize().height);
-        }
-            
-        final Point p = mapViewerBounds.tileToPoint(tile);
-        return new Rectangle(p.x - tileBounds.getHalfWidth(),
-                p.y - tileBounds.getHeight() / 2,
-                tileBounds.getWidth() * 2,
-                tileBounds.getHeight() * 2);
     }
 
     /**
@@ -307,12 +270,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         final Map map = getMap();
 
-        final Rectangle allRenderingClipBounds;
-        if (dirtyClipBounds != null) {
-            allRenderingClipBounds = clipBounds.union(dirtyClipBounds);
-        } else {
-            allRenderingClipBounds = clipBounds;
-        }
+        final Rectangle allRenderingClipBounds = clipBounds.union(dirtyClipBounds);
         paintBlackBackground(backBufferG2d, allRenderingClipBounds);
         
         // Display the animated base tiles:
@@ -324,7 +282,7 @@ public final class MapViewer extends FreeColClientHolder {
                
         // Display everything else:
         final long t2 = now();
-        if (dirtyClipBounds != null) {
+        if (!dirtyClipBounds.isEmpty()) {
             final TileClippingBounds tcb = new TileClippingBounds(map, dirtyClipBounds);
             final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
             displayNonAnimationImages(nonAnimationG2d, dirtyClipBounds, tcb);
@@ -1125,6 +1083,20 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.setColor(oldColor);
             g2d.setStroke(oldStroke);
         }
+    }
+    
+    /**
+     * Get either the tile with the active unit or the selected tile,
+     * but only if it is visible.
+     *
+     * Used to determine where to display the cursor, for displayMap and
+     * and the cursor action listener.
+     *
+     * @return The {@code Tile} found or null.
+     */
+    private Tile getVisibleCursorTile() {
+        Tile ret = mapViewerState.getCursorTile();
+        return (mapViewerBounds.isTileVisible(ret)) ? ret : null;
     }
 
     /**
