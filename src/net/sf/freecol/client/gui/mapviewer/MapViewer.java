@@ -190,7 +190,7 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib.changeScaleFactor(newScale);
         this.tv.updateScaledVariables();
         updateScaledVariables();
-        mapViewerBounds.forceReposition();
+        mapViewerBounds.positionMap();
         rpm.markAsDirty();
     }
     
@@ -251,10 +251,6 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.drawImage(backBufferImage, 0, 0, null);
             return false;
         }
-
-        if (mapViewerBounds.isRepositionNeeded()) {
-            mapViewerBounds.positionMap();
-        }  
         
         boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(mapViewerBounds, mapViewerBounds.getFocus());
         final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();

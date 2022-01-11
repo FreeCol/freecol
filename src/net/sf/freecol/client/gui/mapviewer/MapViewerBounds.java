@@ -125,11 +125,6 @@ public final class MapViewerBounds {
      */
     private Map.Position bottomRightVisibleTile = new Map.Position(-1, -1);
 
-    /**
-     * Describes if repositioning needs to be performed before drawing.
-     */
-    private boolean shouldReposition = false;
-
     // Whether the map is currently aligned with the edge.
     private boolean alignedTop = false, alignedBottom = false,
             alignedLeft = false, alignedRight = false;
@@ -188,7 +183,7 @@ public final class MapViewerBounds {
         // extra space we display one fewer column before the center tile
         this.columnOddYOffset = (hExtra == 0) ? -1 : 0;
 
-        forceReposition();
+        positionMap();
     }
 
 
@@ -315,7 +310,6 @@ public final class MapViewerBounds {
      * @return True if the tile is roughly on screen.
      */
     public boolean onScreen(Tile tile) {
-        repositionMapIfNeeded();
         return (tile.getX() - 1 > topLeftVisibleTile.getX() || alignedLeft)
                 && (tile.getX() + 2 < bottomRightVisibleTile.getX() || alignedRight)
                 && (tile.getY() - 2 > topLeftVisibleTile.getY() || alignedTop)
@@ -342,13 +336,6 @@ public final class MapViewerBounds {
     }
 
     /**
-     * Force the next screen repaint to reposition the tiles on the window.
-     */
-    void forceReposition() {
-        shouldReposition = true;
-    }
-
-    /**
      * Sets the focus tile.
      * 
      * WARNING: This method changes the focus. You need to call
@@ -364,15 +351,8 @@ public final class MapViewerBounds {
         }
 
         this.focus = focus;
-        forceReposition();
+        positionMap();
         return true;
-    }
-
-    /**
-     * Checks if {@code #positionMap()} needs to be called before painting.
-     */
-    boolean isRepositionNeeded() {
-        return shouldReposition;
     }
 
     /**
@@ -479,8 +459,6 @@ public final class MapViewerBounds {
         this.topLeftVisibleTile = new Map.Position(leftColumn, topRow);
         this.bottomRightVisibleTile = new Map.Position(rightColumn, bottomRow);
         this.topLeftVisibleTilePoint = new Point(leftColumnX, topRowY);
-
-        shouldReposition = false;
     }
 
     // There is no getTop/BottomRows(), this.centerRows is sufficient
@@ -697,15 +675,8 @@ public final class MapViewerBounds {
      */
     boolean isTileVisible(Tile tile) {
         if (tile == null) return false;
-        repositionMapIfNeeded();
         return tile.getX() >= topLeftVisibleTile.getX() && tile.getX() <= bottomRightVisibleTile.getX()
                 && tile.getY() >= topLeftVisibleTile.getY() && tile.getY() <= bottomRightVisibleTile.getY();
-    }
-
-    private void repositionMapIfNeeded() {
-        if (isRepositionNeeded()) {
-            positionMap();
-        }
     }
     
     TileBounds getTileBounds() {
