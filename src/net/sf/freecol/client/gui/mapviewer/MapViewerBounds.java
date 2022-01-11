@@ -376,21 +376,15 @@ public final class MapViewerBounds {
     }
 
     /**
-     * Position the map using the focus tile.
+     * Position the map so that the focus is displayed at the center.
      */
     void positionMap() {
-        if (this.focus != null) {
-            positionMap(this.focus);
+        if (this.focus == null) {
+            return;
         }
-    }
-
-    /**
-     * Position the map so that the supplied tile is displayed at the center.
-     * @param pos The {@code Tile} to center at.
-     */
-    private void positionMap(Tile pos) {
-        final int x = pos.getX(), y = pos.getY();
-        final Map map = pos.getMap();
+        
+        final int x = this.focus.getX(), y = this.focus.getY();
+        final Map map = this.focus.getMap();
         final int mapWidth = map.getWidth(), mapHeight = map.getHeight();
         int leftColumns = getLeftColumns(y), rightColumns = getRightColumns(y);
 
