@@ -207,7 +207,8 @@ public final class MapViewerBounds {
      */
     public int setOffsetFocus(Tile tile) {
         if (tile == null) return 0;
-        positionMap(tile);
+        setFocus(tile);
+        positionMap();
 
         int ret = 0, moveX = -1;
         final Map map = tile.getMap();
