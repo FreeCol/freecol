@@ -476,7 +476,10 @@ public class SwingGUI extends GUI {
     private PopupPosition getPopupPosition(Tile tile) {
         if (tile == null) return PopupPosition.CENTERED;
         int where = this.mapViewer.getMapViewerBounds().setOffsetFocus(tile);
-        repaint();
+        /*
+         * XXX: A "repaint" should be sufficient here, but it is not.
+         */
+        refresh();
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
