@@ -287,6 +287,8 @@ public final class MapViewer extends FreeColClientHolder {
         mapViewerState.getChatDisplay().display(g2d, mapViewerBounds.getSize());
         final long chatMs = now();
 
+        verifyAndMarkAsClean(size, clipBounds);
+        
         /*
          * Remove the check for "fullMapRenderedWithoutUsingBackBuffer" to get every repaint
          * logged: This includes several animations per second.
@@ -1058,6 +1060,22 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.draw(path);
             g2d.setColor(oldColor);
             g2d.setStroke(oldStroke);
+        }
+    }
+    
+    private void verifyAndMarkAsClean(Dimension size, final Rectangle clipBounds) {
+        final Rectangle entireScreen = new Rectangle(0, 0, size.width, size.height);
+        final Rectangle relevantDirtyClipBounds = rpm.getDirtyClipBounds().intersection(entireScreen);
+        if (relevantDirtyClipBounds.isEmpty() || clipBounds.contains(relevantDirtyClipBounds)) {
+            rpm.markAsClean();
+        } else {
+            logger.info("Repaint has been called for a smaller area than what is dirty. "
+                    + "Have you forgotten to call repaint() after marking stuff as dirty? "
+                    + "The only known OK instance of this happening is when the GUI is "
+                    + "starting up. Bounds: "
+                    + clipBounds
+                    + " ==> "
+                    + relevantDirtyClipBounds);
         }
     }
     

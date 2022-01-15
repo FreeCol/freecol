@@ -231,6 +231,7 @@ public final class Canvas extends JDesktopPane {
         
         updateSize();
         revalidate();
+        repaint();
         
         /*
          * TODO: Stop using hardcoded 125ms for animation. Instead, we should
@@ -256,6 +257,8 @@ public final class Canvas extends JDesktopPane {
             if (add) {
                 addMapControls();
             }
+            revalidate();
+            repaint();
         }
     }
 
