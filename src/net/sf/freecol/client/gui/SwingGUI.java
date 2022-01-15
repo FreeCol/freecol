@@ -1037,7 +1037,7 @@ public class SwingGUI extends GUI {
     public void clearGotoPath() {
         stopGoto();
         updateUnitPath();
-        refresh();
+        repaint();
     }
 
     /**
@@ -1064,7 +1064,7 @@ public class SwingGUI extends GUI {
             }
             updateUnitPath();
         }
-        refresh();
+        repaint();
     }
 
     /**
@@ -1088,10 +1088,11 @@ public class SwingGUI extends GUI {
             igc().clearGotoOrders(unit);
         } else {
             igc().goToTile(unit, path);
+            refresh();
         }
         // Only update the path if the unit is still active
         if (unit == getActiveUnit()) updateUnitPath();
-        refresh();
+        repaint();
     }
 
     /**
@@ -1114,7 +1115,7 @@ public class SwingGUI extends GUI {
     public void prepareDrag(int x, int y) {
         if (isGotoStarted()) {
             stopGoto();
-            refresh();
+            repaint();
         }
         setDragPoint(x, y);
         this.canvas.requestFocus();
@@ -1423,7 +1424,7 @@ public class SwingGUI extends GUI {
     public void displayChat(String sender, String message, Color color,
                             boolean privateChat) {
         this.mapViewer.getMapViewerState().displayChat(new GUIMessage(sender + ": " + message, color));
-        refresh();
+        repaint();
     }
 
     /**
@@ -1490,6 +1491,9 @@ public class SwingGUI extends GUI {
         this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void repaint() {
     	this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());

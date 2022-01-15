@@ -197,7 +197,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                 }
             }
         }
-        getGUI().refresh();
+        getGUI().repaint();
         // Disabled: Is this needed? canvas.requestFocus();
     }
 
@@ -230,7 +230,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         performDragScrollIfActive(e);
 
-        getGUI().refresh();
+        getGUI().repaint();
     }
 
     /**
