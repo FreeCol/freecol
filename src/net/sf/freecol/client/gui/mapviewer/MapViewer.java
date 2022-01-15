@@ -161,25 +161,6 @@ public final class MapViewer extends FreeColClientHolder {
     
     
     // Public API
-    
-    /**
-     * Change the goto path.
-     * 
-     * @param gotoPath The new goto {@code PathNode}.
-     * @return True if the goto path was changed.
-     */
-    public boolean changeGotoPath(PathNode gotoPath) {
-        boolean result = mapViewerState.changeGotoPath(gotoPath);
-        if (result) {
-        	/*
-        	 * TODO: Only mark changed tiles as dirty -- or even better: Always render
-        	 *       gotoPath directly without storing it to any buffer.
-        	 */
-        	rpm.markAsDirty();
-        }
-        
-        return result;
-    }
 
     /**
      * Change the scale of the map.
@@ -238,7 +219,7 @@ public final class MapViewer extends FreeColClientHolder {
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
     public boolean displayMap(Graphics2D g2d, Dimension size) {
-        final long t0 = now();
+        final long startMs = now();
         final Rectangle clipBounds = g2d.getClipBounds();
         
         if (mapViewerBounds.getFocus() == null) {
@@ -271,13 +252,13 @@ public final class MapViewer extends FreeColClientHolder {
         
         // Display the animated base tiles:
         final TileClippingBounds animatedBaseTileTcb = new TileClippingBounds(map, allRenderingClipBounds);
-        final long t1 = now();
+        final long initMs = now();
         backBufferG2d.setClip(allRenderingClipBounds);
         backBufferG2d.translate(animatedBaseTileTcb.clipLeftX, animatedBaseTileTcb.clipTopY);
         paintEachTile(backBufferG2d, animatedBaseTileTcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
                
         // Display everything else:
-        final long t2 = now();
+        final long animatedBaseMs = now();
         if (!dirtyClipBounds.isEmpty()) {
             final TileClippingBounds tcb = new TileClippingBounds(map, dirtyClipBounds);
             final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
@@ -285,37 +266,50 @@ public final class MapViewer extends FreeColClientHolder {
             nonAnimationG2d.dispose();
         }
         
-        final long t3 = now();   
+        final long nonAnimatedMs = now();   
         backBufferG2d.setTransform(backBufferOriginTransform);
         backBufferG2d.setClip(allRenderingClipBounds);
         backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
         backBufferG2d.dispose();
 
         g2d.drawImage(backBufferImage, 0, 0, null);      
-        final long t4 = now();
+        final long useBuffersMs = now();
+        
+        // Display goto path
+        if (mapViewerState.getUnitPath() != null) {
+            displayPath(g2d, mapViewerState.getUnitPath());
+        } else if (mapViewerState.getGotoPath() != null) {
+            displayPath(g2d, mapViewerState.getGotoPath());
+        }
+        final long gotoPathMs = now();
+
+        // Draw the chat
+        mapViewerState.getChatDisplay().display(g2d, mapViewerBounds.getSize());
+        final long chatMs = now();
 
         /*
          * Remove the check for "fullMapRenderedWithoutUsingBackBuffer" to get every repaint
          * logged: This includes several animations per second.
          */
         if (fullMapRenderedWithoutUsingBackBuffer && logger.isLoggable(Level.FINEST)) {
-            final long gap = now() - t0;
+            final long endMs = now();
+            final long gap = endMs - startMs;
             final StringBuilder sb = new StringBuilder(128);
             sb.append("displayMap fullRendering=").append(fullMapRenderedWithoutUsingBackBuffer)
                 .append(" time= ").append(gap)
-                .append(" init=").append(t1 - t0)
-                .append(" animated=").append(t2 - t1)
-                .append(" displayNonAnimationImages=").append(t3 - t2)
-                .append(" finish=").append(t4 - t3)
+                .append(" init=").append(initMs - startMs)
+                .append(" animated=").append(animatedBaseMs - initMs)
+                .append(" displayNonAnimationImages=").append(nonAnimatedMs - animatedBaseMs)
+                .append(" buffers=").append(useBuffersMs - nonAnimatedMs)
+                .append(" goto=").append(gotoPathMs - useBuffersMs)
+                .append(" chat=").append(chatMs - gotoPathMs)
+                .append(" finish=").append(endMs - chatMs)
                 ;
             logger.finest(sb.toString());
         }
-        
-        rpm.markAsClean();
-        
+                
         return fullMapRenderedWithoutUsingBackBuffer;
     }
-
 
     private void displayNonAnimationImages(Graphics2D nonAnimationG2d,
             Rectangle clipBounds,
@@ -329,7 +323,6 @@ public final class MapViewer extends FreeColClientHolder {
         to be drawn in north to prevent missing parts on partial redraws,
         as they can reach below their tiles, see BR#2580 */
         
-        AffineTransform originTransform = nonAnimationG2d.getTransform();
         nonAnimationG2d.setComposite(AlphaComposite.Clear);
         nonAnimationG2d.fill(clipBounds);
         nonAnimationG2d.setComposite(AlphaComposite.SrcOver);
@@ -492,20 +485,8 @@ public final class MapViewer extends FreeColClientHolder {
                 displaySettlementLabels(tileG2d, settlement, player, colonyLabels, rop);
             });
         }
-
-        // Display goto path
-        long t15 = now();
-        nonAnimationG2d.setTransform(originTransform);
-        if (mapViewerState.getUnitPath() != null) {
-            displayPath(nonAnimationG2d, mapViewerState.getUnitPath());
-        } else if (mapViewerState.getGotoPath() != null) {
-            displayPath(nonAnimationG2d, mapViewerState.getGotoPath());
-        }
-
-        // Draw the chat
-        mapViewerState.getChatDisplay().display(nonAnimationG2d, mapViewerBounds.getSize());
         
-        long t16 = now();
+        long t15 = now();
         
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
@@ -531,7 +512,6 @@ public final class MapViewer extends FreeColClientHolder {
                 .append(" t13=").append(t13 - t12)
                 .append(" t14=").append(t14 - t13)
                 .append(" t15=").append(t15 - t14)
-                .append(" t16=").append(t16 - t15)
                 ;
             logger.finest(sb.toString());
         }

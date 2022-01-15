@@ -510,7 +510,9 @@ public class SwingGUI extends GUI {
     private void startGoto() {
         this.gotoStarted = true;
         this.canvas.setCursor(Canvas.GO_CURSOR);
-        this.mapViewer.changeGotoPath(null);
+        if (this.mapViewer.getMapViewerState().changeGotoPath(null)) {
+            repaint();
+        }
     }
 
     /**
@@ -522,7 +524,9 @@ public class SwingGUI extends GUI {
         PathNode ret = (this.gotoStarted) ? this.mapViewer.getMapViewerState().getGotoPath() : null;
         this.gotoStarted = false;
         this.canvas.setCursor(null);
-        this.mapViewer.changeGotoPath(null);
+        if (this.mapViewer.getMapViewerState().changeGotoPath(null)) {
+            repaint();
+        }
         return ret;
     }
 
@@ -548,8 +552,8 @@ public class SwingGUI extends GUI {
                 || !tile.isExplored()
                 || !unit.getSimpleMoveType(tile).isLegal()) ? null
                 : unit.findPath(tile);
-            if (this.mapViewer.changeGotoPath(newPath)) {
-                refresh();
+            if (this.mapViewer.getMapViewerState().changeGotoPath(newPath)) {
+                repaint();
             }
         }
     }
