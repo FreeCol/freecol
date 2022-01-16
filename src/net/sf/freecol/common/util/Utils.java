@@ -19,16 +19,21 @@
 
 package net.sf.freecol.common.util;
 
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
+import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.MouseInfo;
+import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -38,18 +43,18 @@ import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import static java.nio.file.StandardOpenOption.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.XMLConstants;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -383,5 +388,34 @@ public class Utils {
             return lge.getDefaultScreenDevice();
         } catch (HeadlessException he) {}
         return null;
+    }
+    
+    /**
+     * Tries to determine the DPI of the given {@code GraphicsDevice}.
+     * 
+     * @param gd The {@code GraphicsDevice} to determine the DPI for.
+     * @return The calculated DPI.
+     */
+    public static int determineDpi(GraphicsDevice gd) {
+        /*
+         * getScreenResolution returns the DPI at maximum resolution -- but we might
+         * currently be running with a lower resolution.
+         */
+        final int candidateDpi = Toolkit.getDefaultToolkit().getScreenResolution();
+
+        final DisplayMode[] displayModes = gd.getDisplayModes();
+        if (displayModes.length <= 1) {
+            /*
+             * There is a bug when running under KDE X11 with multiple screens
+             * where getDisplayModes() return an empty array.
+             */
+            return candidateDpi;
+        }
+
+        final int highestScreenSize = Arrays.stream(displayModes).map(dm -> dm.getHeight()).max(Integer::compare).get();
+        final int currentScreenSize = gd.getDisplayMode().getHeight();
+
+        final int actualDpi = (candidateDpi * currentScreenSize) / highestScreenSize;
+        return actualDpi;
     }
 }
