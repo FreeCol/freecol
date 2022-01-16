@@ -1726,6 +1726,8 @@ public class GUI extends FreeColClientHolder {
      * @see #refresh()
      */
     public void repaint() {}
+    
+    public void refreshTile(Tile tile) {}
 
     /**
      * Refresh the players table in the StartGamePanel.
