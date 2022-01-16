@@ -148,19 +148,6 @@ public class ServerInfo {
     }
 
     /**
-     * Set the connection information.
-     *
-     * @param name The name of the connection.
-     * @param address The IP-address of the server.
-     * @param port The port number to connect to.
-     */
-    public void setConnection(String name, String address, int port) {
-        if (this.name == null) this.name = name;
-        this.address = address;
-        this.port = port;
-    }
-
-    /**
      * Update this server.
      *
      * @param name The name of the server.

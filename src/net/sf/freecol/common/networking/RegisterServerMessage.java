@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Game;
  */
 public class RegisterServerMessage extends ServerInfoMessage {
 
-    public static final String TAG = "register";
+    public static final String TAG = "registerServer";
 
 
     /**

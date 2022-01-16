@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Game;
  */
 public class UpdateServerMessage extends ServerInfoMessage {
 
-    public static final String TAG = "update";
+    public static final String TAG = "updateServer";
 
 
     /**

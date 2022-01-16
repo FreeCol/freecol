@@ -151,13 +151,17 @@ public class MetaServerUtils {
         // This update is really a "Hi! I am still here!"-message,
         // since an additional update should be sent when a new
         // player is added to/removed from this server etc.
-        Timer t = new Timer(true);
+        final Timer t = new Timer(true);
         updaters.put(t, si);
         t.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    ServerInfo si = updaters.get(this);
-                    if (si == null || !updateServer(si)) cancel();
+                    ServerInfo si = updaters.get(t);
+                    if (si == null) {
+                        cancel();
+                    } else {
+                        updateServer(si);
+                    }
                 }
             }, UPDATE_INTERVAL, UPDATE_INTERVAL);
         return true;
@@ -237,7 +241,6 @@ public class MetaServerUtils {
     private static boolean metaMessage(MetaMessageType type, ServerInfo si) {
         try (Connection mc = getMetaServerConnection(null)) {
             if (mc == null) return false;
-            si.setConnection(mc.getName(), mc.getHostAddress(), mc.getPort());
             switch (type) {
             case REGISTER:
                 mc.sendMessage(new RegisterServerMessage(si));
@@ -255,7 +258,7 @@ public class MetaServerUtils {
         } catch (FreeColException|IOException|XMLStreamException ex) {
             logger.log(Level.WARNING, "Meta message " + type + " failure", ex);
         }
-        return false;
+        return true;
     }
 
 

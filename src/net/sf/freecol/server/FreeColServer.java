@@ -166,7 +166,28 @@ public final class FreeColServer {
     public static final String DEFAULT_SPEC = "freecol";
 
     /** The server is either starting, loading, being played, or ending. */
-    public static enum ServerState { PRE_GAME, LOAD_GAME, IN_GAME, END_GAME }
+    public static enum ServerState {
+        PRE_GAME(0),
+        LOAD_GAME(0),
+        IN_GAME(1),
+        END_GAME(2);
+        
+        private int metaServerState;
+        
+        private ServerState(int metaServerState) {
+            this.metaServerState = metaServerState;
+        }
+        
+        /*
+         * XXX: Gets the number used for server state being
+         *      published to the meta server. Using these
+         *      numbers as they are already in the translation
+         *      files -- but we should use named keys instead. 
+         */
+        public int getMetaServerState() {
+            return metaServerState;
+        }
+     }
 
 
     // Serializable fundamentals
@@ -1333,11 +1354,12 @@ public final class FreeColServer {
         int slots = count(getGame().getLiveEuropeanPlayers(), absentAI);
         int players = count(getGame().getLiveEuropeanPlayers(), liveHuman);
         return new ServerInfo(getName(),
-                              null, -1, // Missing these at this point
+                              getHost(),
+                              getPort(),
                               slots, players,
                               this.serverState == ServerState.IN_GAME,
                               FreeCol.getVersion(),
-                              getServerState().ordinal());
+                              getServerState().getMetaServerState());
     }
 
     /**
@@ -1348,7 +1370,6 @@ public final class FreeColServer {
     public synchronized boolean registerWithMetaServer() {
         if (!this.publicServer) return false;
         boolean ret = MetaServerUtils.registerServer(getServerInfo());
-        if (!ret) this.publicServer = false;
         return ret;
     }
 
@@ -1360,7 +1381,6 @@ public final class FreeColServer {
     public synchronized boolean removeFromMetaServer() {
         if (!this.publicServer) return false;
         boolean ret = MetaServerUtils.removeServer(getServerInfo());
-        if (!ret) this.publicServer = false;
         return ret;
     }
 
@@ -1372,7 +1392,6 @@ public final class FreeColServer {
     public synchronized boolean updateMetaServer() {
         if (!this.publicServer) return false;
         boolean ret = MetaServerUtils.updateServer(getServerInfo());
-        if (!ret) this.publicServer = false;
         return ret;
     }
 }

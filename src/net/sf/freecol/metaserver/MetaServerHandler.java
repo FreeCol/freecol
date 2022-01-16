@@ -78,18 +78,20 @@ public final class MetaServerHandler implements MessageHandler {
             disconnect(connection);
             break;
         case RegisterServerMessage.TAG:
-            RegisterServerMessage rsm = (RegisterServerMessage)message;
+            final RegisterServerMessage rsm = (RegisterServerMessage) message;
             rsm.setAddress(connection.getHostAddress()); // Trust the connection
             register(rsm);
             break;
         case RemoveServerMessage.TAG:
-            remove((RemoveServerMessage)message);
+            final RemoveServerMessage removeServerMessage = (RemoveServerMessage) message;
+            removeServerMessage.setAddress(connection.getHostAddress()); // Trust the connection
+            remove(removeServerMessage);
             break;
         case ServerListMessage.TAG:
             reply = serverList();
             break;
         case UpdateServerMessage.TAG:
-            UpdateServerMessage usm = (UpdateServerMessage)message;
+            final UpdateServerMessage usm = (UpdateServerMessage) message;
             usm.setAddress(connection.getHostAddress()); // Trust the connection
             update(usm);
             break;

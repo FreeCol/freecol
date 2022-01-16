@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Game;
  */
 public class RemoveServerMessage extends ServerInfoMessage {
 
-    public static final String TAG = "remove";
+    public static final String TAG = "removeServer";
 
 
     /**
