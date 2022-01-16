@@ -559,7 +559,9 @@ public final class MapViewerBounds {
      *
      * If the Tile is not on-screen an empty rectangle is returned.
      * The bounds includes a one-tile padding area above the Tile and
-     * half a tile padding to each side.
+     * half a tile padding to each side. There is currently no padding
+     * below the tile. Feel free to add more padding if we start using
+     * larger images.
      *
      * @param tile The {@code Tile} on the screen.
      * @return The bounds {@code Rectangle}.
@@ -571,7 +573,7 @@ public final class MapViewerBounds {
             
         final Point p = tileToPoint(tile);
         return new Rectangle(p.x - tileBounds.getHalfWidth(),
-                p.y - tileBounds.getHeight() / 2,
+                p.y - tileBounds.getHeight(),
                 tileBounds.getWidth() * 2,
                 tileBounds.getHeight() * 2);
     }
