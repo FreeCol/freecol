@@ -9,6 +9,7 @@ import java.awt.Transparency;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -137,6 +138,15 @@ public class MapViewerRepaintManager {
     public void markAsDirty(Tile dirtyTile) {
         Objects.requireNonNull(dirtyTile, "dirtyTile");
         this.dirtyTiles.add(dirtyTile);
+    }
+    
+    /**
+     * Marks the given {@code Tile}s as dirty for all layers.
+     * 
+     * @param dirtyTiles The {@code Tile}s that should be repainted.
+     */
+    public void markAsDirty(Collection<Tile> dirtyTiles) {
+        this.dirtyTiles.addAll(dirtyTiles);
     }
 
     /**
