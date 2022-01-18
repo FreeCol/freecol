@@ -1326,6 +1326,7 @@ public final class Canvas extends JDesktopPane {
      */
     public FreeColPanel showMainPanel() {
         closeMenus();
+        closeMainPanel();
         this.parentFrame.removeMenuBar();
         this.mainPanel = new MainPanel(this.freeColClient);
         addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
