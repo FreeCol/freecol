@@ -184,15 +184,16 @@ public class SwingGUI extends GUI {
      * Create the GUI.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param scaleFactor The scale factor for the GUI.
      */
-    public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
-        super(freeColClient, scaleFactor);
+    public SwingGUI(FreeColClient freeColClient) {
+        super(freeColClient);
 
         this.graphicsDevice = Utils.getGoodGraphicsDevice();
         if (this.graphicsDevice == null) {
             FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         }
+        
+        final float scaleFactor = determineScaleFactorUsingClientOptions(Utils.determineDpi(graphicsDevice));
         this.imageCache = new ImageCache();
         this.scaledImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
         this.fixedImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
@@ -203,6 +204,7 @@ public class SwingGUI extends GUI {
         this.canvas = null;
         this.widgets = null;
         this.dragPoint = null;
+        
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
@@ -662,25 +664,10 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void installLookAndFeel(String fontName, float scale) throws FreeColException {
-        /*
-         * Quick (and dirty) fix for font scaling until this can be adjusted in-game.
-         * 
-         * The scale factor should default to a value based on the DPI of the screen,
-         * but an even better approach would be determining it using the font size.
-         * 
-         * We should have the option of specifying the font size in the client
-         * options dialog.
-         */
-        if (scale >= 1.999) {
-            FontLibrary.DEFAULT_FONT_SIZE = 18F;
-        } else if  (scale >= 1.749) {
-            FontLibrary.DEFAULT_FONT_SIZE = 16F;
-        } else if (scale >= 1.499) {
-            FontLibrary.DEFAULT_FONT_SIZE = 14F;
-        } else if (scale >= 1.499) {
-            FontLibrary.DEFAULT_FONT_SIZE = 14F;
-        }
+    public void installLookAndFeel(String fontName) throws FreeColException {
+        final int dpi = Utils.determineDpi(graphicsDevice);
+        final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
+        FontLibrary.setMainFontSize(fontSize);
         
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
@@ -1346,8 +1333,12 @@ public class SwingGUI extends GUI {
 
     private void changeMapScale(float newScale) {
         imageCache.clear();
-        this.mapViewer.changeScale(newScale);
-        refresh();
+        if (this.mapViewer != null) {
+            this.mapViewer.changeScale(newScale);
+        }
+        if (this.canvas != null) {
+            refresh();
+        }
     }
 
 
@@ -1510,8 +1501,12 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void refresh() {
-        this.mapViewer.getMapViewerRepaintManager().markAsDirty();
-        this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+        if (this.mapViewer != null) {
+            this.mapViewer.getMapViewerRepaintManager().markAsDirty();
+        }
+        if (this.canvas != null) {
+            this.canvas.repaint(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+        }
     }
     
     /**
@@ -1668,11 +1663,7 @@ public class SwingGUI extends GUI {
                 = new ClientOptionsDialog(fcc, this.canvas.getParentFrame());
             group = this.canvas.showFreeColDialog(dialog, null);
         } finally {
-            this.canvas.resetMenuBar();
-            if (group != null) {
-                // Immediately redraw the minimap if that was updated.
-                updateMapControls();
-            }
+            refreshGuiUsingClientOptions();
         }
         if (fcc.isMapEditor()) {
             startMapEditorGUI();
@@ -1681,6 +1672,81 @@ public class SwingGUI extends GUI {
         } else {
             showMainPanel(null); // back to the main panel
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void refreshGuiUsingClientOptions() {
+        final int dpi = Utils.determineDpi(graphicsDevice);
+        final float scaleFactor = determineScaleFactorUsingClientOptions(dpi);
+        
+        this.fixedImageLibrary.changeScaleFactor(scaleFactor);
+        resetMapZoom();
+        if (this.tileViewer != null) {
+            this.tileViewer.updateScaledVariables();
+        }
+        
+        final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
+        FontLibrary.setMainFontSize(fontSize);
+        
+        final Font font = FontLibrary.getMainFont();
+        FreeColLookAndFeel.installFont(font);
+        Utility.initStyleContext(font);
+        
+        if (this.mapControls != null) {
+            this.mapControls.updateLayoutIfNeeded();
+        }
+        if (this.canvas != null) { 
+            this.canvas.resetMenuBar();
+            if (this.canvas.removeMapControls()) {
+                this.canvas.addMapControls();
+            }
+        }
+        
+        updateMapControls();
+        refresh();
+    }
+
+    private int determineMainFontSizeUsingClientOptions(final int dpi) {
+        final int DEFAULT_DPI = 96;
+        final float DEFAULT_MAIN_FONT_SIZE = 12f;
+        
+        final int fontSize;
+        if (getClientOptions().getBoolean("model.option.manualMainFontSize")) {
+            fontSize = getClientOptions().getInteger("model.option.mainFontSize");
+            logger.info("Manual font size: " + fontSize + " (reported DPI: " + dpi + ")");
+        } else {
+            fontSize = (int) ((DEFAULT_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
+            logger.info("Automatic font size: " + fontSize + " (reported DPI: " + dpi + ")");
+        }
+        
+        return fontSize;
+    }
+
+    private float determineScaleFactorUsingClientOptions(final int dpi) {
+        final int DEFAULT_DPI = 96;
+        final int displayScaling = getClientOptions().getInteger("model.option.displayScaling");
+        float scaleFactor;
+        if (displayScaling == 0) {
+            /* 
+             * Multiplication and division by 4 gives a rounded number
+             * to the closest 25.
+             */
+            scaleFactor = Math.round((dpi * 4f) / DEFAULT_DPI) / 4f;
+            if (scaleFactor < 1) {
+                scaleFactor = 1;
+            }
+            if (scaleFactor > 2) {
+                scaleFactor = 2;
+            }
+            logger.info("Automatic scale factor: " + scaleFactor + " (reported DPI: " + dpi + ")");
+        } else {
+            scaleFactor = displayScaling / 100f;
+            logger.info("Manual scale factor: " + scaleFactor + " (reported DPI: " + dpi + ")");
+        }
+        return scaleFactor;
     }
 
     /**

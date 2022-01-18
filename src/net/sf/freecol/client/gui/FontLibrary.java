@@ -19,14 +19,17 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableMap;
+import static net.sf.freecol.common.util.StringUtils.downCase;
+import static net.sf.freecol.common.util.StringUtils.join;
+import static net.sf.freecol.common.util.StringUtils.upCase;
+
 import java.awt.Font;
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -39,7 +42,7 @@ public class FontLibrary {
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
 
     /** Default size, used for the main-font. */
-    public static float DEFAULT_FONT_SIZE = 12f;
+    private static float mainFontSize = 12f;
 
     /**
      * FontType is used for choosing the typeface of the {@code Font}.
@@ -56,12 +59,6 @@ public class FontLibrary {
         SIMPLE,
         HEADER
     }
-
-    /**
-     * Scale to use if otherwise unspecified.
-     * May be redundant but we avoid magic numbers.
-     */
-    private static final float DEFAULT_SCALE = 1f;
     
     /** Conversion map for getFontKey. */
     private static final Map<FontType, String> keyMap = makeUnmodifiableMap(
@@ -86,6 +83,10 @@ public class FontLibrary {
         return (fontType == FontType.NORMAL && mainFont != null) ? null
             : FontLibrary.keyMap.getOrDefault(fontType, (String)null);
     }
+    
+    public static void setMainFontSize(float newMainFontSize) {
+        mainFontSize = newMainFontSize;
+    }
 
     /**
      * Convert a font size and scale factor to float.
@@ -109,8 +110,12 @@ public class FontLibrary {
         Font font = null;
         if (fontName != null) font = Font.decode(fontName);
         if (font == null) font = ResourceManager.getFont("font.normal");
-        mainFont = font = font.deriveFont(DEFAULT_FONT_SIZE);
+        mainFont = font = font.deriveFont(mainFontSize);
         return font;
+    }
+    
+    public static Font getMainFont() {
+        return mainFont.deriveFont(mainFontSize);
     }
 
     /**

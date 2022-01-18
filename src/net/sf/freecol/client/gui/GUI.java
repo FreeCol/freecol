@@ -118,9 +118,8 @@ public class GUI extends FreeColClientHolder {
      * Create the GUI.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param scaleFactor The scale factor for the GUI.
      */
-    public GUI(FreeColClient freeColClient, float scaleFactor) {
+    public GUI(FreeColClient freeColClient) {
         super(freeColClient);
     }
 
@@ -1094,7 +1093,7 @@ public class GUI extends FreeColClientHolder {
      * @param fontName An optional font name to be used.
      * @exception FreeColException if the LAF is incompatible with the GUI.
      */
-    public void installLookAndFeel(String fontName, float scale) throws FreeColException {}
+    public void installLookAndFeel(String fontName) throws FreeColException {}
 
     /**
      * Quit the GUI.  All that is required is to exit the full screen.
@@ -1850,6 +1849,11 @@ public class GUI extends FreeColClientHolder {
      */
     public void showClientOptionsDialog() {}
 
+    /**
+     * Refreshes the GUI with settings from the client options.
+     */
+    public void refreshGuiUsingClientOptions() {}
+    
     /**
      * Show the colony panel
      *

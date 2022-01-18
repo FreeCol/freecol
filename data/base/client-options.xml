@@ -29,6 +29,20 @@
     </optionGroup>
 
     <optionGroup id="clientOptions.display" >
+      <rangeOption id="model.option.displayScaling"
+                   defaultValue="0" localizedLabels="true">
+        <rangeValue label="model.option.displayScaling.automatic" value="0"/>
+        <rangeValue label="model.option.displayScaling.100" value="100"/>
+        <rangeValue label="model.option.displayScaling.125" value="125"/>
+        <rangeValue label="model.option.displayScaling.150" value="150"/>
+        <rangeValue label="model.option.displayScaling.175" value="175"/>
+        <rangeValue label="model.option.displayScaling.200" value="200"/>
+      </rangeOption>
+      
+      <booleanOption id="model.option.manualMainFontSize" defaultValue="false"/>
+      <integerOption id="model.option.mainFontSize"
+               defaultValue="12" minimumValue="10" maximumValue="48" stepSize="1" enabledBy="model.option.manualMainFontSize"/>
+     
       <!-- Use openGL or not? -->
       <booleanOption id="model.option.useOpenGL"
                      defaultValue="true"/>

@@ -393,6 +393,15 @@ public abstract class FreeColAction extends AbstractAction
     public void setValue(FreeColAction value) {
         logger.warning("Unsupported method FreeColAction.setValue.");
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getEnabledBy() {
+        /* FreeColAction cannot be enabled/disabled by other options. */
+        return null;
+    }
 
 
     // Serialization

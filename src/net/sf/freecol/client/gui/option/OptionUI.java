@@ -56,6 +56,8 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
     /** The Option value itself. */
     private T option;
+    
+    private BooleanOptionUI enabler = null;
 
 
     /**
@@ -81,7 +83,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     protected void initialize() {
         JComponent component = getComponent();
         component.setToolTipText(label.getToolTipText());
-        component.setEnabled(editable);
+        component.setEnabled(isEditable());
         component.setOpaque(false);
     }
 
@@ -94,13 +96,22 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     }
 
     public final boolean isEditable() {
-        return this.editable;
+        return this.editable && isEnabled();
+    }
+
+    private boolean isEnabled() {
+        return enabler == null || enabler.getValue();
     }
 
     public final void setEditable(final boolean newEditable) {
         this.editable = newEditable;
     }
-
+    
+    public void setEnabler(BooleanOptionUI enabler) {
+        this.enabler = enabler;
+        JComponent component = getComponent();
+        component.setEnabled(isEditable());
+    }
 
     // Routines to be implemented/overridden
 

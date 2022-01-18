@@ -147,7 +147,6 @@ public final class FreeColClient {
      */
     public FreeColClient(final SplashScreen splashScreen,
                          final String fontName,
-                         final float scale,
                          final Dimension windowSize,
                          final String userMsg,
                          final boolean sound,
@@ -233,13 +232,14 @@ public final class FreeColClient {
         /*
          * All mods are loaded, so the GUI can safely be created.
          */
-        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
-                : new SwingGUI(this, scale);
+
+        gui = (FreeCol.getHeadless()) ? new GUI(this)
+                : new SwingGUI(this);
         
         // Swing system and look-and-feel initialization.
         if (!FreeCol.getHeadless()) {
             try {
-                gui.installLookAndFeel(fontName, scale);
+                gui.installLookAndFeel(fontName);
             } catch (Exception e) {
                 FreeCol.fatal(logger,
                         Messages.message("client.laf") + "\n" + e.getMessage());

@@ -37,10 +37,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -210,6 +210,14 @@ public final class OptionGroupUI extends MigPanel
             if (ui == null) {
                 logger.warning("Unknown option type: " + option.toString());
                 return;
+            }
+            if (option.getEnabledBy() != null) {
+                BooleanOptionUI enabler = (BooleanOptionUI) optionUIs.get(option.getEnabledBy());
+                final OptionUI theUI = ui;
+                enabler.addActionListener((e) -> {
+                    theUI.initialize();
+                });
+                ui.setEnabler(enabler);
             }
             if (ui instanceof FreeColActionUI) {
                 ((FreeColActionUI)ui).setOptionGroupUI(this);

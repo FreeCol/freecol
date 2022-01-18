@@ -46,6 +46,9 @@ public class IntegerOption extends AbstractOption<Integer> {
 
     /** A lower bound on the value of this option. */
     private int minimumValue = Integer.MIN_VALUE;
+    
+    /** The step size to be used when this option is displayed using a spinner. */
+    private int stepSize = 0;
 
 
     /**
@@ -113,6 +116,16 @@ public class IntegerOption extends AbstractOption<Integer> {
     public int limitValue(int value) {
         return Math.min(Math.max(value, this.minimumValue), this.maximumValue);
     }
+    
+    /**
+     * Gets the step size to be used when this option is displayed using
+     * a spinner.
+     * 
+     * @return The step size, if defined, or {@code 0}.
+     */
+    public int getStepSize() {
+        return stepSize;
+    }
 
 
     // Interface Option
@@ -171,6 +184,7 @@ public class IntegerOption extends AbstractOption<Integer> {
 
     private static final String MAXIMUM_VALUE_TAG = "maximumValue";
     private static final String MINIMUM_VALUE_TAG = "minimumValue";
+    private static final String STEP_SIZE_TAG = "stepSize";
 
 
     /**
@@ -189,6 +203,10 @@ public class IntegerOption extends AbstractOption<Integer> {
         if (minimumValue > Integer.MIN_VALUE) {
             xw.writeAttribute(MINIMUM_VALUE_TAG, minimumValue);
         }
+        
+        if (stepSize > 0) {
+            xw.writeAttribute(STEP_SIZE_TAG, stepSize);
+        }
     }
 
     /**
@@ -201,6 +219,8 @@ public class IntegerOption extends AbstractOption<Integer> {
         maximumValue = xr.getAttribute(MAXIMUM_VALUE_TAG, Integer.MAX_VALUE);
 
         minimumValue = xr.getAttribute(MINIMUM_VALUE_TAG, Integer.MIN_VALUE);
+        
+        stepSize = xr.getAttribute(STEP_SIZE_TAG, 0); 
 
         value = limitValue(this.value);
     }

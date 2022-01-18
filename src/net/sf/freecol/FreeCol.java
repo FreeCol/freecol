@@ -236,15 +236,12 @@ public final class FreeCol {
      */
     private static Dimension windowSize = WINDOWSIZE_FALLBACK;
 
-    /** How much gui elements get scaled. */
-    private static float guiScale = GUI_SCALE_DEFAULT;
-
     /** The special client options that must be processed early. */
     private static Map<String,String> specialOptions = null;
     
    
     private FreeCol() {} // Hide constructor
-    private static List<BufferedImage> l = new ArrayList<>();
+
     /**
      * The entrypoint.
      *
@@ -253,7 +250,7 @@ public final class FreeCol {
     public static void main(String[] args) {
         freeColRevision = FREECOL_VERSION;
         JarURLConnection juc;
-        
+
         try {
             juc = getJarURLConnection(FreeCol.class);
         } catch (ClassCastException cce) {
@@ -610,7 +607,6 @@ public final class FreeCol {
         { null,  "fast", "cli.fast", null },
         { "f", "font", "cli.font", "cli.arg.font" },
         { "F", "full-screen", "cli.full-screen", null },
-        { "g", "gui-scale", getGUIScaleDescription(), "!cli.arg.gui-scale" },
         { "H", "headless", "cli.headless", null },
         { "l", "load-savegame", "cli.load-savegame", argFile },
         { null,  "log-console", "cli.log-console", null },
@@ -757,15 +753,6 @@ public final class FreeCol {
 
             if (line.hasOption("full-screen")) {
                 windowSize = null;
-            }
-
-            if (line.hasOption("gui-scale")) {
-                String arg = line.getOptionValue("gui-scale");
-                if(!setGUIScale(arg)) {
-                    gripe(StringTemplate.template("cli.error.gui-scale")
-                        .addName("%scales%", getValidGUIScales())
-                        .addName("%arg%", arg));
-                }
             }
 
             if (line.hasOption("headless")) {
@@ -1126,37 +1113,6 @@ public final class FreeCol {
     }
 
     /**
-     * Sets the scale for GUI elements.
-     * 
-     * @param arg The optional command line argument to be parsed.
-     * @return If the argument was correctly formatted.
-     */
-    private static boolean setGUIScale(String arg) {
-        boolean valid = true;
-        if(arg == null) {
-            guiScale = GUI_SCALE_MAX;
-        } else {
-            try {
-                int n = Integer.parseInt(arg);
-                if (n < GUI_SCALE_MIN_PCT) {
-                    valid = false;
-                    n = GUI_SCALE_MIN_PCT;
-                } else if(n > GUI_SCALE_MAX_PCT) {
-                    valid = false;
-                    n = GUI_SCALE_MAX_PCT;
-                } else if(n % GUI_SCALE_STEP_PCT != 0) {
-                    valid = false;
-                }
-                guiScale = ((float)n / GUI_SCALE_STEP_PCT) * GUI_SCALE_STEP;
-            } catch (NumberFormatException nfe) {
-                valid = false;
-                guiScale = GUI_SCALE_MAX;
-            }
-        }
-        return valid;
-    }
-
-    /**
      * Gets the valid scale factors for the GUI.
      * 
      * @return A string containing these.
@@ -1167,16 +1123,6 @@ public final class FreeCol {
              i += GUI_SCALE_STEP_PCT) sb.append(i).append(',');
         sb.setLength(sb.length()-1);
         return sb.toString();
-    }
-
-    /**
-     * Get a description of the GUI scale argument.
-     *
-     * @return A suitable description.
-     */
-    private static String getGUIScaleDescription() {
-        return Messages.message(StringTemplate.template("cli.gui-scale")
-                                    .addName("%scales%", getValidGUIScales()));
     }
 
     /**
@@ -1531,6 +1477,13 @@ public final class FreeCol {
      * Start a client.
      */
     private static void startClient() {
+        /*
+         * Deactivate automatic UI scaling since we are solving it
+         * manually instead.
+         */
+        System.setProperty("sun.java2d.uiScale", "1.0");
+        System.setProperty("sun.java2d.uiScale.enabled", "false");
+
         SwingUtilities.invokeLater(() -> {
             /*
              * Please do NOT move the splash screen into SwingGUI again. Make a separate
@@ -1561,8 +1514,7 @@ public final class FreeCol {
                     // savegame was specified on command line
                 }
                 
-                new FreeColClient(splashScreen, fontName,
-                                      guiScale, windowSize,
+                new FreeColClient(splashScreen, fontName, windowSize,
                                       (String)null, sound, introVideo, savegame, spec);
             });
         });
@@ -1592,8 +1544,7 @@ public final class FreeCol {
      */
     public static FreeColClient startTestClient(Specification spec) {
         FreeCol.setHeadless(true);
-        return new FreeColClient(null, (String)null,
-                                 FreeCol.GUI_SCALE_DEFAULT, (Dimension)null,
+        return new FreeColClient(null, (String)null, (Dimension)null,
                                  (String)null, false, false, (File)null, spec);
     }
 

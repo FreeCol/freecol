@@ -234,6 +234,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         for (Object key : u.keySet()) {
             if (u.get(key) instanceof javax.swing.plaf.FontUIResource) {
                 u.put(key, defaultFont);
+            } else if (u.get(key) instanceof Font) {
+                u.put(key, defaultFont);
             }
         }
     }

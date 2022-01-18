@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBox;
 
 import net.sf.freecol.common.option.BooleanOption;
@@ -57,7 +59,18 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
     public void setValue(boolean b) {
         box.setSelected(b);
     }
-
+    
+    public boolean getValue() {
+        return box.isSelected();
+    }
+    
+    public void addActionListener(ActionListener actionListener) {
+        box.addActionListener(actionListener);
+    }
+    
+    public void removeActionListener(ActionListener actionListener) {
+        box.removeActionListener(actionListener);
+    }
 
     // Implement OptionUI
 
