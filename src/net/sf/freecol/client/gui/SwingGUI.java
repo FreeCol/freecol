@@ -750,8 +750,15 @@ public class SwingGUI extends GUI {
         final FreeColClient fcc = getFreeColClient();
         final ClientOptions opts = getClientOptions();
         this.mapControls = MapControls.newInstance(fcc);
-        final ActionListener al = (ActionEvent ae) ->
-            this.refreshTile(this.mapViewer.getMapViewerState().getCursorTile());
+        final ActionListener al = (ActionEvent ae) -> {
+            final Tile tile = mapViewer.getMapViewerState().getCursorTile();
+            if (tile != null) {
+                mapViewer.getMapViewerRepaintManager().markAsDirty(tile);
+                // Repaint as part of normal animation.
+                //this.canvas.repaint();
+            }
+        };
+        
         this.mapViewer = new MapViewer(fcc, this.scaledImageLibrary, al);
         this.canvas = new Canvas(getFreeColClient(), this.graphicsDevice,
                                  desiredWindowSize, this.mapViewer,
