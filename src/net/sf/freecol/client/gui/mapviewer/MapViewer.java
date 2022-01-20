@@ -255,7 +255,7 @@ public final class MapViewer extends FreeColClientHolder {
         final long initMs = now();
         backBufferG2d.setClip(allRenderingClipBounds);
         backBufferG2d.translate(animatedBaseTileTcb.clipLeftX, animatedBaseTileTcb.clipTopY);
-        paintEachTile(backBufferG2d, animatedBaseTileTcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile));
+        paintEachTile(backBufferG2d, animatedBaseTileTcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile, false));
                
         // Display everything else:
         final long animatedBaseMs = now();
@@ -333,7 +333,7 @@ public final class MapViewer extends FreeColClientHolder {
         
         long t1 = now();
         
-        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.displayTileWithBeach(tileG2d, tile, true));
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.displayTileWithBeach(tileG2d, tile));
         
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
