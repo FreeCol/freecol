@@ -1052,6 +1052,7 @@ public final class Canvas extends JDesktopPane {
         repaint();
         addAsFrame(panel, false, popupPosition, resizable);
         panel.requestFocus();
+        freeColClient.getActionManager().update();
         return panel;
     }
 
