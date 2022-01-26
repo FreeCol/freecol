@@ -269,55 +269,6 @@ public class ClientOptions extends OptionGroup {
         = "model.option.color.background";
 
     
-    /**
-     * Used by GUI, the number will be displayed when a group of goods are
-     * higher than this number.
-     *
-     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
-     */
-    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT
-        = "model.option.guiMinNumberToDisplayGoodsCount";
-
-    /**
-     * Used by GUI, this is the most repetitions drawn of a goods image for a
-     * single goods grouping.
-     *
-     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
-     */
-    public static final String MAX_NUMBER_OF_GOODS_IMAGES
-        = "model.option.guiMaxNumberOfGoodsImages";
-
-    /**
-     * Used by GUI, this is the minimum number of goods a colony must
-     * possess for the goods to show up at the bottom of the colony
-     * panel.
-     *
-     * @see net.sf.freecol.client.gui.GUI
-     */
-    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS
-        = "model.option.guiMinNumberToDisplayGoods";
-
-    public static final String REMEMBER_PANEL_POSITIONS
-        = "model.option.rememberPanelPositions";
-
-    /** Whether to remember the sizes of various dialogs and panels. */
-    public static final String REMEMBER_PANEL_SIZES
-        = "model.option.rememberPanelSizes";
-
-    /** Whether to display end turn grey background or not. */
-    public static final String DISABLE_GRAY_LAYER
-        = "model.option.disableGrayLayer";
-
-    /** Used by GUI to sort colonies. */
-    public static final String COLONY_COMPARATOR
-        = "model.option.colonyComparator";
-    public static final int COLONY_COMPARATOR_NAME = 0,
-        COLONY_COMPARATOR_AGE = 1,
-        COLONY_COMPARATOR_POSITION = 2,
-        COLONY_COMPARATOR_SIZE = 3,
-        COLONY_COMPARATOR_SOL = 4;
-
-
     // clientOptions.messages
 
     private static final String MESSAGES_GROUP
@@ -336,7 +287,7 @@ public class ClientOptions extends OptionGroup {
         MESSAGES_GROUP_BY_TYPE = 1,
         MESSAGES_GROUP_BY_SOURCE = 2;
 
-    /** Show goods movement messages. */
+    /** Show goods movement messages.  Used by followTradeRoute. */
     public static final String SHOW_GOODS_MOVEMENT
         = "model.option.guiShowGoodsMovement";
 
@@ -391,6 +342,55 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String STOCK_ACCOUNTS_FOR_PRODUCTION
         = "model.option.stockAccountsForProduction";
+
+    /**
+     * Used by GUI, the number will be displayed when a group of goods are
+     * higher than this number.
+     *
+     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
+     */
+    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT
+        = "model.option.guiMinNumberToDisplayGoodsCount";
+
+    /**
+     * Used by GUI, this is the most repetitions drawn of a goods image for a
+     * single goods grouping.
+     *
+     * @see net.sf.freecol.client.gui.mapviewer.MapViewer
+     */
+    public static final String MAX_NUMBER_OF_GOODS_IMAGES
+        = "model.option.guiMaxNumberOfGoodsImages";
+
+    /**
+     * Used by GUI, this is the minimum number of goods a colony must
+     * possess for the goods to show up at the bottom of the colony
+     * panel.
+     *
+     * @see net.sf.freecol.client.gui.GUI
+     */
+    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS
+        = "model.option.guiMinNumberToDisplayGoods";
+
+    /** Whether to remember the positions of various dialogs and panels. */
+    public static final String REMEMBER_PANEL_POSITIONS
+        = "model.option.rememberPanelPositions";
+
+    /** Whether to remember the sizes of various dialogs and panels. */
+    public static final String REMEMBER_PANEL_SIZES
+        = "model.option.rememberPanelSizes";
+
+    /** Whether to display end turn grey background or not. */
+    public static final String DISABLE_GRAY_LAYER
+        = "model.option.disableGrayLayer";
+
+    /** Used by GUI to sort colonies. */
+    public static final String COLONY_COMPARATOR
+        = "model.option.colonyComparator";
+    public static final int COLONY_COMPARATOR_NAME = 0,
+        COLONY_COMPARATOR_AGE = 1,
+        COLONY_COMPARATOR_POSITION = 2,
+        COLONY_COMPARATOR_SIZE = 3,
+        COLONY_COMPARATOR_SOL = 4;
 
 
     // clientOptions.savegames
@@ -768,12 +768,12 @@ public class ClientOptions extends OptionGroup {
 
         // Reorg ~early 2022
         // - model.option.smoothRendering is no longer used
-        // - ClientOptions.GUI was split into DISPLAY and INTERFACE
+        // - ClientOptions.GUI was split into DISPLAY_GROUP and INTERFACE_GROUP
         // - LANGUAGE is now in the PERSONAL group
         regroup(LANGUAGE, PERSONAL_GROUP);
-        // - DISPLAY_SCALING added to DISPLAY
-        // - font overrides added to DISPLAY
-        // - USE_* booleans and animation speed move to DISPLAY
+        // - DISPLAY_SCALING added to DISPLAY_GROUP
+        // - font overrides added to DISPLAY_GROUP
+        // - USE_* booleans and animation speed move to DISPLAY_GROUP
         addOptionGroup(DISPLAY_GROUP, TAG);
         addIntegerOption(DISPLAY_SCALING,
                          DISPLAY_GROUP, 0);
