@@ -204,10 +204,6 @@ public class ClientOptions extends OptionGroup {
     public static final String REMEMBER_PANEL_SIZES
         = "model.option.rememberPanelSizes";
 
-    /** Whether to enable smooth rendering of the minimap when zoomed out. */
-    public static final String SMOOTH_MINIMAP_RENDERING
-        = "model.option.smoothRendering";
-
     /** Whether to display end turn grey background or not. */
     public static final String DISABLE_GRAY_LAYER
         = "model.option.disableGrayLayer";

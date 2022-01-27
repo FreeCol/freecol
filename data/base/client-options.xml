@@ -154,9 +154,6 @@
         <!-- Draw the borders on the minimap. -->
         <booleanOption id="model.option.miniMapToggleBorders"
                        defaultValue="true"/>
-        <!-- Enable smooth rendering of the minimap when zoomed out? -->
-        <booleanOption id="model.option.smoothRendering"
-                       defaultValue="false"/>
         <!-- The color to fill in around the actual map on the minimap. -->
         <selectOption id="model.option.color.background"
                       defaultValue="0" localizedLabels="true">
