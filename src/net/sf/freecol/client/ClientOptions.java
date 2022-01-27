@@ -54,6 +54,8 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
@@ -93,22 +95,39 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.personal
 
+    private static final String PERSONAL_GROUP
+        = "clientOptions.personal";
+   
     /** Option for the player's preferred name. */
     public static final String NAME
         = "model.option.playerName";
 
-
-    // clientOptions.gui
-
-    public static final String GUI
-        = "clientOptions.gui";
-
-    /** Option for setting the language. */
+    /** Special option for setting the language. */
     public static final String LANGUAGE
         = "model.option.languageOption";
     /** Value for automatic language selection. */
     public static final String AUTOMATIC
         = "clientOptions.gui.languageOption.autoDetectLanguage";
+
+
+    // clientOptions.gui is an old heading, the constant is still used
+    // in fixClientOptions below.  Several "value" constants still
+    // have clientOptions.gui.* names.
+    private static final String GUI_GROUP
+        = "clientOptions.gui";
+    
+
+    // clientOptions.display
+
+    private static final String DISPLAY_GROUP
+        = "clientOptions.display";
+
+    /**
+     * Option to control the display scale factor.
+     */
+    public static final String DISPLAY_SCALING
+        = "model.option.displayScaling";
+
 
     /**
      * Used by GUI, the number will be displayed when a group of goods are
@@ -660,8 +679,8 @@ public class ClientOptions extends OptionGroup {
      */
     public void fixClientOptions() {
         // @compact 0.11.0
-        addBooleanOption(MINIMAP_TOGGLE_BORDERS, ClientOptions.GUI, true);
-        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR, ClientOptions.GUI, true);
+        addBooleanOption(MINIMAP_TOGGLE_BORDERS, GUI_GROUP, true);
+        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR, GUI_GROUP, true);
         addTextOption(AUTO_SAVE_PREFIX, ClientOptions.SAVEGAMES, "Autosave");
         addTextOption(LAST_TURN_NAME, ClientOptions.SAVEGAMES, "last-turn");
         addTextOption(BEFORE_LAST_TURN_NAME,
@@ -707,10 +726,18 @@ public class ClientOptions extends OptionGroup {
                          ClientOptions.MESSAGES, true);
         addBooleanOption("model.option.guiShowDisasters",
                          ClientOptions.MESSAGES, true);
-        addBooleanOption(USE_OPENGL, ClientOptions.GUI, true);
-        addBooleanOption(USE_XRENDER, ClientOptions.GUI, true);
-        addRangeOption(FRIENDLY_MOVE_ANIMATION_SPEED, ClientOptions.GUI, 3,
+        addBooleanOption(USE_OPENGL, GUI_GROUP, true);
+        addBooleanOption(USE_XRENDER, GUI_GROUP, true);
+        addRangeOption(FRIENDLY_MOVE_ANIMATION_SPEED, GUI_GROUP, 3,
                        friendlyMoveAnimationSpeeds);
+
+        // Reorg ~early 2022
+        // - model.option.smoothRendering is no longer used
+        // - ClientOptions.GUI was split into DISPLAY and INTERFACE
+        // - LANGUAGE is now in the PERSONAL group
+        // - DISPLAY_SCALING added to DISPLAY
+        addOptionGroup(DISPLAY_GROUP, TAG);
+        addIntegerOption(DISPLAY_SCALING, DISPLAY_GROUP, 0);
         // end @compat 0.11.6
     }
 
@@ -723,7 +750,6 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
-    /** Currently unused.
     private void addIntegerOption(String id, String gr, int val) {
         if (!hasOption(id, IntegerOption.class)) {
             IntegerOption op = new IntegerOption(id, null);
@@ -731,16 +757,26 @@ public class ClientOptions extends OptionGroup {
             op.setValue(val);
             add(op);
         }
-    }*/
+    }
 
-    /** Currently unused.
     private void addOptionGroup(String id, String gr) {
         if (!hasOption(id, OptionGroup.class)) {
             OptionGroup og = new OptionGroup(id);
             og.setGroup(gr);
             add(og);
         }
-    }*/
+    }
+
+    /**
+     * Move an option to a different group.
+     *
+     * @param id The identifier for the option to move.
+     * @param gr The identifier for the option group to move to.
+     */
+    private void regroup(String id, String gr) {
+        Option op = getOption(id);
+        if (op != null) op.setGroup(gr);
+    }
 
     /**
      * Add a new range option.
