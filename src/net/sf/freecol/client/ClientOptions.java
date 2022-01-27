@@ -262,7 +262,7 @@ public class ClientOptions extends OptionGroup {
         DISPLAY_TILE_TEXT_REGIONS = 3;
 
     /** Style of colony labels. */
-    public static final String COLONY_LABELS
+    public static final String DISPLAY_COLONY_LABELS
         = "model.option.displayColonyLabels";
     public static final int COLONY_LABELS_NONE = 0;
     public static final int COLONY_LABELS_CLASSIC = 1;

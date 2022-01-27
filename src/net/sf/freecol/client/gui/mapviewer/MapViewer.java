@@ -392,7 +392,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display the Tile overlays
         long t8 = now();
-        final int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
+        final int colonyLabels = options.getInteger(ClientOptions.DISPLAY_COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
         paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (!tile.isExplored()) {

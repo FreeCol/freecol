@@ -620,7 +620,7 @@ public final class TileViewer extends FreeColClientHolder {
             float xOffset = this.lib.scaleInt(STATE_OFFSET_X);
             float yOffset = this.lib.scaleInt(STATE_OFFSET_Y);
             final int colonyLabels = getClientOptions()
-                .getInteger(ClientOptions.COLONY_LABELS);
+                .getInteger(ClientOptions.DISPLAY_COLONY_LABELS);
             if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                 // Draw the settlement chip
                 chip = this.lib.getIndianSettlementChip(g2d, is);
