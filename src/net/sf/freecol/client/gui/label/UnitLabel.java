@@ -393,11 +393,13 @@ public final class UnitLabel extends FreeColLabel
             if (workType != null) {
                 int production = ((ColonyTile)this.unit.getLocation())
                     .getTotalProductionOf(workType);
-                ProductionLabel pl = new ProductionLabel(this.freeColClient,
-                    new AbstractGoods(workType, production));
-                g.translate(0, 10);
-                pl.paintComponent(g);
-                g.translate(0, -10);
+                if (production > 0) {
+                    ProductionLabel pl = new ProductionLabel(this.freeColClient,
+                        new AbstractGoods(workType, production));
+                    g.translate(0, 10);
+                    pl.paintComponent(g);
+                    g.translate(0, -10);
+                }
             }
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
                 getParent() instanceof InPortPanel ||
