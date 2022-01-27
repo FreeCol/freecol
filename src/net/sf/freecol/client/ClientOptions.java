@@ -259,7 +259,7 @@ public class ClientOptions extends OptionGroup {
         COLONY_COMPARATOR_SOL = 4;
 
     /** Default zoom level of the minimap. */
-    public static final String DEFAULT_MINIMAP_ZOOM
+    public static final String DEFAULT_ZOOM_LEVEL
         = "model.option.defaultZoomLevel";
 
     /** Animation speed for our units. */
@@ -676,7 +676,7 @@ public class ClientOptions extends OptionGroup {
         // @compat 0.11.3
         addBooleanOption(AUTOLOAD_SENTRIES, ClientOptions.OTHER, false);
         try { // Zoom range was increased
-            RangeOption ro = getOption(DEFAULT_MINIMAP_ZOOM,
+            RangeOption ro = getOption(DEFAULT_ZOOM_LEVEL,
                                        RangeOption.class);
             if (ro.getItemValues().size() != 6) {
                 Integer value = ro.getValue();
@@ -690,7 +690,7 @@ public class ClientOptions extends OptionGroup {
                 ro.setValue(value); // Make sure the value is valid
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to fix " + DEFAULT_MINIMAP_ZOOM
+            logger.log(Level.WARNING, "Failed to fix " + DEFAULT_ZOOM_LEVEL
                 + " option", e);
         }
         // end @compat 0.11.3
