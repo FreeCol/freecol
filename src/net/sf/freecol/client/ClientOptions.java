@@ -128,7 +128,18 @@ public class ClientOptions extends OptionGroup {
     public static final String DISPLAY_SCALING
         = "model.option.displayScaling";
 
+    /**
+     * Enable manual override of main font size.
+     */
+    public static final String MANUAL_MAIN_FONT_SIZE
+        = "model.option.manualMainFontSize";
 
+    /**
+     * Value to use to override the main font size, if enabled by the above.
+     */
+    public static final String MAIN_FONT_SIZE
+        = "model.option.mainFontSize";
+    
     /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
@@ -736,8 +747,18 @@ public class ClientOptions extends OptionGroup {
         // - ClientOptions.GUI was split into DISPLAY and INTERFACE
         // - LANGUAGE is now in the PERSONAL group
         // - DISPLAY_SCALING added to DISPLAY
+        // - font overrides added to DISPLAY
+        // - USE_* booleans and animation speed move to DISPLAY
         addOptionGroup(DISPLAY_GROUP, TAG);
         addIntegerOption(DISPLAY_SCALING, DISPLAY_GROUP, 0);
+        addBooleanOption(MANUAL_MAIN_FONT_SIZE, DISPLAY_GROUP, false);
+        addIntegerOption(MAIN_FONT_SIZE, DISPLAY_GROUP, 12);
+        for (String n: new String[] {
+                USE_PIXMAPS, USE_OPENGL, USE_XRENDER,
+                MOVE_ANIMATION_SPEED, ENEMY_MOVE_ANIMATION_SPEED,
+                FRIENDLY_MOVE_ANIMATION_SPEED }) {
+            regroup(n, DISPLAY_GROUP);
+        }
         // end @compat 0.11.6
     }
 
@@ -765,17 +786,6 @@ public class ClientOptions extends OptionGroup {
             og.setGroup(gr);
             add(og);
         }
-    }
-
-    /**
-     * Move an option to a different group.
-     *
-     * @param id The identifier for the option to move.
-     * @param gr The identifier for the option group to move to.
-     */
-    private void regroup(String id, String gr) {
-        Option op = getOption(id);
-        if (op != null) op.setGroup(gr);
     }
 
     /**
@@ -814,6 +824,17 @@ public class ClientOptions extends OptionGroup {
             op.setValue(val);
             add(op);
         }
+    }
+
+    /**
+     * Move an option to a different group.
+     *
+     * @param id The identifier for the option to move.
+     * @param gr The identifier for the option group to move to.
+     */
+    private void regroup(String id, String gr) {
+        Option op = getOption(id);
+        if (op != null) op.setGroup(gr);
     }
 
     /**

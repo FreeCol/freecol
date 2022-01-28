@@ -1721,8 +1721,8 @@ public class SwingGUI extends GUI {
         final float DEFAULT_MAIN_FONT_SIZE = 12f;
         
         final int fontSize;
-        if (getClientOptions().getBoolean("model.option.manualMainFontSize")) {
-            fontSize = getClientOptions().getInteger("model.option.mainFontSize");
+        if (getClientOptions().getBoolean(ClientOptions.MANUAL_MAIN_FONT_SIZE)) {
+            fontSize = getClientOptions().getInteger(ClientOptions.MAIN_FONT_SIZE);
             logger.info("Manual font size: " + fontSize + " (reported DPI: " + dpi + ")");
         } else {
             fontSize = (int) ((DEFAULT_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
