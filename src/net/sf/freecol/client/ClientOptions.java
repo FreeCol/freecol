@@ -307,7 +307,7 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.messages
 
-    public static final String MESSAGES
+    private static final String MESSAGES_GROUP
         = "clientOptions.messages";
     
     /**
@@ -355,10 +355,36 @@ public class ClientOptions extends OptionGroup {
     public static final int LABOUR_REPORT_COMPACT = 1;
 
 
+    // clientOptions.warehouse
+
+    private static final String WAREHOUSE_GROUP
+        = "clientOptions.warehouse";
+
+    /** The amount of stock the custom house should keep when selling goods. */
+    public static final String CUSTOM_STOCK
+        = "model.option.customStock";
+
+    /** Generate warning of stock drops below this percentage of capacity. */
+    public static final String LOW_LEVEL
+        = "model.option.lowLevel";
+
+    /** Generate warning of stock exceeds this percentage of capacity. */
+    public static final String HIGH_LEVEL
+        = "model.option.highLevel";
+
+    /**
+     * Should trade route units check production to determine goods levels at
+     * stops along its route?
+     */
+    public static final String STOCK_ACCOUNTS_FOR_PRODUCTION
+        = "model.option.stockAccountsForProduction";
+
+
     // clientOptions.savegames
 
-    public static final String SAVEGAMES
+    private static final String SAVEGAMES_GROUP
         = "clientOptions.savegames";
+
     /** Use default values for savegames instead of displaying a dialog. */
     public static final String SHOW_SAVEGAME_SETTINGS
         = "model.option.showSavegameSettings";
@@ -407,32 +433,10 @@ public class ClientOptions extends OptionGroup {
         = "model.option.beforeLastTurnName";
 
 
-    // clientOptions.warehouse
-
-    public static final String WAREHOUSE
-        = "clientOptions.warehouse";
-
-    /** The amount of stock the custom house should keep when selling goods. */
-    public static final String CUSTOM_STOCK
-        = "model.option.customStock";
-
-    /** Generate warning of stock drops below this percentage of capacity. */
-    public static final String LOW_LEVEL
-        = "model.option.lowLevel";
-
-    /** Generate warning of stock exceeds this percentage of capacity. */
-    public static final String HIGH_LEVEL
-        = "model.option.highLevel";
-
-    /**
-     * Should trade route units check production to determine goods levels at
-     * stops along its route?
-     */
-    public static final String STOCK_ACCOUNTS_FOR_PRODUCTION
-        = "model.option.stockAccountsForProduction";
-
-
     // clientOptions.audio
+
+    private static final String AUDIO_GROUP
+        = "clientOptions.audio";
 
     /** Choose the default mixer. */
     public static final String AUDIO_MIXER
@@ -449,7 +453,7 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.other
 
-    public static final String OTHER
+    private static final String OTHER_GROUP
         = "clientOptions.other";
 
     /** Option to autoload emigrants on sailing to america. */
@@ -690,24 +694,28 @@ public class ClientOptions extends OptionGroup {
      */
     public void fixClientOptions() {
         // @compact 0.11.0
-        addBooleanOption(MINIMAP_TOGGLE_BORDERS, GUI_GROUP, true);
-        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR, GUI_GROUP, true);
-        addTextOption(AUTO_SAVE_PREFIX, ClientOptions.SAVEGAMES, "Autosave");
-        addTextOption(LAST_TURN_NAME, ClientOptions.SAVEGAMES, "last-turn");
+        addBooleanOption(MINIMAP_TOGGLE_BORDERS,
+                         GUI_GROUP, true);
+        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
+                         GUI_GROUP, true);
+        addTextOption(AUTO_SAVE_PREFIX,
+                      SAVEGAMES_GROUP, "Autosave");
+        addTextOption(LAST_TURN_NAME,
+                      SAVEGAMES_GROUP, "last-turn");
         addTextOption(BEFORE_LAST_TURN_NAME,
-                      ClientOptions.SAVEGAMES, "before-last-turn");
+                      SAVEGAMES_GROUP, "before-last-turn");
         // end @compact 0.11.0
 
         // @compat 0.11.1
         addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
-                         ClientOptions.WAREHOUSE, false);
+                         WAREHOUSE_GROUP, false);
         // end @compat 0.11.1
 
         // @compat 0.11.3
-        addBooleanOption(AUTOLOAD_SENTRIES, ClientOptions.OTHER, false);
+        addBooleanOption(AUTOLOAD_SENTRIES,
+                         OTHER_GROUP, false);
         try { // Zoom range was increased
-            RangeOption ro = getOption(DEFAULT_ZOOM_LEVEL,
-                                       RangeOption.class);
+            RangeOption ro = getOption(DEFAULT_ZOOM_LEVEL, RangeOption.class);
             if (ro.getItemValues().size() != 6) {
                 Integer value = ro.getValue();
                 ro.clearItemValues();
@@ -726,21 +734,24 @@ public class ClientOptions extends OptionGroup {
         // end @compat 0.11.3
 
         // @compat 0.11.6
-        addBooleanOption(SHOW_REGION_NAMING, ClientOptions.MESSAGES, true);
+        addBooleanOption(SHOW_REGION_NAMING,
+                         MESSAGES_GROUP, true);
 
         // These have computed keys in ModelMessage.MessageType
         addBooleanOption("model.option.guiShowCombatResult",
-                         ClientOptions.MESSAGES, true);
+                         MESSAGES_GROUP, true);
         addBooleanOption("model.option.guiShowUnitRepaired",
-                         ClientOptions.MESSAGES, true);
+                         MESSAGES_GROUP, true);
         addBooleanOption("model.option.guiShowArrived",
-                         ClientOptions.MESSAGES, true);
+                         MESSAGES_GROUP, true);
         addBooleanOption("model.option.guiShowDisasters",
-                         ClientOptions.MESSAGES, true);
-        addBooleanOption(USE_OPENGL, GUI_GROUP, true);
-        addBooleanOption(USE_XRENDER, GUI_GROUP, true);
-        addRangeOption(FRIENDLY_MOVE_ANIMATION_SPEED, GUI_GROUP, 3,
-                       friendlyMoveAnimationSpeeds);
+                         MESSAGES_GROUP, true);
+        addBooleanOption(USE_OPENGL,
+                         GUI_GROUP, true);
+        addBooleanOption(USE_XRENDER,
+                         GUI_GROUP, true);
+        addRangeOption(FRIENDLY_MOVE_ANIMATION_SPEED,
+                       GUI_GROUP, 3, friendlyMoveAnimationSpeeds);
 
         // Reorg ~early 2022
         // - model.option.smoothRendering is no longer used
@@ -750,9 +761,12 @@ public class ClientOptions extends OptionGroup {
         // - font overrides added to DISPLAY
         // - USE_* booleans and animation speed move to DISPLAY
         addOptionGroup(DISPLAY_GROUP, TAG);
-        addIntegerOption(DISPLAY_SCALING, DISPLAY_GROUP, 0);
-        addBooleanOption(MANUAL_MAIN_FONT_SIZE, DISPLAY_GROUP, false);
-        addIntegerOption(MAIN_FONT_SIZE, DISPLAY_GROUP, 12);
+        addIntegerOption(DISPLAY_SCALING,
+                         DISPLAY_GROUP, 0);
+        addBooleanOption(MANUAL_MAIN_FONT_SIZE,
+                         DISPLAY_GROUP, false);
+        addIntegerOption(MAIN_FONT_SIZE,
+                         DISPLAY_GROUP, 12);
         for (String n: new String[] {
                 USE_PIXMAPS, USE_OPENGL, USE_XRENDER,
                 MOVE_ANIMATION_SPEED, ENEMY_MOVE_ANIMATION_SPEED,
