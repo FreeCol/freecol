@@ -757,6 +757,7 @@ public class ClientOptions extends OptionGroup {
         // - model.option.smoothRendering is no longer used
         // - ClientOptions.GUI was split into DISPLAY and INTERFACE
         // - LANGUAGE is now in the PERSONAL group
+        regroup(LANGUAGE, PERSONAL_GROUP);
         // - DISPLAY_SCALING added to DISPLAY
         // - font overrides added to DISPLAY
         // - USE_* booleans and animation speed move to DISPLAY
