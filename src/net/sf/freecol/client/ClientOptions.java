@@ -752,7 +752,7 @@ public class ClientOptions extends OptionGroup {
                          MESSAGES_GROUP, true);
         addBooleanOption("model.option.guiShowUnitRepaired",
                          MESSAGES_GROUP, true);
-        addBooleanOption("model.option.guiShowArrived",
+        addBooleanOption("model.option.guiShowUnitArrived",
                          MESSAGES_GROUP, true);
         addBooleanOption("model.option.guiShowDisasters",
                          MESSAGES_GROUP, true);
