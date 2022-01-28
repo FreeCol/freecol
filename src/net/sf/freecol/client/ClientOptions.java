@@ -228,7 +228,11 @@ public class ClientOptions extends OptionGroup {
     public static final int COLONY_LABELS_CLASSIC = 1;
     public static final int COLONY_LABELS_MODERN = 2;
 
+    // clientOptions.interface.mapControls
 
+    private static final String MAPCONTROLS_GROUP
+        = "clientOptions.interface.mapControls";
+    
     /** Whether to display a compass rose or not. */
     public static final String DISPLAY_COMPASS_ROSE
         = "model.option.displayCompassRose";
@@ -237,6 +241,34 @@ public class ClientOptions extends OptionGroup {
     public static final String DISPLAY_MAP_CONTROLS
         = "model.option.displayMapControls";
 
+    /** The type of map controls, corner or classic. */
+    public static final String MAP_CONTROLS
+        = "model.option.mapControls";
+    /** Styles of map controls. */
+    public static final String MAP_CONTROLS_CORNERS
+        = "clientOptions.gui.mapControls.CornerMapControls";
+    public static final String MAP_CONTROLS_CLASSIC
+        = "clientOptions.gui.mapControls.ClassicMapControls";
+
+    /** Whether to draw the fog of war on the minimap. */
+    public static final String MINIMAP_TOGGLE_FOG_OF_WAR
+        = "model.option.miniMapToggleFogOfWar";
+
+    /** Whether to draw the borders on the minimap. */
+    public static final String MINIMAP_TOGGLE_BORDERS
+        = "model.option.miniMapToggleBorders";
+
+    /**
+     * The color to fill in around the actual map on the
+     * minimap.  Typically only visible when the minimap is at full
+     * zoom-out, but at the default 'black' you can't differentiate
+     * between the background and the (unexplored) map.  Actually:
+     * clientOptions.minimap.color.background
+     */
+    public static final String MINIMAP_BACKGROUND_COLOR
+        = "model.option.color.background";
+
+    
     /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
@@ -275,32 +307,6 @@ public class ClientOptions extends OptionGroup {
     /** Whether to display end turn grey background or not. */
     public static final String DISABLE_GRAY_LAYER
         = "model.option.disableGrayLayer";
-
-    /** Whether to draw the fog of war on the minimap. */
-    public static final String MINIMAP_TOGGLE_FOG_OF_WAR
-        = "model.option.miniMapToggleFogOfWar";
-
-    /** Whether to draw the borders on the minimap. */
-    public static final String MINIMAP_TOGGLE_BORDERS
-        = "model.option.miniMapToggleBorders";
-
-    /** Style of map controls. */
-    public static final String MAP_CONTROLS
-        = "model.option.mapControls";
-    public static final String MAP_CONTROLS_CORNERS
-        = "clientOptions.gui.mapControls.CornerMapControls";
-    public static final String MAP_CONTROLS_CLASSIC
-        = "clientOptions.gui.mapControls.ClassicMapControls";
-
-    /**
-     * The color to fill in around the actual map on the
-     * minimap.  Typically only visible when the minimap is at full
-     * zoom-out, but at the default 'black' you can't differentiate
-     * between the background and the (unexplored) map.  Actually:
-     * clientOptions.minimap.color.background
-     */
-    public static final String MINIMAP_BACKGROUND_COLOR
-        = "model.option.color.background";
 
     /** Used by GUI to sort colonies. */
     public static final String COLONY_COMPARATOR
@@ -790,6 +796,15 @@ public class ClientOptions extends OptionGroup {
                 DISPLAY_GRID, DISPLAY_BORDERS, UNIT_LAST_MOVE_DELAY,
                 DISPLAY_TILE_TEXT, DISPLAY_COLONY_LABELS }) {
             regroup(n, MAPVIEW_GROUP);
+        }
+        // except the minimap controls which are in MAPCONTROLS_GROUP
+        addOptionGroup(MAPCONTROLS_GROUP, INTERFACE_GROUP);
+        for (String n: new String[] {
+                DISPLAY_COMPASS_ROSE, DISPLAY_MAP_CONTROLS,
+                MINIMAP_TOGGLE_FOG_OF_WAR, MINIMAP_TOGGLE_BORDERS,
+                //MINIMAP_SMOOTH_RENDERING,
+                MINIMAP_BACKGROUND_COLOR }) {
+            regroup(n, MAPCONTROLS_GROUP);
         }
         // end @compat 0.11.6
     }
