@@ -29,6 +29,7 @@
     </optionGroup>
 
     <optionGroup id="clientOptions.display" >
+      <!-- Control the display scale -->
       <rangeOption id="model.option.displayScaling"
                    defaultValue="0" localizedLabels="true">
         <rangeValue label="model.option.displayScaling.automatic" value="0"/>
@@ -134,14 +135,14 @@
         </selectOption>
 
       </optionGroup>
-      <optionGroup id="clientOptions.clientOptions.interface.mapControls" >
+      <optionGroup id="clientOptions.interface.mapControls" >
         <!-- Whether to display a compass rose or not. -->
         <booleanOption id="model.option.displayCompassRose"
                        defaultValue="false"/>
         <!-- Whether to display the map controls by default or not. -->
         <booleanOption id="model.option.displayMapControls"
                        defaultValue="true"/>
-        <!-- Map controls -->
+        <!-- What type of map controls, corner or classic? -->
         <stringOption id="model.option.mapControls"
                       defaultValue="clientOptions.gui.mapControls.CornerMapControls">
           <choice value="clientOptions.gui.mapControls.CornerMapControls"/>
