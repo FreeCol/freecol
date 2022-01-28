@@ -267,9 +267,6 @@
         <!-- Option to disable end turn grey background. -->
         <booleanOption id="model.option.disableGrayLayer"
                        defaultValue="false"/>
-        <!-- Used by GUI to sort colonies. -->
-      
-      
         <!-- Option for autoload emigrants on sailing to america. -->
         <booleanOption id="model.option.autoloadEmigrants"
                        defaultValue="false"/>
@@ -309,7 +306,7 @@
              panel when its quantity is at least this number. -->
         <integerOption id="model.option.guiMinNumberToDisplayGoods"
                        defaultValue="0" minimumValue="0" maximumValue="100"/>
-                       
+        <!-- Used by GUI to sort colonies. -->
         <selectOption id="model.option.colonyComparator"
                       defaultValue="0" localizedLabels="true">
           <selectValue label="clientOptions.gui.colonyComparator.byName" value="0"/>

@@ -268,11 +268,10 @@ public class ClientOptions extends OptionGroup {
     public static final String MINIMAP_BACKGROUND_COLOR
         = "model.option.color.background";
 
-    
-    // clientOptions.messages
+    // clientOptions.interface.messages
 
     private static final String MESSAGES_GROUP
-        = "clientOptions.messages";
+        = "clientOptions.messages"; // should be .interface.warehouse
     
     /**
      * Used by GUI, this defines the grouping of ModelMessages.
@@ -318,11 +317,10 @@ public class ClientOptions extends OptionGroup {
     public static final int LABOUR_REPORT_CLASSIC = 0;
     public static final int LABOUR_REPORT_COMPACT = 1;
 
-
-    // clientOptions.warehouse
+    // clientOptions.interface.warehouse
 
     private static final String WAREHOUSE_GROUP
-        = "clientOptions.warehouse";
+        = "clientOptions.warehouse"; // should be .interface.warehouse
 
     /** The amount of stock the custom house should keep when selling goods. */
     public static final String CUSTOM_STOCK
@@ -342,6 +340,53 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String STOCK_ACCOUNTS_FOR_PRODUCTION
         = "model.option.stockAccountsForProduction";
+
+    // clientOptions.other
+
+    private static final String OTHER_GROUP
+        = "clientOptions.other"; // should be .interface.other
+
+    /** Whether to remember the positions of various dialogs and panels. */
+    public static final String REMEMBER_PANEL_POSITIONS
+        = "model.option.rememberPanelPositions";
+
+    /** Whether to remember the sizes of various dialogs and panels. */
+    public static final String REMEMBER_PANEL_SIZES
+        = "model.option.rememberPanelSizes";
+
+    /** Whether to display end turn grey background or not. */
+    public static final String DISABLE_GRAY_LAYER
+        = "model.option.disableGrayLayer";
+
+    /** Option to autoload emigrants on sailing to america. */
+    public static final String AUTOLOAD_EMIGRANTS
+        = "model.option.autoloadEmigrants";
+
+    /** Option to autoload sentried units. */
+    public static final String AUTOLOAD_SENTRIES
+        = "model.option.autoloadSentries";
+
+    /** Automatically end the turn when no units can be * made active. */
+    public static final String AUTO_END_TURN
+        = "model.option.autoEndTurn";
+
+    /** Show the end turn dialog. */
+    public static final String SHOW_END_TURN_DIALOG
+        = "model.option.showEndTurnDialog";
+
+    /** Set the default native demand action. */
+    public static final String INDIAN_DEMAND_RESPONSE
+        = "model.option.indianDemandResponse";
+    public static final int INDIAN_DEMAND_RESPONSE_ASK = 0;
+    public static final int INDIAN_DEMAND_RESPONSE_ACCEPT = 1;
+    public static final int INDIAN_DEMAND_RESPONSE_REJECT = 2;
+
+    /** Set the default warehouse overflow on unload action. */
+    public static final String UNLOAD_OVERFLOW_RESPONSE
+        = "model.option.unloadOverflowResponse";
+    public static final int UNLOAD_OVERFLOW_RESPONSE_ASK = 0;
+    public static final int UNLOAD_OVERFLOW_RESPONSE_NEVER = 1;
+    public static final int UNLOAD_OVERFLOW_RESPONSE_ALWAYS = 2;
 
     /**
      * Used by GUI, the number will be displayed when a group of goods are
@@ -370,18 +415,6 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS
         = "model.option.guiMinNumberToDisplayGoods";
-
-    /** Whether to remember the positions of various dialogs and panels. */
-    public static final String REMEMBER_PANEL_POSITIONS
-        = "model.option.rememberPanelPositions";
-
-    /** Whether to remember the sizes of various dialogs and panels. */
-    public static final String REMEMBER_PANEL_SIZES
-        = "model.option.rememberPanelSizes";
-
-    /** Whether to display end turn grey background or not. */
-    public static final String DISABLE_GRAY_LAYER
-        = "model.option.disableGrayLayer";
 
     /** Used by GUI to sort colonies. */
     public static final String COLONY_COMPARATOR
@@ -462,42 +495,6 @@ public class ClientOptions extends OptionGroup {
     /** Play an alert sound on message arrival. */
     public static final String AUDIO_ALERTS
         = "model.option.audioAlerts";
-
-
-    // clientOptions.other
-
-    private static final String OTHER_GROUP
-        = "clientOptions.other";
-
-    /** Option to autoload emigrants on sailing to america. */
-    public static final String AUTOLOAD_EMIGRANTS
-        = "model.option.autoloadEmigrants";
-
-    /** Option to autoload sentried units. */
-    public static final String AUTOLOAD_SENTRIES
-        = "model.option.autoloadSentries";
-
-    /** Automatically end the turn when no units can be * made active. */
-    public static final String AUTO_END_TURN
-        = "model.option.autoEndTurn";
-
-    /** Show the end turn dialog. */
-    public static final String SHOW_END_TURN_DIALOG
-        = "model.option.showEndTurnDialog";
-
-    /** Set the default native demand action. */
-    public static final String INDIAN_DEMAND_RESPONSE
-        = "model.option.indianDemandResponse";
-    public static final int INDIAN_DEMAND_RESPONSE_ASK = 0;
-    public static final int INDIAN_DEMAND_RESPONSE_ACCEPT = 1;
-    public static final int INDIAN_DEMAND_RESPONSE_REJECT = 2;
-
-    /** Set the default warehouse overflow on unload action. */
-    public static final String UNLOAD_OVERFLOW_RESPONSE
-        = "model.option.unloadOverflowResponse";
-    public static final int UNLOAD_OVERFLOW_RESPONSE_ASK = 0;
-    public static final int UNLOAD_OVERFLOW_RESPONSE_NEVER = 1;
-    public static final int UNLOAD_OVERFLOW_RESPONSE_ALWAYS = 2;
 
 
     // clientOptions.mods
@@ -787,7 +784,7 @@ public class ClientOptions extends OptionGroup {
                 FRIENDLY_MOVE_ANIMATION_SPEED }) {
             regroup(n, DISPLAY_GROUP);
         }
-        // Most of the remaining options move to the MAPVIEW_GROUP
+        // Most of the remaining options move to the MAPVIEW_GROUP...
         addOptionGroup(INTERFACE_GROUP, TAG);
         addOptionGroup(MAPVIEW_GROUP, INTERFACE_GROUP);
         for (String n: new String[] {
@@ -797,7 +794,7 @@ public class ClientOptions extends OptionGroup {
                 DISPLAY_TILE_TEXT, DISPLAY_COLONY_LABELS }) {
             regroup(n, MAPVIEW_GROUP);
         }
-        // except the minimap controls which are in MAPCONTROLS_GROUP
+        // ...except the minimap controls which are in MAPCONTROLS_GROUP
         addOptionGroup(MAPCONTROLS_GROUP, INTERFACE_GROUP);
         for (String n: new String[] {
                 DISPLAY_COMPASS_ROSE, DISPLAY_MAP_CONTROLS,
@@ -806,6 +803,10 @@ public class ClientOptions extends OptionGroup {
                 MINIMAP_BACKGROUND_COLOR }) {
             regroup(n, MAPCONTROLS_GROUP);
         }
+        // MESSAGES,WAREHOUSE,OTHER_GROUP move to INTERFACE_GROUP
+        regroup(MESSAGES_GROUP, INTERFACE_GROUP);
+        regroup(WAREHOUSE_GROUP, INTERFACE_GROUP);
+        regroup(OTHER_GROUP, INTERFACE_GROUP);
         // end @compat 0.11.6
     }
 
