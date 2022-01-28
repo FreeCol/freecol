@@ -165,6 +165,78 @@ public class ClientOptions extends OptionGroup {
         = "model.option.friendlyMoveAnimationSpeed";
 
 
+    // clientOptions.interface
+
+    private static final String INTERFACE_GROUP
+        = "clientOptions.interface";
+
+    // clientOptions.interface.mapView
+
+    private static final String MAPVIEW_GROUP
+        = "clientOptions.interface.mapView";
+    
+    /** Default zoom level of the minimap. */
+    public static final String DEFAULT_ZOOM_LEVEL
+        = "model.option.defaultZoomLevel";
+    
+    /**
+     * Selected tiles always gets centered if this option is enabled (even if
+     * the tile is on screen.
+     */
+    public static final String ALWAYS_CENTER
+        = "model.option.alwaysCenter";
+
+    /**
+     * If this option is enabled, the display will recenter in order
+     * to display the active unit if it is not on screen.
+     */
+    public static final String JUMP_TO_ACTIVE_UNIT
+        = "model.option.jumpToActiveUnit";
+
+    /** Option to scroll when dragging units on the mapboard. */
+    public static final String MAP_SCROLL_ON_DRAG
+        = "model.option.mapScrollOnDrag";
+
+    /** Option to auto-scroll on mouse movement. */
+    public static final String AUTO_SCROLL
+        = "model.option.autoScroll";
+
+    /** Whether to display the grid by default or not. */
+    public static final String DISPLAY_GRID
+        = "model.option.displayGrid";
+
+    /** Whether to display borders by default or not. */
+    public static final String DISPLAY_BORDERS
+        = "model.option.displayBorders";
+
+    /** Whether to delay on a unit's last move or not. */
+    public static final String UNIT_LAST_MOVE_DELAY
+        = "model.option.unitLastMoveDelay";
+
+    /** What text to display in the tiles. */
+    public static final String DISPLAY_TILE_TEXT
+        = "model.option.displayTileText";
+    public static final int DISPLAY_TILE_TEXT_EMPTY = 0,
+        DISPLAY_TILE_TEXT_NAMES = 1,
+        DISPLAY_TILE_TEXT_OWNERS = 2,
+        DISPLAY_TILE_TEXT_REGIONS = 3;
+
+    /** Style of colony labels. */
+    public static final String DISPLAY_COLONY_LABELS
+        = "model.option.displayColonyLabels";
+    public static final int COLONY_LABELS_NONE = 0;
+    public static final int COLONY_LABELS_CLASSIC = 1;
+    public static final int COLONY_LABELS_MODERN = 2;
+
+
+    /** Whether to display a compass rose or not. */
+    public static final String DISPLAY_COMPASS_ROSE
+        = "model.option.displayCompassRose";
+
+    /** Whether to display the map controls or not. */
+    public static final String DISPLAY_MAP_CONTROLS
+        = "model.option.displayMapControls";
+
     /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
@@ -192,52 +264,6 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS
         = "model.option.guiMinNumberToDisplayGoods";
-
-    /**
-     * Selected tiles always gets centered if this option is enabled (even if
-     * the tile is on screen.
-     *
-     * @see net.sf.freecol.client.gui.GUI
-     */
-    public static final String ALWAYS_CENTER
-        = "model.option.alwaysCenter";
-
-    /**
-     * If this option is enabled, the display will recenter in order
-     * to display the active unit if it is not on screen.
-     *
-     * @see net.sf.freecol.client.gui.GUI
-     */
-    public static final String JUMP_TO_ACTIVE_UNIT
-        = "model.option.jumpToActiveUnit";
-
-    /** Option to scroll when dragging units on the mapboard. */
-    public static final String MAP_SCROLL_ON_DRAG
-        = "model.option.mapScrollOnDrag";
-
-    /** Option to auto-scroll on mouse movement. */
-    public static final String AUTO_SCROLL
-        = "model.option.autoScroll";
-
-    /** Whether to display a compass rose or not. */
-    public static final String DISPLAY_COMPASS_ROSE
-        = "model.option.displayCompassRose";
-
-    /** Whether to display the map controls or not. */
-    public static final String DISPLAY_MAP_CONTROLS
-        = "model.option.displayMapControls";
-
-    /** Whether to display the grid by default or not. */
-    public static final String DISPLAY_GRID
-        = "model.option.displayGrid";
-
-    /** Whether to display borders by default or not. */
-    public static final String DISPLAY_BORDERS
-        = "model.option.displayBorders";
-
-    /** Whether to delay on a unit's last move or not. */
-    public static final String UNIT_LAST_MOVE_DELAY
-        = "model.option.unitLastMoveDelay";
 
     public static final String REMEMBER_PANEL_POSITIONS
         = "model.option.rememberPanelPositions";
@@ -276,21 +302,6 @@ public class ClientOptions extends OptionGroup {
     public static final String MINIMAP_BACKGROUND_COLOR
         = "model.option.color.background";
 
-    /** What text to display in the tiles. */
-    public static final String DISPLAY_TILE_TEXT
-        = "model.option.displayTileText";
-    public static final int DISPLAY_TILE_TEXT_EMPTY = 0,
-        DISPLAY_TILE_TEXT_NAMES = 1,
-        DISPLAY_TILE_TEXT_OWNERS = 2,
-        DISPLAY_TILE_TEXT_REGIONS = 3;
-
-    /** Style of colony labels. */
-    public static final String DISPLAY_COLONY_LABELS
-        = "model.option.displayColonyLabels";
-    public static final int COLONY_LABELS_NONE = 0;
-    public static final int COLONY_LABELS_CLASSIC = 1;
-    public static final int COLONY_LABELS_MODERN = 2;
-
     /** Used by GUI to sort colonies. */
     public static final String COLONY_COMPARATOR
         = "model.option.colonyComparator";
@@ -299,10 +310,6 @@ public class ClientOptions extends OptionGroup {
         COLONY_COMPARATOR_POSITION = 2,
         COLONY_COMPARATOR_SIZE = 3,
         COLONY_COMPARATOR_SOL = 4;
-
-    /** Default zoom level of the minimap. */
-    public static final String DEFAULT_ZOOM_LEVEL
-        = "model.option.defaultZoomLevel";
 
 
     // clientOptions.messages
@@ -773,6 +780,16 @@ public class ClientOptions extends OptionGroup {
                 MOVE_ANIMATION_SPEED, ENEMY_MOVE_ANIMATION_SPEED,
                 FRIENDLY_MOVE_ANIMATION_SPEED }) {
             regroup(n, DISPLAY_GROUP);
+        }
+        // Most of the remaining options move to the MAPVIEW_GROUP
+        addOptionGroup(INTERFACE_GROUP, TAG);
+        addOptionGroup(MAPVIEW_GROUP, INTERFACE_GROUP);
+        for (String n: new String[] {
+                DEFAULT_ZOOM_LEVEL, ALWAYS_CENTER, JUMP_TO_ACTIVE_UNIT,
+                MAP_SCROLL_ON_DRAG, AUTO_SCROLL,
+                DISPLAY_GRID, DISPLAY_BORDERS, UNIT_LAST_MOVE_DELAY,
+                DISPLAY_TILE_TEXT, DISPLAY_COLONY_LABELS }) {
+            regroup(n, MAPVIEW_GROUP);
         }
         // end @compat 0.11.6
     }

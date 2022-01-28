@@ -1734,7 +1734,7 @@ public class SwingGUI extends GUI {
 
     private float determineScaleFactorUsingClientOptions(final int dpi) {
         final int DEFAULT_DPI = 96;
-        final int displayScaling = getClientOptions().getInteger("model.option.displayScaling");
+        final int displayScaling = getClientOptions().getInteger(ClientOptions.DISPLAY_SCALING);
         float scaleFactor;
         if (displayScaling == 0) {
             /* 
