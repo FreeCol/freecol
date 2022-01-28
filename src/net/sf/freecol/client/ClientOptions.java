@@ -140,6 +140,31 @@ public class ClientOptions extends OptionGroup {
     public static final String MAIN_FONT_SIZE
         = "model.option.mainFontSize";
     
+    /** Pixmap setting to work around Java 2D graphics bug. */
+    public static final String USE_PIXMAPS
+        = "model.option.usePixmaps";
+
+    /** Enable use of openGL pipeline. */
+    public static final String USE_OPENGL
+        = "model.option.useOpenGL";
+
+    /** Enable use of XRender pipeline (unix specific). */
+    public static final String USE_XRENDER
+        = "model.option.useXRender";
+
+    /** Animation speed for our units. */
+    public static final String MOVE_ANIMATION_SPEED
+        = "model.option.moveAnimationSpeed";
+
+    /** Animation speed for enemy units. */
+    public static final String ENEMY_MOVE_ANIMATION_SPEED
+        = "model.option.enemyMoveAnimationSpeed";
+
+    /** Animation speed for friendly units. */
+    public static final String FRIENDLY_MOVE_ANIMATION_SPEED
+        = "model.option.friendlyMoveAnimationSpeed";
+
+
     /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
@@ -214,19 +239,6 @@ public class ClientOptions extends OptionGroup {
     public static final String UNIT_LAST_MOVE_DELAY
         = "model.option.unitLastMoveDelay";
 
-    /** Pixmap setting to work around Java 2D graphics bug. */
-    public static final String USE_PIXMAPS
-        = "model.option.usePixmaps";
-
-    /** Enable use of openGL pipeline. */
-    public static final String USE_OPENGL
-        = "model.option.useOpenGL";
-
-    /** Enable use of XRender pipeline (unix specific). */
-    public static final String USE_XRENDER
-        = "model.option.useXRender";
-
-    /** Whether to remember the positions of various dialogs and panels. */
     public static final String REMEMBER_PANEL_POSITIONS
         = "model.option.rememberPanelPositions";
 
@@ -291,18 +303,6 @@ public class ClientOptions extends OptionGroup {
     /** Default zoom level of the minimap. */
     public static final String DEFAULT_ZOOM_LEVEL
         = "model.option.defaultZoomLevel";
-
-    /** Animation speed for our units. */
-    public static final String MOVE_ANIMATION_SPEED
-        = "model.option.moveAnimationSpeed";
-
-    /** Animation speed for enemy units. */
-    public static final String ENEMY_MOVE_ANIMATION_SPEED
-        = "model.option.enemyMoveAnimationSpeed";
-
-    /** Animation speed for friendly units. */
-    public static final String FRIENDLY_MOVE_ANIMATION_SPEED
-        = "model.option.friendlyMoveAnimationSpeed";
 
 
     // clientOptions.messages
