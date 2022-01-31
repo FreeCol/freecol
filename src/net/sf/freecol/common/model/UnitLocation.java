@@ -40,6 +40,13 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * can be put.  The UnitLocation can not store any other Locatables,
  * such as {@link Goods}, or {@link TileItem}s.
  *
+ * Be *very* careful with use of the units list for low level routines
+ * as distinct from use of getUnits()/getUnitList()/getUnitCount()
+ * etc.  Beware that Colony is a UnitLocation, but it does *not* store
+ * its units in the unit list, they live in its WorkLocations.
+ * Therefore Colony overrides several such routines to do the right thing,
+ * which can lead to confusion especially when debugging.
+ *
  * @see Locatable
  */
 public abstract class UnitLocation extends FreeColGameObject implements Location {
@@ -173,14 +180,13 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         synchronized (this.units) {
             ret = this.units.add(u);
         }
-	return ret;
+        return ret;
     }
+
 
     // Some useful utilities, marked final as they will work as long
     // as working implementations of getUnits/List(), getUnitCount(),
-    // getUnitCapacity() and getSettlement() are provided.  Note that
-    // Colony overrides these, as it contains units indirectly in its
-    // work location.
+    // getUnitCapacity() and getSettlement() are provided.
 
     /**
      * Is this unit location empty?
