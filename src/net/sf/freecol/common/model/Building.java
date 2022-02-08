@@ -729,10 +729,11 @@ public class Building extends WorkLocation
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
+        Colony c =  getColony();
         sb.append('[').append(getId())
             .append(' ').append((buildingType == null) ? ""
                 : lastPart(buildingType.getId(), "."))
-            .append('/').append(getColony().getName())
+            .append('/').append((c == null) ? "NO-COLONY" : c.getName())
             .append(']');
         return sb.toString();
     }
