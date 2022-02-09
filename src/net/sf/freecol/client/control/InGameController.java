@@ -4102,8 +4102,8 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = unit.getOwner();
         StringTemplate t = StringTemplate.template("event.firstLanding")
             .addName("%name%", name);
-        getGUI().showEventPanel(Messages.message(t),
-                                "image.flavor.event.firstLanding", null);
+        invokeLater(() -> getGUI().showEventPanel(Messages.message(t),
+                "image.flavor.event.firstLanding", null));
 
         // Add tutorial message.
         final String key = FreeColActionUI
