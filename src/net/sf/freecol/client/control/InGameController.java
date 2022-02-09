@@ -640,16 +640,17 @@ public final class InGameController extends FreeColClientHolder {
         final FreeColServer server = getFreeColServer();
         boolean result = false;
         if (server != null) {
-            getGUI().showStatusPanel(Messages.message("status.savingGame"));
+            invokeLater(() ->
+                getGUI().showStatusPanel(Messages.message("status.savingGame")));
             try {
                 server.saveGame(file, getClientOptions(), getGUI().getActiveUnit());
                 result = true;
             } catch (IOException ioe) {
-                getGUI().showErrorPanel(FreeCol.badFile("error.couldNotSave",
-                                                        file));
+                invokeLater(() ->
+                    getGUI().showErrorPanel(FreeCol.badFile("error.couldNotSave", file)));
                 logger.log(Level.WARNING, "Save fail", ioe);
             } finally {
-                getGUI().closeStatusPanel();
+                invokeLater(() -> getGUI().closeStatusPanel());
             }
         }
         return result;
