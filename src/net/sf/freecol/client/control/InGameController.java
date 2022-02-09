@@ -2585,9 +2585,9 @@ public final class InGameController extends FreeColClientHolder {
                 // Check units present for treasure cash-in as they are now
                 // at a colony.
                 for (Unit u : tile.getUnitList()) checkCashInTreasureTrain(u);
+                updateGUI(null, false);
                 dispColonyPanel((Colony)tile.getSettlement(), unit);
             }
-            updateGUI(null, false);
         }
         return ret;
     }
