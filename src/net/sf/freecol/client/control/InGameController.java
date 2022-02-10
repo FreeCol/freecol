@@ -197,7 +197,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean requireOurTurn() {
         if (currentPlayerIsMyPlayer()) return true;
         if (getFreeColClient().isInGame()) {
-            getGUI().showInformationPanel("info.notYourTurn");
+            showInformationPanel(null, "info.notYourTurn");
         }
         return false;
     }
@@ -268,6 +268,27 @@ public final class InGameController extends FreeColClientHolder {
      */
     private void changeView(final Unit unit, final boolean force) {
         invokeLater(() -> getGUI().changeView(unit, force));
+    }
+
+    /**
+     * Wrapper for GUI.showInformationPanel.
+     *
+     * @param disp An optional object to display in the panel.
+     * @param messageId A message identifier.
+     */
+    private void showInformationPanel(FreeColObject disp, String messageId) {
+        showInformationPanel(disp, StringTemplate.template(messageId));
+    }
+
+    /**
+     * Wrapper for GUI.showInformationPanel.
+     *
+     * @param disp An optional object to display in the panel.
+     * @param template A {@code StringTemplate} to display.
+     */
+    private void showInformationPanel(final FreeColObject disp,
+                                      final StringTemplate template) {
+        invokeLater(() -> getGUI().showInformationPanel(disp, template));
     }
 
     /**
@@ -525,7 +546,7 @@ public final class InGameController extends FreeColClientHolder {
 
             // Check that the purchase is funded.
             if (!player.checkGold(player.getMarket().getBidPrice(type, amount))) {
-                getGUI().showInformationPanel("info.notEnoughGold");
+                showInformationPanel(null, "info.notEnoughGold");
                 return false;
             }
         }
@@ -946,7 +967,7 @@ public final class InGameController extends FreeColClientHolder {
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addStringTemplate("%location%", src)
                 .addStringTemplate("%destination%", dst);
-            getGUI().showInformationPanel(unit, template);
+            showInformationPanel(unit, template);
             changeState(unit, UnitState.SKIPPED);
             ret = false;
         } else if (!movePath(unit, path)) {
@@ -1097,7 +1118,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessBeached")
                     .addStringTemplate("%nation%", nation));
             }
@@ -1106,7 +1127,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessContact")
                     .addStringTemplate("%nation%", nation));
             }
@@ -1115,7 +1136,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessGoods")
                     .addStringTemplate("%nation%", nation)
                     .addStringTemplate("%unit%",
@@ -1133,7 +1154,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessMissionBan")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL))
@@ -1144,7 +1165,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessSettlement")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL))
@@ -1154,7 +1175,7 @@ public final class InGameController extends FreeColClientHolder {
         case MOVE_NO_ACCESS_SKILL:
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessSkill")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
@@ -1164,7 +1185,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessTrade")
                     .addStringTemplate("%nation%", nation));
             }
@@ -1173,7 +1194,7 @@ public final class InGameController extends FreeColClientHolder {
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessWar")
                     .addStringTemplate("%nation%", nation));
             }
@@ -1181,7 +1202,7 @@ public final class InGameController extends FreeColClientHolder {
         case MOVE_NO_ACCESS_WATER:
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAccessWater")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
@@ -1190,7 +1211,7 @@ public final class InGameController extends FreeColClientHolder {
         case MOVE_NO_ATTACK_MARINE:
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noAttackWater")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
@@ -1207,7 +1228,7 @@ public final class InGameController extends FreeColClientHolder {
         case MOVE_NO_TILE:
             if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
-                getGUI().showInformationPanel(unit, StringTemplate
+                showInformationPanel(unit, StringTemplate
                     .template("move.noTile")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
@@ -1588,9 +1609,9 @@ public final class InGameController extends FreeColClientHolder {
                 = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
             UnitType skill = is.getLearnableSkill();
             if (skill == null) {
-                getGUI().showInformationPanel(is, "info.noMoreSkill");
+                showInformationPanel(is, "info.noMoreSkill");
             } else if (unit.getUnitChange(UnitChangeType.NATIVES) == null) {
-                getGUI().showInformationPanel(is, StringTemplate
+                showInformationPanel(is, StringTemplate
                     .template("info.cantLearnSkill")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL))
@@ -1601,9 +1622,9 @@ public final class InGameController extends FreeColClientHolder {
                     unit, "learnSkill.yes", "learnSkill.no")) {
                 if (askServer().learnSkill(unit, direction)) {
                     if (unit.isDisposed()) {
-                        getGUI().showInformationPanel(is, "learnSkill.die");
+                        showInformationPanel(is, "learnSkill.die");
                     } else if (unit.getType() != skill) {
-                        getGUI().showInformationPanel(is, "learnSkill.leave");
+                        showInformationPanel(is, "learnSkill.leave");
                     }
                 }
             }
@@ -2545,7 +2566,7 @@ public final class InGameController extends FreeColClientHolder {
         final Tile tile = unit.getTile();
         if (tile == null) return false;
         if (!unit.canBuildColony()) {
-            getGUI().showInformationPanel(unit, StringTemplate
+            showInformationPanel(unit, StringTemplate
                 .template("buildColony.badUnit")
                 .addName("%unit%", unit.getName()));
             return false;
@@ -2562,7 +2583,7 @@ public final class InGameController extends FreeColClientHolder {
         case NATIVES: // Tile can still be claimed
             break;
         default:
-            getGUI().showInformationPanel(reason.getDescriptionKey());
+            showInformationPanel(null, reason.getDescriptionKey());
             return false;
         }
 
@@ -2933,7 +2954,7 @@ public final class InGameController extends FreeColClientHolder {
         UnitTypeChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
         UnitType newType = (uc == null) ? null : uc.to;
         if (newType == null) {
-            getGUI().showInformationPanel(unit, StringTemplate
+            showInformationPanel(unit, StringTemplate
                 .template("clearSpeciality.impossible")
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL)));
@@ -3004,7 +3025,7 @@ public final class InGameController extends FreeColClientHolder {
         // Check for adequate support.
         StringTemplate declare = player.checkDeclareIndependence();
         if (declare != null) {
-            getGUI().showInformationPanel(declare);
+            showInformationPanel(null, declare);
             return false;
         }
 
@@ -3074,7 +3095,7 @@ public final class InGameController extends FreeColClientHolder {
         case REJECT_TRADE:
             t = StringTemplate.template("diplomacy.offerRejected")
                 .addStringTemplate("%nation%", nation);
-            getGUI().showInformationPanel(t);
+            showInformationPanel(null, t);
             break;
         case PROPOSE_TRADE:
             t = agreement.getReceiveMessage(otherPlayer);
@@ -3214,7 +3235,7 @@ public final class InGameController extends FreeColClientHolder {
                         .addNamed("%equipment%", ag.getType())
                         .addStringTemplate("%unit%",
                             unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                    getGUI().showInformationPanel(unit, template);
+                    showInformationPanel(unit, template);
                     return false;
                 }
             }
@@ -3482,7 +3503,7 @@ public final class InGameController extends FreeColClientHolder {
             ; // protocol fail
         } else if (!player.checkGold(gold)) {
             invokeLater(() ->
-                getGUI().showInformationPanel(is, StringTemplate
+                showInformationPanel(is, StringTemplate
                     .template("missionarySettlement.inciteGoldFail")
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold)));
@@ -3962,19 +3983,16 @@ public final class InGameController extends FreeColClientHolder {
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType());
             break;
         case NAK_HAGGLE:
-            invokeLater(() ->
-                gui.showInformationPanel(StringTemplate
-                    .template("trade.noTradeHaggle")));
+            showInformationPanel(null, StringTemplate
+                .template("trade.noTradeHaggle"));
             return;
         case NAK_HOSTILE:
-            invokeLater(() ->
-                gui.showInformationPanel(StringTemplate
-                    .template("trade.noTradeHostile")));
+            showInformationPanel(null, StringTemplate
+                    .template("trade.noTradeHostile"));
             return;
         case NAK_NOSALE:
-            invokeLater(() ->
-                gui.showInformationPanel(StringTemplate
-                    .template("trade.nothingToSell")));
+            showInformationPanel(null, StringTemplate
+                .template("trade.nothingToSell"));
             return;
         case NAK_INVALID: // Should not happen, log and fail quietly.
         default:
@@ -4323,9 +4341,9 @@ public final class InGameController extends FreeColClientHolder {
         int arrears = player.getArrears(type);
         if (arrears <= 0) return false;
         if (!player.checkGold(arrears)) {
-            getGUI().showInformationPanel(StringTemplate
+            showInformationPanel(null, StringTemplate
                 .template("payArrears.noGold")
-                    .addAmount("%amount%", arrears));
+                .addAmount("%amount%", arrears));
             return false;
         }
 
@@ -4354,12 +4372,12 @@ public final class InGameController extends FreeColClientHolder {
         if (!requireOurTurn() || colony == null) return false;
 
         if (!getSpecification().getBoolean(GameOptions.PAY_FOR_BUILDING)) {
-            getGUI().showInformationPanel("payForBuilding.disabled");
+            showInformationPanel(null, "payForBuilding.disabled");
             return false;
         }
 
         if (!colony.canPayToFinishBuilding()) {
-            getGUI().showInformationPanel("info.notEnoughGold");
+            showInformationPanel(null, "info.notEnoughGold");
             return false;
         }
 
@@ -4447,7 +4465,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!player.isColonial()) return false;
 
         if (!player.checkGold(player.getEuropeanRecruitPrice())) {
-            getGUI().showInformationPanel("info.notEnoughGold");
+            showInformationPanel(null, "info.notEnoughGold");
             return false;
         }
 
@@ -4523,13 +4541,13 @@ public final class InGameController extends FreeColClientHolder {
             if (name == null) { // User cancelled
                 return false;
             } else if (name.isEmpty()) { // Zero length invalid
-                getGUI().showInformationPanel("info.enterSomeText");
+                showInformationPanel(null, "info.enterSomeText");
                 return false;
             } else if (colony.getName().equals(name)) { // No change
                 return false;
             } else if (player.getSettlementByName(name) != null) {
                 // Colony name must be unique.
-                getGUI().showInformationPanel((Colony)object, StringTemplate
+                showInformationPanel((Colony)object, StringTemplate
                     .template("nameColony.notUnique")
                     .addName("%name%", name));
                 return false;
@@ -4606,31 +4624,25 @@ public final class InGameController extends FreeColClientHolder {
         case "":
             break;
         case "die":
-            invokeLater(() ->
-                getGUI().showInformationPanel(is, "scoutSettlement.speakDie"));
+            showInformationPanel(is, "scoutSettlement.speakDie");
             break;
         case "expert":
-            invokeLater(() ->
-                getGUI().showInformationPanel(is, StringTemplate
-                    .template("scoutSettlement.expertScout")
-                    .addNamed("%unit%", unit.getType())));
+            showInformationPanel(is, StringTemplate
+                .template("scoutSettlement.expertScout")
+                .addNamed("%unit%", unit.getType()));
             break;
         case "tales":
-            invokeLater(() ->
-                getGUI().showInformationPanel(is,
-                    "scoutSettlement.speakTales"));
+            showInformationPanel(is, "scoutSettlement.speakTales");
             break;
         case "nothing":
-            invokeLater(() ->
-                getGUI().showInformationPanel(is, StringTemplate
-                    .template("scoutSettlement.speakNothing")
-                    .addStringTemplate("%nation%", unit.getOwner().getNationLabel())));
+            showInformationPanel(is, StringTemplate
+                .template("scoutSettlement.speakNothing")
+                .addStringTemplate("%nation%", unit.getOwner().getNationLabel()));
             break;
         default: // result == amount of gold
-            invokeLater(() ->
-                getGUI().showInformationPanel(is, StringTemplate
-                    .template("scoutSettlement.speakBeads")
-                    .add("%amount%", result)));
+            showInformationPanel(is, StringTemplate
+                .template("scoutSettlement.speakBeads")
+                .add("%amount%", result));
             break;
         }
     }
@@ -4948,7 +4960,7 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         final Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
-            getGUI().showInformationPanel("info.notEnoughGold");
+            showInformationPanel(null, "info.notEnoughGold");
             return false;
         }
 
@@ -5133,7 +5145,7 @@ public final class InGameController extends FreeColClientHolder {
         Tile tile = workLocation.getWorkTile();
         if (tile != null) {
             if (tile.hasLostCityRumour()) {
-                getGUI().showInformationPanel("tileHasRumour");
+                showInformationPanel(null, "tileHasRumour");
                 return false;
             }
             if (!unit.getOwner().owns(tile)) {
