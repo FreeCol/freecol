@@ -251,6 +251,15 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Defer execution to the event thread.
+     *
+     * @param runnable The {@code Runnable} to run.
+     */
+    private void invokeLater(Runnable runnable) {
+        getFreeColClient().getGUI().invokeNowOrLater(runnable);
+    }
+
+    /**
      * Makes a new unit active if any, or focus on a tile (useful if the
      * current unit just died).
      *
@@ -302,35 +311,28 @@ public final class InGameController extends FreeColClientHolder {
      * @param updateUnit An override setting which if true forces a new
      *     active unit to be selected (useful for the Wait command).
      */
-    private void updateGUI(Tile tile, boolean updateUnit) {
-        Unit active = getGUI().getActiveUnit();
+    private void updateGUI(final Tile tile, boolean updateUnit) {
         if (displayModelMessages(false, false)) {
             ; // If messages are displayed they probably refer to the
               // current unit, so do not update it.
         } else {
+            final GUI gui = getGUI();
             // Update the unit if asked to, or none present, or the
             // current one is out of moves (but not in Europe or newly
             // bought/trained units get immediately deselected), or has
             // been captured.
-            if (updateUnit || active == null
+            Unit active = gui.getActiveUnit();
+            final boolean update = updateUnit || active == null
                 || (!active.couldMove() && !active.isInEurope())
-                || !getMyPlayer().owns(active)) {
-                // Tile is displayed if no new active unit is found,
-                // useful when the last unit might have died
-                updateActiveUnit(tile);
-            }
-            getGUI().updateMapControls();
-            getGUI().updateMenuBar();
+                || !getMyPlayer().owns(active); 
+            // Tile is displayed if no new active unit is found,
+            // which is useful when the last unit might have died
+            invokeLater(() -> {
+                    if (update) updateActiveUnit(tile);
+                    gui.updateMapControls();
+                    gui.updateMenuBar();
+                });
         }
-    }
-
-    /**
-     * GUI delegator.
-     *
-     * @param runnable The {@code Runnable} to run.
-     */
-    private void invokeLater(Runnable runnable) {
-        getFreeColClient().getGUI().invokeNowOrLater(runnable);
     }
 
 
