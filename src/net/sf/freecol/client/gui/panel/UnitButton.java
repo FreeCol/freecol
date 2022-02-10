@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -42,6 +43,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * be placed on a JComponent in order to be useable.
  */
 public final class UnitButton extends JButton {
+
+    private static final Logger logger = Logger.getLogger(UnitButton.class.getName());
 
     private final String actionId;
     private final ActionManager am;
@@ -85,7 +88,11 @@ public final class UnitButton extends JButton {
             setContentAreaFilled(false);
             setBorderPainted(false);
 
-            setSize(bi.getIconWidth(), bi.getIconHeight());
+            if (bi != null) {
+                setSize(bi.getIconWidth(), bi.getIconHeight());
+            } else {
+                logger.warning("Action " + a + " has no BUTTON_IMAGE");
+            }
         }
     }
 

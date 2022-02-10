@@ -3502,11 +3502,10 @@ public final class InGameController extends FreeColClientHolder {
         if (gold < 0) {
             ; // protocol fail
         } else if (!player.checkGold(gold)) {
-            invokeLater(() ->
-                showInformationPanel(is, StringTemplate
-                    .template("missionarySettlement.inciteGoldFail")
-                    .add("%player%", enemy.getName())
-                    .addAmount("%amount%", gold)));
+            showInformationPanel(is, StringTemplate
+                .template("missionarySettlement.inciteGoldFail")
+                .add("%player%", enemy.getName())
+                .addAmount("%amount%", gold));
         } else {
             invokeLater(() -> {
                     if (getGUI().confirm(unit.getTile(), StringTemplate
