@@ -350,7 +350,9 @@ public class Resource extends TileItem {
      */
     @Override
     public String toString() {
-        return (quantity == UNLIMITED) ? getType().getId()
-            : Integer.toString(quantity) + " " + getType().getId();
+        final ResourceType ty = getType();
+        final String id = (ty == null) ? "NOTYPE" : ty.getId();
+        return (quantity == UNLIMITED) ? id
+            : Integer.toString(quantity) + " " + id;
     }
 }

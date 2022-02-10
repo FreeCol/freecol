@@ -786,7 +786,8 @@ public class TileImprovement extends TileItem {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append('[').append(getType().getId());
+        TileImprovementType ty = getType();
+        sb.append('[').append((ty == null) ? "NOTYPE" : ty.getId());
         if (turnsToComplete > 0) {
             sb.append(" (").append(turnsToComplete).append(" turns left)");
         }
