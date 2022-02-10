@@ -1796,8 +1796,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
+        String name = getName();
+        sb.append((name == null) ? "NONAME" : name);
         Tile tile = getTile();
-        sb.append(getName());
         if (tile != null) sb.append(" at (").append(tile.getX())
                               .append(',').append(tile.getY()).append(')');
         return sb.toString();
