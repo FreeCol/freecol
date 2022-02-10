@@ -260,6 +260,17 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Wrapper for GUI.changeView.
+     *
+     * @param unit The {@code Unit} to select.
+     * @param force Set true if the unit is the same, but *has*
+     *     changed in some way (e.g. moves left).
+     */
+    private void changeView(final Unit unit, final boolean force) {
+        invokeLater(() -> getGUI().changeView(unit, force));
+    }
+
+    /**
      * Makes a new unit active if any, or focus on a tile (useful if the
      * current unit just died).
      *
@@ -800,7 +811,7 @@ public final class InGameController extends FreeColClientHolder {
         for (Unit unit : transform(player.getUnits(), tradePred,
                                    Function.<Unit>identity(),
                                    tradeRouteUnitComparator)) {
-            getGUI().changeView(unit, false);
+            changeView(unit, false);
             if (!moveToDestination(unit, messages)) {
                 ret = false;
                 break;
@@ -825,7 +836,7 @@ public final class InGameController extends FreeColClientHolder {
         // Process all units.
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
-            getGUI().changeView(unit, false);
+            changeView(unit, false);
             // Move the unit as much as possible
             if (!moveToDestination(unit, null)) {
                 ret = false;
@@ -837,7 +848,7 @@ public final class InGameController extends FreeColClientHolder {
         }
         nextModelMessage(); // Might have LCR messages to display
         if (ret) { // If no unit issues, restore previously active unit 
-            getGUI().changeView(active, false);
+            changeView(active, false);
         }
         return ret;
     }
@@ -1216,7 +1227,7 @@ public final class InGameController extends FreeColClientHolder {
             if (!askClearGotoOrders(unit)) result = false;
         }
         // Force redisplay of unit information
-        getGUI().changeView(unit, true);
+        changeView(unit, true);
 
         return result;
     }
@@ -1793,7 +1804,7 @@ public final class InGameController extends FreeColClientHolder {
 
         } else if (settlement instanceof IndianSettlement) {
             askServer().newNativeTradeSession(unit, (IndianSettlement)settlement);
-            getGUI().changeView(unit, false); // Will be deselected on losing moves
+            changeView(unit, false); // Will be deselected on losing moves
 
         } else {
             throw new RuntimeException("Bogus settlement: "
@@ -4443,7 +4454,7 @@ public final class InGameController extends FreeColClientHolder {
         Unit newUnit = askEmigrate(player.getEurope(),
                                    MigrationType.migrantIndexToSlot(index));
         if (newUnit != null) {
-            getGUI().changeView(newUnit, false);
+            changeView(newUnit, false);
             updateGUI(null, false);
         }
         return newUnit != null;
@@ -4947,7 +4958,7 @@ public final class InGameController extends FreeColClientHolder {
             && (newUnit = europeWas.getNewUnit()) != null;
         if (ret) {
             europeWas.fireChanges();
-            getGUI().changeView(newUnit, false);
+            changeView(newUnit, false);
             updateGUI(null, false);
         }
         return ret;
