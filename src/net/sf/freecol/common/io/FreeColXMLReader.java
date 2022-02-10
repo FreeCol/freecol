@@ -849,6 +849,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 if (required) throw new XMLStreamException(err);
                 logger.warning(err);
             } else if (ret instanceof FreeColGameObject) {
+                // Do not set the id earlier or interning will happen
+                // by default in the constructor called from newInstance
+                ret.setId(id);
                 if (shouldIntern()) {
                     ((FreeColGameObject)ret).internId(id);
                 } else {
