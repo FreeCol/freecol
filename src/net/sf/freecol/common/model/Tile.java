@@ -2447,9 +2447,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.owner = game.updateRef(o.getOwner());
         // Allow settlement creation, might be first sight
         this.settlement = game.update(o.getSettlement(), true);
-        // Not updateRef, the settlement might be referred to through
-        // ownership before it actually appears
-        this.owningSettlement = game.update(o.getOwningSettlement(), true);
+        this.owningSettlement = game.updateRef(o.getOwningSettlement());
         // Allow TIC creation, might be the first time we see the tile
         this.tileItemContainer = game.update(o.getTileItemContainer(), true);
         this.region = game.updateRef(o.getRegion());
