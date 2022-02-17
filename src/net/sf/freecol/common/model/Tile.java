@@ -2447,7 +2447,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.owner = game.updateRef(o.getOwner());
         // Allow settlement creation, might be first sight
         this.settlement = game.update(o.getSettlement(), true);
-        this.owningSettlement = game.updateRef(o.getOwningSettlement());
+        Settlement owning = null;
+        if (o.getOwningSettlement() != null) {
+            // There is an owning settlement for this tile.  Have we seen
+            // it before?  If so there will be a reference to it which we
+            // should use.
+            owning = game.updateRef(o.getOwningSettlement());
+            if (owning == null) {
+                // No, we have never seen it before.  In this case it
+                // is safe to create a skeleton settlement in the
+                // expectation that it will get filled in shortly in
+                // another part of the update we are processing.
+                owning = game.update(o.getOwningSettlement(), true);
+            }
+        }
+        this.owningSettlement = owning;
         // Allow TIC creation, might be the first time we see the tile
         this.tileItemContainer = game.update(o.getTileItemContainer(), true);
         this.region = game.updateRef(o.getRegion());
