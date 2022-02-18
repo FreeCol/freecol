@@ -219,8 +219,6 @@ public final class CornerMapControls extends MapControls {
             int x = this.miniMapPanel.getWidth() + 1
                 + (this.infoPanel.getX() - this.miniMapPanel.getWidth() - width) / 2;
             int y = ch - height - SPACE;
-            logger.info("Unitbuttons at " + x + "," + y
-                + " spaced " + SPACE + " in " + cw + "," + ch);
             for (UnitButton ub : this.unitButtons) {
                 if (ub.isShowing()) continue;
                 ub.setLocation(x, y);
