@@ -20,6 +20,7 @@
 package net.sf.freecol.server.generator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -736,6 +739,57 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     /**
+     * Sample a list of tiles to pick spread out starting positions.
+     * Shuffle the result or clear it if there were too few tiles.
+     *
+     * @param tiles The list of {@code Tile}s to sample.
+     * @param number The number of players, which determines the spacing.
+     * @return True if there were enough tiles in the list.
+     */
+    private boolean sampleTiles(List<Tile> tiles, int number) {
+        final int n = tiles.size();
+        final int step = n / number;
+        if (step <= 1) {
+            tiles.clear();
+            return false;
+        }
+        List<Tile> samples = new ArrayList<>();
+        // The offset start prevents selecting right on the poles
+        for (int i = step/2; i < n; i += step) {
+            samples.add(tiles.get(i));
+        }
+        tiles.clear();
+        tiles.addAll(samples);
+        randomShuffle(logger, "Starting tiles", tiles, random);
+        return true;
+    }
+
+    /**
+     * Find the best historical starting position for a player from lists
+     * of tiles.
+     *
+     * @param player The {@code Player} to find a tile for.
+     * @param map The {@code Map} to search.
+     * @param east A list of starting {@code Tile}s on the east of the map.
+     * @param west A list of starting {@code Tile}s on the west of the map.
+     * @return The best {@code Tile} found, or null if none suitable.
+     */
+    private Tile findHistoricalStartingPosition(final Player player,
+                                                final Map map,
+                                                List<Tile> east,
+                                                List<Tile> west) {
+        final Nation nation = player.getNation();
+        final int latY = map.getRow(nation.getPreferredLatitude());
+        List<Tile> tiles = (nation.getStartsOnEastCoast()) ? east : west;
+        if (tiles.isEmpty()) return null;
+        final ToIntFunction<Tile> dist = t -> Math.abs(t.getY() - latY);
+        final Comparator<Tile> closest = Comparator.comparingInt(dist);
+        Tile ret = minimize(tiles, closest);
+        tiles.remove(ret); // chosen tile is no longer a candidate
+        return ret;
+    }
+
+    /**
      * Create two ships, one with a colonist, for each player, and
      * select suitable starting positions.
      *
@@ -749,37 +803,66 @@ public class SimpleMapGenerator implements MapGenerator {
                                      LogBuilder lb) {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
-        final int width = map.getWidth();
-        final int height = map.getHeight();
-        final int poleDistance = (int)(MIN_DISTANCE_FROM_POLE*height/2);
-
-        List<Player> europeanPlayers = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isREF()) {
-                // eastern edge of the map
-                int x = width - 2;
-                // random latitude, not too close to the pole
-                int y = randomInt(logger, "Pole", random,
-                                  height - 2*poleDistance) + poleDistance;
-                player.setEntryTile(map.getTile(x, y));
-                continue;
-            }
-            if (player.isEuropean()) europeanPlayers.add(player);
+        final int positionType = spec.getInteger(GameOptions.STARTING_POSITIONS);
+        // Split out the non-REF players
+        final Predicate<Player> notREF = (Player p) -> !p.isREF();
+        List<Player> europeanPlayers = transform(players, notREF);
+        final int number = europeanPlayers.size();
+        if (europeanPlayers.isEmpty()) {
+            throw new RuntimeException("No players to generate units for!");
         }
 
-        List<Position> positions = generateStartingPositions(map, europeanPlayers);
+        // Make lists of candidate starting tiles on the east and west
+        // of the map, then break them up by land and "sea" (revisit
+        // if we get a map with a lake on the edge)
+        List<Tile> eastTiles = new ArrayList<>();
+        List<Tile> westTiles = new ArrayList<>();
+        List<Tile> eastLandTiles = new ArrayList<>();
+        List<Tile> westLandTiles = new ArrayList<>();
+        List<Tile> eastSeaTiles = new ArrayList<>();
+        List<Tile> westSeaTiles = new ArrayList<>();
+        map.collectStartingTiles(eastTiles, westTiles);
+        for (Tile t : eastTiles) {
+            if (t.isLand()) eastLandTiles.add(t); else eastSeaTiles.add(t);
+        }
+        for (Tile t : westTiles) {
+            if (t.isLand()) westLandTiles.add(t); else westSeaTiles.add(t);
+        }
+
+        // Now consider what type of positions we are selecting from
+        switch (positionType) {
+        case GameOptions.STARTING_POSITIONS_CLASSIC:
+            // Break the lists up into at least <number> candidate
+            // positions and shuffle.  Empty the relevant list on failure.
+            sampleTiles(eastLandTiles, number);
+            sampleTiles(eastSeaTiles, number);
+            sampleTiles(westLandTiles, number);
+            sampleTiles(westSeaTiles, number);
+            break;
+        case GameOptions.STARTING_POSITIONS_RANDOM:
+            // Random starts are the same as classic but do not
+            // distinguish between east and west
+            eastLandTiles.addAll(westLandTiles);
+            eastSeaTiles.addAll(westSeaTiles);
+            sampleTiles(eastLandTiles, number);
+            sampleTiles(eastSeaTiles, number);
+            break;
+        case GameOptions.STARTING_POSITIONS_HISTORICAL:
+            break; // Historic positions retain all the possible tiles
+        }
+
+        // For each player, find the units, which determines whether
+        // to start at sea.
         List<Tile> startingTiles = new ArrayList<>();
         List<Unit> carriers = new ArrayList<>();
         List<Unit> passengers = new ArrayList<>();
-
-        for (int index = 0; index < europeanPlayers.size(); index++) {
-            Player player = europeanPlayers.get(index);
-            Position position = positions.get(index);
-            lb.add("Generating units for player ", player, ".\n");
-
+        List<Unit> otherNaval = new ArrayList<>();
+        for (Player player : europeanPlayers) {
+            lb.add("For player ", player, ", ");
             carriers.clear();
             passengers.clear();
-            List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
+            otherNaval.clear();
+            List<AbstractUnit> unitList = ((EuropeanNationType)player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
                 UnitType type = startingUnit.getType(spec);
@@ -790,56 +873,58 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (newUnit.canCarryUnits()) {
                         newUnit.setState(Unit.UnitState.ACTIVE);
                         carriers.add(newUnit);
+                    } else {
+                        otherNaval.add(newUnit);
                     }
                 } else {
                     newUnit.setState(Unit.UnitState.SENTRY);
                     passengers.add(newUnit);
                 }
             }
+            boolean startEast = player.getNation().getStartsOnEastCoast();
+            boolean startAtSea = !carriers.isEmpty();
+            lb.add("found ", carriers.size(), " carriers, ",
+                passengers.size(), " passengers, ",
+                otherNaval.size(), " other naval units, starting ",
+                (startAtSea) ? "at sea" : "on land", " to the ",
+                (startEast) ? "east" : "west");
 
-            boolean startAtSea = true;
-            if (carriers.isEmpty()) {
-                lb.add("No carriers defined for player ", player, ".\n");
-                startAtSea = false;
+            // Select a starting position from the available tiles
+            Tile start = null;
+            switch (positionType) {
+            case GameOptions.STARTING_POSITIONS_CLASSIC:
+                // Classic mode respects coast preference, the lists
+                // are pre-sampled and shuffled
+                start = ((startAtSea)
+                    ? ((startEast) ? eastSeaTiles : westSeaTiles)
+                    : ((startEast) ? eastLandTiles : westLandTiles)).remove(0);
+                break;
+            case GameOptions.STARTING_POSITIONS_RANDOM:
+                // Random mode is as classic but ignores coast
+                // preference, the east lists already contain the west
+                start = ((startAtSea) ? eastSeaTiles : eastLandTiles).remove(0);
+                break;
+            case GameOptions.STARTING_POSITIONS_HISTORICAL:
+                start = (startAtSea)
+                    ? findHistoricalStartingPosition(player, map,
+                        eastSeaTiles, westSeaTiles)
+                    : findHistoricalStartingPosition(player, map,
+                        eastLandTiles, westLandTiles);
+                break;
             }
-
-            Tile startTile = null;
-            int x = position.getX();
-            int y = position.getY();
-            for (int i = 0; i < 2 * map.getHeight(); i++) {
-                int offset = (i % 2 == 0) ? i / 2 : -(1 + i / 2);
-                int row = y + offset;
-                if (row < 0 || row >= map.getHeight()) continue;
-                startTile = findTileFor(map, row, x, startAtSea, lb);
-                if (startTile != null) {
-                    if (startingTiles.contains(startTile)) {
-                        startTile = null;
-                    } else {
-                        startingTiles.add(startTile);
-                        break;
-                    }
-                }
+            if (start == null) {
+                throw new RuntimeException("Failed to find start tile "
+                    + ((startAtSea) ? "at sea" : "on land")
+                    + " for player " + player);
             }
-            if (startTile == null) {
-                LogBuilder lb2 = new LogBuilder(64);
-                lb2.add("Failed to find start tile ",
-                    ((startAtSea) ? "at sea" : "on land"),
-                    " for player ", player,
-                    " from (", x, ",", y, ") avoiding:");
-                for (Tile t : startingTiles) lb2.add(" ", t);
-                lb2.add(" with map: ");
-                for (int xx = 0; xx < map.getWidth(); xx++) {
-                    lb2.add(" ", map.getTile(xx, y));
-                }
-                throw new RuntimeException(lb2.toString());
-            }
+            player.setEntryTile(start);
+            lb.add(" at starting tile ", start);
 
-            player.setEntryTile(startTile);
-
-            if (startAtSea) {
-                for (Unit carrier : carriers) {
-                    carrier.setLocation(startTile);
-                    ((ServerPlayer)player).exploreForUnit(carrier);
+            final Europe europe = player.getEurope();
+            if (startAtSea) { // All aboard!
+                for (Unit u : carriers) {
+                    u.setLocation(start);
+                    ((ServerPlayer)player).exploreForUnit(u);
                 }
                 passengers: for (Unit unit : passengers) {
                     for (Unit carrier : carriers) {
@@ -849,37 +934,56 @@ public class SimpleMapGenerator implements MapGenerator {
                         }
                     }
                     // no space left on carriers
-                    unit.setLocation(player.getEurope());
+                    unit.setLocation(europe);
                 }
-            } else {
-                for (Unit unit : passengers) {
-                    unit.setLocation(startTile);
-                    ((ServerPlayer)player).exploreForUnit(unit);
+            } else { // Land ho!
+                for (Unit u : passengers) {
+                    u.setLocation(start);
+                    ((ServerPlayer)player).exploreForUnit(u);
                 }
+            }
+            for (Unit u : otherNaval) {
+                u.setLocation(europe);
             }
 
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
-                createDebugUnits(map, player, startTile, lb);
+                createDebugUnits(map, player, start, lb);
                 spec.setInteger(GameOptions.STARTING_MONEY, 10000);
             }
+
+            // Start our REF player entry tile somewhere near to our
+            // starting tile, but do not place their units.
+            // They are assumed to always be on naval transport.
+            final Player ourREF = player.getREFPlayer();
+            if (ourREF == null) continue; // Some tests do not generate REFs
+            final int threshold = 10;
+            final int startY = start.getY();
+            final Predicate<Tile> closeSeaTile
+                = t -> !t.isLand() && Math.abs(t.getY() - startY) < threshold;
+            List<Tile> refTiles = (startEast) ? eastTiles : westTiles;
+            start = getRandomMember(logger, ourREF + " start",
+                                    transform(refTiles, closeSeaTile), random);
+                
+            ourREF.setEntryTile(start);
+            lb.add(" with REF at ", start, ".\n");
         }
     }
 
     private Tile findTileFor(Map map, int row, int start, boolean startAtSea,
                              LogBuilder lb) {
         Tile tile = null;
-        Tile seas = null;
+        Tile ret = null;
         int offset = (start == 0) ? 1 : -1;
         for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
             tile = map.getTile(x, row);
             if (tile.isDirectlyHighSeasConnected()) {
-                seas = tile;
-            } else if (tile.isLand()) {
-                return (startAtSea) ? seas : tile;
-            } 
+                if (startAtSea != tile.isLand()) ret = tile;
+            } else {
+                break; // Previous tile is a potential candidate
+            }
         }
-        lb.add("No land in row ", row, ".\n");
-        return null;
+        if (ret == null) lb.add("No suitable tile in row ", row, ".\n");
+        return ret;
     }
 
     private List<Unit> createDebugUnits(Map map, Player player, Tile startTile,
@@ -999,52 +1103,6 @@ public class SimpleMapGenerator implements MapGenerator {
 
         ((ServerPlayer)player).exploreForSettlement(colony);
         return ret;
-    }
-
-    private List<Position> generateStartingPositions(Map map,
-                                                     List<Player> players) {
-        final Specification spec = map.getGame().getSpecification();
-        int number = players.size();
-        List<Position> positions = new ArrayList<>(number);
-        if (number > 0) {
-            int west = 0;
-            int east = map.getWidth() - 1;
-            switch (spec.getInteger(GameOptions.STARTING_POSITIONS)) {
-            case GameOptions.STARTING_POSITIONS_CLASSIC:
-                int distance = map.getHeight() / number;
-                int row = distance/2;
-                for (int index = 0; index < number; index++) {
-                    positions.add(new Position(east, row));
-                    row += distance;
-                }
-                randomShuffle(logger, "Classic starting positions",
-                              positions, random);
-                break;
-            case GameOptions.STARTING_POSITIONS_RANDOM:
-                distance = 2 * map.getHeight() / number;
-                row = distance/2;
-                for (int index = 0; index < number; index++) {
-                    if (index % 2 == 0) {
-                        positions.add(new Position(east, row));
-                    } else {
-                        positions.add(new Position(west, row));
-                        row += distance;
-                    }
-                }
-                randomShuffle(logger, "Random starting positions",
-                              positions, random);
-                break;
-            case GameOptions.STARTING_POSITIONS_HISTORICAL:
-                for (Player player : players) {
-                    Nation nation = player.getNation();
-                    int where = (nation.getStartsOnEastCoast()) ? east : west;
-                    positions.add(new Position(where,
-                            map.getRow(nation.getPreferredLatitude())));
-                }
-                break;
-            }
-        }
-        return positions;
     }
 
 

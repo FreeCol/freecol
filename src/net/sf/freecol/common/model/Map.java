@@ -2227,6 +2227,47 @@ ok:     while (!openMap.isEmpty()) {
     }
 
     /**
+     * Collect lists of valid starting tiles on this map.
+     * Called from the map generator to help choose starting tiles
+     * for European units.
+     *
+     * @param eastTiles A list of {@code Tile}s on the east of the map
+     *     to fill in.
+     * @param westTiles A list of {@code Tile}s on the west of the map
+     *     to fill in.
+     */
+    public void collectStartingTiles(List<Tile> eastTiles,
+                                     List<Tile> westTiles) {
+        // Find the innermost high seas connected tile on each row (if
+        // any) on the east and west sides of the map
+        final int west = 0;
+        final int east = getWidth() - 1;
+        eastTiles.clear();
+        westTiles.clear();
+        for (int y = 0; y < getHeight(); y++) {
+            int x;
+            Tile ok = getTile(east, y);
+            if (ok.isDirectlyHighSeasConnected()) {
+                for (x = east; x > west; x--) {
+                    Tile t = getTile(x, y);
+                    if (!t.isDirectlyHighSeasConnected()) break;
+                    ok = t;
+                }
+                if (ok != null) eastTiles.add(ok);
+            }
+            ok = getTile(west, y);
+            if (ok.isDirectlyHighSeasConnected()) {
+                for (x = west; x < east; x++) {
+                    Tile t = getTile(x, y);
+                    if (!t.isDirectlyHighSeasConnected()) break;
+                    ok = t;
+                }
+                if (ok != null) westTiles.add(ok);
+            }
+        }
+    }
+    
+    /**
      * Places the "high seas"-tiles on the border of this map.
      *
      * All other tiles previously of type High Seas will be set to Ocean.
