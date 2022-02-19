@@ -266,14 +266,16 @@ public final class Utility {
     public static JButton getMessageButton(String key, String val,
         Player player, FreeColGameObject source) {
         FreeColGameObject link = null;
-        if ("%colony%".equals(key) || key.endsWith("Colony%")) {
+        if ("%colony%".equals(key) || key.endsWith("Colony%")
+            || "%settlement%".equals(key)) {
             Settlement settlement = player.getGame().getSettlementByName(val);
             link = (settlement == null) ? null
                 : (player.owns(settlement)) ? settlement
                 : settlement.getTile();
         } else if ("%europe%".equals(key) || "%market%".equals(key)) {
             link = player.getEurope();
-        } else if ("%location%".equals(key) || key.endsWith("Location%")) {
+        } else if ("%location%".equals(key)
+            || "%repairLocation%".equals(key)) {
             if (source instanceof Location) {
                 link = source.getLinkTarget(player);
             }
