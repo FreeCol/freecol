@@ -5103,7 +5103,8 @@ public final class InGameController extends FreeColClientHolder {
      */
     private boolean victory(Boolean quit) {
         if (quit) {
-            getFreeColClient().getConnectController().newGame();
+            invokeLater(() ->
+                getFreeColClient().getConnectController().newGame());
         } else {
             askServer().continuePlaying();
         }

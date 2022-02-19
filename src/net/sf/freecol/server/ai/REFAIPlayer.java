@@ -319,7 +319,6 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      *
      * @param teleport "Teleporting" in is allowed.
      * @return True if the initialization succeeds.
-     */
     public boolean initialize(boolean teleport) {
         final AIMain aiMain = getAIMain();
         final Random aiRandom = getAIRandom();
@@ -518,6 +517,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         lb.log(logger, Level.FINE);
         return true;
     }
+     */
 
     /**
      * Require more transport missions, recruiting from the privateering
