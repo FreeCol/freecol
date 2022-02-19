@@ -116,7 +116,7 @@ public class InciteMessage extends AttributeMessage {
         
         ServerUnit unit;
         try {
-            unit = getUnit(serverPlayer);
+            unit = (ServerUnit)getUnit(serverPlayer);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }
@@ -153,8 +153,8 @@ public class InciteMessage extends AttributeMessage {
 
     // Public interface
 
-    public ServerUnit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), ServerUnit.class);
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
     }
 
     public IndianSettlement getSettlement(Unit unit) {
