@@ -198,6 +198,9 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
     /** Map of target to count. */
     private final Map<Location, Integer> targetMap = new HashMap<>();
 
+    /** Has the army been landed? */
+    private boolean landed = false;
+
 
     /**
      * Creates a new {@code REFAIPlayer}.
@@ -319,6 +322,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      *
      * @param teleport "Teleporting" in is allowed.
      * @return True if the initialization succeeds.
+     */
     public boolean initialize(boolean teleport) {
         final AIMain aiMain = getAIMain();
         final Random aiRandom = getAIRandom();
@@ -517,7 +521,6 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         lb.log(logger, Level.FINE);
         return true;
     }
-     */
 
     /**
      * Require more transport missions, recruiting from the privateering
@@ -907,7 +910,11 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
                     transport.add(aiu.getMission(TransportMission.class));
                 }
             } else {
-                if (u.isInEurope()) land.add(aiu);
+                if (u.isInEurope()) {
+                    land.add(aiu);
+                } else if (u.isOnTile()) {
+                    this.landed = true;
+                }
             }
         }
         if (!land.isEmpty() && !transport.isEmpty()) {

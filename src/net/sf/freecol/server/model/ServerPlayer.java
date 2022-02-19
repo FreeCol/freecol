@@ -561,20 +561,29 @@ public class ServerPlayer extends Player implements TurnTaker {
         // Not defeated if holding settlements.
         if (hasSettlements()) return false;
 
-        // Not defeated if there is a non-zero navy and enough land units.
         final int landREFUnitsRequired = 7; // FIXME: magic number
-        boolean naval = false;
-        int land = 0;
+        final int navalREFUnitsRequired = 2; // FIXME: magic number
+        int naval = 0;
+        int land = 0, landOnMap = 0;
         for (Unit u : getUnitSet()) {
-            if (u.isNaval()) naval = true; else {
-                if (u.hasAbility(Ability.REF_UNIT) && !u.isInEurope()) land++;
+            if (u.isNaval()) naval++; else {
+                land++;
+                if (u.isOnTile()) landOnMap++;
             }
         }
-        if (naval && land >= landREFUnitsRequired) return false;
 
-        // Surrender if all rebels have a stronger land army
-        final double power = calculateStrength(false);
-        return all(getRebels(), r -> r.calculateStrength(false) > power);
+        // Surrender if all rebels have a significantly stronger land army
+        // and the bulk of the REF is on the map
+        final double presenceFactor = 2.0/3.0; // FIXME: magic number
+        final double landPower = 1.5 * calculateStrength(false);
+        if (all(getRebels(), r -> r.calculateStrength(false) > landPower)
+                && landOnMap > presenceFactor * land) {
+            return true;
+        }
+
+        // Not defeated if there is are still sufficient naval and land units
+        return naval < navalREFUnitsRequired
+            || land < landREFUnitsRequired;
     }
 
     /**
