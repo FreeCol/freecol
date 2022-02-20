@@ -1824,7 +1824,7 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%nation%", owner.getNationLabel()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
-        ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
+        unit.csRemove(See.perhaps().always(serverPlayer),
             unit.getLocation(), cs);//-vis(serverPlayer)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
@@ -2332,7 +2332,7 @@ public final class InGameController extends Controller {
         switch (tension.getLevel()) {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
-            ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
+            unit.csRemove(See.perhaps().always(serverPlayer),
                                         loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
@@ -2621,7 +2621,7 @@ public final class InGameController extends Controller {
         switch (is.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
             cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
-            ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
+            unit.csRemove(See.perhaps().always(serverPlayer),
                                         loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
@@ -3488,7 +3488,7 @@ public final class InGameController extends Controller {
         if (tension.getLevel() == Tension.Level.HATEFUL) {
             Location loc = unit.getLocation();
             cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
-            ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
+            unit.csRemove(See.perhaps().always(serverPlayer),
                                         loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             result = "die";

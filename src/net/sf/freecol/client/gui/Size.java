@@ -52,7 +52,7 @@ public enum Size {
     }
 
     public Size scaled(float f) {
-        int val = this.ordinal() + (int)Math.round(4 * (f - 1.0f));
+        int val = this.ordinal() + Math.round(4 * (f - 1.0f));
         return (val < 0 || val >= Size.MAX.ordinal()) ? null
             : this.values()[val];
     }
