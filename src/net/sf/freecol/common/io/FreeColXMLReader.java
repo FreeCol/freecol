@@ -686,7 +686,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         FreeColObject fco = lookup(game, attrib);
         if (fco == null && make) {
             Class<? extends FreeColGameObject> c
-                = game.getLocationClass(attrib);
+                = Game.getLocationClass(attrib);
             if (c != null) {
                 fco = makeFreeColObject(game, attributeName, c,
                                         getReadScope()==ReadScope.SERVER);
