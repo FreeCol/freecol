@@ -972,7 +972,7 @@ public final class InGameController extends FreeColClientHolder {
             ret = false;
         } else if (!movePath(unit, path)) {
             ret = false; // ask the player to resolve the movePath problem
-        } if (unit.isAtLocation(destination)) {
+        } else if (unit.isAtLocation(destination)) {
             final Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
                 : null;
             // Clear ordinary destinations if arrived.
