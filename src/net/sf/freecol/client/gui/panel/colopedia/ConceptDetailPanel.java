@@ -152,7 +152,7 @@ public class ConceptDetailPanel extends FreeColPanel
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (this.id.equals(id)) return;
+        if (ConceptDetailPanel.id.equals(id)) return;
 
         panel.setLayout(new MigLayout("wrap 1, center"));
 

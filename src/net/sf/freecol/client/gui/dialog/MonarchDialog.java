@@ -108,6 +108,6 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             .cancelOption().defaultOption());
 
         initializeDialog(frame, DialogType.QUESTION, false, panel,
-                         new ImageIcon(lib.getMonarchImage(monarchKey)), c);
+            new ImageIcon(ImageLibrary.getMonarchImage(monarchKey)), c);
     }
 }

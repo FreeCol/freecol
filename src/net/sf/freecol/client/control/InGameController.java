@@ -4270,7 +4270,7 @@ public final class InGameController extends FreeColClientHolder {
             player.addModelMessage(new ModelMessage(MessageType.WARNING,
                                                     "twoTurnsPerYear", player)
                 .addStringTemplate("%year%", currTurn.getLabel())
-                .addAmount("%amount%", currTurn.getSeasonNumber()));
+                .addAmount("%amount%", Turn.getSeasonNumber()));
         }
         player.clearNationCache();
         return true;

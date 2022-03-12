@@ -54,16 +54,16 @@ public enum Size {
     public Size scaled(float f) {
         int val = this.ordinal() + (int)Math.round(4 * (f - 1.0f));
         return (val < 0 || val >= Size.MAX.ordinal()) ? null
-            : this.values()[val];
+            : Size.values()[val];
     }
     
     public Size up() {
         return (this == Size.MAX) ? Size.MAX
-            : this.values()[this.ordinal() + 1];
+            : Size.values()[this.ordinal() + 1];
     }
 
     public Size down() {
         return (this == Size.TINY) ? Size.TINY
-            : this.values()[this.ordinal() - 1];
+            : Size.values()[this.ordinal() - 1];
     }
 };
