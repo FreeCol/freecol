@@ -492,8 +492,11 @@ public final class MapViewer extends FreeColClientHolder {
         
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
+            final Map.Position bottomRight = tcb.getBottomRightDirtyTile();
+            final Map.Position topLeft = tcb.getTopLeftDirtyTile();
             final double avg = ((double)gap)
-                    / ((tcb.getBottomRightDirtyTile().getX()-tcb.getTopLeftDirtyTile().getX()) * (tcb.getBottomRightDirtyTile().getY()-tcb.getBottomRightDirtyTile().getY()));
+                    / ((bottomRight.getX() - topLeft.getX())
+                        * (bottomRight.getY() - topLeft.getY()));
             final StringBuilder sb = new StringBuilder(128);
             sb.append("displayNonAnimationImages time = ").append(gap)
             .append(" for ").append(tcb.getTopLeftDirtyTile())
