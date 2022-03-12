@@ -1055,7 +1055,7 @@ public class ColonyPlan {
                 && u.getUnitChange(UnitChangeType.EXPERIENCE, expert) != null) {
                 score += 10000;
             } else if (expert != null
-                && u.getUnitChange(UnitChangeType.EXPERIENCE, expert) != null) {
+                && u.getUnitChange(UnitChangeType.EXPERIENCE) != null) {
                 score -= 10000;
             }
             if (score > bestValue) {
