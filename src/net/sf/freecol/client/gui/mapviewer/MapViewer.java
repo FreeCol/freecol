@@ -394,7 +394,7 @@ public final class MapViewer extends FreeColClientHolder {
         long t8 = now();
         final int colonyLabels = options.getInteger(ClientOptions.DISPLAY_COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
-        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
+        paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (!tile.isExplored()) {
                 return;
             }
@@ -1287,7 +1287,7 @@ public final class MapViewer extends FreeColClientHolder {
                     topLeftDirtyTile.getX(),
                     topLeftDirtyTile.getY() - 1,
                     subMapWidth,
-                    subMapHeight + 1);
+                    subMapHeight + 2);
             
             superExtendedTiles = map.subMap(
                     topLeftDirtyTile.getX() - 2,

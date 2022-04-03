@@ -250,7 +250,6 @@ public class MapViewerRepaintManager {
      */
     private void updateDirtyRegion(final MapViewerBounds mapViewerBounds, final int dx, final int dy) {
         final Dimension size = mapViewerBounds.getSize();
-        final TileBounds tileBounds = mapViewerBounds.getTileBounds();
         
         final Rectangle alreadyPaintedBounds = new Rectangle(0, 0, size.width, size.height);
         alreadyPaintedBounds.translate(dx, dy);
@@ -258,15 +257,6 @@ public class MapViewerRepaintManager {
         final Area dirtyArea = new Area(new Rectangle(0, 0, size.width, size.height));
         dirtyArea.subtract(new Area(alreadyPaintedBounds));
         final Rectangle newDirtyBounds = dirtyArea.getBounds();
-        
-        /*
-         * TODO: Move the definition, on how far tile graphics can extend into neighbouring tiles,
-         *       from TileClippingBounds to MapViewerBounds -- and use here.
-         *       
-         *       For now, adding enough space to satisfy superExtendedTiles.
-         */
-        newDirtyBounds.grow(tileBounds.getHalfWidth(), tileBounds.getHeight());
-        
         
         if (dirtyRegion != null) {
             dirtyRegion = dirtyRegion.union(newDirtyBounds);
