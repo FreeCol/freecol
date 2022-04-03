@@ -208,6 +208,10 @@ public class ClientOptions extends OptionGroup {
     /** Whether to display borders by default or not. */
     public static final String DISPLAY_BORDERS
         = "model.option.displayBorders";
+    
+    /** Whether to draw the fog of war on the actual map or not. */
+    public static final String DISPLAY_FOG_OF_WAR
+        = "model.option.displayFogOfWar";
 
     /** Whether to delay on a unit's last move or not. */
     public static final String UNIT_LAST_MOVE_DELAY
@@ -807,6 +811,7 @@ public class ClientOptions extends OptionGroup {
         regroup(MESSAGES_GROUP, INTERFACE_GROUP);
         regroup(WAREHOUSE_GROUP, INTERFACE_GROUP);
         regroup(OTHER_GROUP, INTERFACE_GROUP);
+        addBooleanOption(DISPLAY_FOG_OF_WAR, MAPCONTROLS_GROUP, false);
         // end @compat 0.11.6
     }
 

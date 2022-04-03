@@ -114,6 +114,9 @@
         <!-- Whether to display borders by default or not. -->
         <booleanOption id="model.option.displayBorders"
                        defaultValue="false"/>
+        <!-- Whether to draw the fog of war on the actual map or not. -->
+        <booleanOption id="model.option.displayFogOfWar"
+                       defaultValue="false"/>
         <!-- Whether to have a delay on a unit's last move or not. -->
         <booleanOption id="model.option.unitLastMoveDelay"
                        defaultValue="true"/>

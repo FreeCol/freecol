@@ -363,7 +363,7 @@ public final class MapViewer extends FreeColClientHolder {
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_OFF);
         final RescaleOp fow;
-        if (player != null && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+        if (shouldFogOfWarBeDisplayed(player, options)) {
             // Knowing that we have FOW, prepare a rescaling for the
             // overlay step below.
             fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
@@ -520,6 +520,11 @@ public final class MapViewer extends FreeColClientHolder {
                 ;
             logger.finest(sb.toString());
         }
+    }
+
+
+    private boolean shouldFogOfWarBeDisplayed(final Player player, final ClientOptions options) {
+        return player != null && getSpecification().getBoolean(GameOptions.FOG_OF_WAR) && options.getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
     }
 
     private void displayGrid(Graphics2D g2d, final ClientOptions options, final TileClippingBounds tcb) {
