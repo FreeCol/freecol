@@ -197,7 +197,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                 }
             }
         }
-        getGUI().repaint();
+        getGUI().refresh();
         // Disabled: Is this needed? canvas.requestFocus();
     }
 
