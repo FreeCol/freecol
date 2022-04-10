@@ -229,7 +229,7 @@ public class Europe extends UnitLocation
      *
      * @param recruitables The new list of recruitables {@code AbstractUnit}s.
      */
-    protected void setRecruitables(List<AbstractUnit> recruitables) {
+    private void setRecruitables(List<AbstractUnit> recruitables) {
         this.recruitables.clear();
         this.recruitables.addAll(recruitables);
     }
