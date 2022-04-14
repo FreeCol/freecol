@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.tooltip;
 
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;
 
@@ -26,11 +29,12 @@ import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.*;
+import net.sf.freecol.client.gui.ModifierFormat;
 import net.sf.freecol.client.gui.label.ProductionLabel;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.FreeColProgressBar;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
@@ -41,8 +45,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.GameOptions;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -63,33 +65,32 @@ public class RebelToolTip extends JToolTip {
         final int solPercent = colony.getSoL();
         final int rebels = Colony.calculateRebels(population, solPercent);
         final Turn turn = colony.getGame().getTurn();
-        StringTemplate t;
+        
+        setLayout(new BorderLayout());
+        final MigPanel content = new MigPanel(new MigLayout("fill, wrap 3", "[300px][50px, right][50px, right]", ""));
 
-        setLayout(new MigLayout("fill, wrap 3", "[300px][50px, right][50px, right]", ""));
-        // TODO: Calculate this from the size of the components
-
-        add(Utility.localizedLabel(StringTemplate
+        content.add(Utility.localizedLabel(StringTemplate
                 .template("rebelToolTip.rebelLabel")
                 .addName("%number%", "")));
 
-        add(new JLabel(Integer.toString(rebels)));
+        content.add(new JLabel(Integer.toString(rebels)));
 
-        add(new JLabel(solPercent + "%"));
+        content.add(new JLabel(solPercent + "%"));
 
-        add(Utility.localizedLabel(StringTemplate
+        content.add(Utility.localizedLabel(StringTemplate
                 .template("rebelToolTip.royalistLabel")
                 .addName("%number%", "")));
 
-        add(new JLabel(Integer.toString(population - rebels)));
+        content.add(new JLabel(Integer.toString(population - rebels)));
 
-        add(new JLabel(colony.getTory() + "%"));
+        content.add(new JLabel(colony.getTory() + "%"));
 
         int libertyProduction = 0;
         for (GoodsType goodsType : libertyGoods) {
-            add(new JLabel(Messages.getName(goodsType)));
+            content.add(new JLabel(Messages.getName(goodsType)));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
-            add(new ProductionLabel(freeColClient,
+            content.add(new ProductionLabel(freeColClient,
                     new AbstractGoods(goodsType, production)), "span 2");
         }
         libertyProduction = (int) FeatureContainer
@@ -97,7 +98,7 @@ public class RebelToolTip extends JToolTip {
                         colony.getOwner().getModifiers(Modifier.LIBERTY));
         forEach(colony.getOwner().getModifiers(Modifier.LIBERTY), m -> {
                 for (JLabel j : ModifierFormat.getModifierLabels(m, null, turn)) {
-                    add(j);
+                    content.add(j);
                 }
             });
 
@@ -105,13 +106,11 @@ public class RebelToolTip extends JToolTip {
                 && colony.getSoL() >= 100;
         final int liberty = colony.getLiberty();
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
-        final int progressWidth = 400;
         FreeColProgressBar progress
             = new FreeColProgressBar(freeColClient, libertyGoods.get(0), 0,
                                      Colony.LIBERTY_PER_REBEL, modulo,
                                      ((capped) ? 0 : libertyProduction));
-        progress.setPreferredSize(new Dimension(progressWidth, 20));
-        add(progress, "span 3, alignx center");
+        content.add(progress, "span 3, alignx center, height 20:");
 
         double turnsNext = -1.0;
         double turns100 = -1.0;
@@ -135,35 +134,37 @@ public class RebelToolTip extends JToolTip {
         }
 
         final String na = Messages.message("notApplicable");
-        add(Utility.localizedLabel("rebelToolTip.nextMember"));
-        add(new JLabel((turnsNext < 0) ? na
+        content.add(Utility.localizedLabel("rebelToolTip.nextMember"));
+        content.add(new JLabel((turnsNext < 0) ? na
                 : String.valueOf((int)Math.ceil(turnsNext))), "skip");
 
         // Displays the number of turns until 50% of the population is Rebel
         // If the colony has passed 50%, then do not display notice.
         if (turns50 > 0) {
-            add(Utility.localizedLabel("rebelToolTip.50percent"));
-            add(new JLabel(String.valueOf((int)Math.ceil(turns50))), "skip");
+            content.add(Utility.localizedLabel("rebelToolTip.50percent"));
+            content.add(new JLabel(String.valueOf((int)Math.ceil(turns50))), "skip");
         }
 
         // DDisplays the number of turns until 100% of the population is Rebel
         // If the colony has passed 100%, then do not display notice.
         if (turns100 > 0) {
-            add(Utility.localizedLabel("rebelToolTip.100percent"));
-            add(new JLabel(String.valueOf((int)Math.ceil(turns100))), "skip");
+            content.add(Utility.localizedLabel("rebelToolTip.100percent"));
+            content.add(new JLabel(String.valueOf((int)Math.ceil(turns100))), "skip");
         }
 
         final int grow = colony.getPreferredSizeChange();
         if (grow >= Colony.CHANGE_UPPER_BOUND) {
-            add(Utility.localizedLabel("rebelToolTip.changeMore"));
-            add(Utility.localizedLabel("many"), "skip");
+            content.add(Utility.localizedLabel("rebelToolTip.changeMore"));
+            content.add(Utility.localizedLabel("many"), "skip");
         } else if (grow >= 0) {
-            add(Utility.localizedLabel("rebelToolTip.changeMore"));
-            add(new JLabel(String.valueOf(grow)), "skip");
+            content.add(Utility.localizedLabel("rebelToolTip.changeMore"));
+            content.add(new JLabel(String.valueOf(grow)), "skip");
         } else { // grow < 0
-            add(Utility.localizedLabel("rebelToolTip.changeLess"));
-            add(new JLabel(String.valueOf(-grow)), "skip");
+            content.add(Utility.localizedLabel("rebelToolTip.changeLess"));
+            content.add(new JLabel(String.valueOf(-grow)), "skip");
         }
+        setPreferredSize(content.getPreferredSize());   
+        add(content, BorderLayout.CENTER);
     }
 
     // Override Component
