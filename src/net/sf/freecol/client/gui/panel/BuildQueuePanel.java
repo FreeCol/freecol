@@ -552,8 +552,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
         super(freeColClient, null,
-              new MigLayout("wrap 3", "[260:][390:, fill][260:]",
-                            "[][][300:400:][]"));
+              new MigLayout("fill, wrap 3", "[150:260:][290:390:, fill][150:260:]",
+                            "[][][150:400:, growprio 150,shrinkprio 50][]"));
 
         this.colony = colony;
         this.featureContainer = new FeatureContainer();
