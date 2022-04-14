@@ -260,7 +260,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             super(new ImageIcon(getImageLibrary()
                 .getScaledImage(ImageLibrary.ICON_COIN)));
             this.number = number;
-            this.font = FontLibrary.getUnscaledFont("simple-bold-tiny");
+            this.font = getImageLibrary().getScaledFont("simple-bold-tiny", null);
         }
 
         /**

@@ -110,7 +110,7 @@ public class WorkProductionPanel extends FreeColPanel {
             result = 0.0f;
         }
 
-        Font bigFont = FontLibrary.getUnscaledFont("normal-bold-smaller");
+        Font bigFont = lib.getScaledFont("normal-bold-smaller", null);
         JLabel finalLabel = Utility.localizedLabel("finalResult");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");

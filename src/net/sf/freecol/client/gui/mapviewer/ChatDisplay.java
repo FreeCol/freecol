@@ -69,7 +69,7 @@ class ChatDisplay {
      */
     ChatDisplay(FreeColClient freeColClient) {
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
-        this.font = FontLibrary.getUnscaledFont("normal-plain-tiny");
+        this.font = FontLibrary.getScaledFont("normal-plain-tiny");
         this.messages = new ArrayList<>(MESSAGE_COUNT);
         this.decorationS = ImageLibrary.getUnscaledImage("image.menuborder.shadow.s");
         this.decorationSW = ImageLibrary.getUnscaledImage("image.menuborder.shadow.sw");

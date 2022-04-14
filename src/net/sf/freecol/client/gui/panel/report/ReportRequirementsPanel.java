@@ -19,6 +19,11 @@
 
 package net.sf.freecol.client.gui.panel.report;
 
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+import static net.sf.freecol.common.util.CollectionUtils.map;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,10 +40,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -54,7 +58,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -391,8 +394,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         String text = colony.getName() + info;
         JButton button = Utility.getLinkButton(text, null, colony.getId());
         if (headline) {
-            button.setFont(FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE,
-                                                       text));
+            button.setFont(FontLibrary.getScaledFont(Utility.FONTSPEC_SUBTITLE, text));
         }
         button.addActionListener(this);
         return button;

@@ -25,10 +25,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
@@ -53,11 +51,10 @@ public final class EventPanel extends FreeColPanel {
               new MigLayout("wrap 1", "[center]", "[]20"));
 
         JLabel headerLabel = new JLabel(header);
-        headerLabel.setFont(FontLibrary.getUnscaledFont(Utility.FONTSPEC_TITLE,
-                                                        header));
+        headerLabel.setFont(FontLibrary.getScaledFont(Utility.FONTSPEC_TITLE, header));
 
         JLabel imageLabel
-            = new JLabel(new ImageIcon(ImageLibrary.getUnscaledImage(key)));
+            = new JLabel(new ImageIcon(getImageLibrary().getScaledImage(key)));
 
         JLabel footerLabel = (footer == null) ? null : new JLabel(footer);
 

@@ -512,7 +512,7 @@ public final class Utility {
                                               String fontSpec) {
         String text = Messages.message(key);
         JLabel header = new JLabel(text, alignment);
-        header.setFont(FontLibrary.getUnscaledFont(fontSpec, text));
+        header.setFont(FontLibrary.getScaledFont(fontSpec, text));
         header.setOpaque(false);
         return header;
     }
@@ -522,7 +522,7 @@ public final class Utility {
                                               String fontSpec) {
         String text = Messages.message(template);
         JLabel header = new JLabel(text, alignment);
-        header.setFont(FontLibrary.getUnscaledFont(fontSpec, text));
+        header.setFont(FontLibrary.getScaledFont(fontSpec, text));
         header.setOpaque(false);
         return header;
     }

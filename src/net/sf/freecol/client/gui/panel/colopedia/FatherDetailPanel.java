@@ -126,7 +126,7 @@ public class FatherDetailPanel
         String type = Messages.message(father.getTypeKey());
         String text = name + " (" + type + ")";
         JLabel header = new JLabel(text);
-        header.setFont(FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE, text));
+        header.setFont(FontLibrary.getScaledFont(Utility.FONTSPEC_SUBTITLE, text));
 
         Image image = getImageLibrary().getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));

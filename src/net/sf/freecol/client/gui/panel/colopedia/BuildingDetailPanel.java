@@ -19,6 +19,11 @@
 
 package net.sf.freecol.client.gui.panel.colopedia;
 
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
@@ -39,12 +44,11 @@ import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -52,7 +56,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -210,7 +213,7 @@ public class BuildingDetailPanel
                 if (input != null) {
                     panel.add(getGoodsButton(input), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
-                    Font font = FontLibrary.getUnscaledFont("simple-bold-small");
+                    Font font = FontLibrary.getScaledFont("simple-bold-small");
                     arrow.setFont(font);
                     panel.add(arrow);
                 }

@@ -150,7 +150,7 @@ public class ConstructionPanel extends MigPanel
         removeAll();
         final ImageLibrary lib = this.freeColClient.getGUI()
             .getFixedImageLibrary();
-        final Font font = FontLibrary.getUnscaledFont("normal-plain-smaller");
+        final Font font = FontLibrary.getScaledFont("normal-plain-smaller", null);
 
         if (buildable == null) {
             String clickToBuild = Messages.message(getDefaultLabel());

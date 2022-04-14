@@ -31,7 +31,7 @@ public enum Size {
     LARGE  (1.25f, 20f),
     BIG    (1.5f,  24f),
     HUGE   (1.75f, 32f),
-    MAX    (2.0f,  40f);
+    MAX    (2f,  40f);
 
     /** The scaling value to use for images. */
     private final float image;

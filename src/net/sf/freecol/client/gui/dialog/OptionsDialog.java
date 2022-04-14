@@ -28,12 +28,12 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.OptionGroup;
@@ -148,15 +148,11 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @param ui The {@code OptionGroupUI} to encapsulate.
      */
     private void preparePanel(String headerKey, OptionGroupUI ui) {
-        this.optionPanel = new MigPanel("ReportPanelUI");
-        this.optionPanel.setOpaque(true);
-        this.optionPanel.add(ui);
+        this.optionPanel = new MigPanel(new MigLayout("fill"));
+        this.optionPanel.setOpaque(false);
+        this.optionPanel.add(ui, "grow");
         this.optionPanel.setSize(this.optionPanel.getPreferredSize());
-        this.scrollPane = new JScrollPane(this.optionPanel,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        
+
         this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
         this.panel.add(Utility.localizedHeader(Messages.nameKey(headerKey),
                                                Utility.FONTSPEC_TITLE),
@@ -170,8 +166,13 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @param c Extra choices to add beyond the default ok and cancel.
      */
     protected void initialize(JFrame frame, List<ChoiceItem<OptionGroup>> c) {
-        this.panel.add(this.scrollPane, "height 100%, width 100%");
-        this.panel.setPreferredSize(new Dimension(850, 650));
+        this.panel.add(this.optionPanel, "width 100%, height 100%");
+        final float scaleFactor = getImageLibrary().getScaleFactor();
+        final int maxWidth = (int) (850 * scaleFactor);
+        final int maxHeight = (int) (650 * scaleFactor);
+        final int width = Math.min(maxWidth, frame.getWidth() - 200);
+        final int height = Math.min(maxHeight, frame.getHeight() - 200);
+        this.panel.setPreferredSize(new Dimension(width, height));
         this.panel.setSize(this.panel.getPreferredSize());
 
         c.add(new ChoiceItem<>(Messages.message("ok"), this.group).okOption());
@@ -197,7 +198,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     private void update() {
         this.optionPanel.removeAll();
         this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
-        this.optionPanel.add(this.ui);
+        this.optionPanel.add(this.ui, "grow");
         invalidate();
         validate();
         repaint();

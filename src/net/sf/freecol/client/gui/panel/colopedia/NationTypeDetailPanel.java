@@ -19,6 +19,14 @@
 
 package net.sf.freecol.client.gui.panel.colopedia;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.map;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.join;
+
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -32,11 +40,10 @@ import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.EuropeanNationType;
@@ -44,8 +51,6 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -114,7 +119,7 @@ public class NationTypeDetailPanel
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType,
                                                JPanel panel) {
-        Font boldFont = FontLibrary.getUnscaledFont("simple-bold-smaller");
+        Font boldFont = FontLibrary.getScaledFont("simple-bold-smaller");
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 

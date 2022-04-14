@@ -442,9 +442,16 @@ public final class ImageLibrary {
 
 
     // Scaled font wrapper
-
+    
     /**
      * Get a scaled font with a simple text specification.
+     * 
+     * The <code>Font</code> is scaled with the scaleFactor from this
+     * <code>ImageLibrary</code> instead of the global scaleFactor in
+     * {@link FontLibrary}.
+     * 
+     * This method is meant to be used for font that should scale
+     * perfectly with the graphics, for example text on the map.
      *
      * @param spec The font specification.
      * @param text Optional text that the font must be able to represent.
@@ -671,11 +678,10 @@ public final class ImageLibrary {
      * Please use a more specific method!
      *
      * @param display The {@code FreeColObject} to display.
-     * @param scale How much the image should be scaled.
      * @return The appropriate {@code BufferedImage}.
      */
-    public BufferedImage getObjectImage(FreeColObject display, float scale) {
-        return getObjectImageInternal(display, scale(ICON_SIZE, scale));
+    public BufferedImage getObjectImage(FreeColObject display) {
+        return getObjectImageInternal(display, scale(ICON_SIZE, scaleFactor));
     }
 
     /**
@@ -699,7 +705,7 @@ public final class ImageLibrary {
      */
     public ImageIcon getObjectImageIcon(FreeColObject display) {
         if (display == null) return null;
-        BufferedImage image = getObjectImage(display, 2f);
+        BufferedImage image = getObjectImage(display, scale(ICON_SIZE, scaleFactor * 2));
         return (image == null) ? null : new ImageIcon(image);
     }
 
@@ -1782,7 +1788,7 @@ public final class ImageLibrary {
                                      double amount, Color fill,
                                      Color foreground,
                                      boolean filled) {
-        Font font = FontLibrary.getUnscaledFont("simple-bold-tiny", null);
+        Font font = getScaledFont("simple-bold-tiny", null);
         FontMetrics fm = g.getFontMetrics(font);
         int padding = scaleInt(6);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,

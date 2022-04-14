@@ -147,7 +147,7 @@ public final class UnitLabel extends FreeColLabel
         this.selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
-        this.tinyFont = FontLibrary.getUnscaledFont("normal-plain-tiny");
+        this.tinyFont = freeColClient.getGUI().getFixedImageLibrary().getScaledFont("normal-plain-tiny", null);
 
         updateIcon();
     }

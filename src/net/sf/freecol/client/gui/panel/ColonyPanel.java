@@ -342,8 +342,8 @@ public final class ColonyPanel extends PortPanel
             this.nameBox.addItem(colony);
             sb.append(colony.getName());
         }
-        Font nameBoxFont = FontLibrary.getUnscaledFont("header-plain-big",
-                                                       compat);
+        Font nameBoxFont = FontLibrary.getScaledFont("header-plain-big", compat);
+        
         this.nameBox.setFont(nameBoxFont);
         this.nameBox.setSelectedItem(colony);
         this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
@@ -485,7 +485,7 @@ public final class ColonyPanel extends PortPanel
         warehousePanel.initialize();
 
         add(this.nameBox, "height 42:, grow");
-        int tmp = ImageLibrary.ICON_SIZE.height;
+        int tmp = (int) (ImageLibrary.ICON_SIZE.height * getImageLibrary().getScaleFactor());
         
         final Dimension tilesScrollDimension = getTilesScrollGuiScaledDimension();
         add(netProductionPanel,
@@ -1181,7 +1181,7 @@ public final class ColonyPanel extends PortPanel
             final Colony colony = getColony();
             if (colony == null) return;
             final ImageLibrary lib = getImageLibrary();
-            final Font font = FontLibrary.getUnscaledFont("normal-plain-smaller");
+            final Font font = FontLibrary.getScaledFont("normal-plain-smaller", null);
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
             final int rebels = Colony.calculateRebels(uc, solPercent);

@@ -26,10 +26,9 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.StringTemplate;
@@ -60,7 +59,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                             "span, wrap 10");
         }
 
-        Font font = FontLibrary.getUnscaledFont(Utility.FONTSPEC_SUBTITLE);
+        Font font = FontLibrary.getScaledFont(Utility.FONTSPEC_SUBTITLE);
         for (HighScore highScore : highScores) {
             JLabel scoreValue
                 = new JLabel(String.valueOf(highScore.getScore()));

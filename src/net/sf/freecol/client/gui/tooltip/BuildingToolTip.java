@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.tooltip;
 
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+
 import java.awt.Font;
 import java.util.List;
 
@@ -27,12 +30,13 @@ import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.*;
+import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.ModifierFormat;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -44,7 +48,6 @@ import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -76,7 +79,7 @@ public class BuildingToolTip extends JToolTip {
         setLayout(layout);
 
         JLabel buildingName = new JLabel(Messages.getName(building));
-        Font font = FontLibrary.getUnscaledFont("simple-bold-smaller");
+        Font font = FontLibrary.getScaledFont("simple-bold-smaller");
         buildingName.setFont(font);
         add(buildingName, "span");
 
@@ -89,7 +92,7 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(), "span");
         } else {
             JLabel arrow = new JLabel(ResourceManager.getString("arrow.E"));
-            arrow.setFont(FontLibrary.getUnscaledFont("simple-bold-small"));
+            arrow.setFont(FontLibrary.getScaledFont("simple-bold-small"));
             AbstractGoods maxProduction = (info == null) ? null
                 : first(info.getMaximumProduction());
             ProductionLabel productionOutput

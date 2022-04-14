@@ -19,6 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.join;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -31,8 +39,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -63,7 +71,6 @@ import javax.swing.TransferHandler;
 import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -85,8 +92,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -552,7 +557,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
         super(freeColClient, null,
-              new MigLayout("fill, wrap 3", "[150:260:][290:390:, fill][150:260:]",
+              new MigLayout("fill, wrap 3", "[150:260:][fill][150:260:]",
                             "[][][150:400:, growprio 150,shrinkprio 50][]"));
 
         this.colony = colony;
@@ -589,7 +594,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             };
 
         // Create Font choice
-        Font fontSubHead = FontLibrary.getUnscaledFont("normal-bold-smaller");
+        Font fontSubHead = FontLibrary.getScaledFont("normal-bold-smaller");
         
         // Create the components
         JLabel header

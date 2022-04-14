@@ -32,7 +32,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
@@ -103,8 +102,8 @@ public final class AboutPanel extends FreeColPanel {
         add(apLogoLabel, "center");
 
         // Create available Font choices
-        Font fontBold = FontLibrary.getUnscaledFont("normal-bold-tiny");
-        Font fontNormal = FontLibrary.getUnscaledFont("normal-plain-tiny");
+        Font fontBold = FontLibrary.getScaledFont("normal-bold-tiny");
+        Font fontNormal = FontLibrary.getScaledFont("normal-plain-tiny");
 
         // Version
         JLabel apVersion = Utility.localizedLabel("aboutPanel.version");

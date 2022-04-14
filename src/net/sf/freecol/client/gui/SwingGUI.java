@@ -1717,8 +1717,7 @@ public class SwingGUI extends GUI {
     }
 
     private int determineMainFontSizeUsingClientOptions(final int dpi) {
-        final int DEFAULT_DPI = 96;
-        final float DEFAULT_MAIN_FONT_SIZE = 12f;
+        final int DEFAULT_DPI = 96;;
         
         if (getClientOptions().getBoolean(ClientOptions.MANUAL_MAIN_FONT_SIZE)) {
             final int fontSize = getClientOptions().getInteger(ClientOptions.MAIN_FONT_SIZE);
@@ -1728,12 +1727,12 @@ public class SwingGUI extends GUI {
         
         final int displayScaling = getClientOptions().getInteger(ClientOptions.DISPLAY_SCALING);
         if (displayScaling == 0) {
-            final int fontSize = (int) ((DEFAULT_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
+            final int fontSize = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
             logger.info("Automatic font size: " + fontSize + " (reported DPI: " + dpi + ")");        
             return fontSize;
         }
         
-        final int fontSize = (int) (DEFAULT_MAIN_FONT_SIZE * (displayScaling / 100f));
+        final int fontSize = (int) (FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * (displayScaling / 100f));
         logger.info("Font size based on manual display scaling: " + fontSize + " (reported DPI: " + dpi + ")");        
         return fontSize;
     }

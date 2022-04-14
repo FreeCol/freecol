@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.option;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +27,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.event.TreeSelectionEvent;
@@ -40,7 +41,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -68,14 +68,6 @@ public final class OptionGroupUI extends MigPanel
             DefaultTreeCellRenderer renderer
                 = (DefaultTreeCellRenderer)getCellRenderer();
             renderer.setBackgroundNonSelectionColor(bgColor);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(200, super.getPreferredSize().height);
         }
 
         /**
@@ -115,9 +107,7 @@ public final class OptionGroupUI extends MigPanel
      * @param editable Is the group editable.
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
-        super("ReportPanelUI",
-            new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
-                          "[top]"));
+        super("ReportPanelUI", new MigLayout("fill"));
 
         this.gui = gui;
         this.group = group;
@@ -130,10 +120,29 @@ public final class OptionGroupUI extends MigPanel
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
 
-        add(tree);
-        detailPanel = new MigPanel(new MigLayout("wrap 2", "[fill]related[fill]"));
-        detailPanel.setOpaque(false);
-        add(detailPanel, "grow");
+        detailPanel = new MigPanel(new MigLayout("wrap 2, fill", "[fill]related[fill]"));
+        detailPanel.setOpaque(true);
+        
+        final MigPanel treePanel = new MigPanel(new MigLayout("fill"));
+        treePanel.add(tree, "grow");
+        
+        final JScrollPane treeScrollPane =  new JScrollPane(treePanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        treeScrollPane.setOpaque(false);
+        
+        final JScrollPane detailsScrollPane =  new JScrollPane(detailPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        detailsScrollPane.setOpaque(false);
+            
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScrollPane, detailsScrollPane);
+        
+        for (int i=0; i<tree.getRowCount(); i++) {
+            tree.expandRow(i);
+        }
+        
+        add(splitPane, "grow");
     }
 
     public JTree getTree() {
