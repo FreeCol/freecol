@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -71,20 +72,30 @@ public final class ColopediaPanel extends FreeColPanel
      */
     public ColopediaPanel(FreeColClient freeColClient, String id) {
         super(freeColClient, "ColopediaPanelUI",
-              new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
+              new MigLayout("fill", "[750:, grow, fill]",
                             "[][grow, fill][]"));
 
         add(Utility.localizedHeader("colopedia", Utility.FONTSPEC_TITLE),
             "span, align center");
 
-        listPanel = new MigPanel("ColopediaPanelUI");
+        listPanel = new MigPanel(new MigLayout("fill"));
         listPanel.setOpaque(true);
+        
+        tree = buildTree();
+        listPanel.add(tree, "grow");
+        
         JScrollPane sl = new JScrollPane(listPanel,
-                                         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+            @Override
+            public Dimension getPreferredSize() {
+                final Dimension preferredSize = listPanel.getPreferredSize();
+                return new Dimension(preferredSize.width + 32, preferredSize.height);
+            }
+        };
+
         sl.getVerticalScrollBar().setUnitIncrement(16);
         sl.getViewport().setOpaque(false);
-        add(sl);
 
         detailPanel = new MigPanel("ColopediaPanelUI");
         detailPanel.setOpaque(true);
@@ -93,14 +104,15 @@ public final class ColopediaPanel extends FreeColPanel
                                              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         detail.getVerticalScrollBar().setUnitIncrement(16);
         detail.getViewport().setOpaque(false);
-        add(detail, "grow");
-
-        add(okButton, "newline 20, span, tag ok");
+        
+        select(id);
 
         getGUI().restoreSavedSize(this, new Dimension(1050, 725));
-        tree = buildTree();
+        
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sl, detail);
 
-        select(id);
+        add(splitPane, "grow");
+        add(okButton, "newline 20, span, tag ok");
     }
 
     /**
@@ -138,18 +150,12 @@ public final class ColopediaPanel extends FreeColPanel
         new ConceptDetailPanel(fcc, this).addSubTrees(root);
 
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
-        tree = new JTree(treeModel) {
-                @Override
-                public Dimension getPreferredSize() {
-                    return new Dimension(200, super.getPreferredSize().height);
-                }
-            };
+        tree = new JTree(treeModel);
         tree.setRootVisible(false);
         tree.setCellRenderer(new ColopediaTreeCellRenderer());
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
 
-        listPanel.add(tree);
         Enumeration allNodes = root.depthFirstEnumeration();
         while (allNodes.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) allNodes.nextElement();
