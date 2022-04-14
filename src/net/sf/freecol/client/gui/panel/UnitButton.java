@@ -31,7 +31,6 @@ import javax.swing.JButton;
 
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
@@ -124,20 +123,20 @@ public final class UnitButton extends JButton {
                 button.setIcon(icon);
                 button.repaint();
             } else if (FreeColAction.BUTTON_IMAGE.equals(e.getPropertyName())) {
-                String key = (String) e.getNewValue();
-                button.setIcon(new ImageIcon(ImageLibrary.getUnscaledImage(key)));
+                final ImageIcon bi = (ImageIcon) e.getNewValue();
+                button.setIcon(bi);
+                if (bi != null) {
+                    button.setSize(bi.getIconWidth(), bi.getIconHeight());
+                }
                 button.repaint();
             } else if (FreeColAction.BUTTON_ROLLOVER_IMAGE.equals(e.getPropertyName())) {
-                String key = (String) e.getNewValue();
-                button.setRolloverIcon(new ImageIcon(ImageLibrary.getUnscaledImage(key)));
+                button.setRolloverIcon((ImageIcon) e.getNewValue());
                 button.repaint();
             } else if (FreeColAction.BUTTON_PRESSED_IMAGE.equals(e.getPropertyName())) {
-                String key = (String) e.getNewValue();
-                button.setPressedIcon(new ImageIcon(ImageLibrary.getUnscaledImage(key)));
+                button.setPressedIcon((ImageIcon) e.getNewValue());
                 button.repaint();
             } else if (FreeColAction.BUTTON_DISABLED_IMAGE.equals(e.getPropertyName())) {
-                String key = (String) e.getNewValue();
-                button.setDisabledIcon(new ImageIcon(ImageLibrary.getUnscaledImage(key)));
+                button.setDisabledIcon((ImageIcon) e.getNewValue());
                 button.repaint();
             } else if (Action.MNEMONIC_KEY.equals(e.getPropertyName())) {
                 Integer mn = (Integer) e.getNewValue();

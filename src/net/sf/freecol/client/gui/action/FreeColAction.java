@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -38,7 +39,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.dialog.*;
+import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -115,7 +116,7 @@ public abstract class FreeColAction extends AbstractAction
     protected final FreeColClient freeColClient;
 
     private int orderButtonImageCount = 0;
-
+    private List<String> imageIconKeys = new ArrayList<>();
 
     /**
      * Creates a new {@code FreeColAction}.
@@ -253,23 +254,35 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
+        imageIconKeys.add(key);
+        
         /*
          * Running this method later so that we are certain images
          * have been loaded before trying to get them.
          */
         SwingUtilities.invokeLater(() -> {
-            List<BufferedImage> images = getGUI().getFixedImageLibrary().getButtonImages(key);
-            orderButtonImageCount = images.size();
-            if (hasOrderButtons()) {
-                putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
-                putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images.remove(0)));
-                putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
-                putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
-            } else {
-                logger.warning("Found only " + orderButtonImageCount
-                    + " order button images for " + getId() + "/" + key);
-            }
+            updateImageIcon(key);
         });
+    }
+
+    public void updateRegisteredImageIcons() {
+        for (String key : imageIconKeys) {
+            updateImageIcon(key);
+        }
+    }
+
+    private void updateImageIcon(String key) {
+        List<BufferedImage> images = getGUI().getFixedImageLibrary().getButtonImages(key);
+        orderButtonImageCount = images.size();
+        if (hasOrderButtons()) {
+            putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
+        } else {
+            logger.warning("Found only " + orderButtonImageCount
+                + " order button images for " + getId() + "/" + key);
+        }
     }
 
     /**

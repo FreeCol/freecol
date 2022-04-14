@@ -1702,6 +1702,10 @@ public class SwingGUI extends GUI {
         FreeColLookAndFeel.installFont(font);
         Utility.initStyleContext(font);
         
+        if (getFreeColClient().getActionManager() != null) {
+            getFreeColClient().getActionManager().refreshResources();
+        }
+        
         if (this.mapControls != null) {
             this.mapControls.updateLayoutIfNeeded();
         }

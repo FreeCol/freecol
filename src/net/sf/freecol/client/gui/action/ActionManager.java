@@ -254,4 +254,12 @@ public class ActionManager extends OptionGroup {
         ret.add(new UnitButton(this, DisbandUnitAction.id));
         return ret;
     }
+    
+    public void refreshResources() {
+        for (Option<?> option : getOptions() ){
+            if (option instanceof FreeColAction) {
+                ((FreeColAction) option).updateRegisteredImageIcons();
+            }
+        }
+    }
 }
