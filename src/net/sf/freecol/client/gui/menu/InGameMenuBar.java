@@ -32,6 +32,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.CenterAction;
@@ -325,6 +326,8 @@ public class InGameMenuBar extends FreeColMenuBar {
                              RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                              RenderingHints.VALUE_RENDER_QUALITY);
+
+        g2d.setFont(FontLibrary.getMainFont());
         
         final FontMetrics fm = g2d.getFontMetrics();
         final Rectangle2D d  = fm.getStringBounds(text, g2d);
