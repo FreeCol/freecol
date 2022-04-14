@@ -539,6 +539,10 @@ public final class ImageLibrary {
             + ((expanded) ? "open" : "closed") + "Section";
         return getUnscaledImage(key);
     }
+    
+    public static BufferedImage getColopediaConceptImage() {
+        return getUnscaledImage("image.icon.Colopedia.idea");
+    }
 
     public static BufferedImage getColorCellRendererBackground() {
         return getUnscaledImage("image.background.ColorCellRenderer");
