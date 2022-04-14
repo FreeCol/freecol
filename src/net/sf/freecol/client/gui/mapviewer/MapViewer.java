@@ -900,7 +900,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param g2d The Graphics2D object on which to draw the Unit.
      * @param unit The Unit to draw.
      */
-    private void displayUnit(Graphics2D g2d, Unit unit) {
+    void displayUnit(Graphics2D g2d, Unit unit) {
         final Player player = getMyPlayer();
 
         // Draw the unit.

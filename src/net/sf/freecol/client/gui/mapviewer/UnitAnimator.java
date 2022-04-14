@@ -10,8 +10,6 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -112,20 +110,18 @@ public class UnitAnimator {
      */
     private JLabel createUnitAnimationLabel(Unit unit) {
         final BufferedImage unitImg =  this.lib.getScaledUnitImage(unit);
-        final int width = mapViewer.getTileBounds().getHalfWidth() + unitImg.getWidth()/2;
-        final int height = unitImg.getHeight();
+        
+        final int scaledUnitOffset = (int) (TileBounds.UNIT_OFFSET * lib.getScaleFactor());
+        final int width = Math.max(unitImg.getWidth(), mapViewer.getTileBounds().getWidth());
+        final int height = Math.max(unitImg.getHeight() + scaledUnitOffset * 2, mapViewer.getTileBounds().getHeight());
 
         BufferedImage img = new BufferedImage(width, height,
                                               BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
+        g2d.translate((width - mapViewer.getTileBounds().getWidth()) / 2,
+                (height - mapViewer.getTileBounds().getHeight()) / 2);
 
-        final int unitX = (width - unitImg.getWidth()) / 2;
-        g2d.drawImage(unitImg, unitX, 0, null);
-
-        final Player player = freeColClient.getMyPlayer();
-        String text = Messages.message(unit.getOccupationLabel(player, false));
-        g2d.drawImage(this.lib.getOccupationIndicatorChip(g2d, unit, text),
-                      0, 0, null);
+        mapViewer.displayUnit(g2d, unit);
 
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);

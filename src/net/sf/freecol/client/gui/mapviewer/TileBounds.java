@@ -78,12 +78,7 @@ final class TileBounds {
                                                   Point tileP) {
         if (tileP == null) return null;
         int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
-        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2 - scaleInt(UNIT_OFFSET);
+        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2;
         return new Point(labelX, labelY);
     }
-    
-    private int scaleInt(int n) {
-        return (int)(n * this.scaleFactor);
-    }
-
 }
