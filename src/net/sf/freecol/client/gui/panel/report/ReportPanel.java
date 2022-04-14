@@ -90,7 +90,10 @@ public class ReportPanel extends FreeColPanel {
         add(scrollPane, SCROLL_PANE_SIZE);
         add(okButton, "cell 0 2, tag ok");
 
-        getGUI().restoreSavedSize(this, new Dimension(1050, 725));
+        final int width = (int) (1050 * getImageLibrary().getScaleFactor());
+        final int height = (int) (725 * getImageLibrary().getScaleFactor());
+        
+        getGUI().restoreSavedSize(this, new Dimension(width, height));
     }
 
 

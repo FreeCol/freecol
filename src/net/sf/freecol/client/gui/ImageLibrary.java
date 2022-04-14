@@ -566,7 +566,7 @@ public final class ImageLibrary {
     public BufferedImage getFoundingFatherImage(FoundingFather father,
                                                 boolean grayscale) {
         final String key = "image.flavor." + father.getId();
-        return this.imageCache.getScaledImage(key, NORMAL_SCALE, grayscale);
+        return this.imageCache.getScaledImage(key, scaleFactor, grayscale);
     }
 
     public BufferedImage getInformationPanelSkin(Player player) {
