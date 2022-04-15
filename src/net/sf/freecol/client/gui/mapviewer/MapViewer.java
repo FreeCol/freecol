@@ -605,7 +605,7 @@ public final class MapViewer extends FreeColClientHolder {
             specs[0] = new TextSpecification(name, mapViewerScaledUtils.getFontNormal());
 
             BufferedImage nameImage = createLabel(g2d, specs, backgroundColor);
-            int spacing = 3;
+            int spacing = this.lib.scaleInt(3);
             BufferedImage leftImage = null;
             BufferedImage rightImage = null;
             if (settlement instanceof Colony) {
@@ -644,18 +644,16 @@ public final class MapViewer extends FreeColClientHolder {
                 }
             }
             
-            int width = this.lib.scaleInt(nameImage.getWidth()
-                + ((leftImage == null) ? 0 : leftImage.getWidth() + spacing)
-                + ((rightImage == null) ? 0 : rightImage.getWidth() + spacing));
-            int xOffset = (tileBounds.getWidth() - width)/2;
-            yOffset -= this.lib.scaleInt(nameImage.getHeight())/2;
+            int xOffset = tileBounds.getWidth() / 2 - nameImage.getWidth() / 2
+                    - ((leftImage == null) ? 0 : leftImage.getWidth() + spacing);
+            yOffset -= nameImage.getHeight() / 2;
             if (leftImage != null) {
                 g2d.drawImage(leftImage, rop, xOffset, yOffset);
-                xOffset += this.lib.scaleInt(leftImage.getWidth() + spacing);
+                xOffset += leftImage.getWidth() + spacing;
             }
             g2d.drawImage(nameImage, rop, xOffset, yOffset);
             if (rightImage != null) {
-                xOffset += this.lib.scaleInt(nameImage.getWidth() + spacing);
+                xOffset += nameImage.getWidth() + spacing;
                 g2d.drawImage(rightImage, rop, xOffset, yOffset);
             }
             break;
