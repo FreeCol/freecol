@@ -717,8 +717,34 @@ public final class ImageLibrary {
         return getUnscaledImage("image.background.FreeColOptionPane");
     }
 
+    /**
+     * Gets the default background for panels (dialogs/windows).
+     * @return The default background image.
+     * @see #getPanelBackground(Class)
+     */
     public static BufferedImage getPanelBackground() {
         return getUnscaledImage("image.background.FreeColPanel");
+    }
+    
+    /**
+     * Gets the background for the given panel.
+     * 
+     * @param clazz The {@code Class} of the panel.
+     * @return The background for the given panel, or the first matching
+     *      superclass.
+     */
+    public static BufferedImage getPanelBackground(Class<?> clazz) {
+        while (clazz != null) {
+            final ImageResource ir = ResourceManager.getImageResource("image.background." + clazz.getSimpleName(), false);
+            if (ir != null) {
+                return ir.getImage();
+            }
+            clazz = clazz.getSuperclass();
+            if (!clazz.getName().startsWith("net.sf.freecol")) {
+                clazz = null;
+            }
+        }
+        return getPanelBackground();
     }
 
     /**

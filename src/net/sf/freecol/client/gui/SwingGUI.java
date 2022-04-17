@@ -1721,7 +1721,7 @@ public class SwingGUI extends GUI {
     }
 
     private int determineMainFontSizeUsingClientOptions(final int dpi) {
-        final int DEFAULT_DPI = 96;;
+        final int DEFAULT_DPI = 72;
         
         if (getClientOptions().getBoolean(ClientOptions.MANUAL_MAIN_FONT_SIZE)) {
             final int fontSize = getClientOptions().getInteger(ClientOptions.MAIN_FONT_SIZE);
@@ -1742,7 +1742,7 @@ public class SwingGUI extends GUI {
     }
 
     private float determineScaleFactorUsingClientOptions(final int dpi) {
-        final int DEFAULT_DPI = 96;
+        final int DEFAULT_DPI = 72;
         final int displayScaling = getClientOptions().getInteger(ClientOptions.DISPLAY_SCALING);
         float scaleFactor;
         if (displayScaling == 0) {

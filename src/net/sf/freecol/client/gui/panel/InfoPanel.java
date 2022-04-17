@@ -170,7 +170,7 @@ public final class InfoPanel extends FreeColPanel
             setOpaque(false);
         } else {
             setSize(this.lib.scale(PREFERRED_SIZE));
-            setBorder(FreeColImageBorder.imageBorder);
+            setBorder(FreeColImageBorder.panelWithoutShadowBorder);
             setOpaque(true);
         }
     }

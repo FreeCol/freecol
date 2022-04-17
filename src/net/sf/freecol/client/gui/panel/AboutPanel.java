@@ -96,9 +96,6 @@ public final class AboutPanel extends FreeColPanel {
         // Header with image
         JLabel apLogoLabel = new JLabel(new ImageIcon(ImageLibrary
                 .getUnscaledImage("image.flavor.Title")));
-        apLogoLabel.setBorder(
-            new CompoundBorder(new EmptyBorder(2,2,2,2),
-                               new BevelBorder(BevelBorder.LOWERED)));
         add(apLogoLabel, "center");
 
         // Create available Font choices

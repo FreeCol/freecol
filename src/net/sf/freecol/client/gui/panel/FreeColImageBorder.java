@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.ImageUtils.fillTexture;
+
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -28,8 +30,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.border.AbstractBorder;
 
-import net.sf.freecol.client.gui.ImageLibrary;
-import static net.sf.freecol.common.util.ImageUtils.*;
+import net.sf.freecol.common.resources.ImageResource;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -37,7 +39,11 @@ import static net.sf.freecol.common.util.ImageUtils.*;
  */
 public class FreeColImageBorder extends AbstractBorder {
 
-    public static final FreeColImageBorder imageBorder = new FreeColImageBorder();
+    public static final FreeColImageBorder panelWithoutShadowBorder = new FreeColImageBorder("image.border.panel.noshadow");
+    public static final FreeColImageBorder panelBorder = new FreeColImageBorder("image.border.panel");    
+    public static final FreeColImageBorder buttonBorder = new FreeColImageBorder("image.border.button");
+    public static final FreeColImageBorder simpleButtonBorder = new FreeColImageBorder("image.border.button.simple");
+    public static final FreeColImageBorder menuBarBorder = new FreeColImageBorder("image.border.menu");
 
 
     // The buffered image objects
@@ -54,15 +60,15 @@ public class FreeColImageBorder extends AbstractBorder {
     /**
      * Creates the default border.
      */
-    public FreeColImageBorder() {
-        this(ImageLibrary.getUnscaledImage("image.menuborder.nw"),
-             ImageLibrary.getUnscaledImage("image.menuborder.n"),
-             ImageLibrary.getUnscaledImage("image.menuborder.ne"),
-             ImageLibrary.getUnscaledImage("image.menuborder.e"),
-             ImageLibrary.getUnscaledImage("image.menuborder.se"),
-             ImageLibrary.getUnscaledImage("image.menuborder.s"),
-             ImageLibrary.getUnscaledImage("image.menuborder.sw"),
-             ImageLibrary.getUnscaledImage("image.menuborder.w"));
+    public FreeColImageBorder(String baseKey) {
+        this(getImage(baseKey + ".nw"),
+                getImage(baseKey + ".n"),
+                getImage(baseKey + ".ne"),
+                getImage(baseKey + ".e"),
+                getImage(baseKey + ".se"),
+                getImage(baseKey + ".s"),
+                getImage(baseKey + ".sw"),
+                getImage(baseKey + ".w"));
     }
 
 
@@ -96,6 +102,15 @@ public class FreeColImageBorder extends AbstractBorder {
         this.bottomImage = bottomImage;
         this.bottomLeftCornerImage = bottomLeftCornerImage;
         this.leftImage = leftImage;
+    }
+    
+    
+    private static BufferedImage getImage(String key) {
+        final ImageResource ir = ResourceManager.getImageResource(key, false);
+        if (ir == null) {
+            return null;
+        }
+        return ir.getImage();
     }
 
     /**

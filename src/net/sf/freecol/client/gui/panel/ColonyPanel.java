@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -345,6 +346,7 @@ public final class ColonyPanel extends PortPanel
         Font nameBoxFont = FontLibrary.getScaledFont("header-plain-big", compat);
         
         this.nameBox.setFont(nameBoxFont);
+        this.nameBox.setBorder(BorderFactory.createEmptyBorder());
         this.nameBox.setSelectedItem(colony);
         this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
                                        "selectPrevious2");
@@ -509,7 +511,7 @@ public final class ColonyPanel extends PortPanel
         add(colonyUnitsButton);
         if (setGoodsButton != null) add(setGoodsButton);
         if (traceWorkButton != null) add(traceWorkButton);
-        add(okButton, "tag ok");
+        add(okButton, "gapbefore push"); // tag ok
 
         update();
     }

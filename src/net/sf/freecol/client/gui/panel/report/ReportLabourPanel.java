@@ -23,12 +23,11 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +41,11 @@ import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import net.miginfocom.swing.MigLayout;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
@@ -61,7 +61,7 @@ import net.sf.freecol.common.model.UnitType;
 public final class ReportLabourPanel extends ReportPanel {
 
     /** An individual unit type panel. */
-    private static class LabourUnitPanel extends FreeColPanel {
+    private static class LabourUnitPanel extends MigPanel {
 
         public boolean selected;
         public final UnitType unitType;
@@ -69,12 +69,11 @@ public final class ReportLabourPanel extends ReportPanel {
 
         public LabourUnitPanel(FreeColClient freeColClient, UnitType unitType,
                                int count) {
-            super(freeColClient, null,
-                  new MigLayout("wrap 2", "[60, right][left]"));
+            super(new MigLayout("wrap 2", "[60, right][left]"));
 
             this.unitType = unitType;
             setOpaque(false);
-            add(new JLabel(new ImageIcon(getImageLibrary()
+            add(new JLabel(new ImageIcon(freeColClient.getGUI().getFixedImageLibrary()
                         .getSmallUnitTypeImage(unitType, (count == 0)))),
                 "spany 2");
             add(new JLabel(Messages.getName(unitType)));
@@ -83,7 +82,7 @@ public final class ReportLabourPanel extends ReportPanel {
 
 
         @Override
-        public void paint(Graphics g) {
+        public void paintComponent(Graphics g) {
             if (selected) {
                 Graphics2D g2d = (Graphics2D) g;
                 Composite oldComposite = g2d.getComposite();
@@ -94,7 +93,7 @@ public final class ReportLabourPanel extends ReportPanel {
                 g2d.setComposite(oldComposite);
                 g2d.setColor(oldColor);
             }
-            super.paint(g);
+            super.paintComponent(g);
         }
     }
 
@@ -202,15 +201,12 @@ public final class ReportLabourPanel extends ReportPanel {
         this.panelList.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        showDetails();
-                    }
+                    showDetails();
                 }
             });
         this.panelList.setOpaque(false);
         this.panelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.panelList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        this.panelList.setVisibleRowCount(-1);
         this.panelList.setCellRenderer(new LabourUnitPanelRenderer());
 
         this.scrollPane.setViewportView(this.panelList);

@@ -44,7 +44,7 @@ public class FreeColPanelUI extends BasicPanelUI {
     @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageUtils.drawTiledImage(ImageLibrary.getPanelBackground(),
+            ImageUtils.drawTiledImage(ImageLibrary.getPanelBackground(c.getClass()),
                                       g, c, null);
         }
     }

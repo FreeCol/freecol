@@ -26,8 +26,10 @@ import java.util.logging.Logger;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIDefaults.LazyValue;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalIconFactory;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.freecol.common.FreeColException;
@@ -127,8 +129,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         FreeColTableUI.class,
         FreeColTextAreaUI.class,
         FreeColTextFieldUI.class,
+        FreeColFormattedTextFieldUI.class,
         FreeColToolTipUI.class,
-        FreeColTransparentPanelUI.class
+        FreeColTransparentPanelUI.class,
+        FreeColSpinnerUI.class
     };
 
 
@@ -205,6 +209,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         // Add cursors:
         u.put("cursor.go", ImageLibrary.getCursor());
 
+        u.put("CheckBox.icon", (LazyValue) t -> FreeColCheckBoxUI.createCheckBoxIcon());
+        
         return u;
     }
 

@@ -87,7 +87,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
         
         this.am = f.getActionManager();
 
-        setBorder(FreeColImageBorder.imageBorder);
+        setBorder(FreeColImageBorder.menuBarBorder);
     }
 
 

@@ -1330,7 +1330,7 @@ public final class Canvas extends JDesktopPane {
         closeMainPanel();
         this.parentFrame.removeMenuBar();
         this.mainPanel = new MainPanel(this.freeColClient);
-        addCentered(this.mainPanel, JLayeredPane.DEFAULT_LAYER);
+        addAsFrame(mainPanel, false, PopupPosition.CENTERED, true);
         this.mainPanel.requestFocus();
         return this.mainPanel;
     }

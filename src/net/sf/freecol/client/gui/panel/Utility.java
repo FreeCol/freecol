@@ -50,6 +50,7 @@ import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
@@ -238,7 +239,7 @@ public final class Utility {
      * @return a {@code JButton} value
      */
     public static JButton getLinkButton(String text, Icon icon, String action) {
-        JButton button = new JButton(text, icon);
+        JButton button = new FreeColButton(text, icon).withButtonStyle(ButtonStyle.TRANSPARENT);
         button.setMargin(EMPTY_MARGIN);
         button.setOpaque(false);
         button.setForeground(getLinkColor());
@@ -460,8 +461,8 @@ public final class Utility {
      * @param key The key to use.
      * @return The {@code JButton}.
      */
-    public static JButton localizedButton(String key) {
-        return new JButton(Messages.message(key));
+    public static FreeColButton localizedButton(String key) {
+        return new FreeColButton(Messages.message(key));
     }
 
     /**

@@ -247,8 +247,18 @@ public class FontLibrary {
      * @return The {@code Font} found, or null if scaling fails.
      */
     public static Font getScaledFont(String spec, String text) {
-        final float scaleFactor = mainFontSize / DEFAULT_UNSCALED_MAIN_FONT_SIZE; 
+        final float scaleFactor = getFontScaling(); 
         return getScaledFont(spec, scaleFactor, text);
+    }
+
+    /**
+     * Gets the scaling factor for the main font.
+     * 
+     * @return A scaling factor that can be used when scaling resources
+     *      that should scale together with the font.
+     */
+    public static float getFontScaling() {
+        return mainFontSize / DEFAULT_UNSCALED_MAIN_FONT_SIZE;
     }
     
     /**

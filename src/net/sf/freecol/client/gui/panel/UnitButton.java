@@ -27,7 +27,6 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
@@ -41,7 +40,7 @@ import net.sf.freecol.client.gui.action.FreeColAction;
  * The UnitButton is useless by itself, this object needs to
  * be placed on a JComponent in order to be useable.
  */
-public final class UnitButton extends JButton {
+public final class UnitButton extends FreeColButton {
 
     private static final Logger logger = Logger.getLogger(UnitButton.class.getName());
 
@@ -55,7 +54,7 @@ public final class UnitButton extends JButton {
      * @param actionId The key for the action to be used with this button
      */
     public UnitButton(ActionManager am, String actionId) {
-        super(am.getFreeColAction(actionId));
+        super(ButtonStyle.TRANSPARENT, am.getFreeColAction(actionId));
         this.actionId = actionId;
         this.am = am;
     }

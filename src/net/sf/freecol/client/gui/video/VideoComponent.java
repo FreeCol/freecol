@@ -110,7 +110,7 @@ public class VideoComponent extends JPanel {
 
 
     private Border createBorder() {
-        return FreeColImageBorder.imageBorder;
+        return FreeColImageBorder.panelWithoutShadowBorder;
     }
 
     ///**

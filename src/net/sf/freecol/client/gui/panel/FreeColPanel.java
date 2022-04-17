@@ -42,6 +42,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -74,7 +75,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     protected boolean editable = true;
 
-    protected JButton okButton = Utility.localizedButton("ok");
+    protected JButton okButton = Utility.localizedButton("ok").withButtonStyle(ButtonStyle.IMPORTANT);
 
 
     /**
@@ -99,10 +100,11 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         this.freeColClient = freeColClient;
 
-        setBorder(FreeColImageBorder.imageBorder);
+        setBorder(FreeColImageBorder.panelBorder);
 
         okButton.setActionCommand(OK);
         okButton.addActionListener(this);
+        
         setCancelComponent(okButton);
     }
 

@@ -27,14 +27,21 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
 
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.client.gui.panel.FreeColButton;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.util.ImageUtils;
 
 
@@ -44,25 +51,66 @@ import net.sf.freecol.common.util.ImageUtils;
  */
 public class FreeColButtonUI extends MetalButtonUI {
 
-    private static final FreeColButtonUI sharedInstance = new FreeColButtonUI();
-
+    private boolean paintBackground;
+    private PropertyChangeListener pcl;
 
     public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {
-        return sharedInstance;
+        return new FreeColButtonUI();
     }
 
     @Override
     public void installUI(JComponent c) {
         super.installUI(c);
+        
+        pcl = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (FreeColButton.BUTTON_STYLE_PROPERTY_NAME.equals(evt.getPropertyName())) {
+                    updateStyle(c, (ButtonStyle) evt.getNewValue());
+                }
+            }
+        };
+        c.addPropertyChangeListener(pcl);
+        
+        if (c instanceof FreeColButton) {
+            updateStyle(c, ((FreeColButton) c).getButtonStyle());
+        } else {
+            updateStyle(c, (ButtonStyle) c.getClientProperty(FreeColButton.BUTTON_STYLE_PROPERTY_NAME));
+        }
+    }
+    
+    @Override
+    public void uninstallUI(JComponent c) {
+        super.uninstallUI(c);
+        c.removePropertyChangeListener(pcl);
+    }
 
-        c.setOpaque(false);
+    protected void updateStyle(JComponent c, ButtonStyle buttonStyle) {
+        final int padding = (int) (5 * FontLibrary.getFontScaling());
+        if (buttonStyle == ButtonStyle.IMPORTANT) {
+            c.setBorder(BorderFactory.createCompoundBorder(
+                    FreeColImageBorder.buttonBorder,
+                    BorderFactory.createEmptyBorder(padding, padding, padding, padding)));
+            c.setOpaque(true);
+            paintBackground = true;
+        } else if (buttonStyle == ButtonStyle.TRANSPARENT) { 
+            c.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            c.setOpaque(false);
+            paintBackground = false;
+        } else {
+            c.setBorder(BorderFactory.createCompoundBorder(
+                    FreeColImageBorder.simpleButtonBorder,
+                    BorderFactory.createEmptyBorder(padding, padding, padding, padding)));
+            c.setOpaque(false);
+            paintBackground = true;
+        }
     }
 
     @Override
     public void paint(Graphics g, JComponent c) {
         LAFUtilities.setProperties(g, c);
-
-        if (c.isOpaque()) {
+        
+        if (c.isOpaque() || paintBackground) {
             ImageUtils.drawTiledImage(ImageLibrary.getButtonBackground(),
                                       g, c, null);
         }
@@ -91,7 +139,6 @@ public class FreeColButtonUI extends MetalButtonUI {
             g2d.fillRect(0, 0, size.width, size.height);
             g2d.setComposite(oldComposite);
             g2d.setColor(oldColor);
-
         }
     }
 }

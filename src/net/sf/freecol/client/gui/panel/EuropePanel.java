@@ -50,6 +50,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Constants.BoycottAction;
 import net.sf.freecol.common.model.Europe;
@@ -321,7 +322,7 @@ public final class EuropePanel extends PortPanel {
         }
     }
 
-    private static final class EuropeButton extends JButton {
+    private static final class EuropeButton extends FreeColButton {
 
         public EuropeButton(String text, int keyEvent, String command,
                             ActionListener listener) {
@@ -624,7 +625,7 @@ public final class EuropePanel extends PortPanel {
 
         exitButton = new EuropeButton(Messages.message("close"),
             KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(),
-            ae -> exitAction());
+            ae -> exitAction()).withButtonStyle(ButtonStyle.IMPORTANT);
         trainButton = new EuropeButton(Messages.message("train"),
             KeyEvent.VK_T, EuropeAction.TRAIN.toString(),
             ae -> getGUI().showTrainPanel());

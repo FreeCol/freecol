@@ -19,17 +19,17 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import net.miginfocom.swing.MigLayout;
 
+import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.AboutAction;
@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.io.FreeColDirectories;
 
 
@@ -58,18 +59,18 @@ public final class MainPanel extends FreeColPanel {
      */
     public MainPanel(FreeColClient freeColClient) {
         super(freeColClient, null,
-              new MigLayout("wrap 1, insets n n 20 n", "[center]"));
+                new MigLayout("wrap 1, insets 32px 32px 32px 32px, gap 0", "[center]"));
 
         boolean canContinue = FreeColDirectories
             .getLastSaveGameFile() != null;
 
         ActionManager am = getFreeColClient().getActionManager();
-        JButton newButton = new JButton(am.getFreeColAction(NewAction.id));
-        JButton openButton = new JButton(am.getFreeColAction(OpenAction.id));
-        JButton mapEditorButton = new JButton(am.getFreeColAction(MapEditorAction.id));
-        JButton optionsButton = new JButton(am.getFreeColAction(PreferencesAction.id));
-        JButton aboutButton = new JButton(am.getFreeColAction(AboutAction.id));
-        JButton quitButton = new JButton(am.getFreeColAction(QuitAction.id));
+        JButton newButton = createImportantButton(am.getFreeColAction(NewAction.id));
+        JButton openButton = createImportantButton(am.getFreeColAction(OpenAction.id));
+        JButton mapEditorButton = createImportantButton(am.getFreeColAction(MapEditorAction.id));
+        JButton optionsButton = createImportantButton(am.getFreeColAction(PreferencesAction.id));
+        JButton aboutButton = createImportantButton(am.getFreeColAction(AboutAction.id));
+        JButton quitButton = createImportantButton(am.getFreeColAction(QuitAction.id));
 
         setCancelComponent(quitButton);
         okButton.setAction(am.getFreeColAction((canContinue)
@@ -78,19 +79,31 @@ public final class MainPanel extends FreeColPanel {
 
         JLabel logoLabel = new JLabel(new ImageIcon(ImageLibrary
                 .getUnscaledImage("image.flavor.Title")));
-        logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2),
-                new BevelBorder(BevelBorder.LOWERED)));
+
         add(logoLabel);
+        
+        final JLabel versionLabel = new JLabel(FreeCol.getVersion());
+        versionLabel.setForeground(new Color(180, 162, 66)); // b4a242
+        add(versionLabel);
 
-        add(okButton, "newline 20, width 70%");
-        if (canContinue) add(newButton, "width 70%");
-        add(openButton, "width 70%");
-        add(mapEditorButton, "width 70%");
-        add(optionsButton, "width 70%");
-        add(aboutButton, "width 70%");
-        add(quitButton, "width 70%");
+        final MigPanel buttons = new MigPanel(new MigLayout("wrap 2"));
+        buttons.setOpaque(false);
+        buttons.add(okButton, "grow");
+        if (canContinue) buttons.add(newButton, "grow");
+        buttons.add(openButton, "grow");
+        buttons.add(mapEditorButton, "grow");
+        buttons.add(optionsButton, "grow");
+        buttons.add(aboutButton, "grow");
+        buttons.add(quitButton, "grow, span");
 
+        add(buttons, "gapy 16px");
+        
         setSize(getPreferredSize());
+    }
+    
+    private JButton createImportantButton(Action action) {
+        final FreeColButton button = new FreeColButton(ButtonStyle.IMPORTANT, action);
+        return button;
     }
 
 
