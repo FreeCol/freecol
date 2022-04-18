@@ -120,7 +120,7 @@ public final class OptionGroupUI extends MigPanel
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
 
-        detailPanel = new MigPanel(new MigLayout("wrap 2, fill", "[fill]related[fill]"));
+        detailPanel = new MigPanel(new MigLayout("wrap 2, fillx", "[fill]related[fill]"));
         detailPanel.setOpaque(true);
         
         final MigPanel treePanel = new MigPanel(new MigLayout("fill"));
