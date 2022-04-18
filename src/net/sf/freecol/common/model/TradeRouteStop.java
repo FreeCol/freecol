@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -28,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -361,6 +363,11 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
         } else {
             super.readChild(xr);
         }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        return o == this;
     }
 
     /**
