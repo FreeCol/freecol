@@ -29,12 +29,15 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
@@ -49,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -188,6 +192,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
             if (ret instanceof GoodsTypeLabel) {
                 GoodsTypeLabel gtl = (GoodsTypeLabel)ret;
                 enableImport(gtl.getType());
+                revalidate();
+                repaint();
             }
             return ret;
         }
@@ -251,11 +257,13 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         protected Transferable createTransferable(JComponent c) {
-            JList list = (JList)c;
+            final JList list = (JList) c;
             final DefaultListModel model = (DefaultListModel)list.getModel();
-            int[] indicies = list.getSelectedIndices();
-            List<TradeRouteStop> stops = new ArrayList<>(indicies.length);
-            for (int i : indicies) stops.add(i, (TradeRouteStop)model.get(i));
+            final int[] indicies = list.getSelectedIndices();
+            final List<TradeRouteStop> stops = new ArrayList<>(indicies.length);
+            for (int i : indicies) {
+                stops.add((TradeRouteStop) model.get(i));
+            }
             return new StopListTransferable(stops);
         }
 
@@ -272,47 +280,70 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public boolean importData(JComponent target, Transferable data) {
-            JList<TradeRouteStop> stl = TradeRouteInputPanel.this.stopList;
-            if (target == stl
-                && data instanceof StopListTransferable
-                && canImport(target, data.getTransferDataFlavors())) {
-                List<TradeRouteStop> stops
-                    = ((StopListTransferable)data).getStops();
-                DefaultListModel<TradeRouteStop> model
-                    = new DefaultListModel<>();
-                int index = stl.getMaxSelectionIndex();
-                for (TradeRouteStop stop : stops) {
-                    if (index < 0) {
-                        model.addElement(stop);
+            final JList<TradeRouteStop> stl = TradeRouteInputPanel.this.stopList;
+            try {
+                if (target == stl && canImport(target, data.getTransferDataFlavors())) {
+                    @SuppressWarnings("unchecked")
+                    final List<TradeRouteStop> stops = (List<TradeRouteStop>) data.getTransferData(STOP_FLAVOR);
+                    
+                    final DefaultListModel<TradeRouteStop> newModel = new DefaultListModel<>();
+                    final int targetIndex = stl.getMaxSelectionIndex();
+                    
+                    final List<TradeRouteStop> oldList = getAllValues(stl);
+                    if (targetIndex < 0) {
+                        oldList.removeAll(stops);
+                        newModel.addAll(oldList);
+                        newModel.addAll(stops);
                     } else {
-                        index++;
-                        model.add(index, stop);
+                        final List<TradeRouteStop> beforeList = new ArrayList<>(oldList.subList(0, targetIndex));
+                        beforeList.removeAll(stops);
+                        
+                        final List<TradeRouteStop> afterList = new ArrayList<>(oldList.subList(targetIndex, oldList.size()));
+                        afterList.removeAll(stops);
+                        
+                        newModel.addAll(beforeList);
+                        newModel.addAll(stops);
+                        newModel.addAll(afterList);
                     }
+                    
+                    stopListModel = newModel;
+                    stl.setModel(newModel);
+                    if (targetIndex < 0) {
+                        stl.setSelectedIndex(newModel.getSize() - 1);
+                    } else {
+                        stl.setSelectedIndex(targetIndex);
+                    }
+                    stl.invalidate();
+                    stl.repaint();
+                    
+                    return true;
                 }
-                stl.setModel(model);
-                return true;
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Drag&drop failed.", e);
+                return false;
+            } catch (UnsupportedFlavorException e) {
+                logger.log(Level.WARNING, "Drag&drop failed.", e);
+                return false;
+            } catch (RuntimeException e) {
+                logger.log(Level.WARNING, "Drag&drop failed.", e);
+                throw e;
             }
             return false;
+        }
+
+        private List<TradeRouteStop> getAllValues(final JList<TradeRouteStop> jList) {
+            final List<TradeRouteStop> oldList = new ArrayList<>();
+            for (int i=0; i<jList.getModel().getSize(); i++) {
+                oldList.add(jList.getModel().getElementAt(i));
+            }
+            return oldList;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        protected void exportDone(JComponent source, Transferable data,
-                                  int action) {
-            try {
-                if (source instanceof JList && action == MOVE) {
-                    JList stopList = (JList)source;
-                    DefaultListModel listModel
-                        = (DefaultListModel)stopList.getModel();
-                    for (Object o : (List) data.getTransferData(STOP_FLAVOR)) {
-                        listModel.removeElement(o);
-                    }
-                }
-            } catch (Exception e) {
-                logger.warning(e.toString());
-            }
+        protected void exportDone(JComponent source, Transferable data, int action) {
         }
     }
 
@@ -322,9 +353,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
         private final JPanel NORMAL_COMPONENT = new JPanel();
 
         public StopRenderer() {
-            NORMAL_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
+            NORMAL_COMPONENT.setLayout(new MigLayout("", "[center][]"));
             NORMAL_COMPONENT.setOpaque(false);
-            SELECTED_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
+            SELECTED_COMPONENT.setLayout(new MigLayout("", "[center][]"));
             SELECTED_COMPONENT.setOpaque(false);
             SELECTED_COMPONENT.setUI((PanelUI)FreeColSelectedPanelUI
                 .createUI(SELECTED_COMPONENT));
@@ -354,7 +385,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 TradeLocation tl = (TradeLocation) location;
                 if (tl.canBeInput() == true) {
                     name = tl.getNameAsJlabel();
-                } else {
+                } else   {
                     throw new IllegalStateException("Bogus location: " + location);
                 }
             } else {
@@ -370,7 +401,12 @@ public final class TradeRouteInputPanel extends FreeColPanel
             } else {
                 throw new IllegalStateException("Bogus location: " + location);
             }
-            panel.add(new JLabel(ii), "spany");
+            
+            name.setVerticalTextPosition(SwingConstants.CENTER);
+            
+            final int width = (int) (80 * getImageLibrary().getScaleFactor());
+            final int height = (int) (60 * getImageLibrary().getScaleFactor());
+            panel.add(new JLabel(ii), "spany, width " + width + ", height " + height);
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
                 ii = new ImageIcon(lib.getSmallerGoodsTypeImage(cargo));
@@ -447,7 +483,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         this.stopList = new JList<>(this.stopListModel);
         this.stopList.setCellRenderer(new StopRenderer());
-        this.stopList.setFixedCellHeight(48);
         this.stopList.setDragEnabled(true);
         this.stopList.setTransferHandler(new StopListHandler());
         this.stopList.addKeyListener(new KeyListener() {
@@ -531,7 +566,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
         add(this.addStopButton);
         add(this.removeStopButton, "span");
         add(this.allGoodsTypesPanel, "span");
-        add(this.stopGoodsTypesPanel, "span, height 80:, growy");
+        
+        final int iconHeight = (int) (80 * getImageLibrary().getScaleFactor());
+        add(this.stopGoodsTypesPanel, "span, height " + iconHeight + "px:, growy");
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
 
