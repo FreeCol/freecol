@@ -68,7 +68,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             }
         }
 
-        gen.generateMap(g, null, new LogBuilder(-1));
+        gen.generateMap(g, null, true, new LogBuilder(-1));
         assertNotNull("New map", g.getMap());
     }
 
@@ -86,7 +86,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         g.addPlayer(new ServerPlayer(g, false, nation));
 
-        gen.generateMap(g, null, new LogBuilder(-1));
+        gen.generateMap(g, null, true, new LogBuilder(-1));
         assertNotNull("New map", g.getMap());
 
         // Check that the map is created at all
@@ -112,7 +112,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         //spec().applyDifficultyLevel("model.difficulty.medium");
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
-        gen.generateMap(g, null, new LogBuilder(-1));
+        gen.generateMap(g, null, true, new LogBuilder(-1));
         assertNotNull("New map", g.getMap());
 
         // Map of correct size?
@@ -156,7 +156,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.generateMap(g, null, new LogBuilder(-1));
+        gen.generateMap(g, null, true, new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -206,7 +206,7 @@ public class MapGeneratorTest extends FreeColTestCase {
                     + ex.toString());
             }
             try {
-                assertNotNull(gen.generateMap(game, importMap,
+                assertNotNull(gen.generateMap(game, importMap, true,
                                               new LogBuilder(-1)));
             } catch (Exception ex) {
                 fail("Map generate of " + importFile.getName() + " failed: "
@@ -221,7 +221,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
         Game game = getStandardGame();
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
-        gen.generateMap(game, null, new LogBuilder(-1));
+        gen.generateMap(game, null, true, new LogBuilder(-1));
         
         Map map = game.getMap();
         Region pacific = map.getRegionByKey("model.region.pacific");

@@ -1123,7 +1123,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * {@inheritDoc}
      */
     @Override
-    public Map generateMap(Game game, Map importMap, LogBuilder lb) {
+    public Map generateMap(Game game, Map importMap, boolean generateEuropeanPlayerUnits, LogBuilder lb) {
         // Create land map.
         LandMap landMap = (importMap != null)
             ? new LandMap(importMap, this.cache)
@@ -1136,7 +1136,9 @@ public class SimpleMapGenerator implements MapGenerator {
         // Decorate the map.
         makeNativeSettlements(map, importMap, lb);
         makeLostCityRumours(map, importMap, lb);
-        createEuropeanUnits(map, game.getLiveEuropeanPlayerList(), lb);
+        if (generateEuropeanPlayerUnits) {
+            createEuropeanUnits(map, game.getLiveEuropeanPlayerList(), lb);
+        }
         lb.shrink("\n");
         return map;
     }

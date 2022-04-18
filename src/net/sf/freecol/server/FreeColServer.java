@@ -1193,7 +1193,7 @@ public final class FreeColServer {
 
         // Create the map.
         if (serverGame.getMap() == null) {
-            generateMap();
+            generateMap(true);
         
             // Initial stances and randomizations for all players.
             spec.generateDynamicOptions();
@@ -1243,9 +1243,10 @@ public final class FreeColServer {
     /**
      * Generate a new map in this server/game.
      *
+     * @param generateEuropeanPlayerUnits If {@code true}, then the european player units are generated.
      * @return The {@code Map} that was created.
      */
-    public Map generateMap() {
+    public Map generateMap(boolean generateEuropeanPlayerUnits) {
         ServerGame serverGame = getGame();
         LogBuilder lb = new LogBuilder(256);
         File importFile = serverGame.getMapGeneratorOptions()
@@ -1260,7 +1261,7 @@ public final class FreeColServer {
                     + importFile.getName(), ex);
             }
         }
-        Map ret = getMapGenerator().generateMap(serverGame, importMap, lb);
+        Map ret = getMapGenerator().generateMap(serverGame, importMap, generateEuropeanPlayerUnits, lb);
         lb.shrink("\n");
         lb.log(logger, Level.FINER);
         return ret;

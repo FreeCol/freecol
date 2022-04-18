@@ -52,7 +52,7 @@ public class MockMapGenerator implements MapGenerator {
     /**
      * {@inheritDoc}
      */
-    public Map generateMap(Game game, Map importMap, LogBuilder lb) {
+    public Map generateMap(Game game, Map importMap, boolean generateEuropeanPlayerUnits, LogBuilder lb) {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
