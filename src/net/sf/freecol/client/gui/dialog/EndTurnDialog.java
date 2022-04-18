@@ -20,8 +20,10 @@
 package net.sf.freecol.client.gui.dialog;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,6 +38,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.PanelUI;
@@ -94,21 +98,8 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
     private class UnitCellRenderer implements ListCellRenderer<UnitWrapper> {
 
-        private final JPanel itemPanel
-            = new MigPanel(new MigLayout("", "[60]"));
-        private final JPanel selectedPanel
-            = new MigPanel(new MigLayout("", "[60]"));
-        private final JLabel imageLabel = new JLabel();
-        private final JLabel nameLabel = new JLabel();
-        private final JLabel locationLabel = new JLabel();
-
-
         public UnitCellRenderer() {
-            itemPanel.setOpaque(false);
-            selectedPanel.setOpaque(false);
-            selectedPanel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(selectedPanel));
-            locationLabel.setFont(locationLabel.getFont()
-                .deriveFont(Font.ITALIC));
+            
         }
 
 
@@ -121,17 +112,50 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            imageLabel.setIcon(new ImageIcon(
-                getImageLibrary().getSmallerUnitImage(value.unit)));
+            final JLabel imageLabel = new JLabel();
+            imageLabel.setIcon(new ImageIcon(getImageLibrary().getSmallerUnitImage(value.unit)));
+            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            final JLabel nameLabel = new JLabel();
             nameLabel.setText(value.name);
+            
+            final JLabel locationLabel = new JLabel();
+            locationLabel.setFont(locationLabel.getFont().deriveFont(Font.ITALIC));
             locationLabel.setText(value.location);
-
-            JPanel panel = (isSelected) ? selectedPanel : itemPanel;
-            panel.removeAll();
-            panel.add(imageLabel, "center, width 40!, height 40!");
-            panel.add(nameLabel, "split 2, flowy");
-            panel.add(locationLabel);
+            
+            final JPanel panel;
+            if (isSelected) {
+                panel = new MigPanel(new MigLayout("", "[fill]"));
+                panel.setOpaque(false);
+                panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
+            } else {
+                panel = new MigPanel(new MigLayout("", "[fill]"));
+                panel.setOpaque(false);
+            }
+            
+            final Dimension largestIconSize = largestIconSize(list);
+            panel.add(imageLabel, "center, width " + largestIconSize.width + "px!, height " + largestIconSize.height + "px!");
+            panel.add(nameLabel, "split 2, flowy, grow");
+            panel.add(locationLabel, "grow");
+            
             return panel;
+        }
+        
+        private Dimension largestIconSize(JList<? extends UnitWrapper> list) {
+            final ListModel<? extends UnitWrapper> model = list.getModel();
+            int largestWidth = 0;
+            int largestHeight = 0;
+            for (int i=0; i<model.getSize(); i++) {
+                final UnitWrapper value = model.getElementAt(i);
+                final BufferedImage image = getImageLibrary().getSmallerUnitImage(value.unit);
+                if (image.getWidth() > largestWidth) {
+                    largestWidth = image.getWidth();
+                }
+                if (image.getHeight() > largestHeight) {
+                    largestHeight = image.getHeight(); 
+                }
+            }
+            return new Dimension(largestWidth, largestHeight);
         }
     }
 
@@ -165,7 +189,6 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
         this.unitList = new JList<>(model);
         this.unitList.setCellRenderer(new UnitCellRenderer());
-        this.unitList.setFixedCellHeight(48);
         this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),
                                         "select");
         this.unitList.getActionMap().put("select", new AbstractAction() {
@@ -192,7 +215,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         JScrollPane listScroller = new JScrollPane(this.unitList);
 
         JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
-                                                  "[400, align center]"));
+                                                  "[align center]"));
         panel.add(header);
         panel.add(text, "newline 20");
         panel.add(listScroller, "newline 10");
