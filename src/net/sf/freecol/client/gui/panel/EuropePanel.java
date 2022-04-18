@@ -757,7 +757,10 @@ public final class EuropePanel extends PortPanel {
         Unit u = europe.getLastUnit();
         if (u == null) setSelectedUnitLabel(null); else setSelectedUnit(u);
 
-        getGUI().restoreSavedSize(this, new Dimension(1050, 725));
+        final int width = getImageLibrary().scaleInt(1050);
+        final int height = getImageLibrary().scaleInt(725);
+        
+        getGUI().restoreSavedSize(this, new Dimension(width, height));
     }
 
     /**

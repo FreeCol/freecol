@@ -107,7 +107,9 @@ public final class ColopediaPanel extends FreeColPanel
         
         select(id);
 
-        getGUI().restoreSavedSize(this, new Dimension(1050, 725));
+        final int width = getImageLibrary().scaleInt(1050);
+        final int height = getImageLibrary().scaleInt(725);
+        getGUI().restoreSavedSize(this, new Dimension(width, height));
         
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sl, detail);
 
