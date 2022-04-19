@@ -576,6 +576,14 @@ public class SwingGUI extends GUI {
     public void refreshTile(Tile tile) {
         if (tile != null) {
             mapViewer.getMapViewerRepaintManager().markAsDirty(tile);
+            
+            /*
+             * XXX: Find a better way to support updating the "modern" settlement label:
+             */
+            if (tile.hasSettlement()) {
+                mapViewer.getMapViewerRepaintManager().markAsDirty(tile.getSurroundingTiles(1, 1));
+            }
+            
             this.canvas.repaint();
         }
     }
@@ -1347,8 +1355,7 @@ public class SwingGUI extends GUI {
             refresh();
         }
     }
-
-
+    
     // Highest level panel and dialog handling
 
     /**

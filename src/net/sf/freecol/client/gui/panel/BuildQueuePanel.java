@@ -1035,6 +1035,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             }
         }
         getGUI().removeComponent(this);
+        getGUI().refreshTile(colony.getTile()); // Update the "modern" colony label.
     }
 
 
