@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel.colopedia;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,6 +42,7 @@ import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -139,8 +141,9 @@ public class ConceptDetailPanel extends FreeColPanel
         for (String concept : concepts) {
             String nodeId = "colopedia.concepts." + concept;
             String nodeName = Messages.getName(nodeId);
+            final BufferedImage image = ImageUtils.createCenteredImage(getImageLibrary().getColopediaConceptImage(), colopediaPanel.getListItemIconSize());
             nodes.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this,
-                        nodeId, nodeName, new ImageIcon(ImageLibrary.getColopediaConceptImage()))));
+                        nodeId, nodeName, new ImageIcon(image))));
         }
         Collections.sort(nodes, nodeComparator);
         for (DefaultMutableTreeNode n : nodes) {

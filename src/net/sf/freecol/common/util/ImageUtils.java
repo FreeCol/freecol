@@ -221,6 +221,38 @@ public class ImageUtils {
         g2d.setPaint(paint);
         g2d.fillRect(x, y, width, height);
     }
+    
+    /**
+     * Creates a new image of the given size with the provided image centered.
+     * 
+     * @param image The image to be drawn in the center (both vertically and horizontally) of
+     *      the new image. 
+     * @param size The size of the new image.
+     * @return A new image. 
+     */
+    public static BufferedImage createCenteredImage(BufferedImage image, Dimension size) {
+        return createCenteredImage(image, size.width, size.height);
+    }
+    
+    /**
+     * Creates a new image of the given size with the provided image centered.
+     * 
+     * @param image The image to be drawn in the center (both vertically and horizontally) of
+     *      the new image. 
+     * @param width The width of the new image.
+     * @param height The height of the new image.
+     * @return A new image. 
+     */
+    public static BufferedImage createCenteredImage(BufferedImage image, int width, int height) {
+        final int x = (width - image.getWidth(null)) / 2;
+        final int y = (height - image.getHeight(null)) / 2;
+        
+        final BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = centeredImage.createGraphics();
+        g.drawImage(image, x, y, null);
+        g.dispose();
+        return centeredImage;
+    }
 
     /**
      * Given a dimension with potential wildcard (non-positive) parts,

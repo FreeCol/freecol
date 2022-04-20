@@ -40,6 +40,7 @@ import javax.swing.tree.TreePath;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -154,7 +155,7 @@ public final class ColopediaPanel extends FreeColPanel
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel);
         tree.setRootVisible(false);
-        tree.setCellRenderer(new ColopediaTreeCellRenderer());
+        tree.setCellRenderer(new ColopediaTreeCellRenderer(this, getImageLibrary()));
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
 
@@ -165,6 +166,16 @@ public final class ColopediaPanel extends FreeColPanel
             nodeMap.put(item.getId(), node);
         }
         return tree;
+    }
+    
+    /**
+     * Gets the preferred size for the list item images in the colopedia tree.
+     */
+    public Dimension getListItemIconSize() {
+        final int width = getImageLibrary().scaleInt(ImageLibrary.ICON_SIZE.width * 3 / 2);
+        final int height = getImageLibrary().scaleInt(ImageLibrary.ICON_SIZE.height);
+        
+        return new Dimension(width, height);
     }
 
     /**

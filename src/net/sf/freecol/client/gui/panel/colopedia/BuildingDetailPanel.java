@@ -26,6 +26,7 @@ import static net.sf.freecol.common.util.CollectionUtils.iterable;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,6 +57,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -94,12 +96,14 @@ public class BuildingDetailPanel
                  : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.getName(buildingType);
+                final Dimension listItemIconSize = getListItemIconSize();
+                final BufferedImage buildingTypeImage = getImageLibrary().getBuildingTypeImage(buildingType, new Dimension(-1, listItemIconSize.height));
+                final BufferedImage centeredImage = ImageUtils.createCenteredImage(buildingTypeImage, listItemIconSize);
+                
                 DefaultMutableTreeNode item =
                     new DefaultMutableTreeNode(new ColopediaTreeItem(
                         this, buildingType.getId(), name,
-                        new ImageIcon(getImageLibrary()
-                            .getBuildingTypeImage(buildingType,
-                                new Dimension(-1, ImageLibrary.ICON_SIZE.height)))));
+                        new ImageIcon(centeredImage)));
                 buildingHash.put(buildingType, item);
                 parent.add(item);
             } else {
@@ -108,18 +112,21 @@ public class BuildingDetailPanel
         }
 
         while (!buildingTypes.isEmpty()) {
-            Iterator<BuildingType> iterator = buildingTypes.iterator();
+            final Iterator<BuildingType> iterator = buildingTypes.iterator();
             while (iterator.hasNext()) {
-                BuildingType buildingType = iterator.next();
-                DefaultMutableTreeNode node = buildingHash.get(buildingType.getUpgradesFrom());
+                final BuildingType buildingType = iterator.next();
+                final DefaultMutableTreeNode node = buildingHash.get(buildingType.getUpgradesFrom());
                 if (node != null) {
                     String name = Messages.getName(buildingType);
-                    DefaultMutableTreeNode item =
+                    final Dimension listItemIconSize = getListItemIconSize();
+                    final BufferedImage buildingTypeImage = getImageLibrary().getBuildingTypeImage(buildingType, new Dimension(-1, listItemIconSize.height));
+                    final BufferedImage centeredImage = ImageUtils.createCenteredImage(buildingTypeImage, listItemIconSize);
+                    
+                    final DefaultMutableTreeNode item =
                         new DefaultMutableTreeNode(new ColopediaTreeItem(
                             this, buildingType.getId(), name,
-                            new ImageIcon(getImageLibrary()
-                                .getBuildingTypeImage(buildingType,
-                                    new Dimension(-1, ImageLibrary.ICON_SIZE.height)))));
+                            new ImageIcon(centeredImage)));
+                        
                     node.add(item);
                     buildingHash.put(buildingType, item);
                     iterator.remove();

@@ -21,6 +21,8 @@ package net.sf.freecol.client.gui.panel.colopedia;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.image.BufferedImage;
+
 import javax.swing.ImageIcon;
 
 import javax.swing.JTree;
@@ -28,6 +30,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -36,10 +39,17 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
 
+    private final ColopediaPanel colopediaPanel;
+    private final ImageLibrary lib;
+    
+    
     /**
      * The constructor makes sure that the backgrounds are transparent.
      */
-    public ColopediaTreeCellRenderer() {
+    public ColopediaTreeCellRenderer(ColopediaPanel colopediaPanel, ImageLibrary lib) {
+        this.colopediaPanel = colopediaPanel;
+        this.lib = lib;
+        
         setBackgroundNonSelectionColor(new Color(0,0,0,1));
     }
 
@@ -59,8 +69,8 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
         if (nodeItem.getIcon() != null) {
             setIcon(nodeItem.getIcon());
         } else if (!leaf) {
-            setIcon(new ImageIcon(ImageLibrary
-                    .getColopediaCellImage(expanded)));
+            final BufferedImage image = ImageUtils.createCenteredImage(lib.getColopediaCellImage(expanded), colopediaPanel.getListItemIconSize());
+            setIcon(new ImageIcon(image));
         }
         return this;
     }

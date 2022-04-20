@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.util.ImageUtils;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
@@ -85,7 +86,7 @@ public class FatherDetailPanel
         for (FoundingFather foundingFather : spec.getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
-        ImageIcon icon = new ImageIcon(getImageLibrary().getLibertyImage());
+        ImageIcon icon = new ImageIcon(ImageUtils.createCenteredImage(getImageLibrary().getLibertyImage(), getListItemIconSize()));
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = fatherType.getTypeKey();
             String typeName = Messages.message(id);

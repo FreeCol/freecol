@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -76,17 +77,9 @@ public class TerrainDetailPanel
             = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
                                          getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            BufferedImage tileImage
-                = getImageLibrary().getTileImageWithOverlayAndForest(t,
-                    new Dimension(-1, ImageLibrary.ICON_SIZE.height));
-            BufferedImage image = new BufferedImage(tileImage.getWidth(null),
-                ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = image.createGraphics();
-            g.drawImage(tileImage, 0,
-                (ImageLibrary.ICON_SIZE.height - tileImage.getHeight(null)) / 2,
-                null);
-            g.dispose();
-            ImageIcon icon = new ImageIcon(image);
+            final Dimension size = getListItemIconSize();
+            final BufferedImage tileImage = getImageLibrary().getTileImageWithOverlayAndForest(t, new Dimension(-1, size.height));
+            final ImageIcon icon = new ImageIcon(ImageUtils.createCenteredImage(tileImage, size));
             node.add(buildItem(t, icon));
         }
         root.add(node);

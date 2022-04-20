@@ -534,14 +534,14 @@ public final class ImageLibrary {
             : getUnscaledImage(key);
     }
 
-    public static BufferedImage getColopediaCellImage(boolean expanded) {
+    public BufferedImage getColopediaCellImage(boolean expanded) {
         final String key = "image.icon.Colopedia."
             + ((expanded) ? "open" : "closed") + "Section";
-        return getUnscaledImage(key);
+        return getScaledImage(key);
     }
     
-    public static BufferedImage getColopediaConceptImage() {
-        return getUnscaledImage("image.icon.Colopedia.idea");
+    public BufferedImage getColopediaConceptImage() {
+        return getScaledImage("image.icon.Colopedia.idea");
     }
 
     public static BufferedImage getColorCellRendererBackground() {
@@ -606,7 +606,7 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getLibertyImage() {
-        return this.imageCache.getSizedImage(BELLS, ICON_SIZE, false);
+        return this.imageCache.getSizedImage(BELLS, scale(ICON_SIZE), false);
     }
 
     public static BufferedImage getListBackground() {
@@ -685,7 +685,7 @@ public final class ImageLibrary {
      * @return The appropriate {@code BufferedImage}.
      */
     public BufferedImage getObjectImage(FreeColObject display) {
-        return getObjectImageInternal(display, scale(ICON_SIZE, scaleFactor));
+        return getObjectImageInternal(display, scale(ICON_SIZE));
     }
 
     /**

@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.ImageUtils;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -86,7 +87,7 @@ public class NationTypeDetailPanel
         nations.addAll(getSpecification().getEuropeanNationTypes());
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
-        ImageIcon icon = new ImageIcon(getImageLibrary().getLibertyImage());
+        ImageIcon icon = new ImageIcon(ImageUtils.createCenteredImage(getImageLibrary().getLibertyImage(), getListItemIconSize()));
         for (NationType type : nations) {
             // Suppress special case.  FIXME: This is a kludge
             if ("model.nationType.optionOnly".equals(type.getId())) continue;
