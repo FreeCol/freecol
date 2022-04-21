@@ -72,14 +72,14 @@ public class FreeColCheckBoxUI extends MetalCheckBoxUI {
     }
     
     private static class CheckBoxIcon implements Icon, UIResource, Serializable {
-        private final int mainFontSize = FontLibrary.getMainFont().getSize(); 
         
         protected int getWidgetSize() {
-            return mainFontSize * 3 / 2;
+            return FontLibrary.getMainFont().getSize() * 3 / 2;
         }
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
             final Graphics2D g2d = (Graphics2D) g;
+            final int mainFontSize = FontLibrary.getMainFont().getSize();
             
             final ButtonModel model = ((JCheckBox) c).getModel();
             final int widgetSize = getWidgetSize();
