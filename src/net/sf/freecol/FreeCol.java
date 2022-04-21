@@ -27,7 +27,6 @@ import static net.sf.freecol.common.util.StringUtils.upCase;
 
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +93,18 @@ import net.sf.freecol.server.control.Controller;
  * @see net.sf.freecol.server.FreeColServer FreeColServer
  */
 public final class FreeCol {
+	
+    static {
+    	/*
+         * Deactivate automatic UI scaling since we are solving it manually instead.
+         * 
+         * This needs to be done before any Swing/AWT class gets loaded. Please keep
+         * this static block right here at the top.
+         */
+    	
+        System.setProperty("sun.java2d.uiScale", "1.0");
+        System.setProperty("sun.java2d.uiScale.enabled", "false");
+    }
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
@@ -1477,13 +1488,6 @@ public final class FreeCol {
      * Start a client.
      */
     private static void startClient() {
-        /*
-         * Deactivate automatic UI scaling since we are solving it
-         * manually instead.
-         */
-        System.setProperty("sun.java2d.uiScale", "1.0");
-        System.setProperty("sun.java2d.uiScale.enabled", "false");
-
         SwingUtilities.invokeLater(() -> {
             /*
              * Please do NOT move the splash screen into SwingGUI again. Make a separate

@@ -20,20 +20,21 @@
 package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Font;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIDefaults;
+import javax.swing.UIDefaults.LazyValue;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIDefaults.LazyValue;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalIconFactory;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.FreeColException;
 
 
 /**
@@ -236,8 +237,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
      * @param defaultFont A {@code Font} to use by default.
      */
     public static void installFont(Font defaultFont) {
-        UIDefaults u = UIManager.getDefaults();
-        for (Object key : u.keySet()) {
+        final UIDefaults u = UIManager.getLookAndFeelDefaults();
+        final Set<Object> keySet = new HashSet<>(u.keySet());
+        for (Object key : keySet) {
             if (u.get(key) instanceof javax.swing.plaf.FontUIResource) {
                 u.put(key, defaultFont);
             } else if (u.get(key) instanceof Font) {
