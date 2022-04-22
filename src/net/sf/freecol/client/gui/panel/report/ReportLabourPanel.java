@@ -78,6 +78,7 @@ public final class ReportLabourPanel extends ReportPanel {
                 "spany 2");
             add(new JLabel(Messages.getName(unitType)));
             add(new JLabel(Integer.toString(count)));
+            setPreferredSize(getPreferredSize());
         }
 
 
@@ -215,6 +216,12 @@ public final class ReportLabourPanel extends ReportPanel {
     private void showDetails() {
         UnitType unitType = panelList.getSelectedValue()
             .unitType;
+        
+        if (unitCount.getCount(unitType) == 0) {
+            // No details to be displayed: Ignore.
+            return;
+        }
+        
         getGUI().showReportLabourDetailPanel(unitType, this.data,
                                              this.unitCount, this.colonies);
     }
