@@ -2455,7 +2455,7 @@ public class SwingGUI extends GUI {
             }
             panel.initialize(singlePlayerMode);
             return this.canvas.showFreeColPanel(panel,
-                PopupPosition.CENTERED, false);
+                PopupPosition.CENTERED, true);
         }
         return null;
     }
