@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.mapviewer.GUIMessage;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
@@ -676,6 +677,7 @@ public class SwingGUI extends GUI {
         final int dpi = Utils.determineDpi(graphicsDevice);
         final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
         FontLibrary.setMainFontSize(fontSize);
+        FreeColImageBorder.setScaleFactor(fixedImageLibrary.getScaleFactor());
         
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
@@ -1355,7 +1357,8 @@ public class SwingGUI extends GUI {
             refresh();
         }
     }
-    
+
+
     // Highest level panel and dialog handling
 
     /**
@@ -1701,6 +1704,8 @@ public class SwingGUI extends GUI {
         if (this.tileViewer != null) {
             this.tileViewer.updateScaledVariables();
         }
+        
+        FreeColImageBorder.setScaleFactor(scaleFactor);
         
         final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
         FontLibrary.setMainFontSize(fontSize);

@@ -22,11 +22,14 @@ package net.sf.freecol.client.gui.panel;
 import static net.sf.freecol.common.util.ImageUtils.fillTexture;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.border.AbstractBorder;
 
@@ -39,29 +42,91 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class FreeColImageBorder extends AbstractBorder {
 
+    private static final List<FreeColImageBorder> borders = new ArrayList<>();
+    
     public static final FreeColImageBorder panelWithoutShadowBorder = new FreeColImageBorder("image.border.panel.noshadow");
     public static final FreeColImageBorder panelBorder = new FreeColImageBorder("image.border.panel");    
     public static final FreeColImageBorder buttonBorder = new FreeColImageBorder("image.border.button");
     public static final FreeColImageBorder simpleButtonBorder = new FreeColImageBorder("image.border.button.simple");
-    public static final FreeColImageBorder menuBarBorder = new FreeColImageBorder("image.border.menu");
+    public static final FreeColImageBorder menuBarBorder = new FreeColImageBorder("image.border.menu", true);
 
-
-    // The buffered image objects
-    private final BufferedImage topLeftCornerImage;
-    private final BufferedImage topImage;
-    private final BufferedImage topRightCornerImage;
-    private final BufferedImage rightImage;
-    private final BufferedImage bottomRightCornerImage;
-    private final BufferedImage bottomImage;
-    private final BufferedImage bottomLeftCornerImage;
-    private final BufferedImage leftImage;
-
+    private static float scaleFactor = 1;
+    
+    /**
+     * The key used for getting the image resources.
+     */
+    private final String baseKey;
+    
+    /**
+     * If true, no scaling to the border is applied.
+     */
+    private final boolean noScaling;
+    
+    private boolean initialized = false;
 
     /**
-     * Creates the default border.
+     * NW-corner
      */
-    public FreeColImageBorder(String baseKey) {
-        this(getImage(baseKey + ".nw"),
+    private BufferedImage topLeftCornerImage;
+    
+    /**
+     * N-border
+     */
+    private BufferedImage topImage;
+    
+    /**
+     * NE-corner
+     */
+    private BufferedImage topRightCornerImage;
+    
+    /**
+     * E-border
+     */
+    private BufferedImage rightImage;
+    
+    /**
+     * SE-corner
+     */
+    private BufferedImage bottomRightCornerImage;
+    
+    /**
+     * S-border
+     */
+    private BufferedImage bottomImage;
+    
+    /**
+     * SW-corner
+     */
+    private BufferedImage bottomLeftCornerImage;
+    
+    /**
+     * W-border
+     */
+    private BufferedImage leftImage;
+
+
+    private FreeColImageBorder(String baseKey) {
+        this(baseKey, false);
+    }
+    
+
+    private FreeColImageBorder(String baseKey, boolean noScaling) {
+        this.baseKey = baseKey;
+        this.noScaling = noScaling;
+        
+        loadImages();
+        borders.add(this);
+    }
+
+    
+    private void ensureInitialized() {
+        if (!initialized) {
+            loadImages();
+        }
+    }
+
+    private void loadImages() {
+        loadImages(getImage(baseKey + ".nw"),
                 getImage(baseKey + ".n"),
                 getImage(baseKey + ".ne"),
                 getImage(baseKey + ".e"),
@@ -69,13 +134,11 @@ public class FreeColImageBorder extends AbstractBorder {
                 getImage(baseKey + ".s"),
                 getImage(baseKey + ".sw"),
                 getImage(baseKey + ".w"));
+        initialized = true;
     }
 
-
     /**
-     * Creates a border with the given set of images.
-     * Needs {@code BufferedImage} objects, because the images will
-     * be used as Textures for the border.
+     * Loads the images for the border.
      *
      * @param topLeftCornerImage NW-corner
      * @param topImage N-border
@@ -86,7 +149,7 @@ public class FreeColImageBorder extends AbstractBorder {
      * @param bottomLeftCornerImage SW-corner
      * @param leftImage W-border
      */
-    private FreeColImageBorder(BufferedImage topLeftCornerImage,
+    private void loadImages(BufferedImage topLeftCornerImage,
                                BufferedImage topImage,
                                BufferedImage topRightCornerImage,
                                BufferedImage rightImage,
@@ -101,16 +164,33 @@ public class FreeColImageBorder extends AbstractBorder {
         this.bottomRightCornerImage = bottomRightCornerImage;
         this.bottomImage = bottomImage;
         this.bottomLeftCornerImage = bottomLeftCornerImage;
-        this.leftImage = leftImage;
+        this.leftImage = leftImage;      
     }
     
+    public static void setScaleFactor(float scaleFactor) {
+        FreeColImageBorder.scaleFactor = scaleFactor;
+        reloadAllImages();
+    }
     
-    private static BufferedImage getImage(String key) {
+    private static void reloadAllImages() {
+        borders.stream().forEach(FreeColImageBorder::loadImages);
+    }
+
+
+    private BufferedImage getImage(String key) {
         final ImageResource ir = ResourceManager.getImageResource(key, false);
         if (ir == null) {
             return null;
         }
-        return ir.getImage();
+        final BufferedImage image = ir.getImage();
+        if (noScaling) {
+            return image;
+        }
+        final Dimension scaledDimensions = new Dimension(
+            (int) Math.round(image.getWidth() * scaleFactor),
+            (int) Math.round(image.getHeight() * scaleFactor)
+        );
+        return ir.getImage(scaledDimensions, false);
     }
 
     /**
@@ -121,6 +201,7 @@ public class FreeColImageBorder extends AbstractBorder {
      */    
     @Override
     public Insets getBorderInsets(Component c) {
+        ensureInitialized();
         return getBorderInsets(c, null);
     }
 
@@ -133,7 +214,8 @@ public class FreeColImageBorder extends AbstractBorder {
      *      {@code null}, or a new instance otherwise.
      */
     @Override
-    public Insets getBorderInsets(Component c, Insets insets) {        
+    public Insets getBorderInsets(Component c, Insets insets) {
+        ensureInitialized();
         int top = Math.max(Math.max(getHeight(topImage),
                 getHeight(topLeftCornerImage)),
             getHeight(topRightCornerImage));
@@ -183,6 +265,8 @@ public class FreeColImageBorder extends AbstractBorder {
      */
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+        ensureInitialized();
+        
         Insets insets = getBorderInsets(c);
         Graphics2D g2 = (Graphics2D) g;
 
