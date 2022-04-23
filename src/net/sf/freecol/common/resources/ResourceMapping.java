@@ -292,6 +292,10 @@ public final class ResourceMapping {
         return ret;
     }
     
+    public void clearCaches() {
+        imageResources.values().stream().forEach(r -> r.clean());
+    }
+    
     public interface PreloadController {
         boolean shouldContinue();
     }

@@ -50,6 +50,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
@@ -115,6 +116,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ImageCache;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.Utils;
 
@@ -1357,6 +1359,22 @@ public class SwingGUI extends GUI {
             refresh();
         }
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reloadResources() {
+        ResourceManager.reload();
+        imageCache.clear();
+        refresh();
+    }
+    
+    public void prepareResources() {
+        ResourceManager.prepare();
+        imageCache.clear();
+        refresh();
+    }
 
 
     // Highest level panel and dialog handling
@@ -1706,6 +1724,9 @@ public class SwingGUI extends GUI {
         }
         
         FreeColImageBorder.setScaleFactor(scaleFactor);
+        
+        ResourceManager.setMods(getClientOptions().getActiveMods());
+        prepareResources();
         
         final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
         FontLibrary.setMainFontSize(fontSize);

@@ -210,10 +210,10 @@ public final class FreeColClient {
         // Not so easy, since the ActionManager also creates tile
         // improvement actions, which depend on the specification.
         // However, this step could probably be delayed.
-        ResourceManager.addMapping("base", baseData.getResourceMapping());
+        ResourceManager.setBaseData(baseData);
         
         FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
-        ResourceManager.addMapping("tc", tcData.getResourceMapping());
+        ResourceManager.setTcData(tcData);
 
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
@@ -224,10 +224,7 @@ public final class FreeColClient {
         this.clientOptions.fixClientOptions();
 
         // Reset the mod resources as a result of the client option update.
-        for (FreeColModFile f : this.clientOptions.getActiveMods()) {
-            ResourceManager.addMapping("mod " + f.getId(),
-                                       f.getResourceMapping());
-        }
+        ResourceManager.setMods(this.clientOptions.getActiveMods());
         
         /*
          * All mods are loaded, so the GUI can safely be created.
@@ -884,7 +881,7 @@ public final class FreeColClient {
         setFreeColServer(fcs);
         setSinglePlayer(singlePlayer);
         this.inGameController.setGameConnected();
-        ResourceManager.addMapping("game", fsg.getResourceMapping());
+        ResourceManager.setSavegameFile(fsg);
         return fcs;
     }
     

@@ -56,7 +56,8 @@ public class SoundTest extends FreeColTestCase {
         } catch (Exception e) {
             fail("Could not load base data: " + e.getMessage());
         }
-        ResourceManager.addMapping("testbase", baseData.getResourceMapping());
+        ResourceManager.setBaseData(baseData);
+        ResourceManager.prepare();
     }
 
     @Override
@@ -86,7 +87,8 @@ public class SoundTest extends FreeColTestCase {
 
     public void testClassic() {
         FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
-        ResourceManager.addMapping("testtc", tcData.getResourceMapping());
+        ResourceManager.setTcData(tcData);
+        ResourceManager.prepare();
 
         playSound("sound.intro.model.nation.english");
         playSound("sound.intro.model.nation.dutch");

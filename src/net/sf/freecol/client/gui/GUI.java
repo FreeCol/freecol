@@ -2483,4 +2483,11 @@ public class GUI extends FreeColClientHolder {
      * @return The panel shown.
      */
     public FreeColPanel showWorkProductionPanel(Unit unit) { return null; }
+
+    /**
+     * Reloads all images managed by {@code ResourceManager}.
+     */
+    public void reloadResources() {
+
+    }
 }

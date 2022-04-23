@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
@@ -442,6 +443,11 @@ public final class ConnectController extends FreeColClientHolder {
                                             port, serverName);
         if (fcs == null) return false;
 
+        /*
+         * TODO: The choice of active mods with a specification should be stored in the savegame.
+         *       These mods should also be loaded in the ResourceManager (after global mods without
+         *       a specification).
+         */
         fcs.getGame().getSpecification().loadMods(options.getActiveMods());
 
         fcc.setFreeColServer(fcs);

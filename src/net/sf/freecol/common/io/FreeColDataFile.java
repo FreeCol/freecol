@@ -203,8 +203,9 @@ public class FreeColDataFile {
      *      data files.
      */
     private List<String> handleResources(final Properties properties, ResourceMapping rc) {
-        List<String> virtualResources = new ArrayList<>();
-        Enumeration<?> pn = properties.propertyNames();
+        final ResourceFactory resourceFactory = new ResourceFactory();
+        final List<String> virtualResources = new ArrayList<>();
+        final Enumeration<?> pn = properties.propertyNames();
         while (pn.hasMoreElements()) {
             final String key = (String) pn.nextElement();
             
@@ -219,18 +220,18 @@ public class FreeColDataFile {
             if (value.startsWith(resourceScheme)) {
                 virtualResources.add(updatedKey);
             } else {
-                handleNormalResource(rc, key, value);
+                handleNormalResource(resourceFactory, rc, key, value);
             }
         }
         return virtualResources;
     }
 
-    private void handleNormalResource(ResourceMapping rc, final String key, final String value) {
+    private void handleNormalResource(ResourceFactory resourceFactory, ResourceMapping rc, final String key, final String value) {
         final URI uri = getURI(value);
         if (uri == null) {
             return;
         }
-        final Resource resource = ResourceFactory.createResource(key, uri);
+        final Resource resource = resourceFactory.createResource(key, uri);
         
         /*
          * Rivers need new keys in order to support variations.
@@ -239,7 +240,7 @@ public class FreeColDataFile {
         
         if (resource instanceof ImageResource && supportsVariations) {
             final ImageResource imageResource = (ImageResource) resource;
-            extendWithAdditionalSizesAndVariations(imageResource, value);
+            extendWithAdditionalSizesAndVariations(resourceFactory, imageResource, value);
         }
         
         if (resource != null) {
@@ -309,7 +310,7 @@ public class FreeColDataFile {
         return (key.endsWith(ending)) ? key.substring(0, key.length() - 3) : key;
     }
     
-    private void extendWithAdditionalSizesAndVariations(ImageResource imageResource, String value) {
+    private void extendWithAdditionalSizesAndVariations(ResourceFactory resourceFactory, ImageResource imageResource, String value) {
         Map<URI, List<URI>> variationsWithAlternateSizes = findVariationsWithAlternateSizes(value);
         imageResource.addAlternativeResourceLocators(variationsWithAlternateSizes.get(null));
         
@@ -317,7 +318,7 @@ public class FreeColDataFile {
             .stream()
             .filter(entry -> entry.getKey() != null)
             .forEach(entry -> {
-                final ImageResource variationResource = (ImageResource) ResourceFactory.createResource(imageResource.getPrimaryKey(), entry.getKey());
+                final ImageResource variationResource = (ImageResource) resourceFactory.createResource(imageResource.getPrimaryKey(), entry.getKey());
                 if (variationResource != null) {
                     variationResource.addAlternativeResourceLocators(entry.getValue());
                     imageResource.addVariation(variationResource);

@@ -43,12 +43,14 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import net.sf.freecol.common.resources.Resource.Cleanable;
+
 
 /**
  * A {@code Resource} wrapping an {@code Image}.
  * @see Resource
  */
-public class ImageResource extends Resource {
+public class ImageResource extends Resource implements Cleanable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
@@ -295,6 +297,16 @@ public class ImageResource extends Resource {
         return null;
     }
 
+    @Override
+    public void clean() {
+        image = null;
+        if (loadedImages != null) {
+            loadedImages.clear();
+        }
+        if (variations != null) {
+            variations.stream().forEach(v -> v.clean());
+        }
+    }
 
     private static boolean canUseBitmask(URI uri) {
         /* TODO: Better method for determining images that can use a bitmask. */

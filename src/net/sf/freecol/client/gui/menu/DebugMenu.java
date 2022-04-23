@@ -87,6 +87,15 @@ public class DebugMenu extends JMenu {
         this.setOpaque(false);
         this.setMnemonic(KeyEvent.VK_D);
         add(this);
+        
+        final JMenuItem reload = Utility.localizedMenuItem("menuBar.debug.reloadResources");
+        reload.setOpaque(false);
+        reload.addActionListener((event) -> {
+            freeColClient.getGUI().reloadResources();
+        });
+        this.add(reload);
+        
+        addSeparator();
 
         final JCheckBoxMenuItem sc
             = Utility.localizedCheckBoxMenuItem("menuBar.debug.showCoordinates",

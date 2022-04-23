@@ -35,19 +35,11 @@ public class ResourceFactory {
 
     private static final Logger logger = Logger.getLogger(ResourceFactory.class.getName());
 
-    /**
-     * Takes a newly produced Resource.
-     */
-    public interface ResourceSink {
-
-        void add(Resource r);
-
-    }
 
     /**
      * Ensures that only one {@code Resource} is created given the same {@code URI}.
      */
-    private static final Map<URI, Resource> resources = new HashMap<>();
+    private final Map<URI, Resource> resources = new HashMap<>();
 
     
     /**
@@ -58,7 +50,7 @@ public class ResourceFactory {
      *      instance.
      * @return The <code>Resource</code> if created.     
      */
-    public static Resource createResource(String primaryKey, URI uri) {
+    public Resource createResource(String primaryKey, URI uri) {
     	final Resource r = resources.get(uri);
     	if (r != null) { 
     		return r;

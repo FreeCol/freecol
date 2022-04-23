@@ -27,13 +27,17 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColDataFile;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
@@ -53,23 +57,76 @@ public class ResourceManager {
     /**
      * All the mappings are merged in order into this single ResourceMapping.
      */
-    private static final ResourceMapping mergedContainer
-        = new ResourceMapping();
+    private static ResourceMapping mergedContainer = new ResourceMapping();
+    
+    private static FreeColDataFile baseDataFile = null;
+    private static ResourceMapping baseResourceMapping = new ResourceMapping();
+    private static FreeColDataFile tcDataFile = null;
+    private static ResourceMapping tcResourceMapping = new ResourceMapping();
+    private static List<? extends FreeColDataFile> mods = new ArrayList<>();
+    private static List<ResourceMapping> modResourceMappings = new ArrayList<>();
+    private static FreeColSavegameFile savegameFile = null;
+    private static ResourceMapping savegameResourceMapping = new ResourceMapping();
 
+    
+    public static void setBaseData(FreeColDataFile baseDataFile) {
+        ResourceManager.baseDataFile = baseDataFile;
+        baseResourceMapping = baseDataFile.getResourceMapping();
+    }
+    
+    public static void setTcData(FreeColDataFile tcDataFile) {
+        ResourceManager.tcDataFile = tcDataFile;
+        tcResourceMapping = (tcDataFile != null) ? tcDataFile.getResourceMapping() : new ResourceMapping();
+        prepare();
+    }
+    
+    public static <T extends FreeColDataFile> void setMods(List<T> mods) {
+        ResourceManager.mods = mods;
+        modResourceMappings =  mods.stream().map(FreeColDataFile::getResourceMapping).collect(Collectors.toList());
+        prepare();
+    }
+    
+    public static void setSavegameFile(FreeColSavegameFile savegameFile) {
+        ResourceManager.savegameFile = savegameFile;
+        savegameResourceMapping = (savegameFile != null) ? savegameFile.getResourceMapping() : new ResourceMapping();
+        prepare();
+    }
 
-    /**
-     * Sets the mappings specified in the date/base-directory.
-     * Do not access the mapping after the call.
-     *
-     * @param name The name of the mapping, for logging purposes.
-     * @param mapping The mapping between IDs and files.
-     */
-    public static void addMapping(String name, ResourceMapping mapping) {
-        if (preloadThread != null) {
-            throw new IllegalStateException("New mappings should not be added while preloading is running.");
+    public static void prepare() {
+        finishPreloading();
+        
+        final ResourceMapping newMergedContainer = new ResourceMapping();
+        newMergedContainer.addAll(baseResourceMapping);
+        newMergedContainer.addAll(tcResourceMapping);
+        for (ResourceMapping modResourceMapping : modResourceMappings) {
+            newMergedContainer.addAll(modResourceMapping);
         }
-        logger.info("Resource manager adding mapping " + name);
-        mergedContainer.addAll(mapping);
+        newMergedContainer.addAll(savegameResourceMapping);
+        
+        waitForPreloadingToStop();
+        mergedContainer = newMergedContainer;
+    }
+    
+    /**
+     * Clear all caches and 
+     */
+    public static void reload() {
+        baseResourceMapping = baseDataFile.getResourceMapping();
+        tcResourceMapping = (tcDataFile != null) ? tcDataFile.getResourceMapping() : new ResourceMapping();
+        modResourceMappings = mods.stream().map(FreeColDataFile::getResourceMapping).collect(Collectors.toList());
+        savegameResourceMapping = (savegameFile != null) ? savegameFile.getResourceMapping() : new ResourceMapping();
+
+        prepare();
+    }
+
+    private static void waitForPreloadingToStop() {
+        try {
+            while (preloadThread != null) {
+                Thread.sleep(10);
+            }
+        } catch (InterruptedException e) {
+            logger.warning(e.getMessage());
+        }
     }
 
     /**
