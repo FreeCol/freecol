@@ -28,7 +28,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -668,7 +670,10 @@ public final class TileViewer extends FreeColClientHolder {
         Graphics2D g1 = (Graphics2D)image.getGraphics();
         g1.translate(0, this.halfHeight);
         // layer additions and improvements according to zIndex
-        List<TileItem> tileItems = tile.getCompleteItems();
+        List<TileItem> tileItems = new ArrayList<>(tile.getCompleteItems());
+        Collections.sort(tileItems, (a, b) -> {
+            return Integer.valueOf(a.getZIndex()).compareTo(b.getZIndex());
+        });
         int startIndex = 0;
         for (int index = startIndex; index < tileItems.size(); index++) {
             if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {
@@ -700,12 +705,10 @@ public final class TileViewer extends FreeColClientHolder {
             g1.drawImage(forestImage,
                 0, (this.tileHeight - forestImage.getHeight()), null);
         }
-
         // draw all remaining items
         for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
             displayTileItem(g1, tile, ti);
         }
-
         g1.dispose();
         g2d.drawImage(image, rop, 0, -this.halfHeight);
     }
