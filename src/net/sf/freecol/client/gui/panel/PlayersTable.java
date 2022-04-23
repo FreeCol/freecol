@@ -50,6 +50,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -668,7 +669,8 @@ public final class PlayersTable extends JTable {
 
         setModel(new PlayersTableModel(freeColClient.getPreGameController(),
                  nationOptions, myPlayer));
-        setRowHeight(47);
+        setRowHeight((int) (FontLibrary.getFontScaling() * 47));
+        getTableHeader().setReorderingAllowed(false);
 
         JButton nationButton = Utility.localizedButton("nation");
         nationButton.addActionListener((ActionEvent ae) -> {
