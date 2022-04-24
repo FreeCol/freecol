@@ -38,6 +38,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -80,7 +81,11 @@ public final class StartGamePanel extends FreeColPanel {
 
     private final ActionListener cancelCmd = ae -> {
         final GUI gui = getGUI();
-        getFreeColClient().getConnectController().newGame();
+        
+        if (getFreeColClient().isLoggedIn()) {
+            getFreeColClient().getConnectController().requestLogout(LogoutReason.NEW_GAME);
+        }
+        getFreeColClient().stopServer();
         gui.removeComponent(this);
         gui.showNewPanel();
     };
