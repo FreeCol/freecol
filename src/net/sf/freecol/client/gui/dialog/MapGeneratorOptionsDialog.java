@@ -19,7 +19,10 @@
 
 package net.sf.freecol.client.gui.dialog;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -29,12 +32,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
+import javax.swing.Scrollable;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -42,7 +49,10 @@ import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.client.gui.option.OptionUI;
+import net.sf.freecol.client.gui.panel.FreeColButton;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.StringTemplate;
@@ -81,22 +91,24 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         if (isEditable()) {
             loadDefaultOptions();
             // FIXME: The update should be solved by PropertyEvent.
-
+            
             final List<File> mapFiles = FreeColDirectories.getMapFileList();
-            JPanel mapPanel = new JPanel();
+            final JPanel mapPanel = new JPanel(new MigLayout("wrap 4, fill"));
+            final JButton randomMap = new FreeColButton(Messages.message("mapGeneratorOptions.landGenerator.name"));
+            randomMap.addActionListener((ActionEvent ae) -> {
+                        updateFile(null);
+                    });
+            mapPanel.add(randomMap, "sizegroup button, grow");
             for (File f : mapFiles) {
                 JButton mapButton = makeMapButton(f);
                 if (mapButton == null) continue;
                 mapButton.addActionListener((ActionEvent ae) -> {
                         updateFile(f);
                     });
-                mapPanel.add(mapButton);
+                mapPanel.add(mapButton, "sizegroup button, grow");
             }
 
-            JScrollPane scrollPane = new JScrollPane(mapPanel,
-                JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            final JScrollPane scrollPane = new JScrollPane(mapPanel);
             scrollPane.getViewport().setOpaque(false);
             panel.add(scrollPane, "height 80%, width 100%");
         }
@@ -161,6 +173,11 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             settUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
         }
         settUI.setValue(false);
+        if (file == null) {
+            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_LAND_GENERATOR);
+        } else {
+            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_IMPORT);
+        }
     }
 
     /**
@@ -194,7 +211,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         }
 
         if (thumbnail != null) {
-            mapButton = Utility.localizedButton("freecol.map." + mapName);
+            mapButton = new FreeColButton(Messages.message("freecol.map." + mapName));
             mapButton.setIcon(new ImageIcon(thumbnail));
             mapButton.setHorizontalTextPosition(JButton.CENTER);
             mapButton.setVerticalTextPosition(JButton.BOTTOM);

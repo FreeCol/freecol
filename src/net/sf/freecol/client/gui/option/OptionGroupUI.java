@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -36,6 +37,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
@@ -86,6 +89,7 @@ public final class OptionGroupUI extends MigPanel
     private final List<OptionUpdater> optionUpdaters = new ArrayList<>();
 
     private final HashMap<String, OptionUI> optionUIs = new HashMap<>();
+    private final Map<String, TreeNode[]> optionGroupSelectionPath = new HashMap<>(); 
 
     private final JPanel detailPanel;
 
@@ -148,6 +152,13 @@ public final class OptionGroupUI extends MigPanel
     public JTree getTree() {
         return tree;
     }
+    
+    public void selectOption(String key) {
+        final TreeNode[] path = optionGroupSelectionPath.get(key);
+        if (path != null) {
+            tree.setSelectionPath(new TreePath(path));
+        }
+    }
 
     /**
      * Builds the JTree which represents the navigation menu and then
@@ -164,6 +175,7 @@ public final class OptionGroupUI extends MigPanel
                     = new DefaultMutableTreeNode(option);
                 parent.add(branch);
                 buildTree((OptionGroup) option, branch);
+                optionGroupSelectionPath.put(option.getId(), branch.getPath());
             }
         }
     }
