@@ -1209,7 +1209,14 @@ public final class Canvas extends JDesktopPane {
      */
     public void playVideo(String videoId, boolean muteAudio,
                           final Runnable runnable) {
-        final Video video = ImageLibrary.getVideo(videoId);        
+        final Video video = ImageLibrary.getVideo(videoId);
+        
+        final String originalVendor = System.getProperty("java.vendor");
+        if (originalVendor.indexOf(" ") == -1) {
+            /* Cortado crashes unless there is a space in "java.vendor". */
+            System.setProperty("java.vendor", originalVendor + " cortadoBugFix");
+        }
+
         final VideoComponent vc = new VideoComponent(video, muteAudio, getSize());
 
         final class AbortListener implements ActionListener, KeyListener,
@@ -1276,6 +1283,8 @@ public final class Canvas extends JDesktopPane {
                 if (t != null) {
                     t.stop();
                 }
+                
+                System.setProperty("java.vendor", originalVendor);
                 runnable.run();
             }
         }
