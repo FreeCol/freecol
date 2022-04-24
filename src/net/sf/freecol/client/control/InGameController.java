@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -4221,20 +4222,23 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = unit.getOwner();
         StringTemplate t = StringTemplate.template("event.firstLanding")
             .addName("%name%", name);
-        showEventPanel(Messages.message(t), "image.flavor.event.firstLanding",
-                       null);
-        
-        // Add tutorial message.
-        final String key = FreeColActionUI
-            .getHumanKeyStrokeText(getFreeColClient()
-                .getActionManager().getFreeColAction("buildColonyAction")
-                .getAccelerator());
-        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                               "buildColony.tutorial", player)
-            .addName("%colonyKey%", key)
-            .add("%colonyMenuItem%", "buildColonyAction.name")
-            .add("%ordersMenuItem%", "menuBar.orders"));
-        nextModelMessage();
+
+        invokeLater(() -> {
+            final FreeColPanel firstLandinPanel = getGUI().showEventPanel(Messages.message(t), "image.flavor.event.firstLanding", null);
+            firstLandinPanel.addClosingCallback(() -> {
+                // Add tutorial message.
+                final String key = FreeColActionUI
+                    .getHumanKeyStrokeText(getFreeColClient()
+                        .getActionManager().getFreeColAction("buildColonyAction")
+                        .getAccelerator());
+                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL, "buildColony.tutorial", player)
+                    .addName("%colonyKey%", key)
+                    .add("%colonyMenuItem%", "buildColonyAction.name")
+                    .add("%ordersMenuItem%", "menuBar.orders"));
+                nextModelMessage();
+            });
+        });
+
         return true;
     }
 
