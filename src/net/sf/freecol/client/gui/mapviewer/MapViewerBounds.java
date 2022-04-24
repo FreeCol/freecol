@@ -142,6 +142,8 @@ public final class MapViewerBounds {
 
     /**
      * Update the variables that depend on the screen size (and scale).
+     *
+     * @param tileBounds The new scaled tile sizes.
      */
     void updateSizeVariables(TileBounds tileBounds) {
         this.tileBounds = tileBounds;
@@ -540,7 +542,7 @@ public final class MapViewerBounds {
      * currently visible.
      *
      * @param tile The {@code Tile} to convert coordinates.
-     * @param a An array to pass back the x,y pixel coordinates.
+     * @return The new {@code Point}.
      */
     Point tileToPoint(Tile tile) {
         final int tileX = tile.getX(), tileY = tile.getY();
@@ -603,6 +605,7 @@ public final class MapViewerBounds {
      * Converts the given screen coordinates to Map coordinates.
      * It checks to see to which Tile the given pixel 'belongs'.
      *
+     * @param map The {@code Map} to convert within.
      * @param x The x-coordinate in pixels.
      * @param y The y-coordinate in pixels.
      * @return The {@code Tile} that is located at the given position

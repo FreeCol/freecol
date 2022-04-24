@@ -135,6 +135,7 @@ public final class FreeColClient {
      * Creates a new {@code FreeColClient}.  Creates the control
      * objects.
      *
+     * @param splashScreen An optional splash screen to display.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
      * @param windowSize An optional window size.

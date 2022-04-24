@@ -214,6 +214,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Displays the Map.
      *
      * @param g2d The {@code Graphics2D} object on which to draw the Map.
+     * @param size The size of the map.
      * @return {@code true} if the entire map has been repainted.
      */
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
@@ -1103,16 +1104,20 @@ public final class MapViewer extends FreeColClientHolder {
      * Internal class for the {@link MapViewer} that handles what part of the
      * {@link Map} is visible on screen
      * 
-     * Methods in this class should only be used by {@link SwingGUI}, {@link Canvas}
-     * or {@link MapViewer}.
+     * Methods in this class should only be used by {@link SwingGUI},
+     * {@link Canvas} or {@link MapViewer}.
+     *
+     * @return The visible map bounds.
      */
     public MapViewerBounds getMapViewerBounds() {
         return mapViewerBounds;
     }
     
     /**
-     * Bounds of the tiles to be rendered. These bounds are scaled according to the
-     * zoom level of the map.
+     * Bounds of the tiles to be rendered. These bounds are scaled
+     * according to the zoom level of the map.
+     *
+     * @return The tile bounds.
      */
     public TileBounds getTileBounds() {
         return tileBounds;
@@ -1121,18 +1126,23 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Internal state for the {@link MapViewer}.
      * 
-     * Methods in this class should only be used by {@link SwingGUI}, {@link Canvas}
-     * or {@link MapViewer}.
+     * Methods in this class should only be used by {@link SwingGUI},
+     * {@link Canvas} or {@link MapViewer}.
+     *
+     * @return The {@code MapViewerState}.
      */
     public MapViewerState getMapViewerState() {
         return mapViewerState;
     }
     
     /**
-     * Gets the internal class that handles buffers and dirty state of {@link MapViewer}.
+     * Gets the internal class that handles buffers and dirty state of
+     * {@link MapViewer}.
      * 
-     * Methods in this class should only be used by {@link SwingGUI}, {@link Canvas}
-     * or {@link MapViewer}.
+     * Methods in this class should only be used by {@link SwingGUI},
+     * {@link Canvas} or {@link MapViewer}
+     *
+     * @return The repaint manager.
      */
     public MapViewerRepaintManager getMapViewerRepaintManager() {
         return rpm;
@@ -1144,13 +1154,14 @@ public final class MapViewer extends FreeColClientHolder {
      * 
      * @param g2d The {@code Graphics2D} that is used for rendering.
      * @param tcb The bounds used for clipping the area to be rendered.
-     * @param tile The tile to be rendered.
+     * @param tile The {@code Tile} to be rendered.
      * @param c A callback that should render the tile. The coordinates for the
      *      {@code Graphics2D}, that's provided by the, callback will be
      *      translated so that position (0, 0) is the upper left corner of the
      *      tile image (that is, outside of the tile diamond itself).
      */
-    private void paintSingleTile(Graphics2D g2d, TileClippingBounds tcb, Tile tile, TileRenderingCallback c) {
+    private void paintSingleTile(Graphics2D g2d, TileClippingBounds tcb,
+                                 Tile tile, TileRenderingCallback c) {
         paintEachTile(g2d, tcb.getTopLeftDirtyTile(), List.of(tile), c);
     }
     
@@ -1239,8 +1250,8 @@ public final class MapViewer extends FreeColClientHolder {
      * 
      * The list of tiles to be repainted depends on the possible image sizes
      * that can be drawn on a tile: {@link #getBaseTiles() baseTiles},
-     * {@link #getExtendedTiles()() extendedTiles} and
-     * {@link #getSuperExtendedTiles()() superExtendedTiles}.
+     * {@link #getExtendedTiles() extendedTiles} and
+     * {@link #getSuperExtendedTiles() superExtendedTiles}.
      */
     private final class TileClippingBounds {
         
@@ -1303,24 +1314,31 @@ public final class MapViewer extends FreeColClientHolder {
         }
         
         /**
-         * The tiles to be repainted for graphics that does not extend beyond the
-         * tile size.
+         * The tiles to be repainted for graphics that does not extend
+         * beyond the tile size.
+         *
+         * @return The list of tiles to repaint.
          */
         public List<Tile> getBaseTiles() {
             return baseTiles;
         }
         
         /**
-         * The tiles to be repainted for graphics that might have double height
-         * compared to the tile size.
+         * The tiles to be repainted for graphics that might have
+         * double height compared to the tile size.
+         *
+         * @return The list of potential double height tiles.
          */
         public List<Tile> getExtendedTiles() {
             return extendedTiles;
         }
         
         /**
-         * The tiles to be repainted for graphics that might extend far into other
-         * tiles in every direction (typically halos, like in revenge mode).
+         * The tiles to be repainted for graphics that might extend
+         * far into other tiles in every direction (typically halos,
+         * like in revenge mode).
+         *
+         * @return The list of potentially haloed tiles.
          */
         public List<Tile> getSuperExtendedTiles() {
             return superExtendedTiles;

@@ -330,7 +330,7 @@ public final class InGameController extends FreeColClientHolder {
      * Wrapper for GUI.showEventPanel.
      *
      * @param header The title.
-     * @param image A resource key for the image to display.
+     * @param imageKey A resource key for the image to display.
      * @param footer Optional footer text.
      */
     private void showEventPanel(String header, String imageKey,

@@ -218,6 +218,7 @@ public class SwingGUI extends GUI {
      * Perform a single animation.
      *
      * @param a The {@code Animation} to perform.
+     * @param unitLabel The unit label to animate.
      */
     private void animate(Animation a, JLabel unitLabel) {
         final List<Tile> tiles = a.getTiles();
