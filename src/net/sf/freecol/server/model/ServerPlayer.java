@@ -561,8 +561,6 @@ public class ServerPlayer extends Player implements TurnTaker {
         // Not defeated if holding settlements.
         if (hasSettlements()) return false;
 
-        final int landREFUnitsRequired = 7; // FIXME: magic number
-        final int navalREFUnitsRequired = 2; // FIXME: magic number
         int naval = 0;
         int land = 0, landOnMap = 0;
         for (Unit u : getUnitSet()) {
@@ -572,18 +570,36 @@ public class ServerPlayer extends Player implements TurnTaker {
             }
         }
 
-        // Surrender if all rebels have a significantly stronger land army
-        // and the bulk of the REF is on the map
+        // Do not surrender until at least presenceFactor of the land
+        // army has arrived on the map
         final double presenceFactor = 2.0/3.0; // FIXME: magic number
-        final double landPower = 1.5 * calculateStrength(false);
-        if (all(getRebels(), r -> r.calculateStrength(false) > landPower)
-                && landOnMap > presenceFactor * land) {
-            return true;
+        if (landOnMap < presenceFactor * land) return false;
+
+        // The REF is arrogant and overestimates its strength by a fudge factor
+        final double refLandPower = 1.5 * calculateStrength(false);
+        // Do not surrender if there is a rebel whose land army seems weaker
+        for (Player r : getRebels()) {
+            double rebelLandPower = r.calculateStrength(false);
+            if (rebelLandPower < refLandPower) return false;
+            logger.fine("REF in trouble wrt " + r.getName() + " ("
+                + refLandPower + " <= " + rebelLandPower + ")");
         }
 
-        // Not defeated if there is are still sufficient naval and land units
-        return naval < navalREFUnitsRequired
-            || land < landREFUnitsRequired;
+        // OK, the situation is poor, but the REF hangs on if it has
+        // a minimal number of land and naval units
+        final int landREFUnitsRequired = 7; // FIXME: magic number
+        if (land < landREFUnitsRequired) {
+            logger.info("REF surrenders due to land army collapse ("
+                + land + " < " + landREFUnitsRequired + ")");
+            return true;
+        }
+        final int navalREFUnitsRequired = 2; // FIXME: magic number
+        if (naval < navalREFUnitsRequired) {
+            logger.info("REF surrenders due to lack of naval support ("
+                + naval + " < " + navalREFUnitsRequired + ")");
+            return true;
+        }
+        return false;
     }
 
     /**
