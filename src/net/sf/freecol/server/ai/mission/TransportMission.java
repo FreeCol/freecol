@@ -924,7 +924,6 @@ public final class TransportMission extends Mission {
             // Fall through
         case UNLOAD:
             if (isCarrying(t) && !t.leaveTransport(d)) {
-                //lb.add(", ", t, " NO-LEAVE");
                 PathNode pn = t.getDeliveryPath(carrier, t.getTransportDestination());
                 lb.add(", ", t, " NO-LEAVE(", here, "~", cargo.getLeaveDirection(), "~", t.getTransportDestination(), " ", ((pn == null) ? "no-path" : pn.fullPathToString()));
                 return CargoResult.TRETRY;

@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -40,7 +42,9 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -66,6 +70,8 @@ public final class ScoutingMission extends Mission {
      * - An unexplored tile
      */
     private Location target;
+    /** A Tile to go to before going to the real target. */
+    private Location precedingTile;
 
 
     /**
@@ -366,7 +372,7 @@ public final class ScoutingMission extends Mission {
      */
     @Override
     public Location getTarget() {
-        return this.target;
+        return (this.precedingTile != null) ? this.precedingTile : this.target;
     }
 
     /**
@@ -374,8 +380,26 @@ public final class ScoutingMission extends Mission {
      */
     @Override
     public void setTarget(Location target) {
-        if (target == null
-            || target instanceof Settlement || target instanceof Tile) {
+        if (target == null || target instanceof Tile
+            || target instanceof Colony) {
+            this.target = target;
+            this.precedingTile = null;
+        } else if (target instanceof IndianSettlement) {
+            AIUnit aiUnit = getAIUnit();
+            Unit unit = aiUnit.getUnit();
+            Tile t = target.getTile();
+            if (!unit.hasTile()
+                || unit.getTile().getContiguity() != t.getContiguity()) {
+                // Not going to be able to walk there, so we will need to take
+                // a carrier, but that means going first to a tile adjacent
+                // to the settlement, which we were not doing in BR#3228.
+                List<Tile> tiles = toList(t.getContiguityAdjacent(t.getContiguity()));
+                List<Tile> coast = transform(tiles, Tile::isCoastland);
+                this.precedingTile = getRandomMember(logger, "scout-tile",
+                    (coast.isEmpty()) ? tiles : coast, aiUnit.getAIRandom());
+            } else {
+                this.precedingTile = null;
+            }
             this.target = target;
         }
     }
@@ -415,8 +439,15 @@ public final class ScoutingMission extends Mission {
         Direction d;
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
+System.err.println("SM " + getUnit() + " " + reason + " " + isTargetReason(reason) + " mt=" + mt);
         switch (mt) {
-        case MOVE: // Arrived at a colony
+        case MOVE: // Arrived
+            if (this.precedingTile != null) {
+                // At a tile next to the settlement, stop pretending that
+                // is where we are going.
+                this.precedingTile = null;
+                return doMission(lb);
+            }
             break;
 
         case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
@@ -508,7 +539,7 @@ public final class ScoutingMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
+        setTarget(xr.getLocationAttribute(getGame(), TARGET_TAG, false));
     }
 
     /**
