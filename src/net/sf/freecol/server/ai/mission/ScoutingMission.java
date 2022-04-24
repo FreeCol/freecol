@@ -439,7 +439,6 @@ public final class ScoutingMission extends Mission {
         Direction d;
         Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
-System.err.println("SM " + getUnit() + " " + reason + " " + isTargetReason(reason) + " mt=" + mt);
         switch (mt) {
         case MOVE: // Arrived
             if (this.precedingTile != null) {
