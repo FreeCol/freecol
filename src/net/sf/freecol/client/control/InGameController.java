@@ -271,6 +271,24 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Wrapper for GUI.showEmigrationDialog
+     *
+     * @param player The {@code Player} who has migrating units.
+     * @param foy True if this is a fountain of youth event.
+     * @param n The number of migrants available.
+     */
+    private void showEmigrationDialog(final Player player, final boolean foy,
+                                      final int n) {
+        invokeLater(() ->
+            getGUI().showEmigrationDialog(player, foy,
+                (Integer value) -> { // Value is a valid slot
+                    emigrate(player,
+                        Europe.MigrationType.convertToMigrantSlot(value),
+                        n-1, foy);
+                }));
+    }
+
+    /**
      * Wrapper for GUI.showInformationPanel.
      *
      * @param disp An optional object to display in the panel.
@@ -505,13 +523,7 @@ public final class InGameController extends FreeColClientHolder {
 
         for (; n > 0 || player.checkEmigrate() ; n--) {
             if (!allSame(europe.getExpandedRecruitables(false))) {
-                final int nf = n;
-                getGUI().showEmigrationDialog(player, fountainOfYouth,
-                    (Integer value) -> { // Value is a valid slot
-                        emigrate(player,
-                            Europe.MigrationType.convertToMigrantSlot(value),
-                            nf-1, fountainOfYouth);
-                    });
+                showEmigrationDialog(player, fountainOfYouth, n);
                 return;
             }
             Unit u = askEmigrate(europe, Europe.MigrationType.getDefaultSlot());
@@ -3386,16 +3398,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param n The number of migrants available for selection.
      */
     public void fountainOfYouthHandler(int n) {
-        final Player player = getMyPlayer();
-        final boolean fountainOfYouth = true;
-        
-        invokeLater(() ->
-            getGUI().showEmigrationDialog(player, fountainOfYouth,
-                (Integer value) -> { // Value is a valid slot
-                    emigrate(player,
-                             Europe.MigrationType.convertToMigrantSlot(value),
-                             n-1, fountainOfYouth);
-                }));
+        showEmigrationDialog(getMyPlayer(), true, n);
     }
 
     /**
