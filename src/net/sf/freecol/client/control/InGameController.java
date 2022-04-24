@@ -1079,6 +1079,8 @@ public final class InGameController extends FreeColClientHolder {
 
         // Clear outdated turn report messages.
         turnReportMessages.clear();
+        
+        getGUI().changeView();
 
         // Inform the server of end of turn.
         return askServer().endTurn();
