@@ -360,6 +360,49 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Wrapper for GUI.getMissionaryChoice
+     *
+     * @param unit The {@code Unit} that will enter the settlement.
+     * @param is The {@code IndianSettlement} to check.
+     * @param direction The {@code Direction} to move the unit.
+     */
+    private void getMissionaryChoice(final Unit unit,
+        final IndianSettlement is, final Direction direction) {
+        final Player player = unit.getOwner();
+        final boolean canEstablish = !is.hasMissionary();
+        final boolean canDenounce = !canEstablish
+            && !is.hasMissionary(player);
+
+        // Offer the choices.
+        invokeLater(() -> {
+                MissionaryAction act = getGUI().getMissionaryChoice(unit, is,
+                    canEstablish, canDenounce);
+                if (act == null) return;
+                switch (act) {
+                case MISSIONARY_ESTABLISH_MISSION: case MISSIONARY_DENOUNCE_HERESY:
+                    if (askServer().missionary(unit, direction,
+                            act == MissionaryAction.MISSIONARY_DENOUNCE_HERESY)
+                        && is.hasMissionary(player)) {
+                        sound("sound.event.missionEstablished");
+                        player.invalidateCanSeeTiles();
+                    }
+                    break;
+                case MISSIONARY_INCITE_INDIANS:
+                    Player enemy = getGUI().getChoice(unit.getTile(),
+                        StringTemplate.key("missionarySettlement.inciteQuestion"),
+                        unit, "missionarySettlement.cancel",
+                        transform(getGame().getLiveEuropeanPlayers(player), alwaysTrue(),
+                            p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p)));
+                    if (enemy != null) askServer().incite(unit, is, enemy, -1);
+                    break;
+                default:
+                    logger.warning("showUseMissionaryDialog fail");
+                    break;
+                }
+            });
+    }
+
+    /**
      * Wrapper for GUI.showNamingDialog.
      *
      * @param template A message template.
@@ -1982,39 +2025,11 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveUseMissionary(Unit unit, Direction direction) {
-        final IndianSettlement is
-            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        Player player = unit.getOwner();
-        boolean canEstablish = !is.hasMissionary();
-        boolean canDenounce = !canEstablish
-            && !is.hasMissionary(player);
         if (!askClearGotoOrders(unit)) return false;
 
-        // Offer the choices.
-        MissionaryAction act = getGUI().getMissionaryChoice(unit, is,
-            canEstablish, canDenounce);
-        if (act == null) return false;
-        switch (act) {
-        case MISSIONARY_ESTABLISH_MISSION: case MISSIONARY_DENOUNCE_HERESY:
-            if (askServer().missionary(unit, direction,
-                    act == MissionaryAction.MISSIONARY_DENOUNCE_HERESY)
-                && is.hasMissionary(player)) {
-                sound("sound.event.missionEstablished");
-                player.invalidateCanSeeTiles();
-            }
-            break;
-        case MISSIONARY_INCITE_INDIANS:
-            Player enemy = getGUI().getChoice(unit.getTile(),
-                StringTemplate.key("missionarySettlement.inciteQuestion"),
-                unit, "missionarySettlement.cancel",
-                transform(getGame().getLiveEuropeanPlayers(player), alwaysTrue(),
-                    p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p)));
-            if (enemy != null) askServer().incite(unit, is, enemy, -1);
-            break;
-        default:
-            logger.warning("showUseMissionaryDialog fail");
-            break;
-        }
+        final IndianSettlement is
+            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+        getMissionaryChoice(unit, is, direction);
         return false;
     }
 
