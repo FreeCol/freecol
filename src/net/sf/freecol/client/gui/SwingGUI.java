@@ -80,6 +80,7 @@ import net.sf.freecol.client.gui.panel.TrainPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
+import net.sf.freecol.client.gui.plaf.FreeColToolTipUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.i18n.Messages;
@@ -681,6 +682,7 @@ public class SwingGUI extends GUI {
         final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
         FontLibrary.setMainFontSize(fontSize);
         FreeColImageBorder.setScaleFactor(fixedImageLibrary.getScaleFactor());
+        FreeColToolTipUI.setFontScaling(FontLibrary.getFontScaling());
         
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
@@ -1734,6 +1736,7 @@ public class SwingGUI extends GUI {
         
         final Font font = FontLibrary.getMainFont();
         FreeColLookAndFeel.installFont(font);
+        FreeColToolTipUI.setFontScaling(FontLibrary.getFontScaling());
         Utility.initStyleContext(font);
         
         if (getFreeColClient().getActionManager() != null) {

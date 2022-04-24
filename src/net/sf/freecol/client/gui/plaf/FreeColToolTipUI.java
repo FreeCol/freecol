@@ -21,14 +21,16 @@ package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.font.LineBreakMeasurer;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.regex.Pattern;
+
 import javax.swing.JComponent;
 import javax.swing.JToolTip;
 import javax.swing.plaf.ComponentUI;
@@ -53,6 +55,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     private static final int margin = 5;
     private static int maximumWidth = 300;
+    private static int fontSize = 11;
     private static final int LEADING = 5;
 
     private static final Pattern lineBreak = Pattern.compile("\n");
@@ -66,8 +69,9 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         return sharedInstance;
     }
 
-    public static void setMaximumWidth(int width) {
-        maximumWidth = width;
+    public static void setFontScaling(float fontScaleFactor) {
+        maximumWidth = (int) (300 * fontScaleFactor);
+        fontSize = (int) (11 * fontScaleFactor);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
             ImageUtils.drawTiledImage(ImageLibrary.getToolTipBackground(),
                                       g, c, null);
         }
-
+        
         g.setColor(Color.BLACK); // FIXME: find out why this is necessary
 
         Graphics2D graphics = (Graphics2D)g;
@@ -87,8 +91,10 @@ public class FreeColToolTipUI extends BasicToolTipUI {
                 y += LEADING;
                 continue;
             }
+            final AttributedString attributedString = new AttributedString(line);
+            attributedString.addAttribute(TextAttribute.SIZE, fontSize);
             AttributedCharacterIterator styledText =
-                new AttributedString(line).getIterator();
+                attributedString.getIterator();
 
             LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
 
@@ -120,8 +126,10 @@ public class FreeColToolTipUI extends BasicToolTipUI {
                 y += LEADING;
                 continue;
             }
+            AttributedString attributedString = new AttributedString(line);
+            attributedString.addAttribute(TextAttribute.SIZE, fontSize);
             AttributedCharacterIterator styledText
-                = new AttributedString(line).getIterator();
+                = attributedString.getIterator();
             LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
 
             while (measurer.getPosition() < styledText.getEndIndex()) {
