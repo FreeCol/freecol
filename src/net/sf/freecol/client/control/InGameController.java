@@ -39,6 +39,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.common.FreeColException;
@@ -203,17 +204,6 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Display the colony panel for a colony, and select the unit that just
-     * arrived there if it is a carrier.
-     *
-     * @param colony The {@code Colony} to display.
-     * @param unit An optional {@code Unit} to select.
-     */
-    private void dispColonyPanel(Colony colony, Unit unit) {
-        getGUI().showColonyPanel(colony, (unit.isCarrier()) ? unit : null);
-    }
-
-    /**
      * Convenience function to find an adjacent settlement.  Intended
      * to be called in contexts where we are expecting a settlement to
      * be there, such as when handling a particular move type.
@@ -271,6 +261,53 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Wrapper for GUI.displayChat.
+     *
+     * @param sender The sender of the chat message.
+     * @param message What to say.
+     * @param color The message color.
+     * @param pri If true, the message is private.
+     */
+    private void displayChat(String sender, String message, Color color,
+                            boolean pri) {
+        invokeLater(() ->
+            getGUI().displayChat(sender, message, color, pri));
+    }
+
+    /**
+     * Wrapper for GUI.showColonyPanel.
+     *
+     * @param colony The {@code Colony} to show.
+     * @param unit An optional {@code Unit} to select within the panel.
+     */
+    private void showColonyPanel(final Colony colony, final Unit unit) {
+        invokeLater(() -> {
+                getGUI().showColonyPanel(colony, unit);
+            });
+    }
+
+    /**
+     * Display the colony panel for a colony, and select the unit that just
+     * arrived there if it is a carrier.
+     *
+     * @param colony The {@code Colony} to display.
+     * @param unit An optional {@code Unit} to select.
+     */
+    private void showColonyPanelWithCarrier(Colony colony, Unit unit) {
+        showColonyPanel(colony, (unit.isCarrier()) ? unit : null);
+    }
+
+    /**
+     * Wrapper for GUI.showErrorPanel.
+     *
+     * @param template A {@code StringTemplate} to display.
+     * @param message An extra non-i18n message to display if debugging.
+     */
+    private void error(StringTemplate template, String message) {
+        invokeLater(() -> getGUI().showErrorPanel(template, message));
+    }
+
+    /**
      * Wrapper for GUI.showEmigrationDialog
      *
      * @param player The {@code Player} who has migrating units.
@@ -286,6 +323,18 @@ public final class InGameController extends FreeColClientHolder {
                         Europe.MigrationType.convertToMigrantSlot(value),
                         n-1, foy);
                 }));
+    }
+
+    /**
+     * Wrapper for GUI.showEventPanel.
+     *
+     * @param header The title.
+     * @param image A resource key for the image to display.
+     * @param footer Optional footer text.
+     */
+    private void showEventPanel(String header, String imageKey,
+                                String footer) {
+        invokeLater(() -> getGUI().showEventPanel(header, imageKey, footer));
     }
 
     /**
@@ -307,6 +356,59 @@ public final class InGameController extends FreeColClientHolder {
     private void showInformationPanel(final FreeColObject disp,
                                       final StringTemplate template) {
         invokeLater(() -> getGUI().showInformationPanel(disp, template));
+    }
+
+    /**
+     * Wrapper for GUI.showNamingDialog.
+     *
+     * @param template A message template.
+     * @param defaultName The default name for the object.
+     * @param unit The {@code Unit} that is naming.
+     * @param handler A callback to handle the user response.
+     */
+    private void showNamingDialog(final StringTemplate template,
+        final String defaultName, final Unit unit,
+        final DialogHandler<String> handler) {
+        invokeLater(() ->
+            getGUI().showNamingDialog(template, defaultName, unit, handler));
+    }
+
+    /**
+     * Wrapper for GUI.showNegotiationDialog and followup.
+     *
+     * @param unit The {@code Unit} that is negotiating.
+     * @param settlement The {@code Settlement} that is negotiating.
+     * @param agreement The proposed agreement.
+     * @param comment An optional {@code StringTemplate} containing a
+     *     commentary message.
+     * @param direction An optional {@code Direction} to move the unit
+     *     to the settlement on success.
+     */
+    private void showNegotiationDialog(final Unit unit,
+        final Settlement settlement, final DiplomaticTrade agreement,
+        final StringTemplate comment, final Direction direction) {
+        final Player player = unit.getOwner();
+        invokeLater(() -> {
+                DiplomaticTrade dt = getGUI()
+                    .showNegotiationDialog(unit, settlement, agreement, comment);
+                if (direction != null && dt != null
+                    && dt.getStatus() != TradeStatus.REJECT_TRADE) {
+                    moveDiplomacy(unit, direction, dt);
+                }
+            });
+    }
+
+    /**
+     * Wrapper for GUI.showStatusPanel, but clear on null.
+     *
+     * @param message The text message to display on the status panel.
+     */
+    private void showStatusPanel(String message) {
+        if (message == null) {
+            invokeLater(() -> getGUI().closeStatusPanel());
+        } else {
+            invokeLater(() -> getGUI().showStatusPanel(message));
+        }
     }
 
     /**
@@ -332,7 +434,7 @@ public final class InGameController extends FreeColClientHolder {
 
         // Successfully found a unit to display
         if (player.hasNextActiveUnit()) {
-            getGUI().changeView(player.getNextActiveUnit(), false);
+            changeView(player.getNextActiveUnit(), false);
             return true;
         }
 
@@ -340,11 +442,13 @@ public final class InGameController extends FreeColClientHolder {
         if (!doExecuteGotoOrders()) return true;
 
         // Disable active unit display, using fallback tile if supplied
-        if (tile != null) {
-            getGUI().changeView(tile);
-        } else {
-            getGUI().changeView();
-        }
+        invokeLater(() -> {
+                if (tile != null) {
+                    getGUI().changeView(tile);
+                } else {
+                    getGUI().changeView();
+                }
+            });
 
         // Check for automatic end of turn
         final ClientOptions options = getClientOptions();
@@ -686,17 +790,15 @@ public final class InGameController extends FreeColClientHolder {
         final FreeColServer server = getFreeColServer();
         boolean result = false;
         if (server != null) {
-            invokeLater(() ->
-                getGUI().showStatusPanel(Messages.message("status.savingGame")));
+            showStatusPanel(Messages.message("status.savingGame"));
             try {
                 server.saveGame(file, getClientOptions(), getGUI().getActiveUnit());
                 result = true;
             } catch (IOException ioe) {
-                invokeLater(() ->
-                    getGUI().showErrorPanel(FreeCol.badFile("error.couldNotSave", file)));
+                error(FreeCol.badFile("error.couldNotSave", file), null);
                 logger.log(Level.WARNING, "Save fail", ioe);
             } finally {
-                invokeLater(() -> getGUI().closeStatusPanel());
+                showStatusPanel(null);
             }
         }
         return result;
@@ -998,7 +1100,7 @@ public final class InGameController extends FreeColClientHolder {
                 if (checkCashInTreasureTrain(unit)) {
                     ret = true;
                 } else {
-                    dispColonyPanel(colony, unit);
+                    showColonyPanelWithCarrier(colony, unit);
                     ret = false;
                 }
             } else {
@@ -1364,7 +1466,7 @@ public final class InGameController extends FreeColClientHolder {
                 askServer().attack(unit, direction);
                 Colony col = target.getColony();
                 if (col != null && unit.getOwner().owns(col)) {
-                    dispColonyPanel(col, unit);
+                    showColonyPanel(col, unit);
                 }
                 // Immediately display resulting message, allowing
                 // next updateGUI to select another unit.
@@ -1696,7 +1798,7 @@ public final class InGameController extends FreeColClientHolder {
                 // Bring up colony panel if non-trade-route carrier
                 // unit just arrived at a destination colony.
                 // Automatic movement should stop.
-                dispColonyPanel(tile.getColony(), unit);
+                showColonyPanelWithCarrier(tile.getColony(), unit);
                 ret = false;
             } else {
                 ; // Automatic movement can continue after successful move.
@@ -1734,11 +1836,9 @@ public final class InGameController extends FreeColClientHolder {
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.DIPLOMATIC,
                                       player, colony.getOwner(), null, 0);
-            agreement = getGUI().showNegotiationDialog(unit, colony,
-                agreement, agreement.getSendMessage(player, colony));
-            return (agreement == null
-                || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
-                : moveDiplomacy(unit, direction, agreement);
+            showNegotiationDialog(unit, colony, agreement,
+                agreement.getSendMessage(player, colony), direction);
+            return false;
         case SCOUT_COLONY_SPY:
             return moveSpy(unit, direction);
         default:
@@ -1829,12 +1929,8 @@ public final class InGameController extends FreeColClientHolder {
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.TRADE,
                     player, settlement.getOwner(), null, 0);
-            agreement = getGUI().showNegotiationDialog(unit, settlement,
-                agreement, agreement.getSendMessage(player, settlement));
-            if (agreement != null
-                && agreement.getStatus() != TradeStatus.REJECT_TRADE)
-                return moveDiplomacy(unit, direction, agreement);
-
+            showNegotiationDialog(unit, settlement, agreement,
+                agreement.getSendMessage(player, settlement), direction);
         } else if (settlement instanceof IndianSettlement) {
             askServer().newNativeTradeSession(unit, (IndianSettlement)settlement);
             changeView(unit, false); // Will be deselected on losing moves
@@ -2633,7 +2729,7 @@ public final class InGameController extends FreeColClientHolder {
                 // at a colony.
                 for (Unit u : tile.getUnitList()) checkCashInTreasureTrain(u);
                 updateGUI(null, false);
-                dispColonyPanel((Colony)tile.getSettlement(), unit);
+                showColonyPanelWithCarrier((Colony)tile.getSettlement(), unit);
             }
         }
         return ret;
@@ -2684,8 +2780,7 @@ public final class InGameController extends FreeColClientHolder {
         if (chat == null) return false;
 
         final Player player = getMyPlayer();
-        getGUI().displayChat(player.getName(), chat, player.getNationColor(),
-                             false);
+        displayChat(player.getName(), chat, player.getNationColor(), false);
         return askServer().chat(player, chat);
     }
 
@@ -2699,10 +2794,9 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void chatHandler(String sender, String message, Color color,
                             boolean pri) {
-        invokeLater(() ->
-            getGUI().displayChat(sender, message, color, pri));
+        displayChat(sender, message, color, pri);
     }
-
+    
     /**
      * Changes the state of this {@code Unit}.
      *
@@ -3079,8 +3173,9 @@ public final class InGameController extends FreeColClientHolder {
      * @param other The other {@code FreeColGameObject}.
      * @param agreement The {@code DiplomaticTrade} agreement.
      */
-    public void diplomacyHandler(FreeColGameObject our, FreeColGameObject other,
-                                 DiplomaticTrade agreement) {
+    public void diplomacyHandler(final FreeColGameObject our,
+                                 final FreeColGameObject other,
+                                 final DiplomaticTrade agreement) {
         final Player player = getMyPlayer();
         final Player otherPlayer = agreement.getOtherPlayer(player);
         StringTemplate t, nation = otherPlayer.getNationLabel();
@@ -3110,15 +3205,16 @@ public final class InGameController extends FreeColClientHolder {
             showInformationPanel(null, t);
             break;
         case PROPOSE_TRADE:
-            t = agreement.getReceiveMessage(otherPlayer);
-            DiplomaticTrade ourAgreement
-                = getGUI().showNegotiationDialog(our, other, agreement, t);
-            if (ourAgreement == null) {
-                agreement.setStatus(TradeStatus.REJECT_TRADE);
-            } else {
-                agreement = ourAgreement;
-            }
-            askServer().diplomacy(our, other, agreement);
+            invokeLater(() -> {
+                    StringTemplate template = agreement.getReceiveMessage(otherPlayer);
+                    DiplomaticTrade ourAgreement = getGUI()
+                        .showNegotiationDialog(our, other, agreement, template);
+                    if (ourAgreement == null) {
+                        ourAgreement = agreement;
+                        ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
+                    }
+                    askServer().diplomacy(our, other, ourAgreement);
+                });
             break;
         default:
             logger.warning("Bogus trade status: " + agreement.getStatus());
@@ -3269,24 +3365,13 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Display an error.
-     *
-     * @param template A {@code StringTemplate} to display.
-     * @param message An extra non-i18n message to display if debugging.
-     */
-    private void error(StringTemplate template, String message) {
-        getGUI().showErrorPanel(template, message);
-    }
-
-    /**
      * Handle an error.
      *
      * @param template A {@code StringTemplate} to display.
      * @param message An extra non-i18n message to display if debugging.
      */
     public void errorHandler(StringTemplate template, String message) {
-        invokeLater(() ->
-            error(template, message));
+        error(template, message);
     }
 
     /**
@@ -3591,7 +3676,7 @@ public final class InGameController extends FreeColClientHolder {
             && unit.getState() == UnitState.IN_COLONY;
         if (ret) {
             updateGUI(null, false);
-            dispColonyPanel(colony, unit);
+            showColonyPanel(colony, unit);
         }
         return ret;
     }
@@ -3855,7 +3940,7 @@ public final class InGameController extends FreeColClientHolder {
             && !unit.isDisposed() && unit.hasTile()) {
             // Show colony panel if unit moved and is now out of moves
             Colony colony = unit.getTile().getColony();
-            if (colony != null) dispColonyPanel(colony, unit);
+            if (colony != null) showColonyPanel(colony, unit);
         }
         return ret;
     }
@@ -4136,9 +4221,9 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = unit.getOwner();
         StringTemplate t = StringTemplate.template("event.firstLanding")
             .addName("%name%", name);
-        invokeLater(() -> getGUI().showEventPanel(Messages.message(t),
-                "image.flavor.event.firstLanding", null));
-
+        showEventPanel(Messages.message(t), "image.flavor.event.firstLanding",
+                       null);
+        
         // Add tutorial message.
         final String key = FreeColActionUI
             .getHumanKeyStrokeText(getFreeColClient()
@@ -4160,11 +4245,9 @@ public final class InGameController extends FreeColClientHolder {
      * @param defaultName The default name to use.
      */
     public void newLandNameHandler(Unit unit, String defaultName) {
-        invokeLater(() ->
-            getGUI().showNamingDialog(StringTemplate.key("newLand.text"),
-                                      defaultName, unit,
-                (String name) -> newLandName(unit,
-                    (name == null || name.isEmpty()) ? defaultName : name)));
+        showNamingDialog(StringTemplate.key("newLand.text"), defaultName, unit,
+            (String name) -> newLandName(unit,
+                (name == null || name.isEmpty()) ? defaultName : name));
     }
 
     /**
@@ -4196,13 +4279,13 @@ public final class InGameController extends FreeColClientHolder {
         invokeLater(() -> {
                 if (region.hasName()) {
                     if (region.isPacific()) {
-                        getGUI().showEventPanel(Messages.message("event.discoverPacific"),
+                        showEventPanel(Messages.message("event.discoverPacific"),
                             "image.flavor.event.discoverPacific", null);
                     }
                     newRegionName(region, tile, unit, name);
                 } else {
                     if (getClientOptions().getBoolean(ClientOptions.SHOW_REGION_NAMING)) {
-                        getGUI().showNamingDialog(StringTemplate
+                        showNamingDialog(StringTemplate
                             .template("nameRegion.text")
                             .addStringTemplate("%type%", region.getLabel()),
                             name, unit,
@@ -4435,13 +4518,16 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void reconnect() {
         final FreeColClient fcc = getFreeColClient();
-        if (getGUI().confirm("reconnect.text", "reconnect.no", "reconnect.yes")) {
-            logger.finest("Reconnect quit.");
-            fcc.getConnectController().requestLogout(LogoutReason.QUIT);
-        } else {
-            logger.finest("Reconnect accepted.");
-            fcc.getConnectController().requestLogout(LogoutReason.RECONNECT);
-        }
+        invokeLater(() -> {
+                if (getGUI().confirm("reconnect.text",
+                                     "reconnect.no", "reconnect.yes")) {
+                    logger.finest("Reconnect quit.");
+                    fcc.getConnectController().requestLogout(LogoutReason.QUIT);
+                } else {
+                    logger.finest("Reconnect accepted.");
+                    fcc.getConnectController().requestLogout(LogoutReason.RECONNECT);
+                }
+            });
     }
 
     /**
@@ -4941,11 +5027,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void spySettlementHandler(Tile tile) {
         final Colony colony = tile.getColony();
-        if (colony != null) {
-            invokeLater(() -> {
-                    getGUI().showColonyPanel(colony, null);
-                });
-        }
+        if (colony != null) showColonyPanel(colony, null);
     }
     
     /**
