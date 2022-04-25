@@ -50,6 +50,6 @@ public class ReconnectAction extends FreeColAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getFreeColClient().getConnectController().requestLogout(LogoutReason.RECONNECT);
+        igc().reconnect();
     }
 }
