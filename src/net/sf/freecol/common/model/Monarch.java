@@ -483,7 +483,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         int turn = getGame().getTurn().getNumber();
         int oldTax = player.getTax();
         int adjust = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
-        adjust = 1 + randomInt(logger, "Tax rise", random, 5 + turn/adjust);
+        adjust = 1 + randomInt(logger, "Tax rise", random, 3 + turn/adjust);
         return Math.min(oldTax + adjust, taxMaximum());
     }
 
