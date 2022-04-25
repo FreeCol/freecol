@@ -262,6 +262,21 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Wrapper for GUI.changeView.
+     *
+     * @param tile An optional {@code Tile} to select.
+     */
+    private void changeView(final Tile tile) {
+        invokeLater(() -> {
+                if (tile != null) {
+                    getGUI().changeView(tile);
+                } else {
+                    getGUI().changeView();
+                }
+            });
+    }
+    
+    /**
      * Wrapper for GUI.displayChat.
      *
      * @param sender The sender of the chat message.
@@ -470,10 +485,12 @@ public final class InGameController extends FreeColClientHolder {
         // Make sure the active unit is done.
         final Player player = getMyPlayer();
 
-        // Flush any outstanding orders once the mode is raised.
-        if (moveMode != MoveMode.NEXT_ACTIVE_UNIT
-            && !doExecuteGotoOrders()) {
-            return false;
+        // Are we no longer in normal next unit mode?
+        if (moveMode != MoveMode.NEXT_ACTIVE_UNIT) {
+            // Clear the panel first
+            if (getGUI().isPanelShowing()) return false;
+            // Flush any orders
+            if (!doExecuteGotoOrders()) return false;
         }
 
         // Successfully found a unit to display
@@ -486,13 +503,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!doExecuteGotoOrders()) return true;
 
         // Disable active unit display, using fallback tile if supplied
-        invokeLater(() -> {
-                if (tile != null) {
-                    getGUI().changeView(tile);
-                } else {
-                    getGUI().changeView();
-                }
-            });
+        changeView(tile);
 
         // Check for automatic end of turn
         final ClientOptions options = getClientOptions();
@@ -974,8 +985,6 @@ public final class InGameController extends FreeColClientHolder {
      *     reached their destination and are free to move again.
      */
     private boolean doExecuteGotoOrders() {
-        if (getGUI().isPanelShowing()) return false; // Clear the panel first
-
         final Player player = getMyPlayer();
         Unit active = getGUI().getActiveUnit();
         boolean ret = true;
@@ -1040,6 +1049,9 @@ public final class InGameController extends FreeColClientHolder {
      */
     private boolean doEndTurn(boolean showDialog) {
         final Player player = getMyPlayer();
+        // Clear any panels first
+        if (getGUI().isPanelShowing()) return false;
+        
         if (showDialog) {
             List<Unit> units = transform(player.getUnits(), Unit::couldMove);
             if (!units.isEmpty()) {
@@ -1080,7 +1092,7 @@ public final class InGameController extends FreeColClientHolder {
         // Clear outdated turn report messages.
         turnReportMessages.clear();
         
-        getGUI().changeView();
+        changeView(null);
 
         // Inform the server of end of turn.
         return askServer().endTurn();
@@ -3401,7 +3413,8 @@ public final class InGameController extends FreeColClientHolder {
      *     reached their destination and are free to move again.
      */
     public boolean executeGotoOrders() {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn()
+            || getGUI().isPanelShowing()) return false;
 
         return doExecuteGotoOrders();
     }
