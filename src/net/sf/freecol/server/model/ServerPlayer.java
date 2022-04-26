@@ -2048,16 +2048,17 @@ outer:  for (Effect effect : effects) {
                             t.setCachedTile(this, c);
                         }
                         tiles.add(t);
+                        // Revealed tiles in 11x11 block in Col1
+                        final int fullRadius = (int)father
+                            .apply((float)colony.getLineOfSight(),
+                                turn, Modifier.EXPOSED_TILES_RADIUS);
+                        tiles.addAll(exploreTiles(t.getSurroundingTiles(1,
+                                    fullRadius)));
+                        cs.add(See.only(this), tiles);
                     }
-                    // Revealed tiles in 11x11 block in Col1
-                    final int fullRadius = (int)father
-                        .apply((float)colony.getLineOfSight(),
-                               turn, Modifier.EXPOSED_TILES_RADIUS);
-                    tiles.addAll(exploreTiles(t.getSurroundingTiles(1,
-                                fullRadius)));
-                    cs.add(See.only(this), tiles);
                 }
-
+                break;
+                
             case "model.event.newRecruits":
                 if (europe != null) {
                     europeDirty = europe.replaceRecruits(random);
