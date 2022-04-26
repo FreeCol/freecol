@@ -98,7 +98,9 @@ public final class ChatPanel extends FreeColPanel {
             switch (Integer.parseInt(command)) {
             case CHAT:
                 String message = getChatText();
-                igc().chat(message);
+                if (!message.trim().equals("")) {
+                    igc().chat(message);
+                }
                 getGUI().removeComponent(this);
                 break;
             default:

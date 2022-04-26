@@ -38,7 +38,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 class ChatDisplay {
 
     /** The number of messages getting remembered. */
-    private static final int MESSAGE_COUNT = 3;
+    private static final int MESSAGE_COUNT = 5;
 
     /** Left margin for the text. */
     private static final int LEFT_MARGIN = 40;
@@ -58,9 +58,6 @@ class ChatDisplay {
     /** The messages to display. */
     private final List<GUIMessage> messages;
 
-    /** Cache the decoration images. */
-    private final Image decorationS, decorationSW, decorationSE;
-
 
     /**
      * Create the chat display/ container.
@@ -71,9 +68,6 @@ class ChatDisplay {
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
         this.font = FontLibrary.getScaledFont("normal-plain-tiny");
         this.messages = new ArrayList<>(MESSAGE_COUNT);
-        this.decorationS = ImageLibrary.getUnscaledImage("image.menuborder.shadow.s");
-        this.decorationSW = ImageLibrary.getUnscaledImage("image.menuborder.shadow.sw");
-        this.decorationSE = ImageLibrary.getUnscaledImage("image.menuborder.shadow.se");
     }
 
     /**
@@ -123,24 +117,17 @@ class ChatDisplay {
         // true in single player games.
         List<GUIMessage> msgs = prepareMessages();
         if (msgs.isEmpty()) return;
-        
+
         int yy = -1;
-        final int xx = LEFT_MARGIN;
+        final int xx = lib.scaleInt(LEFT_MARGIN);
         for (GUIMessage m : msgs) {
             Image si = this.lib.getStringImage(g, m.getMessage(),
                                                m.getColor(), this.font);
             if (yy < 0) {
-                yy = size.height - TOP_MARGIN - msgs.size() * si.getHeight(null);
+                yy = size.height - lib.scaleInt(TOP_MARGIN) - msgs.size() * si.getHeight(null);
             }
             g.drawImage(si, xx, yy, null);
             yy += si.getHeight(null);
         }
-        int width = this.decorationS.getWidth(null);
-        for (int index = 0; index < size.width; index += width) {
-            g.drawImage(this.decorationS, index, 0, null);
-        }
-        g.drawImage(this.decorationSW, 0, 0, null);
-        g.drawImage(this.decorationSE,
-                    size.width - this.decorationSE.getWidth(null), 0, null);
     }
 }
