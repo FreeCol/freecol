@@ -124,8 +124,8 @@ public class MapViewerRepaintManager {
     /**
      * Marks the given area as dirty for all layers.
      * 
-     * This method should only be used if {@link paintImmediately} is
-     * called both before and after.
+     * This method should only be used if {@link paintImmediately}
+     * is called both before and after.
      * 
      * @param bounds The bounds that should be marked dirty.
      */

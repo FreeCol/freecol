@@ -229,6 +229,8 @@ public final class ResourceMapping {
     /**
      * Preload all resources in this mapping.
      *
+     * @param preloadController The {@code PreloadController} handling
+     *     this preload.
      * @return The number of resources loaded.
      */
     public int preload(PreloadController preloadController) {

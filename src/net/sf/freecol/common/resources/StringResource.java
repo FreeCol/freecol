@@ -35,6 +35,7 @@ public class StringResource extends Resource {
     /**
      * Do not use directly.
      *
+     * @param primaryKey The primary key.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */

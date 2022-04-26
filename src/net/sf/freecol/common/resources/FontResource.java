@@ -52,6 +52,7 @@ public class FontResource extends Resource {
     /**
      * Do not use directly.
      *
+     * @param primaryKey The primary key.
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      * @exception IOException if unable to read the font.

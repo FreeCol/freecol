@@ -57,6 +57,8 @@ public abstract class Resource {
 
     /**
      * Trivial constructor.
+     *
+     * @param primaryKey The primary key.
      */
     protected Resource(String primaryKey) {
         this(primaryKey, null);

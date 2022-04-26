@@ -68,6 +68,7 @@ public class ImageResource extends Resource implements Cleanable {
     /**
      * Do not use directly.
      *
+     * @param primaryKey The primary key.
      * @param resourceLocator The {@code URI} used when loading this resource.
      */
     public ImageResource(String primaryKey, URI resourceLocator) {
@@ -139,6 +140,7 @@ public class ImageResource extends Resource implements Cleanable {
     /**
      * Gets the image using the specified dimension and choice of grayscale.
      * 
+     * @param variation The image variation.
      * @param d The {@code Dimension} of the requested image.
      * @param grayscale If true return a grayscale image.
      * @return The scaled {@code BufferedImage}.

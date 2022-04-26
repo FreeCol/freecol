@@ -43,6 +43,8 @@ public class AudioResource extends Resource {
 
     /**
      * Do not use directly.
+     *
+     * @param primaryKey The primary key.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      * @exception IOException if the URI does not point to recognizable audio.

@@ -89,6 +89,7 @@ public class ImageCache {
      * @param key The image key.
      * @param size The size of the image.
      * @param grayscale True if grayscale.
+     * @param variation The image variation.
      * @return A unique hash of these parameters.
      */
     public static long imageHash(final String key, final Dimension size,
@@ -120,6 +121,7 @@ public class ImageCache {
      * @param size The size of the requested image.
      *     Rescaling will be performed if necessary.
      * @param grayscale If true return a grayscale image.
+     * @param variation The image variation.
      * @return The image identified by {@code resource}.
      */
     public BufferedImage getCachedImage(final ImageResource ir,

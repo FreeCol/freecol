@@ -75,8 +75,6 @@ public class InformationPanel extends FreeColPanel {
      * @param texts The texts to be displayed in the panel.
      * @param fcos The source {@code FreeColObject}s for the text.
      * @param images The images to be displayed in the panel.
-     *
-     * @see #createLayout(FreeColClient) For the outer layout
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
                             FreeColObject[] fcos, ImageIcon[] images) {

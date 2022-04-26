@@ -134,6 +134,8 @@ public class ResourceManager {
      *
      * Synchronization protects preloadThread.  The thread is the only place
      * mergedContainer is written.
+     *
+     * @param afterPreloadHasCompleted A {@code Runnable} to run when it says.
      */
     public static synchronized void startPreloading(Runnable afterPreloadHasCompleted) {
         if (FreeCol.getHeadless()) return; // Do not preload in headless mode

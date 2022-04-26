@@ -46,15 +46,15 @@ public class ResourceFactory {
      * Returns an instance of {@code Resource} with the
      * given {@code URI} as the parameter.
      *
-     * @param uri The {@code URI} used when creating the
-     *      instance.
+     * @param primaryKey The primary key.
+     * @param uri The {@code URI} used when creating the instance.
      * @return The <code>Resource</code> if created.     
      */
     public Resource createResource(String primaryKey, URI uri) {
-    	final Resource r = resources.get(uri);
-    	if (r != null) { 
-    		return r;
-    	}
+        final Resource r = resources.get(uri);
+        if (r != null) { 
+            return r;
+        }
 
         final String pathPart;
         if (uri.getPath() != null) {

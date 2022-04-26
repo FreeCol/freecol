@@ -45,6 +45,9 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
     
     /**
      * The constructor makes sure that the backgrounds are transparent.
+     *
+     * @param colopediaPanel The parent panel.
+     * @param lib The {@code ImageLibrary} to use.
      */
     public ColopediaTreeCellRenderer(ColopediaPanel colopediaPanel, ImageLibrary lib) {
         this.colopediaPanel = colopediaPanel;

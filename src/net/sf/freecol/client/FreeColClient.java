@@ -137,7 +137,6 @@ public final class FreeColClient {
      *
      * @param splashScreen An optional splash screen to display.
      * @param fontName An optional override of the main font.
-     * @param scale The scale factor for gui elements.
      * @param windowSize An optional window size.
      * @param userMsg An optional message key to be displayed early.
      * @param sound True if sounds should be played

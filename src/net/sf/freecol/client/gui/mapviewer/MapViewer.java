@@ -1170,7 +1170,6 @@ public final class MapViewer extends FreeColClientHolder {
      * 
      * @param g2d The {@code Graphics2D} that is used for rendering.
      * @param tcb The bounds used for clipping the area to be rendered.
-     * @param tile The tile to be rendered.
      * @param c A callback that should render the tile. The coordinates for the
      *      {@code Graphics2D}, that's provided by the, callback will be
      *      translated so that position (0, 0) is the upper left corner of the

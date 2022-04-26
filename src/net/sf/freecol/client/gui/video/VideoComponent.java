@@ -49,9 +49,10 @@ public class VideoComponent extends JPanel {
 
     /**
      * Creates a component for displaying the given video.
-     * @param video The {@code Video} to be displayed.
      *
-     * @param mute boolean silence
+     * @param video The {@code Video} to be displayed.
+     * @param mute If true, silence the video.
+     * @param maximumSize An upper bound on the size of the video pane.
      */
     public VideoComponent(Video video, boolean mute, Dimension maximumSize) {
         final String url = video.getURL().toExternalForm();

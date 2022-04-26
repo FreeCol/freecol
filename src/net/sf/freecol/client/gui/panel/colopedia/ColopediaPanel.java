@@ -170,6 +170,8 @@ public final class ColopediaPanel extends FreeColPanel
     
     /**
      * Gets the preferred size for the list item images in the colopedia tree.
+     *
+     * @return The {@code Dimension} to use.
      */
     public Dimension getListItemIconSize() {
         final int width = getImageLibrary().scaleInt(ImageLibrary.ICON_SIZE.width * 3 / 2);

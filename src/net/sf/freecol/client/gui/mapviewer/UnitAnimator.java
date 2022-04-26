@@ -74,7 +74,9 @@ public class UnitAnimator {
     }
     
     /**
-     * Checks if at least one unit is currently being animated.
+     * Are any units being animated?
+     *
+     * @return True if unit animation underway.
      */
     boolean isUnitsOutForAnimation() {
         return !unitsOutForAnimation.isEmpty();
