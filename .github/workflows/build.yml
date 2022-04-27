@@ -1,0 +1,28 @@
+
+name: Build
+on:
+  push:
+    branches:
+      - master
+    
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          
+      - name: Build artifacts
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml nightly-release
+  
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Packages
+          path: dist/releases/
