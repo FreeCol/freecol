@@ -15,13 +15,13 @@
     <embeddedJar>false</embeddedJar>
     <executableName>freecol.exe</executableName>
     <iconLocation>../packaging/icons/freecol.ico</iconLocation>
-    <initialMemoryHeap>134217728</initialMemoryHeap>
+    <initialMemoryHeap>1073741824</initialMemoryHeap>
     <javaProperties>
         <name>sun.java2d.d3d</name>
         <value>false</value>
     </javaProperties>
     <mainClassName>net.sf.freecol.FreeCol</mainClassName>
-    <maximumMemoryHeap>536870912</maximumMemoryHeap>
+    <maximumMemoryHeap>2147483647</maximumMemoryHeap>
     <maximumVersion></maximumVersion>
     <minimumVersion>1.8</minimumVersion>
     <skeletonName>Windowed Wrapper</skeletonName>
