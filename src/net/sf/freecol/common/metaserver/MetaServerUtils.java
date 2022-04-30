@@ -58,7 +58,7 @@ import net.sf.freecol.common.networking.UpdateServerMessage;
  */
 public class MetaServerUtils {
 
-    private static final long METASERVER_REPLY_TIMEOUT = 2000;
+    private static final long METASERVER_REPLY_TIMEOUT = 10000;
 
     private static final Logger logger = Logger.getLogger(MetaServerUtils.class.getName());
 
