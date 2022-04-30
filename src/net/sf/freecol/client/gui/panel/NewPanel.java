@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -110,6 +111,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
 
     /** Start server port number label and field to input through. */
     private final JTextField serverPortField;
+    
+    private final JComboBox<InetAddress> serverAddressBox;
 
     /** The label for the rules selection. */
     private final JLabel rulesLabel;
@@ -217,6 +220,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         this.serverPortField.addActionListener((ActionEvent ae) -> {
                 getSelectedPort(NewPanel.this.serverPortField);
             });
+        
+        this.serverAddressBox = Utility.createServerInetAddressBox();
 
         this.rulesLabel = Utility.localizedLabel("rules");
         this.rulesBox = new JComboBox<>();
@@ -249,6 +254,13 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
 
         this.publicServer
             = new JCheckBox(Messages.message("newPanel.publicServer"));
+        
+        serverAddressBox.addActionListener(event -> {
+            final InetAddress address = (InetAddress) serverAddressBox.getSelectedItem();
+            publicServer.setEnabled(!address.isLoopbackAddress());
+        });
+        final InetAddress address = (InetAddress) serverAddressBox.getSelectedItem();
+        publicServer.setEnabled(!address.isLoopbackAddress());
 
         this.difficultyLabel = Utility.localizedLabel("difficulty");
         this.difficultyBox = new JComboBox<>();
@@ -301,6 +313,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         add(start, "newline, span 3");
         add(this.advantagesLabel);
         add(this.advantagesBox, "growx");
+        add(this.serverAddressBox, "newline, skip");
         add(this.serverPortLabel, "newline, skip");
         add(this.serverPortField, "width 60:");
         add(this.rulesLabel);
@@ -322,7 +335,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             this.joinPortLabel, this.joinPortField
         };
         serverComponents = new Component[] {
-            this.serverPortLabel, this.serverPortField, this.publicServer
+            this.serverAddressBox, this.serverPortLabel, this.serverPortField, this.publicServer
         };
         gameComponents = new Component[] {
             this.advantagesLabel, this.advantagesBox,
@@ -351,7 +364,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         setSize(getPreferredSize());
     }
 
-    
+        
     /**
      * Update specification and difficulty as needed.
      *
@@ -572,8 +585,11 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                 if (serverPort < 0) break;
                 this.specification.prepare(getSelectedAdvantages(),
                                            this.difficulty);
+                final InetAddress serverAddress = (InetAddress) this.serverAddressBox.getSelectedItem();
+                final boolean publicServerValue = this.publicServer.isSelected()
+                        && !serverAddress.isLoopbackAddress();
                 if (cc.startMultiplayerGame(this.specification,
-                        this.publicServer.isSelected(), serverPort)) return;
+                        publicServerValue, serverAddress, serverPort)) return;
                 break;
             case META_SERVER:
                 List<ServerInfo> servers = MetaServerUtils.getServerList();

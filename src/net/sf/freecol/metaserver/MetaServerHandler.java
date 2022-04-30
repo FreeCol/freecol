@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.ConnectionVerificationMessage;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -80,12 +81,15 @@ public final class MetaServerHandler implements MessageHandler {
         case RegisterServerMessage.TAG:
             final RegisterServerMessage rsm = (RegisterServerMessage) message;
             rsm.setAddress(connection.getHostAddress()); // Trust the connection
-            register(rsm);
+            final boolean connectable = register(rsm);
+            reply = new ConnectionVerificationMessage(connectable);
             break;
         case RemoveServerMessage.TAG:
             final RemoveServerMessage removeServerMessage = (RemoveServerMessage) message;
             removeServerMessage.setAddress(connection.getHostAddress()); // Trust the connection
             remove(removeServerMessage);
+            
+            // TODO: Send connection.getHostAddress() and message about connectivity
             break;
         case ServerListMessage.TAG:
             reply = serverList();
@@ -126,11 +130,12 @@ public final class MetaServerHandler implements MessageHandler {
      * Handle a "register"-request.
      * 
      * @param message The {@code RegisterServerMessage} to process.
+     * @return true if the server was registered.
      */
-    private void register(RegisterServerMessage message) {
+    private boolean register(RegisterServerMessage message) {
         final ServerInfo si = message.getServerInfo(); 
 
-        metaRegister.addServer(si);
+        return metaRegister.addServer(si);
     }
 
     /**

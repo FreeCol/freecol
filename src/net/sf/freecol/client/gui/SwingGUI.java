@@ -2546,4 +2546,9 @@ public class SwingGUI extends GUI {
     public FreeColPanel showWorkProductionPanel(Unit unit) {
         return this.widgets.showWorkProductionPanel(unit);
     }
+    
+    @Override
+    public void prepareShowingMainMenu() {
+        canvas.prepareShowingMainMenu();
+    }
 }

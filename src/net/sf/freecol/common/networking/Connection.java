@@ -28,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +49,15 @@ public class Connection implements Closeable {
 
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
+    /**
+     * The default timeout when waiting for a reply from the server. Defined
+     * in milliseconds.
+     * 
+     * Setting 30s for now since there was no timeout earlier when waiting
+     * for å reply.
+     */
+    public static final long DEFAULT_REPLY_TIMEOUT = 30000;
+    
     public static final char END_OF_STREAM = '\n';
     private static final char[] END_OF_STREAM_ARRAY = { END_OF_STREAM };
     public static final int BUFFER_SIZE = 1 << 14;
@@ -411,13 +421,17 @@ public class Connection implements Closeable {
      * Send a message, and return the response.  Log both.
      *
      * @param message The {@code Message} to send.
+     * @param timeout A timeout in milliseconds, after which a
+     *      {@code TimeoutException} gets thrown when waiting
+     *      for a reply.
      * @return The response.
      * @exception FreeColException on extreme confusion.
      * @exception IOException on failure to send.
      * @exception XMLStreamException on stream write error.
+     * @exception TimeoutException when the timeout is reached.
      */
-    protected Message askMessage(Message message)
-        throws FreeColException, IOException, XMLStreamException {
+    public Message askMessage(Message message, long timeout)
+        throws FreeColException, IOException, XMLStreamException, TimeoutException {
         if (message == null) return null;
         final String tag = message.getType();
         if (Thread.currentThread() == this.receivingThread) {
@@ -434,7 +448,7 @@ public class Connection implements Closeable {
 
         // Block waiting for the reply to occur.  Expect a reply
         // message, except on shutdown.
-        Object response = nro.getResponse();
+        Object response = nro.getResponse(timeout);
         if (response == null && !this.connected) {
             return null;
         } else if (!(response instanceof ReplyMessage)) {
@@ -541,10 +555,14 @@ public class Connection implements Closeable {
     public void request(Message message)
         throws FreeColException, IOException, XMLStreamException {
         if (message == null) return;
-        Message response = askMessage(message);
-        if (response != null) {
-            Message reply = handle(response);
-            assert reply == null;
+        try {
+            Message response = askMessage(message, DEFAULT_REPLY_TIMEOUT);
+            if (response != null) {
+                Message reply = handle(response);
+                assert reply == null;
+            }
+        } catch (TimeoutException e) {
+            throw new IOException(e);
         }
     }
         

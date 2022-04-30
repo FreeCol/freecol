@@ -1323,7 +1323,6 @@ public final class Canvas extends JDesktopPane {
      * Closes all panels, changes the background and shows the main menu.
      */
     public void mainTitle() {
-        removeInGameComponents();
         showMainPanel();
         revalidate();
         repaint();
@@ -1335,13 +1334,18 @@ public final class Canvas extends JDesktopPane {
      * @return The main panel.
      */
     public FreeColPanel showMainPanel() {
-        closeMenus();
-        closeMainPanel();
-        this.parentFrame.removeMenuBar();
+        prepareShowingMainMenu();
         this.mainPanel = new MainPanel(this.freeColClient);
         addAsFrame(mainPanel, false, PopupPosition.CENTERED, false);
         this.mainPanel.requestFocus();
         return this.mainPanel;
+    }
+    
+    public void prepareShowingMainMenu() {
+        removeInGameComponents();
+        closeMenus();
+        closeMainPanel();
+        this.parentFrame.removeMenuBar();
     }
 
     /**

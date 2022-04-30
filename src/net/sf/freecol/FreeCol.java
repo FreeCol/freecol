@@ -31,9 +31,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -229,6 +231,7 @@ public final class FreeCol {
     private static String name = null;
 
     /** How to name and configure the server. */
+    private static InetAddress serverAddress = null;
     private static int serverPort = -1;
     private static String serverName = null;
 
@@ -634,6 +637,7 @@ public final class FreeCol {
         { "Z", "seed", "cli.seed", "cli.arg.seed" },
         { null,  "server", "cli.server", null },
         { null,  "server-name", "cli.server-name", "cli.arg.name" },
+        { null,  "server-ip", "cli.server-ip", "cli.arg.serverIp" },
         { null,  "server-port", "cli.server-port", "cli.arg.port" },
         { "s", "splash", "cli.splash", "!" + argFile },
         { "t", "tc", "cli.tc", "cli.arg.name" },
@@ -837,6 +841,13 @@ public final class FreeCol {
                 String arg = line.getOptionValue("server-port");
                 if (!setServerPort(arg)) {
                     fatal(StringTemplate.template("cli.error.serverPort")
+                        .addName("%string%", arg));
+                }
+            }
+            if (line.hasOption("server-ip")) {
+                String arg = line.getOptionValue("server-ip");
+                if (!setServerAddress(arg)) {
+                    fatal(StringTemplate.template("cli.error.serverIp")
                         .addName("%string%", arg));
                 }
             }
@@ -1273,10 +1284,23 @@ public final class FreeCol {
     /**
      * Gets the server network port.
      *
-     * @return The port number.
+     * @return The port number the server will be listening on.
      */
     public static int getServerPort() {
         return (serverPort < 0) ? PORT_DEFAULT : serverPort;
+    }
+    
+    /**
+     * Gets the server address.
+     * 
+     * @return The {@code InetAddress} the server will be listening on.
+     */
+    public static InetAddress getServerName() {
+        try {
+            return (serverAddress == null) ? InetAddress.getByName("0.0.0.0") : serverAddress;
+        } catch (UnknownHostException e) {
+            return Inet4Address.getLoopbackAddress();
+        }
     }
 
     /**
@@ -1290,6 +1314,22 @@ public final class FreeCol {
         try {
             serverPort = Integer.parseInt(arg);
         } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Sets the server address.
+     *
+     * @param arg The server address.
+     * @return True if the address was set.
+     */
+    private static boolean setServerAddress(String arg) {
+        if (arg == null) return false;
+        try {
+            serverAddress = InetAddress.getByName(arg);
+        } catch (UnknownHostException e) {
             return false;
         }
         return true;
@@ -1598,7 +1638,11 @@ public final class FreeCol {
                 final FreeColSavegameFile fis
                     = new FreeColSavegameFile(saveGame);
                 freeColServer = new FreeColServer(fis, (Specification)null,
-                                                  serverPort, serverName);
+                        serverAddress, serverPort, serverName);
+                freeColServer.setPublicServer(publicServer);
+                if (!freeColServer.registerWithMetaServer()) {
+                    fatal(Messages.message("server.noRouteToServer"));
+                }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Load fail", e);
                 fatal(Messages.message(badFile("error.couldNotLoad", saveGame))
@@ -1611,7 +1655,10 @@ public final class FreeCol {
             Specification spec = FreeCol.getTCSpecification();
             try {
                 freeColServer = new FreeColServer(publicServer, false, spec,
-                                                  serverPort, serverName);
+                        serverAddress, serverPort, serverName);
+                if (!freeColServer.registerWithMetaServer()) {
+                    fatal(Messages.message("server.noRouteToServer"));
+                }
             } catch (Exception e) {
                 fatal(Messages.message("server.initialize")
                     + ": " + e.getMessage());

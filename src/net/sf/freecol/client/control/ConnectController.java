@@ -26,6 +26,7 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
@@ -345,7 +345,7 @@ public final class ConnectController extends FreeColClientHolder {
         spec.loadMods(mods);
         Messages.loadActiveModMessageBundle(mods, FreeCol.getLocale());
 
-        FreeColServer fcs = fcc.startServer(false, true, spec, -1);
+        FreeColServer fcs = fcc.startServer(false, true, spec, null, -1);
         return (fcs == null) ? false
             : requestLogin(FreeCol.getName(),
                            fcs.getHost(), fcs.getPort());
@@ -411,6 +411,7 @@ public final class ConnectController extends FreeColClientHolder {
         final boolean publicServer = defaultPublicServer;
         final boolean singlePlayer;
         final String serverName;
+        final InetAddress address;
         final int port;
         final int sgo = options.getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
         boolean show = sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
@@ -423,24 +424,19 @@ public final class ConnectController extends FreeColClientHolder {
             if (lsi == null) return false;
             singlePlayer = lsi.isSinglePlayer();
             serverName = lsi.getServerName();
+            address = lsi.getAddress();
             port = lsi.getPort();
         } else {
             singlePlayer = defaultSinglePlayer;
             serverName = null;
+            address = null;
             port = -1;
         }
         Messages.loadActiveModMessageBundle(options.getActiveMods(),
             FreeCol.getLocale());
 
-        if (!fcc.unblockServer(port)) return false;
-
-        if (fcc.isLoggedIn()) { // Should not happen, warn and suppress
-            logger.warning("startSavedGame while logged in!");
-            requestLogout(LogoutReason.LOGIN);
-        }
-
         FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
-                                            port, serverName);
+                address, port, serverName);
         if (fcs == null) return false;
 
         /*
@@ -460,11 +456,14 @@ public final class ConnectController extends FreeColClientHolder {
      *
      * @param specification The {@code Specification} for the game.
      * @param publicServer Whether to make the server public.
+     * @param address The address in which the server should listen for new clients.
      * @param port The port in which the server should listen for new clients.
      * @return True if the game is started successfully.
      */
     public boolean startMultiplayerGame(Specification specification,
-                                        boolean publicServer, int port) {
+                                        boolean publicServer,
+                                        InetAddress address,
+                                        int port) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
@@ -476,7 +475,7 @@ public final class ConnectController extends FreeColClientHolder {
         }
 
         FreeColServer fcs = fcc.startServer(publicServer, false,
-                                            specification, port);
+                                            specification, address, port);
         if (fcs == null) return false;
         fcc.setFreeColServer(fcs);
         fcc.setSinglePlayer(false);

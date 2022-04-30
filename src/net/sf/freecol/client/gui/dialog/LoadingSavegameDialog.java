@@ -20,10 +20,12 @@
 package net.sf.freecol.client.gui.dialog;
 
 import java.awt.FlowLayout;
+import java.net.InetAddress;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,6 +55,8 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
     private final JRadioButton publicMultiplayer;
 
     private final JTextField serverNameField;
+    
+    private final JComboBox<InetAddress> serverAddressBox;
 
     private final JSpinner portField;
 
@@ -71,7 +75,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
-        JLabel header = Utility.localizedHeaderLabel("loadingSavegameDialog",
+        JLabel header = Utility.localizedHeaderLabel("loadingSavegameDialog.name",
                                                      JLabel.CENTER,
                                                      Utility.FONTSPEC_SUBTITLE);
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
@@ -80,6 +84,8 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         p1.add(Utility.localizedLabel("loadingSavegameDialog.serverName"));
 
         serverNameField = new JTextField();
+        
+        serverAddressBox = Utility.createServerInetAddressBox();
 
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         p2.add(Utility.localizedLabel("loadingSavegameDialog.port"));
@@ -91,6 +97,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         ButtonGroup bg = new ButtonGroup();
         String str = Messages.message("loadingSavegameDialog.singlePlayer");
         singlePlayer = new JRadioButton(str);
+        singlePlayer.setSelected(true);
         bg.add(singlePlayer);
         str = Messages.message("loadingSavegameDialog.privateMultiplayer");
         privateMultiplayer = new JRadioButton(str);
@@ -98,10 +105,18 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         str = Messages.message("loadingSavegameDialog.publicMultiplayer");
         publicMultiplayer = new JRadioButton(str);
         bg.add(publicMultiplayer);
+        
+        serverAddressBox.addActionListener(event -> {
+            final InetAddress address = (InetAddress) serverAddressBox.getSelectedItem();
+            publicMultiplayer.setEnabled(!address.isLoopbackAddress());
+        });
+        final InetAddress address = (InetAddress) serverAddressBox.getSelectedItem();
+        publicMultiplayer.setEnabled(!address.isLoopbackAddress());
 
         panel.add(header);
         panel.add(p1);
         panel.add(serverNameField);
+        panel.add(serverAddressBox);
         panel.add(p2);
         panel.add(portField);
         panel.add(singlePlayer);
@@ -128,7 +143,11 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      * @return True if public server is selected.
      */
     public boolean isPublic() {
-        return publicMultiplayer.isSelected();
+        return publicMultiplayer.isSelected() && !getAddress().isLoopbackAddress();
+    }
+    
+    public InetAddress getAddress() {
+        return singlePlayer.isSelected() ? null : (InetAddress) serverAddressBox.getSelectedItem();
     }
 
     /**
@@ -137,7 +156,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      * @return The port number.
      */
     public int getPort() {
-        return ((Integer) portField.getValue());
+        return singlePlayer.isSelected() ? -1 : ((Integer) portField.getValue());
     }
 
     /**
@@ -155,7 +174,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      * @return A LoadingSavegameInfo.
      */
     public LoadingSavegameInfo getInfo() {
-        return new LoadingSavegameInfo(isSinglePlayer(), getPort(), getServerName());
+        return new LoadingSavegameInfo(isSinglePlayer(), getAddress(), getPort(), getServerName(), isPublic());
     }
 
     /**

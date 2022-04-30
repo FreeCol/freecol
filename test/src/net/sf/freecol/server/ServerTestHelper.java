@@ -96,7 +96,7 @@ public final class ServerTestHelper {
         try {
             // FIXME: Pass tc
             server = new FreeColServer(publicServer, singlePlayer,
-                                       spec, port, name);
+                                       spec, null, port, name);
         } catch (IOException ex) {
             fail(ex.getMessage());
         }
@@ -118,7 +118,7 @@ public final class ServerTestHelper {
         stopServer();
         try {
             server = new FreeColServer(new FreeColSavegameFile(file), 
-                                       null, port, name);
+                                       null, null, port, name);
         } catch (Exception e) {
             fail(e.getMessage());
         }

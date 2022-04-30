@@ -25,6 +25,7 @@ import java.io.File;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.model.Game.LogoutReason;
 
 
 /**
@@ -58,9 +59,11 @@ public class ContinueAction extends FreeColAction {
     public void actionPerformed(ActionEvent ae) {
         File lastSave = FreeColDirectories.getLastSaveGameFile();
         if (lastSave != null) {
-            if (getConnectController().startSavedGame(lastSave)) {
-                getGUI().removeInGameComponents();
-            } else {
+            if (getFreeColClient().isLoggedIn()) {
+                getFreeColClient().getConnectController().requestLogout(LogoutReason.LOGIN);
+            }
+            getFreeColClient().stopServer();
+            if (!getConnectController().startSavedGame(lastSave)) {
                 getGUI().showMainPanel(null);
             }
         }

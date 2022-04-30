@@ -19,6 +19,8 @@
 
 package net.sf.freecol.metaserver;
 
+import static net.sf.freecol.common.util.Utils.now;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.networking.Connection;
-import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -94,28 +95,6 @@ public final class MetaRegister {
     }
 
     /**
-     * Updates a given server.
-     *
-     * @param si The {@code ServerInfo} that should be updated.
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
-     * @param version The version of the server.
-     * @param gameState The current state of the game:
-     */
-    private void updateServer(ServerInfo si, String name, String address,
-                              int port, int slotsAvailable,
-                              int currentlyPlaying, boolean isGameStarted,
-                              String version, int gameState) {
-        si.update(name, address, port, slotsAvailable, currentlyPlaying,
-                  isGameStarted, version, gameState);
-        logger.info("Server updated:" + si.getName());
-    }
-
-    /**
      * Start a timer to periodically clean up dead servers.
      */
     private void startCleanupTimer() {
@@ -139,29 +118,34 @@ public final class MetaRegister {
      * Adds a new server with the given attributes.
      *
      * @param newSi The new {@code ServerInfo} to add.
+     * @return true if the server was added.
      */
-    public synchronized void addServer(ServerInfo newSi) {
-        ServerInfo si = getServer(newSi.getAddress(), newSi.getPort());
-        if (si == null) {
-            final String identity = newSi.getName()
-                + " (" + newSi.getAddress() + ":" + newSi.getPort() + ")";
-            // Check connection before adding the server:
-            Connection mc = null;
-            try {
-                mc = new Connection(newSi.getAddress(), newSi.getPort(),
-                                    FreeCol.METASERVER_THREAD);
-                if (mc == null) {
-                    logger.info("Server not found: " + identity);
-                } else {
-                    items.add(newSi);
-                    logger.info("Server added:" + identity);
-                    mc.startReceiving();
-                }
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Server fail: " + identity, ioe);
-            }
-        } else {
+    public synchronized boolean addServer(ServerInfo newSi) {
+        final ServerInfo si = getServer(newSi.getAddress(), newSi.getPort());
+        if (si != null) {
             si.update(newSi);
+            return true;
+        }
+        
+        final String identity = newSi.getName() + " (" + newSi.getAddress() + ":" + newSi.getPort() + ")";
+        if (!canConnectToServer(newSi)) {
+            logger.log(Level.INFO, "Cannot connect to server: " + identity);
+            return false;
+        }
+        
+        items.add(newSi);
+        logger.info("Server added:" + identity);
+        
+        return true;
+    }
+
+    private boolean canConnectToServer(ServerInfo serverInfo) {
+        try (Connection mc = new Connection(serverInfo.getAddress(), serverInfo.getPort(), FreeCol.METASERVER_THREAD)) {
+            mc.startReceiving();
+            mc.disconnect();
+            return true;
+        } catch (IOException ioe) {
+            return false;
         }
     }
 

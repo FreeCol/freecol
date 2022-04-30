@@ -145,7 +145,7 @@ public final class MapEditorController extends FreeColClientHolder {
             Specification specification = getDefaultSpecification();
             fcc.setMapEditor(true);
             final FreeColServer freeColServer
-                = new FreeColServer(false, false, specification, 0, null);
+                = new FreeColServer(false, false, specification, null, 0, null);
             fcc.setFreeColServer(freeColServer);
             ServerGame serverGame = freeColServer.getGame();
             requireNativeNations(serverGame);

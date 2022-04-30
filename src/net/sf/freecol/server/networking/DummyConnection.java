@@ -91,7 +91,7 @@ public final class DummyConnection extends Connection {
     @Override
     public void sendMessage(Message message)
         throws FreeColException, IOException {
-        Message reply = askMessage(message);
+        Message reply = askMessage(message, Connection.DEFAULT_REPLY_TIMEOUT);
         assert reply == null;
     }
 
@@ -99,7 +99,7 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    protected Message askMessage(Message message)
+    public Message askMessage(Message message, long timeout)
         throws FreeColException, IOException {
         DummyConnection other = getOtherConnection();
         if (other == null) return null;

@@ -19,19 +19,25 @@
 
 package net.sf.freecol.client.gui;
 
+import java.net.InetAddress;
+
 /**
  * Used for transferring data for the savegame to be loaded.
  */
 public class LoadingSavegameInfo {
 
     private final boolean singlePlayer;
+    private final InetAddress address;
     private final int port;
     private final String serverName;
+    private final boolean publicServer;
 
-    public LoadingSavegameInfo(boolean singlePlayer, int port, String serverName) {
-        this.singlePlayer=singlePlayer;
-        this.port=port;
-        this.serverName=serverName;
+    public LoadingSavegameInfo(boolean singlePlayer, InetAddress address, int port, String serverName, boolean publicServer) {
+        this.singlePlayer = singlePlayer;
+        this.address = address;
+        this.port = port;
+        this.serverName = serverName;
+        this.publicServer = publicServer;
     }
 
     /**
@@ -41,6 +47,14 @@ public class LoadingSavegameInfo {
      */
     public boolean isSinglePlayer() {
         return singlePlayer;
+    }
+    
+    /**
+     * Get the selected address;
+     * @return
+     */
+    public InetAddress getAddress() {
+        return address;
     }
 
     /**
@@ -61,4 +75,7 @@ public class LoadingSavegameInfo {
         return serverName;
     }
 
+    public boolean isPublicServer() {
+        return publicServer;
+    }
 }

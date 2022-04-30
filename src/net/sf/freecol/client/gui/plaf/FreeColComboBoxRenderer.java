@@ -25,13 +25,13 @@ import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.net.InetAddress;
+import java.util.logging.Logger;
 
-import javax.swing.plaf.UIResource;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-
-import java.util.logging.Logger;
+import javax.swing.plaf.UIResource;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.i18n.Messages;
@@ -150,6 +150,9 @@ public class FreeColComboBoxRenderer<T>
             }
             c.setText(nd[0]);
             if (nd[1] != null) c.setToolTipText(nd[1]);
+        } else if (value instanceof InetAddress) {
+            final InetAddress address = (InetAddress) value;
+            c.setText(address.getHostAddress());
         } else {
             logger.warning("What is this?: " + value
                 + " (" + value.getClass() + ")");

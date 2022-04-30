@@ -25,12 +25,19 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -51,6 +58,7 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
@@ -396,6 +404,31 @@ public final class Utility {
                 blankBorder(top, left, bottom, right),
                 component.getBorder()));
     }
+    
+    /**
+     * Returns a combo box for selecting a possible server address.
+     * @return The combo box.
+     */
+    public static JComboBox<InetAddress> createServerInetAddressBox() {
+        final List<InetAddress> serverAddresses = getPossibleServerAddresses();
+        final JComboBox<InetAddress> serverAddressBox = new JComboBox<>(serverAddresses.toArray(new InetAddress[0]));
+        serverAddressBox.setRenderer(new FreeColComboBoxRenderer<>());
+        return serverAddressBox;
+    }
+
+    private static List<InetAddress> getPossibleServerAddresses() {
+        List<InetAddress> serverAddresses;
+        try {
+            serverAddresses = NetworkInterface.networkInterfaces()
+                    .flatMap(NetworkInterface::inetAddresses)
+                    .filter(ia -> ia instanceof Inet4Address)
+                    .collect(Collectors.toList());
+        } catch (SocketException e) {
+            serverAddresses = List.of(Inet4Address.getLoopbackAddress());
+        }
+        return serverAddresses;
+    }
+
 
     /**
      * Localize the a titled border.

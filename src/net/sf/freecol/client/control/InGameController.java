@@ -19,8 +19,18 @@
 
 package net.sf.freecol.client.control;
 
-import java.awt.Color;
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.model.Constants.STEAL_LAND;
+import static net.sf.freecol.common.util.CollectionUtils.allSame;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.Utils.delay;
+import static net.sf.freecol.common.util.Utils.deleteFile;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,8 +40,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,10 +65,19 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyWas;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.ArmedUnitSettlementAction;
+import net.sf.freecol.common.model.Constants.ClaimAction;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
+import net.sf.freecol.common.model.Constants.MissionaryAction;
+import net.sf.freecol.common.model.Constants.ScoutColonyAction;
+import net.sf.freecol.common.model.Constants.ScoutIndianSettlementAction;
+import net.sf.freecol.common.model.Constants.TradeAction;
+import net.sf.freecol.common.model.Constants.TradeBuyAction;
+import net.sf.freecol.common.model.Constants.TradeSellAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.EuropeWas;
@@ -77,7 +96,6 @@ import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.MarketWas;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
@@ -86,16 +104,16 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
-import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
+import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -104,17 +122,15 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.Utils.*;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -2810,8 +2826,9 @@ public final class InGameController extends FreeColClientHolder {
         if (chat == null) return false;
 
         final Player player = getMyPlayer();
+        final boolean sent = askServer().chat(player, chat);
         displayChat(player.getName(), chat, player.getNationColor(), false);
-        return askServer().chat(player, chat);
+        return sent;
     }
 
     /**
@@ -3793,13 +3810,24 @@ public final class InGameController extends FreeColClientHolder {
             .showLoadSaveFileDialog(FreeColDirectories.getSaveDirectory(),
                                     FreeCol.FREECOL_SAVE_EXTENSION);
         if (file == null) return;
-        if (getFreeColClient().isInGame()
-            && !getGUI().confirmStopGame()) return;
 
-        turnReportMessages.clear();
-        getGUI().removeInGameComponents();
+        final FreeColClient fcc = getFreeColClient();
+        if (fcc.isInGame() && !getGUI().confirmStopGame()) {
+            // User aborted.
+            return;
+        }
+
+        if (fcc.isLoggedIn()) {
+            fcc.getConnectController().requestLogout(LogoutReason.LOGIN);
+        }
+        fcc.stopServer();
+        getGUI().prepareShowingMainMenu();
+        getGUI().repaint();
+
         FreeColDirectories.setSavegameFile(file.getPath());
-        getConnectController().startSavedGame(file);
+        if (!getConnectController().startSavedGame(file)) {
+            getGUI().showMainPanel(null);
+        } 
     }
 
     /**

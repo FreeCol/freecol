@@ -2490,4 +2490,11 @@ public class GUI extends FreeColClientHolder {
     public void reloadResources() {
 
     }
+    
+    /**
+     * Prepares showing the main menu by removing almost everything from the view.
+     */
+    public void prepareShowingMainMenu() {
+       
+    }
 }

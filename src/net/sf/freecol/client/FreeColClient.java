@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -47,7 +48,6 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
@@ -798,8 +798,7 @@ public final class FreeColClient {
      */
     public boolean unblockServer(int port) {
         final FreeColServer freeColServer = getFreeColServer();
-        if (freeColServer != null
-            && freeColServer.getServer().getPort() == port) {
+        if (freeColServer != null ) {
             if (!getGUI().confirm("stopServer.text", "stopServer.yes",
                                   "stopServer.no")) return false;
             stopServer();
@@ -826,21 +825,23 @@ public final class FreeColClient {
      * @param publicServer If true, add to the meta-server.
      * @param singlePlayer True if this is a single player game.
      * @param spec The {@code Specification} to use in this game.
-     * @param port The TCP port to use for the public socket.
+     * @param address The address to use for the public socket.
+     * @param port The TCP port to use for the public socket. If null, try
+     *      ports until 
      * @return A new {@code FreeColServer} or null on error.
      */
     public FreeColServer startServer(boolean publicServer,
                                      boolean singlePlayer, Specification spec,
+                                     InetAddress address,
                                      int port) {
         final FreeColServer fcs;
         try {
-            fcs = new FreeColServer(publicServer, singlePlayer, spec,
-                                    port, null);
+            fcs = new FreeColServer(publicServer, singlePlayer, spec, address, port, null);
+            if (!fcs.registerWithMetaServer()) {
+                return failToMain(null, "server.noRouteToServer");
+            }
         } catch (IOException ioe) {
             return failToMain(ioe, "server.initialize");
-        }
-        if (publicServer && !fcs.getPublicServer()) {
-            return failToMain(null, "server.noRouteToServer");
         }
 
         setFreeColServer(fcs);
@@ -854,13 +855,15 @@ public final class FreeColClient {
      * @param publicServer If true, add to the meta-server.
      * @param singlePlayer True if this is a single player game.
      * @param saveFile The saved game {@code File}.
+     * @param address The TCP address to use for the public socket.
      * @param port The TCP port to use for the public socket.
      * @param name An optional name for the server.
      * @return A new {@code FreeColServer}, or null on error.
      */
     public FreeColServer startServer(boolean publicServer,
                                      boolean singlePlayer,
-                                     File saveFile, int port, String name) {
+                                     File saveFile, InetAddress address,
+                                     int port, String name) {
         final FreeColSavegameFile fsg;
         try {
             fsg = new FreeColSavegameFile(saveFile);
@@ -871,7 +874,11 @@ public final class FreeColClient {
         }
         final FreeColServer fcs;
         try {
-            fcs = new FreeColServer(fsg, (Specification)null, port, name);
+            fcs = new FreeColServer(fsg, (Specification)null, address, port, name);
+            fcs.setPublicServer(publicServer);
+            if (!fcs.registerWithMetaServer()) {
+                return failToMain(null, "server.noRouteToServer");
+            }
         } catch (XMLStreamException xse) {
             return failToMain(xse, FreeCol.badFile("error.couldNotLoad", saveFile));
         } catch (Exception ex) {
