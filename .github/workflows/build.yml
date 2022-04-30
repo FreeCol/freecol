@@ -16,14 +16,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+      
+      - name: Run tests
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml testall
           
       - name: Build artifacts
         shell: bash
         run: |
           ant -noinput -buildfile build.xml nightly-release
-  
-      - uses: actions/upload-artifact@v3
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: Packages
-          path: dist/releases/
-          
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            dist/releases/*
