@@ -838,6 +838,7 @@ public final class FreeColClient {
         try {
             fcs = new FreeColServer(publicServer, singlePlayer, spec, address, port, null);
             if (!fcs.registerWithMetaServer()) {
+                fcs.shutdown();
                 return failToMain(null, "server.noRouteToServer");
             }
         } catch (IOException ioe) {
