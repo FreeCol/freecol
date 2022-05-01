@@ -42,8 +42,6 @@ image of what Colonization 2 would have been.
 
 #### Supports Mac OS X, Windows, and Linux
 
-Current stable release is _0.11.6_, since this release, there has been a complete code overhaul over the last 2 years, and we are nearing a stable release (0.12.0)
-
 The latest binary releases are created weekly and contain Mac OS X, Windows, and Linux installers.
 
 * See: [Weekly Releases](https://github.com/FreeCol/freecol/releases)
@@ -69,6 +67,6 @@ Build the latest version of the code by running:
 ant
 ```
 
-Requires Java 9, Ant, and Java SDK to build.
+Requires Java 11, Ant, and Java SDK to build.
 
 
