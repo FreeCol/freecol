@@ -17,7 +17,14 @@ FreeCol.log
 FreeCol*.jar
 src/*.MF
 build/installer/
+build/net/
 doc/specification_*.html
+doc/*.aux
+doc/*.idx
+doc/*.log
+doc/*.out
+doc/*.pdf
+doc/*.toc
 dist/
 a/
 b/
