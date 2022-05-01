@@ -51,7 +51,8 @@ public class LoadingSavegameInfo {
     
     /**
      * Get the selected address;
-     * @return
+     *
+     * @return The {@code InetAddress}.
      */
     public InetAddress getAddress() {
         return address;
@@ -75,6 +76,11 @@ public class LoadingSavegameInfo {
         return serverName;
     }
 
+    /**
+     * Is this a public server?
+     *
+     * @return True if this is a public server.
+     */
     public boolean isPublicServer() {
         return publicServer;
     }
