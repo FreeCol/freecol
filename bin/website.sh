@@ -1,11 +1,13 @@
 #! /bin/sh
 # Upload the website
 #
-# Default is to upload what changed recently, with -g from a specific commit.
-# -a just uploads all of it.
+# Former default is to upload what changed recently, with -g from a
+# specific commit.  -a just uploads all of it.  But with the jekyll
+# stage, we can not reliably tell what has changed, so now defaulting to
+# full upload.
 #
-set -xv
-MODE=prev
+#set -xv
+MODE=all
 while test "x$1" != "x" ; do
     case "x$1" in
     "x-a")
@@ -26,14 +28,24 @@ if test "x$USERNAME" = "x" ; then
     exit 1
 fi
 WEBDIR=www.freecol.org
+if test ! -d "$WEBDIR" ; then
+   echo "run from the top of the source tree, $WEBDIR should be a subdirectory" >&2
+   exit 1
+fi
+
+# Build the website
+(cd "$WEBDIR" ; jekyll build) || exit $?
 
 if test "x$MODE" = "xall" ; then
     {
         echo "cd /home/project-web/freecol/htdocs"
-        find www.freecol.org -type f -print \
-            | sed -e 's|^www.freecol.org/\(.*\)$|put \1 \1|'
-    } | (cd "$WEBDIR" ; sftp $USERNAME,freecol@web.sf.net)
+        find "$WEBDIR/_site" -type f -print \
+            | sed -n -e "s|^$WEBDIR/_site/"'\(.*\)$|put \1 \1|p'
+    } | (cd "$WEBDIR/_site" ; sftp $USERNAME,freecol@web.sf.net)
 else
+    echo "incremental mode disabled" >&2
+    exit 1
+    
     if test "x$MODE" = "xprev" ; then
         PREV=`git log --pretty=oneline "$WEBDIR" | sed -n -e '2s/^\([^ ]*\).*$/\1/p'`
     else
@@ -41,6 +53,6 @@ else
     fi
     {
         echo "cd /home/project-web/freecol/htdocs"
-        git diff --name-only "$PREV" HEAD -- "$WEBDIR" | sed -e 's|^[^/]*/\(.*\)$|put \1 \1|p'
-    } | (cd "$WEBDIR" ; sftp $USERNAME,freecol@web.sf.net)
+        git diff --name-only "$PREV" HEAD -- "$WEBDIR" | sed -n -e 's|^[^/]*/\(.*\)$|put \1 \1|p'
+    } | cat #(cd "$WEBDIR" ; sftp $USERNAME,freecol@web.sf.net)
 fi
