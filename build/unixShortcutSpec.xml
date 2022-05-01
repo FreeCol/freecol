@@ -13,7 +13,6 @@
               type="Application"
               commandLine="--windowed"
               workingDirectory="$INSTALL_PATH"
-              categories="Application;Game;StrategyGame"
               description="A turn-based strategy game based on 'Sid Meier's Colonization'."
               iconFile="$INSTALL_PATH/freecol.xpm"
               iconIndex="0"
