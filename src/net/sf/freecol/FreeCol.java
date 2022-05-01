@@ -97,13 +97,13 @@ import net.sf.freecol.server.control.Controller;
 public final class FreeCol {
 	
     static {
-    	/*
-         * Deactivate automatic UI scaling since we are solving it manually instead.
+        /*
+         * Deactivate automatic UI scaling since we are solving it
+         * manually instead.
          * 
-         * This needs to be done before any Swing/AWT class gets loaded. Please keep
-         * this static block right here at the top.
+         * This needs to be done before any Swing/AWT class gets
+         * loaded. Please keep this static block right here at the top.
          */
-    	
         System.setProperty("sun.java2d.uiScale", "1.0");
         System.setProperty("sun.java2d.uiScale.enabled", "false");
     }
@@ -111,7 +111,7 @@ public final class FreeCol {
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     /** The FreeCol release version number. */
-    private static final String FREECOL_VERSION = "0.11.6";
+    private static final String FREECOL_VERSION = "0.12.0";
 
     /** The FreeCol protocol version number. */
     private static final String FREECOL_PROTOCOL_VERSION = "0.1.6";
