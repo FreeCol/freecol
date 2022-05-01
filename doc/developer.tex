@@ -445,32 +445,29 @@ recommended for a release. Uploads to sourceforge use \texttt{sftp}.
   keep the announcement brief but refer to a detailed \textbf{Release Notes}
   page on the sourceforge freecol wiki.
 
-\item The \texttt{freecol.org} website is in transition to a new
-  format, and the master copy lives in the git tree in the
-  \texttt{www.freecol.org} top-level directory. To update the
-  website, for now, you will need to add a new
-  \texttt{www.freecol.org/news/freecol-}\emph{version}\texttt{-released.html}
+\item The source for the \texttt{freecol.org} website lives in the git
+  tree in the \texttt{www.freecol.org} top-level directory. To update
+  the website, for now, you will need to add a new
+  \texttt{www.freecol.org/\_posts/freecol-}\emph{version}\texttt{-released.html}
   file and edit the following files:
   \begin{description}
   \item[\texttt{www.freecol.org/download.html}] Update the release
     version number.
-  \item[\texttt{www.freecol.org/index.html}] Add a reference to the
-    new release.
   \item[\texttt{www.freecol.org/sitemap.html}] Add a reference to the
     new release.
   \item[\texttt{www.freecol.org/status.html}] Update the release
     version number.
-  \item[\texttt{www.freecol.org/news/index.html}] Add a section for
-    the new release containing the release announcement, and move the
-    download button from the previous release to the new one.
-  \item[\texttt{www.freecol.org/news/releases.html}] Copy in the same
-    section from the previous file, these two are nearly identical.
   \end{description}
-  Use \texttt{sftp} to log in at
-  \emph{username}\texttt{,freecol@web.sf.net} to upload changes (the
-  website lives in the \texttt{htdocs} subdirectory), or use the
-  \verb|bin/website.sh| script which uploads everything that has
-  changed in the git website directory.
+
+\item Change directory to the \texttt{www.freecol.org} subdirectory
+  and build the website with Jekyll (\texttt{jekyll build}).  This
+  creates a new fully linked version of the website in the
+  \texttt{\_site} subdirectory.
+
+\item Change directory to the \texttt{\_site} subdirectory and upload
+  to \emph{username}\texttt{,freecol@web.sf.net} with \texttt{sftp}.
+  The website lives in the \texttt{htdocs} subdirectory there.  There
+  is a script in \verb|bin/website.sh| script which uploads everything.
 
 \item Post the release announcement to:
   \begin{itemize}
@@ -485,16 +482,15 @@ recommended for a release. Uploads to sourceforge use \texttt{sftp}.
   \end{itemize}
 
 \item Consider revising the preamble to the ``Bugs'' page,
-  particularly the ``Known Common Problems'' section. Go to ``Admin /
-  Tools / Bugs / Options'' to make changes.
+  particularly the ``Known Common Problems'' section. Go to ``Tickets /
+  Admin-Bugs / Options'' to make changes.
 
 \item Go to the bug tracker and create a new milestone (``Edit
   Milestones'') called ``Fixed\_\emph{release}''
-  (e.g. ``Fixed\_0.10.2''). Select the ``Fixed\_trunk'' group and do
-  a mass edit (the pencil icon in the top right of the bug tracker
-  list) and move all bugs to the new milestone. Repeat for the
-  ``Pending\_Fixed'' group. Do the corresponding action in other
-  ticket categories that have distinct release milestones.
+  (e.g. ``Fixed\_0.10.2''). Select the ``Fixed\_trunk'' group and do a
+  mass edit (the pencil icon in the top right of the bug tracker list)
+  and move all bugs to the new milestone. Repeat for the
+  ``Pending\_Fixed'' group setting them to ``Closed\_Fixed''.
 
 \item Start a new wiki page for the release notes for the next
   release.
