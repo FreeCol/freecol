@@ -30,7 +30,7 @@ import net.sf.freecol.common.util.Utils;
  * Helper container to remember a unit state prior to some change,
  * and fire off any consequent property changes.
  */
-public class UnitWas implements Comparable<UnitWas> {
+public class UnitWas extends ObjectWas implements Comparable<UnitWas> {
 
     private static final Logger logger = Logger.getLogger(UnitWas.class.getName());
 
