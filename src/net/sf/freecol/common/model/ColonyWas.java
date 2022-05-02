@@ -30,7 +30,7 @@ import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
  * Helper container to remember a colony state prior to some
  * change, and fire off any consequent property changes.
  */
-public class ColonyWas {
+public class ColonyWas extends ObjectWas {
 
     private static final Logger logger = Logger.getLogger(ColonyWas.class.getName());
 

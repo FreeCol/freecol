@@ -28,7 +28,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * Helper container to remember the Europe state prior to some
  * change, and fire off any consequent property changes.
  */
-public class EuropeWas {
+public class EuropeWas extends ObjectWas {
 
     private static final Logger logger = Logger.getLogger(EuropeWas.class.getName());
 
