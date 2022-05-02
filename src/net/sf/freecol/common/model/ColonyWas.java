@@ -53,10 +53,7 @@ public class ColonyWas extends ObjectWas {
     }
 
     /**
-     * Fire any property changes resulting from actions within a
-     * colony.
-     *
-     * @return True if something changed.
+     * {@inheritDoc}
      */
     public boolean fireChanges() {
         boolean ret = false;

@@ -65,9 +65,7 @@ public class EuropeWas extends ObjectWas {
     }
 
     /**
-     * Fire any property changes resulting from actions in Europe.
-     *
-     * @return True if something changed.
+     * {@inheritDoc}
      */
     public boolean fireChanges() {
         final int newCount = europe.getUnitCount();
