@@ -2816,9 +2816,9 @@ public final class InGameController extends FreeColClientHolder {
 
         boolean ret = askLoadGoods(europe, type, amount, carrier);
         if (ret) {
+            marketWas.add(new AbstractGoods(type, -amount));
             sound("sound.event.loadCargo");
-            marketWas.fireChanges(type, -amount);
-            fireChanges(unitWas, europeWas);
+            fireChanges(unitWas, europeWas, marketWas);
             updateGUI(null, false);
         }
         return ret;
@@ -3410,12 +3410,12 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
+        marketWas.addAll(req);
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askServer().equipUnitForRole(unit, role, roleCount)
             && unit.getRole() == role;
         if (ret) {
-            if (marketWas != null) marketWas.fireChanges(req);
-            fireChanges(colonyWas, europeWas, unitWas);
+            fireChanges(colonyWas, europeWas, marketWas, unitWas);
             updateGUI(null, false);
         }
         return ret;
@@ -4865,9 +4865,9 @@ public final class InGameController extends FreeColClientHolder {
         UnitWas unitWas = new UnitWas(carrier);
         boolean ret = askUnloadGoods(goods.getType(), goods.getAmount(), carrier);
         if (ret) {
+            marketWas.add(new AbstractGoods(goods.getType(), goods.getAmount()));
             sound("sound.event.sellCargo");
-            marketWas.fireChanges(goods.getType(), goods.getAmount());
-            fireChanges(europeWas, unitWas);
+            fireChanges(europeWas, marketWas, unitWas);
             updateGUI(null, false);
         }
         return ret;

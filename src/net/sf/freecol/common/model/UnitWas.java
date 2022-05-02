@@ -81,9 +81,7 @@ public class UnitWas extends ObjectWas implements Comparable<UnitWas> {
     }
 
     /**
-     * Fire any property changes resulting from actions of a unit.
-     *
-     * @return True if something changed.
+     * {@inheritDoc}
      */
     public boolean fireChanges() {
         UnitType newType = null;
