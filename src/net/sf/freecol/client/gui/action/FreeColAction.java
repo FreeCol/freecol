@@ -39,6 +39,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -272,7 +273,8 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     private void updateImageIcon(String key) {
-        List<BufferedImage> images = getGUI().getFixedImageLibrary().getButtonImages(key);
+        final ImageLibrary lib = getGUI().getFixedImageLibrary();
+        List<BufferedImage> images = lib.getButtonImages(key);
         orderButtonImageCount = images.size();
         if (hasOrderButtons()) {
             putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
