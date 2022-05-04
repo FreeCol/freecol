@@ -34,15 +34,6 @@ a:hover {
     display: none;
 }
 
-#pagewidth-800 {
-    width: 770px;
-    text-align: left;
-    margin-left: auto;
-    margin-right: auto;
-    background: transparent url(../images/back_all.gif) repeat-y 0 140px;
-    margin-bottom: 20px;
-}
-
 #pagewidth-1024 {
     width: 970px;
     text-align: left;
@@ -50,6 +41,438 @@ a:hover {
     margin-right: auto;
     background: transparent url(../images/back_all1024.gif) repeat-y;
     margin-bottom: 20px;
+}
+
+#leftcol div.module div div div div.submenu {
+    padding: 0 0 0 4px;
+}
+
+.image-with-title {
+    display: inline-block;
+    text-align: center;
+    /*flex: 1 1 0px;*/
+    
+    min-width: 10rem;
+}
+
+.center {
+    text-align: center;
+}
+
+.group-image-with-title {
+    width: 100%;
+    
+    
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    
+    justify-content: center;
+    column-gap: 1rem;
+    row-gap: 1rem;
+    align-content: flex-start;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+    
+
+@media only screen and (min-width: 770px) {
+    #pagewidth-800 {
+        width: 770px;
+        text-align: left;
+        margin-left: auto;
+        margin-right: auto;
+        background: transparent url(../images/back_all.gif) repeat-y 0 140px;
+        margin-bottom: 20px;
+    }
+    
+    #outer-800 {
+        width: 770px;
+        padding-top: 6px;
+        background: transparent url(../images/content-top.gif) no-repeat top;
+    }
+    
+    #footer-800 {
+        height: 28px;
+        width: 100%;
+        background: transparent url(../images/footer.jpg) bottom left no-repeat;
+        font-size: 12px;
+    }
+    
+    #pathway {
+        width: 740px;
+        height: 19px;
+        padding-left: 20px;
+        padding-top: 5px;
+    }
+    
+    #maincol-normal-800 {
+        float: left;
+        margin-left: -5px;
+        width: 446px;
+    }
+
+    #maincol-broad-800 {
+        float: left;
+        margin-left: -5px;
+        width: 417px;
+    }
+
+    #maincol-wide-800 {
+        float: left;
+        width: 595px;
+        margin-left: -5px;
+        padding-top: 0;
+    }
+    div#sflogo {
+        text-align: right;
+        position: relative;
+        right: 1px;
+        top: -27px;
+        height: 10px;
+    }
+    
+    .graded_block {
+        width: 489px;
+        height: 64px;
+        background: transparent url(../images/graded_block.png);
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .graded_block > table {
+        position: relative;
+        top: 20%;
+        margin-top: -25px;
+    }
+    
+    .screenshot-welcome-bottom {
+        display: none;
+    }
+    
+    #leftcol {
+        width: 152px;
+        float: left;
+        position: relative;
+        margin-right: 5px;
+    }
+
+    #leftcol div.module, #rightcol-normal div.module {
+        width: 152px;
+        background: transparent url(../images/module_middle.jpg) left repeat-y;
+        margin-bottom: 10px;
+        margin-top: 3px;
+    }
+
+    #leftcol div.module div, #rightcol-normal div.module div {
+        width: 152px;
+        background: transparent url(../images/module_top.jpg) top left no-repeat;
+    }
+
+    #leftcol div.module div div, #rightcol-normal div.module div div {
+        width: 152px;
+        background: transparent url(../images/module_bottom.jpg) bottom left no-repeat;
+    }
+
+    #leftcol div.module div div div, #rightcol-normal div.module div div div {
+        width: 137px;
+        background: transparent;
+        padding: 10px 10px 10px 5px;
+        font-size: 12px;
+    }
+    
+    #leftcol div.module div div div div.mainmenu {
+        padding: 0;
+    }
+    
+    /* Main Menu(s) */
+
+    a.mainlevel {
+        font-size: 12px;
+        padding-left: 4px;
+        width: 143px;
+        display: block;
+        line-height: 26px;
+        margin-bottom: 2px;
+        text-decoration: none;
+        font-weight: normal;
+        border-right: 4px solid #CACACA;
+    }
+
+    html > body a.mainlevel {
+        width: 135px;
+    }
+
+    /* Opera5-Fix-fix ;-) */
+
+    a.mainlevel:hover, a.mainlevel#active_menu {
+        background: #F1F1F1;
+        text-decoration: none;
+    }
+
+    a.sublevel {
+        font-size: 12px;
+        padding: 0 0 0 12px;
+        width: 139px;
+        display: block;
+        line-height: 20px;
+        margin: 0 0 2px;
+        text-decoration: none;
+        font-weight: normal;
+        border-right: 4px solid #CACACA;
+    }
+
+    html > body a.sublevel {
+        width: 123px;
+    }
+
+    /* Opera5-Fix-fix ;-) */
+
+    a.sublevel:hover, a.sublevel#active_menu {
+        text-decoration: none;
+        width: 123px;
+    }
+
+    html > body a.sublevel:hover, a.sublevel#active_menu {
+        width: 123px;
+    }
+}
+
+@media only screen and (max-width: 769.9px) {
+    #header {
+        display: none;
+    }
+    
+    #pagewidth-800 {
+        width: 100%;
+        text-align: left;
+        background: white;
+    }
+    
+    #outer-800 {
+        width: 100%;
+        bottom: 0rem;
+        background: white;
+        padding-top: 6px;
+    }
+
+    #footer-800 {
+        position: relative;
+        height: 28px;
+        width: 100%;
+        background: white;
+        font-size: 12px;
+    }
+    
+    #pathway {
+        width: calc(100% - 1rem);
+        height: 19px;
+        padding-left: 1rem;
+        padding-top: 5px;
+    }
+    
+    #maincol-normal-800 {
+        float: left;
+        margin-left: -5px;
+        width: calc(100% - 2rem);
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    #maincol-broad-800 {
+        float: left;
+        margin-left: -5px;
+        width: calc(100% - 2rem);
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    #maincol-wide-800 {
+        float: left;
+        width: calc(100% - 2rem);
+        margin-left: -5px;
+        padding-top: 0;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    div#sflogo {
+        text-align: right;
+        position: relative;
+        right: 1rem;
+        top: -27px;
+        height: 10px;
+    }
+    
+    .graded_block {
+        width: 100%;
+        height: 64px;
+        background: #dddddd;
+        border: 1px solid black;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .graded_block > table {
+        position: relative;
+        height: 100%;
+    }
+    
+    #leftcol h3 {
+        /* main menu title */
+        display: none;
+    }
+    
+    .pathway-right {
+        padding-right: 1rem;
+    }
+    
+    .screenshot-welcome {
+        display: none;
+    }
+    
+    .screenshot-welcome-bottom {
+        display: block;
+        padding-top: 1rem;
+        padding-bottom: 2rem;
+    }
+    
+    .screenshot-welcome-bottom img {
+        width: 100%;
+    }
+    
+    #leftcol {
+        width: 100%;
+        float: left;
+        position: relative;
+    }
+    
+    #leftcol div.module, #rightcol-normal div.module {
+        width: 100%;
+        background: white;
+        margin-bottom: 10px;
+        margin-top: 3px;
+    }
+
+    #leftcol div.module div, #rightcol-normal div.module div {
+        width: 100%;
+        background: white;
+    }
+
+    #leftcol div.module div div, #rightcol-normal div.module div div {
+        width: 100%;
+        background: white;
+    }
+
+    #leftcol div.module div div div, #rightcol-normal div.module div div div {
+        width: calc(100% - 2rem);
+        padding-left: 1rem;
+        background: transparent;
+        font-size: 12px;
+    }
+    
+    #leftcol div.module div div div div.mainmenu {
+        display: inline-block;
+        width: 8rem;
+        padding: 0;
+    }
+    
+    /* Main Menu(s) */
+
+    a.mainlevel {
+        font-size: 12px;
+        /* padding-left: 4px; */
+        width: 143px;
+        display: block;
+        line-height: 26px;
+        margin-bottom: 2px;
+        text-decoration: none;
+        font-weight: normal;
+        border-right: 4px solid #CACACA;
+    }
+
+    html > body a.mainlevel {
+        width: 100%;
+    }
+
+    /* Opera5-Fix-fix ;-) */
+
+    a.mainlevel:hover, a.mainlevel#active_menu {
+        background: #F1F1F1;
+        text-decoration: none;
+    }
+
+    a.sublevel {
+        font-size: 12px;
+        padding: 0 0 0 12px;
+        width: 139px;
+        display: block;
+        line-height: 20px;
+        margin: 0 0 2px;
+        text-decoration: none;
+        font-weight: normal;
+        border-right: 4px solid #CACACA;
+    }
+
+    html > body a.sublevel {
+        width: 100%;
+    }
+
+    /* Opera5-Fix-fix ;-) */
+
+    a.sublevel:hover, a.sublevel#active_menu {
+        text-decoration: none;
+        width: 100%;
+    }
+
+    html > body a.sublevel:hover, a.sublevel#active_menu {
+        width: 100%;
+    }
+    
+    #leftcol > .module > div > div > div {
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+
+        -webkit-box-orient: horizontal;
+        -moz-box-orient: horizontal;
+        -webkit-flex-direction: row;
+        -ms-flex-direction: row;
+        flex-direction: row;
+       
+        justify-content: space-between;       
+        column-gap: 1rem;
+        align-content: flex-start;
+        flex-wrap: wrap;
+    }
+    
+    #leftcol .mainmenu {
+        -webkit-box-ordinal-group: 1;
+        -moz-box-ordinal-group: 1;
+        -ms-flex-order: 1;
+        -webkit-order: 1;
+        order: 1;
+    }
+    #leftcol .submenu {
+        -webkit-box-ordinal-group: 2;
+        -moz-box-ordinal-group: 2;
+        -ms-flex-order: 2;
+        -webkit-order: 2;
+        order: 2;
+    }
+}
+
+#outer-1024 {
+    background: transparent url(../images/content-top1024.gif) no-repeat top;
 }
 
 #header {
@@ -70,20 +493,6 @@ a:hover {
     float: left;
 }
 
-#pathway {
-    width: 740px;
-    height: 19px;
-    padding-left: 20px;
-    padding-top: 5px;
-}
-
-#leftcol {
-    width: 152px;
-    float: left;
-    position: relative;
-    margin-right: 5px;
-}
-
 #rightcol-normal {
     width: 155px;
     float: right;
@@ -102,22 +511,21 @@ a:hover {
     margin-top: -12px;
 }
 
-#outer-800 {
-    width: 770px;
-    padding-top: 6px;
-    /*margin-top: 2px;*/
-}
-
 #outer-1024 {
     width: 970px;
     padding-top: 6px;
 }
 
-#footer-800 {
-    height: 28px;
-    width: 100%;
-    background: transparent url(../images/footer.jpg) bottom left no-repeat;
-    font-size: 12px;
+#rightcol-broad-top {
+    width: 170px;
+    padding-left: 5px;
+    background: transparent url(../images/horizontal-line.jpg) bottom repeat-x;
+}
+
+#rightcol-broad-bottom {
+    width: 170px;
+    padding-left: 5px;
+    background: transparent url(../images/horizontal-line.jpg) top repeat-x;
 }
 
 #footer-1024 {
@@ -125,25 +533,6 @@ a:hover {
     width: 100%;
     background: transparent url(../images/footer1024.jpg) bottom left no-repeat;
     font-size: 12px;
-}
-
-#maincol-normal-800 {
-    float: left;
-    margin-left: -5px;
-    width: 446px;
-}
-
-#maincol-broad-800 {
-    float: left;
-    margin-left: -5px;
-    width: 417px;
-}
-
-#maincol-wide-800 {
-    float: left;
-    width: 595px;
-    margin-left: -5px;
-    padding-top: 0;
 }
 
 #maincol-normal-1024 {
@@ -191,38 +580,6 @@ iframe.wrapper {
 
 /* Modules */
 
-#leftcol div.module, #rightcol-normal div.module {
-    width: 152px;
-    background: transparent url(../images/module_middle.jpg) left repeat-y;
-    margin-bottom: 10px;
-    margin-top: 3px;
-}
-
-#leftcol div.module div, #rightcol-normal div.module div {
-    width: 152px;
-    background: transparent url(../images/module_top.jpg) top left no-repeat;
-}
-
-#leftcol div.module div div, #rightcol-normal div.module div div {
-    width: 152px;
-    background: transparent url(../images/module_bottom.jpg) bottom left no-repeat;
-}
-
-#leftcol div.module div div div, #rightcol-normal div.module div div div {
-    width: 137px;
-    background: transparent;
-    padding: 10px 10px 10px 5px;
-    font-size: 12px;
-}
-
-#leftcol div.module div div div div.mainmenu {
-    padding: 0;
-}
-
-#leftcol div.module div div div div.submenu {
-    padding: 0 0 0 4px;
-}
-
 .footer-copyright {
     position: relative;
     top: 5px;
@@ -235,17 +592,6 @@ iframe.wrapper {
     padding-bottom: 10px;
 }
 
-#rightcol-broad-top {
-    width: 170px;
-    padding-left: 5px;
-    background: transparent url(../images/horizontal-line.jpg) bottom repeat-x;
-}
-
-#rightcol-broad-bottom {
-    width: 170px;
-    padding-left: 5px;
-    background: transparent url(../images/horizontal-line.jpg) top repeat-x;
-}
 
 #rightcol-broad div.module div {
     width: 180px;
@@ -327,58 +673,6 @@ ul#mainlevel-nav li a {
     color: #CCCCCC;
     margin-left: 5px;
     white-space: nowrap;
-}
-
-/* Main Menu(s) */
-
-a.mainlevel {
-    font-size: 12px;
-    padding-left: 4px;
-    width: 143px;
-    display: block;
-    line-height: 26px;
-    margin-bottom: 2px;
-    text-decoration: none;
-    font-weight: normal;
-    border-right: 4px solid #CACACA;
-}
-
-html > body a.mainlevel {
-    width: 135px;
-}
-
-/* Opera5-Fix-fix ;-) */
-
-a.mainlevel:hover, a.mainlevel#active_menu {
-    background: #F1F1F1;
-    text-decoration: none;
-}
-
-a.sublevel {
-    font-size: 12px;
-    padding: 0 0 0 12px;
-    width: 139px;
-    display: block;
-    line-height: 20px;
-    margin: 0 0 2px;
-    text-decoration: none;
-    font-weight: normal;
-    border-right: 4px solid #CACACA;
-}
-
-html > body a.sublevel {
-    width: 123px;
-}
-
-/* Opera5-Fix-fix ;-) */
-
-a.sublevel:hover, a.sublevel#active_menu {
-    text-decoration: none;
-    width: 123px;
-}
-
-html > body a.sublevel:hover, a.sublevel#active_menu {
-    width: 123px;
 }
 
 /* Module specific */
@@ -506,7 +800,7 @@ a.readon:hover {
 .contentheading {
     font-weight: bold;
     font-size: 18px;
-    height: 23px;
+    padding-bottom: 5px;
     line-height: 20px;
     font-family: 'Trebuchet MS', verdana, sans-serif;
     border-bottom: 1px solid #002E61;
@@ -631,12 +925,4 @@ tr.trLine .leftcell {
 
 .content table.contentpane {
     margin-bottom: 2em;
-}
-
-div#sflogo {
-    text-align: right;
-    position: relative;
-    right: 1px;
-    top: -27px;
-    height: 10px;
 }
