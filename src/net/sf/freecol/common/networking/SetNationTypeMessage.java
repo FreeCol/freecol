@@ -107,8 +107,7 @@ public class SetNationTypeMessage extends AttributeMessage {
             ok = true;
             break;
         case FIXED:
-            if (nationType.equals(fixedNationType)) return null;
-            ok = false;
+            ok = nationType.equals(fixedNationType);
             break;
         case NONE:
             ok = nationType == spec.getDefaultNationType();

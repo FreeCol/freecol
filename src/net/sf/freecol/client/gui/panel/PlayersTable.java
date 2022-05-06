@@ -145,11 +145,12 @@ public final class PlayersTable extends JTable {
             final NationType nationType = ((Nation)table.getValueAt(row,
                     PlayersTable.NATION_COLUMN)).getType();
             JLabel label;
-            switch (advantages) {
+            switch (this.advantages) {
             case SELECTABLE:
-                return Utility.localizedLabel(Messages.nameKey((player == null)
+                label = Utility.localizedLabel(Messages.nameKey((player == null)
                         ? nationType
                         : player.getNationType()));
+                break;
             case FIXED:
                 label = Utility.localizedLabel(Messages.nameKey(nationType));
                 break;
@@ -345,10 +346,8 @@ public final class PlayersTable extends JTable {
          */
         @Override
         public Component getListCellRendererComponent(JList<? extends NationState> list,
-                                                      NationState value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
+            NationState value, int index, boolean isSelected,
+            boolean cellHasFocus) {
             setText(Messages.getName(value));
             return this;
         }
