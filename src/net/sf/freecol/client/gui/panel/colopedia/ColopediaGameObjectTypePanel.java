@@ -269,17 +269,4 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
     public Dimension getListItemIconSize() {
         return colopediaPanel.getListItemIconSize();
     }
-        
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        colopediaPanel = null;
-    }
 }
