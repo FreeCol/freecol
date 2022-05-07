@@ -83,7 +83,6 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         button2 = Utility.localizedButton("music");
         panel.add(button2);
 
-        cbox.add(super.getJLabel());
         cbox.setModel(new DefaultComboBoxModel<>(getOption().getChoices()
                 .toArray(new MixerWrapper[0])));
         cbox.setRenderer(new FreeColComboBoxRenderer<>());

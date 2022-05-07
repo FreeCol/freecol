@@ -280,6 +280,12 @@ public abstract class OptionsDialog extends FreeColPanel {
                 dialogHandler.handle(group);
             }
         } else if (CANCEL.equals(command)) {
+            /*
+             * Resets so that the option with preview (volume)
+             * gets restored on cancel.
+             */
+            getOptionUI().reset();
+            
             getGUI().removeComponent(this);
             if (dialogHandler != null) {
                 dialogHandler.handle(null);
