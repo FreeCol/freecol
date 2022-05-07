@@ -37,6 +37,7 @@ import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Named;
+import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 import net.sf.freecol.common.option.LanguageOption.Language;
 
 
@@ -153,6 +154,9 @@ public class FreeColComboBoxRenderer<T>
         } else if (value instanceof InetAddress) {
             final InetAddress address = (InetAddress) value;
             c.setText(address.getHostAddress());
+        } else if (value instanceof MixerWrapper) {
+            final MixerWrapper mw = (MixerWrapper) value;
+            c.setText(mw.getKey());
         } else {
             logger.warning("What is this?: " + value
                 + " (" + value.getClass() + ")");

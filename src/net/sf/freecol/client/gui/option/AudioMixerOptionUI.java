@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
@@ -85,6 +86,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         cbox.add(super.getJLabel());
         cbox.setModel(new DefaultComboBoxModel<>(getOption().getChoices()
                 .toArray(new MixerWrapper[0])));
+        cbox.setRenderer(new FreeColComboBoxRenderer<>());
         reset();
         cbox.setEnabled(editable);
 
