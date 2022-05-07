@@ -21,6 +21,8 @@ package net.sf.freecol.client.gui.dialog;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -31,7 +33,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -72,29 +74,31 @@ public final class DifficultyDialog extends OptionsDialog
     public DifficultyDialog(FreeColClient freeColClient, JFrame frame,
                             Specification specification, OptionGroup level,
                             boolean editable) {
-        super(freeColClient, frame, editable, level, "difficultyDialog",
+        super(freeColClient, level, "difficultyDialog",
               FreeColDirectories.CUSTOM_DIFFICULTY_FILE_NAME,
-              "model.difficulty.custom");
+              "model.difficulty.custom", editable);
 
         this.specification = specification;
         this.selected = level;
-
+        
         getOptionUI().getTree().addTreeSelectionListener(this);
+        
+        final List<JButton> extraButtons = new ArrayList<>();
         if (isEditable()) {
-            JButton resetButton = Utility.localizedButton("reset");
+            final JButton resetButton = Utility.localizedButton("reset");
             addResetAction(resetButton);
             
-            JButton loadButton = Utility.localizedButton("load");
+            final JButton loadButton = Utility.localizedButton("load");
             addLoadAction(loadButton);
                     
-            JButton saveButton = Utility.localizedButton("save");
+            final JButton saveButton = Utility.localizedButton("save");
             addSaveAction(saveButton);
 
-            this.panel.add(resetButton, "span, split 3");
-            this.panel.add(loadButton);
-            this.panel.add(saveButton);
+            extraButtons.add(resetButton);
+            extraButtons.add(loadButton);
+            extraButtons.add(saveButton);
         }
-        initialize(frame, choices());
+        initialize(frame, extraButtons);
     }
 
 
@@ -173,16 +177,9 @@ public final class DifficultyDialog extends OptionsDialog
         }
     }
 
-
-    // Override OptionsDialog
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public OptionGroup getResponse() {
-        OptionGroup value = super.getResponse();
-        return (value == null) ? null // Cancelled
-            : getGroup();
+    protected boolean saveDefaultOptions() {
+        // No saving of default options.
+        return false;
     }
 }

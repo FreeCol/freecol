@@ -50,7 +50,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
@@ -1695,21 +1694,13 @@ public class SwingGUI extends GUI {
     @Override
     public void showClientOptionsDialog() {
         final FreeColClient fcc = getFreeColClient();
-        OptionGroup group = null;
-        try {
-            ClientOptionsDialog dialog
-                = new ClientOptionsDialog(fcc, this.canvas.getParentFrame());
-            group = this.canvas.showFreeColDialog(dialog, null);
-        } finally {
-            refreshGuiUsingClientOptions();
-        }
-        if (fcc.isMapEditor()) {
-            startMapEditorGUI();
-        } else if (fcc.isInGame()) {
-            ; // do nothing
-        } else {
-            showMainPanel(null); // back to the main panel
-        }
+        final ClientOptionsDialog dialog = new ClientOptionsDialog(fcc, this.canvas.getParentFrame(), true);
+        dialog.setDialogHandler(group -> {
+            if (group != null) {
+                refreshGuiUsingClientOptions();
+            }
+        });
+        this.canvas.showFreeColPanel(dialog, PopupPosition.CENTERED, true);
     }
     
     /**
@@ -1881,13 +1872,11 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public OptionGroup showDifficultyDialog(Specification spec,
+    public void showDifficultyDialog(Specification spec,
                                             OptionGroup group,
-                                            boolean editable) {
-        OptionGroup ret
-            = this.widgets.showDifficultyDialog(spec, group, editable);
-        if (ret != null) FreeCol.setDifficulty(ret);
-        return ret;
+                                            boolean editable,
+                                            DialogHandler<OptionGroup> dialogHandler) {
+        this.widgets.showDifficultyDialog(spec, group, editable, dialogHandler);
     }
 
     /**
@@ -1990,8 +1979,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public OptionGroup showGameOptionsDialog(boolean editable) {
-        return this.widgets.showGameOptionsDialog(editable);
+    public void showGameOptionsDialog(boolean editable, DialogHandler<OptionGroup> dialogHandler) {
+        this.widgets.showGameOptionsDialog(editable, dialogHandler);
     }
 
     /**
@@ -2094,8 +2083,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
-        return this.widgets.showMapGeneratorOptionsDialog(editable);
+    public void showMapGeneratorOptionsDialog(boolean editable, DialogHandler<OptionGroup> dialogHandler) {
+        this.widgets.showMapGeneratorOptionsDialog(editable, dialogHandler);
     }
 
     /**

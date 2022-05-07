@@ -877,14 +877,11 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Get the option group that defines a difficulty level.
-     *
-     * @return The {@code OptionGroup} selected.
+     * Shows the current difficulty as an uneditable dialog.
      */
-    public final OptionGroup showDifficultyDialog() {
+    public final void showDifficultyDialog() {
         final Specification spec = getSpecification();
-        return showDifficultyDialog(spec, spec.getDifficultyOptionGroup(),
-                                    false);
+        showDifficultyDialog(spec, spec.getDifficultyOptionGroup(), false, null);
     }
 
     /**
@@ -1917,9 +1914,10 @@ public class GUI extends FreeColClientHolder {
      * @param editable If true, the option group can be edited.
      * @return The (possibly modified) {@code OptionGroup}.
      */
-    public OptionGroup showDifficultyDialog(Specification spec,
+    public void showDifficultyDialog(Specification spec,
                                             OptionGroup group,
-                                            boolean editable) { return null; }
+                                            boolean editable,
+                                            DialogHandler<OptionGroup> dialogHandler) {  }
 
     /**
      * Show a dialog to choose what goods to dump.
@@ -2018,9 +2016,9 @@ public class GUI extends FreeColClientHolder {
      * Show the Game options dialog.
      *
      * @param editable True if the options can be edited.
-     * @return The game options {@code OptionGroup}.
+     * @param dialogHandler A callback for handling the closing of the dialog.
      */
-    public OptionGroup showGameOptionsDialog(boolean editable) { return null; }
+    public void showGameOptionsDialog(boolean editable, DialogHandler<OptionGroup> dialogHandler) { }
 
     /**
      * Show the high scores panel.
@@ -2093,9 +2091,8 @@ public class GUI extends FreeColClientHolder {
      * Show the map generator options.
      *
      * @param editable If true, allow edits.
-     * @return The map generator {@code OptionGroup}.
      */
-    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) { return null; }
+    public void showMapGeneratorOptionsDialog(boolean editable, DialogHandler<OptionGroup> dialogHandler) { }
 
     /**
      * Show the map size dialog.

@@ -170,6 +170,9 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * @return The {@code Specification}.
      */
     protected Specification getSpecification() {
+        if (freeColClient.getGame() == null) {
+            return null;
+        }
         return freeColClient.getGame().getSpecification();
     }
 

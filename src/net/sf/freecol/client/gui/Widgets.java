@@ -436,15 +436,16 @@ public final class Widgets {
      * @param spec The enclosing {@code Specification}.
      * @param group The {@code OptionGroup} containing the difficulty.
      * @param editable If the options should be editable.
+     * @param dialogHandler Callback executed when the dialog gets closed.
      * @return The resulting {@code OptionGroup}.
      */
-    public OptionGroup showDifficultyDialog(Specification spec,
+    public void showDifficultyDialog(Specification spec,
                                             OptionGroup group,
-                                            boolean editable) {
-        DifficultyDialog dialog
-            = new DifficultyDialog(this.freeColClient, getFrame(),
-                                   spec, group, editable);
-        return this.canvas.showFreeColDialog(dialog, null);
+                                            boolean editable,
+                                            DialogHandler<OptionGroup> dialogHandler) {
+        final DifficultyDialog dialog = new DifficultyDialog(this.freeColClient, getFrame(), spec, group, editable);
+        dialog.setDialogHandler(dialogHandler);
+        this.canvas.showFreeColPanel(dialog, PopupPosition.CENTERED, true);
     }
 
     /**
@@ -605,12 +606,12 @@ public final class Widgets {
      * Show the GameOptionsDialog.
      *
      * @param editable Should the game options be editable?
-     * @return The {@code OptionGroup} selected.
+     * @param dialogHandler A callback for handling the closing of the dialog.
      */
-    public OptionGroup showGameOptionsDialog(boolean editable) {
-        GameOptionsDialog dialog
-            = new GameOptionsDialog(this.freeColClient, getFrame(), editable);
-        return this.canvas.showFreeColDialog(dialog, null);
+    public void showGameOptionsDialog(boolean editable, DialogHandler<OptionGroup> dialogHandler) {
+        final GameOptionsDialog dialog = new GameOptionsDialog(this.freeColClient, getFrame(), editable);
+        dialog.setDialogHandler(dialogHandler);
+        this.canvas.showFreeColPanel(dialog, PopupPosition.CENTERED, true);
     }
 
     /**
@@ -711,13 +712,11 @@ public final class Widgets {
      * Show the map generator options dialog.
      *
      * @param editable Should these options be editable.
-     * @return The {@code OptionGroup} as edited.
      */
-    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
-        MapGeneratorOptionsDialog dialog
-            = new MapGeneratorOptionsDialog(this.freeColClient, getFrame(),
-                                            editable);
-        return this.canvas.showFreeColDialog(dialog, null);
+    public void showMapGeneratorOptionsDialog(boolean editable, DialogHandler<OptionGroup> dialogHandler) {
+        final MapGeneratorOptionsDialog dialog = new MapGeneratorOptionsDialog(this.freeColClient, getFrame(), editable);
+        dialog.setDialogHandler(dialogHandler);
+        this.canvas.showFreeColPanel(dialog, PopupPosition.CENTERED, true);
     }
 
     /**

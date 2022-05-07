@@ -19,10 +19,7 @@
 
 package net.sf.freecol.client.gui.dialog;
 
-import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -32,14 +29,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
-import javax.swing.Scrollable;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
@@ -50,8 +44,6 @@ import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.client.gui.panel.FreeColButton;
-import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
-import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -82,12 +74,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      */
     public MapGeneratorOptionsDialog(FreeColClient freeColClient, JFrame frame,
                                      boolean editable) {
-        super(freeColClient, frame, editable,
+        super(freeColClient,
               freeColClient.getGame().getMapGeneratorOptions(),
               MapGeneratorOptions.TAG,
               FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
-              MapGeneratorOptions.TAG);
-
+              MapGeneratorOptions.TAG,
+              editable);
+        
         if (isEditable()) {
             loadDefaultOptions();
             // FIXME: The update should be solved by PropertyEvent.
@@ -112,7 +105,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             scrollPane.getViewport().setOpaque(false);
             panel.add(scrollPane, "height 80%, width 100%");
         }
-        initialize(frame, choices());
+        initialize(frame, List.of());
     }
 
     /**
@@ -127,7 +120,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     private void updateFile(File file) {
         final OptionGroup mgo = getGroup();
         final OptionGroupUI mgoUI = getOptionUI();
-        final GUI gui = freeColClient.getGUI();
+        final GUI gui = getFreeColClient().getGUI();
 
         FileOptionUI foui = (FileOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_FILE);
@@ -259,17 +252,5 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             return false;
         }
         return super.save(file);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OptionGroup getResponse() {
-        OptionGroup value = super.getResponse();
-        if (value != null) {
-            if (isEditable()) saveDefaultOptions();
-        }
-        return value;
     }
 }

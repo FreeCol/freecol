@@ -105,20 +105,22 @@ public final class StartGamePanel extends FreeColPanel {
 
     private final ActionListener gameOptionsCmd = ae -> {
         final FreeColClient fcc = getFreeColClient();
-        OptionGroup go = getGUI().showGameOptionsDialog(fcc.isAdmin());
-        if (go != null) {
-            fcc.getGame().setGameOptions(go);
-            fcc.getPreGameController().updateGameOptions();
-        }
+        getGUI().showGameOptionsDialog(fcc.isAdmin(), (gameOptions) -> {
+            if (gameOptions != null) {
+                fcc.getGame().setGameOptions(gameOptions);
+                fcc.getPreGameController().updateGameOptions();                
+            }
+        });
     };
 
     private final ActionListener mapGeneratorOptionsCmd = ae -> {
         final FreeColClient fcc = getFreeColClient();
-        OptionGroup mgo = getGUI().showMapGeneratorOptionsDialog(fcc.isAdmin());
-        if (mgo != null) {
-            fcc.getGame().setMapGeneratorOptions(mgo);
-            fcc.getPreGameController().updateMapGeneratorOptions();
-        }
+        getGUI().showMapGeneratorOptionsDialog(fcc.isAdmin(), mgo -> {
+            if (mgo != null) {
+                fcc.getGame().setMapGeneratorOptions(mgo);
+                fcc.getPreGameController().updateMapGeneratorOptions();
+            }
+        });
     };
 
     /**

@@ -19,16 +19,16 @@
 
 package net.sf.freecol.client.gui.dialog;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
@@ -36,46 +36,33 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public final class ClientOptionsDialog extends OptionsDialog {
 
-    /** Magic cookie for the reset button. */
-    private static final OptionGroup resetCookie = new OptionGroup("cookie");
-
-
     /**
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
-    public ClientOptionsDialog(FreeColClient freeColClient, JFrame frame) {
-        super(freeColClient, frame, true, freeColClient.getClientOptions(),
+    public ClientOptionsDialog(FreeColClient freeColClient, JFrame frame, boolean editable) {
+        super(freeColClient, freeColClient.getClientOptions(),
               freeColClient.getClientOptions().getId(),
               FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
-              ClientOptions.TAG);
-
-        List<ChoiceItem<OptionGroup>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("reset"), resetCookie));
-        initialize(frame, c);
-    }
-
-
-    // Override OptionsDialog
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OptionGroup getResponse() {
-        OptionGroup value = super.getResponse();
-        if (value == null) {
-            ; // Cancelled
-        } else if (value == resetCookie) {
-            load(FreeColDirectories.getBaseClientOptionsFile());
-            getOptionUI().updateOption();
-            saveDefaultOptions();
-            value = getGroup();
-        } else {
-            saveDefaultOptions();
+              ClientOptions.TAG, editable);
+        
+        final List<JButton> buttons = new ArrayList<>();
+        if (editable) {
+            final JButton resetButton = Utility.localizedButton("reset");
+            resetButton.addActionListener(e -> {
+                getOptionUI().reset();
+            });
+            buttons.add(resetButton);
+            
+            final JButton applyDefaults = Utility.localizedButton("revertToDefaults");
+            applyDefaults.addActionListener(e -> {
+                load(FreeColDirectories.getBaseClientOptionsFile());
+            });
+            buttons.add(applyDefaults);
         }
-        return value;
+        
+        initialize(frame, buttons);
     }
 }
