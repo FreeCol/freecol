@@ -93,6 +93,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -1009,7 +1010,11 @@ public class GUI extends FreeColClientHolder {
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
-        getFreeColClient().getSoundController().playSound(sound);
+        if (sound != null && ResourceManager.getString(sound + ".type", "").equals("music")) {
+            getFreeColClient().getSoundController().playMusic(sound);
+        } else {
+            getFreeColClient().getSoundController().playSound(sound);
+        }
     }
 
     /**

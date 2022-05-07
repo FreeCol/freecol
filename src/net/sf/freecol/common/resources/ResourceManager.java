@@ -392,6 +392,19 @@ public class ResourceManager {
         final StringResource r = getStringResource(key, true);
         return (r == null) ? StringResource.REPLACEMENT_STRING : r.getString();
     }
+    
+    /**
+     * Gets a string resource with the given name, or returns the default value
+     * if the resource could not be found.
+     *
+     * @param key The name of the resource to query.
+     * @param defaultString The default value.
+     * @return The string value.
+     */
+    public static String getString(final String key, final String defaultString) {
+        final StringResource r = getStringResource(key, false);
+        return (r == null) ? defaultString : r.getString();
+    }
 
     /**
      * Returns the animation specified by the given name.

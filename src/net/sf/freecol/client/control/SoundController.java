@@ -20,6 +20,7 @@
 package net.sf.freecol.client.control;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.Mixer;
@@ -39,8 +40,11 @@ public class SoundController {
 
     private static final Logger logger = Logger.getLogger(SoundController.class.getName());
 
-    /** The internal sound player. */
+    /** The internal sound player for sound effects. */
     private SoundPlayer soundPlayer;
+    
+    /** The internal sound player for music. */
+    private SoundPlayer musicPlayer;
 
 
     /**
@@ -74,6 +78,7 @@ public class SoundController {
             // mixer option to one that works.
             logger.info("Create sound player with " + amo + "/" + vo);
             this.soundPlayer = new SoundPlayer(amo, vo);
+            this.musicPlayer = new SoundPlayer(amo, vo);
         }
     }
 
@@ -87,19 +92,52 @@ public class SoundController {
     }
 
     /**
-     * Play a sound.
+     * Play as a sound effect.
      *
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
+        play(soundPlayer, sound);
+    }
+    
+    /**
+     * Play as music.
+     *
+     * @param sound The sound resource to play, or if null stop playing.
+     */
+    public void playMusic(String sound) {
+        /*
+         * Please do not remove the separate method for playing music
+         * again. It's needed in order to play sound effects at the
+         * same time as music.
+         * 
+         * A few mixers have only one line for playing audio. If we want
+         * to support playing multiple sounds/music on these systems we
+         * need to perform software mixing.
+         */
+        
+        play(musicPlayer, sound);
+    }
+        
+    private void play(SoundPlayer sp, String sound) {
         if (!canPlaySound()) return;
-        this.soundPlayer.stop(); // Always stop, including sound==null
+        sp.stop(); // Always stop, including sound==null
         if (sound == null) return;
         File file = ResourceManager.getAudio(sound);
         if (file == null) return;
-        boolean playing = soundPlayer.playOnce(file);
+        boolean playing = sp.playOnce(file);
         logger.finest(((playing) ? "Queued" : "Fail on")
             + " sound: " + sound);
+    }
+    
+    /**
+     * Defines the default playlist.
+     *
+     * @param files The {@code File}s to be played when
+     *      nothing else is being played.
+     */
+    public void setDefaultPlaylist(List<File> files) {
+        musicPlayer.setDefaultPlaylist(files.toArray(new File[0]));
     }
 
     /**

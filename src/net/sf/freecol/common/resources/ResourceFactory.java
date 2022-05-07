@@ -92,6 +92,8 @@ public class ResourceFactory {
                 } else {
                     resource = new AudioResource(primaryKey, uri);
                 }
+            } else if (primaryKey.startsWith("sound.")) {
+                resource = new AudioResource(primaryKey, uri);
             } else {
                 resource = new ImageResource(primaryKey, uri);
             }
