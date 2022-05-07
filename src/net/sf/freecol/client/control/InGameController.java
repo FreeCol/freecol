@@ -3392,6 +3392,7 @@ public final class InGameController extends FreeColClientHolder {
             // want a positive amount => unit gave up (sold)
             // goods/equipment.
             for (AbstractGoods ag : req) ag.setAmount(-ag.getAmount());
+            marketWas.addAll(req);
         } else if (colony != null) {
             colonyWas = new ColonyWas(colony);
             for (AbstractGoods ag : req) {
@@ -3410,7 +3411,6 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
-        marketWas.addAll(req);
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askServer().equipUnitForRole(unit, role, roleCount)
             && unit.getRole() == role;
