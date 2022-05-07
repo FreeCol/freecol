@@ -72,17 +72,4 @@ public class MigPanel extends JPanel {
     public String getUIClassID() {
         return (uiClassId != null) ? uiClassId : super.getUIClassID();
     }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        setLayout(null);
-    }
 }
