@@ -1608,7 +1608,7 @@ public final class ImageLibrary {
                                            String roleId,
                                            boolean nativeEthnicity,
                                            boolean grayscale, float scale) {
-        final String key = getUnitTypeImageKey(unitType, null, roleId,
+        final String key = getUnitTypeImageKey(unitType, owner, roleId,
                                                nativeEthnicity);
         return this.imageCache.getScaledImage(key, scale, grayscale);
     }
