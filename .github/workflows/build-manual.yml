@@ -19,7 +19,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-        ref: "${{ inputs.release_tag }}"
+        with:
+          ref: "${{ inputs.release_tag }}"
         
       - uses: actions/setup-java@v3
         with:
@@ -49,7 +50,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-        ref: "${{ inputs.release_tag }}"
+        with:
+          ref: "${{ inputs.release_tag }}"
         
       - uses: actions/setup-java@v3
         with:
@@ -74,7 +76,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-        ref: "${{ inputs.release_tag }}"
+        with:
+          ref: "${{ inputs.release_tag }}"
         
       - uses: actions/setup-java@v3
         with:
