@@ -2499,4 +2499,11 @@ public class GUI extends FreeColClientHolder {
     public void prepareShowingMainMenu() {
        
     }
+
+    /**
+     * Checks if mods with a specification can be added now.
+     */
+    public boolean canGameChangingModsBeAdded() {
+        return true;
+    }
 }

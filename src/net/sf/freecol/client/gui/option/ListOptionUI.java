@@ -19,10 +19,13 @@
 
 package net.sf.freecol.client.gui.option;
 
+import static net.sf.freecol.common.util.CollectionUtils.first;
+
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,13 +39,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -64,6 +65,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private final JButton removeButton = Utility.localizedButton("list.remove");
     private final JButton upButton = Utility.localizedButton("list.up");
     private final JButton downButton = Utility.localizedButton("list.down");
+    
+    private final Function<AbstractOption, Boolean> choiceModifiableCheck;
 
 
     /**
@@ -73,11 +76,14 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * @param gui The {@code GUI} to display on.
      * @param option The {@code ListOption} to display.
      * @param editable boolean whether user can modify the setting
+     * @param choiceModifiableCheck Checks if a specific option can
+     *      be added/modified in the list.
      */
     public ListOptionUI(final GUI gui, final ListOption<T> option,
-                        boolean editable) {
+                        boolean editable, Function<AbstractOption, Boolean> choiceModifiableCheck) {
         super(option, editable);
 
+        this.choiceModifiableCheck = choiceModifiableCheck;
         this.panel = new MigPanel(new MigLayout("wrap 2, fill",
                                                 "[fill, grow]20[fill]"));
         this.panel.setBorder(Utility.localizedBorder(super.getJLabel().getText(),
@@ -134,6 +140,9 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                              */
                             return;
                         }
+                        if (!canModifyChoice(ao)) {
+                            return;
+                        }
                         this.model.addElement(ao);
                         this.list.setSelectedValue(ao, true);
                         this.list.repaint();
@@ -150,10 +159,18 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 }
             });
         removeButton.addActionListener((ActionEvent ae) -> {
+                if (!canModifyChoice(this.list.getSelectedValue())) {
+                    return;
+                }
                 this.model.removeElementAt(this.list.getSelectedIndex());
             });
         upButton.addActionListener((ActionEvent ae) -> {
-                if (this.list.getSelectedIndex() == 0) return;
+                if (this.list.getSelectedIndex() == 0) {
+                    return;
+                }
+                if (!canModifyChoice(this.list.getSelectedValue())) {
+                    return;
+                }
                 final int index = this.list.getSelectedIndex();
                 final AbstractOption<T> temp = this.model.getElementAt(index);
                 this.model.setElementAt(this.model.getElementAt(index-1), index);
@@ -161,7 +178,12 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 this.list.setSelectedIndex(index-1);
             });
         downButton.addActionListener((ActionEvent ae) -> {
-                if (this.list.getSelectedIndex() == this.model.getSize() - 1) return;
+                if (this.list.getSelectedIndex() == this.model.getSize() - 1) {
+                    return;
+                }
+                if (!canModifyChoice(this.list.getSelectedValue())) {
+                    return;
+                }
                 final int index = this.list.getSelectedIndex();
                 final AbstractOption<T> temp = this.model.getElementAt(index);
                 this.model.setElementAt(this.model.getElementAt(index+1), index);
@@ -171,6 +193,10 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
         this.list.addListSelectionListener(this);
         initialize();
+    }
+    
+    private boolean canModifyChoice(AbstractOption<T> choice) {
+        return choiceModifiableCheck.apply(choice);
     }
 
     @SuppressWarnings("unchecked")

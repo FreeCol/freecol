@@ -26,6 +26,7 @@ import javax.swing.ListCellRenderer;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -186,11 +187,17 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         } else if (option instanceof AbstractUnitOption) {
             return new AbstractUnitOptionUI((AbstractUnitOption)option, editable);
         } else if (option instanceof ModOption) {
-            return new ModOptionUI((ModOption)option, editable);
+            return new ModOptionUI(gui, (ModOption)option, editable);
         } else if (option instanceof UnitListOption) {
-            return new ListOptionUI<>(gui, (UnitListOption)option, editable);
+            return new ListOptionUI<>(gui, (UnitListOption)option, editable, choice -> true);
         } else if (option instanceof ModListOption) {
-            return new ListOptionUI<>(gui, (ModListOption)option, editable);
+            return new ListOptionUI<>(gui, (ModListOption)option, editable, choice -> {
+                if (gui.canGameChangingModsBeAdded()) {
+                    return true;
+                }
+                final FreeColModFile modFile = ((ModOption) choice).getValue();
+                return !modFile.hasSpecification();
+            });
         } else if (option instanceof TextOption) {
             return new TextOptionUI((TextOption)option, editable);
         } else {

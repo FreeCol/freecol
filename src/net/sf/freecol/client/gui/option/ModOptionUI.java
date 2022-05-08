@@ -24,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.ListCellRenderer;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -38,23 +39,33 @@ import net.sf.freecol.common.option.ModOption;
 public final class ModOptionUI extends OptionUI<ModOption>  {
 
 
-    private static class BoxRenderer
-        extends FreeColComboBoxRenderer<FreeColModFile> {
+    private static class BoxRenderer extends FreeColComboBoxRenderer<FreeColModFile> {
 
+        private final GUI gui;
+        
+        private BoxRenderer(GUI gui) {
+            this.gui = gui;
+        }
+        
         /**
          * {@inheritDoc}
          */
         @Override
         public void setLabelValues(JLabel label, FreeColModFile value) {
             if (value != null) {
-                ModOptionUI.labelModFile(label, value);
+                ModOptionUI.labelModFile(gui, label, value);
             }
         }
     }
 
-    private static class ModOptionRenderer
-        extends FreeColComboBoxRenderer<ModOption> {
+    private static class ModOptionRenderer extends FreeColComboBoxRenderer<ModOption> {
 
+        private final GUI gui;
+        
+        private ModOptionRenderer(GUI gui) {
+            this.gui = gui;
+        }
+        
         /**
          * {@inheritDoc}
          */
@@ -64,11 +75,12 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
             if (modFile == null) {
                 label.setText(value.toString());
             } else {
-                ModOptionUI.labelModFile(label, modFile);
+                ModOptionUI.labelModFile(gui, label, modFile);
             }
         }
     }
 
+    private final GUI gui;
 
     /** The selection box for the various mod files. */
     private final JComboBox<FreeColModFile> box;
@@ -81,9 +93,11 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * @param option The {@code ModOption} to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public ModOptionUI(final ModOption option, boolean editable) {
+    public ModOptionUI(GUI gui, final ModOption option, boolean editable) {
         super(option, editable);
 
+        this.gui = gui;
+        
         DefaultComboBoxModel<FreeColModFile> model
             = new DefaultComboBoxModel<>();
         for (FreeColModFile choice : option.getChoices()) {
@@ -91,7 +105,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
         }
         this.box = new JComboBox<>();
         this.box.setModel(model);
-        this.box.setRenderer(new BoxRenderer());
+        this.box.setRenderer(new BoxRenderer(gui));
         if (option.getValue() != null) {
             this.box.setSelectedItem(option.getValue());
         }
@@ -105,12 +119,15 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * @param label The {@code JLabel} to modify.
      * @param modFile The {@code FreeColModFile} to use.
      */
-    private static void labelModFile(JLabel label, FreeColModFile modFile) {
+    private static void labelModFile(GUI gui, JLabel label, FreeColModFile modFile) {
         String key = "mod." + modFile.getId();
         label.setText(Messages.getName(key));
         if (Messages.containsKey(Messages.shortDescriptionKey(key))) {
             label.setToolTipText(Messages.getShortDescription(key));
         }
+        
+        final boolean shouldBeEnabled = gui.canGameChangingModsBeAdded() || !modFile.hasSpecification();
+        label.setEnabled(shouldBeEnabled);
     }
 
 
@@ -121,7 +138,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      */
     @Override
     public ListCellRenderer getListCellRenderer() {
-        return new ModOptionRenderer();
+        return new ModOptionRenderer(gui);
     }
 
     /**

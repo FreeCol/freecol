@@ -2536,8 +2536,19 @@ public class SwingGUI extends GUI {
         return this.widgets.showWorkProductionPanel(unit);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void prepareShowingMainMenu() {
         canvas.prepareShowingMainMenu();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canGameChangingModsBeAdded() {
+        return getFreeColClient().getGame() == null;
     }
 }
