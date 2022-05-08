@@ -96,6 +96,16 @@ public class IntegerOption extends AbstractOption<Integer> {
     }
     
     /**
+     * Sets if the option should have immediate effect when changed in
+     * the {@code OptionUI}.
+     * 
+     * @param previewEnabled The value to be applied.
+     */
+    public void setPreviewEnabled(boolean previewEnabled) {
+        this.previewEnabled = previewEnabled;
+    }
+    
+    /**
      * Resets the value to the original value.
      */
     public void resetValue() {
