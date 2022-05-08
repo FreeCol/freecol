@@ -57,6 +57,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.util.LogBuilder;
@@ -710,7 +711,7 @@ public class ClientOptions extends OptionGroup {
      * can clean these up as they become standard.
      */
     public void fixClientOptions() {
-        // @compact 0.11.0
+        // @compat 0.11.0
         addBooleanOption(MINIMAP_TOGGLE_BORDERS,
                          GUI_GROUP, true);
         addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
@@ -721,7 +722,7 @@ public class ClientOptions extends OptionGroup {
                       SAVEGAMES_GROUP, "last-turn");
         addTextOption(BEFORE_LAST_TURN_NAME,
                       SAVEGAMES_GROUP, "before-last-turn");
-        // end @compact 0.11.0
+        // end @compat 0.11.0
 
         // @compat 0.11.1
         addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
@@ -816,6 +817,10 @@ public class ClientOptions extends OptionGroup {
         regroup(OTHER_GROUP, INTERFACE_GROUP);
         addBooleanOption(DISPLAY_FOG_OF_WAR, MAPCONTROLS_GROUP, false);
         // end @compat 0.11.6
+        // @compat 0.12.0
+        final PercentageOption volumeOption = getOption(AUDIO_VOLUME, PercentageOption.class);
+        volumeOption.setPreviewEnabled(true);
+        // end @compat 0.12.0
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {
