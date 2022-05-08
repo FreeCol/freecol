@@ -1,0 +1,84 @@
+
+name: Create Release Packages
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (x.y.z)'
+        required: true
+        type: string
+        
+jobs:
+  build_linux:
+    name: Linux Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      
+      - name: Run tests
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml testall
+          
+      - name: Build artifacts
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION dist
+        env:
+          FREECOL_VERSION: "${{ inputs.release_version }}"
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Linux-packages
+          path: dist/releases/
+
+  build_windows:
+    name: Windows Build
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build artifacts
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION winCompleteInstaller
+        env:
+          FREECOL_VERSION: "${{ inputs.release_version }}"
+          
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Windows-packages
+          path: dist/releases/
+
+  build_mac:
+    name: Mac Build
+    runs-on: macos-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build artifacts
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION macCompleteInstaller
+        env:
+          FREECOL_VERSION: "${{ inputs.release_version }}"
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Mac-packages
+          path: dist/releases/

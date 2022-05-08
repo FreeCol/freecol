@@ -510,6 +510,68 @@
         <jsmoothgen project="${freecol.release.dir}/installer.jsmooth"
                     skeletonroot="${freecol.build.dir}/skeletons"/>
     </target>
+    
+    <target name="winCompleteInstaller"
+            description="Builds an installer for Windows with an included JVM."
+            depends="initDist,prepareManual,prepareBaseFiles">
+        
+        <exec executable="jpackage" dir="." >
+            <arg value="--input"/>
+            <arg file="${freecol.release.dir}/base/freecol/"/>
+            <arg value="--type"/>
+            <arg value="exe"/>
+            <arg value="--name"/>
+            <arg value="FreeCol"/>
+            <arg value="--dest"/>
+            <arg file="${freecol.release.dir}"/>
+            <arg value="--add-modules"/>
+            <arg value="java.base,java.datatransfer,java.desktop,java.logging,java.xml"/>
+            <arg value="--main-jar"/>
+            <arg value="FreeCol.jar"/>
+            <arg value="--win-dir-chooser"/>
+            <arg value="--win-menu"/>
+            <arg value="--win-shortcut"/>
+            <arg value="--arguments"/>
+            <arg value="--freecol-data app/data"/>
+            <arg value="--app-version"/>
+            <arg value="${freecol.version}"/>
+            <arg value="--icon"/>
+            <arg file="packaging/icons/freecol.ico"/>
+        </exec>
+    	
+        <mkdir dir="${freecol.release.dir}/releases"/>
+        <copy todir="${freecol.release.dir}/releases">
+            <fileset dir="${freecol.release.dir}" includes="FreeCol-*"/>
+        </copy>
+    </target>
+	
+    <target name="macCompleteInstaller"
+            description="Builds an installer for macOs with an included JVM."
+            depends="initDist,prepareManual,prepareBaseFiles">
+        
+        <exec executable="jpackage" dir="." >
+            <arg value="--input"/>
+            <arg file="${freecol.release.dir}/base/freecol/"/>
+            <arg value="--name"/>
+            <arg value="FreeCol"/>
+            <arg value="--dest"/>
+            <arg file="${freecol.release.dir}"/>
+            <arg value="--add-modules"/>
+            <arg value="java.base,java.datatransfer,java.desktop,java.logging,java.xml"/>
+            <arg value="--main-jar"/>
+            <arg value="FreeCol.jar"/>
+            <arg value="--arguments"/>
+            <arg value="--freecol-data app/data"/>
+            <arg value="--app-version"/>
+            <arg value="${freecol.version}"/>
+            <arg value="--icon"/>
+            <arg file="packaging/icons/FreeCol.icns"/>
+        </exec>
+        <mkdir dir="${freecol.release.dir}/releases"/>
+        <copy todir="${freecol.release.dir}/releases">
+            <fileset dir="${freecol.release.dir}" includes="FreeCol-*"/>
+        </copy>
+    </target>
 
     <!-- Builds a doubleclickable application bundle running on Mac OS X -->
     <target name="macJavaBundle" unless="skip.dist.mac"
@@ -525,9 +587,6 @@
         <taskdef name="jarbundler"
                  classname="com.ultramixer.jarbundler.JarBundler"
                  classpath="${freecol.build.dir}/jars/jarbundler-core-3.3.0.jar"/>
-        <!-- BR#3255 reports an error:
-             The syntax of the required Java version is invalid: 1.11+
-             and that the jvmversion value below works. -->
         <jarbundler dir="${freecol.release.dir}"
                     name="FreeCol"
                     mainclass="${freecol.main.class}"
