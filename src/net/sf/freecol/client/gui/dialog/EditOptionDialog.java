@@ -50,9 +50,15 @@ public class EditOptionDialog extends FreeColConfirmDialog {
 
         this.ui = OptionUI.getOptionUI(getGUI(), option, true);
         JPanel panel = new MigPanel(new MigLayout());
-        if (this.ui.getJLabel() == null) {
+        /*
+         * The JLabel was never added since the null check was
+         * inverted. Not enbling for now, since the options
+         * do not have titles in Messages.
+         *
+        if (this.ui.getJLabel() != null) {
             panel.add(this.ui.getJLabel(), "split 2");
         }
+        */
         panel.add(this.ui.getComponent());
 
         initializeConfirmDialog(frame, true, panel, null, "ok", "cancel");
