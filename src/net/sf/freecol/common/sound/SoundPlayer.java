@@ -231,6 +231,12 @@ public final class SoundPlayer {
 
         this.volumeOption = volumeOption;
         this.soundPlayerThread = new SoundPlayerThread();
+        
+        /*
+         * A high thread priority is necessary in order to avoid stuttering on
+         * slow systems.
+         */
+        soundPlayerThread.setPriority(Thread.MAX_PRIORITY);
         this.soundPlayerThread.start();
     }
 
