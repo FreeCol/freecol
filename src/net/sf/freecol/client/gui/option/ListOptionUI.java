@@ -103,8 +103,17 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         JScrollPane pane = new JScrollPane(this.list);
         this.panel.add(pane, "grow, spany 5");
         
+        if (option.getAllowDuplicates()) {
+            /*
+             * The edit option is not available since it it's confusing and
+             * can also produce duplicates.
+             */
+            editButton.setEnabled(editable);
+            this.panel.add(editButton);
+        }
+        
         for (JButton button : new JButton[] {
-                editButton, addButton, removeButton, upButton, downButton }) {
+                addButton, removeButton, upButton, downButton }) {
             button.setEnabled(editable);
             this.panel.add(button);
         }
@@ -116,6 +125,15 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 try {
                     AbstractOption<T> ao = option.getTemplate().cloneOption();
                     if (gui.showEditOptionDialog(ao) && option.canAdd(ao)) {
+                        if (!option.getAllowDuplicates() && getValue().contains(ao)) {
+                            /*
+                             * Ignore when trying to add the same element twice. Note that
+                             * we need to check the list instead of just the option. The
+                             * reason being that the option is only updated when the
+                             * change is confirmed in the options dialog.
+                             */
+                            return;
+                        }
                         this.model.addElement(ao);
                         this.list.setSelectedValue(ao, true);
                         this.list.repaint();
