@@ -47,6 +47,7 @@ import javax.swing.text.StyledDocument;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
@@ -505,7 +506,7 @@ public final class EuropePanel extends PortPanel {
      */
     private final class TransactionLog extends JTextPane
         implements TransactionListener {
-
+        
         /**
          * Creates a transaction log.
          */
@@ -538,6 +539,7 @@ public final class EuropePanel extends PortPanel {
             StyledDocument doc = getStyledDocument();
             try {
                 if (doc.getLength() > 0) text = "\n\n" + text;
+                
                 doc.insertString(doc.getLength(), text, null);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Transaction log update failure", e);
@@ -655,6 +657,7 @@ public final class EuropePanel extends PortPanel {
         StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
         //StyleConstants.setForeground(attributes, Color.WHITE);
         StyleConstants.setBold(attributes, true);
+        StyleConstants.setFontSize(attributes, (int) FontLibrary.getMainFontSize());
         log.setParagraphAttributes(attributes, true);
 
         defaultTransferHandler

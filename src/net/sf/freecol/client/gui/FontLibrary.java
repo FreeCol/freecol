@@ -87,6 +87,10 @@ public class FontLibrary {
     public static void setMainFontSize(float newMainFontSize) {
         mainFontSize = newMainFontSize;
     }
+    
+    public static float getMainFontSize() {
+        return mainFontSize;
+    }
 
     /**
      * Convert a font size and scale factor to float.
