@@ -387,7 +387,7 @@
                         <authors>
                             <author name="The FreeCol Team" email="developers@freecol.org" />
                         </authors>
-                        <javaversion>1.11</javaversion>
+                        <javaversion>11</javaversion>
                     </info>
                     <guiprefs width="640" height="480" resizable="no">
                         <laf name="looks">
@@ -533,7 +533,7 @@
                     mainclass="${freecol.main.class}"
                     version="${freecol.version}"
                     vmoptions="-Xmx2G -Dapple.awt.fakefullscreen=true"
-                    jvmversion="11+"
+                    jvmversion="1.11"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                     stubfile="${freecol.build.dir}/skeletons/universalJavaApplicationStub"
                     useJavaXKey="true"
