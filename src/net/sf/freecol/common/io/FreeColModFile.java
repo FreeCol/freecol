@@ -84,6 +84,20 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
         }
         return null;
     }
+    
+    /**
+     * Checks if there is a specification included in this mod.
+     * 
+     * @return {@code true} if the "specification.xml" file exists
+     *      and can be opened.
+     */
+    public boolean hasSpecification() {
+        try (InputStream is = getSpecificationInputStream()) {
+            return is != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 
     /**
      * Gets the Specification.
