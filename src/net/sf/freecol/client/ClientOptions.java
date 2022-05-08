@@ -614,7 +614,10 @@ public class ClientOptions extends OptionGroup {
         ClientOptions clop = new ClientOptions();
         if (!clop.load(save)) return false;
         LogBuilder lb = new LogBuilder(64);
-        boolean ret = this.merge(clop, lb);
+        
+        /** Only the mods should be loaded from the savegame: */
+        boolean ret = this.merge(clop.getOption(USER_MODS), lb);
+        
         lb.shrink("\n"); lb.log(logger, Level.FINEST);
         return ret;
     }

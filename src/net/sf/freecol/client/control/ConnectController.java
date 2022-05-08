@@ -385,8 +385,8 @@ public final class ConnectController extends FreeColClientHolder {
             return false;
         }
         options.merge(fis);
-
-        options.fixClientOptions();
+        options.fixClientOptions();       
+        
         List<String> values = null;
         try {
             values = fis.peekAttributes(savedKeys);
@@ -445,6 +445,8 @@ public final class ConnectController extends FreeColClientHolder {
          *       a specification).
          */
         fcs.getGame().getSpecification().loadMods(options.getActiveMods());
+        
+        getGUI().refreshGuiUsingClientOptions();
 
         fcc.setFreeColServer(fcs);
         fcc.setSinglePlayer(true);
