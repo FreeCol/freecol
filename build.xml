@@ -511,7 +511,7 @@
                     skeletonroot="${freecol.build.dir}/skeletons"/>
     </target>
     
-    <target name="winCompleteInstaller"
+    <target name="win-complete-installer"
             description="Builds an installer for Windows with an included JVM."
             depends="initDist,prepareManual,prepareBaseFiles">
         
@@ -545,7 +545,7 @@
         </copy>
     </target>
 	
-    <target name="macCompleteInstaller"
+    <target name="mac-complete-installer"
             description="Builds an installer for macOs with an included JVM."
             depends="initDist,prepareManual,prepareBaseFiles">
         
