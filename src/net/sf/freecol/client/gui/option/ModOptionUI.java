@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.option;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.ListCellRenderer;
@@ -29,6 +30,7 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.option.ModOption;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -120,13 +122,20 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * @param modFile The {@code FreeColModFile} to use.
      */
     private static void labelModFile(GUI gui, JLabel label, FreeColModFile modFile) {
-        String key = "mod." + modFile.getId();
+        final String key = "mod." + modFile.getId();
         label.setText(Messages.getName(key));
         if (Messages.containsKey(Messages.shortDescriptionKey(key))) {
             label.setToolTipText(Messages.getShortDescription(key));
         }
         
-        final boolean shouldBeEnabled = gui.canGameChangingModsBeAdded() || !modFile.hasSpecification();
+        final boolean containsSpecification = modFile.hasSpecification();
+        if (containsSpecification) {
+            label.setIcon(new ImageIcon(ResourceManager.getImage("image.ui.includesSpecification")));
+        } else {
+            label.setIcon(new ImageIcon(ResourceManager.getImage("image.ui.noSpecification")));
+        }
+        
+        final boolean shouldBeEnabled = gui.canGameChangingModsBeAdded() || !containsSpecification;
         label.setEnabled(shouldBeEnabled);
     }
 
