@@ -3705,6 +3705,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                         alwaysTrue(), v -> 1.0);
 
         // Penalize certain problems more in the initial colonies.
+        // development starts at 1/LSC and rises to 1.0
         double development = Math.min(LOW_SETTLEMENT_NUMBER,
                                       getSettlementCount())
                 / (double)LOW_SETTLEMENT_NUMBER;
@@ -3842,7 +3843,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 GoodsType type = ag.getType();
                 if (type.isFoodType()) type = foodType;
                 int amount = ag.getAmount();
-                if (!t.isLand()) amount *= development;
+                if (!t.isLand()) { // Penalize water early
+                    amount = (int)(amount * development);
+                }
                 values.set(ColonyValueCategory.A_PROD.ordinal(),
                            values.get(ColonyValueCategory.A_PROD.ordinal())
                            + amount * type.getProductionWeight() * pf);

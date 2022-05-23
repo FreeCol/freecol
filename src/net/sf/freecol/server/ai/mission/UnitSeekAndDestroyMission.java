@@ -175,7 +175,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
         if (tile == null || off <= 0) return Integer.MIN_VALUE;
 
         int value = 1020 - turns * 100;
-        value += 100 * (off - def);
+        value += (int)(100 * (off - def));
 
         // Add a big bonus for treasure trains on the tile.
         // Do not cheat and look at the value.

@@ -135,7 +135,7 @@ public final class PrivateerMission extends Mission {
         if (defender.isOffensiveUnit()) {
             CombatModel.CombatOdds co = attacker.getGame().getCombatModel()
                 .calculateCombatOdds(attacker, defender);
-            if (co != null) value += (co.win - 0.5) * 200;
+            if (co != null) value += (int)((co.win - 0.5) * 200);
         }
         return value;
     }

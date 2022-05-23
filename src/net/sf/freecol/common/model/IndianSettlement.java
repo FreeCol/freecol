@@ -881,7 +881,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 : (rawProduction < 10) ? 5 * rawProduction + 25
                 : (rawProduction < 20) ? 2 * rawProduction + 55
                 : 100;
-            fakeProduction *= 0.5;
+            fakeProduction /= 2;
             // Pretend that we have actually done so, in proportion to
             // the available space
             current += fakeProduction * Math.max(0, capacity - current) / capacity;
@@ -1421,7 +1421,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // that they produce from their entire area at reduced
         // efficiency.
         if (tiles > getUnitCount()) {
-            potential *= (float) getUnitCount() / tiles;
+            potential = (int)(potential * (double)getUnitCount() / tiles);
         }
 
         // Raw production is too generous, apply a fudge factor to reduce it
