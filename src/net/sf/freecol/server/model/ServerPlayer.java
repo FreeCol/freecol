@@ -389,7 +389,8 @@ public class ServerPlayer extends Player implements TurnTaker {
                     min = max;
                     max = bad;
                 } else if (max == min) continue;
-                int add = randomInt(null, null, random, max - min);
+                int add = randomInt(logger, type.getId() + " initial price",
+                                    random, max - min);
                 if (add > 0) {
                     market.setInitialPrice(type, min + add);
                     market.update(type);
