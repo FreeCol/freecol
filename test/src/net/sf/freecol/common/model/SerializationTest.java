@@ -34,6 +34,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -167,7 +168,7 @@ public class SerializationTest extends FreeColTestCase {
     public void testDifficulty() throws Exception {
         Specification spec1 = null;
         Specification spec2 = null;
-        spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
+        spec1 = FreeColRules.getFreeColRulesFile("classic").getSpecification();
         spec1.applyDifficultyLevel("model.difficulty.veryEasy");
         StringWriter sw = new StringWriter();
         try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
@@ -199,7 +200,7 @@ public class SerializationTest extends FreeColTestCase {
     public void testGeneratedLists() throws Exception {
         Specification spec1 = null;
         Specification spec2 = null;
-        spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
+        spec1 = FreeColRules.getFreeColRulesFile("classic").getSpecification();
         spec1.applyDifficultyLevel("model.difficulty.veryEasy");
         StringWriter sw = new StringWriter();
         try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,

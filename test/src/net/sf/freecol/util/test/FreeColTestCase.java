@@ -19,8 +19,11 @@
 
 package net.sf.freecol.util.test;
 
-import java.lang.reflect.Field;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.none;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +32,8 @@ import java.util.Locale;
 import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
@@ -51,7 +55,6 @@ import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.WorkLocation;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -84,7 +87,7 @@ public class FreeColTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        FreeColTcFile.loadTCs();
+        FreeColRules.loadRules();
         if (updateLocale) {
             updateLocale = false;
             Messages.loadMessageBundle(Locale.US);
@@ -137,10 +140,10 @@ public class FreeColTestCase extends TestCase {
     public static Specification getSpecification(String name) {
         Specification result = specifications.get(name);
         if (result == null) {
-            FreeColTcFile.loadTCs();
+            FreeColRules.loadRules();
             try {
-                FreeColTcFile tc = FreeColTcFile.getFreeColTcFile(name);
-                result = FreeCol.loadSpecification(tc, null, "model.difficulty.medium");
+                FreeColModFile rules = FreeColRules.getFreeColRulesFile(name);
+                result = FreeCol.loadSpecification(rules, null, "model.difficulty.medium");
                 specifications.put(name, result);
             } catch (Exception e) {
                 e.printStackTrace();

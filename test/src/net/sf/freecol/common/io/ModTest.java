@@ -42,7 +42,7 @@ public class ModTest extends FreeColTestCase {
     public void testGetRuleSets() {
         // Check that all rule sets can be loaded
         Set<String> ids = new HashSet<String>();
-        for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
+        for (FreeColModFile tc : FreeColRules.getRulesList()) {
             assertNotNull("Null identifier for " + tc, tc.getId());
             ids.add(tc.getId());
         }

@@ -1210,6 +1210,10 @@ public final class Canvas extends JDesktopPane {
     public void playVideo(String videoId, boolean muteAudio,
                           final Runnable runnable) {
         final Video video = ImageLibrary.getVideo(videoId);
+        if (video == null) {
+            runnable.run();
+            return;
+        }
         
         final String originalVendor = System.getProperty("java.vendor");
         if (originalVendor.indexOf(" ") == -1) {

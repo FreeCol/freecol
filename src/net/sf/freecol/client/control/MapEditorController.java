@@ -164,12 +164,12 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Get the default specification from the default TC.
+     * Get the default specification from the default rules.
      *
      * @return A {@code Specification} to use in the map editor.
      */
     public Specification getDefaultSpecification() {
-        return FreeCol.loadSpecification(FreeCol.getTCFile(), 
+        return FreeCol.loadSpecification(FreeCol.getRulesFile(), 
             FreeCol.getAdvantages(), FreeCol.getDifficulty());
     }
         

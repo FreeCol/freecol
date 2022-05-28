@@ -54,7 +54,7 @@ import javax.xml.stream.XMLStreamException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -3190,7 +3190,7 @@ public final class Specification implements OptionContainer {
                                           (String)null);
         if (parentId != null) {
             try {
-                FreeColTcFile parent = FreeColTcFile.getFreeColTcFile(parentId);
+                FreeColModFile parent = FreeColRules.getFreeColRulesFile(parentId);
                 load(parent.getSpecificationInputStream());
                 initialized = false;
             } catch (IOException e) {

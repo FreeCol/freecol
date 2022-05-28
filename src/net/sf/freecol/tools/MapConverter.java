@@ -29,8 +29,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 
@@ -42,8 +42,8 @@ public class MapConverter {
 
     public static void main(String[] args) throws Exception {
 
-        FreeColTcFile.loadTCs();
-        Specification specification = FreeColTcFile.getFreeColTcFile("freecol").getSpecification();
+        FreeColRules.loadRules();
+        Specification specification = FreeColRules.getFreeColRulesFile("freecol").getSpecification();
 
         for (String filename : args) {
             File out = new File(filename);

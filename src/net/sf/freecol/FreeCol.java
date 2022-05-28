@@ -72,6 +72,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
@@ -164,7 +165,8 @@ public final class FreeCol {
     private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
     private static final String SPLASH_DEFAULT = "splash.jpg";
-    private static final String TC_DEFAULT = "freecol";
+    private static final String TC_DEFAULT = "default";
+    private static final String RULES_DEFAULT = "freecol";
     public static final long    TIMEOUT_DEFAULT = 60L; // 1 minute
     public static final long    TIMEOUT_MIN = 10L; // 10s
     public static final long    TIMEOUT_MAX = 3600000L; // 1000hours:-)
@@ -238,8 +240,11 @@ public final class FreeCol {
     /** A stream to get the splash image from. */
     private static InputStream splashStream;
 
-    /** The TotalConversion / ruleset in play, defaults to "freecol". */
+    /** The TotalConversion in play, defaults to "default". */
     private static String tc = null;
+    
+    /** The ruleset in play, defaults to "freecol". */
+    private static String rules = null;
 
     /** The time out (seconds) for otherwise blocking commands. */
     private static long timeout = -1L;
@@ -370,8 +375,8 @@ public final class FreeCol {
         }
 
         // Now we have the user mods directory and the locale is now
-        // stable, load the TCs, the mods and their messages.
-        FreeColTcFile.loadTCs();
+        // stable, load the rules, the mods and their messages.
+        FreeColRules.loadRules();
         FreeColModFile.loadMods();
         Messages.loadModMessageBundle(getLocale());
 
@@ -634,6 +639,7 @@ public final class FreeCol {
         { null,  "no-sound", "cli.no-sound", null },
         { null,  "no-splash", "cli.no-splash", null },
         { "p", "private", "cli.private", null },
+        { "r", "rules", "cli.rules", "cli.arg.name" },
         { "Z", "seed", "cli.seed", "cli.arg.seed" },
         { null,  "server", "cli.server", null },
         { null,  "server-name", "cli.server-name", "cli.arg.name" },
@@ -868,7 +874,11 @@ public final class FreeCol {
             }
 
             if (line.hasOption("tc")) {
-                setTC(line.getOptionValue("tc")); // Failure is deferred.
+                setTc(line.getOptionValue("tc")); // Failure is deferred.
+            }
+            
+            if (line.hasOption("rules")) {
+                setRules(line.getOptionValue("rules")); // Failure is deferred.
             }
 
             if (line.hasOption("timeout")) {
@@ -942,19 +952,19 @@ public final class FreeCol {
     /**
      * Get the specification from a given TC file.
      *
-     * @param tcf The {@code FreeColTcFile} to load.
+     * @param rulesFile The {@code FreeColModFile} to load.
      * @param advantages An optional {@code Advantages} setting.
      * @param difficulty An optional difficulty level.
      * @return A {@code Specification}.
      */
-    public static Specification loadSpecification(FreeColTcFile tcf,
+    public static Specification loadSpecification(FreeColModFile rulesFile,
                                                   Advantages advantages,
                                                   String difficulty) {
         Specification spec = null;
         try {
-            if (tcf != null) spec = tcf.getSpecification();
+            if (rulesFile != null) spec = rulesFile.getSpecification();
         } catch (IOException|XMLStreamException ex) {
-            System.err.println("Spec read failed in " + tcf.getId()
+            System.err.println("Spec read failed in " + rulesFile.getId()
                 + ": " + ex.getMessage() + "\n");
         }
         if (spec != null) spec.prepare(advantages, difficulty);
@@ -962,16 +972,16 @@ public final class FreeCol {
     }
 
     /**
-     * Get the specification from the specified TC.
+     * Get the specification from the currently selected rules.
      *
      * @return A {@code Specification}, quits on error.
      */
-    private static Specification getTCSpecification() {
-        Specification spec = loadSpecification(getTCFile(), getAdvantages(),
+    private static Specification getRulesSpecification() {
+        Specification spec = loadSpecification(getRulesFile(), getAdvantages(),
                                                getDifficulty());
         if (spec == null) {
             fatal(StringTemplate.template("cli.error.badTC")
-                .addName("%tc%", getTC()));
+                .addName("%tc%", getRules()));
         }
         return spec;
     }
@@ -1340,10 +1350,10 @@ public final class FreeCol {
      *
      * @return Usually TC_DEFAULT, but can be overridden at the command line.
      */
-    public static String getTC() {
+    public static String getTc() {
         return (tc == null) ? TC_DEFAULT : tc;
     }
-
+    
     /**
      * Sets the Total-Conversion.
      *
@@ -1351,17 +1361,37 @@ public final class FreeCol {
      *
      * @param tc The name of the new total conversion.
      */
-    public static void setTC(String tc) {
+    public static void setTc(String tc) {
         FreeCol.tc = tc;
+    }
+    
+    /**
+     * Gets the current rules
+     *
+     * @return Usually RULES_DEFAULT, but can be overridden at the command line.
+     */
+    public static String getRules() {
+        return (rules == null) ? RULES_DEFAULT : rules;
     }
 
     /**
-     * Gets the FreeColTcFile for the current TC.
+     * Sets the rules.
      *
-     * @return The {@code FreeColTcFile}.
+     * Called from NewPanel when a selection is made.
+     *
+     * @param tc The name of the new total conversion.
      */
-    public static FreeColTcFile getTCFile() {
-        return FreeColTcFile.getFreeColTcFile(getTC());
+    public static void setRules(String tc) {
+        FreeCol.rules = tc;
+    }
+
+    /**
+     * Gets the FreeColModFile for the current rules.
+     *
+     * @return The {@code FreeColModFile}.
+     */
+    public static FreeColModFile getRulesFile() {
+        return FreeColRules.getFreeColRulesFile(getRules());
     }
 
     /**
@@ -1545,14 +1575,14 @@ public final class FreeCol {
                 Specification spec = null;
                 File savegame = FreeColDirectories.getSavegameFile();
                 if (debugStart) {
-                    spec = FreeCol.getTCSpecification();
+                    spec = FreeCol.getRulesSpecification();
                 } else if (fastStart) {
                     if (savegame == null) {
                         // continue last saved game if possible,
                         // otherwise start a new one
                         savegame = FreeColDirectories.getLastSaveGameFile();
                         if (savegame == null) {
-                            spec = FreeCol.getTCSpecification();
+                            spec = FreeCol.getRulesSpecification();
                         }
                     }
                     // savegame was specified on command line
@@ -1652,7 +1682,7 @@ public final class FreeCol {
             if (checkIntegrity) checkServerIntegrity(freeColServer);
             if (freeColServer == null) return;
         } else {
-            Specification spec = FreeCol.getTCSpecification();
+            Specification spec = FreeCol.getRulesSpecification();
             try {
                 freeColServer = new FreeColServer(publicServer, false, spec,
                         serverAddress, serverPort, serverName);

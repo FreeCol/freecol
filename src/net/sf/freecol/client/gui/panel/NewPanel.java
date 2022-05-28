@@ -45,6 +45,8 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.metaserver.MetaServerUtils;
 import net.sf.freecol.common.metaserver.ServerInfo;
@@ -118,7 +120,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     private final JLabel rulesLabel;
 
     /** A box to choose the rules from. */
-    private final JComboBox<FreeColTcFile> rulesBox;
+    private final JComboBox<FreeColModFile> rulesBox;
 
     /** The check box to select a public server with. */
     private final JCheckBox publicServer;
@@ -225,19 +227,19 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
 
         this.rulesLabel = Utility.localizedLabel("rules");
         this.rulesBox = new JComboBox<>();
-        String selectTC;
+        String selectRules;
         if (this.fixedSpecification == null) { // Allow TC selection
-            selectTC = FreeCol.getTC();
-            for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
+            selectRules = FreeCol.getRules();
+            for (FreeColModFile tc : FreeColRules.getRulesList()) {
                 this.rulesBox.addItem(tc);
-                if (selectTC.equals(tc.getId())) {
+                if (selectRules.equals(tc.getId())) {
                     this.rulesBox.setSelectedItem(tc);
                 }
             }
         } else { // Force the use of the TC that contains the given spec
-            selectTC = this.fixedSpecification.getId();
-            for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
-                if (selectTC.equals(tc.getId())) {
+            selectRules = this.fixedSpecification.getId();
+            for (FreeColModFile tc : FreeColRules.getRulesList()) {
+                if (selectRules.equals(tc.getId())) {
                     this.rulesBox.addItem(tc);
                     this.rulesBox.setSelectedItem(tc);
                 }
@@ -245,11 +247,11 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         }
         if (this.rulesBox.getSelectedItem() == null) {
             this.rulesBox.setSelectedItem(this.rulesBox.getItemCount()-1);
-            logger.warning("No TC found for: " + selectTC
+            logger.warning("No TC found for: " + selectRules
                 + ", failling back to " + this.rulesBox.getSelectedItem());
         }
         this.rulesBox
-            .setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
+            .setRenderer(new FreeColComboBoxRenderer<FreeColModFile>("mod."));
         this.rulesBox.addItemListener(this);
 
         this.publicServer
@@ -389,7 +391,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      */
     private boolean checkTC() {
         if (this.specification.getId()
-            .equals(getSelectedTC().getId())) return false;
+            .equals(getSelectedRules().getId())) return false;
         this.specification = getSpecification();
         return true;
     }
@@ -452,8 +454,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      *
      * @return The selected TC.
      */
-    private FreeColTcFile getSelectedTC() {
-        return (FreeColTcFile)this.rulesBox.getSelectedItem();
+    private FreeColModFile getSelectedRules() {
+        return (FreeColModFile)this.rulesBox.getSelectedItem();
     }
 
     /**
@@ -543,7 +545,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     @Override
     public Specification getSpecification() {
         if (this.fixedSpecification != null) return this.fixedSpecification;
-        return FreeCol.loadSpecification(getSelectedTC(), null, null);
+        return FreeCol.loadSpecification(getSelectedRules(), null, null);
     }
 
 
@@ -562,7 +564,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         case OK:
             FreeCol.setName(getSelectedName());
             FreeCol.setAdvantages(getSelectedAdvantages());
-            FreeCol.setTC(getSelectedTC().getId());
+            FreeCol.setRules(getSelectedRules().getId());
 
             NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                 buttonGroup.getSelection().getActionCommand());

@@ -212,7 +212,7 @@ public final class FreeColClient {
         // However, this step could probably be delayed.
         ResourceManager.setBaseData(baseData);
         
-        FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
+        final FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile(FreeCol.getTc());
         ResourceManager.setTcData(tcData);
 
         actionManager = new ActionManager(this);

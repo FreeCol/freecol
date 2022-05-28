@@ -47,7 +47,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
@@ -182,9 +182,10 @@ public class Messages {
                     + f.getPath() + ": " + ioe.getMessage());
             }
         }
+
         List<String> filenames
             = FreeColDirectories.getMessageFileNameList(locale);
-        for (FreeColTcFile fctf : FreeColTcFile.getRulesList()) {
+        for (FreeColModFile fctf : FreeColRules.getRulesList()) {
             for (String fn : filenames) {
                 InputStream is = null;
                 try {

@@ -67,9 +67,6 @@ public class FreeColDirectories {
 
     private static final String CLASSIC_DIRECTORY = "classic";
 
-    private static final String[] CONFIG_DIRS
-        = { "classic", "freecol" };
-
     private static final String DATA_DIRECTORY = "data";
 
     private static final String FREECOL_DIRECTORY = "freecol";
@@ -110,8 +107,6 @@ public class FreeColDirectories {
 
     private static final String SEPARATOR
         = System.getProperty("file.separator");
-
-    private static final String TC_FILE_SUFFIX = ".ftc";
 
     private static final String USER_MAPS_DIRECTORY = "maps";
 
@@ -165,8 +160,8 @@ public class FreeColDirectories {
             && f.getName().endsWith("." + FreeCol.FREECOL_MAP_EXTENSION);
 
     /** Predicate to filter suitable candidates to be made into TCs. */
-    private static final Predicate<File> tcFileFilter = f ->
-        fileAnySuffix(f, TC_FILE_SUFFIX, ZIP_FILE_SUFFIX)
+    private static final Predicate<File> rulesFileFilter = f ->
+        fileAnySuffix(f, ZIP_FILE_SUFFIX)
             || directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME,
                                    SPECIFICATION_FILE_NAME);
 
@@ -1052,7 +1047,8 @@ public class FreeColDirectories {
      * @return The directory to save user options in.
      */
     public static File getOptionsDirectory() {
-        File dir = new File(getUserConfigDirectory(), FreeCol.getTC());
+        // Keeping this for now, but we should probably use the "tc" instead.
+        File dir = new File(getUserConfigDirectory(), FreeCol.getRules());
         return (insistDirectory(dir)) ? dir : null;
     }
 
@@ -1197,8 +1193,8 @@ public class FreeColDirectories {
      *
      * @return A list of {@code File}s containing rulesets.
      */
-    public static List<File> getTcFileList() {
-        return collectFiles(getRulesDirectory(), tcFileFilter);
+    public static List<File> getRulesFileList() {
+        return collectFiles(getRulesDirectory(), rulesFileFilter);
     }
 
     /**

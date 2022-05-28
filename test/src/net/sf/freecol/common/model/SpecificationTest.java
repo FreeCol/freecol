@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -92,7 +93,7 @@ public final class SpecificationTest extends FreeColTestCase {
     public void testLoad() {
         Specification spec = null;
         try {
-            spec = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
+            spec = FreeColRules.getFreeColRulesFile("classic").getSpecification();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -382,7 +383,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         // restore original values
         try {
-            spec = FreeColTcFile.getFreeColTcFile("freecol").getSpecification();
+            spec = FreeColRules.getFreeColRulesFile("freecol").getSpecification();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -437,7 +438,7 @@ public final class SpecificationTest extends FreeColTestCase {
         
     public void testLoadMods() {
         try {
-            Specification spec = FreeColTcFile.getFreeColTcFile("freecol")
+            Specification spec = FreeColRules.getFreeColRulesFile("freecol")
                 .getSpecification();
             int numberOfUnitTypes = spec.getUnitTypeList().size();
             List<FreeColModFile> mods = new ArrayList<>();
