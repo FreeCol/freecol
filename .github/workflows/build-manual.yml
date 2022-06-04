@@ -36,6 +36,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get install -y texlive-latex-base
+          sudo apt-get install -y texlive-latex-recommended
           
       - name: Build artifacts
         shell: bash
@@ -47,7 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: Linux-packages
-          path: dist/releases/
+          path: dist/
 
   build_windows:
     name: Windows Build
