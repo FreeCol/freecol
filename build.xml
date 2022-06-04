@@ -549,6 +549,22 @@
             description="Builds an installer for macOs with an included JVM."
             depends="initDist,prepareManual,prepareBaseFiles">
         
+        <!-- 
+          This is a fix for macOs not accepting releases starting with "0."
+        
+          Remove this fix when making the 1.0.0 release ... and change
+          "mac-package-identifier" to "org.freecol.FreeCol" (since the
+          version numbers needs to increase for each release).
+        -->
+        <loadresource property="freecol.version.macos">
+            <propertyresource name="freecol.version"/>
+            <filterchain>
+                <tokenfilter>
+                    <replaceregex pattern="^0\." replace=""/>
+                </tokenfilter>
+            </filterchain>
+        </loadresource>
+            
         <exec executable="jpackage" dir="." >
             <arg value="--input"/>
             <arg file="${freecol.release.dir}/base/freecol/"/>
@@ -563,7 +579,9 @@
             <arg value="--arguments"/>
             <arg value="--freecol-data app/data"/>
             <arg value="--app-version"/>
-            <arg value="${freecol.version}"/>
+            <arg value="${freecol.version.macos}"/>
+            <arg value="--mac-package-identifier"/>
+            <arg value="net.sf.freecol.FreeCol"/>
             <arg value="--icon"/>
             <arg file="packaging/icons/FreeCol.icns"/>
         </exec>
