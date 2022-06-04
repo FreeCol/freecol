@@ -31,11 +31,16 @@ jobs:
         shell: bash
         run: |
           ant -noinput -buildfile build.xml testall
+      
+      - name: Install pdflatex
+        shell: bash
+        run: |
+          sudo apt-get install -y texlive-latex-base
           
       - name: Build artifacts
         shell: bash
         run: |
-          ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION -Dprint.manual.is.up.to.date=true -Dprint.devmanual.is.up.to.date=true dist
+          ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION dist
         env:
           FREECOL_VERSION: ${{ github.event.inputs.release_version }}
       
