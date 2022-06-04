@@ -35,8 +35,7 @@ jobs:
       - name: Install pdflatex
         shell: bash
         run: |
-          sudo apt-get install -y texlive-latex-base
-          sudo apt-get install -y texlive-latex-recommended
+          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-latex-extra
           
       - name: Build artifacts
         shell: bash
