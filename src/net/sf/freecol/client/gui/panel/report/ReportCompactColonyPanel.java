@@ -700,7 +700,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         long n = getAllUnits(s)
                 .filter(u -> u.isPerson() && u.isExpertWorkingAsSomethingElse())
                 .count();
-        reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cWarn, stpld("report.colony.notWorkingInProfession")));
+        reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cAlarm, stpld("report.colony.notWorkingInProfession")));
     }
 
     private Stream<Unit> getAllUnits(ColonySummary s) {
