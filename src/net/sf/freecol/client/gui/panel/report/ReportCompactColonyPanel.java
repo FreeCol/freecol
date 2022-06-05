@@ -19,28 +19,6 @@
 
 package net.sf.freecol.client.gui.panel.report;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -52,7 +30,6 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -70,7 +47,40 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static net.sf.freecol.common.model.Constants.UNDEFINED;
+import static net.sf.freecol.common.util.CollectionUtils.accumulateMap;
+import static net.sf.freecol.common.util.CollectionUtils.accumulateToMap;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.appendToMapList;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.descendingDoubleComparator;
+import static net.sf.freecol.common.util.CollectionUtils.descendingIntegerComparator;
+import static net.sf.freecol.common.util.CollectionUtils.doubleAccumulator;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.integerAccumulator;
+import static net.sf.freecol.common.util.CollectionUtils.mapEntriesByValue;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 
 /**
@@ -226,37 +236,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             this.notWorking.addAll(transform(colony.getTile().getUnits(),
                     notWorkingPred));
 
-            // Collect the types of the units at work in the colony
-            // (colony tiles and buildings) that are suboptimal (and
-            // are not just temporarily there because they are being
-            // taught), the types for sites that really need a new
-            // unit, the teachers, and the units that are not working.
-            //
-            // FIXME: this needs to be merged with the requirements
-            // checking code, but that in turn should be opened up
-            // so the AI can use it...
-            for (WorkLocation wl :transform(colony.getAvailableWorkLocations(),
-                    WorkLocation::canBeWorked)) {
-                if (wl.canTeach()) {
-                    for (Unit u : wl.getUnitList()) {
-                        teachers.put(u, u.getNeededTurnsOfTraining()
-                            - u.getTurnsOfTraining());
-                    }
-                    continue;
-                }
-
-                // Check if the units are working.
-                this.notWorking.addAll(transform(wl.getUnits(),
-                        u -> (u.getTeacher() == null
-                            && u.getWorkType() == null)));
-
-                // Add work location suggestions.
-                forEachMapEntry(wl.getSuggestions(),
-                    e -> addSuggestion(((e.getKey() == null) ? this.want
-                            : this.improve),
-                        spec.getExpertForProducing(e.getValue().goodsType),
-                        e.getValue()));
-            }
+            collectWorkLocations(colony, spec);
 
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
@@ -276,6 +256,40 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                 AbstractGoods needed = new AbstractGoods();
                 this.completeTurns = colony.getTurnsToComplete(build, needed);
                 this.needed = (this.completeTurns < 0) ? needed : null;
+            }
+        }
+
+        // Collect the types of the units at work in the colony
+        // (colony tiles and buildings) that are suboptimal (and
+        // are not just temporarily there because they are being
+        // taught), the types for sites that really need a new
+        // unit, the teachers, and the units that are not working.
+        //
+        // FIXME: this needs to be merged with the requirements
+        // checking code, but that in turn should be opened up
+        // so the AI can use it...
+        private void collectWorkLocations(Colony colony, Specification spec) {
+            for (WorkLocation wl :transform(colony.getAvailableWorkLocations(),
+                                            WorkLocation::canBeWorked)) {
+                if (wl.canTeach()) {
+                    for (Unit u : wl.getUnitList()) {
+                        teachers.put(u, u.getNeededTurnsOfTraining()
+                            - u.getTurnsOfTraining());
+                    }
+                    continue;
+                }
+
+                // Check if the units are working.
+                this.notWorking.addAll(transform(wl.getUnits(),
+                        u -> (u.getTeacher() == null
+                            && u.getWorkType() == null)));
+
+                // Add work location suggestions.
+                forEachMapEntry(wl.getSuggestions(),
+                    e -> addSuggestion(((e.getKey() == null) ? this.want
+                            : this.improve),
+                                       spec.getExpertForProducing(e.getValue().goodsType),
+                                       e.getValue()));
             }
         }
 
@@ -482,25 +496,149 @@ public final class ReportCompactColonyPanel extends ReportPanel {
      * @param s The {@code ColonySummary} to update from.
      */
     private void updateColony(ColonySummary s) {
-        final String cac = s.colony.getId();
-        final UnitType defaultUnitType
-            = spec.getDefaultUnitType(s.colony.getOwner());
+        final String colonyId = s.colony.getId();
+        final UnitType defaultUnitType = spec.getDefaultUnitType(s.colony.getOwner());
         List<JComponent> buttons = new ArrayList<>(16);
+
+        addName(s, colonyId);
+        addSize(s, colonyId);
+        addUnitsToAddAndRemove(s, colonyId);
+        addExploring(s, colonyId);
+        addTileImprovements(s, colonyId);
+        addGoods(s, colonyId);
+        addGrowth(s, colonyId, defaultUnitType);
+        addBuildQueue(s, colonyId, buttons);
+        addEducation(s, colonyId, defaultUnitType, buttons);
+        addTogether(buttons);
+        addUnitsToUpgrade(s, buttons);
+
+        // TODO: notWorking?
+    }
+
+    private void addUnitsToUpgrade(ColonySummary s, List<JComponent> buttons) {
+        // Field: The units that could be upgraded, followed by the units
+        // that could be added.
+        if (s.improve.isEmpty() && s.want.isEmpty()) {
+            reportPanel.add(new JLabel());
+        } else {
+            buttons.clear();
+            buttons.addAll(unitButtons(s.improve, s.couldWork, s.colony));
+            buttons.add(new JLabel("/"));
+            // Prefer to suggest an improvement over and addition.
+            for (UnitType ut : s.improve.keySet()) s.want.remove(ut);
+            buttons.addAll(unitButtons(s.want, s.couldWork, s.colony));
+            addTogether(buttons);
+        }
+    }
+
+    private void addExploring(ColonySummary s, String colonyId) {
         JButton b;
+        StringTemplate t;
+        // Field: The number of potential colony tiles that need
+        // exploring.
+        // Colour: Always cAlarm
+        int n = count(s.tileSuggestions,
+                      TileImprovementSuggestion::isExploration);
+        if (n > 0) {
+            t = stpld("report.colony.exploring")
+                .addName("%colony%", s.colony.getName())
+                .addAmount("%amount%", n);
+            b = newButton(colonyId, Integer.toString(n), null, cAlarm, t);
+        } else {
+            b = null;
+        }
+        reportPanel.add((b == null) ? new JLabel() : b);
+    }
+
+    private void addSize(ColonySummary s, String colonyId) {
         Color c;
         StringTemplate t;
-        Building building;
+        // Field: Size
+        c = cGood;
+        t = stpld("report.colony.size");
+        reportPanel.add(newButton(colonyId, Integer.toString(s.unitCount), null, c, t));
+    }
 
-        // Field: A button for the colony.
-        // Colour: bonus in {-2,2} => {alarm, warn, plain, export, good}
-        // Font: Bold if famine is threatening.
-        c = (s.bonus <= -2) ? cAlarm
-            : (s.bonus == -1) ? cWarn
-            : (s.bonus == 0) ? cPlain
-            : (s.bonus == 1) ? cExport
-            : cGood;
-        String annotations = "", key;
-        t = StringTemplate.label(",");
+    // Field: The number of colonists that can be added to a
+    // colony without damaging the production bonus
+    private void addUnitsToAddAndRemove(ColonySummary s, String colonyId) {
+        Color c;
+        JButton b;
+        StringTemplate t;
+        if (s.unitsToAdd > 0) {
+            c = cGood;
+            t = stpld("report.colony.growing")
+                .addName("%colony%", s.colony.getName())
+                .addAmount("%amount%", s.unitsToAdd);
+            b = newButton(colonyId, Integer.toString(s.unitsToAdd), null, c, t);
+        } else {
+            b = null;
+        }
+        reportPanel.add((b == null) ? new JLabel() : b);
+
+        // Field: the number of colonists to remove to fix the inefficiency.
+        // Colour: Blue if efficient/Red if inefficient.
+        if (s.unitsToRemove > 0) {
+            c = s.bonus < 0 ? cAlarm : cGood;
+            t = stpld("report.colony.shrinking")
+                .addName("%colony%", s.colony.getName())
+                .addAmount("%amount%", s.unitsToRemove);
+            b = newButton(colonyId, Integer.toString(s.unitsToRemove), null, c, t);
+        } else {
+            b = null;
+        }
+        reportPanel.add((b == null) ? new JLabel() : b);
+    }
+
+    // Field: A button for the colony.
+    // Colour: bonus in {-2,2} => {alarm, warn, plain, export, good}
+    // Font: Bold if famine is threatening.
+    private void addName(ColonySummary s, String colonyId) {
+        Color c = (s.bonus <= -2) ? cAlarm
+                : (s.bonus == -1) ? cWarn
+                        : (s.bonus == 0) ? cPlain
+                                : (s.bonus == 1) ? cExport
+                                        : cGood;
+        StringTemplate t = StringTemplate.label(",");
+        String annotations = getAnnotations(s, t);
+        JButton b = newButton(colonyId, s.colony.getName() + annotations, null, c,
+                              StringTemplate.label(": ").add(s.colony.getName())
+                                            .add(Messages.message(t)));
+        if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
+        reportPanel.add(b, "newline");
+    }
+
+    // Field: New colonist arrival or famine warning.
+    // Colour: cGood if arriving eventually, blank if not enough food
+    // to grow, cWarn if negative, cAlarm if famine soon.
+    private void addGrowth(ColonySummary s, String colonyId, UnitType defaultUnitType) {
+        JButton b;
+        StringTemplate t;
+        if (s.newColonist > 0) {
+            t = stpld("report.colony.arriving")
+                .addName("%colony%", s.colony.getName())
+                .addNamed("%unit%", defaultUnitType)
+                .addAmount("%turns%", s.newColonist);
+            b = newButton(colonyId, Integer.toString(s.newColonist), null,
+                          cGood, t);
+        } else if (s.newColonist < 0) {
+            Color c = (s.famine) ? cAlarm : cWarn;
+            t = stpld("report.colony.starving")
+                .addName("%colony%", s.colony.getName())
+                .addAmount("%turns%", -s.newColonist);
+            b = newButton(colonyId, Integer.toString(-s.newColonist), null,
+                          c, t);
+            if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
+        } else {
+            b = null;
+        }
+        reportPanel.add((b == null) ? new JLabel() : b);
+    }
+
+    private String getAnnotations(ColonySummary s, StringTemplate t) {
+        Building building;
+        String annotations = "";
+        String key;
         if ((building = s.colony.getStockade()) == null) {
             key = "annotation.unfortified";
             t.add(Messages.message("report.colony.annotation.unfortified"));
@@ -552,65 +690,103 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             annotations += "*";
             t.add(Messages.message(building.getLabel()));
         }
-        b = newButton(cac, s.colony.getName() + annotations, null, c,
-            StringTemplate.label(": ").add(s.colony.getName())
-            .add(Messages.message(t)));
-        if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
-        reportPanel.add(b, "newline");
+        return annotations;
+    }
 
-        // Field: Size
-        c = cGood;
-        t = stpld("report.colony.size");
-        reportPanel.add(newButton(cac, Integer.toString(s.unitCount), null, c, t));
-
-        // Field: The number of colonists that can be added to a
-        // colony without damaging the production bonus
-        if (s.unitsToAdd > 0) {
-            c = cGood;
-            t = stpld("report.colony.growing")
-                .addName("%colony%", s.colony.getName())
-                .addAmount("%amount%", s.unitsToAdd);
-            b = newButton(cac, Integer.toString(s.unitsToAdd), null, c, t);
-        } else {
-            b = null;
+    private void addEducation(ColonySummary s, String colonyId, UnitType defaultUnitType, List<JComponent> buttons) {
+        StringTemplate t;
+        JButton b;
+        // Field: What is being trained, including shadow units for vacant
+        // places.
+        // Colour: cAlarm if completion is blocked, otherwise cPlain.
+        int empty = 0;
+        Building school = s.colony.getWorkLocationWithAbility(Ability.TEACH,
+                                                              Building.class);
+        if (school != null) empty = school.getType().getWorkPlaces();
+        for (Entry<Unit, Integer> e
+                 : mapEntriesByValue(s.teachers, descendingIntegerComparator)) {
+            Unit u = e.getKey();
+            ImageIcon ii = new ImageIcon(this.lib.getTinyUnitImage(u));
+            if (e.getValue() <= 0) {
+                t = stpld("report.colony.making.noteach")
+                    .addName("%colony%", s.colony.getName())
+                    .addStringTemplate("%teacher%",
+                        u.getLabel(Unit.UnitLabelType.NATIONAL));
+                b = newButton(colonyId, Integer.toString(0), ii, cAlarm, t);
+            } else {
+                t = stpld("report.colony.making.educating")
+                    .addName("%colony%", s.colony.getName())
+                    .addStringTemplate("%teacher%",
+                        u.getLabel(Unit.UnitLabelType.NATIONAL))
+                    .addAmount("%turns%", e.getValue());
+                b = newButton(colonyId, Integer.toString(e.getValue()), ii,
+                              cPlain, t);
+            }
+            buttons.add(b);
+            empty--;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
 
-        // Field: the number of colonists to remove to fix the inefficiency.
-        // Colour: Blue if efficient/Red if inefficient.
-        if (s.unitsToRemove > 0) {
-            c = s.bonus < 0 ? cAlarm : cGood;
-            t = stpld("report.colony.shrinking")
+        if (empty > 0) {
+            final ImageIcon emptyIcon
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(defaultUnitType, true));
+            t = stpld("report.colony.making.educationVacancy")
                 .addName("%colony%", s.colony.getName())
-                .addAmount("%amount%", s.unitsToRemove);
-            b = newButton(cac, Integer.toString(s.unitsToRemove), null, c, t);
-        } else {
-            b = null;
+                .addAmount("%number%", empty);
+            for (; empty > 0; empty--) {
+                buttons.add(newButton(colonyId, "", emptyIcon, cPlain, t));
+            }
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+    }
 
-        // Field: The number of potential colony tiles that need
-        // exploring.
-        // Colour: Always cAlarm
-        int n = count(s.tileSuggestions,
-            TileImprovementSuggestion::isExploration);
-        if (n > 0) {
-            t = stpld("report.colony.exploring")
-                .addName("%colony%", s.colony.getName())
-                .addAmount("%amount%", n);
-            b = newButton(cac, Integer.toString(n), null, cAlarm, t);
-        } else {
-            b = null;
+    // Field: What is currently being built (clickable if on the
+    // buildqueue) and the turns until it completes, including
+    // units being taught, or blank if nothing queued.
+    // Colour: cWarn if no construction is occurring, cGood with
+    // turns if completing, cAlarm with turns if will block, turns
+    // indicates when blocking occurs.
+    // Font: Bold if blocked right now.
+    private void addBuildQueue(ColonySummary s, String colonyId, List<JComponent> buttons) {
+        final String qac = BUILDQUEUE + colonyId;
+        if (s.build != null) {
+            int turns = s.completeTurns;
+            String bname = Messages.getName(s.build);
+            JButton b;
+            StringTemplate t;
+            if (turns == UNDEFINED) {
+                t = stpld("report.colony.making.noconstruction")
+                    .addName("%colony%", s.colony.getName());
+                b = newButton(qac, bname, null, cWarn, t);
+            } else if (turns >= 0) {
+                t = stpld("report.colony.making.constructing")
+                    .addName("%colony%", s.colony.getName())
+                    .addNamed("%buildable%", s.build)
+                    .addAmount("%turns%", turns);
+                b = newButton(qac, bname + " " + turns, null,
+                              cGood, t);
+            } else { // turns < 0
+                turns = -(turns + 1);
+                t = stpld("report.colony.making.blocking")
+                    .addName("%colony%", s.colony.getName())
+                    .addAmount("%amount%", s.needed.getAmount())
+                    .addNamed("%goods%", s.needed.getType())
+                    .addNamed("%buildable%", s.build)
+                    .addAmount("%turns%", turns);
+                b = newButton(qac, bname + " " + turns,
+                    null, cAlarm, t);
+                if (turns == 0) b.setFont(b.getFont().deriveFont(Font.BOLD));
+            }
+            buttons.add(b);
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+    }
 
-        // Fields: The number of existing colony tiles that would
-        // benefit from improvements.
-        // Colour: Always cAlarm
-        // Font: Bold if one of the tiles is the colony center.
+    // Fields: The number of existing colony tiles that would
+    // benefit from improvements.
+    // Colour: Always cAlarm
+    // Font: Bold if one of the tiles is the colony center.
+    private void addTileImprovements(ColonySummary s, String colonyId) {
         for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
-            n = 0;
+            int n = 0;
             boolean center = false;
             for (TileImprovementSuggestion tis : s.tileSuggestions) {
                 if (tis.tileImprovementType == ti) {
@@ -618,8 +794,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                     if (tis.tile == s.colony.getTile()) center = true;
                 }
             }
+            JButton b;
             if (n > 0) {
-                c = cAlarm;
+                Color c = cAlarm;
+                StringTemplate t;
                 if (n == 1) {
                     TileImprovementSuggestion tis = first(s.tileSuggestions);
                     if (any(tis.tile.getUnits(),
@@ -639,27 +817,32 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                         .addName("%colony%", s.colony.getName())
                         .addAmount("%amount%", n);
                 }
-                b = newButton(cac, Integer.toString(n), null, c, t);
+                b = newButton(colonyId, Integer.toString(n), null, c, t);
                 if (center) b.setFont(b.getFont().deriveFont(Font.BOLD));
             } else {
                 b = null;
             }
             reportPanel.add((b == null) ? new JLabel() : b);
         }
+    }
 
-        // Fields: The net production of each storable+non-trade-goods
-        // goods type.
-        // Colour: cAlarm if too low, cWarn if negative, empty if no
-        // production, cPlain if production balanced at zero,
-        // otherwise must be positive, wherein cExport
-        // if exported, cAlarm if too high, else cGood.
+    // Fields: The net production of each storable+non-trade-goods
+    // goods type.
+    // Colour: cAlarm if too low, cWarn if negative, empty if no
+    // production, cPlain if production balanced at zero,
+    // otherwise must be positive, wherein cExport
+    // if exported, cAlarm if too high, else cGood.
+    private void addGoods(ColonySummary s, String colonyId) {
+        Colony colony = s.colony;
         for (GoodsType gt : this.goodsTypes) {
             final ColonySummary.GoodsProduction gp = s.production.get(gt);
+            StringTemplate t;
+            Color c;
             switch (gp.status) {
             case FAIL:
                 c = cAlarm;
                 t = stpld("report.colony.production.low")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", -gp.amount)
                     .addAmount("%turns%", gp.extra);
@@ -667,7 +850,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case BAD:
                 c = cWarn;
                 t = stpld("report.colony.production")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount);
                 break;
@@ -678,21 +861,21 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case ZERO:
                 c = cPlain;
                 t = stpld("report.colony.production")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount);
                 break;
             case GOOD:
                 c = cGood;
                 t = stpld("report.colony.production")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount);
                 break;
             case EXPORT:
                 c = cExport;
                 t = stpld("report.colony.production.export")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%export%", gp.extra);
@@ -700,7 +883,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case EXCESS:
                 c = cWarn;
                 t = stpld("report.colony.production.high")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%turns%", gp.extra);
@@ -708,7 +891,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case OVERFLOW:
                 c = cAlarm;
                 t = stpld("report.colony.production.waste")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%waste%", gp.extra);
@@ -716,7 +899,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case PRODUCTION:
                 c = cWarn;
                 t = stpld("report.colony.production.maxProduction")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%more%", gp.extra);
@@ -724,7 +907,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case CONSUMPTION:
                 c = cWarn;
                 t = stpld("report.colony.production.maxConsumption")
-                    .addName("%colony%", s.colony.getName())
+                    .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%more%", gp.extra);
@@ -733,131 +916,12 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
             reportPanel.add((c == null) ? new JLabel()
-                : newButton(cac, Integer.toString(gp.amount), null, c, t));
+                : newButton(colonyId, Integer.toString(gp.amount), null, c, t));
         }
-
-        // Field: New colonist arrival or famine warning.
-        // Colour: cGood if arriving eventually, blank if not enough food
-        // to grow, cWarn if negative, cAlarm if famine soon.
-        if (s.newColonist > 0) {
-            t = stpld("report.colony.arriving")
-                .addName("%colony%", s.colony.getName())
-                .addNamed("%unit%", defaultUnitType)
-                .addAmount("%turns%", s.newColonist);
-            b = newButton(cac, Integer.toString(s.newColonist), null,
-                cGood, t);
-        } else if (s.newColonist < 0) {
-            c = (s.famine) ? cAlarm : cWarn;
-            t = stpld("report.colony.starving")
-                .addName("%colony%", s.colony.getName())
-                .addAmount("%turns%", -s.newColonist);
-            b = newButton(cac, Integer.toString(-s.newColonist), null,
-                c, t);
-            if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
-        } else {
-            b = null;
-        }
-        reportPanel.add((b == null) ? new JLabel() : b);
-
-        // Field: What is currently being built (clickable if on the
-        // buildqueue) and the turns until it completes, including
-        // units being taught, or blank if nothing queued.
-        // Colour: cWarn if no construction is occurring, cGood with
-        // turns if completing, cAlarm with turns if will block, turns
-        // indicates when blocking occurs.
-        // Font: Bold if blocked right now.
-        final String qac = BUILDQUEUE + cac;
-        if (s.build != null) {
-            int turns = s.completeTurns;
-            String bname = Messages.getName(s.build);
-            if (turns == UNDEFINED) {
-                t = stpld("report.colony.making.noconstruction")
-                    .addName("%colony%", s.colony.getName());
-                b = newButton(qac, bname, null, cWarn, t);
-            } else if (turns >= 0) {
-                t = stpld("report.colony.making.constructing")
-                    .addName("%colony%", s.colony.getName())
-                    .addNamed("%buildable%", s.build)
-                    .addAmount("%turns%", turns);
-                b = newButton(qac, bname + " " + Integer.toString(turns), null,
-                    cGood, t);
-            } else { // turns < 0
-                turns = -(turns + 1);
-                t = stpld("report.colony.making.blocking")
-                    .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", s.needed.getAmount())
-                    .addNamed("%goods%", s.needed.getType())
-                    .addNamed("%buildable%", s.build)
-                    .addAmount("%turns%", turns);
-                b = newButton(qac, bname + " " + Integer.toString(turns),
-                    null, cAlarm, t);
-                if (turns == 0) b.setFont(b.getFont().deriveFont(Font.BOLD));
-            }
-            buttons.add(b);
-        }
-
-        // Field: What is being trained, including shadow units for vacant
-        // places.
-        // Colour: cAlarm if completion is blocked, otherwise cPlain.
-        int empty = 0;
-        Building school = s.colony.getWorkLocationWithAbility(Ability.TEACH,
-            Building.class);
-        if (school != null) empty = school.getType().getWorkPlaces();
-        for (Entry<Unit, Integer> e
-                 : mapEntriesByValue(s.teachers, descendingIntegerComparator)) {
-            Unit u = e.getKey();
-            ImageIcon ii = new ImageIcon(this.lib.getTinyUnitImage(u));
-            if (e.getValue() <= 0) {
-                t = stpld("report.colony.making.noteach")
-                    .addName("%colony%", s.colony.getName())
-                    .addStringTemplate("%teacher%",
-                        u.getLabel(Unit.UnitLabelType.NATIONAL));
-                b = newButton(cac, Integer.toString(0), ii, cAlarm, t);
-            } else {
-                t = stpld("report.colony.making.educating")
-                    .addName("%colony%", s.colony.getName())
-                    .addStringTemplate("%teacher%",
-                        u.getLabel(Unit.UnitLabelType.NATIONAL))
-                    .addAmount("%turns%", e.getValue());
-                b = newButton(cac, Integer.toString(e.getValue()), ii,
-                    cPlain, t);
-            }
-            buttons.add(b);
-            empty--;
-        }
-
-        if (empty > 0) {
-            final ImageIcon emptyIcon
-                = new ImageIcon(this.lib.getTinyUnitTypeImage(defaultUnitType, true));
-            t = stpld("report.colony.making.educationVacancy")
-                .addName("%colony%", s.colony.getName())
-                .addAmount("%number%", empty);
-            for (; empty > 0; empty--) {
-                buttons.add(newButton(cac, "", emptyIcon, cPlain, t));
-            }
-        }
-        addTogether(buttons);
-
-        // Field: The units that could be upgraded, followed by the units
-        // that could be added.
-        if (s.improve.isEmpty() && s.want.isEmpty()) {
-            reportPanel.add(new JLabel());
-        } else {
-            buttons.clear();
-            buttons.addAll(unitButtons(s.improve, s.couldWork, s.colony));
-            buttons.add(new JLabel("/"));
-            // Prefer to suggest an improvement over and addition.
-            for (UnitType ut : s.improve.keySet()) s.want.remove(ut);
-            buttons.addAll(unitButtons(s.want, s.couldWork, s.colony));
-            addTogether(buttons);
-        }
-
-        // TODO: notWorking?
     }
 
     private List<JButton> unitButtons(final Map<UnitType, Suggestion> suggestions,
         List<UnitType> have, Colony colony) {
-        final String cac = colony.getId();
         List<JButton> result = new ArrayList<>(suggestions.size());
         final Comparator<UnitType> buttonComparator
             = Comparator.comparing(ut -> suggestions.get(ut),
@@ -884,8 +948,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                     suggestion.workLocation.getLabel())
                 .addNamed("%goods%", suggestion.goodsType)
                 .addAmount("%amount%", suggestion.amount);
-            JButton b = newButton(cac, label, icon,
-                (present) ? cGood : cPlain, tip);
+            JButton b = newButton(colony.getId(), label, icon,
+                                  (present) ? cGood : cPlain, tip);
             if (present) b.setFont(b.getFont().deriveFont(Font.BOLD));
             result.add(b);
         }
@@ -981,48 +1045,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                 stpld("report.colony.exploring.summary")));
 
-        // Fields: The number of existing colony tiles that would
-        // benefit from improvements.
-        // Colour: cAlarm
-        for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
-            if (ti.isNatural()) continue;
-            tiles.clear();
-            tiles.addAll(transform(rTileSuggestions,
-                    matchKey(ti, ts -> ts.tileImprovementType),
-                    ts -> ts.tile, Collectors.toSet()));
-            reportPanel.add((tiles.isEmpty()) ? new JLabel()
-                : newLabel(Integer.toString(tiles.size()), null, cAlarm,
-                    stpld("report.colony.tile." + ti.getSuffix()
-                        + ".summary")));
-        }
-
-        // Fields: The net production of each storable+non-trade-goods
-        // goods type.
-        // Colour: cWarn if negative, empty if no production,
-        // cPlain if production balanced at zero, otherwise cGood.
-        for (GoodsType gt : this.goodsTypes) {
-            final ColonySummary.GoodsProduction gp = rProduction.get(gt);
-            switch (gp.status) {
-            case BAD:
-                c = cWarn;
-                break;
-            case NONE:
-                c = null;
-                break;
-            case ZERO:
-                c = cPlain;
-                break;
-            case GOOD:
-                c = cGood;
-                break;
-            default:
-                throw new IllegalStateException("Bogus status: " + gp.status);
-            }
-            reportPanel.add((c == null) ? new JLabel()
-                : newLabel(Integer.toString(gp.amount), null, c,
-                    stpld("report.colony.production.summary")
-                    .addNamed("%goods%", gt)));
-        }
+        addTotalTimeImprovements(rTileSuggestions, tiles);
+        addTotalGoods(rProduction);
 
         // Field: New colonist arrival or famine warning.
         // Colour: cWarn if negative, else cGood
@@ -1051,6 +1075,54 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         // that could be added.
         addTogether(unitTypeLabels(rImprove, improveLen,
                 stpld("report.colony.improving.summary")));
+    }
+
+    // Fields: The net production of each storable+non-trade-goods
+    // goods type.
+    // Colour: cWarn if negative, empty if no production,
+    // cPlain if production balanced at zero, otherwise cGood.
+    private void addTotalGoods(Map<GoodsType, ColonySummary.GoodsProduction> productionMap) {
+        for (GoodsType gt : this.goodsTypes) {
+            final ColonySummary.GoodsProduction gp = productionMap.get(gt);
+            Color c;
+            switch (gp.status) {
+            case BAD:
+                c = cWarn;
+                break;
+            case NONE:
+                c = null;
+                break;
+            case ZERO:
+                c = cPlain;
+                break;
+            case GOOD:
+                c = cGood;
+                break;
+            default:
+                throw new IllegalStateException("Bogus status: " + gp.status);
+            }
+            reportPanel.add((c == null) ? new JLabel()
+                : newLabel(Integer.toString(gp.amount), null, c,
+                    stpld("report.colony.production.summary")
+                    .addNamed("%goods%", gt)));
+        }
+    }
+
+    // Fields: The number of existing colony tiles that would
+    // benefit from improvements.
+    // Colour: cAlarm
+    private void addTotalTimeImprovements(List<TileImprovementSuggestion> rTileSuggestions, Set<Tile> tiles) {
+        for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
+            if (ti.isNatural()) continue;
+            tiles.clear();
+            tiles.addAll(transform(rTileSuggestions,
+                                   matchKey(ti, ts -> ts.tileImprovementType),
+                    ts -> ts.tile, Collectors.toSet()));
+            reportPanel.add((tiles.isEmpty()) ? new JLabel()
+                : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                           stpld("report.colony.tile." + ti.getSuffix()
+                        + ".summary")));
+        }
     }
 
     private List<JLabel> unitTypeLabels(Map<UnitType, Integer> unitTypeMap,
