@@ -54,7 +54,6 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -468,7 +467,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
     
     private void drawRiverMouth(Graphics2D g2d, Tile tile) {
-        for (Direction direction : Direction.values()) {
+        for (Direction direction : Direction.longSides) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
             if (borderingTile == null || tile.isLand() || !borderingTile.isLand()) {
                 continue;
@@ -484,7 +483,7 @@ public final class TileViewer extends FreeColClientHolder {
             if (magnitude <= 0) {
                 continue;
             }
-            
+
             final BufferedImage ri = this.lib.getRiverMouthImage(direction, magnitude, tile.getX(), tile.getY());
             g2d.drawImage(ri, 0, 0, null);
         }
@@ -727,12 +726,9 @@ public final class TileViewer extends FreeColClientHolder {
             if (ti.isRoad()) {
                 this.rp.displayRoad(g2d, tile);
             } else if (ti.isRiver()) {
-                TileImprovementStyle style = ti.getStyle();
-                if (style == null) { // This is all too common with broken maps
-                    logger.severe("Null river style for " + tile);
-                } else {
-                    BufferedImage img = this.lib.getScaledRiverImage(style);
-                    if (img != null) g2d.drawImage(img, 0, 0, null);
+                final BufferedImage img = this.lib.getAnimatedScaledRiverTerrainImage(tile, 0);
+                if (img != null) {
+                    g2d.drawImage(img, 0, 0, null);
                 }
             } else {
                 BufferedImage img

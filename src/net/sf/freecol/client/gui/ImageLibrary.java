@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui;
 import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
 import static net.sf.freecol.common.util.StringUtils.getEnumKey;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -34,6 +35,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.images.BeachTileAnimationImageCreator;
+import net.sf.freecol.client.gui.images.RiverAnimationImageCreator;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
@@ -67,6 +70,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -1009,6 +1013,11 @@ public final class ImageLibrary {
         return ImageCache.getImageResource(key);
     }
     
+    private ImageResource getRiverPebblesImageResource() {
+        final String key = "image.tile.river.pebbles";
+        return ImageCache.getImageResource(key);
+    }
+    
     /**
      * Returns a transparent image for making a transition between
      * the given tiles.
@@ -1434,6 +1443,99 @@ public final class ImageLibrary {
                 this.tileSize,
                 false,
                 imageResource.getVariationNumberForTick(ticks));
+    }
+    
+    /**
+     * Gets the combined animated image for river
+     * 
+     * @param tile The tile. 
+     * @param ticks The number of ticks to get the correct animation frame.
+     * @return A cached, generated image.
+     */
+    public BufferedImage getAnimatedScaledRiverTerrainImage(Tile tile, long ticks) {
+        final ImageResource riverPebblesImageResource = getRiverPebblesImageResource();
+        if (riverPebblesImageResource == null) {
+            return null;
+        }
+        
+        // Automatically determine:
+        //final String riverVariationKey = determineRiverCombinationKey(tile);
+        
+        // Using hardcoded style:
+        final String riverVariationKey = determineRiverCombinationKeyFromStyle(tile);
+        
+        final ImageResource riverWaterImageResource = ImageCache.getImageResource("image.tile.river.water");
+        final int riverVariationNumber = riverWaterImageResource.getVariationNumberForTick(ticks);
+        
+        final int magnitude = tile.getRiver().getMagnitude();
+        final String minorString = (magnitude <= 1) ? ".minor" : "";
+        final List<Direction> minorToMajorTransitions = determineMinorToMajorRiverTransitions(tile);
+        
+        final String generatedKey = riverWaterImageResource.getPrimaryKey() + ".river." + minorString + directionsToString(minorToMajorTransitions) + "." + riverVariationKey + "$gen";
+        final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, tileSize, false, riverVariationNumber, () -> {
+            final BufferedImage riverWaterImage = riverWaterImageResource.getVariation(riverVariationNumber).getImage(this.tileSize, false);
+            
+            final String riverMaskKey = "image.mask.river" + minorString + (riverVariationKey.isEmpty() ? "" : "." + riverVariationKey);
+            final BufferedImage baseMaskImage = this.imageCache.getSizedImage(riverMaskKey, this.tileSize, false);
+            final BufferedImage maskImage = createRiverMaskImageWithTransitions(baseMaskImage, minorToMajorTransitions);
+            
+            return RiverAnimationImageCreator.generateImage(riverPebblesImageResource.getImage(tileSize, false), riverWaterImage, riverVariationNumber, maskImage, getTerrainMask(null));
+        });
+        
+        return result;
+    }
+
+    private BufferedImage createRiverMaskImageWithTransitions(BufferedImage baseMaskImage, List<Direction> minorToMajorTransitions) {
+        if (minorToMajorTransitions.isEmpty()) {
+            return baseMaskImage;
+        }
+        final BufferedImage resultImage = new BufferedImage(baseMaskImage.getWidth(), baseMaskImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g2d = resultImage.createGraphics();
+        g2d.drawImage(baseMaskImage, 0, 0, null);
+        for (Direction d : minorToMajorTransitions) {
+            final String riverMaskKey = "image.mask.river.to_major." + d.toString().toLowerCase();
+            final BufferedImage maskImage = this.imageCache.getSizedImage(riverMaskKey, this.tileSize, false);
+            g2d.drawImage(maskImage, 0, 0, null);
+        }
+        g2d.dispose();
+        return resultImage;
+    }
+    
+    private List<Direction> determineMinorToMajorRiverTransitions(Tile tile) {
+        if (tile.getRiver().getMagnitude() > 1) {
+            return List.of();
+        }
+        final List<Direction> directionsWithRiverTransitions = Direction.longSides.stream().filter(d -> {
+            final Tile neighbour = tile.getNeighbourOrNull(d);
+            return neighbour != null && (neighbour.hasRiver() && neighbour.getRiver().getMagnitude() > 1 || tile.isLand() && !neighbour.isLand());
+        }).collect(Collectors.toList());
+        
+        return directionsWithRiverTransitions;
+    }
+    
+    private String determineRiverCombinationKey(Tile tile) {
+        final List<Direction> directionsWithRiver = Direction.longSides.stream().filter(d -> {
+            final Tile neighbour = tile.getNeighbourOrNull(d);
+            return neighbour != null && (neighbour.hasRiver() || tile.isLand() && !neighbour.isLand());
+        }).collect(Collectors.toList());
+
+        return directionsToString(directionsWithRiver);
+    }
+    
+    private String determineRiverCombinationKeyFromStyle(Tile tile) {
+        final TileImprovement river = tile.getRiver();
+        if (river == null) {
+            return "";
+        }
+                
+        return directionsToString(river.getConnections().entrySet().stream().filter(e -> e.getValue() > 0).map(e -> e.getKey()).collect(Collectors.toList()));
+    }
+    
+    private String directionsToString(List<Direction> directions) {
+        return directions.stream()
+                .map(d -> d.toString().toLowerCase())
+                .sorted()
+                .reduce((a, b) -> a + "_" + b).orElse("");
     }
     
     /**
