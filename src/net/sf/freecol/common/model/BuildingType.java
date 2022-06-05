@@ -19,19 +19,20 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JList;
-import javax.swing.ListModel;
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+
+import javax.swing.*;
+import javax.xml.stream.XMLStreamException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.model.Constants.UNDEFINED;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 
 /**
@@ -249,10 +250,10 @@ public final class BuildingType extends BuildableType
      *
      * @return The {@code ProductionType} list.
      */
-    protected List<ProductionType> getProductionTypes() {
+    public List<ProductionType>getProductionTypes() {
         return this.productionTypes;
     }
-    
+
     /**
      * Set the production type list.
      *
@@ -484,7 +485,7 @@ public final class BuildingType extends BuildableType
         this.rebelFactor = o.getRebelFactor();
         this.upgradesFrom = o.getUpgradesFrom();
         this.upgradesTo = o.getUpgradesTo();
-        this.setProductionTypes(o.getProductionTypes());        
+        this.setProductionTypes(o.getProductionTypes());
         return true;
     }
 

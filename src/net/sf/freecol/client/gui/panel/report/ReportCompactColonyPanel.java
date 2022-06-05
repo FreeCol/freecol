@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
 import net.sf.freecol.common.model.ExportData;
@@ -37,6 +38,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -54,6 +56,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,16 +96,17 @@ public final class ReportCompactColonyPanel extends ReportPanel {
     private static final Predicate<Unit> notWorkingPred = u ->
         u.getState() != Unit.UnitState.FORTIFIED && u.getState() != Unit.UnitState.SENTRY;
 
+    private static Map<String, Set<BuildingType>> bestProduction;
+
     /** Container class for all the information about a colony. */
     private static class ColonySummary {
 
         /** Types of production for a given goods type. */
         public static enum ProductionStatus {
             FAIL,        // Negative production and below low alarm level
-            NEGATIVE,         // Negative production
             NONE,        // No production at all
-            ZERO,        // Production == consumption
-            GOOD,        // Positive production
+            INSUFFICIENT_BUILDINGS,     // Positive or negative production
+            GOOD,        // Production with best buildings
             EXPORT,      // Positive production and exporting
             EXCESS,      // Positive production and above high alarm level
             OVERFLOW,    // Positive production and above capacity
@@ -145,11 +149,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             public GoodsProduction accumulate(GoodsProduction other) {
                 this.amount += other.amount;
                 this.status = (this.status == ProductionStatus.NONE
-                    && other.status == ProductionStatus.NONE)
-                    ? ProductionStatus.NONE
-                    : (this.amount < 0) ? ProductionStatus.NEGATIVE
-                    : (this.amount > 0) ? ProductionStatus.GOOD
-                    : ProductionStatus.ZERO;
+                               && other.status == ProductionStatus.NONE)
+                        ? ProductionStatus.NONE
+                        : ProductionStatus.INSUFFICIENT_BUILDINGS;
                 this.extra = 0;
                 return this;
             }
@@ -294,6 +296,41 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             }
         }
 
+        private boolean hasBestBuildings(GoodsType goodsType) {
+            if (bestProduction == null) {
+                initBestProduction();
+            }
+            Set<BuildingType> buildingTypes = bestProduction.get(goodsType.getId());
+            if (buildingTypes == null) {
+                return true;
+            }
+            return buildingTypes.stream().allMatch(type -> {
+                Building b = colony.getBuilding(type);
+                return b != null && b.getType().getId().equals(type.getId());
+            });
+        }
+
+        private void initBestProduction() {
+            bestProduction = new HashMap<>();
+            for (BuildingType buildingType : colony.getGame().getSpecification().getBuildingTypeList()) {
+                if (buildingType.getUpgradesTo() != null) {
+                    continue;
+                }
+                buildingType.getModifiers().forEach(m -> {
+                    bestProduction.computeIfAbsent(m.getId(), s -> new HashSet<>()).add(buildingType);
+                });
+                for (ProductionType productionType : buildingType.getProductionTypes()) {
+                    if (productionType.getUnattended()) {
+                        continue;
+                    }
+                    productionType.getOutputs().forEach(o -> {
+                        String goodsType = o.getId();
+                        bestProduction.computeIfAbsent(goodsType, s -> new HashSet<>()).add(buildingType);
+                    });
+                }
+            }
+        }
+
         /**
          * Set the production map values for the given goods type.
          *
@@ -310,15 +347,15 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
             ProductionStatus status;
             int extra = 0;
+            ProductionStatus base = hasBestBuildings(goodsType) ? ProductionStatus.GOOD : ProductionStatus.INSUFFICIENT_BUILDINGS;
             if (p < 0) {
-                status = (amount < low) ? ProductionStatus.FAIL
-                    : ProductionStatus.NEGATIVE;
+                status = (amount < low) ? ProductionStatus.FAIL : base;
                 extra = -amount / p + 1;
             } else if (p == 0 && !colony.isProducing(goodsType)) {
                 status = (colony.isConsuming(goodsType)) ? ProductionStatus.FAIL
                     : ProductionStatus.NONE;
             } else if (p == 0) {
-                status = ProductionStatus.ZERO;
+                status = base;
                 extra = 0;
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
@@ -335,7 +372,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                 status = ProductionStatus.EXPORT;
                 extra = exportData.getExportLevel();
             } else if (goodsType.limitIgnored()) {
-                status = ProductionStatus.GOOD;
+                status = base;
             } else if (amount + p > colony.getWarehouseCapacity()) {
                 status = ProductionStatus.OVERFLOW;
                 extra = amount + p - colony.getWarehouseCapacity();
@@ -343,7 +380,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                 status = ProductionStatus.EXCESS;
                 extra = (colony.getWarehouseCapacity() - amount) / p;
             } else {
-                status = ProductionStatus.GOOD;
+                status = base;
                 extra = 0;
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
@@ -882,18 +919,11 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                     .addAmount("%amount%", -gp.amount)
                     .addAmount("%turns%", gp.extra);
                 break;
-            case NEGATIVE:
-                c = cGood;
-                t = stpld("report.colony.production")
-                    .addName("%colony%", colony.getName())
-                    .addNamed("%goods%", gt)
-                    .addAmount("%amount%", gp.amount);
-                break;
             case NONE:
                 c = null;
                 t = null;
                 break;
-            case ZERO:
+            case INSUFFICIENT_BUILDINGS:
                 c = cPlain;
                 t = stpld("report.colony.production")
                     .addName("%colony%", colony.getName())
@@ -1122,13 +1152,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             final ColonySummary.GoodsProduction gp = productionMap.get(gt);
             Color c;
             switch (gp.status) {
-            case NEGATIVE:
-                c = cGood;
-                break;
             case NONE:
                 c = null;
                 break;
-            case ZERO:
+            case INSUFFICIENT_BUILDINGS:
                 c = cPlain;
                 break;
             case GOOD:
