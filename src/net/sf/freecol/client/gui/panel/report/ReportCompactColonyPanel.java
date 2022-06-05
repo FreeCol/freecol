@@ -98,15 +98,15 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         /** Types of production for a given goods type. */
         public static enum ProductionStatus {
             FAIL,        // Negative production and below low alarm level
-            BAD,         // Negative production
+            NEGATIVE,         // Negative production
             NONE,        // No production at all
             ZERO,        // Production == consumption
             GOOD,        // Positive production
             EXPORT,      // Positive production and exporting
             EXCESS,      // Positive production and above high alarm level
             OVERFLOW,    // Positive production and above capacity
-            PRODUCTION,  // Positive production but could produce more
-            CONSUMPTION, // Positive production but could consume more
+            INSUFFICIENT_PRODUCTION,  // Positive production but could produce more
+            INSUFFICIENT_CONSUMPTION, // Positive production but could consume more
         };
 
 
@@ -146,7 +146,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                 this.status = (this.status == ProductionStatus.NONE
                     && other.status == ProductionStatus.NONE)
                     ? ProductionStatus.NONE
-                    : (this.amount < 0) ? ProductionStatus.BAD
+                    : (this.amount < 0) ? ProductionStatus.NEGATIVE
                     : (this.amount > 0) ? ProductionStatus.GOOD
                     : ProductionStatus.ZERO;
                 this.extra = 0;
@@ -308,11 +308,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             int p = colony.getAdjustedNetProductionOf(goodsType);
 
             ProductionStatus status;
-            AbstractGoods deficit;
             int extra = 0;
             if (p < 0) {
                 status = (amount < low) ? ProductionStatus.FAIL
-                    : ProductionStatus.BAD;
+                    : ProductionStatus.NEGATIVE;
                 extra = -amount / p + 1;
             } else if (p == 0 && !colony.isProducing(goodsType)) {
                 status = (colony.isConsuming(goodsType)) ? ProductionStatus.FAIL
@@ -320,14 +319,13 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             } else if (p == 0) {
                 status = ProductionStatus.ZERO;
                 extra = 0;
-                deficit = null;
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
                     if (pi == null) continue;
-                    deficit = find(pi.getConsumptionDeficit(),
+                    AbstractGoods deficit = find(pi.getConsumptionDeficit(),
                         AbstractGoods.matches(goodsType));
                     if (deficit != null) {
-                        status = ProductionStatus.CONSUMPTION;
+                        status = ProductionStatus.INSUFFICIENT_CONSUMPTION;
                         extra = deficit.getAmount();
                         break;
                     }
@@ -346,14 +344,13 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             } else {
                 status = ProductionStatus.GOOD;
                 extra = 0;
-                deficit = null;
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
                     if (pi == null) continue;
-                    deficit = find(pi.getProductionDeficit(),
+                    AbstractGoods deficit = find(pi.getProductionDeficit(),
                         AbstractGoods.matches(goodsType));
                     if (deficit != null) {
-                        status = ProductionStatus.PRODUCTION;
+                        status = ProductionStatus.INSUFFICIENT_PRODUCTION;
                         extra = deficit.getAmount();
                         break;
                     }
@@ -847,8 +844,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                     .addAmount("%amount%", -gp.amount)
                     .addAmount("%turns%", gp.extra);
                 break;
-            case BAD:
-                c = cWarn;
+            case NEGATIVE:
+                c = cGood;
                 t = stpld("report.colony.production")
                     .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
@@ -896,16 +893,16 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%waste%", gp.extra);
                 break;
-            case PRODUCTION:
-                c = cWarn;
+            case INSUFFICIENT_PRODUCTION:
+                c = cAlarm;
                 t = stpld("report.colony.production.maxProduction")
                     .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)
                     .addAmount("%more%", gp.extra);
                 break;
-            case CONSUMPTION:
-                c = cWarn;
+            case INSUFFICIENT_CONSUMPTION:
+                c = cAlarm;
                 t = stpld("report.colony.production.maxConsumption")
                     .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
@@ -1086,8 +1083,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             final ColonySummary.GoodsProduction gp = productionMap.get(gt);
             Color c;
             switch (gp.status) {
-            case BAD:
-                c = cWarn;
+            case NEGATIVE:
+                c = cGood;
                 break;
             case NONE:
                 c = null;
