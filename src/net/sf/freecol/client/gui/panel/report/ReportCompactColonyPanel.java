@@ -62,6 +62,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.sf.freecol.common.model.Constants.UNDEFINED;
 import static net.sf.freecol.common.util.CollectionUtils.accumulateMap;
@@ -236,7 +237,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             this.notWorking.addAll(transform(colony.getTile().getUnits(),
                     notWorkingPred));
 
-            collectWorkLocations(colony, spec);
+            collectSuboptimalWorkLocations(colony, spec);
 
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
@@ -268,7 +269,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         // FIXME: this needs to be merged with the requirements
         // checking code, but that in turn should be opened up
         // so the AI can use it...
-        private void collectWorkLocations(Colony colony, Specification spec) {
+        private void collectSuboptimalWorkLocations(Colony colony, Specification spec) {
             for (WorkLocation wl :transform(colony.getAvailableWorkLocations(),
                                             WorkLocation::canBeWorked)) {
                 if (wl.canTeach()) {
@@ -499,17 +500,18 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
         addName(s, colonyId);
         addSize(s, colonyId);
-        addUnitsToAddAndRemove(s, colonyId);
+        addUnitsToAdd(s, colonyId);
+        addUnitsToRemove(s, colonyId);
         addExploring(s, colonyId);
         addTileImprovements(s, colonyId);
         addGoods(s, colonyId);
         addGrowth(s, colonyId, defaultUnitType);
+        addNotWorking(s, colonyId);
+        addNotWorkingInProfession(s, colonyId);
         addBuildQueue(s, colonyId, buttons);
         addEducation(s, colonyId, defaultUnitType, buttons);
         addTogether(buttons);
         addUnitsToUpgrade(s, buttons);
-
-        // TODO: notWorking?
     }
 
     private void addUnitsToUpgrade(ColonySummary s, List<JComponent> buttons) {
@@ -558,7 +560,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
     // Field: The number of colonists that can be added to a
     // colony without damaging the production bonus
-    private void addUnitsToAddAndRemove(ColonySummary s, String colonyId) {
+    private void addUnitsToAdd(ColonySummary s, String colonyId) {
         Color c;
         JButton b;
         StringTemplate t;
@@ -572,6 +574,13 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             b = null;
         }
         reportPanel.add((b == null) ? new JLabel() : b);
+    }
+
+
+    private void addUnitsToRemove(ColonySummary s, String colonyId) {
+        JButton b;
+        Color c;
+        StringTemplate t;
 
         // Field: the number of colonists to remove to fix the inefficiency.
         // Colour: Blue if efficient/Red if inefficient.
@@ -630,6 +639,35 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             b = null;
         }
         reportPanel.add((b == null) ? new JLabel() : b);
+    }
+
+    private boolean isWorking(Unit unit) {
+        if (!unit.isPerson()) {
+            return true;
+        }
+        if (unit.isInColony()) {
+            return unit.getWorkType() != null || unit.getStudent() != null;
+        } else {
+            return unit.getRole().getId().equals("model.role.soldier");
+        }
+    }
+
+    private void addNotWorking(ColonySummary s, String colonyId) {
+        long n = getAllUnits(s)
+                .filter(u -> !isWorking(u))
+                .count();
+        reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cAlarm, stpld("report.colony.notWorking")));
+    }
+
+    private void addNotWorkingInProfession(ColonySummary s, String colonyId) {
+        long n = getAllUnits(s)
+                .filter(u -> u.isPerson() && u.isExpertWorkingAsSomethingElse())
+                .count();
+        reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cWarn, stpld("report.colony.notWorkingInProfession")));
+    }
+
+    private Stream<Unit> getAllUnits(ColonySummary s) {
+        return Stream.concat(s.colony.getUnits(), s.colony.getTile().getUnits());
     }
 
     private String getAnnotations(ColonySummary s, StringTemplate t) {
@@ -959,8 +997,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
      * @param summaries A list of {@code ColonySummary}s to update from.
      */
     private void updateCombinedColonies(List<ColonySummary> summaries) {
-        JLabel l;
-        Color c;
         StringTemplate t;
 
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
@@ -1050,6 +1086,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         reportPanel.add(newLabel(Integer.toString((int)rNewColonist), null,
                 (rNewColonist < 0) ? cWarn : cGood,
                 stpld("report.colony.arriving.summary")));
+
+        reportPanel.add(new JLabel()); // not working
+        reportPanel.add(new JLabel()); // not working in profession
 
         // Field: The required goods rates.
         // Colour: cPlain
@@ -1176,18 +1215,17 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             reportPanel.add(l);
         }
 
-        final UnitType type = spec.getDefaultUnitType(getMyPlayer());
-        ImageIcon colonistIcon
-            = new ImageIcon(this.lib.getTinyUnitTypeImage(type));
-        reportPanel.add(newLabel(null, colonistIcon, null,
-                stpld("report.colony.birth")));
-        reportPanel.add(newLabel("report.colony.making.header", null, null,
-                stpld("report.colony.making")));
-        reportPanel.add(newLabel("report.colony.improve.header", null, null,
-                stpld("report.colony.improve")));
+        ImageIcon colonist = new ImageIcon(this.lib.getTinyUnitTypeImage(spec.getDefaultUnitType(getMyPlayer())));
+        reportPanel.add(newLabel(null, colonist, null, stpld("report.colony.birth")));
+        ImageIcon criminal = new ImageIcon(this.lib.getTinyUnitTypeImage(spec.getUnitType("model.unit.pettyCriminal")));
+        reportPanel.add(newLabel(null, criminal, null, stpld("report.colony.notWorking")));
+        ImageIcon elderStatesman = new ImageIcon(this.lib.getTinyUnitTypeImage(spec.getUnitType("model.unit.elderStatesman")));
+        reportPanel.add(newLabel(null, elderStatesman, null, stpld("report.colony.notWorkingInProfession")));
 
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
-            "newline, span, growx");
+        reportPanel.add(newLabel("report.colony.making.header", null, null, stpld("report.colony.making")));
+        reportPanel.add(newLabel("report.colony.improve.header", null, null, stpld("report.colony.improve")));
+
+        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
     }
 
     /**
@@ -1200,7 +1238,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[l][c][c][c]");
         for (int i = 0; i < this.goodsTypes.size(); i++) sb.append("[c]");
-        sb.append("[c][c][l][l][l]");
+        sb.append("[c][c][c][c][l][l][l]");
         reportPanel.setLayout(new MigLayout("fillx, insets 0, gap 0 0",
                 sb.toString(), ""));
 

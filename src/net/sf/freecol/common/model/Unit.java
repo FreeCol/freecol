@@ -19,6 +19,29 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Constants.IntegrityType;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.LogBuilder;
+
+import javax.xml.stream.XMLStreamException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static net.sf.freecol.common.model.Constants.INFINITY;
 import static net.sf.freecol.common.model.Constants.UNDEFINED;
 import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
@@ -35,30 +58,6 @@ import static net.sf.freecol.common.util.CollectionUtils.sum;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 import static net.sf.freecol.common.util.StringUtils.getEnumKey;
 import static net.sf.freecol.common.util.StringUtils.lastPart;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.xml.stream.XMLStreamException;
-
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Constants.IntegrityType;
-import net.sf.freecol.common.model.pathfinding.CostDecider;
-import net.sf.freecol.common.model.pathfinding.CostDeciders;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -151,7 +150,7 @@ public class Unit extends GoodsLocation
 
     /** Default value of unpriced units, used in evaluate_for. */
     public static final int DEFAULT_UNIT_VALUE = 500;
-    
+
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
@@ -2013,7 +2012,7 @@ public class Unit extends GoodsLocation
             && (getTile().hasAbility(Ability.AMBUSH_TERRAIN)
                 || defender.getTile().hasAbility(Ability.AMBUSH_TERRAIN));
     }
-            
+
     /**
      * Is an alternate unit a better defender than the current choice.
      * Prefer if there is no current defender, or if the alternate
@@ -3002,7 +3001,7 @@ public class Unit extends GoodsLocation
             } else {
                 entry = unitLoc;
             }
-            
+
         } else if (start instanceof HighSeas) {
             if (isOnCarrier()) {
                 entry = getCarrier().resolveDestination();
@@ -3919,6 +3918,21 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Is this unit is a person that is an expert, but works as something else.
+     *
+     * @return True if this unit is a non-expert worker.
+     */
+    public boolean isExpertWorkingAsSomethingElse() {
+        if (getStudent() != null) {
+            return false;
+        }
+        if (getRole().getId().equals("model.role.soldier")) {
+            return !hasAbility(Ability.EXPERT_SOLDIER);
+        }
+        return getType().getExpertProduction() != null && isInColony() && nonExpertWorker(getWorkType());
+    }
+
+    /**
      * Try to swap this unit if it is an expert for another that is
      * doing its job.
      *
@@ -3957,7 +3971,7 @@ public class Unit extends GoodsLocation
         changeRole(tmpRole, tmpRoleCount);
     }
 
-        
+
     // Message unpacking support.
 
     /**
@@ -4904,7 +4918,7 @@ public class Unit extends GoodsLocation
             sb.append(" unowned");
         } else if (getType() == null) {
             sb.append(" untyped");
-        } else {            
+        } else {
             sb.append(' ').append(lastPart(owner.getNationId(), "."))
                 .append(' ').append(getType().getSuffix());
             if (!hasDefaultRole()) {
