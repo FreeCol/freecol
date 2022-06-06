@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui;
 import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
 import static net.sf.freecol.common.util.StringUtils.getEnumKey;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -35,7 +34,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1459,17 +1457,18 @@ public final class ImageLibrary {
         }
         
         // Automatically determine:
-        //final String riverVariationKey = determineRiverCombinationKey(tile);
+        //final List<Direction> riverTransitions = determineRiverCombinations(tile);
         
         // Using hardcoded style:
-        final String riverVariationKey = determineRiverCombinationKeyFromStyle(tile);
+        final List<Direction> riverTransitions = determineRiverTransitionsUsingStyle(tile);
+        final String riverVariationKey = directionsToString(riverTransitions);
         
         final ImageResource riverWaterImageResource = ImageCache.getImageResource("image.tile.river.water");
         final int riverVariationNumber = riverWaterImageResource.getVariationNumberForTick(ticks);
         
         final int magnitude = tile.getRiver().getMagnitude();
         final String minorString = (magnitude <= 1) ? ".minor" : "";
-        final List<Direction> minorToMajorTransitions = determineMinorToMajorRiverTransitions(tile);
+        final List<Direction> minorToMajorTransitions = determineMinorToMajorRiverTransitions(tile, riverTransitions);
         
         final String generatedKey = riverWaterImageResource.getPrimaryKey() + ".river." + minorString + directionsToString(minorToMajorTransitions) + "." + riverVariationKey + "$gen";
         final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, tileSize, false, riverVariationNumber, () -> {
@@ -1501,11 +1500,11 @@ public final class ImageLibrary {
         return resultImage;
     }
     
-    private List<Direction> determineMinorToMajorRiverTransitions(Tile tile) {
+    private List<Direction> determineMinorToMajorRiverTransitions(Tile tile, List<Direction> riverTransitions) {
         if (tile.getRiver().getMagnitude() > 1) {
             return List.of();
         }
-        final List<Direction> directionsWithRiverTransitions = Direction.longSides.stream().filter(d -> {
+        final List<Direction> directionsWithRiverTransitions = riverTransitions.stream().filter(d -> {
             final Tile neighbour = tile.getNeighbourOrNull(d);
             return neighbour != null && (neighbour.hasRiver() && neighbour.getRiver().getMagnitude() > 1 || tile.isLand() && !neighbour.isLand());
         }).collect(Collectors.toList());
@@ -1513,24 +1512,23 @@ public final class ImageLibrary {
         return directionsWithRiverTransitions;
     }
     
-    private String determineRiverCombinationKey(Tile tile) {
+    private List<Direction> determineRiverCombinations(Tile tile) {
         final List<Direction> directionsWithRiver = Direction.longSides.stream().filter(d -> {
             final Tile neighbour = tile.getNeighbourOrNull(d);
             return neighbour != null && (neighbour.hasRiver() || tile.isLand() && !neighbour.isLand());
         }).collect(Collectors.toList());
 
-        return directionsToString(directionsWithRiver);
+        return directionsWithRiver;
     }
     
-    private String determineRiverCombinationKeyFromStyle(Tile tile) {
+    private List<Direction> determineRiverTransitionsUsingStyle(Tile tile) {
         final TileImprovement river = tile.getRiver();
         if (river == null) {
-            return "";
+            return List.of();
         }
-                
-        return directionsToString(river.getConnections().entrySet().stream().filter(e -> e.getValue() > 0).map(e -> e.getKey()).collect(Collectors.toList()));
+        return river.getConnections().entrySet().stream().filter(e -> e.getValue() > 0).map(e -> e.getKey()).collect(Collectors.toList());
     }
-    
+
     private String directionsToString(List<Direction> directions) {
         return directions.stream()
                 .map(d -> d.toString().toLowerCase())
