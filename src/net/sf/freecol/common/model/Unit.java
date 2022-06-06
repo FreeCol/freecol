@@ -3926,7 +3926,7 @@ public class Unit extends GoodsLocation
         if (getStudent() != null) {
             return false;
         }
-        if (getRole().getId().equals("model.role.soldier")) {
+        if (getRole().getRequiredGoodsList().stream().anyMatch(g -> g.getId().equals("model.goods.muskets"))) {
             return !hasAbility(Ability.EXPERT_SOLDIER);
         }
         return getType().getExpertProduction() != null && isInColony() && nonExpertWorker(getWorkType());

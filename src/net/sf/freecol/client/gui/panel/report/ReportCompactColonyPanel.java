@@ -682,11 +682,15 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         if (!unit.isPerson()) {
             return true;
         }
-        if (unit.isInColony()) {
-            return unit.getWorkType() != null || unit.getStudent() != null;
-        } else {
-            return unit.getRole().getId().equals("model.role.soldier");
+        switch (unit.getState()) {
+            case FORTIFIED:
+            case FORTIFYING:
+            case IMPROVING:
+                return true;
+            case IN_COLONY:
+                return unit.getWorkType() != null || unit.getStudent() != null;
         }
+        return unit.getRole().getRequiredGoodsList().stream().anyMatch(g -> g.getId().equals("model.goods.muskets"));
     }
 
     private void addNotWorking(ColonySummary s, String colonyId) {
