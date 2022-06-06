@@ -474,8 +474,10 @@ public class TileItemContainer extends FreeColGameObject {
                     || improvement.getType().isNatural()) {
                     TileImprovementType type
                         = spec.getTileImprovementType(improvement.getType().getId());
-                    result.add(new TileImprovement(game, tile, type,
-                                                   improvement.getStyle()));
+                    final TileImprovement tileImprovement = new TileImprovement(game, tile, type,
+                                                   improvement.getStyle());
+                    tileImprovement.setMagnitude(improvement.getMagnitude());
+                    result.add(tileImprovement);
                 }
             } else {
                 logger.warning("Bogus tile item: " + item.getId());
