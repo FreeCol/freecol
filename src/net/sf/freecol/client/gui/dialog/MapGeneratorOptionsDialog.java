@@ -122,6 +122,12 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         final OptionGroupUI mgoUI = getOptionUI();
         final GUI gui = getFreeColClient().getGUI();
 
+        if (file == null) {
+            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_LAND_GENERATOR);
+        } else {
+            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_IMPORT);
+        }
+        
         FileOptionUI foui = (FileOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_FILE);
         if (foui == null) {
@@ -166,11 +172,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             settUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
         }
         settUI.setValue(false);
-        if (file == null) {
-            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_LAND_GENERATOR);
-        } else {
-            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_IMPORT);
-        }
     }
 
     /**
