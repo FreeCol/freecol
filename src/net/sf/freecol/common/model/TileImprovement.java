@@ -319,7 +319,14 @@ public class TileImprovement extends TileItem {
      * @return A production {@code Modifier}, or null if none applicable.
      */
     private Modifier getProductionModifier(GoodsType goodsType) {
-        return (isComplete()) ? type.getProductionModifier(goodsType) : null;
+        final Modifier modifier = (isComplete()) ? type.getProductionModifier(goodsType) : null;
+        if (modifier == null || modifier.getValue() == 0 || magnitude <= 0) {
+            return modifier;
+        }
+        
+        final Modifier modifierWithMagnitudeBonus = Modifier.makeModifier(modifier);
+        modifierWithMagnitudeBonus.setValue(modifierWithMagnitudeBonus.getValue() * magnitude);
+        return modifierWithMagnitudeBonus;
     }
 
     /**
@@ -545,9 +552,18 @@ public class TileImprovement extends TileItem {
         // any goods, and don't apply bonuses for incomplete
         // improvements (such as roads)
         if (potential > 0 && isComplete()) {
-            result += type.getBonus(goodsType);
+            result += getBonus(goodsType);
         }
         return result;
+    }
+    
+    private int getBonus(GoodsType goodsType) {
+        final Modifier result = getProductionModifier(goodsType);
+        if (result == null) {
+            return 0;
+        } else {
+            return (int) result.getValue();
+        }
     }
 
     /**
