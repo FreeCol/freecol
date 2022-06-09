@@ -22,7 +22,9 @@ package net.sf.freecol.client.gui;
 import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
 import static net.sf.freecol.common.util.StringUtils.getEnumKey;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -33,6 +35,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +45,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -1022,43 +1027,71 @@ public final class ImageLibrary {
      *  
      * @param tile The tile that should get a transition.
      * @param direction The direction to get the bordering tile from..
+     * @param useNiceCorners Determines if the corners of the base transitions
+     *      should be rendered nicely (takes more time). 
      * @return The image, or {@code null} if there is no transition that
      *      should be drawn.
      */
-    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction) {
+    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction, boolean useNiceCorners) {
         final Tile borderingTile = tile.getNeighbourOrNull(direction);
+        
+        final boolean renderSpecialTransition = useNiceCorners && (direction == Direction.NW || direction == Direction.SE);
         
         if (borderingTile == null
                 || !borderingTile.isExplored()
-                || !tile.isExplored()
-                || tile.getType() == borderingTile.getType()) {
+                || !tile.isExplored()) {
             // No transition needed in these cases.
             return null;
         }
         
-        final ImageResource terrainImageResource;
-        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
-        if (notABeachTransition) {
-            terrainImageResource = ImageCache.getImageResource(getTerrainImageKey(borderingTile.getType()));
-        } else {
-            terrainImageResource = getBeachCenterImageResource();
+        if (tile.getType() == borderingTile.getType()
+                && !renderSpecialTransition) {
+            // No transition needed in these cases.
+            return null;
         }
+        
+        final ImageResource terrainImageResource = getTerrainOrBeachImageResource(tile, borderingTile);
         
         if (terrainImageResource == null) {
             return null;
         }
         
         final ImageResource tileImageResource = ImageCache.getImageResource(getTerrainImageKey(tile.getType()));
-        if (tileImageResource == null
-                || terrainImageResource.getPrimaryKey().equals(tileImageResource.getPrimaryKey())) {
+        if (tileImageResource == null) {
+            return null;
+        }
+        if (terrainImageResource.getPrimaryKey().equals(tileImageResource.getPrimaryKey())
+                && !renderSpecialTransition) {
             /*
              * No reason to make transitions between tiles with the same graphics.
              */
             return null;
         }
         
+        final boolean beachTransitionNe;
+        final boolean beachTransitionSw;
+        final String transitionKey;
+        if (renderSpecialTransition) {
+            beachTransitionNe = shouldIncludeSpecialBeachTransitionInDirection(tile, borderingTile, Direction.NE);
+            beachTransitionSw = shouldIncludeSpecialBeachTransitionInDirection(tile, borderingTile, Direction.SW);
+            
+            final Tile neBorderingTile = borderingTile.getNeighbourOrNull(Direction.NE);
+            final Tile swBorderingTile = borderingTile.getNeighbourOrNull(Direction.SW);
 
-        final String transitionKey = terrainImageResource.getPrimaryKey() + "$gen"; 
+            transitionKey = terrainImageResource.getPrimaryKey()
+                    + ","
+                    + (neBorderingTile != null && neBorderingTile.getType() != null ? neBorderingTile.getType().getId() : "null")
+                    + ","
+                    + (swBorderingTile != null && swBorderingTile.getType() != null ? swBorderingTile.getType().getId() : "null")
+                    + ","
+                    + beachTransitionNe
+                    + beachTransitionSw
+                    + "$baseTransition$gen";
+        } else {
+            beachTransitionNe = false;
+            beachTransitionSw = false;
+            transitionKey = terrainImageResource.getPrimaryKey() + "$baseTransition$gen";
+        }
         
         /*
          * Using direction.ordinal() as the cached variation in order to get different
@@ -1070,10 +1103,92 @@ public final class ImageLibrary {
              * of memory used.
              */
             final BufferedImage terrainImage = imageCache.getCachedImage(terrainImageResource, tileSize, false, 0);
-            return ImageUtils.imageWithAlphaFromMask(terrainImage, getTerrainMask(direction));
+            BufferedImage transitionTileImage;
+            
+            if (renderSpecialTransition) {
+                /*
+                 * When doing the transitions for NW and SE, the base terrain is
+                 * the blended version of the neighbouring tiles. That is, the
+                 * result after applying the transitions for NE and SW.
+                 */
+                transitionTileImage = new BufferedImage(terrainImage.getWidth(), terrainImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                final Graphics2D tranitionG2d = transitionTileImage.createGraphics();
+
+                final BufferedImage beachImage = imageCache.getCachedImage(getBeachCenterImageResource(), tileSize, false, 0);
+                
+                if (tile.isLand() || borderingTile.isLand()) {
+                    tranitionG2d.drawImage(terrainImage, 0, 0, null);
+                } else {
+                    if (beachTransitionNe) {
+                        tranitionG2d.drawImage(getBeachBaseTileTransitionImage(Direction.NE), 0, 0, null);
+                    }
+                    if (beachTransitionSw) {
+                        tranitionG2d.drawImage(getBeachBaseTileTransitionImage(Direction.SW), 0, 0, null);
+                    }
+                }
+                
+                final BufferedImage transitionImage2 = getBaseTileTransitionImage(borderingTile, Direction.NE, useNiceCorners);
+                if (transitionImage2 != null) {
+                    tranitionG2d.drawImage(transitionImage2, 0, 0, null);
+                }
+                final BufferedImage transitionImage3 = getBaseTileTransitionImage(borderingTile, Direction.SW, useNiceCorners);
+                if (transitionImage3 != null) {
+                    tranitionG2d.drawImage(transitionImage3, 0, 0, null);
+                }
+                tranitionG2d.dispose();
+            } else {
+                transitionTileImage = terrainImage;
+            }
+            
+            return ImageUtils.imageWithAlphaFromMask(transitionTileImage, getTerrainMask(direction));
         });
 
         return transitionImage;
+    }
+    
+    private boolean shouldIncludeSpecialBeachTransitionInDirection(Tile tile, Tile borderingTile, Direction direction) {
+        if (tile.isLand() || borderingTile.isLand()) {
+            return false;
+        }
+        final Tile tileNeighbour = tile.getNeighbourOrNull(direction);
+        final Tile borderingTileNeighbour = borderingTile.getNeighbourOrNull(direction);
+        return tileNeighbour != null && tileNeighbour.isLand()
+                || borderingTileNeighbour != null && borderingTileNeighbour.isLand();
+    }
+    
+    private BufferedImage getBeachBaseTileTransitionMask(Direction direction) {
+        final String key = "image.mask.special.beach." + direction.toString().toLowerCase();
+        return this.imageCache.getSizedImage(key, this.tileSize, false);
+    }
+
+    /**
+     * Gets the beach overlay to use when making base tile transitions with beach.
+     */
+    private BufferedImage getBeachBaseTileTransitionImage(Direction direction) {
+        final String transitionKey = "beachTransition." + direction.toString() + "$gen";
+        final BufferedImage resultImage = imageCache.getCachedImageOrGenerate(transitionKey, tileSize, false, direction.ordinal(), () -> {
+            final BufferedImage beachImage = imageCache.getCachedImage(getBeachCenterImageResource(), tileSize, false, 0);
+            return ImageUtils.imageWithAlphaFromMask(beachImage, getBeachBaseTileTransitionMask(direction));
+        });
+        
+        return resultImage;
+    }
+
+    /**
+     * Gets the terrain image resource, or the beach, in order to create transitions.
+     */
+    private ImageResource getTerrainOrBeachImageResource(Tile tile, final Tile borderingTile) {
+        if (borderingTile == null) {
+            return null;
+        }
+        final ImageResource terrainImageResource;
+        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();;
+        if (notABeachTransition) {
+            terrainImageResource = ImageCache.getImageResource(getTerrainImageKey(borderingTile.getType()));
+        } else {
+            terrainImageResource = getBeachCenterImageResource();
+        }
+        return terrainImageResource;
     }
     
     /**

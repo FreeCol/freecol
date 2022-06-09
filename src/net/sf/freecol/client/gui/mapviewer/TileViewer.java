@@ -440,19 +440,12 @@ public final class TileViewer extends FreeColClientHolder {
     
     void drawBaseTileTransitions(Graphics2D g2d, Tile tile) {
         /*
-         * We are using masks for creating transitions between base tiles. Please note
-         * that corners have not yet been implemented, but the result look good enough
-         * for now.
+         * We are using masks for creating transitions between base tiles.
          */
         
         drawBaseTileTransitionAtDirection(g2d, tile, Direction.NE);
         drawBaseTileTransitionAtDirection(g2d, tile, Direction.SW);
         
-        /*
-         * How to implement corners: When doing the transitions for NW and SE, the base
-         * terrain should be the blended version of the neighbouring tiles. That is,
-         * the result after applying the transitions for NE and SW.
-         */
         drawBaseTileTransitionAtDirection(g2d, tile, Direction.NW);
         drawBaseTileTransitionAtDirection(g2d, tile, Direction.SE);
         
@@ -460,7 +453,8 @@ public final class TileViewer extends FreeColClientHolder {
     }
     
     private void drawBaseTileTransitionAtDirection(Graphics2D g2d, Tile tile, Direction direction) {
-        final BufferedImage transitionImage = this.lib.getBaseTileTransitionImage(tile, direction);
+        final boolean useNiceCorners = getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_HIGH;
+        final BufferedImage transitionImage = this.lib.getBaseTileTransitionImage(tile, direction, useNiceCorners);
         if (transitionImage != null) {
             g2d.drawImage(transitionImage, 0, 0, null);
         }
