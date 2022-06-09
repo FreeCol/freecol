@@ -74,7 +74,7 @@ public final class BeachTileAnimationImageCreator {
      *      no pixels are out of bounds of the base tile.
      * @return A base tile image fitting inside the standard "diamond".
      */
-    public static BufferedImage generateImage(BufferedImage beachImage,
+    private static BufferedImage generateImage(BufferedImage beachImage,
             BufferedImage oceanImage,
             int oceanImageVariationNumber,
             BufferedImage beachMaskImage,

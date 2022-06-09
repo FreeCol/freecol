@@ -142,7 +142,7 @@ public final class RiverAnimationImageCreator {
      *      no pixels are out of bounds of the base tile.
      * @return A base tile image fitting inside the standard "diamond".
      */
-    public static BufferedImage generateImage(BufferedImage pebblesImage,
+    private static BufferedImage generateImage(BufferedImage pebblesImage,
             BufferedImage waterImage,
             int riverImageVariationNumber,
             BufferedImage riverMaskImage,
