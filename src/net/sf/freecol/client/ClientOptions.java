@@ -153,6 +153,16 @@ public class ClientOptions extends OptionGroup {
     public static final String USE_XRENDER
         = "model.option.useXRender";
 
+    /** Allows the user to determine the tradeoff between quality and rendering speed. */
+    public static final String GRAPHICS_QUALITY
+        = "model.option.graphicsQuality";
+    
+    public static final int GRAPHICS_QUALITY_LOWEST = 0;
+    public static final int GRAPHICS_QUALITY_LOW = 10;
+    public static final int GRAPHICS_QUALITY_NORMAL = 20;
+    public static final int GRAPHICS_QUALITY_HIGH = 30;
+    public static final int GRAPHICS_QUALITY_HIGHEST = 40;
+    
     /** Animation speed for our units. */
     public static final String MOVE_ANIMATION_SPEED
         = "model.option.moveAnimationSpeed";
@@ -554,6 +564,22 @@ public class ClientOptions extends OptionGroup {
                 "clientOptions.gui.friendlyMoveAnimationSpeed.normal",
                 "clientOptions.gui.friendlyMoveAnimationSpeed.fast"
             });
+    
+    private static final Map<Integer, String> graphicsQualityChoices
+        = makeUnmodifiableMap(new Integer[] {
+                GRAPHICS_QUALITY_LOWEST,
+                GRAPHICS_QUALITY_LOW,
+                GRAPHICS_QUALITY_NORMAL,
+                GRAPHICS_QUALITY_HIGH,
+                GRAPHICS_QUALITY_HIGHEST
+            },
+            new String[] {
+                "clientOptions.gui.graphicsQuality.lowest",
+                "clientOptions.gui.graphicsQuality.low",
+                "clientOptions.gui.graphicsQuality.normal",
+                "clientOptions.gui.graphicsQuality.high",
+                "clientOptions.gui.graphicsQuality.highest"
+            });
         
     
     /**
@@ -820,6 +846,9 @@ public class ClientOptions extends OptionGroup {
         // @compat 0.12.0
         final PercentageOption volumeOption = getOption(AUDIO_VOLUME, PercentageOption.class);
         volumeOption.setPreviewEnabled(true);
+        
+        addRangeOption(GRAPHICS_QUALITY,
+                DISPLAY_GROUP, 20, graphicsQualityChoices);
         // end @compat 0.12.0
     }
 

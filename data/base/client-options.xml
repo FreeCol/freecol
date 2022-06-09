@@ -53,7 +53,16 @@
       <!-- Use XRender or not? -->
       <booleanOption id="model.option.useXRender"
                      defaultValue="true"/>
-      
+
+      <rangeOption id="model.option.graphicsQuality"
+                   defaultValue="20" localizedLabels="true">
+        <rangeValue label="clientOptions.gui.graphicsQuality.lowest" value="0"/>
+        <rangeValue label="clientOptions.gui.graphicsQuality.low" value="10"/>
+        <rangeValue label="clientOptions.gui.graphicsQuality.normal" value="20"/>
+        <rangeValue label="clientOptions.gui.graphicsQuality.high" value="30"/>
+        <rangeValue label="clientOptions.gui.graphicsQuality.highest" value="40"/>
+      </rangeOption>      
+
       <!-- Animation speed for our units. -->
       <rangeOption id="model.option.moveAnimationSpeed"
                    defaultValue="3" localizedLabels="true">
