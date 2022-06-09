@@ -4,7 +4,15 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.resources.ImageCache;
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.util.ImageUtils;
 
 /**
@@ -12,6 +20,113 @@ import net.sf.freecol.common.util.ImageUtils;
  */
 public final class RiverAnimationImageCreator {
 
+    private final ImageLibrary lib;
+    private final ImageCache imageCache;
+    
+    public RiverAnimationImageCreator(ImageLibrary lib, ImageCache imageCache) {
+        this.lib = lib;
+        this.imageCache = imageCache;
+    }
+    
+    /**
+     * Gets the combined animated image for river
+     * 
+     * @param tile The tile. 
+     * @param ticks The number of ticks to get the correct animation frame.
+     * @return A cached, generated image.
+     */
+    public BufferedImage getAnimatedScaledRiverTerrainImage(Tile tile, long ticks) {
+        final ImageResource riverPebblesImageResource = getRiverPebblesImageResource();
+        if (riverPebblesImageResource == null) {
+            return null;
+        }
+        
+        // Automatically determine:
+        //final List<Direction> riverTransitions = determineRiverCombinations(tile);
+        
+        // Using hardcoded style:
+        final List<Direction> riverTransitions = determineRiverTransitionsUsingStyle(tile);
+        final String riverVariationKey = directionsToString(riverTransitions);
+        
+        final ImageResource riverWaterImageResource = ImageCache.getImageResource("image.tile.river.water");
+        final int riverVariationNumber = riverWaterImageResource.getVariationNumberForTick(ticks);
+        
+        final int magnitude = tile.getRiver().getMagnitude();
+        final String minorString = (magnitude <= 1) ? ".minor" : "";
+        final List<Direction> minorToMajorTransitions = determineMinorToMajorRiverTransitions(tile, riverTransitions);
+        
+        final String generatedKey = riverWaterImageResource.getPrimaryKey() + ".river." + minorString + directionsToString(minorToMajorTransitions) + "." + riverVariationKey + "$gen";
+        final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, lib.getTileSize(), false, riverVariationNumber, () -> {
+            final BufferedImage riverPebblesImage = riverPebblesImageResource.getImage(lib.getTileSize(), false);
+            final BufferedImage riverWaterImage = riverWaterImageResource.getVariation(riverVariationNumber).getImage(lib.getTileSize(), false);
+            final String riverMaskKey = "image.mask.river" + minorString + (riverVariationKey.isEmpty() ? "" : "." + riverVariationKey);
+            final BufferedImage baseMaskImage = this.imageCache.getSizedImage(riverMaskKey, lib.getTileSize(), false);
+            final BufferedImage maskImage = createRiverMaskImageWithTransitions(baseMaskImage, minorToMajorTransitions);
+            final BufferedImage baseTileMask = lib.getTerrainMask(null);
+            
+            return generateImage(riverPebblesImage, riverWaterImage, riverVariationNumber, maskImage, baseTileMask);
+        });
+        
+        return result;
+    }
+    
+    private static ImageResource getRiverPebblesImageResource() {
+        final String key = "image.tile.river.pebbles";
+        return ImageCache.getImageResource(key);
+    }
+
+    private BufferedImage createRiverMaskImageWithTransitions(BufferedImage baseMaskImage, List<Direction> minorToMajorTransitions) {
+        if (minorToMajorTransitions.isEmpty()) {
+            return baseMaskImage;
+        }
+        final BufferedImage resultImage = new BufferedImage(baseMaskImage.getWidth(), baseMaskImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g2d = resultImage.createGraphics();
+        g2d.drawImage(baseMaskImage, 0, 0, null);
+        for (Direction d : minorToMajorTransitions) {
+            final String riverMaskKey = "image.mask.river.to_major." + d.toString().toLowerCase();
+            final BufferedImage maskImage = this.imageCache.getSizedImage(riverMaskKey, lib.getTileSize(), false);
+            g2d.drawImage(maskImage, 0, 0, null);
+        }
+        g2d.dispose();
+        return resultImage;
+    }
+    
+    private List<Direction> determineMinorToMajorRiverTransitions(Tile tile, List<Direction> riverTransitions) {
+        if (tile.getRiver().getMagnitude() > 1) {
+            return List.of();
+        }
+        final List<Direction> directionsWithRiverTransitions = riverTransitions.stream().filter(d -> {
+            final Tile neighbour = tile.getNeighbourOrNull(d);
+            return neighbour != null && (neighbour.hasRiver() && neighbour.getRiver().getMagnitude() > 1 || tile.isLand() && !neighbour.isLand());
+        }).collect(Collectors.toList());
+        
+        return directionsWithRiverTransitions;
+    }
+    
+    private List<Direction> determineRiverCombinations(Tile tile) {
+        final List<Direction> directionsWithRiver = Direction.longSides.stream().filter(d -> {
+            final Tile neighbour = tile.getNeighbourOrNull(d);
+            return neighbour != null && (neighbour.hasRiver() || tile.isLand() && !neighbour.isLand());
+        }).collect(Collectors.toList());
+
+        return directionsWithRiver;
+    }
+    
+    private List<Direction> determineRiverTransitionsUsingStyle(Tile tile) {
+        final TileImprovement river = tile.getRiver();
+        if (river == null) {
+            return List.of();
+        }
+        return river.getConnections().entrySet().stream().filter(e -> e.getValue() > 0).map(e -> e.getKey()).collect(Collectors.toList());
+    }
+
+    private String directionsToString(List<Direction> directions) {
+        return directions.stream()
+                .map(d -> d.toString().toLowerCase())
+                .sorted()
+                .reduce((a, b) -> a + "_" + b).orElse("");
+    }
+    
     /**
      * Generates the image.
      * 

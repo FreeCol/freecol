@@ -37,16 +37,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.images.BaseTileTransitionImageCreator;
-import net.sf.freecol.client.gui.images.BeachTileAnimationImageCreator;
-import net.sf.freecol.client.gui.images.RiverAnimationImageCreator;
+import net.sf.freecol.client.gui.images.ImageCreators;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
@@ -69,7 +66,6 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -194,7 +190,7 @@ public final class ImageLibrary {
     /** Cache for the string images. */
     private Map<String,BufferedImage> stringImageCache;
     
-    private final BaseTileTransitionImageCreator baseTileTransitionImageCreator;
+    private final ImageCreators imageCreators;
 
 
     /**
@@ -223,7 +219,7 @@ public final class ImageLibrary {
     public ImageLibrary(float scaleFactor, ImageCache imageCache) {
         changeScaleFactor(scaleFactor);
         this.imageCache = imageCache;
-        this.baseTileTransitionImageCreator = new BaseTileTransitionImageCreator(this, imageCache);
+        this.imageCreators = new ImageCreators(this, imageCache);
     }
 
 
@@ -1013,12 +1009,7 @@ public final class ImageLibrary {
         final String key = "image.tile.model.tile.beach";
         return ImageCache.getImageResource(key);
     }
-    
-    private static ImageResource getRiverPebblesImageResource() {
-        final String key = "image.tile.river.pebbles";
-        return ImageCache.getImageResource(key);
-    }
-    
+        
     /**
      * Returns a transparent image for making a transition between
      * the given tiles.
@@ -1031,7 +1022,7 @@ public final class ImageLibrary {
      *      should be drawn.
      */
     public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction, boolean useNiceCorners) {
-        return baseTileTransitionImageCreator.getBaseTileTransitionImage(tile, direction, useNiceCorners);
+        return imageCreators.getBaseTileTransitionImageCreator().getBaseTileTransitionImage(tile, direction, useNiceCorners);
     }
     
     /**
@@ -1409,89 +1400,7 @@ public final class ImageLibrary {
      * @return A cached, generated image.
      */
     public BufferedImage getAnimatedScaledRiverTerrainImage(Tile tile, long ticks) {
-        final ImageResource riverPebblesImageResource = getRiverPebblesImageResource();
-        if (riverPebblesImageResource == null) {
-            return null;
-        }
-        
-        // Automatically determine:
-        //final List<Direction> riverTransitions = determineRiverCombinations(tile);
-        
-        // Using hardcoded style:
-        final List<Direction> riverTransitions = determineRiverTransitionsUsingStyle(tile);
-        final String riverVariationKey = directionsToString(riverTransitions);
-        
-        final ImageResource riverWaterImageResource = ImageCache.getImageResource("image.tile.river.water");
-        final int riverVariationNumber = riverWaterImageResource.getVariationNumberForTick(ticks);
-        
-        final int magnitude = tile.getRiver().getMagnitude();
-        final String minorString = (magnitude <= 1) ? ".minor" : "";
-        final List<Direction> minorToMajorTransitions = determineMinorToMajorRiverTransitions(tile, riverTransitions);
-        
-        final String generatedKey = riverWaterImageResource.getPrimaryKey() + ".river." + minorString + directionsToString(minorToMajorTransitions) + "." + riverVariationKey + "$gen";
-        final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, tileSize, false, riverVariationNumber, () -> {
-            final BufferedImage riverWaterImage = riverWaterImageResource.getVariation(riverVariationNumber).getImage(this.tileSize, false);
-            
-            final String riverMaskKey = "image.mask.river" + minorString + (riverVariationKey.isEmpty() ? "" : "." + riverVariationKey);
-            final BufferedImage baseMaskImage = this.imageCache.getSizedImage(riverMaskKey, this.tileSize, false);
-            final BufferedImage maskImage = createRiverMaskImageWithTransitions(baseMaskImage, minorToMajorTransitions);
-            
-            return RiverAnimationImageCreator.generateImage(riverPebblesImageResource.getImage(tileSize, false), riverWaterImage, riverVariationNumber, maskImage, getTerrainMask(null));
-        });
-        
-        return result;
-    }
-
-    private BufferedImage createRiverMaskImageWithTransitions(BufferedImage baseMaskImage, List<Direction> minorToMajorTransitions) {
-        if (minorToMajorTransitions.isEmpty()) {
-            return baseMaskImage;
-        }
-        final BufferedImage resultImage = new BufferedImage(baseMaskImage.getWidth(), baseMaskImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g2d = resultImage.createGraphics();
-        g2d.drawImage(baseMaskImage, 0, 0, null);
-        for (Direction d : minorToMajorTransitions) {
-            final String riverMaskKey = "image.mask.river.to_major." + d.toString().toLowerCase();
-            final BufferedImage maskImage = this.imageCache.getSizedImage(riverMaskKey, this.tileSize, false);
-            g2d.drawImage(maskImage, 0, 0, null);
-        }
-        g2d.dispose();
-        return resultImage;
-    }
-    
-    private List<Direction> determineMinorToMajorRiverTransitions(Tile tile, List<Direction> riverTransitions) {
-        if (tile.getRiver().getMagnitude() > 1) {
-            return List.of();
-        }
-        final List<Direction> directionsWithRiverTransitions = riverTransitions.stream().filter(d -> {
-            final Tile neighbour = tile.getNeighbourOrNull(d);
-            return neighbour != null && (neighbour.hasRiver() && neighbour.getRiver().getMagnitude() > 1 || tile.isLand() && !neighbour.isLand());
-        }).collect(Collectors.toList());
-        
-        return directionsWithRiverTransitions;
-    }
-    
-    private List<Direction> determineRiverCombinations(Tile tile) {
-        final List<Direction> directionsWithRiver = Direction.longSides.stream().filter(d -> {
-            final Tile neighbour = tile.getNeighbourOrNull(d);
-            return neighbour != null && (neighbour.hasRiver() || tile.isLand() && !neighbour.isLand());
-        }).collect(Collectors.toList());
-
-        return directionsWithRiver;
-    }
-    
-    private List<Direction> determineRiverTransitionsUsingStyle(Tile tile) {
-        final TileImprovement river = tile.getRiver();
-        if (river == null) {
-            return List.of();
-        }
-        return river.getConnections().entrySet().stream().filter(e -> e.getValue() > 0).map(e -> e.getKey()).collect(Collectors.toList());
-    }
-
-    private String directionsToString(List<Direction> directions) {
-        return directions.stream()
-                .map(d -> d.toString().toLowerCase())
-                .sorted()
-                .reduce((a, b) -> a + "_" + b).orElse("");
+        return imageCreators.getRiverAnimationImageCreator().getAnimatedScaledRiverTerrainImage(tile, ticks);
     }
     
     /**
@@ -1503,58 +1412,8 @@ public final class ImageLibrary {
      * @return A cached, genereated image.
      */
     public BufferedImage getAnimatedScaledWaterAndBeachTerrainImage(TileType type, List<Direction> directionsWithLand, long ticks) {
-        final ImageResource beachCenterImageResource = getBeachCenterImageResource();
-        if (beachCenterImageResource == null) {
-            return null;
-        }
-        
-        final String beachVariationKey = determineDirectionCombinationKey(directionsWithLand);
-        
-        final ImageResource oceanImageResource = ImageCache.getImageResource(getTerrainImageKey(type));
-        final int oceanVariationNumber = oceanImageResource.getVariationNumberForTick(ticks);
-        
-        final String generatedKey = oceanImageResource.getPrimaryKey() + ".beach." + beachVariationKey + "$gen";
-        final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, tileSize, false, oceanVariationNumber, () -> {
-            final BufferedImage oceanImage = getAnimatedScaledTerrainImage(type, ticks);
-            final String oceanMaskKey = "image.mask.beach." + beachVariationKey;
-            final BufferedImage maskImage = this.imageCache.getSizedImage(oceanMaskKey, this.tileSize, false);
-            return BeachTileAnimationImageCreator.generateImage(beachCenterImageResource.getImage(tileSize, false), oceanImage, oceanVariationNumber, maskImage, getTerrainMask(null));
-        });
-        
-        return result;
+        return imageCreators.getBeachTileAnimationImageCreator().getAnimatedScaledWaterAndBeachTerrainImage(type, directionsWithLand, ticks);
     }
-
-    /**
-     * Returns a string representing the {@code directions} given.
-     * @param directions The directions that should be included
-     * @return The directions in lowercase, ordered alphabetically and
-     *      combined with "_". Corners that are a part of a longSide is
-     *      not included in the returned {@code String}.
-     */
-    private String determineDirectionCombinationKey(List<Direction> directions) {
-        final Optional<String> neighboursPre = directions.stream()
-                .filter(d -> Direction.longSides.contains(d))
-                .map(d -> d.toString().toLowerCase())
-                .sorted()
-                .reduce((a, b) -> a + "_" + b);
-        
-        /*
-         * We need to remove some of the combinations where the corners are
-         * included in the edges. This is done in order to reduce the number
-         * of possible images -- although it would look nicer to have special
-         * graphics for these cases as well.
-         */
-        final String beachVariationKey = directions.stream()
-                .filter(d -> Direction.longSides.contains(d)
-                        || neighboursPre.isEmpty()
-                        || !neighboursPre.get().contains(d.toString().toLowerCase()))
-                .map(d -> d.toString().toLowerCase())
-                .sorted()
-                .reduce((a, b) -> a + "_" + b).get();
-        
-        return beachVariationKey;
-    }
-
 
     /**
      * Get the tile improvement image with for a given identifier.
