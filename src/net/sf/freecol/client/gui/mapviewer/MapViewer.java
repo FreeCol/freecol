@@ -276,6 +276,18 @@ public final class MapViewer extends FreeColClientHolder {
         g2d.drawImage(backBufferImage, 0, 0, null);      
         final long useBuffersMs = now();
         
+        // Display cursor for selected tile or active unit
+        final Tile cursorTile = getVisibleCursorTile();
+        if (cursorTile != null && mapViewerState.getCursor().isActive() && !mapViewerState.getUnitAnimator().isUnitsOutForAnimation()) {
+            /*
+             * The cursor is hidden when units are animated. 
+             */
+            final Point p = mapViewerBounds.calculateTilePosition(cursorTile, false);
+            final BufferedImage image = this.lib.getScaledImage(ImageLibrary.UNIT_SELECT);
+            g2d.drawImage(image, p.x - (image.getWidth() - tileBounds.getWidth() ) / 2, p.y - (image.getHeight() - tileBounds.getHeight()) / 2, null);
+        }
+        final long cursorTileMs = now();
+        
         // Display goto path
         if (mapViewerState.getUnitPath() != null) {
             displayPath(g2d, mapViewerState.getUnitPath());
@@ -304,7 +316,8 @@ public final class MapViewer extends FreeColClientHolder {
                 .append(" animated=").append(animatedBaseMs - initMs)
                 .append(" displayNonAnimationImages=").append(nonAnimatedMs - animatedBaseMs)
                 .append(" buffers=").append(useBuffersMs - nonAnimatedMs)
-                .append(" goto=").append(gotoPathMs - useBuffersMs)
+                .append(" cursorTile=").append(cursorTileMs - useBuffersMs)
+                .append(" goto=").append(gotoPathMs - cursorTileMs)
                 .append(" chat=").append(chatMs - gotoPathMs)
                 .append(" finish=").append(endMs - chatMs)
                 ;
@@ -347,7 +360,6 @@ public final class MapViewer extends FreeColClientHolder {
             }
             this.tv.drawBaseTileTransitions(tileG2d, tile);
         });
-
 
         // Draw the grid, if needed
         long t3 = now();
@@ -425,19 +437,6 @@ public final class MapViewer extends FreeColClientHolder {
         long t10 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
             paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, false));
-        }
-
-        // Display cursor for selected tile or active unit
-        long t11 = now();
-        final Tile cursorTile = getVisibleCursorTile();
-        if (cursorTile != null && mapViewerState.getCursor().isActive() && !mapViewerState.getUnitAnimator().isUnitsOutForAnimation()) {
-            /*
-             * The cursor is hidden when units are animated. 
-             */
-            
-            paintSingleTile(nonAnimationG2d, tcb, cursorTile, (tileG2d, tile) -> {
-                nonAnimationG2d.drawImage(this.lib.getScaledImage(ImageLibrary.UNIT_SELECT), 0, 0, null);
-            });
         }
 
         // Display units
@@ -519,8 +518,7 @@ public final class MapViewer extends FreeColClientHolder {
                 .append(" t8=").append(t8 - t7)
                 .append(" t9=").append(t9 - t8)
                 .append(" t10=").append(t10 - t9)
-                .append(" t11=").append(t11 - t10)
-                .append(" t12=").append(t12 - t11)
+                .append(" t12=").append(t12 - t10)
                 .append(" t13=").append(t13 - t12)
                 .append(" t14=").append(t14 - t13)
                 .append(" t15=").append(t15 - t14)

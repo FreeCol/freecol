@@ -767,7 +767,7 @@ public class SwingGUI extends GUI {
         final ActionListener al = (ActionEvent ae) -> {
             final Tile tile = mapViewer.getMapViewerState().getCursorTile();
             if (tile != null) {
-                mapViewer.getMapViewerRepaintManager().markAsDirty(tile);
+                //mapViewer.getMapViewerRepaintManager().markAsDirty(tile);
                 // Repaint as part of normal animation.
                 //this.canvas.repaint();
             }
