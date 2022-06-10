@@ -103,6 +103,7 @@ public final class RiverAnimationImageCreator {
         return directionsWithRiverTransitions;
     }
     
+    @SuppressWarnings("unused")
     private List<Direction> determineRiverCombinations(Tile tile) {
         final List<Direction> directionsWithRiver = Direction.longSides.stream().filter(d -> {
             final Tile neighbour = tile.getNeighbourOrNull(d);
@@ -183,8 +184,11 @@ public final class RiverAnimationImageCreator {
         final Graphics2D expandedRiverMaskImageG2d = expandedRiverMaskImage.createGraphics();
         expandedRiverMaskImageG2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         expandedRiverMaskImageG2d.drawImage(riverMaskImage, 0, 0, largerWidth, largerHeight, null);
-        expandedRiverMaskImageG2d.drawImage(riverMaskImage, 0, 0, largerWidth, largerHeight, null);
+
+        final int x = (largerWidth - origWidth) / 2;
+        final int y = (largerHeight - origHeight) / 2;
+        expandedRiverMaskImageG2d.drawImage(riverMaskImage, x, y, origWidth, origHeight, null);
         expandedRiverMaskImageG2d.dispose();
-        return expandedRiverMaskImage.getSubimage((largerWidth - origWidth) / 2, (largerHeight - origHeight) / 2, origWidth, origHeight);
+        return expandedRiverMaskImage.getSubimage(x, y, origWidth, origHeight);
     }
 }
