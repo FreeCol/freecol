@@ -54,6 +54,8 @@
       <booleanOption id="model.option.useXRender"
                      defaultValue="true"/>
 
+      <booleanOption id="model.option.useTerrainAnimations" defaultValue="true"/>
+
       <rangeOption id="model.option.graphicsQuality"
                    defaultValue="20" localizedLabels="true">
         <rangeValue label="clientOptions.gui.graphicsQuality.lowest" value="0"/>

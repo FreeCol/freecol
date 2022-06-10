@@ -152,6 +152,9 @@ public class ClientOptions extends OptionGroup {
     /** Enable use of XRender pipeline (unix specific). */
     public static final String USE_XRENDER
         = "model.option.useXRender";
+    
+    public static final String USE_TERRAIN_ANIMATIONS
+        = "model.option.useTerrainAnimations";
 
     /** Allows the user to determine the tradeoff between quality and rendering speed. */
     public static final String GRAPHICS_QUALITY
@@ -730,6 +733,14 @@ public class ClientOptions extends OptionGroup {
             return null;
         }
     }
+    
+    public boolean isRiverAnimationEnabled() {
+        return isTerrainAnimationsEnabled() && getRange(ClientOptions.GRAPHICS_QUALITY) == ClientOptions.GRAPHICS_QUALITY_HIGHEST;
+    }
+    
+    public boolean isTerrainAnimationsEnabled() {
+        return getBoolean(ClientOptions.USE_TERRAIN_ANIMATIONS) && getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_LOW;
+    }
 
     /**
      * Perform backward compatibility fixups on new client options as
@@ -846,9 +857,8 @@ public class ClientOptions extends OptionGroup {
         // @compat 0.12.0
         final PercentageOption volumeOption = getOption(AUDIO_VOLUME, PercentageOption.class);
         volumeOption.setPreviewEnabled(true);
-        
-        addRangeOption(GRAPHICS_QUALITY,
-                DISPLAY_GROUP, 20, graphicsQualityChoices);
+        addRangeOption(GRAPHICS_QUALITY, DISPLAY_GROUP, 20, graphicsQualityChoices);
+        addBooleanOption(USE_TERRAIN_ANIMATIONS, DISPLAY_GROUP, true);
         // end @compat 0.12.0
     }
 

@@ -313,7 +313,9 @@ public final class TileViewer extends FreeColClientHolder {
         displayAnimatedBaseTiles(g2d, tile, false);
         displayTileWithBeach(g2d, tile);
         if (!tile.isExplored()) return;
-        drawBaseTileTransitions(g2d, tile);
+        if (!getClientOptions().isRiverAnimationEnabled() && tile.hasRiver()) {
+            drawBaseTileTransitions(g2d, tile);
+        }
         
         RescaleOp rop = (player.canSee(tile)) ? null : standardRescale;
         displayTileItems(g2d, tile, rop, overlayImage);
@@ -370,23 +372,34 @@ public final class TileViewer extends FreeColClientHolder {
      */
     public void displayAnimatedBaseTiles(Graphics2D g2d, Tile tile, boolean freezeAnimation) {
         final TileType tileType = tile.getType();
-        if (tileType != null && tileType.isWater()) { // TODO: And animation enabled
-            /* 
-             * TODO: Add a single shared clock for MapViewer and TileViewer.
-             *       For now, just support water with 125ms frames.
-             */
-            final long ticks;
-            if (freezeAnimation) {
-                ticks = 0;
-            } else {
-                ticks = System.currentTimeMillis() / 125;
-            }
-
+        if (tileType == null) {
+            return;
+        }
+        
+        /* 
+         * TODO: Add a single shared clock for MapViewer and TileViewer.
+         *       For now, just support water with 125ms frames.
+         */
+        final long ticks;
+        if (freezeAnimation || !getClientOptions().isTerrainAnimationsEnabled()) {
+            ticks = 0;
+        } else {
+            ticks = System.currentTimeMillis() / 125;
+        }
+        
+        if (tileType.isWater()) { // TODO: And animation enabled
             final List<Direction> directionsWithLand = allDirectionsWithLand(tile);
             if (directionsWithLand.isEmpty()) {
                 g2d.drawImage(this.lib.getAnimatedScaledTerrainImage(tileType, ticks), 0, 0, null);
             } else {
                 g2d.drawImage(this.lib.getAnimatedScaledWaterAndBeachTerrainImage(tileType, directionsWithLand, ticks), 0, 0, null);
+            }
+        } else if (getClientOptions().isRiverAnimationEnabled() && tile.hasRiver()) {
+            g2d.drawImage(this.lib.getScaledTerrainImage(tileType, tile.getX(), tile.getY()), 0, 0, null);
+            drawBaseTileTransitions(g2d, tile);
+            final BufferedImage img = this.lib.getAnimatedScaledRiverTerrainImage(tile, ticks);
+            if (img != null) {
+                g2d.drawImage(img, 0, 0, null);
             }
         }
     }
@@ -411,7 +424,7 @@ public final class TileViewer extends FreeColClientHolder {
         final int x = tile.getX();
         final int y = tile.getY();
 
-        final boolean outForBaseTileAnimation = (tileType != null) && tileType.isWater();
+        final boolean outForBaseTileAnimation = (tileType != null) && (tileType.isWater() || getClientOptions().isRiverAnimationEnabled() && tile.hasRiver());
         if (!outForBaseTileAnimation) {
             // ATTENTION: we assume that all base tiles have the same size
             g2d.drawImage(this.lib.getScaledTerrainImage(tileType, x, y), 0, 0, null);
@@ -439,6 +452,10 @@ public final class TileViewer extends FreeColClientHolder {
     }
     
     void drawBaseTileTransitions(Graphics2D g2d, Tile tile) {
+        if (getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) == ClientOptions.GRAPHICS_QUALITY_LOWEST) {
+            return;
+        }
+        
         /*
          * We are using masks for creating transitions between base tiles.
          */
@@ -720,6 +737,10 @@ public final class TileViewer extends FreeColClientHolder {
             if (ti.isRoad()) {
                 this.rp.displayRoad(g2d, tile);
             } else if (ti.isRiver()) {
+                if (getClientOptions().isRiverAnimationEnabled()) {
+                    // Painted elsewhere.
+                    return;
+                }
                 final BufferedImage img = this.lib.getAnimatedScaledRiverTerrainImage(tile, 0);
                 if (img != null) {
                     g2d.drawImage(img, 0, 0, null);

@@ -341,7 +341,13 @@ public final class MapViewer extends FreeColClientHolder {
         
         // Display the borders
         long t2 = now();
-        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.drawBaseTileTransitions(tileG2d, tile));
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
+            if (getClientOptions().isRiverAnimationEnabled() && tile.hasRiver()) {
+                return;
+            }
+            this.tv.drawBaseTileTransitions(tileG2d, tile);
+        });
+
 
         // Draw the grid, if needed
         long t3 = now();
