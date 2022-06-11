@@ -137,7 +137,9 @@ public class SoundController {
      *      nothing else is being played.
      */
     public void setDefaultPlaylist(List<File> files) {
-        musicPlayer.setDefaultPlaylist(files.toArray(new File[0]));
+        if (this.musicPlayer != null) {
+            musicPlayer.setDefaultPlaylist(files.toArray(new File[0]));
+        }
     }
 
     /**
