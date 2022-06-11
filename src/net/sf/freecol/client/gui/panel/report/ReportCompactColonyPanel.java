@@ -60,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -111,7 +112,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             EXCESS,      // Positive production and above high alarm level
             OVERFLOW,    // Positive production and above capacity
             INSUFFICIENT_PRODUCTION,  // Positive production but could produce more
-            INSUFFICIENT_CONSUMPTION, // Positive production but could consume more
         };
 
 
@@ -234,7 +234,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             this.unitsToAdd = colony.getUnitsToAdd();
             this.unitsToRemove = colony.getUnitsToRemove();
 
-            for (GoodsType gt : goodsTypes) produce(gt);
+            for (GoodsType gt : goodsTypes) {
+                this.production.put(gt, getGoodsProduction(gt));
+            }
 
             this.notWorking.addAll(transform(colony.getTile().getUnits(),
                     notWorkingPred));
@@ -336,66 +338,63 @@ public final class ReportCompactColonyPanel extends ReportPanel {
          *
          * @param goodsType The {@code GoodsType} to use.
          */
-        private void produce(GoodsType goodsType) {
+        private GoodsProduction getGoodsProduction(GoodsType goodsType) {
             final ExportData exportData = colony.getExportData(goodsType);
-            final int adjustment = colony.getWarehouseCapacity()
-                / GoodsContainer.CARGO_SIZE;
+            final int adjustment = colony.getWarehouseCapacity() / GoodsContainer.CARGO_SIZE;
             final int low = exportData.getLowLevel() * adjustment;
             final int high = exportData.getHighLevel() * adjustment;
             final int amount = colony.getGoodsCount(goodsType);
             int p = colony.getAdjustedNetProductionOf(goodsType);
 
-            ProductionStatus status;
-            int extra = 0;
-            ProductionStatus base = hasBestBuildings(goodsType) ? ProductionStatus.GOOD : ProductionStatus.INSUFFICIENT_BUILDINGS;
-            if (p < 0) {
-                status = (amount < low) ? ProductionStatus.FAIL : base;
-                extra = -amount / p + 1;
-            } else if (p == 0 && !colony.isProducing(goodsType)) {
-                status = (colony.isConsuming(goodsType)) ? ProductionStatus.FAIL
-                    : ProductionStatus.NONE;
-            } else if (p == 0) {
-                status = base;
-                extra = 0;
-                for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
-                    ProductionInfo pi = colony.getProductionInfo(wl);
-                    if (pi == null) continue;
-                    AbstractGoods deficit = find(pi.getConsumptionDeficit(),
-                        AbstractGoods.matches(goodsType));
-                    if (deficit != null) {
-                        status = ProductionStatus.INSUFFICIENT_CONSUMPTION;
-                        extra = deficit.getAmount();
-                        break;
-                    }
+            if (!goodsType.limitIgnored()) {
+                if (amount + p > colony.getWarehouseCapacity()) {
+                    return new GoodsProduction(p, ProductionStatus.OVERFLOW, amount + p - colony.getWarehouseCapacity());
                 }
-            } else if (exportData.getExported()) {
-                status = ProductionStatus.EXPORT;
-                extra = exportData.getExportLevel();
-            } else if (goodsType.limitIgnored()) {
-                status = base;
-            } else if (amount + p > colony.getWarehouseCapacity()) {
-                status = ProductionStatus.OVERFLOW;
-                extra = amount + p - colony.getWarehouseCapacity();
-            } else if (amount >= high) {
-                status = ProductionStatus.EXCESS;
-                extra = (colony.getWarehouseCapacity() - amount) / p;
-            } else {
-                status = base;
-                extra = 0;
-                for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
-                    ProductionInfo pi = colony.getProductionInfo(wl);
-                    if (pi == null) continue;
-                    AbstractGoods deficit = find(pi.getProductionDeficit(),
-                        AbstractGoods.matches(goodsType));
-                    if (deficit != null) {
-                        status = ProductionStatus.INSUFFICIENT_PRODUCTION;
-                        extra = deficit.getAmount();
-                        break;
-                    }
+                if (p > 0 && amount >= high) {
+                    return new GoodsProduction(p, ProductionStatus.EXCESS, (colony.getWarehouseCapacity() - amount) / p);
                 }
             }
-            this.production.put(goodsType,
-                new GoodsProduction(p, status, extra));
+            if (p < 0 && amount < low) {
+                return new GoodsProduction(p, ProductionStatus.FAIL, -amount / p + 1);
+            }
+            int productionDeficit = getProductionDeficit(goodsType);
+            if (productionDeficit > 0) {
+                return new GoodsProduction(p, ProductionStatus.INSUFFICIENT_PRODUCTION, productionDeficit);
+            }
+            if (exportData.getExported()) {
+                return new GoodsProduction(p, ProductionStatus.EXPORT, exportData.getExportLevel());
+            }
+            if (colony.isProducing(goodsType) && !hasBestBuildings(goodsType)) {
+                return new GoodsProduction(p, ProductionStatus.INSUFFICIENT_BUILDINGS, 0);
+            }
+            if (p == 0) {
+                return new GoodsProduction(p, ProductionStatus.NONE, 0);
+            }
+            return new GoodsProduction(p, ProductionStatus.GOOD, 0);
+        }
+
+        private int getProductionDeficit(GoodsType goodsType) {
+            for (WorkLocation wl : colony.getCurrentWorkLocationsList()) {
+                if (wl.getUnitCount() == 0) {
+                    continue;
+                }
+                List<AbstractGoods> goodsList = wl.getAvailableProductionTypes(false)
+                                                  .stream()
+                                                  .flatMap(t -> Optional.ofNullable(
+                                                          t.getOutput(goodsType)).stream())
+                                                  .collect(Collectors.toList());
+                if (goodsList.isEmpty()) {
+                    continue;
+                }
+                ProductionInfo pi = colony.getProductionInfo(wl);
+                List<AbstractGoods> abstractGoods = pi == null || (pi.getMaximumProduction().size() == 0 && pi.getProduction().size() == 0)
+                        ? goodsList : pi.getProductionDeficit();
+                AbstractGoods deficit = find(abstractGoods, AbstractGoods.matches(goodsType));
+                if (deficit != null) {
+                    return deficit.getAmount();
+                }
+            }
+            return 0;
         }
 
         private void addSuggestion(Map<UnitType, Suggestion> suggestions,
@@ -408,9 +407,11 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         }
     };
 
-    /** Predicate to select the goods to report on. */
+    /**
+     * Predicate to select the goods to report on.
+     */
     private static final Predicate<GoodsType> reportGoodsPred = gt ->
-        (gt.isStorable() && !gt.isTradeGoods()) || gt.isLibertyType();
+            (gt.isStorable() && !gt.isTradeGoods()) || gt.limitIgnored();
     private static final String BUILDQUEUE = "buildQueue.";
     private static final String cAlarmKey = "color.report.colony.alarm";
     private static final String cWarnKey = "color.report.colony.warning";
@@ -679,7 +680,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
     }
 
     private boolean isWorking(Unit unit) {
-        if (!unit.isPerson()) {
+        if (!unit.isPerson() || unit.getDestination() != null) {
             return true;
         }
         switch (unit.getState()) {
@@ -694,17 +695,15 @@ public final class ReportCompactColonyPanel extends ReportPanel {
     }
 
     private void addNotWorking(ColonySummary s, String colonyId) {
-        long n = getAllUnits(s)
-                .filter(u -> !isWorking(u))
-                .count();
+        long n = getAllUnits(s).filter(u -> !isWorking(u)).count();
         reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cAlarm, stpld("report.colony.notWorking")));
     }
 
     private void addNotWorkingInProfession(ColonySummary s, String colonyId) {
         long n = getAllUnits(s)
-                .filter(u -> u.isPerson() && u.isExpertWorkingAsSomethingElse())
+                .filter(u -> u.isPerson() && !u.isWorkingInProfession())
                 .count();
-        reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cAlarm, stpld("report.colony.notWorkingInProfession")));
+        reportPanel.add((n == 0) ? new JLabel() : newButton(colonyId, Long.toString(n), null, cWarn, stpld("report.colony.notWorkingInProfession")));
     }
 
     private Stream<Unit> getAllUnits(ColonySummary s) {
@@ -968,14 +967,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             case INSUFFICIENT_PRODUCTION:
                 c = cAlarm;
                 t = stpld("report.colony.production.maxProduction")
-                    .addName("%colony%", colony.getName())
-                    .addNamed("%goods%", gt)
-                    .addAmount("%amount%", gp.amount)
-                    .addAmount("%more%", gp.extra);
-                break;
-            case INSUFFICIENT_CONSUMPTION:
-                c = cAlarm;
-                t = stpld("report.colony.production.maxConsumption")
                     .addName("%colony%", colony.getName())
                     .addNamed("%goods%", gt)
                     .addAmount("%amount%", gp.amount)

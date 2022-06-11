@@ -3918,18 +3918,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Is this unit is a person that is an expert, but works as something else.
-     *
-     * @return True if this unit is a non-expert worker.
+     * Is this unit is working in their profession, if it has any.
      */
-    public boolean isExpertWorkingAsSomethingElse() {
-        if (getStudent() != null) {
-            return false;
-        }
+    public boolean isWorkingInProfession() {
         if (getRole().getRequiredGoodsList().stream().anyMatch(g -> g.getId().equals("model.goods.muskets"))) {
-            return !hasAbility(Ability.EXPERT_SOLDIER);
+            return hasAbility(Ability.EXPERT_SOLDIER);
         }
-        return getType().getExpertProduction() != null && isInColony() && nonExpertWorker(getWorkType());
+        return getType().getExpertProduction() == null
+               || !isInColony()
+               || !nonExpertWorker(getWorkType())
+               || getStudent() != null;
     }
 
     /**
