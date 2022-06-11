@@ -19,26 +19,8 @@
 
 package net.sf.freecol.client.gui.label;
 
-import static net.sf.freecol.common.util.StringUtils.upCase;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Logger;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
@@ -58,6 +40,15 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitLabelType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitLocation;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Logger;
+
+import static net.sf.freecol.common.util.StringUtils.upCase;
 
 
 /**
@@ -78,10 +69,11 @@ public final class UnitLabel extends FreeColLabel
         SENTRY,
         COLOPEDIA,
         LEAVE_TOWN,
-        WORK_COLONYTILE, // Must match the WorkLocation actual type
-        WORK_BUILDING,   // Must match the WorkLocation actual type
+        WORK_COLONYTILE, // Must match the WorkLocation actual type, see net.sf.freecol.client.gui.panel.QuickActionMenu.getWorkLabel
+        WORK_BUILDING,   // Must match the WorkLocation actual type, see net.sf.freecol.client.gui.panel.QuickActionMenu.getWorkLabel
         CLEAR_ORDERS,
         ASSIGN_TRADE_ROUTE,
+        GO_TO,
         LEAVE_SHIP,
         UNLOAD,
     }
@@ -353,6 +345,10 @@ public final class UnitLabel extends FreeColLabel
                 break;
             case ASSIGN_TRADE_ROUTE:
                 getGUI().showTradeRoutePanel(this.unit);
+                break;
+            case GO_TO:
+                igc.putOutsideColony(this.unit);
+                igc.goTo(this.unit, game.getFreeColGameObject(args[1], UnitLocation.class));
                 break;
             case LEAVE_SHIP:
                 igc.leaveShip(this.unit);

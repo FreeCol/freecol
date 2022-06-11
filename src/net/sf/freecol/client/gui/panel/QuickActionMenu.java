@@ -19,30 +19,18 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.util.*;
-import java.util.logging.Logger;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.*;
-import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.ModifierFormat;
+import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.label.UnitLabel.UnitAction;
+import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -57,20 +45,33 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+import static net.sf.freecol.common.util.StringUtils.upCase;
 
 
 /**
@@ -185,6 +186,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 if (addTileItem(unitLabel)) this.addSeparator();
                 if (addWorkItems(unitLabel)) this.addSeparator();
                 if (addEducationItems(unitLabel)) this.addSeparator();
+                if (addGoToItems(unitLabel)) this.addSeparator();
                 if (unit.isInColony() && colony.canReducePopulation()) {
                     JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.leaveTown");
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
@@ -289,7 +291,6 @@ public final class QuickActionMenu extends JPopupMenu {
         return sort(map.keySet(), comp);
     }
 
-
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,
                                          int amount, UnitLabel unitLabel,
                                          boolean claim) {
@@ -312,6 +313,35 @@ public final class QuickActionMenu extends JPopupMenu {
         return menuItem;
     }
 
+
+    private boolean addGoToItems(UnitLabel unitLabel) {
+        Unit unit = unitLabel.getUnit();
+        JMenu container = Utility.localizedMenu("quickActionMenu.goto");
+        List<SelectDestinationDialog.Destination> destinations = SelectDestinationDialog.getPossibleDestinations(unit, unit.getGame());
+        for (SelectDestinationDialog.Destination destination : destinations) {
+            Location location = destination.getLocation();
+            if (!includeLocation(location, unit.getOwner())) {
+                continue;
+            }
+            JMenuItem menuItem = new JMenuItem(destination.getText());
+            menuItem.setActionCommand(UnitAction.GO_TO + "/" + location.getId());
+            menuItem.addActionListener(unitLabel);
+            container.add(menuItem);
+        }
+        if (container.getItemCount() == 0) {
+            return false;
+        }
+        this.add(container);
+        return true;
+    }
+
+    private boolean includeLocation(Location location, Player owner) {
+        if (location instanceof Europe) {
+            return true;
+        }
+        Colony colony = location.getColony();
+        return colony != null && colony.getOwner() == owner;
+    }
 
     private boolean addWorkItems(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
