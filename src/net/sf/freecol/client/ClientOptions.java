@@ -735,7 +735,7 @@ public class ClientOptions extends OptionGroup {
     }
     
     public boolean isRiverAnimationEnabled() {
-        return isTerrainAnimationsEnabled() && getRange(ClientOptions.GRAPHICS_QUALITY) == ClientOptions.GRAPHICS_QUALITY_HIGHEST;
+        return isTerrainAnimationsEnabled() && getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_NORMAL;
     }
     
     public boolean isTerrainAnimationsEnabled() {
