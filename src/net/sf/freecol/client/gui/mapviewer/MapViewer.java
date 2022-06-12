@@ -355,7 +355,8 @@ public final class MapViewer extends FreeColClientHolder {
         // Display the borders
         long t2 = now();
         paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
-            if (getClientOptions().isRiverAnimationEnabled() && tile.hasRiver()) {
+            if (getClientOptions().isRiverAnimationEnabled()
+                    && (tile.hasRiver() || tv.hasRiverDelta(tile))) {
                 return;
             }
             this.tv.drawBaseTileTransitions(tileG2d, tile);
@@ -526,7 +527,6 @@ public final class MapViewer extends FreeColClientHolder {
             logger.finest(sb.toString());
         }
     }
-
 
     private boolean shouldFogOfWarBeDisplayed(final Player player, final ClientOptions options) {
         return player != null && getSpecification().getBoolean(GameOptions.FOG_OF_WAR) && options.getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);

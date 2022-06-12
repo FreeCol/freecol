@@ -313,7 +313,8 @@ public final class TileViewer extends FreeColClientHolder {
         displayAnimatedBaseTiles(g2d, tile, false);
         displayTileWithBeach(g2d, tile);
         if (!tile.isExplored()) return;
-        if (!getClientOptions().isRiverAnimationEnabled() && tile.hasRiver()) {
+        if (!getClientOptions().isRiverAnimationEnabled()
+                && (tile.hasRiver() || hasRiverDelta(tile))) {
             drawBaseTileTransitions(g2d, tile);
         }
         
@@ -394,6 +395,10 @@ public final class TileViewer extends FreeColClientHolder {
             } else {
                 g2d.drawImage(this.lib.getAnimatedScaledWaterAndBeachTerrainImage(tileType, directionsWithLand, ticks), 0, 0, null);
             }
+            if (getClientOptions().isRiverAnimationEnabled() && hasRiverDelta(tile)) {
+                drawBaseTileTransitions(g2d, tile);
+                drawRiverMouth(g2d, tile, ticks);
+            }
         } else if (getClientOptions().isRiverAnimationEnabled() && tile.hasRiver()) {
             g2d.drawImage(this.lib.getScaledTerrainImage(tileType, tile.getX(), tile.getY()), 0, 0, null);
             drawBaseTileTransitions(g2d, tile);
@@ -466,7 +471,9 @@ public final class TileViewer extends FreeColClientHolder {
         drawBaseTileTransitionAtDirection(g2d, tile, Direction.NW);
         drawBaseTileTransitionAtDirection(g2d, tile, Direction.SE);
         
-        drawRiverMouth(g2d, tile);
+        if (!getClientOptions().isRiverAnimationEnabled()) {
+            drawRiverMouth(g2d, tile, 0);
+        }
     }
     
     private void drawBaseTileTransitionAtDirection(Graphics2D g2d, Tile tile, Direction direction) {
@@ -477,7 +484,29 @@ public final class TileViewer extends FreeColClientHolder {
         }
     }
     
-    private void drawRiverMouth(Graphics2D g2d, Tile tile) {
+    boolean hasRiverDelta(Tile tile) {
+        for (Direction direction : Direction.longSides) {
+            Tile borderingTile = tile.getNeighbourOrNull(direction);
+            if (borderingTile == null || tile.isLand() || !borderingTile.isLand() || !tile.isExplored()) {
+                continue;
+            }
+            
+            final TileImprovement river = borderingTile.getRiver();
+            if (river == null) {
+                continue;
+            }
+            
+            final Direction reverseDirection = direction.getReverseDirection();
+            final int magnitude = river.getRiverConnection(reverseDirection);
+            if (magnitude <= 0) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    private void drawRiverMouth(Graphics2D g2d, Tile tile, long ticks) {
         for (Direction direction : Direction.longSides) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
             if (borderingTile == null || tile.isLand() || !borderingTile.isLand() || !tile.isExplored()) {
@@ -495,8 +524,13 @@ public final class TileViewer extends FreeColClientHolder {
                 continue;
             }
 
+            /*
             final BufferedImage ri = this.lib.getRiverMouthImage(direction, magnitude, tile.getX(), tile.getY());
             g2d.drawImage(ri, 0, 0, null);
+            */
+
+            final BufferedImage riverDelta = lib.getAnimatedScaledRiverDeltaTerrainImage(direction, ticks);
+            g2d.drawImage(riverDelta, 0, 0, null);
         }
     }
 

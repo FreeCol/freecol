@@ -1414,6 +1414,17 @@ public final class ImageLibrary {
     public BufferedImage getAnimatedScaledWaterAndBeachTerrainImage(TileType type, List<Direction> directionsWithLand, long ticks) {
         return imageCreators.getBeachTileAnimationImageCreator().getAnimatedScaledWaterAndBeachTerrainImage(type, directionsWithLand, ticks);
     }
+    
+    /**
+     * Gets the combined animated image for the river delta.
+     * 
+     * @param direction The direction to where the river is coming from. 
+     * @param ticks The number of ticks to get the correct animation frame.
+     * @return A cached, genereated image.
+     */
+    public BufferedImage getAnimatedScaledRiverDeltaTerrainImage(Direction direction, long ticks) {
+        return imageCreators.getDeltaAnimationImageCreator().getAnimatedScaledRiverDeltaTerrainImage(direction, ticks);
+    }
 
     /**
      * Get the tile improvement image with for a given identifier.
