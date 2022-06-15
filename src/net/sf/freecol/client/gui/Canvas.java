@@ -1331,6 +1331,12 @@ public final class Canvas extends JDesktopPane {
         revalidate();
         repaint();
     }
+    
+    void mainTitleIfMainPanelIsAlreadyShowing() {
+        if (mainPanel != null && mainPanel.isShowing()) {
+            mainTitle();
+        }
+    }
 
     /**
      * Shows the {@code MainPanel}.

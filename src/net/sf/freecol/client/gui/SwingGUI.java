@@ -1702,6 +1702,7 @@ public class SwingGUI extends GUI {
         dialog.setDialogHandler(group -> {
             if (group != null) {
                 refreshGuiUsingClientOptions();
+                canvas.mainTitleIfMainPanelIsAlreadyShowing();
             }
         });
         this.canvas.showFreeColPanel(dialog, PopupPosition.CENTERED, true);
