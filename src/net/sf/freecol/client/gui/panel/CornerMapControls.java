@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
@@ -39,6 +40,8 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.resources.PropertyList;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -50,11 +53,13 @@ import net.sf.freecol.common.model.Unit;
 public final class CornerMapControls extends MapControls {
 
     private static final Logger logger = Logger.getLogger(CornerMapControls.class.getName());
-
-    public class MiniMapPanel extends JPanel {
-        /**
-         * {@inheritDoc}
-         */
+    
+    private class MiniMapPanelSkin extends JPanel {
+        
+        MiniMapPanelSkin() {
+            setOpaque(false);
+        }
+        
         @Override
         public void paintComponent(Graphics graphics) {
             super.paintComponent(graphics);
@@ -71,10 +76,12 @@ public final class CornerMapControls extends MapControls {
     private final JLabel compassRose;
 
     /** The mini map has its own panel. */
-    private final MiniMapPanel miniMapPanel;
+    private final JPanel miniMapPanel;
 
     /** A skin for the mini map. */
     private Image miniMapSkin;
+
+    private MiniMapPanelSkin miniMapPanelSkin;
 
 
     /**
@@ -107,7 +114,7 @@ public final class CornerMapControls extends MapControls {
                 }
             });
     
-        this.miniMapPanel = new MiniMapPanel();
+        this.miniMapPanel = new JPanel();
         this.miniMapPanel.setFocusable(false);
         /**
          * In order to make the setLocation setup work, we need to set
@@ -115,12 +122,15 @@ public final class CornerMapControls extends MapControls {
          * and then its location.
          */
         this.miniMapPanel.setLayout(null);
-                             
+
+        this.miniMapPanelSkin = new MiniMapPanelSkin();
+        
         // Add buttons:
         this.miniMapPanel.add(this.miniMapToggleBorders);
         this.miniMapPanel.add(this.miniMapToggleFogOfWarButton);
         this.miniMapPanel.add(this.miniMapZoomInButton);
         this.miniMapPanel.add(this.miniMapZoomOutButton);
+        this.miniMapPanel.add(this.miniMapPanelSkin);
         this.miniMapPanel.add(this.miniMap);
         
         updateLayoutIfNeeded();
@@ -153,28 +163,34 @@ public final class CornerMapControls extends MapControls {
             height = this.miniMapSkin.getHeight(null);
             this.miniMapPanel.setBorder(null);
             this.miniMapPanel.setSize(width, height);
+            this.miniMapPanelSkin.setSize(width, height);
             this.miniMapPanel.setOpaque(false);
         } else {
             this.miniMapPanel.setOpaque(true);
             this.miniMap.setBorder(new BevelBorder(BevelBorder.RAISED));
         }
-        int scaledGap = this.lib.scaleInt(GAP);
-        int x = scaledGap;
-        int y = height - this.miniMapZoomInButton.getHeight() - 2 * scaledGap;
-        this.miniMapZoomInButton.setLocation(x, y);
-        y -= this.miniMapZoomInButton.getHeight() - 2 * scaledGap;
-        this.miniMapToggleFogOfWarButton.setLocation(x, y);
-        y -= this.miniMapToggleFogOfWarButton.getHeight() - 2 * scaledGap;
-        this.miniMapToggleBorders.setLocation(x, y);
-        x += this.miniMapZoomInButton.getWidth() + scaledGap;
-        y = height - 2 * scaledGap- this.miniMap.getHeight();
-        this.miniMap.setLocation(x, y);
-        x += this.miniMap.getWidth() + scaledGap;
-        y = height - this.miniMapZoomOutButton.getHeight() - 2 * scaledGap;
-        this.miniMapZoomOutButton.setLocation(x, y);
+
+        final PropertyList pl = ResourceManager.getPropertyList("image.skin.MiniMap.properties");
+        this.miniMap.setLocation(
+                this.lib.scaleInt(pl.getInt("minimap.x")),
+                this.lib.scaleInt(pl.getInt("minimap.y")));
+        this.miniMap.setSize(
+                this.lib.scaleInt(pl.getInt("minimap.width")),
+                this.lib.scaleInt(pl.getInt("minimap.height")));
         
+        centerComponentOnCoordinate(miniMapToggleBorders, pl, "politicalButton");
+        centerComponentOnCoordinate(miniMapToggleFogOfWarButton, pl, "fogOfWarButton");
+        centerComponentOnCoordinate(miniMapZoomInButton, pl, "zoomInButton");
+        centerComponentOnCoordinate(miniMapZoomOutButton, pl, "zoomOutButton");
+
         miniMapPanel.revalidate();
         miniMapPanel.repaint();
+    }
+    
+    private void centerComponentOnCoordinate(JComponent component, PropertyList pl, String key) {
+        final int x = this.lib.scaleInt(pl.getInt(key + ".x"));
+        final int y = this.lib.scaleInt(pl.getInt(key + ".y"));
+        component.setLocation(x - component.getWidth() / 2, y - component.getHeight() / 2);
     }
 
     /**

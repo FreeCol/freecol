@@ -394,6 +394,21 @@ public class ResourceManager {
     }
     
     /**
+     * Gets a string resource with the given name and builds a
+     * {@code PropertyList} from it.
+     * 
+     * @param key The name of the resource to query.
+     * @return The string value.
+     */
+    public static PropertyList getPropertyList(final String key) {
+        final StringResource r = getStringResource(key, true);
+        if (r == null) {
+            return new PropertyList("");
+        }
+        return new PropertyList(r.getString());
+    }
+    
+    /**
      * Gets a string resource with the given name, or returns the default value
      * if the resource could not be found.
      *

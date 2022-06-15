@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.StringUtils.splitText;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -40,11 +43,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
-import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -54,8 +56,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.resources.PropertyList;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -194,12 +196,18 @@ public final class InfoPanel extends FreeColPanel
      * @param panel The new panel to display.
      */
     private void setPanel(MigPanel panel) {
-        panel.addMouseListener(this.mouseAdapter);
-        // Center the panel but push down a bit vertically to allow for
-        // the ragged top border
-        final int y = (this.getHeight() - panel.getHeight()/2) / 2;
-        panel.setLocation((this.getWidth() - panel.getWidth()) / 2, y);
-        if (this.skin != null) panel.setOpaque(false);
+        panel.addMouseListener(this.mouseAdapter);        
+        if (this.skin != null) {
+            panel.setOpaque(false);
+            final PropertyList pl = ResourceManager.getPropertyList("image.skin.InfoPanel.properties");
+            panel.setLocation(lib.scaleInt(pl.getInt("panel.x")), lib.scaleInt(pl.getInt("panel.y")));
+            panel.setSize(lib.scaleInt(pl.getInt("panel.width")), lib.scaleInt(pl.getInt("panel.height")));
+        } else {
+            final int y = (this.getHeight() - panel.getHeight()/2) / 2;
+            final int x = (this.getWidth() - panel.getWidth()) / 2;
+            panel.setLocation(x, y);
+        }
+ 
         this.removeAll();
         this.add(panel);
         this.revalidate();
