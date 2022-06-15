@@ -65,6 +65,16 @@ public class MiniMapToggleViewAction extends MapboardAction {
     public void actionPerformed(ActionEvent ae) {
         getGUI().miniMapToggleViewControls();
 
+        updateIcons();
+    }
+    
+    @Override
+    public void update() {
+        super.update();
+        updateIcons();
+    }
+
+    private void updateIcons() {
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
             addImageIcons("toggle_view_politics");
         } else {

@@ -65,7 +65,9 @@ public final class UnitButton extends FreeColButton {
      */
     public void refreshAction() {
         setAction(null);
-        setAction(am.getFreeColAction(actionId));
+        final FreeColAction freeColAction = am.getFreeColAction(actionId);
+        freeColAction.update();
+        setAction(freeColAction);
     }
 
 
