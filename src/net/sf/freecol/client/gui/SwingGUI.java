@@ -456,6 +456,10 @@ public class SwingGUI extends GUI {
             
         if (update) {
             updateMapControls();
+            final Unit activeUnit = getActiveUnit();
+            if (activeUnit != null) {
+                refreshTile(activeUnit.getTile());
+            }
         }
         updateMenuBar();
     }
