@@ -710,7 +710,7 @@ public final class ImageLibrary {
      */
     public ImageIcon getObjectImageIcon(FreeColObject display) {
         if (display == null) return null;
-        BufferedImage image = getObjectImage(display, scale(ICON_SIZE, scaleFactor * 2));
+        BufferedImage image = getObjectImage(display, scale(ICON_SIZE, 2));
         return (image == null) ? null : new ImageIcon(image);
     }
 
