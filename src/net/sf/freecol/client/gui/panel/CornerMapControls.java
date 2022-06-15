@@ -23,12 +23,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -222,28 +224,62 @@ public final class CornerMapControls extends MapControls {
             this.compassRose.setLocation(cw - this.compassRose.getWidth() - 20, 20);
             ret.add(this.compassRose);
         }
+        
+        ret.addAll(this.unitButtons.stream().filter(b -> !b.isShowing()).collect(Collectors.toList()));
 
-        if (!this.unitButtons.isEmpty()
-            && !this.getFreeColClient().isMapEditor()) {
-            final int SPACE = 5;
-            int width = -SPACE, height = 0;
-            for (UnitButton ub : this.unitButtons) {
-                if (ub.isShowing()) continue;
-                height = Math.max(height, ub.getHeight());
-                width += SPACE + ub.getWidth();
-            }
-            int x = this.miniMapPanel.getWidth() + 1
-                + (this.infoPanel.getX() - this.miniMapPanel.getWidth() - width) / 2;
-            int y = ch - height - SPACE;
-            for (UnitButton ub : this.unitButtons) {
-                if (ub.isShowing()) continue;
-                ub.setLocation(x, y);
-                x += SPACE + ub.getWidth();
-                ub.refreshAction();
-                ret.add(ub);
+        if (!this.unitButtons.isEmpty() && !this.getFreeColClient().isMapEditor()) {
+            final int UNSCALED_SPACE_BETWEEN_BUTTONS = 5;
+            final int spaceBetweenButtons = lib.scaleInt(UNSCALED_SPACE_BETWEEN_BUTTONS);
+            final Dimension buttonsDimension = calculateTotalDimension(unitButtons, spaceBetweenButtons);
+            
+            final int totalWidth = buttonsDimension.width + this.miniMapPanel.getWidth() + this.infoPanel.getWidth();
+            if (totalWidth < newSize.width) {
+                final Point firstButtonPoint = calculateFirstPosition(newSize, unitButtons, spaceBetweenButtons, buttonsDimension);
+                layoutUnitButtons(unitButtons, buttonsDimension, firstButtonPoint, spaceBetweenButtons);
+            } else {
+                final int numberInTopRow = this.unitButtons.size() / 2;
+                
+                final List<UnitButton> bottomRowButtons = unitButtons.subList(numberInTopRow, unitButtons.size());
+                final Dimension buttonsBottomRowDimension = calculateTotalDimension(bottomRowButtons, spaceBetweenButtons);
+                final Point firstButtonBottomRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsBottomRowDimension);
+                layoutUnitButtons(bottomRowButtons,buttonsDimension, firstButtonBottomRowPoint, spaceBetweenButtons);
+
+                final List<UnitButton> topRowButtons = unitButtons.subList(0, numberInTopRow);
+                final Dimension buttonsTopRowDimension = calculateTotalDimension(topRowButtons, spaceBetweenButtons);
+                final Point firstButtonTopRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsTopRowDimension);
+                layoutUnitButtons(topRowButtons, buttonsDimension, new Point(firstButtonTopRowPoint.x, firstButtonBottomRowPoint.y - buttonsTopRowDimension.height - spaceBetweenButtons), spaceBetweenButtons);
             }
         }
         return ret;
+    }
+    
+    private static Dimension calculateTotalDimension(List<UnitButton> unitButtons, int spaceBetweenButtons) {
+        int width = -spaceBetweenButtons, height = 0;
+        for (UnitButton ub : unitButtons) {
+            if (ub.isShowing()) continue;
+            height = Math.max(height, ub.getHeight());
+            width += spaceBetweenButtons + ub.getWidth();
+        }
+        return new Dimension(width, height);
+    }
+    
+    private Point calculateFirstPosition(Dimension newSize, List<UnitButton> unitButtons, int spaceBetweenButtons, Dimension buttonsDimension) {
+        final int x = this.miniMapPanel.getWidth() + 1
+                + (this.infoPanel.getX() - this.miniMapPanel.getWidth() - buttonsDimension.width) / 2;
+        final int y = newSize.height - buttonsDimension.height - spaceBetweenButtons;
+        return new Point(x, y);
+    }
+
+    private void layoutUnitButtons(List<UnitButton> unitButtons, final Dimension buttonsDimension, Point firstButtonPoint, final int spaceBetweenButtons) {
+        int x = firstButtonPoint.x;
+        final int y = firstButtonPoint.y;
+        
+        for (UnitButton ub : unitButtons) {
+            if (ub.isShowing()) continue;
+            ub.setLocation(x, y);
+            x += spaceBetweenButtons + ub.getWidth();
+            ub.refreshAction();
+        }
     }
 
     /**
