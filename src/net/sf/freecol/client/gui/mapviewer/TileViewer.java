@@ -314,7 +314,7 @@ public final class TileViewer extends FreeColClientHolder {
         displayTileWithBeach(g2d, tile);
         if (!tile.isExplored()) return;
         if (!getClientOptions().isRiverAnimationEnabled()
-                && (tile.hasRiver() || hasRiverDelta(tile))) {
+                || !tile.hasRiver() && !hasRiverDelta(tile)) {
             drawBaseTileTransitions(g2d, tile);
         }
         
