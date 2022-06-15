@@ -48,7 +48,7 @@ public class FreeColImageBorder extends AbstractBorder {
     public static final FreeColImageBorder panelBorder = new FreeColImageBorder("image.border.panel");    
     public static final FreeColImageBorder buttonBorder = new FreeColImageBorder("image.border.button");
     public static final FreeColImageBorder simpleButtonBorder = new FreeColImageBorder("image.border.button.simple");
-    public static final FreeColImageBorder menuBarBorder = new FreeColImageBorder("image.border.menu", true);
+    public static final FreeColImageBorder menuBarBorder = new FreeColImageBorder("image.border.menu");
 
     private static float scaleFactor = 1;
     
