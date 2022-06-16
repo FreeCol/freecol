@@ -53,6 +53,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -283,7 +284,8 @@ public final class MapViewer extends FreeColClientHolder {
              * The cursor is hidden when units are animated. 
              */
             final Point p = mapViewerBounds.calculateTilePosition(cursorTile, false);
-            final BufferedImage image = this.lib.getScaledImage(ImageLibrary.UNIT_SELECT);
+            final String key = mapViewerState.getViewMode() == ViewMode.MOVE_UNITS ? ImageLibrary.UNIT_SELECT : ImageLibrary.TILE_SELECT;
+            final BufferedImage image = this.lib.getScaledImage(key);
             g2d.drawImage(image, p.x - (image.getWidth() - tileBounds.getWidth() ) / 2, p.y - (image.getHeight() - tileBounds.getHeight()) / 2, null);
         }
         final long cursorTileMs = now();

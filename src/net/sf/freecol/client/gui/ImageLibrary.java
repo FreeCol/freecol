@@ -117,6 +117,7 @@ public final class ImageLibrary {
     public static final String DELETE = "image.miscicon.delete",
                                PLOWED = "image.tile.model.improvement.plow",
                                UNIT_SELECT = "image.tile.unitSelect",
+                               TILE_SELECT = "image.tile.tileSelect",
                                TILE_TAKEN = "image.tile.tileTaken",
                                TILE_OWNED_BY_INDIANS = "image.tileitem.nativeLand",
                                LOST_CITY_RUMOUR = "image.tileitem.lostCityRumour",
