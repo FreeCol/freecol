@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui.images;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Direction;
@@ -31,11 +32,12 @@ public final class BaseTileTransitionImageCreator {
      * @param tile The tile that should get a transition.
      * @param direction The direction to get the bordering tile from.
      * @param useNiceCorners Determines if the corners of the base transitions
-     *      should be rendered nicely (takes more time). 
+     *      should be rendered nicely (takes more time).
+     * @param useVariations Uses variations of the transition.
      * @return The image, or {@code null} if there is no transition that
      *      should be drawn.
      */
-    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction, boolean useNiceCorners) {
+    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction, boolean useNiceCorners, boolean useVariations) {
         /*
          * 1. Transitions between tiles in NE and SW directions are made using only the
          * graphics for the other tile (using a mask in order to make it fade out).
@@ -96,6 +98,19 @@ public final class BaseTileTransitionImageCreator {
             beachTransitionSw = false;
         }
         
+        final ImageResource terrainMaskResource = lib.getTerrainMaskResource(direction);
+        final int maskVariationNumber;
+        if (useVariations && terrainMaskResource.getNumberOfVariations() > 1) {
+            // Choose the same variation for both sides of the transition.
+            final Tile transitionSeedTile = (direction == Direction.NW || direction == Direction.NE) ? tile : borderingTile;
+            final int seed = ImageLibrary.variationSeedUsing(transitionSeedTile.getX(), transitionSeedTile.getY());
+            
+            // This never picks the last variation as that's just a simple, almost completely straight line, transition.
+            maskVariationNumber = new Random(seed).nextInt(terrainMaskResource.getNumberOfVariations() - 1);
+        } else {
+            maskVariationNumber = 0;
+        }
+        
         /*
          * The transitionKey is used for caching, and needs to be unique for every transition.
          */
@@ -110,11 +125,13 @@ public final class BaseTileTransitionImageCreator {
                     + ","
                     + (swBorderingTile != null && swBorderingTile.getType() != null ? swBorderingTile.getType().getId() : "null")
                     + ","
+                    + maskVariationNumber
+                    + ","
                     + beachTransitionNe
                     + beachTransitionSw
                     + "$baseTransition$gen";
         } else {
-            transitionKey = terrainImageResource.getPrimaryKey() + "$baseTransition$gen";
+            transitionKey = terrainImageResource.getPrimaryKey() + "," + maskVariationNumber + "$baseTransition$gen";
         }
         
         /*
@@ -162,7 +179,7 @@ public final class BaseTileTransitionImageCreator {
                     }
                 }
                 
-                /*
+                /*+
                  * These two includes the neighboring tiles to the bordering tiles, so that
                  * we get the correct blended transition for the cornes.
                  * 
@@ -171,11 +188,11 @@ public final class BaseTileTransitionImageCreator {
                  * transitionTileImage (before returning it) reduces the edges to only the
                  * relevant two corners.
                  */
-                final BufferedImage transitionImage2 = getBaseTileTransitionImage(borderingTile, Direction.NE, useNiceCorners);
+                final BufferedImage transitionImage2 = getBaseTileTransitionImage(borderingTile, Direction.NE, false, false);
                 if (transitionImage2 != null) {
                     tranitionG2d.drawImage(transitionImage2, 0, 0, null);
                 }
-                final BufferedImage transitionImage3 = getBaseTileTransitionImage(borderingTile, Direction.SW, useNiceCorners);
+                final BufferedImage transitionImage3 = getBaseTileTransitionImage(borderingTile, Direction.SW, false, false);
                 if (transitionImage3 != null) {
                     tranitionG2d.drawImage(transitionImage3, 0, 0, null);
                 }
@@ -183,7 +200,8 @@ public final class BaseTileTransitionImageCreator {
                 tranitionG2d.dispose();
             }
             
-            return ImageUtils.imageWithAlphaFromMask(transitionTileImage, lib.getTerrainMask(direction));
+            final BufferedImage terrainMaskImage = imageCache.getCachedImage(terrainMaskResource, lib.getTileSize(), false, maskVariationNumber);
+            return ImageUtils.imageWithAlphaFromMask(transitionTileImage, terrainMaskImage);
         });
 
         return transitionImage;

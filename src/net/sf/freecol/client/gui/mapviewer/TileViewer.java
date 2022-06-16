@@ -478,7 +478,8 @@ public final class TileViewer extends FreeColClientHolder {
     
     private void drawBaseTileTransitionAtDirection(Graphics2D g2d, Tile tile, Direction direction) {
         final boolean useNiceCorners = getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_NORMAL;
-        final BufferedImage transitionImage = this.lib.getBaseTileTransitionImage(tile, direction, useNiceCorners);
+        final boolean useVariations = getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_HIGH;
+        final BufferedImage transitionImage = this.lib.getBaseTileTransitionImage(tile, direction, useNiceCorners, useVariations);
         if (transitionImage != null) {
             g2d.drawImage(transitionImage, 0, 0, null);
         }

@@ -321,7 +321,7 @@ public final class ImageLibrary {
      * @param y The tile y coordinate.
      * @return The seed.
      */
-    private static int variationSeedUsing(int x, int y) {
+    public static int variationSeedUsing(int x, int y) {
         return x * 6841 + y * 7919;
     }
 
@@ -1017,12 +1017,13 @@ public final class ImageLibrary {
      * @param tile The tile that should get a transition.
      * @param direction The direction to get the bordering tile from..
      * @param useNiceCorners Determines if the corners of the base transitions
-     *      should be rendered nicely (takes more time). 
+     *      should be rendered nicely (takes more time).
+     * @param useVariations Uses variations of the transition. 
      * @return The image, or {@code null} if there is no transition that
      *      should be drawn.
      */
-    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction, boolean useNiceCorners) {
-        return imageCreators.getBaseTileTransitionImageCreator().getBaseTileTransitionImage(tile, direction, useNiceCorners);
+    public BufferedImage getBaseTileTransitionImage(Tile tile, Direction direction, boolean useNiceCorners, boolean useVariations) {
+        return imageCreators.getBaseTileTransitionImageCreator().getBaseTileTransitionImage(tile, direction, useNiceCorners, useVariations);
     }
     
     /**
@@ -1366,9 +1367,17 @@ public final class ImageLibrary {
                                              size, false, variationSeedUsing(x, y));
     }
     
+    public ImageResource getTerrainMaskResource(Direction direction) {
+        return ResourceManager.getImageResource(getTerrainMaskKey(direction), true);
+    }
+        
     public BufferedImage getTerrainMask(Direction direction) {
-        final String key = (direction != null) ? "image.mask." + direction.toString().toLowerCase() : "image.mask";
+        final String key = getTerrainMaskKey(direction);
         return this.imageCache.getSizedImage(key, this.tileSize, false);
+    }
+
+    private String getTerrainMaskKey(Direction direction) {
+        return (direction != null) ? "image.mask." + direction.toString().toLowerCase() : "image.mask";
     }
     
     public BufferedImage getTerrainImage(TileType type, int x, int y,

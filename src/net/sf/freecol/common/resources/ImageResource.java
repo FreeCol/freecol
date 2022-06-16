@@ -125,6 +125,10 @@ public class ImageResource extends Resource implements Cleanable {
         return (int) (ticks % (variations.size() + 1));
     }
     
+    public int getNumberOfVariations() {
+        return variations.size() + 1;
+    }
+    
     public ImageResource getVariation(int variationNumber) {
         if (variations.isEmpty()) {
             return this;
