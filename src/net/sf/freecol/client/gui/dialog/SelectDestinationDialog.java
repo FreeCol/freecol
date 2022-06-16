@@ -19,44 +19,6 @@
 
 package net.sf.freecol.client.gui.dialog;
 
-import static net.sf.freecol.common.model.Constants.INFINITY;
-import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
-import static net.sf.freecol.common.util.CollectionUtils.find;
-import static net.sf.freecol.common.util.CollectionUtils.first;
-import static net.sf.freecol.common.util.CollectionUtils.flatten;
-import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
-import static net.sf.freecol.common.util.CollectionUtils.toList;
-import static net.sf.freecol.common.util.CollectionUtils.transform;
-
-import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
-
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
@@ -87,6 +49,35 @@ import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDeci
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.LogBuilder;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
+
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.flatten;
+import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 
 /**
  * Select a location as the destination for a given unit.
@@ -102,7 +93,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * A container for a destination location, with associated
      * distance and extra characteristics.
      */
-    private static class Destination {
+    public static class Destination {
 
         /** Basic destination comparator, that just uses the name field. */
         private static Comparator<Destination> nameComparator
@@ -125,25 +116,22 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 .thenComparing(Destination.nameComparator);
 
         /** The unit that is travelling. */
-        public final Unit unit;
+        private final Unit unit;
 
         /** The location to travel to. */
-        public final Location location;
+        private final Location location;
 
         /** The displayed name of the location (needed in text and comparator)*/
-        public final String name;
+        private final String name;
 
         /** The number of turns to reach the destination. */
-        public final int turns;
-
-        /** Extra special information about the destination */
-        public final String extras;
+        private final int turns;
 
         /** A magic score for the destination for the comparator/s. */
-        public final int score;
+        private final int score;
 
         /** The full text to display. */
-        public final String text;
+        private final String text;
 
 
         /**
@@ -160,13 +148,14 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             this.location = location;
             this.name = Messages.message(location.getLocationLabelFor(unit.getOwner()));
             this.turns = turns;
-            this.extras = getExtras(location, unit, goodsTypes);
+            /** Extra special information about the destination */
+            String extras = getExtras(location, unit, goodsTypes);
             this.score = calculateScore();
             this.text = Messages.message(StringTemplate
                 .template("selectDestinationDialog.destinationTurns")
                 .addName("%location%", this.name)
                 .addAmount("%turns%", this.turns)
-                .addName("%extras%", this.extras));
+                .addName("%extras%", extras));
         }
 
         /**
@@ -268,6 +257,13 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             return this.score;
         }
 
+        public Location getLocation() {
+            return location;
+        }
+
+        public String getText() {
+            return text;
+        }
 
         public static int getDestinationComparatorIndex(Comparator<Destination> dc) {
             return (dc == nameComparator) ? 1
@@ -286,7 +282,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         extends FreeColComboBoxRenderer<Destination> {
 
         private final ImageLibrary lib;
-        
+
         /**
          * Create a new location renderer.
          *
@@ -317,7 +313,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /** How to order the destinations. */
     private static AtomicReference<Comparator<Destination>>
         destinationComparator = new AtomicReference<>(null);
-    
+
     /** The available destinations. */
     private final List<Destination> destinations = new ArrayList<>();
 
@@ -343,11 +339,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         super(freeColClient, frame);
 
         final ImageLibrary lib = getImageLibrary();
-        // Collect the goods the unit is carrying and set this.destinations.
-        final List<GoodsType> goodsTypes
-            = transform(unit.getCompactGoodsList(), alwaysTrue(),
-                        Goods::getType);
-        loadDestinations(unit, goodsTypes);
+        this.destinations.addAll(getPossibleDestinations(unit, getGame()));
 
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
@@ -416,7 +408,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      *
      * @return The destination comparator.
      */
-    private Comparator<Destination> getDestinationComparator() {
+    private static Comparator<Destination> getDestinationComparator() {
         Comparator<Destination> ret = destinationComparator.get();
         if (ret == null) {
             ret = Destination.getDestinationComparator(0);
@@ -433,23 +425,25 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private void setDestinationComparator(Comparator<Destination> dc) {
         destinationComparator.set(dc);
     }
-    
+
     /**
      * Load destinations for a given unit and carried goods types.
      *
      * @param unit The {@code Unit} to select destinations for.
-     * @param goodsTypes A list of {@code GoodsType}s carried.
      */
-    private void loadDestinations(final Unit unit,
-                                  List<GoodsType> goodsTypes) {
-        if (unit.isInEurope() && !unit.getType().canMoveToHighSeas()) return;
+    public static List<Destination> getPossibleDestinations(Unit unit, Game game) {
+        // Collect the goods the unit is carrying and set this.destinations.
+        final List<GoodsType> goodsTypes
+            = transform(unit.getCompactGoodsList(), alwaysTrue(),
+                        Goods::getType);
+
+        if (unit.isInEurope() && !unit.getType().canMoveToHighSeas()) return Collections.emptyList();
 
         final Player player = unit.getOwner();
         final Settlement inSettlement = unit.getSettlement();
         final boolean canTrade
             = player.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES);
         final Europe europe = player.getEurope();
-        final Game game = getGame();
         final Map map = game.getMap();
         // Quick check for whether a settlement is reachable by the unit.
         // Used to knock out obviously impossible candidates before invoking
@@ -499,7 +493,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     + Messages.message(e.getKey().getLocationLabel())
                     + " path=" + p.fullPathToString());
                 return null;
-            }                    
+            }
             int turns = p.getTotalTurns();
             if (unit.isInEurope()) turns += unit.getSailTurns();
             if (p.getMovesLeft() < unit.getInitialMovesLeft()) turns++;
@@ -508,9 +502,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         td.addAll(transform(md.getResults().entrySet(), isNotNull(), dmapper));
 
         // Drop inaccessible destinations and sort as specified.
-        this.destinations.addAll(transform(td, d -> d.turns < Unit.MANY_TURNS,
+        return transform(td, d -> d.turns < Unit.MANY_TURNS,
                                            Function.<Destination>identity(),
-                                           getDestinationComparator()));
+                                           getDestinationComparator());
     }
 
     /**
@@ -563,7 +557,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
 
     // Interface ListSelectionListener
-    
+
     /**
      * {@inheritDoc}
      */
