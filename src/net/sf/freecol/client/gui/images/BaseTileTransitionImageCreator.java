@@ -108,7 +108,7 @@ public final class BaseTileTransitionImageCreator {
             // This never picks the last variation as that's just a simple, almost completely straight line, transition.
             maskVariationNumber = new Random(seed).nextInt(terrainMaskResource.getNumberOfVariations() - 1);
         } else {
-            maskVariationNumber = 0;
+            maskVariationNumber = terrainMaskResource.getNumberOfVariations() - 1;
         }
         
         /*
