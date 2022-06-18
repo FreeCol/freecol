@@ -1764,8 +1764,16 @@ public class SwingGUI extends GUI {
         
         final int displayScaling = getClientOptions().getInteger(ClientOptions.DISPLAY_SCALING);
         if (displayScaling == 0) {
-            final int fontSize = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
-            logger.info("Automatic font size: " + fontSize + " (reported DPI: " + dpi + ")");        
+            int fontSize = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
+            
+            final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
+            if (screenHeight < 900) {
+                fontSize = Math.min(14, fontSize);
+            } else if (screenHeight < 1050) {
+                fontSize = Math.min(18, fontSize);
+            }
+                    
+            logger.info("Automatic font size: " + fontSize + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");        
             return fontSize;
         }
         
@@ -1785,12 +1793,24 @@ public class SwingGUI extends GUI {
              */
             scaleFactor = Math.round((dpi * 4f) / DEFAULT_DPI) / 4f;
             if (scaleFactor < 1) {
-                scaleFactor = 1;
+                scaleFactor = 1F;
             }
             if (scaleFactor > 2) {
-                scaleFactor = 2;
+                scaleFactor = 2F;
             }
-            logger.info("Automatic scale factor: " + scaleFactor + " (reported DPI: " + dpi + ")");
+            
+            final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
+            if (screenHeight < 900) {
+                scaleFactor = 1F;
+            } else if (screenHeight < 1050) {
+                scaleFactor = Math.min(1.25F, scaleFactor);
+            } else if (screenHeight < 1200) {
+                scaleFactor = Math.min(1.5F, scaleFactor);
+            } else if (screenHeight < 1400) {
+                scaleFactor = Math.min(1.75F, scaleFactor);
+            }
+            
+            logger.info("Automatic scale factor: " + scaleFactor + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
         } else {
             scaleFactor = displayScaling / 100f;
             logger.info("Manual scale factor: " + scaleFactor + " (reported DPI: " + dpi + ")");
