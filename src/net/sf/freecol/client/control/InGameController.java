@@ -551,27 +551,36 @@ public final class InGameController extends FreeColClientHolder {
      *     active unit to be selected (useful for the Wait command).
      */
     private void updateGUI(final Tile tile, boolean updateUnit) {
+        displayModelMessages(false, false);
+        
+        /* This seems dubious, so I am just displaying the message and
+         * continuing even when there are additional model messages.
+         * 
+         * There are multiple cases where we must update the GUI to
+         * avoid errors -- for example when the unit has been removed.
+         * 
         if (displayModelMessages(false, false)) {
             ; // If messages are displayed they probably refer to the
               // current unit, so do not update it.
         } else {
-            final GUI gui = getGUI();
-            // Update the unit if asked to, or none present, or the
-            // current one is out of moves (but not in Europe or newly
-            // bought/trained units get immediately deselected), or has
-            // been captured.
-            Unit active = gui.getActiveUnit();
-            final boolean update = updateUnit || active == null
-                || (!active.couldMove() && !active.isInEurope())
-                || !getMyPlayer().owns(active); 
-            // Tile is displayed if no new active unit is found,
-            // which is useful when the last unit might have died
-            invokeLater(() -> {
-                    if (update) updateActiveUnit(tile);
-                    gui.updateMapControls();
-                    gui.updateMenuBar();
-                });
-        }
+        */
+
+        final GUI gui = getGUI();
+        // Update the unit if asked to, or none present, or the
+        // current one is out of moves (but not in Europe or newly
+        // bought/trained units get immediately deselected), or has
+        // been captured.
+        Unit active = gui.getActiveUnit();
+        final boolean update = updateUnit || active == null
+            || (!active.couldMove() && !active.isInEurope())
+            || !getMyPlayer().owns(active); 
+        // Tile is displayed if no new active unit is found,
+        // which is useful when the last unit might have died
+        invokeLater(() -> {
+                if (update) updateActiveUnit(tile);
+                gui.updateMapControls();
+                gui.updateMenuBar();
+            });
     }
 
 
@@ -1448,7 +1457,14 @@ public final class InGameController extends FreeColClientHolder {
             if (!askClearGotoOrders(unit)) result = false;
         }
         // Force redisplay of unit information
-        changeView(unit, true);
+        if (!unit.isDisposed()) {
+            /*
+             * The unit might have been disposed as a result of the move
+             * when we get here. For example after vanishing when exploring
+             * a lost city rumour.
+             */
+            changeView(unit, true);
+        }
 
         return result;
     }
