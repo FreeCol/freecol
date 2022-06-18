@@ -187,7 +187,8 @@ public final class ConnectController extends FreeColClientHolder {
                 final String name = player.getName();
                 try {
                     if (askServer().reconnect() != null
-                        && askServer().login(name, FreeCol.getVersion(),
+                        && askServer().login(name, player.getNationId(),
+                                             FreeCol.getVersion(),
                                              fcc.getSinglePlayer(),
                                              fcc.currentPlayerIsMyPlayer())) {
                         logger.info("Reconnected for client " + name);
@@ -212,12 +213,13 @@ public final class ConnectController extends FreeColClientHolder {
      * Public for the test suite.
      *
      * @param user The name of the player to use.
+     * @param nationId The nationId when the client is selecting a player.
      * @param host The name of the machine running the {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
      * @return True if the player was already logged in, or if the login
      *     message was sent.
      */
-    public boolean requestLogin(String user, String host, int port) {
+    public boolean requestLogin(String user, String nationId, String host, int port) {
         final FreeColClient fcc = getFreeColClient();
         if (fcc.isLoggedIn()) return true;
         fcc.setMapEditor(false);
@@ -232,7 +234,7 @@ public final class ConnectController extends FreeColClientHolder {
             // name.  Control effectively transfers through the server
             // back to PGIH.login() and then to login() below.
             logger.info("Login request for client " + FreeCol.getName());
-            if (askServer().login(user, FreeCol.getVersion(),
+            if (askServer().login(user, nationId, FreeCol.getVersion(),
                                   fcc.getSinglePlayer(),
                                   fcc.currentPlayerIsMyPlayer())) {
                 return true;
@@ -347,7 +349,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         FreeColServer fcs = fcc.startServer(false, true, spec, null, -1);
         return (fcs == null) ? false
-            : requestLogin(FreeCol.getName(),
+            : requestLogin(FreeCol.getName(), null,
                            fcs.getHost(), fcs.getPort());
     }
 
@@ -450,7 +452,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         fcc.setFreeColServer(fcs);
         fcc.setSinglePlayer(true);
-        return requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
+        return requestLogin(FreeCol.getName(), null, fcs.getHost(), fcs.getPort());
     }
 
     /**
@@ -481,7 +483,7 @@ public final class ConnectController extends FreeColClientHolder {
         if (fcs == null) return false;
         fcc.setFreeColServer(fcs);
         fcc.setSinglePlayer(false);
-        return requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
+        return requestLogin(FreeCol.getName(), null, fcs.getHost(), fcs.getPort());
     }
 
     /**
@@ -510,6 +512,7 @@ public final class ConnectController extends FreeColClientHolder {
         while (fcc.getServerState() == null) Utils.delay(1000, null);
         askServer().disconnect();
         
+        String nationId = null;
         switch (fcc.getServerState()) {
         case PRE_GAME: case LOAD_GAME:
             // Name is good
@@ -529,20 +532,19 @@ public final class ConnectController extends FreeColClientHolder {
             if (names.isEmpty()) return false;
             if (names.contains(name)) break; // Already there, use it
             StringTemplate tmpl = StringTemplate.template("client.choicePlayer");
-            String choice = getGUI().getChoice(tmpl, "cancel",
+            nationId = getGUI().getChoice(tmpl, "cancel",
                     transform(names, alwaysTrue(), n ->
                         new ChoiceItem<>(Messages.message(StringTemplate
                                 .template("countryName")
                                 .add("%nation%", Messages.nameKey(n))), n)));
-            if (choice == null) return false; // User cancelled
-            name = Messages.getRulerName(choice);
+            if (nationId == null) return false; // User cancelled
             break;
 
         case END_GAME: default:
             getGUI().showErrorPanel(StringTemplate.template("client.ending"));
             return false;
         }
-        return requestLogin(name, host, port);
+        return requestLogin(name, nationId, host, port);
     }
 
     /**

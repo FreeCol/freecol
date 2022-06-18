@@ -635,15 +635,16 @@ public abstract class ServerAPI {
      * Server query-response for logging in a player (pre-game).
      *
      * @param userName The user name.
+     * @param nationId The nationId when the client is selecting a player.
      * @param version The client version.
      * @param single True if this is a single player login.
      * @param current True if the requesting player should become the
      *     current player.
      * @return True if the server interaction succeeded.
      */
-    public boolean login(String userName, String version,
+    public boolean login(String userName, String nationId, String version,
                          boolean single, boolean current) {
-        return ask(new LoginMessage(null, userName, version, null,
+        return ask(new LoginMessage(null, userName, nationId, version, null,
                                     single, current, null));
     }
 

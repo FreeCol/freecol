@@ -60,7 +60,7 @@ public class ClientTestHelper {
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
 
-        boolean ok = connectController.requestLogin("test",
+        boolean ok = connectController.requestLogin("test", null,
             freeColServer.getHost(), freeColServer.getPort());
         assertTrue("test login", ok);
         connectController.startSinglePlayerGame(specification);

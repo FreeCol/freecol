@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
@@ -32,7 +35,6 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.ChangeSet.See;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.server.model.ServerGame;
@@ -49,6 +51,7 @@ public class LoginMessage extends ObjectMessage {
     private static final String SINGLE_PLAYER_TAG = "singlePlayer";
     private static final String STATE_TAG = "state";
     private static final String USER_NAME_TAG = "userName";
+    private static final String NATION_ID_TAG = "nationId";
     private static final String VERSION_TAG = "version";
 
     /** The player in the attached game, if any. */
@@ -60,17 +63,21 @@ public class LoginMessage extends ObjectMessage {
      *
      * @param player The {@code player} to send to.
      * @param userName The name of the user logging in.
+     * @param nationId The nationId when the client is selecting a player. 
      * @param version The version of FreeCol at the client.
      * @param state The server state.
      * @param singlePlayer True in single player games.
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
-    public LoginMessage(Player player, String userName,
+    public LoginMessage(Player player, String userName, String nationId,
                         String version, ServerState state,
                         boolean singlePlayer, boolean currentPlayer,
                         Game game) {
-        super(TAG, USER_NAME_TAG, userName, VERSION_TAG, version,
+        super(TAG,
+              USER_NAME_TAG, userName,
+              NATION_ID_TAG, nationId,
+              VERSION_TAG, version,
               SINGLE_PLAYER_TAG, Boolean.toString(singlePlayer),
               CURRENT_PLAYER_TAG, Boolean.toString(currentPlayer));
 
@@ -89,7 +96,7 @@ public class LoginMessage extends ObjectMessage {
      */
     public LoginMessage(@SuppressWarnings("unused") Game ignoredGame,
                         FreeColXMLReader xr) throws XMLStreamException {
-        super(TAG, xr, USER_NAME_TAG, VERSION_TAG, STATE_TAG,
+        super(TAG, xr, USER_NAME_TAG, NATION_ID_TAG, VERSION_TAG, STATE_TAG,
               SINGLE_PLAYER_TAG, CURRENT_PLAYER_TAG);
 
         Game game = null;
@@ -109,6 +116,10 @@ public class LoginMessage extends ObjectMessage {
 
     private String getUserName() {
         return getStringAttribute(USER_NAME_TAG);
+    }
+    
+    private String getNationId() {
+        return getStringAttribute(NATION_ID_TAG);
     }
 
     private String getVersion() {
@@ -139,7 +150,12 @@ public class LoginMessage extends ObjectMessage {
      * @return The {@code ServerPlayer} found.
      */
     private Player getPlayer(Game game) {
-        return game.getPlayerByName(getUserName());
+        final Player playerByUsername = game.getPlayerByName(getUserName());
+        if (playerByUsername != null) {
+            return playerByUsername;
+        }
+
+        return game.getPlayerByNationId(getNationId());
     }
 
 
@@ -214,7 +230,7 @@ public class LoginMessage extends ObjectMessage {
                                     serverGame.getLivePlayerList().isEmpty(),
                                     nation);
 
-            // ... but override player name.
+            // ... but override player name
             serverPlayer.setName(userName);
             
             // Add the new player and inform all other players
@@ -234,7 +250,9 @@ public class LoginMessage extends ObjectMessage {
                 .toClient(serverPlayer));
             
             ret.add(See.only(serverPlayer),
-                new LoginMessage(serverPlayer, userName, getVersion(),
+                new LoginMessage(serverPlayer, userName,
+                                 serverPlayer.getNationId(),
+                                 getVersion(),
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == serverPlayer,
@@ -303,7 +321,9 @@ public class LoginMessage extends ObjectMessage {
             connection.setWriteScope(FreeColXMLWriter.WriteScope
                 .toClient(present));
             ret = ChangeSet.simpleChange(present,
-                new LoginMessage(present, userName, getVersion(),
+                new LoginMessage(present, userName,
+                    present.getNationId(),
+                    getVersion(),
                     freeColServer.getServerState(),
                     freeColServer.getSinglePlayer(),
                     serverGame.getCurrentPlayer() == present,
@@ -350,6 +370,7 @@ public class LoginMessage extends ObjectMessage {
             // Join allowed, including over an AI
             if (present.isAI()) serverGame.changeAI(present, false);
 
+            present.setName(userName);
             present.setConnection(connection);
 
             // Add the connection, send back the game
@@ -357,7 +378,8 @@ public class LoginMessage extends ObjectMessage {
             connection.setWriteScope(FreeColXMLWriter.WriteScope
                 .toClient(present));
             ret = ChangeSet.simpleChange(present,
-                new LoginMessage(present, userName, getVersion(),
+                new LoginMessage(present, userName, present.getNationId(),
+                                 getVersion(),
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == present,
