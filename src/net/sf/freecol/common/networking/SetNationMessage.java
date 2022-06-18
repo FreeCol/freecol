@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
@@ -86,6 +88,10 @@ public class SetNationMessage extends AttributeMessage {
 
         if (player != null && nation != null) {
             player.setNation(nation);
+            
+            if (!freeColClient.isInGame()) {
+                pgc(freeColClient).addPlayerHandler(List.of(player));
+            }
         }
     }
 

@@ -257,6 +257,8 @@ public class LoginMessage extends ObjectMessage {
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == serverPlayer,
                                  serverGame));
+
+            serverGame.sendToOthers(serverPlayer, ret);
         }
         return ret;
     }
