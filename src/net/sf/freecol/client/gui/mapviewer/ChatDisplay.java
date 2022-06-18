@@ -44,7 +44,7 @@ class ChatDisplay {
     private static final int LEFT_MARGIN = 40;
 
     /** Top margin for the text. */
-    private static final int TOP_MARGIN = 300;
+    private static final int TOP_MARGIN = 400;
 
     /** The amount of time before a message gets deleted (in milliseconds). */
     private static final int MESSAGE_AGE = 30000;
