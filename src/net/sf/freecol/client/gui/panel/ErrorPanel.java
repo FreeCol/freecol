@@ -57,7 +57,7 @@ public final class ErrorPanel extends FreeColPanel {
      * @param message The error message to display in this error panel.
      */
     public ErrorPanel(FreeColClient freeColClient, String message) {
-        super(freeColClient, null, new MigLayout());
+        super(freeColClient, null, new MigLayout("wrap 1"));
 
         JButton showButton = Utility.localizedButton(StringTemplate
             .template("errorPanel.showLogFile")
@@ -65,7 +65,7 @@ public final class ErrorPanel extends FreeColPanel {
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 
-        add(Utility.getDefaultTextArea(message, columnWidth), "wrap 20");
+        add(Utility.getDefaultTextArea(message, columnWidth));
         add(okButton, "split 2, tag ok");
         add(showButton);
     }
@@ -76,7 +76,7 @@ public final class ErrorPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ErrorPanel(FreeColClient freeColClient) {
-        super(freeColClient, null, new MigLayout());
+        super(freeColClient, null, new MigLayout("wrap 1, fill", "[]", "[fill, grow][]"));
 
         String message = FreeColDirectories.getLogFileContents();
         if (message == null) message = Messages.message("errorPanel.loadError");
@@ -90,10 +90,10 @@ public final class ErrorPanel extends FreeColPanel {
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getViewport().setOpaque(false);
 
-        add(scrollPane, "height 200:200:, wrap 20");
+        add(scrollPane, "height :200:, grow");
         add(okButton, "tag ok");
     }
-
+    
 
     // Interface ActionListener
 
