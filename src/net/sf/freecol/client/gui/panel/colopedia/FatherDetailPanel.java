@@ -150,7 +150,7 @@ public class FatherDetailPanel
         panel.add(header, "span, align center, wrap 40");
         panel.add(label, "top");
         JTextArea description = Utility.localizedTextArea(template, 20);
-        panel.add(description, "top, growx");
+        panel.add(description, "top, growx, wmin 0");
 
         Dimension hSize = header.getPreferredSize(),
             lSize = label.getPreferredSize(),
