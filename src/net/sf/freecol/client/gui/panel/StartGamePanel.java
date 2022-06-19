@@ -34,6 +34,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -151,7 +152,7 @@ public final class StartGamePanel extends FreeColPanel {
         table = new PlayersTable(getFreeColClient(), nationOptions,
                                  getMyPlayer());
 
-        start = Utility.localizedButton("startGame");
+        start = new FreeColButton(Messages.message("startGame")).withButtonStyle(ButtonStyle.IMPORTANT);
 
         gameOptions = Utility.localizedButton(Messages
             .nameKey(GameOptions.TAG));
@@ -180,9 +181,12 @@ public final class StartGamePanel extends FreeColPanel {
                                       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.getViewport().setOpaque(false);
 
-        add(tableScroll, "width 600:, grow");
+        final int tableWidth = getImageLibrary().scaleInt(600);
+        final int tableHeight =  getImageLibrary().scaleInt(300);
+        add(tableScroll, "width " + tableWidth + ":, height " + tableHeight + ":, grow");
         if (!singlePlayerGame) {
-            add(chatScroll, "width 250:, grow");
+            final int chatWidth = getImageLibrary().scaleInt(250);
+            add(chatScroll, "width " + chatWidth + ":, grow");
         }
         add(mapGeneratorOptions, "newline, split 2, growx, top, sg");
         add(gameOptions, "growx, top, sg");
