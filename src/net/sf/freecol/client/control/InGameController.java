@@ -1457,7 +1457,7 @@ public final class InGameController extends FreeColClientHolder {
             if (!askClearGotoOrders(unit)) result = false;
         }
         // Force redisplay of unit information
-        if (!unit.isDisposed()) {
+        if (unit == getGUI().getActiveUnit()) {
             /*
              * The unit might have been disposed as a result of the move
              * when we get here. For example after vanishing when exploring
@@ -3999,14 +3999,13 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to move.
      * @param direction The {@code Direction} in which to move
      *     the active unit.
-     * @return True if the unit may move further.
      */
-    public boolean moveUnit(Unit unit, Direction direction) {
+    public void moveUnit(Unit unit, Direction direction) {
         if (unit == null || !unit.hasTile()
             || direction == null
-            || !requireOurTurn()) return false;
+            || !requireOurTurn()) return;
 
-        if (!askClearGotoOrders(unit)) return false;
+        if (!askClearGotoOrders(unit)) return;
 
         final Tile oldTile = unit.getTile();
         UnitWas unitWas = new UnitWas(unit);
@@ -4014,18 +4013,16 @@ public final class InGameController extends FreeColClientHolder {
             : new ColonyWas(unit.getColony());
         changeState(unit, UnitState.ACTIVE);
         moveDirection(unit, direction, true);
-        boolean ret = unit.getTile() != oldTile;
-        if (ret) {
-            fireChanges(unitWas, colonyWas);
-            updateGUI(null, false);
-        }
+
+        fireChanges(unitWas, colonyWas);
+        updateGUI(null, false);
+
         if (unit.getTile() != oldTile && !unit.couldMove()
             && !unit.isDisposed() && unit.hasTile()) {
             // Show colony panel if unit moved and is now out of moves
             Colony colony = unit.getTile().getColony();
             if (colony != null) showColonyPanel(colony, unit);
         }
-        return ret;
     }
 
     /**
