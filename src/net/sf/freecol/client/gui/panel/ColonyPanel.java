@@ -405,6 +405,14 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(this.nameBox,
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
+        if (getGUI().getMapViewDimension().height < 770) {
+            /*
+             * Reduces the border size so that the Colony panel
+             * can get slightly bigger.
+             */
+            setBorder(FreeColImageBorder.panelWithoutShadowBorder);
+        }
+        
         initialize(colony);
         getGUI().restoreSavedSize(this, new Dimension(1050, 725));
     }
