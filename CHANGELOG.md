@@ -1,4 +1,28 @@
-## FreeCol 0.12.0 (unreleased) ##
+## FreeCol 0.13.0 (July 9, 2022) ##
+
+The FreeCol team are pleased to announce the release of FreeCol 0.13.0. All 0.11.x (x != 4) and 0.12.0 games should continue to work with 0.13.0, but not vice versa.
+
+We hope you enjoy FreeCol 0.13.0. Onward to 1.0.
+
+The FreeCol Team
+
+
+### User-visible changes since 0.12.0-release ###
+
+* In-game music by Alexander Zhelanov.
+* New skins for the minimap and the unit info panel.
+* New animated rivers.
+* Major river tiles now gets the minor river production bonus twice.
+* The rendering performance has been improved.
+* Rendering quality can now be modified using a new option in the Preferences.
+* More high resolution versions of existing images have been added.
+* Better support for screens with low resolution.
+* Adding two new mods for changing the skins for the minimap and the unit info panel.
+* Multiplayer savegame loading has been fixed.
+* Over 30 bugs fixed.
+
+
+## FreeCol 0.12.0 (May 1, 2022) ##
 
 The FreeCol team are pleased to announce the release of FreeCol 0.12.0.  Its been a while.  All 0.11.x (x != 4) games should continue to work with 0.12.0, but not vice versa.
 
