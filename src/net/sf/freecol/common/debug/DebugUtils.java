@@ -374,9 +374,11 @@ public class DebugUtils {
 
         reconnect(freeColClient);
         // Note "game" is no longer valid after reconnect.
-        Unit unit = freeColClient.getGame()
-            .getFreeColGameObject(sUnit.getId(), Unit.class);
-        if (unit != null) gui.changeView(unit, false);
+        Game game = freeColClient.getGame();
+        if (game != null) {
+            Unit unit = game.getFreeColGameObject(sUnit.getId(), Unit.class);
+            if (unit != null) gui.changeView(unit, false);
+        }
     }
 
     /**
