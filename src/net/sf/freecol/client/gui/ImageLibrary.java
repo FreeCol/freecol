@@ -1301,6 +1301,10 @@ public final class ImageLibrary {
                 String stockade = colony.getStockadeKey();
                 if (stockade != null) key += "." + stockade;
             }
+            final String extraKey = key + "." + settlement.getOwner().getNationResourceKey();
+            if (ResourceManager.getImageResource(extraKey, false) != null) {
+                key = extraKey;
+            }
         } else if (settlement instanceof IndianSettlement) {
             IndianSettlement is = (IndianSettlement)settlement;
             if (is.hasMissionary()) key += ".mission";
