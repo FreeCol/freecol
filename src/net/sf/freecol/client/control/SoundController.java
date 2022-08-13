@@ -64,21 +64,17 @@ public class SoundController {
             } catch (Exception ex) {
                 logger.warning(ex.getMessage());
             }
-            PercentageOption vo = null;
-            try {
-                vo = opts.getOption(ClientOptions.AUDIO_VOLUME,
-                                    PercentageOption.class);
-            } catch (Exception ex) {
-                logger.warning(ex.getMessage());
+            
+            if (amo == null) {
+                return;
             }
-            if (amo == null || vo == null) return;
             // Unless totally disabled, the sound player is always
             // created, but if it has a bad mixer sound output will be
             // suspended.  The hope is that the user will change the
             // mixer option to one that works.
-            logger.info("Create sound player with " + amo + "/" + vo);
-            this.soundPlayer = new SoundPlayer(amo, vo);
-            this.musicPlayer = new SoundPlayer(amo, vo);
+            logger.info("Create sound player with " + amo);
+            this.soundPlayer = new SoundPlayer(amo, opts.getOption(ClientOptions.SOUND_EFFECTS_VOLUME, PercentageOption.class));
+            this.musicPlayer = new SoundPlayer(amo, opts.getOption(ClientOptions.MUSIC_VOLUME, PercentageOption.class));
         }
     }
 

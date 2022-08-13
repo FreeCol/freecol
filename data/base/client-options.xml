@@ -370,9 +370,15 @@
       <!-- Which mixer to use by default. -->
       <audioMixerOption id="model.option.audioMixer"
                         defaultValue="AUTO" />
-      <!-- The default volume percent. -->
-      <percentageOption id="model.option.audioVolume"
+
+      <!--The music volume -->
+      <percentageOption id="model.option.musicVolume"
                         defaultValue="100" previewEnabled="true"/>
+                        
+      <!--The sound effects volume -->
+      <percentageOption id="model.option.soundEffectsVolume"
+                        defaultValue="100" previewEnabled="true"/>
+                        
       <!-- Play an alert sound on message arrival. -->
       <booleanOption id="model.option.audioAlerts"
                      defaultValue="false"/>

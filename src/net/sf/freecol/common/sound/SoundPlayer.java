@@ -128,6 +128,8 @@ public final class SoundPlayer {
          * @exception IOException if unable to read or write the sound data.
          */
         private boolean playSound(File sound) throws IOException {
+            setVolume(volumeOption.getValue());
+            
             boolean ret = false;
             PropertyChangeListener volumeListener = null;
             try (AudioInputStream in = getAudioInputStream(sound)) {
@@ -142,7 +144,6 @@ public final class SoundPlayer {
                 };
                 volumeOption.addPropertyChangeListener(volumeListener);
                 changeVolume(line, getVolume());
-                
                 try {
                     this.playDone = false;
                     int rd;

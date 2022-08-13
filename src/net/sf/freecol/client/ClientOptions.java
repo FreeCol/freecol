@@ -509,6 +509,14 @@ public class ClientOptions extends OptionGroup {
     /** The volume level to set. */
     public static final String AUDIO_VOLUME
         = "model.option.audioVolume";
+    
+    /** The volume level to set for the music. */
+    public static final String MUSIC_VOLUME
+        = "model.option.musicVolume";
+    
+    /** The volume level to set. */
+    public static final String SOUND_EFFECTS_VOLUME
+        = "model.option.soundEffectsVolume";
 
     /** Play an alert sound on message arrival. */
     public static final String AUDIO_ALERTS
@@ -855,11 +863,26 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(DISPLAY_FOG_OF_WAR, MAPCONTROLS_GROUP, false);
         // end @compat 0.11.6
         // @compat 0.12.0
+        /* Gone after 0.13.0:
         final PercentageOption volumeOption = getOption(AUDIO_VOLUME, PercentageOption.class);
         volumeOption.setPreviewEnabled(true);
+        */
         addRangeOption(GRAPHICS_QUALITY, DISPLAY_GROUP, 20, graphicsQualityChoices);
         addBooleanOption(USE_TERRAIN_ANIMATIONS, DISPLAY_GROUP, true);
         // end @compat 0.12.0
+        // @compat 0.13.0
+        addPercentageOption(MUSIC_VOLUME, AUDIO_GROUP, 100);
+        addPercentageOption(SOUND_EFFECTS_VOLUME, AUDIO_GROUP, 100);
+        // end @compat 0.13.0
+    }
+    
+    private void addPercentageOption(String id, String gr, int val) {
+        if (!hasOption(id, PercentageOption.class)) {
+            PercentageOption op = new PercentageOption(id, null);
+            op.setGroup(gr);
+            op.setValue(val);
+            add(op);
+        }
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {
