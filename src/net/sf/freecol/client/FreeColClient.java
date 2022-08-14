@@ -377,7 +377,7 @@ public final class FreeColClient {
         if (userOptions != null && userOptions.exists()) {
             logger.info("Merge client options from user options file: "
                 + userOptions.getPath());
-            clop.merge(userOptions);
+            clop.load(userOptions);
         }
 
         //logger.info("Final client options: " + clop.toString());
