@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -38,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.panel.Utility;
 
@@ -93,12 +95,15 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     * @return The {@code ImageIcon}.
     */
     public static ImageIcon getRecordImage() {
-        BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
+        final int imageSize = (int) (9 * FontLibrary.getFontScaling());
+        final int strokeSize = (int) (1 * FontLibrary.getFontScaling());
+        final int circleSize = imageSize - strokeSize*2;
+        final BufferedImage bi = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = bi.createGraphics();
         g.setColor(Color.RED);
-        g.fillOval(0, 0, 9, 9);
+        g.fillOval(strokeSize, strokeSize, circleSize, circleSize);
         g.setColor(Color.BLACK);
-        g.drawOval(0, 0, 9, 9);
+        g.drawOval(strokeSize, strokeSize, circleSize, circleSize);
         g.dispose();
         return new ImageIcon(bi);
     }
@@ -109,18 +114,21 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     * @return The {@code ImageIcon}.
     */
     public static ImageIcon getRemoveImage() {
-        BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        /*g.fillRect(0, 0, 9, 9);*/
+        final int imageSize = (int) (9 * FontLibrary.getFontScaling());
+        final int strokeSize = (int) (2 * FontLibrary.getFontScaling());
+        final BufferedImage bi = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = bi.createGraphics();
+        
         g.setColor(Color.BLACK);
-        g.drawLine(1, 0, 8, 7);
-        g.drawLine(0, 1, 7, 8);
-        g.drawLine(7, 0, 0, 7);
-        g.drawLine(9, 0, 0, 9);
+        g.setStroke(new BasicStroke(strokeSize + 1));
+        g.drawLine(strokeSize, strokeSize, imageSize - strokeSize, imageSize - strokeSize);
+        g.drawLine(imageSize - strokeSize, strokeSize, strokeSize, imageSize - strokeSize);
+        
         g.setColor(Color.RED);
-        g.drawLine(0, 0, 8, 8);
-        g.drawLine(8, 0, 0, 8);
-        g.dispose();
+        g.setStroke(new BasicStroke(strokeSize));
+        g.drawLine(strokeSize, strokeSize, imageSize - strokeSize, imageSize - strokeSize);
+        g.drawLine(imageSize - strokeSize, strokeSize, strokeSize, imageSize - strokeSize);
+
         return new ImageIcon(bi);
     }
 
@@ -219,7 +227,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
         @Override
         public Dimension getMinimumSize() {
-            return new Dimension(80, super.getMinimumSize().height);
+            return new Dimension((int) (80 * FontLibrary.getFontScaling()), super.getMinimumSize().height);
         }
 
         @Override
