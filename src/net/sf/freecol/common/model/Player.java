@@ -3684,12 +3684,19 @@ public class Player extends FreeColGameObject implements Nameable {
         final double MOD_HIGH_PRODUCTION        = 1.2;
         final double MOD_GOOD_PRODUCTION        = 1.1;
 
-        // Applied per occurrence (own colony only one-time), range-dependent.
-        final int DISTANCE_MAX = 5;
-        final double[] MOD_OWN_COLONY     = {0.0, 0.0, 0.5, 1.50, 1.25};
-        final double[] MOD_ENEMY_COLONY   = {0.0, 0.0, 0.4, 0.50, 0.70};
-        final double[] MOD_NEUTRAL_COLONY = {0.0, 0.0, 0.7, 0.80, 1.00};
-        final double[] MOD_ENEMY_UNIT     = {0.4, 0.5, 0.6, 0.75, 0.90};
+        /* 
+         * Applied per occurrence (own colony only one-time), range-dependent.
+         * 
+         * Note that we should heavily prioritize having colonies placed at
+         * distance 3 between each other. This is the closest distance you
+         * can have without getting an overlap.
+         */
+        final double[] MOD_OWN_COLONY        = {0.0, 0.0, 0.0, 2.00, 0.75, 0.9, 1.50, 1, 1, 1.25};
+        final double[] MOD_ENEMY_COLONY      = {0.0, 0.0, 0.0, 0.70, 0.50, 0.9, 1.25, 1, 1, 1.10};
+        final double[] MOD_NEUTRAL_COLONY    = {0.0, 0.0, 0.0, 1.00, 0.80, 0.9, 1.25, 1, 1, 1.10};
+        final double[] MOD_INDIAN_SETTLEMENT = {0.0, 0.0, 0.9, 1.00, 1.00, 1.0, 1.00, 1, 1, 1.00};
+        final double[] MOD_ENEMY_UNIT        = {0.4, 0.5, 0.6, 0.75, 0.90, 0.0, 0.00, 0, 0, 0.00};
+        final int distanceMax = MOD_OWN_COLONY.length;
 
         // Goods production in excess of this on a tile counts as good/high
         final int GOOD_PRODUCTION = 4;
@@ -3889,19 +3896,19 @@ public class Player extends FreeColGameObject implements Nameable {
         final Predicate<Unit> hostileUnitPred
             = u -> !this.owns(u) && u.isOffensiveUnit()
                 && this.atWarWith(u.getOwner());
-        boolean supportingColony = false;
-        for (int radius = 2; radius < DISTANCE_MAX; radius++) {
+        for (int radius = 1; radius < distanceMax; radius++) {
             for (Tile t : getGame().getMap().getCircleTiles(tile, false,
                                                             radius)) {
                 Settlement settlement = t.getSettlement();
                 if (settlement != null) {
-                    if (owns(settlement)) {
-                        if (!supportingColony) {
-                            supportingColony = true;
-                            values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                    if (settlement instanceof IndianSettlement) {
+                        values.set(ColonyValueCategory.A_NEARBY.ordinal(),
                                 values.get(ColonyValueCategory.A_NEARBY.ordinal())
-                                * MOD_OWN_COLONY[radius]);
-                        }
+                                * MOD_INDIAN_SETTLEMENT[radius]);
+                    } else if (owns(settlement)) {
+                        values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                            values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                            * MOD_OWN_COLONY[radius]);
                     } else if (atWarWith(settlement.getOwner())) {
                         values.set(ColonyValueCategory.A_NEARBY.ordinal(),
                             values.get(ColonyValueCategory.A_NEARBY.ordinal())
@@ -3913,10 +3920,17 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
 
+                /* 
+                 * Commenting out for now, as this actually rewards building colonies
+                 * when there are many hostile units nearby. We should probably
+                 * just remove hostile units from the colony value calculation and
+                 * rather handle it in BuildColonyMission.
+                 * 
                 int hostiles = count(t.getUnits(), hostileUnitPred);
                 values.set(ColonyValueCategory.A_NEARBY.ordinal(),
                     values.get(ColonyValueCategory.A_NEARBY.ordinal())
                         + hostiles * MOD_ENEMY_UNIT[radius]);
+                 */
             }
         }
 
