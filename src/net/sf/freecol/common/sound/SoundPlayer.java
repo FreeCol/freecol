@@ -68,7 +68,7 @@ public final class SoundPlayer {
         private static final int WAIT_TIMEOUT = 100; // 100ms
 
         /** A buffer to hold data to be written to the mixer. */
-        private final byte[] data = new byte[8192];
+        private final byte[] data = new byte[16384];
 
         /** A playlist of files queued to be played. */
         private final List<File> playList = new ArrayList<>();
