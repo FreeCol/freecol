@@ -979,9 +979,11 @@ public class Map extends FreeColGameObject implements Location {
             }
             this.radius = radius;
             n = 0;
-
+            
             Position step;
-            if (isFilled || radius == 1) {
+            if (radius <= 0) {
+                x = y = UNDEFINED;
+            } else if (isFilled || radius == 1) {
                 step = Direction.NE.step(center.getX(), center.getY());
                 x = step.x;
                 y = step.y;
@@ -1097,11 +1099,12 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param center The center {@code Tile} to iterate around.
      * @param isFilled True to get all of the positions in the circle.
-     * @param radius The radius of circle.
-     * @return The circle iterator.
+     * @param radius The radius of circle. No tiles are returned if
+     *      {@code radius <= 0}.
+     * @return The circle iterator. The center tile is never returned.
+     *      The innermost tiles are returned first.
      */
-    public Iterator<Tile> getCircleIterator(Tile center, boolean isFilled,
-        int radius) {
+    public Iterator<Tile> getCircleIterator(Tile center, boolean isFilled, int radius) {
         return new CircleIterator(center, isFilled, radius);
     }
 
@@ -1111,12 +1114,12 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param center The center {@code Tile} to iterate around.
      * @param isFilled True to get all of the positions in the circle.
-     * @param radius The radius of circle.
-     * @return An {@code Iterable} for a circle of tiles.
+     * @param radius The radius of circle. No tiles are returned if
+     *      {@code radius <= 0}.
+     * @return An {@code Iterable} The center tile is never returned.
+     *      The innermost tiles are returned first.
      */
-    public Iterable<Tile> getCircleTiles(final Tile center,
-        final boolean isFilled,
-        final int radius) {
+    public Iterable<Tile> getCircleTiles(final Tile center, final boolean isFilled, final int radius) {
         return new Iterable<Tile>() {
             @Override
             public Iterator<Tile> iterator() {

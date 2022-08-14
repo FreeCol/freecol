@@ -19,18 +19,20 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 import net.sf.freecol.common.FreeColException;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -444,6 +446,76 @@ public class MapTest extends FreeColTestCase {
         assertEquals(45, map.getRow(45));
         assertEquals(90, map.getLatitude(90));
         assertEquals(90, map.getRow(90));
+    }
+    
+    public void testCircleIterator() {
+        final Game game = getStandardGame();
+        final Map map = getCoastTestMap(plainsType, true);
+        game.changeMap(map);
+        
+        final Tile tile = map.getTile(10, 10);
+        
+        final List<Tile> radiusMinusOneList = iteratorToList(map.getCircleIterator(tile, false, -1));
+        assertEquals("Radius -1 should produce 0 tiles", 0, radiusMinusOneList.size());
+
+        final List<Tile> radius0List = iteratorToList(map.getCircleIterator(tile, false, 0));
+        assertEquals("Radius 0 should produce 0 tiles", 0, radius0List.size());
+        
+        final List<Tile> radius1List = iteratorToList(map.getCircleIterator(tile, false, 1));
+        assertEquals("Radius 1", 8, radius1List.size());
+        
+        final List<Tile> radius2List = iteratorToList(map.getCircleIterator(tile, false, 2));
+        assertEquals("Radius 2", 16, radius2List.size());
+        
+        final List<Tile> radius2FilledList = iteratorToList(map.getCircleIterator(tile, true, 2));
+        assertEquals("Radius 2", 24, radius2FilledList.size());
+        assertEquals("The tiles should be returned in a certain order (spiraling clockwise outwards).",
+                List.of(
+                    // Radius 1
+                    map.getTile(10, 9),
+                    map.getTile(11, 10),
+                    map.getTile(10, 11),
+                    map.getTile(10, 12),
+                    map.getTile(9, 11),
+                    map.getTile(9, 10),
+                    map.getTile(9, 9),
+                    map.getTile(10, 8),
+                    
+                    // Radius 2
+                    map.getTile(10, 7),
+                    map.getTile(11, 8),
+                    map.getTile(11, 9),
+                    map.getTile(12, 10),
+                    map.getTile(11, 11),
+                    map.getTile(11, 12),
+                    map.getTile(10, 13),
+                    map.getTile(10, 14),
+                    map.getTile(9, 13),
+                    map.getTile(9, 12),
+                    map.getTile(8, 11),
+                    map.getTile(8, 10),
+                    map.getTile(8, 9),
+                    map.getTile(9, 8),
+                    map.getTile(9, 7),
+                    map.getTile(10, 6)
+                ),
+                radius2FilledList);
+        
+        final Tile cornertile = map.getTile(0, 1);
+        final List<Tile> radius1CornerList = iteratorToList(map.getCircleIterator(cornertile, false, 1));
+        assertEquals("Radius 1 in corner", 6, radius1CornerList.size());
+        
+        final Tile cornertile2 = map.getTile(map.getWidth() - 1, 1);
+        final List<Tile> radius1CornerList2 = iteratorToList(map.getCircleIterator(cornertile2, false, 1));
+        assertEquals("Radius 1 in corner2", 4, radius1CornerList2.size());
+    }
+    
+    private <T> List<T> iteratorToList(Iterator<T> iterator) {
+        final List<T> result = new ArrayList<>();
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+        return result;
     }
 
     public void testFindPath() {
