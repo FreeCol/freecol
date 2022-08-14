@@ -130,7 +130,11 @@ public class MapViewerRepaintManager {
      * @param bounds The bounds that should be marked dirty.
      */
     public void markAsDirty(Rectangle bounds) {
-        this.dirtyRegion = this.dirtyRegion.union(bounds);
+        if (dirtyRegion.isEmpty()) {
+            this.dirtyRegion = bounds;
+        } else {
+            this.dirtyRegion = this.dirtyRegion.union(bounds);
+        }
     }
     
     /**
@@ -269,12 +273,11 @@ public class MapViewerRepaintManager {
         
         final Rectangle alreadyPaintedBounds = new Rectangle(0, 0, size.width, size.height);
         alreadyPaintedBounds.translate(dx, dy);
-        
+
         final Area dirtyArea = new Area(new Rectangle(0, 0, size.width, size.height));
         dirtyArea.subtract(new Area(alreadyPaintedBounds));
         final Rectangle newDirtyBounds = dirtyArea.getBounds();
-        
-        if (dirtyRegion != null) {
+        if (dirtyRegion != null && !dirtyRegion.isEmpty()) {
             dirtyRegion = dirtyRegion.union(newDirtyBounds);
         } else {
             dirtyRegion = newDirtyBounds;
@@ -321,7 +324,11 @@ public class MapViewerRepaintManager {
     private void updateDirtyRegionWithDirtyTiles(MapViewerBounds mapViewerBounds) {
         for (Tile dirtyTile : dirtyTiles) {
             final Rectangle dirtyTileBounds = mapViewerBounds.calculateDrawnTileBounds(dirtyTile);
-            dirtyRegion = dirtyRegion.union(dirtyTileBounds);
+            if (dirtyRegion.isEmpty()) {
+                dirtyRegion = dirtyTileBounds;
+            } else {
+                dirtyRegion = dirtyRegion.union(dirtyTileBounds);
+            }
         }
         dirtyTiles.clear();
     }

@@ -249,7 +249,12 @@ public final class MapViewer extends FreeColClientHolder {
 
         final Map map = getMap();
 
-        final Rectangle allRenderingClipBounds = clipBounds.union(dirtyClipBounds);
+        final Rectangle allRenderingClipBounds;
+        if (dirtyClipBounds.isEmpty()) {
+            allRenderingClipBounds = clipBounds;
+        } else {
+            allRenderingClipBounds = clipBounds.union(dirtyClipBounds);
+        }
         paintBlackBackground(backBufferG2d, allRenderingClipBounds);
         
         // Display the animated base tiles:
