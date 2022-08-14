@@ -80,6 +80,11 @@ public class FreeColDebugger {
      */
     private static boolean normalGameFogOfWar = false;
 
+    /**
+     * Displays elements for debugging the rendering.
+     */
+    private static boolean debugRendering = false;
+    
     /** Display map coordinates? */
     private static boolean displayCoordinates = false;
 
@@ -290,6 +295,22 @@ public class FreeColDebugger {
     public static void signalEndDebugRun() {
         if (debugRunTurns > 0) setDebugRunTurns(0);
     }
+    
+    /**
+     * Should elements for debugging the rendering be displayed?
+     */
+    public static boolean debugRendering() {
+        return debugRendering;
+    }
+    
+    /**
+     * Displays elements for debugging the rendering.
+     *
+     * @param _debugRendering If true, displays elements for debugging the rendering.
+     */
+    public static void setDebugRendering(boolean _debugRendering) {
+        debugRendering = _debugRendering;
+    }
 
     /**
      * Should the map viewer display tile coordinates?
@@ -370,7 +391,6 @@ public class FreeColDebugger {
     public static void handleCrash() {
         if (debugRunSave != null) signalEndDebugRun();
     }
-
 
     /**
      * Emergency run time log to use when the normal logging is failing.

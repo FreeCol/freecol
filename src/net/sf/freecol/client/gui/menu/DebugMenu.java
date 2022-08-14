@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.menu;
 
+import static net.sf.freecol.common.util.Utils.garbageCollect;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -44,7 +46,6 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -96,6 +97,16 @@ public class DebugMenu extends JMenu {
         this.add(reload);
         
         addSeparator();
+        
+        final JCheckBoxMenuItem debugRendering = Utility.localizedCheckBoxMenuItem("menuBar.debug.rendering",
+                FreeColDebugger.debugRendering());
+        debugRendering.setOpaque(false);
+        this.add(debugRendering);
+        debugRendering.addActionListener((ActionEvent ae) -> {
+            final boolean val = ((JCheckBoxMenuItem) ae.getSource()).isSelected();
+            FreeColDebugger.setDebugRendering(val);
+        });
+        debugRendering.setEnabled(true);
 
         final JCheckBoxMenuItem sc
             = Utility.localizedCheckBoxMenuItem("menuBar.debug.showCoordinates",

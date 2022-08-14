@@ -309,6 +309,11 @@ public final class MapViewer extends FreeColClientHolder {
 
         verifyAndMarkAsClean(size, clipBounds);
         
+        if (FreeColDebugger.debugRendering()) {
+            g2d.setColor(new Color(255, 0, 0, 100));
+            g2d.fill(dirtyClipBounds);
+        }
+        
         /*
          * Remove the check for "fullMapRenderedWithoutUsingBackBuffer" to get every repaint
          * logged: This includes several animations per second.

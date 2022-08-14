@@ -77,7 +77,7 @@ public class CanvasMapViewer extends JComponent {
             paintMainMenuBackground(g2d, size);
         }
         
-        if (FreeColDebugger.isInDebugMode()) {
+        if (FreeColDebugger.debugRendering()) {
             drawRenderingTimeStrings(g, startTime, fullMapRenderedWithoutUsingBackBuffer);
         }
     }
