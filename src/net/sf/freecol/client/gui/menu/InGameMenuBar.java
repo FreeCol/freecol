@@ -116,7 +116,6 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InGameMenuBar.class.getName());
-    
 
     /**
      * Creates a new {@code FreeColMenuBar}. This menu bar will include
@@ -127,10 +126,7 @@ public class InGameMenuBar extends FreeColMenuBar {
      */
     public InGameMenuBar(FreeColClient freeColClient,
                          MouseMotionListener listener) {
-        super(freeColClient);
-
-        // Add a mouse listener so that autoscrolling can happen here
-        this.addMouseMotionListener(listener);
+        super(freeColClient, listener);
         
         reset();
     }
@@ -184,7 +180,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(RetireAction.id));
         menu.add(getMenuItem(SaveAndQuitAction.id));
         menu.add(getMenuItem(QuitAction.id));
-
+        
         add(menu);
     }
 

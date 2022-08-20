@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.common.model.Tile;
@@ -40,11 +41,12 @@ import net.sf.freecol.server.generator.TerrainGenerator;
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
-public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
+public final class CanvasMapEditorMouseListener extends FreeColClientHolder
     implements MouseListener, MouseMotionListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMapEditorMouseListener.class.getName());
 
+    private final Scrolling scrolling;
     private Point endPoint;
     private Point startPoint;
 
@@ -54,8 +56,10 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient) {
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Scrolling scrolling) {
         super(freeColClient);
+        
+        this.scrolling = scrolling;
     }
 
 
@@ -228,7 +232,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         endPoint = e.getPoint();
         drawBox(component, startPoint, endPoint);
 
-        performDragScrollIfActive(e);
+        scrolling.performDragScrollIfActive(e);
 
         getGUI().repaint();
     }
@@ -240,6 +244,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     public void mouseMoved(MouseEvent e) {
         if (getMap() == null) return;
 
-        performAutoScrollIfActive(e, true);
+        scrolling.performAutoScrollIfActive(e);
     }
 }

@@ -24,26 +24,27 @@ import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 
 
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
-public final class CanvasMouseMotionListener extends AbstractCanvasListener
-    implements MouseMotionListener {
+public final class CanvasMouseMotionListener extends FreeColClientHolder implements MouseMotionListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseMotionListener.class.getName());
-
+    
+    private final Scrolling scrolling;
 
     /**
      * Creates a new listener for mouse movement.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param canvas The {@code Canvas} to listen on.
      */
-    public CanvasMouseMotionListener(FreeColClient freeColClient,
-                                     Canvas canvas) {
+    public CanvasMouseMotionListener(FreeColClient freeColClient, Scrolling scrolling) {
         super(freeColClient);
+        
+        this.scrolling = scrolling;
     }
 
 
@@ -54,7 +55,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      */
     @Override
     public void mouseMoved(MouseEvent me) {
-        performAutoScrollIfActive(me, true);
+        scrolling.performAutoScrollIfActive(me);
 
         getGUI().updateGoto(me.getX(), me.getY(), false);
     }
@@ -65,9 +66,11 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     @Override
     public void mouseDragged(MouseEvent me) {
         // getButton does not work here, TODO: find out why
-        if ((me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK)
-            != MouseEvent.BUTTON1_DOWN_MASK) return;
-        performDragScrollIfActive(me);
+        if ((me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != MouseEvent.BUTTON1_DOWN_MASK) {
+            return;
+        }
+        
+        scrolling.performDragScrollIfActive(me);
 
         getGUI().updateGoto(me.getX(), me.getY(), true);
     }

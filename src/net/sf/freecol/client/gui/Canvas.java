@@ -143,6 +143,8 @@ public final class Canvas extends JDesktopPane {
      */
     private MainPanel mainPanel;
     
+    private Scrolling scrolling;
+    
     /**
      * The panel used for displaying the map and drawing the background of this class.
      */
@@ -173,6 +175,7 @@ public final class Canvas extends JDesktopPane {
         this.freeColClient = freeColClient;
         this.graphicsDevice = graphicsDevice;
         this.canvasMapViewer = new CanvasMapViewer(freeColClient, mapViewer);
+        this.scrolling = new Scrolling(freeColClient, this);
 
         // Determine if windowed mode should be used and set the window size.
         this.windowed = checkWindowed(graphicsDevice, desiredSize);
@@ -764,9 +767,9 @@ public final class Canvas extends JDesktopPane {
     public void startMapEditorGUI() {
         freeColClient.updateActions();
         this.parentFrame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
-                new MenuMouseMotionListener(this.freeColClient)));
+                new MenuMouseMotionListener(scrolling)));
         CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(this.freeColClient);
+            = new CanvasMapEditorMouseListener(this.freeColClient, scrolling);
         addMouseListener(listener);
         addMouseMotionListener(listener);
     }
@@ -776,9 +779,9 @@ public final class Canvas extends JDesktopPane {
      */
     public void initializeInGame() {
         this.parentFrame.setMenuBar(new InGameMenuBar(this.freeColClient,
-                new MenuMouseMotionListener(this.freeColClient)));
+                new MenuMouseMotionListener(scrolling)));
         addMouseListener(new CanvasMouseListener(this.freeColClient));
-        addMouseMotionListener(new CanvasMouseMotionListener(this.freeColClient, this));
+        addMouseMotionListener(new CanvasMouseMotionListener(this.freeColClient, scrolling));
     }
 
     /**

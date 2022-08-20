@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.menu;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -53,7 +54,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
     private static final Logger logger = Logger.getLogger(FreeColMenuBar.class.getName());
 
     protected final FreeColClient freeColClient;
-
+    private final MouseMotionListener listener;
     protected final ActionManager am;
 
 
@@ -63,7 +64,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
      *
      * @param f The main controller.
      */
-    protected FreeColMenuBar(FreeColClient f) {
+    protected FreeColMenuBar(FreeColClient f, MouseMotionListener listener) {
         // FIXME: FreeColClient should not have to be passed in to
         // this class.  This is only a menu bar, it doesn't need a
         // reference to the main controller. The only reason it has
@@ -84,12 +85,23 @@ public abstract class FreeColMenuBar extends JMenuBar {
         setOpaque(false);
 
         this.freeColClient = f;
+        this.listener = listener;
         
         this.am = f.getActionManager();
+        
+        // Add a mouse listener so that autoscrolling can happen here
+        this.addMouseMotionListener(listener);
 
         setBorder(FreeColImageBorder.menuBarBorder);
     }
 
+    @Override
+    public JMenu add(JMenu c) {
+        // Add a mouse listener so that autoscrolling can happen here
+        c.addMouseMotionListener(listener);
+        
+        return super.add(c);
+    }
 
     /**
      * Resets this menu bar.
