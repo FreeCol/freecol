@@ -43,6 +43,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.awt.image.VolatileImage;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -136,6 +137,8 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private TileBounds tileBounds = new TileBounds(new Dimension(0, 0), 1f);
     
+    private List<Rectangle> fullyRepaintedAreas = new ArrayList<>();
+    
 
     /**
      * The constructor to use.
@@ -223,18 +226,17 @@ public final class MapViewer extends FreeColClientHolder {
     public boolean displayMap(Graphics2D g2d, Dimension size) {
         final long startMs = now();
         final Rectangle clipBounds = g2d.getClipBounds();
-        
         if (mapViewerBounds.getFocus() == null) {
             paintBlackBackground(g2d, clipBounds);
             return false;
         }
-        
+
         if (rpm.isRepaintsBlocked(size)) {
             final VolatileImage backBufferImage = rpm.getBackBufferImage();
             g2d.drawImage(backBufferImage, 0, 0, null);
             return false;
         }
-        
+
         boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(mapViewerBounds, mapViewerBounds.getFocus());
         final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();
         if (rpm.isAllDirty()) {
@@ -267,10 +269,7 @@ public final class MapViewer extends FreeColClientHolder {
         // Display everything else:
         final long animatedBaseMs = now();
         if (!dirtyClipBounds.isEmpty()) {
-            final TileClippingBounds tcb = new TileClippingBounds(map, dirtyClipBounds);
-            final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
-            displayNonAnimationImages(nonAnimationG2d, dirtyClipBounds, tcb);
-            nonAnimationG2d.dispose();
+            displayToNonAnimationBufferImage(dirtyClipBounds, nonAnimationBufferImage, map);
         }
         
         final long nonAnimatedMs = now();   
@@ -307,12 +306,16 @@ public final class MapViewer extends FreeColClientHolder {
         mapViewerState.getChatDisplay().display(g2d, mapViewerBounds.getSize());
         final long chatMs = now();
 
-        verifyAndMarkAsClean(size, clipBounds);
-        
         if (FreeColDebugger.debugRendering()) {
+            fullyRepaintedAreas.add(dirtyClipBounds);
             g2d.setColor(new Color(255, 0, 0, 100));
-            g2d.fill(dirtyClipBounds);
+            for (Rectangle r : fullyRepaintedAreas) {
+                g2d.fill(r);
+            }
+            fullyRepaintedAreas.clear();
         }
+        
+        verifyAndMarkAsClean(size, clipBounds);
         
         /*
          * Remove the check for "fullMapRenderedWithoutUsingBackBuffer" to get every repaint
@@ -337,6 +340,45 @@ public final class MapViewer extends FreeColClientHolder {
         }
                 
         return fullMapRenderedWithoutUsingBackBuffer;
+    }
+
+    /**
+     * Paints the dirty tiles to the buffers. The screen will
+     * be updated the next time {@link #displayMap(Graphics2D, Dimension)}
+     * gets called.
+     * 
+     * This is used for handling several small dirty areas that would otherwise
+     * force a full repaint since the bounding box covers the entire screen.
+     * An example of this is diagonal scrolling.
+     */
+    public void paintImmediatelyToBuffersOnly() {
+        if (mapViewerBounds.getFocus() == null
+                || rpm.isRepaintsBlocked(mapViewerBounds.getSize())) {
+            return;
+        }
+        
+        rpm.prepareBuffers(mapViewerBounds, mapViewerBounds.getFocus());
+        final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();
+        
+        if (dirtyClipBounds.isEmpty()) {
+            return;
+        }
+        
+        final BufferedImage nonAnimationBufferImage = rpm.getNonAnimationBufferImage();
+        final Map map = getMap();
+        displayToNonAnimationBufferImage(dirtyClipBounds, nonAnimationBufferImage, map);
+        if (FreeColDebugger.debugRendering()) {
+            fullyRepaintedAreas.add(dirtyClipBounds);
+        }
+        rpm.markAsClean();
+    }
+
+    private void displayToNonAnimationBufferImage(final Rectangle dirtyClipBounds, final BufferedImage nonAnimationBufferImage,
+            final Map map) {
+        final TileClippingBounds tcb = new TileClippingBounds(map, dirtyClipBounds);
+        final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
+        displayNonAnimationImages(nonAnimationG2d, dirtyClipBounds, tcb);
+        nonAnimationG2d.dispose();
     }
 
     private void displayNonAnimationImages(Graphics2D nonAnimationG2d,
@@ -1089,6 +1131,7 @@ public final class MapViewer extends FreeColClientHolder {
     private void verifyAndMarkAsClean(Dimension size, final Rectangle clipBounds) {
         final Rectangle entireScreen = new Rectangle(0, 0, size.width, size.height);
         final Rectangle relevantDirtyClipBounds = rpm.getDirtyClipBounds().intersection(entireScreen);
+
         if (relevantDirtyClipBounds.isEmpty() || clipBounds.contains(relevantDirtyClipBounds)) {
             rpm.markAsClean();
         } else {

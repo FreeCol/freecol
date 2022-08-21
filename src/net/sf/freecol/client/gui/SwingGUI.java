@@ -1158,48 +1158,39 @@ public class SwingGUI extends GUI {
     
 
     // Scrolling
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Direction getScrollDirection(int x, int y, int scrollSpace,
-                                        boolean ignoreTop) {
-        Direction ret;
-        final Dimension size = this.canvas.getSize();
-        if (x < scrollSpace && y < scrollSpace) { // Upper-Left
-            ret = !ignoreTop ? Direction.NW : Direction.W;
-        } else if (x >= size.width - scrollSpace
-            && y < scrollSpace) { // Upper-Right
-            ret = !ignoreTop ? Direction.NE : Direction.E;
-        } else if (x >= size.width - scrollSpace
-            && y >= size.height - scrollSpace) { // Bottom-Right
-            ret = Direction.SE;
-        } else if (x < scrollSpace
-            && y >= size.height - scrollSpace) { // Bottom-Left
-            ret = Direction.SW;
-        } else if (y < scrollSpace) { // Top
-            ret = !ignoreTop ? Direction.N : null;
-        } else if (x >= size.width - scrollSpace) { // Right
-            ret = Direction.E;
-        } else if (y >= size.height - scrollSpace) { // Bottom
-            ret = Direction.S;
-        } else if (x < scrollSpace) { // Left
-            ret = Direction.W;
-        } else {
-            ret = null;
-        }
-        return ret;
-    }
     
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean scrollMap(Direction direction) {
-        boolean ret = this.mapViewer.getMapViewerBounds().scrollMap(direction);
-        paintImmediately();
-        return ret;
+        boolean scrolled = false;
+        if (Direction.longSides.contains(direction)) {
+            final List<Direction> directions = toNonDiagonalDirections(direction);
+            scrolled |= this.mapViewer.getMapViewerBounds().scrollMap(directions.get(0));
+            if (scrolled) {
+                this.mapViewer.paintImmediatelyToBuffersOnly();
+            }
+            scrolled |=this.mapViewer.getMapViewerBounds().scrollMap(directions.get(1));
+        } else {
+            scrolled |= this.mapViewer.getMapViewerBounds().scrollMap(direction);
+        }
+        
+        if (scrolled) {
+            paintImmediately();
+        }
+        
+        return scrolled;
+    }
+    
+    private static List<Direction> toNonDiagonalDirections(Direction d) {
+        switch (d) {
+        case NE: return List.of(Direction.N, Direction.E);
+        case SE: return List.of(Direction.S, Direction.E);
+        case NW: return List.of(Direction.N, Direction.W);
+        case SW: return List.of(Direction.S, Direction.W);
+        default: return List.of(d);
+        }
     }
 
 
