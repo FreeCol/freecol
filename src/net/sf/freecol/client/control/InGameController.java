@@ -518,9 +518,20 @@ public final class InGameController extends FreeColClientHolder {
         // Are we no longer in normal next unit mode?
         if (moveMode != MoveMode.NEXT_ACTIVE_UNIT) {
             // Clear the panel first
-            if (getGUI().isPanelShowing()) return false;
+            // if (getGUI().isPanelShowing()) return false;
             // Flush any orders
-            if (!doExecuteGotoOrders()) return false;
+            // if (!doExecuteGotoOrders()) return false;
+            
+            /*
+             * Just returning false instead of calling
+             * doExecuteGotoOrders since calling that method
+             * will make it run in parallel at end-turn (giving
+             * all sorts of errors).
+             * 
+             * Please test with the savegame in BR#3277 before
+             * committing a change to this behaviour.
+             */
+            return false;
         }
 
         // Successfully found a unit to display
