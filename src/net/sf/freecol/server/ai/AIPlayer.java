@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
@@ -512,7 +513,12 @@ public abstract class AIPlayer extends AIObject {
     public void setCurrentPlayerHandler(Player currentPlayer) {
         if (getPlayer().getId().equals(currentPlayer.getId())) {
             invoke(() -> {
-                    startWorking();
+                    try {
+                        startWorking();
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Unhandled exception from the AI. The AI's turn has been ended prematurely.", e);
+                        askServer().chat(currentPlayer, Messages.message("ai.chat.stoppedWorking"));
+                    }
                     AIMessage.askEndTurn(this);
                 });
         }
