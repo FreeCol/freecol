@@ -732,13 +732,15 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         } else {
             int[] randoms;
             abortInvalidMissions();
-            randoms = randomInts(logger, "Trades", air,
-                                 nSettlements, nSettlements);
-            secureSettlements(randoms, lb);
-            randoms = randomInts(logger, "Gifts", air, 100, nSettlements);
-            bringGifts(randoms, lb);
-            randoms = randomInts(logger, "Tribute", air, 100, nSettlements);
-            demandTribute(randoms, lb);
+            if (nSettlements > 0) {
+                randoms = randomInts(logger, "Trades", air,
+                                     nSettlements, nSettlements);
+                secureSettlements(randoms, lb);
+                randoms = randomInts(logger, "Gifts", air, 100, nSettlements);
+                bringGifts(randoms, lb);
+                randoms = randomInts(logger, "Tribute", air, 100, nSettlements);
+                demandTribute(randoms, lb);
+            }
             giveNormalMissions(lb);
             more = doMissions(getAIUnits(), lb);
         }
