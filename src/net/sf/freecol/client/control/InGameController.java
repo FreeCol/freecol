@@ -523,14 +523,18 @@ public final class InGameController extends FreeColClientHolder {
             // if (!doExecuteGotoOrders()) return false;
             
             /*
-             * Just returning false instead of calling
-             * doExecuteGotoOrders since calling that method
+             * Resetting moveMode to NEXT_ACTIVE_UNIT AND
+             * returning false instead of calling
+             * doExecuteGotoOrders -- since calling that method
              * will make it run in parallel at end-turn (giving
              * all sorts of errors).
              * 
              * Please test with the savegame in BR#3277 before
              * committing a change to this behaviour.
              */
+            
+            moveMode = MoveMode.NEXT_ACTIVE_UNIT;
+            
             return false;
         }
 
@@ -1107,6 +1111,11 @@ public final class InGameController extends FreeColClientHolder {
                 getGUI().showEndTurnDialog(units,
                     (Boolean value) -> {
                         if (value != null && value) {
+                            units.stream().forEach(unit -> {
+                                if (unit.getState() != Unit.UnitState.SKIPPED) {
+                                    igc().changeState(unit, Unit.UnitState.SKIPPED);
+                                }
+                            });
                             endTurn(false);
                         }
                     });
