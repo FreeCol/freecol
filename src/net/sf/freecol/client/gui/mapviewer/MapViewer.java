@@ -499,7 +499,7 @@ public final class MapViewer extends FreeColClientHolder {
         nonAnimationG2d.setColor(Color.BLACK);
         final boolean revengeMode = getGame().isInRevengeMode();
         if (!revengeMode) {
-            paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
+            paintEachTile(nonAnimationG2d, tcb.getTopLeftDirtyTile(), tcb.getUnitTiles(), (tileG2d, tile) -> {
                 final Unit unit = mapViewerState.findUnitInFront(tile);
                 if (unit == null || mapViewerState.getUnitAnimator().isOutForAnimation(unit)) {
                     return;
@@ -1319,6 +1319,7 @@ public final class MapViewer extends FreeColClientHolder {
         private final int clipTopY;
         
         private final List<Tile> baseTiles;
+        private final List<Tile> unitTiles;
         private final List<Tile> extendedTiles;
         private final List<Tile> superExtendedTiles;
         
@@ -1350,6 +1351,12 @@ public final class MapViewer extends FreeColClientHolder {
                     subMapWidth,
                     subMapHeight);
             
+            unitTiles = map.subMap(
+                    topLeftDirtyTile.getX(),
+                    topLeftDirtyTile.getY(),
+                    subMapWidth,
+                    subMapHeight + 1);
+            
             extendedTiles = map.subMap(
                     topLeftDirtyTile.getX(),
                     topLeftDirtyTile.getY() - 1,
@@ -1379,6 +1386,16 @@ public final class MapViewer extends FreeColClientHolder {
          */
         public List<Tile> getBaseTiles() {
             return baseTiles;
+        }
+        
+        /**
+         * The tiles to be repainted for unit graphics that might extend
+         * up to half a tile in height above the base tile.
+         *
+         * @return The list of tiles to repaint.
+         */
+        public List<Tile> getUnitTiles() {
+            return unitTiles;
         }
         
         /**
