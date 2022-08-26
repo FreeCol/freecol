@@ -200,10 +200,16 @@ public class AIColonyTest extends FreeColTestCase {
 
         assertEquals("Colony does not need a carpenter", 0,
             carpenterHouse.getUnitCount());
+        /* 
+         * No, tools should be imported instead of being produced locally.
+         * This makes the AI perform better (tested with 5 games with 300 turns
+         * before and after the change), and more fun for the human players
+         * when using privateers:
         assertTrue("Colony should be producing ore",
             colony.getTotalProductionOf(oreType) > 0);
         assertTrue("Colony should be producing tools",
             colony.getTotalProductionOf(toolsType) > 0);
+        */
     }
 
     /**
@@ -314,8 +320,13 @@ public class AIColonyTest extends FreeColTestCase {
             0, carpenterHouse.getUnitCount());
         assertFalse("Colony can not have an ore miner, no ore",
             colony.getNetProductionOf(oreType) > 0);
+        
+        /*
+         * No, see last comment in the test "testBuildersAllocation".
+         * 
         assertTrue("Colony should have a blacksmith, has ore in stock",
             blacksmithHouse.getUnitCount() > 0);
+         */
     }
 
     /**

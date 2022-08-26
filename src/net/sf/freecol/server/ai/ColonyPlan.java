@@ -456,10 +456,14 @@ public class ColonyPlan {
             } else if (g.getMilitary()) {
                 militaryGoodsTypes.add(g);
             } else if (g.isRawBuildingMaterial()) {
-                rawBuildingGoodsTypes.add(g);
+                if (g.isRawMaterialForUnstorableBuildingMaterial()) {
+                    rawBuildingGoodsTypes.add(g);
+                }
             } else if (g.isBuildingMaterial()
-                && g.getInputType().isRawBuildingMaterial()) {
-                buildingGoodsTypes.add(g);
+                    && g.getInputType().isRawBuildingMaterial()) {
+                if (!g.isStorable()) {
+                    buildingGoodsTypes.add(g);
+                }
             } else if (g.isNewWorldGoodsType()) {
                 rawLuxuryGoodsTypes.add(g);
             } else if (g.isRefined()
@@ -639,7 +643,7 @@ public class ColonyPlan {
             if ("conquest".equals(advantage)) factor = 1.2;
             ret = prioritize(type, MILITARY_WEIGHT * factor,
                 1.0/*FIXME: amount present wrt amount to equip*/);
-        } else if (goodsType.isBuildingMaterial()) {
+        } else if (goodsType.isBuildingMaterial() && !goodsType.isStorable()) {
             ret = prioritize(type, BUILDING_WEIGHT * factor,
                 1.0/*FIXME: need for this type*/);
         } else if (goodsType.isLibertyType()) {
@@ -709,8 +713,7 @@ public class ColonyPlan {
                     && colony.getTile().isShore()) {
                     int landFood = 0, seaFood = 0;
                     for (Tile t : transform(colony.getTile().getSurroundingTiles(1,1),
-                            t2 -> (t2.getOwningSettlement() == colony
-                                || player.canClaimForSettlement(t2)))) {
+                            t2 -> (t2.getOwningSettlement() == colony || player.canClaimForSettlement(t2)))) {
                         for (AbstractGoods ag : t.getSortedPotential()) {
                             if (ag.isFoodType()) {
                                 if (t.isLand()) {
