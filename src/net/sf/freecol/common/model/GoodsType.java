@@ -459,6 +459,26 @@ public final class GoodsType extends FreeColSpecObjectType {
         }
         return false;
     }
+    
+    /**
+     * Is this type of goods required somewhere in the chain for
+     * producing a BuildableType, and is not itself buildable.
+     *
+     * @return True if a raw building type.
+     * @see BuildableType
+     */
+    public boolean isRawMaterialForUnstorableBuildingMaterial() {
+        if (this.madeFrom != null) return false;
+
+        GoodsType refinedType = makes;
+        while (refinedType != null) {
+            if (refinedType.isBuildingMaterial() && !refinedType.isStorable()) {
+                return true;
+            }
+            refinedType = refinedType.makes;
+        }
+        return false;
+    }
 
     /**
      * Get all the equivalent goods types, in the sense that they are
