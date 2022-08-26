@@ -1796,12 +1796,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Sort possible goods types according to potential.
+     * Sort possible goods types according to potential of autoproduction.
+     *
+     * @return A list of goods, highest potential production first.
+     */
+    public List<AbstractGoods> getSortedAutoPotential() {
+        return getSortedPotential(null, null, false);
+    }
+    
+    /**
+     * Sort possible goods types according to potential with an expert working the tile.
      *
      * @return A list of goods, highest potential production first.
      */
     public List<AbstractGoods> getSortedPotential() {
-        return getSortedPotential(null, null);
+        return getSortedPotential(null, null, true);
     }
 
     /**
@@ -1811,7 +1820,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of goods, highest potential production first.
      */
     public List<AbstractGoods> getSortedPotential(Unit unit) {
-        return getSortedPotential(unit.getType(), unit.getOwner());
+        return getSortedPotential(unit.getType(), unit.getOwner(), false);
     }
 
     /**
@@ -1819,15 +1828,27 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @param unitType The {@code UnitType} to do the work.
      * @param owner the {@code Player} owning the unit.
+     * @param useExperts Use the best expert for the given goods if
+     *      {@code unitType == null}.
      * @return A list of goods, highest potential production first.
      */
-    public List<AbstractGoods> getSortedPotential(UnitType unitType,
-                                                  Player owner) {
+    private List<AbstractGoods> getSortedPotential(UnitType unitType,
+                                                  Player owner,
+                                                  boolean useExperts) {
         // Defend against calls while partially read.
         if (getType() == null) return Collections.<AbstractGoods>emptyList();
         
-        final ToIntFunction<GoodsType> productionMapper = cacheInt(gt ->
-            getPotentialProduction(gt, unitType));
+        final ToIntFunction<GoodsType> productionMapper = cacheInt(gt -> {
+            final UnitType ut;
+            if (unitType != null) {
+                ut = unitType;
+            } else if (useExperts) {
+                ut = getSpecification().getExpertForProducing(gt);
+            } else {
+                ut = null;
+            }
+            return getPotentialProduction(gt, ut);
+        });
         final Predicate<GoodsType> productionPred = gt ->
             productionMapper.applyAsInt(gt) > 0;
         final Function<GoodsType, AbstractGoods> goodsMapper = gt ->
