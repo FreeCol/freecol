@@ -50,6 +50,10 @@ public class GoodsTypeLabel extends FreeColLabel {
     public GoodsTypeLabel(FreeColClient freeColClient, GoodsType goodsType) {
         this(freeColClient.getGUI().getFixedImageLibrary(), goodsType);
     }
+    
+    public GoodsTypeLabel(GoodsTypeLabel goodsTypeLabel) {
+        this(goodsTypeLabel.getImageLibrary(), goodsTypeLabel.getType());
+    }
 
     /**
      * Initializes this label with the given goods type data.

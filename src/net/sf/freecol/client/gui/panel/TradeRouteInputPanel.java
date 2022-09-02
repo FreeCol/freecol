@@ -20,9 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import static net.sf.freecol.common.util.CollectionUtils.any;
-import static net.sf.freecol.common.util.CollectionUtils.matchKey;
 import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
-import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.awt.Component;
@@ -160,12 +158,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public Component add(Component comp, boolean editState) {
-            Component ret = super.add(comp);
             if (comp instanceof GoodsTypeLabel) {
                 GoodsTypeLabel gtl = (GoodsTypeLabel)comp;
-                cancelImport(gtl.getType());
+                cancelImport(gtl);
+                
+                // XXX: Do not add the component -- we already have the GoodsType here.
+                
+                return comp;
+            } else {
+                return super.add(comp);
             }
-            return ret;
         }
     }
 
@@ -188,14 +190,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public Component add(Component comp, boolean editState) {
-            Component ret = super.add(comp);
-            if (ret instanceof GoodsTypeLabel) {
-                GoodsTypeLabel gtl = (GoodsTypeLabel)ret;
-                enableImport(gtl.getType());
+            if (comp instanceof GoodsTypeLabel) {
+                final GoodsTypeLabel dndComp = (GoodsTypeLabel) comp;
+                final Component newComp = super.add(new GoodsTypeLabel(dndComp), editState);
+                enableImport(dndComp.getType());
                 revalidate();
                 repaint();
+                return newComp;
+            } else {
+                return super.add(comp);
             }
-            return ret;
         }
     }
         
@@ -604,6 +608,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
         for (int stopIndex : this.stopList.getSelectedIndices()) {
             TradeRouteStop stop = this.stopListModel.get(stopIndex);
             stop.addCargo(gt);
+            
+            final int[] idx = this.stopList.getSelectedIndices();
+            if (idx.length > 0) {
+                updateCargoPanel(this.stopListModel.get(idx[0]));
+            }
         }
         this.stopList.revalidate();
         this.stopList.repaint();
@@ -614,12 +623,18 @@ public final class TradeRouteInputPanel extends FreeColPanel
      *
      * @param gt The {@code GoodsType} to stop importing.
      */
-    private void cancelImport(GoodsType gt) {
-        this.stopGoodsTypesPanel.removeGoodsType(gt);
+    private void cancelImport(GoodsTypeLabel gtl) {
+        this.stopGoodsTypesPanel.remove(gtl);
+        
+        final GoodsType gt = gtl.getType();
         for (int stopIndex : this.stopList.getSelectedIndices()) {
             TradeRouteStop stop = this.stopListModel.get(stopIndex);
             List<GoodsType> cargo = new ArrayList<>(stop.getCargo());
-            if (removeInPlace(cargo, matchKey(gt))) {
+            
+            // Only remove the GoodsType once.
+            final int cargoIndex = cargo.indexOf(gt);
+            if (cargoIndex >= 0) {
+                cargo.remove(cargoIndex);
                 stop.setCargo(cargo);
             }
         }
