@@ -267,7 +267,7 @@ public class SwingGUI extends GUI {
              * We might have switched active unit. In that case, we have to refocus
              * after the animation has completed.
              */
-            final Tile originalFocus = mapViewer.getMapViewerBounds().getFocus();
+            final Tile originalFocus = mapViewer.getMapViewerState().getActiveUnit() != null ? mapViewer.getMapViewerBounds().getFocus() : null;
             final List<Tile> allTiles = animations
                     .stream()
                     .map(a -> a.getTiles())
