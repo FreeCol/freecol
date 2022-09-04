@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
@@ -173,6 +174,12 @@ public abstract class OptionsDialog extends FreeColPanel {
             cancelButton.setActionCommand(CANCEL);
             cancelButton.addActionListener(this);
             add(cancelButton, "tag cancel");
+            setEscapeAction(new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        OptionsDialog.this.cancelOptionsDialog();
+                    }
+                });
         }
         
         final float scaleFactor = getImageLibrary().getScaleFactor();
@@ -258,6 +265,20 @@ public abstract class OptionsDialog extends FreeColPanel {
         return save(f);
     }
    
+
+    /**
+     * Resets so that the option with preview (volume)
+     * gets restored on cancel.
+     */
+    public void cancelOptionsDialog() {
+        getOptionUI().reset();
+        
+        getGUI().removeComponent(this);
+        if (dialogHandler != null) {
+            dialogHandler.handle(null);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -280,16 +301,7 @@ public abstract class OptionsDialog extends FreeColPanel {
                 dialogHandler.handle(group);
             }
         } else if (CANCEL.equals(command)) {
-            /*
-             * Resets so that the option with preview (volume)
-             * gets restored on cancel.
-             */
-            getOptionUI().reset();
-            
-            getGUI().removeComponent(this);
-            if (dialogHandler != null) {
-                dialogHandler.handle(null);
-            }
+            cancelOptionsDialog();
         } else {
             logger.warning("Bad event: " + command);
         }

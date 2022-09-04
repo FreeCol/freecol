@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -556,7 +557,13 @@ public final class TradeRouteInputPanel extends FreeColPanel
         JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
-
+        setEscapeAction(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    TradeRouteInputPanel.this.cancelTradeRoute();
+                }
+            });
+                    
         add(Utility.localizedHeader("tradeRouteInputPanel.editRoute",
                                     Utility.FONTSPEC_TITLE),
             "span, align center");
