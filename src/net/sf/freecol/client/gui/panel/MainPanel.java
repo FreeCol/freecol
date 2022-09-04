@@ -72,7 +72,6 @@ public final class MainPanel extends FreeColPanel {
         JButton aboutButton = createImportantButton(am.getFreeColAction(AboutAction.id));
         JButton quitButton = createImportantButton(am.getFreeColAction(QuitAction.id));
 
-        setCancelComponent(quitButton);
         okButton.setAction(am.getFreeColAction((canContinue)
                 ? ContinueAction.id
                 : NewAction.id));

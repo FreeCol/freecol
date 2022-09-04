@@ -85,9 +85,6 @@ public final class ServerListPanel extends FreeColPanel {
 
         JButton cancel = Utility.localizedButton("cancel");
         JScrollPane tableScroll;
-
-        setCancelComponent(cancel);
-
         connect = Utility.localizedButton("connect");
 
         tableModel = new ServerListTableModel(new ArrayList<ServerInfo>());

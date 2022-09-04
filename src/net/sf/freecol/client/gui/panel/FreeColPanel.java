@@ -30,6 +30,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.InputMap;
@@ -75,7 +76,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     protected boolean editable = true;
 
-    protected JButton okButton = Utility.localizedButton("ok").withButtonStyle(ButtonStyle.IMPORTANT);
+    protected JButton okButton = Utility.localizedButton("ok")
+        .withButtonStyle(ButtonStyle.IMPORTANT);
 
 
     /**
@@ -104,8 +106,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         okButton.setActionCommand(OK);
         okButton.addActionListener(this);
-        
-        setCancelComponent(okButton);
     }
 
 
@@ -215,23 +215,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
                                                colony.getId());
         button.addActionListener(this);
         return button;
-    }
-
-    /**
-     * Make the given button the CANCEL button.
-     *
-     * @param cancelButton an {@code AbstractButton} value
-     */
-    public final void setCancelComponent(AbstractButton cancelButton) {
-        if (cancelButton == null) throw new NullPointerException();
-
-        InputMap inputMap
-            = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
-                     "release");
-
-        Action cancelAction = cancelButton.getAction();
-        getActionMap().put("release", cancelAction);
     }
 
     /**

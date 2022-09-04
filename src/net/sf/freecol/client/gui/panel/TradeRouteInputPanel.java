@@ -556,7 +556,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
         JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
-        setCancelComponent(cancelButton);
 
         add(Utility.localizedHeader("tradeRouteInputPanel.editRoute",
                                     Utility.FONTSPEC_TITLE),

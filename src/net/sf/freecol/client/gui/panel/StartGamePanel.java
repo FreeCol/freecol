@@ -143,12 +143,8 @@ public final class StartGamePanel extends FreeColPanel {
         }
 
         NationOptions nationOptions = getGame().getNationOptions();
-
         cancel = Utility.localizedButton("cancel");
-        setCancelComponent(cancel);
-
         JScrollPane chatScroll = null, tableScroll;
-
         table = new PlayersTable(getFreeColClient(), nationOptions,
                                  getMyPlayer());
 

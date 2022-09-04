@@ -300,7 +300,6 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                     gui.showMainPanel(null);
                 }
             });
-        setCancelComponent(cancel);
 
         // Add all the components
         add(Utility.localizedHeader("newPanel.newGamePanel",

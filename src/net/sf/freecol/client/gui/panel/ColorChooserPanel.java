@@ -60,7 +60,6 @@ public final class ColorChooserPanel extends FreeColPanel {
         add(cancelButton, "tag cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(l);
-        setCancelComponent(cancelButton);
 
         setOpaque(true);
         setSize(getPreferredSize());

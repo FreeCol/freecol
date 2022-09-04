@@ -172,7 +172,6 @@ public final class TradeRoutePanel extends FreeColPanel {
         JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.addActionListener((ae) ->
             getGUI().removeTradeRoutePanel(this));
-        setCancelComponent(cancelButton);
 
         updateButtons();
         updateList((this.unit == null
