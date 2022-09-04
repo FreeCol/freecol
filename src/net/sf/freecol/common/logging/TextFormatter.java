@@ -51,7 +51,7 @@ final class TextFormatter extends Formatter {
             .append("\n\t").append(record.getLevel().getName())
             .append(": ").append(record.getMessage().replaceAll("\n", "\n\t"))
             .append("\n\t").append(new Date(record.getMillis()))
-            .append("\n\tThread: ").append(record.getThreadID())
+            .append("\n\tThread: ").append(record.getLongThreadID())
             .append('\n');
         if (record.getThrown() != null) {
             StringWriter sw = new StringWriter();
