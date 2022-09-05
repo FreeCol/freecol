@@ -1193,8 +1193,8 @@ public final class ColonyPanel extends PortPanel
             final ImageLibrary lib = getImageLibrary();
             final Font font = FontLibrary.getScaledFont("normal-plain-smaller", null);
             final int uc = colony.getUnitCount();
-            final int solPercent = colony.getSoL();
-            final int rebels = Colony.calculateRebels(uc, solPercent);
+            final int solPercent = colony.getSonsOfLiberty();
+            final int rebelCount = Colony.calculateRebelCount(uc, solPercent);
             final Nation nation = colony.getOwner().getNation();
             final int grow = colony.getPreferredSizeChange();
             final int bonus = colony.getProductionBonus();
@@ -1206,7 +1206,7 @@ public final class ColonyPanel extends PortPanel
             add(rebelShield, "bottom");
 
             t = StringTemplate.template("colonyPanel.rebelLabel")
-                              .addAmount("%number%", rebels);
+                              .addAmount("%number%", rebelCount);
             rebelLabel.setText(Messages.message(t));
             rebelLabel.setFont(font);
             add(rebelLabel, "split 2, flowy");
@@ -1233,12 +1233,12 @@ public final class ColonyPanel extends PortPanel
             add(bonusLabel);
 
             t = StringTemplate.template("colonyPanel.royalistLabel")
-                              .addAmount("%number%", uc - rebels);
+                              .addAmount("%number%", uc - rebelCount);
             royalistLabel.setText(Messages.message(t));
             royalistLabel.setFont(font);
             add(royalistLabel, "split 2, flowy");
 
-            royalistMemberLabel.setText(colony.getTory() + "%");
+            royalistMemberLabel.setText((100 - solPercent) + "%");
             royalistMemberLabel.setFont(font);
             add(royalistMemberLabel);
 

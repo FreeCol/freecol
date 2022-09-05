@@ -94,6 +94,12 @@ public class Colony extends Settlement implements TradeLocation {
         LIMIT_EXCEEDED
     }
 
+    /** Government bonuses/penalties */
+    public int GOVERNMENT_VERY_GOOD = 2,
+        GOVERNMENT_GOOD = 1,
+        GOVERNMENT_ORDINARY = 0,
+        GOVERNMENT_BAD = -1,
+        GOVERNMENT_VERY_BAD = -2;
 
     /** A map of Buildings, indexed by the id of their basic type. */
     protected final java.util.Map<String, Building> buildingMap = new HashMap<>();
@@ -111,7 +117,7 @@ public class Colony extends Settlement implements TradeLocation {
      */
     protected int liberty;
 
-    /** The SoL membership this turn. */
+    /** The SoL membership this turn (percentage). */
     protected int sonsOfLiberty;
 
     /** The SoL membership last turn. */
@@ -316,16 +322,22 @@ public class Colony extends Settlement implements TradeLocation {
         this.exportData.put(newExportData.getId(), newExportData);
     }
 
-    protected int getSonsOfLiberty() {
+    /**
+     * Get the sons-of-liberty percentage.
+     *
+     * @return The sol%.
+     */
+    public int getSonsOfLiberty() {
         return this.sonsOfLiberty;
     }
+
     protected int getOldSonsOfLiberty() {
         return this.oldSonsOfLiberty;
     }
-    protected int getTories() {
+    protected int getToryCount() {
         return this.tories;
     }
-    protected int getOldTories() {
+    protected int getOldToryCount() {
         return this.oldTories;
     }
     
@@ -1226,8 +1238,7 @@ public class Colony extends Settlement implements TradeLocation {
         List<GoodsType> libertyTypeList = getSpecification()
                 .getLibertyGoodsTypeList();
         final int uc = getUnitCount();
-        if (amount > 0 && !libertyTypeList.isEmpty()
-            && calculateRebels(uc, sonsOfLiberty) <= uc + 1) {
+        if (amount > 0 && !libertyTypeList.isEmpty()) {
             addGoods(libertyTypeList.get(0), amount);
         }
         updateSoL();
@@ -1265,18 +1276,18 @@ public class Colony extends Settlement implements TradeLocation {
      */
     public void updateSoL() {
         int uc = getUnitCount();
-        oldSonsOfLiberty = sonsOfLiberty;
-        oldTories = tories;
-        sonsOfLiberty = calculateSoLPercentage(uc, getLiberty());
-        tories = uc - calculateRebels(uc, sonsOfLiberty);
+        this.oldSonsOfLiberty = this.sonsOfLiberty;
+        this.oldTories = this.tories;
+        this.sonsOfLiberty = calculateSoLPercentage(uc, getLiberty());
+        this.tories = calculateToryCount(uc, this.sonsOfLiberty);
     }
 
     /**
-     * Calculate the SoL membership percentage of the colony based on the
-     * number of colonists and liberty.
+     * Calculate the SoL membership percentage of this colony based on
+     * a given number of colonists and liberty.
      *
      * @param uc The proposed number of units in the colony.
-     * @param liberty The amount of liberty.
+     * @param liberty The proposed amount of liberty.
      * @return The percentage of SoLs, negative if not calculable.
      */
     private int calculateSoLPercentage(int uc, int liberty) {
@@ -1294,40 +1305,37 @@ public class Colony extends Settlement implements TradeLocation {
     }
 
     /**
-     * Calculate the SoL membership percentage of a colony.
-     *
-     * @return The percentage of SoLs, negative if not calculable.
-     */
-    public int getSoLPercentage() {
-        return calculateSoLPercentage(getUnitCount(), getLiberty());
-    }
-
-    /**
-     * Calculate the number of rebels given a SoL percentage and unit count.
+     * Calculate the number of rebels in a colony given a unit count
+     * and sons-of-liberty percentage.
      *
      * @param uc The number of units in the colony.
-     * @param solPercent The percentage of SoLs.
+     * @param solPercent The percentage of sons-of-liberty.
      * @return The number of rebels.
      */
-    public static int calculateRebels(int uc, int solPercent) {
+    public static int calculateRebelCount(int uc, int solPercent) {
         return (int)Math.floor(0.01 * solPercent * uc);
     }
 
     /**
-     * Gets the Tory membership percentage of the colony.
+     * Calculate the number of tories in a colony given a
+     * sons-of-liberty percentage and unit count.
      *
-     * @return The current Tory membership of the colony.
+     * @param uc The number of units in the colony.
+     * @param solPercent The percentage of sons-of-liberty.
+     * @return The number of tories.
      */
-    public int getTory() {
-        return 100 - getSoL();
+    public static int calculateToryCount(int uc, int solPercent) {
+        return uc - calculateRebelCount(uc, solPercent);
     }
 
     /**
-     * Update the colony's production bonus.
+     * Calculate the colony production bonus for a given
+     * sons-of-liberty percentage.
      *
-     * @return True if the bonus changed.
+     * @param solPercent The sons-of-liberty percentage to use.
+     * @return The production bonus.
      */
-    protected boolean updateProductionBonus() {
+    private int calculateProductionBonus(int solPercent) {
         final Specification spec = getSpecification();
         final int veryBadGovernment
             = spec.getInteger(GameOptions.VERY_BAD_GOVERNMENT_LIMIT);
@@ -1337,11 +1345,21 @@ public class Colony extends Settlement implements TradeLocation {
             = spec.getInteger(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
         final int goodGovernment
             = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
-        int newBonus = (sonsOfLiberty >= veryGoodGovernment) ? 2
-                : (sonsOfLiberty >= goodGovernment) ? 1
-                : (tories > veryBadGovernment) ? -2
-                : (tories > badGovernment) ? -1
-                : 0;
+        if (solPercent >= veryGoodGovernment) return GOVERNMENT_VERY_GOOD;
+        if (solPercent >= goodGovernment) return GOVERNMENT_GOOD;
+        int tc = calculateToryCount(getUnitCount(), solPercent);
+        return (tc > veryBadGovernment) ? GOVERNMENT_VERY_BAD
+            : (tc > badGovernment) ? GOVERNMENT_BAD
+            : GOVERNMENT_ORDINARY;
+    }        
+
+    /**
+     * Update the colony's production bonus.
+     *
+     * @return True if the bonus changed.
+     */
+    protected boolean updateProductionBonus() {
+        int newBonus = calculateProductionBonus(sonsOfLiberty);
         if (productionBonus != newBonus) {
             invalidateCache();
             setProductionBonus(newBonus);
@@ -1482,37 +1500,38 @@ public class Colony extends Settlement implements TradeLocation {
         final int goodGovernment
                 = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
-        int rebelPercent = calculateSoLPercentage(unitCount, getLiberty());
-        int rebelCount = calculateRebels(unitCount, rebelPercent);
-        int loyalistCount = unitCount - rebelCount;
-
+        int newSoLPercent = calculateSoLPercentage(unitCount, getLiberty());
+        int newToryCount = calculateToryCount(unitCount, newSoLPercent);
+        int oldSoLPercent = getSonsOfLiberty();
+        int oldToryCount = getToryCount();
+        
         int result = 0;
-        if (rebelPercent >= veryGoodGovernment) { // There are no tories left.
-            if (sonsOfLiberty < veryGoodGovernment) {
+        if (newSoLPercent >= veryGoodGovernment) { // There are no tories left.
+            if (oldSoLPercent < veryGoodGovernment) {
                 result = 1;
             }
-        } else if (rebelPercent >= goodGovernment) {
-            if (sonsOfLiberty >= veryGoodGovernment) {
+        } else if (newSoLPercent >= goodGovernment) {
+            if (oldSoLPercent >= veryGoodGovernment) {
                 result = -1;
-            } else if (sonsOfLiberty < goodGovernment) {
+            } else if (oldSoLPercent < goodGovernment) {
                 result = 1;
             }
         } else {
-            if (sonsOfLiberty >= goodGovernment) {
+            if (oldSoLPercent >= goodGovernment) {
                 result = -1;
             } else { // Now that no bonus is applied, penalties may.
-                if (loyalistCount > veryBadGovernment) {
-                    if (tories <= veryBadGovernment) {
+                if (newToryCount > veryBadGovernment) {
+                    if (oldToryCount <= veryBadGovernment) {
                         result = -1;
                     }
-                } else if (loyalistCount > badGovernment) {
-                    if (tories <= badGovernment) {
+                } else if (newToryCount > badGovernment) {
+                    if (oldToryCount <= badGovernment) {
                         result = -1;
-                    } else if (tories > veryBadGovernment) {
+                    } else if (oldToryCount > veryBadGovernment) {
                         result = 1;
                     }
                 } else {
-                    if (tories > badGovernment) {
+                    if (oldToryCount > badGovernment) {
                         result = 1;
                     }
                 }
@@ -1521,6 +1540,11 @@ public class Colony extends Settlement implements TradeLocation {
         return result;
     }
 
+    /**
+     * Has the government bonus changed?  If so, return a suitable message.
+     *
+     * @return A {@code ModelMessage} describing the change, or null if none.
+     */
     public ModelMessage checkForGovMgtChangeMessage() {
         final Specification spec = getSpecification();
         final int veryBadGovernment
@@ -1535,45 +1559,45 @@ public class Colony extends Settlement implements TradeLocation {
         String msgId = null;
         int number = 0;
         ModelMessage.MessageType msgType = ModelMessage.MessageType.GOVERNMENT_EFFICIENCY;
-        if (sonsOfLiberty >= veryGoodGovernment) {
+        if (this.sonsOfLiberty >= veryGoodGovernment) {
             // there are no tories left
-            if (oldSonsOfLiberty < veryGoodGovernment) {
+            if (this.oldSonsOfLiberty < veryGoodGovernment) {
                 msgId = "model.colony.veryGoodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
                 number = veryGoodGovernment;
             }
-        } else if (sonsOfLiberty >= goodGovernment) {
-            if (oldSonsOfLiberty == veryGoodGovernment) {
+        } else if (this.sonsOfLiberty >= goodGovernment) {
+            if (this.oldSonsOfLiberty == veryGoodGovernment) {
                 msgId = "model.colony.lostVeryGoodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
                 number = veryGoodGovernment;
-            } else if (oldSonsOfLiberty < goodGovernment) {
+            } else if (this.oldSonsOfLiberty < goodGovernment) {
                 msgId = "model.colony.goodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
                 number = goodGovernment;
             }
         } else {
-            if (oldSonsOfLiberty >= goodGovernment) {
+            if (this.oldSonsOfLiberty >= goodGovernment) {
                 msgId = "model.colony.lostGoodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
                 number = goodGovernment;
             }
 
             // Now that no bonus is applied, penalties may.
-            if (tories > veryBadGovernment) {
-                if (oldTories <= veryBadGovernment) {
+            if (this.tories > veryBadGovernment) {
+                if (this.oldTories <= veryBadGovernment) {
                     // government has become very bad
                     msgId = "model.colony.veryBadGovernment";
                 }
-            } else if (tories > badGovernment) {
-                if (oldTories <= badGovernment) {
+            } else if (this.tories > badGovernment) {
+                if (this.oldTories <= badGovernment) {
                     // government has become bad
                     msgId = "model.colony.badGovernment";
-                } else if (oldTories > veryBadGovernment) {
+                } else if (this.oldTories > veryBadGovernment) {
                     // government has improved, but is still bad
                     msgId = "model.colony.governmentImproved1";
                 }
-            } else if (oldTories > badGovernment) {
+            } else if (this.oldTories > badGovernment) {
                 // government was bad, but has improved
                 msgId = "model.colony.governmentImproved2";
             }
@@ -2376,7 +2400,7 @@ public class Colony extends Settlement implements TradeLocation {
      */
     public boolean goodsUseful(GoodsType goodsType) {
         if (getOwner().getPlayerType() == Player.PlayerType.INDEPENDENT) {
-            if ((goodsType.isLibertyType() && getSoLPercentage() >= 100)
+            if ((goodsType.isLibertyType() && getSonsOfLiberty() >= 100)
                     || goodsType.isImmigrationType()) return false;
         }
         return true;
@@ -2729,14 +2753,6 @@ public class Colony extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int getSoL() {
-        return sonsOfLiberty;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int getUpkeep() {
         return sum(getBuildings(), b -> b.getType().getUpkeep());
     }
@@ -2971,8 +2987,8 @@ public class Colony extends Settlement implements TradeLocation {
         this.liberty = o.getLiberty();
         this.sonsOfLiberty = o.getSonsOfLiberty();
         this.oldSonsOfLiberty = o.getOldSonsOfLiberty();
-        this.tories = o.getTories();
-        this.oldTories = o.getOldTories();
+        this.tories = o.getToryCount();
+        this.oldTories = o.getOldToryCount();
         this.productionBonus = o.getProductionBonus();
         this.immigration = o.getImmigration();
         this.established = o.getEstablished();

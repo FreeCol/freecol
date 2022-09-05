@@ -314,7 +314,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void addPopularSupportBonus(Colony colony, Unit attacker,
                                         Set<Modifier> result) {
-        int bonus = colony.getSoL();
+        int bonus = colony.getSonsOfLiberty();
         if (bonus >= 0) {
             if (attacker.getOwner().isREF()) bonus = 100 - bonus;
             if (bonus > 0) {

@@ -729,7 +729,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @return The current SoL.
      */
-    public abstract int getSoL();
+    public abstract int getSonsOfLiberty();
 
     /**
      * Get the amount of gold necessary to maintain all of the

@@ -4446,7 +4446,7 @@ outer:  for (Effect effect : effects) {
         List<Settlement> settlements = getSettlementList();
         for (Settlement settlement : settlements) {
             ((TurnTaker)settlement).csNewTurn(random, lb, cs);
-            newSoL += settlement.getSoL();
+            newSoL += settlement.getSonsOfLiberty();
         }
 
         int numberOfSettlements = settlements.size();

@@ -649,7 +649,7 @@ public class ColonyPlan {
         } else if (goodsType.isLibertyType()) {
             if (player.isREF()) return false; // no bells for REF colonies
             ret = prioritize(type, LIBERTY_WEIGHT,
-                (colony.getSoL() >= 100) ? 0.01 : 1.0);
+                (colony.getSonsOfLiberty() >= 100) ? 0.01 : 1.0);
         } else if (goodsType.isImmigrationType()) {
             if ("immigration".equals(advantage)) factor = 1.2;
             ret = prioritize(type, IMMIGRATION_WEIGHT * factor,
@@ -898,7 +898,7 @@ public class ColonyPlan {
                 .reversed();
 
         // If we need liberty put it before the new world production.
-        if (colony.getSoL() < 100) {
+        if (colony.getSonsOfLiberty() < 100) {
             produce.addAll(0, transform(libertyGoodsTypes,
                     gt -> production.containsKey(gt),
                     Function.<GoodsType>identity(), productionComparator));

@@ -1382,7 +1382,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int getSoL() {
+    public int getSonsOfLiberty() {
         // Native settlements do not generate SoL.
         return 0;
     }

@@ -275,7 +275,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
                     : (ag.getType().isBuildingMaterial()
                         && ag.getType().isRefined()) ? 1.5
                     : 1.0);
-            t.score *= 0.01 * (101 - Math.min(100, t.colony.getSoL()))
+            t.score *= 0.01 * (101 - Math.min(100, t.colony.getSonsOfLiberty()))
                 * product(t.colony.getBuildings(), b -> b.getLevel() > 1, bdf)
                 * ((6 - ((!t.colony.hasStockade()) ? 0
                             : t.colony.getStockade().getLevel())) / 6.0)

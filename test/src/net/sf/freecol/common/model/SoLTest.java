@@ -32,14 +32,13 @@ public class SoLTest extends FreeColTestCase {
         Colony colony = getStandardColony(7);
         for (int i = 1; i <= 100; i++) {
             int requiredBells = (Colony.LIBERTY_PER_REBEL
-                * (colony.getSoL() + 1) * colony.getUnitCount()) / 100;
+                * (colony.getSonsOfLiberty() + 1) * colony.getUnitCount()) / 100;
             colony.addGoods(bellsType,
                             requiredBells - colony.getGoodsCount(bellsType));
-            assertEquals(colony.getSoL(), i);
-            assertEquals(colony.getTory(), 100 - i);
-            int rebels = Colony.calculateRebels(colony.getUnitCount(), 
-                                                colony.getSoL());
-            assertEquals((int) Math.floor(i * 7 / 100f), rebels);
+            assertEquals(colony.getSonsOfLiberty(), i);
+            int rebelCount = Colony.calculateRebelCount(colony.getUnitCount(), 
+                colony.getSonsOfLiberty());
+            assertEquals((int) Math.floor(i * 7 / 100f), rebelCount);
         }
     }
 

@@ -332,7 +332,7 @@ public abstract class WorkLocation extends UnitLocation
         // Is the production actually a good idea?  Not if we are independent
         // and have maximized liberty, or for immigration.
         if (owner.getPlayerType() == Player.PlayerType.INDEPENDENT
-            && ((goodsType.isLibertyType() && getColony().getSoL() >= 100)
+            && ((goodsType.isLibertyType() && getColony().getSonsOfLiberty() >= 100)
                 || goodsType.isImmigrationType())) 
             return null;
         

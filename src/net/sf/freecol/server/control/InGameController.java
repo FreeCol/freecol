@@ -1447,9 +1447,9 @@ public final class InGameController extends Controller {
         // Do not use UnitType.getTargetType.
         java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<>();
         for (Colony colony : transform(serverPlayer.getColonies(),
-                                       c -> c.getSoL() > 50)) {
+                                       c -> c.getSonsOfLiberty() > 50)) {
             List<Unit> allUnits = colony.getAllUnitsList();
-            int limit = (allUnits.size() + 2) * (colony.getSoL() - 50) / 100;
+            int limit = (allUnits.size() + 2) * (colony.getSonsOfLiberty() - 50) / 100;
 
             unitMap.clear();
             for (Unit unit : transform(allUnits,

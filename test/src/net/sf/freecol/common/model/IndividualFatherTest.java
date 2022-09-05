@@ -103,21 +103,21 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         // Zero to start
         assertEquals(0, colony.getLiberty());
-        assertEquals(0, colony.getSoL());
+        assertEquals(0, colony.getSonsOfLiberty());
 
         // Add enough to raise 2 out of 5 to rebels => 40%
         int inc = 2 * Colony.LIBERTY_PER_REBEL;
         colony.addLiberty(inc);
         assertEquals(inc, colony.getLiberty());
         assertEquals(100 * inc / (pop * Colony.LIBERTY_PER_REBEL),
-                     colony.getSoL());
+                     colony.getSonsOfLiberty());
 
         // Add Bolivar and check that percentage is 20% higher
         player.addFather(simonBolivar);
         colony.addLiberty(0); // provoke recalculation
         assertEquals(inc, colony.getLiberty());
         assertEquals(100 * inc / (pop * Colony.LIBERTY_PER_REBEL) + 20,
-                     colony.getSoL());
+                     colony.getSonsOfLiberty());
 
         // Is the modifier present
         Modifier bolivarModifier = first(player.getModifiers(Modifier.SOL));

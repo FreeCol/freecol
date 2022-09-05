@@ -553,12 +553,12 @@ public class ClientOptions extends OptionGroup {
     /** Compare by descending size then liberty. */
     private static final Comparator<Colony> colonySizeComparator
         = Comparator.comparingInt(Colony::getUnitCount)
-            .thenComparingInt(Colony::getSoL)
+            .thenComparingInt(Colony::getSonsOfLiberty)
             .reversed();
 
     /** Compare by descending liberty then size. */
     private static final Comparator<Colony> colonySoLComparator
-        = Comparator.comparingInt(Colony::getSoL)
+        = Comparator.comparingInt(Colony::getSonsOfLiberty)
             .thenComparingInt(Colony::getUnitCount)
             .reversed();
 
