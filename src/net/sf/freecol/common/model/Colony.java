@@ -1401,6 +1401,51 @@ public class Colony extends Settlement implements TradeLocation {
         return 0;
     }
 
+    /**
+     * The RebelToolTip shows many things, but the number of turns to
+     * the next bonus point needs to account for the bonuses in
+     * calculateSoLPercentage, which is an awkward calculation to do
+     * in reverse.  Given the tooltip already calculates the
+     * libertyProduction, we use that and count forward to the turns
+     * it takes to reach the next bonus change, the good government
+     * mark, and the very good government mark.
+     *
+     * @param libertyProduction The projected colony liberty production.
+     * @return A list of number of turns to next,good,very good bonus marks.
+     */
+    public List<Integer> rebelHelper(int libertyProduction) {
+        List<Integer> ret = new ArrayList<>();
+        ret.add(-1);
+        ret.add(-1);
+        ret.add(-1);
+        if (libertyProduction <= 0) return ret;
+
+        final int uc = getUnitCount();
+        int liberty = getLiberty();
+        int soLPercent = calculateSoLPercentage(uc, liberty);
+        int bonus0 = calculateProductionBonus(soLPercent);
+
+        int n = 0, bonus = bonus0;
+        for (;;) {
+            if (bonus != bonus0 && ret.get(0) < 0) {
+                ret.set(0, n);
+            }
+            if (bonus == GOVERNMENT_GOOD && ret.get(1) < 0) {
+                ret.set(1, n);
+            }
+            if (bonus == GOVERNMENT_VERY_GOOD && ret.get(2) < 0) {
+                ret.set(2, n);
+                break;
+            }
+            liberty += libertyProduction;
+            soLPercent = calculateSoLPercentage(uc, liberty);
+            bonus = calculateProductionBonus(soLPercent);
+            n++;
+        }
+        return ret;
+    }
+            
+
     // Unit manipulation and population
 
     /**

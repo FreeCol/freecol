@@ -112,25 +112,12 @@ public class RebelToolTip extends JToolTip {
                                      ((capped) ? 0 : libertyProduction));
         content.add(progress, "span 3, alignx center, height 20:");
 
-        double turnsNext = -1.0;
-        double turns100 = -1.0;
-        double turns50 = -1.0;
+        int turnsNext = -1, turns50 = -1, turns100 = -1;
         if (libertyProduction > 0 && !capped) {
-            int requiredLiberty = Colony.LIBERTY_PER_REBEL - modulo;
-
-            turnsNext = (1 + requiredLiberty) / (double) libertyProduction;
-
-            requiredLiberty = Colony.LIBERTY_PER_REBEL * colony.getUnitCount();
-            if (liberty < requiredLiberty) {
-                turns100 = (1 + requiredLiberty - liberty)
-                        / (double) libertyProduction;
-            }
-
-            requiredLiberty /= 2;
-            if (liberty < requiredLiberty) {
-                turns50 = (1 + requiredLiberty - liberty)
-                        / (double) libertyProduction;
-            }
+            List<Integer> bonus = colony.rebelHelper(libertyProduction);
+            turnsNext = bonus.get(0);
+            turns50 = bonus.get(1);
+            turns100 = bonus.get(2);
         }
 
         final String na = Messages.message("notApplicable");
