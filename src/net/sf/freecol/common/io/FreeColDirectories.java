@@ -483,6 +483,14 @@ public class FreeColDirectories {
      * @return The new autosave directory, or null if not possible.
      */
     private static File deriveAutosaveDirectory() {
+        if (saveDirectory != null
+            && saveDirectory.toPath().endsWith(AUTOSAVE_DIRECTORY)) {
+            // Do not create autosave directories inside autosave
+            // directories (BR#3276).  However, having save==autosave
+            // is not a good idea either.  Lets see who that next
+            // complaint is.
+            return saveDirectory;
+        }
         return deriveDirectory(saveDirectory, AUTOSAVE_DIRECTORY);
     }
 
