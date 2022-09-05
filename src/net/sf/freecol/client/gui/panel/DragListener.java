@@ -105,10 +105,13 @@ public final class DragListener extends MouseAdapter {
             final QuickActionMenu menu
                 = new QuickActionMenu(this.freeColClient, this.parentPanel)
                     .addMenuItems(comp);
-            final int lastIdx = menu.getComponentCount() - 1;
-            if ((lastIdx >= 0)
-                    && (menu.getComponent(lastIdx) instanceof Separator))
+            while (true) {
+                int lastIdx = menu.getComponentCount() - 1;
+                if (lastIdx < 0
+                    || !(menu.getComponent(lastIdx) instanceof Separator))
+                    break;
                 menu.remove(lastIdx);
+            }
             if (menu.getComponentCount() <= 0) return;
 
             /*

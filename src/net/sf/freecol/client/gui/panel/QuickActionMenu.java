@@ -850,7 +850,7 @@ public final class QuickActionMenu extends JPopupMenu {
         boolean added = false;
         for (Unit unit : transform(europe.getUnits(), u ->
                 (u.isCarrier() && u.canCarryGoods() && u.canAdd(goods)))) {
-            StringTemplate template = StringTemplate.template("loadOnTo")
+            StringTemplate template = StringTemplate.template("quickActionMenu.loadOnTo")
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL));
             JMenuItem menuItem = Utility.localizedMenuItem(template);
