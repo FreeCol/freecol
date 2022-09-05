@@ -587,7 +587,6 @@ public class FreeColDirectories {
         }
         // TODO: Drop trace when BR#3097b is settled
         File dir = deriveAutosaveDirectory();
-        System.err.println("Autosave directory initialized to " + dir);
         setAutosaveDirectory(dir);
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
