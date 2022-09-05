@@ -338,7 +338,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         final Player owner =  getOwner();
         setHitPoints(getHitPoints() + 1);
         if (!isDamaged()) {
-            Location loc = getLocation();
+            Location loc = Location.upLoc(getLocation());
             cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.UNIT_REPAIRED,
                                  "model.unit.unitRepaired",
