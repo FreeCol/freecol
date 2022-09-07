@@ -1155,8 +1155,6 @@ public class FreeColDirectories {
         saveDirectory = parent;
         // TODO: Drop trace when BR#3097b is settled
         File dir = deriveAutosaveDirectory();
-        System.err.println("Autosave directory " + autosaveDirectory
-                + " follows saveDirectory change to " + dir);
         setAutosaveDirectory(dir);
         return true;
     }
