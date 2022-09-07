@@ -1122,7 +1122,7 @@ public final class InGameController extends FreeColClientHolder {
         // Ensure end-turn mode sticks.
         moveMode = moveMode.maximize(MoveMode.END_TURN);
 
-        getGUI().changeView();
+        changeView(null);
         final List<Unit> units = transform(player.getUnits(), Unit::couldMove);
         units.stream().forEach(unit -> {
             if (unit.getState() != Unit.UnitState.SKIPPED) {
