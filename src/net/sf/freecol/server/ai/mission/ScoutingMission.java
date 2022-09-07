@@ -538,7 +538,9 @@ public final class ScoutingMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        setTarget(xr.getLocationAttribute(getGame(), TARGET_TAG, false));
+        // Do not use setTarget, yet, it does complex stuff that may not
+        // be initialized
+        this.target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
     }
 
     /**

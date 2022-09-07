@@ -226,6 +226,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * @return True if the merge was accepted.
      */
     public boolean merge(Option option, LogBuilder lb) {
+        if (option == null) return false;
         final String id = option.getId();
         OptionGroup etc = null;
 
