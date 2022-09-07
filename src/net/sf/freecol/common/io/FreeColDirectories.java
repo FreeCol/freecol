@@ -624,9 +624,6 @@ public class FreeColDirectories {
         // Re-establish the autosave directory if it has gone away
         if (!isGoodDirectory(autosaveDirectory)) {
             File dir = deriveAutosaveDirectory();
-            // TODO: Drop trace when BR#3097b is settled
-            System.err.println("Autosave directory " + autosaveDirectory
-                + " is broken, replacing with " + dir);
             setAutosaveDirectory(dir);
         }
         return autosaveDirectory;
