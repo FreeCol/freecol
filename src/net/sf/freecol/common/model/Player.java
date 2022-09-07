@@ -515,7 +515,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public StringTemplate getCountryLabel() {
         return (playerType == PlayerType.REBEL
                 || playerType == PlayerType.INDEPENDENT)
-            ? StringTemplate.name(independentNationName)
+            ? StringTemplate.name(newLandName)
             : StringTemplate.template("countryName")
                 .addStringTemplate("%nation%", getNationLabel());
     }
