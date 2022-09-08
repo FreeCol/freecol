@@ -158,8 +158,7 @@ public final class ConnectController extends FreeColClientHolder {
                 mainTitle();
             });
             break;
-        case LOGIN: // FIXME: This should not happen, drop when convinced
-            FreeCol.trace(logger, "logout(LOGIN) detected");
+        case LOGIN: // Occurs when you Open a new game during a current one
             fcc.logout(false);
             break;
         case MAIN_TITLE: // All the way back to the MainPanel
