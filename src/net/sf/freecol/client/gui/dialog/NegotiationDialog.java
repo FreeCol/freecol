@@ -138,7 +138,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         @Override
         public void actionPerformed(ActionEvent ae) {
             agreement.remove(item);
-            updateDialog();
+            updateDialog(true);
         }
     }
 
@@ -1031,7 +1031,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             c.add(new ChoiceItem<>(str,
                     (DiplomaticTrade)null).cancelOption().defaultOption());
         }
-        updateDialog();
+        updateDialog(false);
 
         ImageIcon icon = new ImageIcon((otherColony != null)
                 ? getImageLibrary().getScaledSettlementImage(otherColony)
@@ -1091,8 +1091,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
     /**
      * Update the entire dialog.
+     *
+     * @param changed If true, the agreement has changed, and the accept button
+     *     needs to be disabled
      */
-    private void updateDialog() {
+    private void updateDialog(boolean changed) {
         if (this.goldOfferPanel != null) {
             this.goldOfferPanel.update(agreement);
         }
@@ -1124,6 +1127,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.unitDemandPanel.update(agreement);
         }
 
+        if (changed && this.accept != null) {
+            this.accept.setEnabled(false);
+        }
         updateSummary();
     }
 
@@ -1208,7 +1214,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      */
     public void removeTradeItems(Class<? extends TradeItem> itemClass) {
         this.agreement.removeType(itemClass);
-        updateDialog();
+        updateDialog(true);
     }
 
     /**
@@ -1222,7 +1228,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
         agreement.add(new ColonyTradeItem(getGame(), source, destination, colony));
-        updateDialog();
+        updateDialog(true);
     }
 
     /**
@@ -1236,7 +1242,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
         agreement.add(new GoldTradeItem(getGame(), source, destination, amount));
-        updateDialog();
+        updateDialog(true);
     }
 
     /**
@@ -1250,7 +1256,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
         agreement.add(new GoodsTradeItem(getGame(), source, destination, goods));
-        updateDialog();
+        updateDialog(true);
     }
 
     /**
@@ -1264,7 +1270,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
         agreement.add(new InciteTradeItem(getGame(), source, destination, victim));
-        updateDialog();
+        updateDialog(true);
     }
 
     /**
@@ -1276,7 +1282,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Player player = getMyPlayer();
 
         agreement.add(new StanceTradeItem(getGame(), otherPlayer, player, stance));
-        updateDialog();
+        updateDialog(true);
     }
 
     /**
@@ -1290,7 +1296,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
         agreement.add(new UnitTradeItem(getGame(), source, destination, unit));
-        updateDialog();
+        updateDialog(true);
     }
 
 

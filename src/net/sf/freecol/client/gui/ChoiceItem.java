@@ -39,7 +39,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     private String text;
     private final T object;
     private ImageIcon icon;
-    private final boolean enabled;
+    private boolean enabled;
     private boolean optionOK = false;
     private boolean optionCancel = false;
     private boolean optionDefault = false;
@@ -119,6 +119,18 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
      */
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    /**
+     * Set the enable state of this choice.
+     *
+     * @param enable The new enable state.
+     * @return The old enable state.
+     */
+    public boolean setEnabled(boolean enable) {
+        boolean ret = this.enabled;
+        this.enabled = enable;
+        return ret;
     }
 
     /**
