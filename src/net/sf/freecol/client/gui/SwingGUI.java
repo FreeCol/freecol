@@ -56,6 +56,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.control.SoundController;
 import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special dialogs and panels
@@ -1371,6 +1372,18 @@ public class SwingGUI extends GUI {
         ResourceManager.prepare();
         imageCache.clear();
         refresh();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void emergencyPurge() {
+        imageCache.clear();
+        
+        final SoundController sc = getFreeColClient().getSoundController();
+        sc.setDefaultPlaylist(List.of());
+        sc.playMusic(null);
     }
 
 

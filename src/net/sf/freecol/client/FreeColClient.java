@@ -71,6 +71,9 @@ public final class FreeColClient {
 
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
 
+    @SuppressWarnings("unused")
+    private byte[] memoryToBeFreedOnOutOfMemory = new byte[10 * 1024 * 1024];
+    
     private final ConnectController connectController;
 
     private final PreGameController preGameController;
@@ -167,6 +170,7 @@ public final class FreeColClient {
         if (FreeCol.getHeadless() && savedGame == null && spec == null) {
             FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
         }
+        
         mapEditor = false;
 
         // Look for base data directory and get base resources loaded.
@@ -245,6 +249,8 @@ public final class FreeColClient {
         
         // Initialize Sound (depends on client options)
         this.soundController = new SoundController(this, sound);
+        
+        overrideDefaultUncaughtExceptionHandler();
         
         /*
          * Please do NOT move preloading before mods are loaded -- as that
@@ -1009,5 +1015,32 @@ public final class FreeColClient {
             FreeCol.fatal(logger, "Failed to shutdown gui: " + e);
         }
         FreeCol.quit(0);
+    }
+    
+    private void overrideDefaultUncaughtExceptionHandler() {
+        // This overrides the handler in FreeCol:
+        Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
+            // Free enough space to ensure we can perform the next operations.
+            if (e instanceof Error) {
+                memoryToBeFreedOnOutOfMemory = null;
+                gui.emergencyPurge();
+            }
+            
+            final boolean seriousError = (e instanceof Error);
+            try {
+                logger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                
+                if (seriousError) {
+                    gui.showErrorPanel(Messages.message("error.seriousError"), () -> {
+                        System.exit(1);
+                    });
+                }
+            } catch (Throwable t) {
+                if (seriousError) {
+                    t.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        });
     }
 }

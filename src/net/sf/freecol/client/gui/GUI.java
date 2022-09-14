@@ -2506,4 +2506,14 @@ public class GUI extends FreeColClientHolder {
     public boolean canGameChangingModsBeAdded() {
         return true;
     }
+
+
+    /**
+     * A method to be called only on serious Errors in order
+     * to ensure sufficient memory for displaying an error
+     * message.
+     */
+    public void emergencyPurge() {
+
+    }
 }
