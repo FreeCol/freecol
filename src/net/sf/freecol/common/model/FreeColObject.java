@@ -611,7 +611,9 @@ public abstract class FreeColObject
      * @return A set of modifiers.
      */
     public final Stream<Modifier> getModifiers() {
-        return getModifiers(null);
+        FeatureContainer fc = getFeatureContainer();
+        return (fc == null) ? Stream.<Modifier>empty()
+            : fc.getModifierValues().stream();
     }
 
     /**
