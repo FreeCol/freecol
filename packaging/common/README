@@ -78,7 +78,7 @@ A: Use the command-line option --freecol-data to specify the location
 
 Q: I am unable to start the game.
 A: Try running the game in windowed mode: 
-   'java -Xmx1G -jar FreeCol.jar --windowed'
+   'java -Xmx2G -jar FreeCol.jar --windowed'
 
 
 V.   Help, Feedback & Bug Reports

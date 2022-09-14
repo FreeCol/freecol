@@ -950,7 +950,7 @@ public final class FreeCol {
      */
     private static void printUsage(Options options, int status) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("java -Xmx1G -jar freecol.jar [OPTIONS]",
+        formatter.printHelp("java -Xmx2G -jar freecol.jar [OPTIONS]",
                             options);
         quit(status);
     }
