@@ -160,7 +160,7 @@ public final class FreeCol {
     public static final float   GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "11";
-    private static final long   MEMORY_MIN = 512000000; // 512M
+    private static final long   MEMORY_MIN = 2000000000; // a bit less than 2GB
     private static final String META_SERVER_ADDRESS = "meta.freecol.org";
     private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
@@ -269,7 +269,7 @@ public final class FreeCol {
     public static void main(String[] args) {
         freeColRevision = FREECOL_VERSION;
         JarURLConnection juc;
-
+        
         try {
             juc = getJarURLConnection(FreeCol.class);
         } catch (ClassCastException cce) {
@@ -346,8 +346,14 @@ public final class FreeCol {
         } catch (FreeColException e) {
             System.err.println("Logging initialization failure: " + e);
         }
+        
+        // This is overridden by FreeColClient.
         Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
                 baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                if (e instanceof Error) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             });
 
         // Now we can find the client options, allow the options
