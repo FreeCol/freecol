@@ -692,6 +692,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         add(this.compactBox);
         add(this.showAllBox);
         add(okButton, "tag ok");
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
 
         setSize(getPreferredSize());
     }

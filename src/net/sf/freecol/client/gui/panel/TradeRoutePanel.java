@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -197,6 +198,13 @@ public final class TradeRoutePanel extends FreeColPanel {
         add(this.deassignRouteButton);
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                cancelButton.doClick();
+            }
+        });
 
         getGUI().restoreSavedSize(this, getPreferredSize());
     }

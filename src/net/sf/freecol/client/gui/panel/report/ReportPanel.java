@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -90,6 +91,13 @@ public class ReportPanel extends FreeColPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
         add(scrollPane, SCROLL_PANE_SIZE);
         add(okButton, "cell 0 2, tag ok");
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
 
         final int width = (int) (1050 * getImageLibrary().getScaleFactor());
         final int height = (int) (725 * getImageLibrary().getScaleFactor());

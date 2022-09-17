@@ -23,6 +23,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -60,6 +61,13 @@ public final class ChatPanel extends FreeColPanel {
         this.field.addActionListener(this);
         add(this.field, BorderLayout.CENTER);
         this.field.setFocusable(true);
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                getGUI().removeComponent(ChatPanel.this);
+            }
+        });
 
         setSize(getPreferredSize());
     }

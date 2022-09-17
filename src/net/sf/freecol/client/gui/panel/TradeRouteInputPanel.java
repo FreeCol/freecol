@@ -581,6 +581,13 @@ public final class TradeRouteInputPanel extends FreeColPanel
         add(this.stopGoodsTypesPanel, "span, height " + iconHeight + "px:, growy");
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                cancelButton.doClick();
+            }
+        });
 
         // update cargo panel if stop is selected
         if (this.stopListModel.getSize() > 0) {

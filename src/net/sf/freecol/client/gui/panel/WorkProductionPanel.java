@@ -21,8 +21,10 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -137,6 +139,13 @@ public class WorkProductionPanel extends FreeColPanel {
 
         add(okButton, "newline, span, tag ok");
         setSize(getPreferredSize());
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
     }
 
     private void output(List<Modifier> modifiers, UnitType unitType) {

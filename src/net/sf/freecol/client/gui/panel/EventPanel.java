@@ -19,8 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -63,6 +65,13 @@ public final class EventPanel extends FreeColPanel {
         if (footerLabel != null) add(footerLabel);
         add(okButton, "tag ok");
 
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
+        
         setSize(getPreferredSize());
     }
 }

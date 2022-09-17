@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -47,7 +48,6 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColRules;
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.metaserver.MetaServerUtils;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -300,6 +300,12 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                     gui.showMainPanel(null);
                 }
             });
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                cancel.doClick();
+            }
+        });
 
         // Add all the components
         add(Utility.localizedHeader("newPanel.newGamePanel",

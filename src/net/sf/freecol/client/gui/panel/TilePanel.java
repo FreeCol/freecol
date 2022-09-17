@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -80,15 +81,6 @@ public final class TilePanel extends FreeColPanel {
         JButton colopediaButton = Utility.localizedButton("colopedia");
         colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
-
-        // Use ESCAPE for closing the panel:
-        InputMap inputMap = new ComponentInputMap(okButton);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false),
-                     "pressed");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
-                     "released");
-        SwingUtilities.replaceUIInputMap(okButton,
-            JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
 
         StringTemplate template = StringTemplate.template("tilePanel.label")
             .addStringTemplate("%label%", tile.getLabel())
@@ -215,6 +207,13 @@ public final class TilePanel extends FreeColPanel {
         add(okButton, "newline 30, span, split 2, align center, tag ok");
         add(colopediaButton, "tag help");
 
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
+        
         setSize(getPreferredSize());
     }
 

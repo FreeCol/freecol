@@ -159,6 +159,13 @@ public final class FindSettlementPanel extends FreeColPanel
         getGUI().restoreSavedSize(this, getPreferredSize());
 
         updateSearch(DisplayListOption.valueOf("ALL"));
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
     }
 
     private void updateSearch(DisplayListOption displayListOption) {

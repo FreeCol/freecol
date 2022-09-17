@@ -19,23 +19,26 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
+
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import net.miginfocom.swing.MigLayout;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.common.metaserver.ServerInfo;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 
@@ -121,6 +124,12 @@ public final class ServerListPanel extends FreeColPanel {
         add(tableScroll, "width 400:, height 350:");
         add(connect, "newline 20, split 2");
         add(cancel, "tag cancel");
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                cancel.doClick();
+            }
+        });
 
         setSize(getPreferredSize());
     }

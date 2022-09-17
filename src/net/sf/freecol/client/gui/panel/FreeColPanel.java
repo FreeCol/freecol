@@ -112,12 +112,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
                      ESCAPE);
-        setEscapeAction(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    getGUI().removeComponent(FreeColPanel.this);
-                }
-            });
     }
 
 

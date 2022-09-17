@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -32,7 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.FreeColObject;
@@ -103,6 +103,13 @@ public class InformationPanel extends FreeColPanel {
         add(okButton, "tag ok");
         setPreferredSize(new Dimension(skin.getWidth(), skin.getHeight()));
         setBorder(null);
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
     }
 
     private JPanel createPanelWithAllContent(String[] texts, FreeColObject[] fcos, ImageIcon[] images, final int gap) {

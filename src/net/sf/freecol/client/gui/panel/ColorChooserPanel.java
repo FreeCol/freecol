@@ -21,8 +21,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
@@ -63,6 +65,13 @@ public final class ColorChooserPanel extends FreeColPanel {
 
         setOpaque(true);
         setSize(getPreferredSize());
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                cancelButton.doClick();
+            }
+        });
     }
 
 
