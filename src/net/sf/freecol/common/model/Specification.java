@@ -428,6 +428,8 @@ public final class Specification implements OptionContainer {
     private final List<GoodsType> libertyGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> immigrationGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> rawBuildingGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> rawMaterialsForUnstorableBuildingMaterials = new ArrayList<>();
+    private final List<GoodsType> rawMaterialsForStorableBuildingMaterials = new ArrayList<>();
 
     // Derived from readerMap container: nations
     private final List<Nation> europeanNations = new ArrayList<>();
@@ -651,6 +653,8 @@ public final class Specification implements OptionContainer {
         libertyGoodsTypeList.clear();
         immigrationGoodsTypeList.clear();
         rawBuildingGoodsTypeList.clear();
+        rawMaterialsForUnstorableBuildingMaterials.clear();
+        rawMaterialsForStorableBuildingMaterials.clear();
         for (GoodsType goodsType : goodsTypeList) {
             if (goodsType.isStorable()) {
                 storableGoodsTypeList.add(goodsType);
@@ -675,6 +679,12 @@ public final class Specification implements OptionContainer {
             }
             if (goodsType.isRawBuildingMaterial() && !goodsType.isFoodType()) {
                 rawBuildingGoodsTypeList.add(goodsType);
+                if (!goodsType.isRawMaterialForUnstorableBuildingMaterial()) {
+                    rawMaterialsForStorableBuildingMaterials.add(goodsType);
+                }
+            }
+            if (goodsType.isRawMaterialForUnstorableBuildingMaterial() && !goodsType.isFoodType()) {
+                rawMaterialsForUnstorableBuildingMaterials.add(goodsType);
             }
         }
 
@@ -1429,8 +1439,16 @@ public final class Specification implements OptionContainer {
         return new ArrayList<>(foodGoodsTypeList);
     }
 
-    public final List<GoodsType> getRawBuildingGoodsTypeList() {
+    public List<GoodsType> getRawBuildingGoodsTypeList() {
         return new ArrayList<>(rawBuildingGoodsTypeList);
+    }
+    
+    public List<GoodsType> getRawMaterialsForUnstorableBuildingMaterials() {
+        return new ArrayList<>(rawMaterialsForUnstorableBuildingMaterials);
+    }
+    
+    public List<GoodsType> getRawMaterialsForStorableBuildingMaterials() {
+        return new ArrayList<>(rawMaterialsForStorableBuildingMaterials);
     }
 
     /**
