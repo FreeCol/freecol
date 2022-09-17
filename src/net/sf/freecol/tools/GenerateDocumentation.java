@@ -47,10 +47,9 @@ import net.sf.freecol.common.util.Utils;
  */
 public class GenerateDocumentation {
 
-    private static final File STRING_DIRECTORY =
-            new File("data/strings");
-    private static final File RULE_DIRECTORY =
-            new File("data/rules/classic");
+    private static final File STRING_DIRECTORY = new File("data/strings");
+    private static final File RESOURCE_DIRECTORY = new File("data/default");
+    private static final File RULE_DIRECTORY = new File("data/rules/classic");
     private static final String XSL = "specification.xsl";
 
     private static final File DESTINATION_DIRECTORY =
@@ -81,7 +80,7 @@ public class GenerateDocumentation {
 
     private static void readResources() {
         System.out.println("Processing source file: resources.properties");
-        File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
+        File sourceFile = new File(RESOURCE_DIRECTORY, "resources.properties");
         try (
              Reader reader = Utils.getFileUTF8Reader(sourceFile);
              BufferedReader bufferedReader = new BufferedReader(reader);
@@ -228,13 +227,19 @@ public class GenerateDocumentation {
         String found = resources.get(ourKey);
         if (found == null && splitKey.length > 2
                 && "model".equals(splitKey[0])) {
-            String suffix = ("tile".equals(splitKey[1])) ? ".center.r0" : "";
+            String suffix = ("tile".equals(splitKey[1])) ? ".center" : "";
             options[0] = splitKey[1];
             options[1] = splitKey[1] + "icon";
             for (String x : options) {
                 ourKey = "image." + x + "." + key + suffix;
                 found = resources.get(ourKey);
-                if (found != null) break;
+                if (found != null) {
+                    final String resourcePrefix = "resource:";
+                    if (found.startsWith(resourcePrefix)) {
+                        found = resources.get(found.substring(resourcePrefix.length()));
+                    }
+                    break;
+                }
             }
         }
         return found;

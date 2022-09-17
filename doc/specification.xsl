@@ -83,7 +83,7 @@
             <xsl:variable name="id" select="@made-from"/>
             <xsl:variable name="src"
                           select="freecol:getResource(@made-from)"/>
-            <img src="../data/rules/classic/{$src}"/><br />
+            <img src="../data/default/{$src}"/><br />
             <a href="#{$id}">
               <xsl:value-of select="freecol:localize(concat(@made-from, '.name'))"/>
             </a>
@@ -494,7 +494,7 @@
   <xsl:template match="settlement">
     <div class="center">
       <xsl:variable name="src" select="freecol:getResource(@id)"/>
-      <img src="../data/rules/classic/{$src}"/>
+      <img src="../data/default/{$src}"/>
     </div>
     <ul>
       <li>
@@ -731,7 +731,7 @@
     <xsl:variable name="src" select="freecol:getResource($id)"/>
     <td class="name">
       <a id="{$id}">
-        <img src="../data/rules/classic/{$src}"/><br />
+        <img src="../data/default/{$src}"/><br />
         <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
       </a>
     </td>
