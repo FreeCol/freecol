@@ -196,7 +196,8 @@ public class ServerEurope extends Europe implements TurnTaker {
         final Player owner = getOwner();
         return transform(getSpecification().getUnitTypeList(),
                          ut -> ut.isRecruitable()
-                             && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, ut),
+                             && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, ut)
+                             && ut.isAvailableTo(owner),
                          ut -> new RandomChoice<>(ut, ut.getRecruitProbability()));
     }
 
