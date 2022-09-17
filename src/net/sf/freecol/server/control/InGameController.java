@@ -3802,6 +3802,9 @@ public final class InGameController extends Controller {
                 + serverPlayer.getGold() + " < " + price
                 + ") to train " + type);
         }
+        if (!type.isAvailableTo(serverPlayer)) {
+            return serverPlayer.clientError("Unit type is not available for the player.");
+        }
 
         final Game game = getGame();
         final Specification spec = game.getSpecification();

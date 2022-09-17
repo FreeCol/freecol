@@ -39,6 +39,6 @@ public final class PurchasePanel extends NewUnitPanel {
         super(freeColClient, new MigLayout("wrap 2", "[sg]", ""),
             Messages.message("purchasePanel.clickOn"),
             freeColClient.getGame().getSpecification()
-                .getUnitTypesPurchasedInEurope());
+                .getUnitTypesPurchasedInEurope(freeColClient.getMyPlayer()));
     }
 }

@@ -39,6 +39,6 @@ public final class TrainPanel extends NewUnitPanel {
         super(freeColClient, new MigLayout("wrap 3", "[sg]", ""),
             Messages.message("trainPanel.clickOn"),
             freeColClient.getGame().getSpecification()
-                .getUnitTypesTrainedInEurope());
+                .getUnitTypesTrainedInEurope(freeColClient.getMyPlayer()));
     }
 }

@@ -1933,19 +1933,25 @@ public final class Specification implements OptionContainer {
     /**
      * Gets the unit types that can be trained in Europe.
      *
+     * @param player The player that want to purchase the unit.
      * @return A list of Europe-trainable {@code UnitType}s.
      */
-    public List<UnitType> getUnitTypesTrainedInEurope() {
-        return unitTypesTrainedInEurope;
+    public List<UnitType> getUnitTypesTrainedInEurope(Player player) {
+        return unitTypesTrainedInEurope.stream()
+                .filter(type -> type.isAvailableTo(player))
+                .collect(Collectors.toList());
     }
-
+    
     /**
-     * Get the unit types that can be purchased in Europe.
+     * Get the unit types that can be purchased in Europe for a given player.
      *
+     * @param player The player that want to purchase the unit.
      * @return A list of Europe-purchasable {@code UnitType}s.
      */
-    public List<UnitType> getUnitTypesPurchasedInEurope() {
-        return unitTypesPurchasedInEurope;
+    public List<UnitType> getUnitTypesPurchasedInEurope(Player player) {
+        return unitTypesPurchasedInEurope.stream()
+                .filter(type -> type.isAvailableTo(player))
+                .collect(Collectors.toList());
     }
 
     /**
