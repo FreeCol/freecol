@@ -20,8 +20,11 @@
 package net.sf.freecol.tools;
 
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -31,8 +34,8 @@ import net.sf.freecol.common.util.ImageUtils;
 /**
  * Utility for making a seamless tilable 512x256 tile from a seamless tilable texture.
  * 
- * Recommended texture size (the input image) is 256x128. Other sizes will be seamlessly rescaled
- * with interpolation.
+ * Recommended texture size (the input image) is either 512x512 or 256x128. Other sizes
+ * will be seamlessly rescaled with interpolation.
  */
 public class Texture2Tile {
     
@@ -40,10 +43,56 @@ public class Texture2Tile {
     private static final int RESULT_HEIGHT = 256;
 
     public static void main(String[] args) throws Exception {
-        final File inputImageFile = new File(args[0]);
-        final File resultImagefile = new File("generated.png");
+        if (args.length == 0 || args[0].equals("-h") || args[0].equals("--help")) {
+            printUsage();
+            System.exit(0);
+        }
         
-        BufferedImage inputImage = ImageIO.read(inputImageFile);
+        final File inputImageFile = new File(args[0]);
+        final BufferedImage inputImage = ImageIO.read(inputImageFile);
+        
+        // Preferred input image of size 512x512:
+        createRotatedResult(inputImage);
+        
+        // Preferred input image of size 256x128:
+        createNonRotatedResult(inputImage);
+    }
+
+
+    private static void printUsage() {
+        System.out.println("Creates an isometric base tile image from a tiling texture.");
+        System.out.println();
+        System.out.println("Usage: java -cp FreeCol.jar net.sf.freecol.tools.Texture2Tile IMAGE_FILE");
+        System.out.println();
+        System.out.println("IMAGE_FILE  - A seamlessly tiling texture to be used for creating a seamlessly");
+        System.out.println("              tiling isometric base tile.");
+        System.out.println();
+        System.out.println("Two results are produced by this tool: \"generated.png\" and \"generated-rotated.png\"");
+        System.out.println("The best one to use depends on the texture.");
+    }
+
+
+    private static void createRotatedResult(BufferedImage inputImage) throws IOException {
+        final File resultImagefile = new File("generated-rotated.png");
+        final BufferedImage tileMaskImage = ImageIO.read(new File("data/base/resources/images/masks/mask-center.size9.png"));
+        
+        BufferedImage tempImage = tileThreeByThreeAndRescaledTo(inputImage, RESULT_WIDTH, RESULT_HEIGHT * 2);
+        tempImage = createRotatedImage(tempImage, 45);
+        tempImage = ImageUtils.createResizedImage(tempImage, RESULT_WIDTH * 3, RESULT_HEIGHT * 3, true);
+        tempImage = tempImage.getSubimage(
+                (tempImage.getWidth() - RESULT_WIDTH) / 2,
+                (tempImage.getHeight() - RESULT_HEIGHT) / 2,
+                RESULT_WIDTH,
+                RESULT_HEIGHT);
+        tempImage = ImageUtils.imageWithAlphaFromMask(tempImage, tileMaskImage);
+        
+        ImageIO.write(tempImage, "png", resultImagefile);
+        System.out.println("Image written to: " + resultImagefile.getAbsolutePath().toString());
+    }
+
+
+    private static void createNonRotatedResult(BufferedImage inputImage) throws Exception, IOException {
+        final File resultImagefile = new File("generated.png");
         
         final int quarterTileWidth = RESULT_WIDTH / 2;
         final int quarterTileHeight = RESULT_HEIGHT / 2;
@@ -103,6 +152,31 @@ public class Texture2Tile {
         return resultImage;
     }
     
+    /**
+     * Creates a new image that is the rotated input image.
+     * 
+     * Warning: This method has only been tested using 45 degrees and an image
+     *          with equal width and height.
+     * 
+     * @param image The image to be rotated.
+     * @param degrees The degrees. 
+     * @return An image that is rescaled to cover the entire rotated image.
+     */
+    public static BufferedImage createRotatedImage(BufferedImage image, int degrees) {
+        final int rotatedSize = (int) Math.sqrt(image.getWidth() * image.getWidth() + image.getHeight() * image.getHeight());
+        final BufferedImage result = new BufferedImage(rotatedSize, rotatedSize, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g2d = result.createGraphics();
+        
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.rotate(Math.toRadians(degrees), result.getWidth() / 2.0D, result.getHeight() / 2.0D);
+        
+        final int x = (result.getWidth() - image.getWidth()) / 2;
+        final int y = (result.getHeight() - image.getHeight()) / 2;
+        g2d.drawImage(image, x, y, null);
+        g2d.dispose();
+        return result;
+    }
+    
     private static BufferedImage seamlessRescaleTexture(BufferedImage im, int width, int height) {
         /*
          * We ensure seamless tiling after scaling by repeating the image before
@@ -112,9 +186,24 @@ public class Texture2Tile {
          * few pixels around the center are really needed. This makes the code
          * easier to read :-)
          */
+        final BufferedImage tempImage = tileThreeByThreeAndRescaledTo(im, width, height);
+        return tempImage.getSubimage(width, height, width, height);
+    }
+    
+    /**
+     * Returns an image drawn in a 3x3 grid.
+     * 
+     * @param im The image to be drawn.
+     * @param width The width of each image in the grid.
+     * @param height The height of each image in the grid.
+     * @return The provided image rescaled and drawn in a 3x3 grid so that
+     *      the center image in the grid avoids having edge artifacts from
+     *      the scaling.
+     */
+    private static BufferedImage tileThreeByThreeAndRescaledTo(BufferedImage im, int width, int height) {
         final BufferedImage tempImage = createImageWithTextureFill(im, im.getWidth()*3, im.getHeight()*3);
         final BufferedImage tempImage2 = ImageUtils.createResizedImage(tempImage, width*3, height*3, true);
-        return tempImage2.getSubimage(width, height, width, height);
+        return tempImage2;
     }
     
     private static BufferedImage createImageWithTextureFill(BufferedImage im, int width, int height) {
