@@ -19,19 +19,26 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.concat;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.model.production.BuildingProductionCalculator;
+import net.sf.freecol.common.model.production.WorkerAssignment;
 
 
 /**
@@ -135,33 +142,6 @@ public class Building extends WorkLocation
 
         return eject;
     }
-
-    /**
-     * Gets the production modifiers for the given type of goods and
-     * unit type.
-     *
-     * We use UnitType.getModifiers but modify this according to the
-     * competence factor of this building type.  Note that we do not modify
-     * *multiplicative* modifiers, as this would capture the master blacksmith
-     * doubling.
-     *
-     * @param id The String identifier
-     * @param turn The turn number of type {@link Turn}
-     * @param unitType The optional {@code UnitType} to produce them.
-     * @return A stream of the applicable modifiers.
-     */
-    public Stream<Modifier> getCompetenceModifiers(String id,
-        UnitType unitType, Turn turn) {
-        final float competence = getCompetenceFactor();
-        return (competence == 1.0f) // Floating comparison OK!
-            ? unitType.getModifiers(id, getType(), turn)
-            : map(unitType.getModifiers(id, getType(), turn),
-                m -> {
-                    return (m.getType() == Modifier.ModifierType.ADDITIVE)
-                        ? Modifier.makeModifier(m).setValue(m.getValue() * competence)
-                        : m;
-                });
-    }
         
     /**
      * Does this building have a higher level?
@@ -223,18 +203,6 @@ public class Building extends WorkLocation
     }
 
     /**
-     * Convenience function to extract a goods amount from a list of
-     * available goods.
-     *
-     * @param type The {@code GoodsType} to extract the amount for.
-     * @param available The list of available goods to query.
-     * @return The goods amount, or zero if none found.
-     */
-    private int getAvailable(GoodsType type, List<AbstractGoods> available) {
-        return AbstractGoods.getCount(type, available);
-    }
-
-    /**
      * Gets the production information for this building taking account
      * of the available input and output goods.
      *
@@ -244,136 +212,14 @@ public class Building extends WorkLocation
      * @return The production information.
      * @see ProductionCache#update
      */
-    public ProductionInfo getAdjustedProductionInfo(List<AbstractGoods> inputs,
-                                                    List<AbstractGoods> outputs) {
-        ProductionInfo result = new ProductionInfo();
-        if (!hasOutputs()) return result;
-        final Specification spec = getSpecification();
+    public ProductionInfo getAdjustedProductionInfo(List<AbstractGoods> inputs, List<AbstractGoods> outputs) {
+        final BuildingProductionCalculator pc = new BuildingProductionCalculator(getOwner(), getColony().getFeatureContainer(), getColony().getProductionBonus());
+        final List<WorkerAssignment> workerAssignments = getUnits()
+                .map(u -> new WorkerAssignment(u.getType(), getProductionType()))
+                .collect(Collectors.toList());
         final Turn turn = getGame().getTurn();
-        final boolean avoidOverflow
-            = hasAbility(Ability.AVOID_EXCESS_PRODUCTION);
-        final int capacity = getColony().getWarehouseCapacity();
-        // Calculate two production ratios, the minimum (and actual)
-        // possible multiplier between the nominal input and output
-        // goods and the amount actually consumed and produced, and
-        // the maximum possible ratio that would apply but for
-        // circumstances such as limited input availability.
-        double maximumRatio = 0.0, minimumRatio = Double.MAX_VALUE;
-
-        // First, calculate the nominal production ratios.
-        if (canAutoProduce()) {
-            // Autoproducers are special
-            for (AbstractGoods output : transform(getOutputs(),
-                                                  AbstractGoods::isPositive)) {
-                final GoodsType goodsType = output.getType();
-                int available = getColony().getGoodsCount(goodsType);
-                if (available >= capacity) {
-                    minimumRatio = maximumRatio = 0.0;
-                } else {
-                    int divisor = (int)getType().apply(0f, turn,
-                        Modifier.BREEDING_DIVISOR);
-                    int factor = (int)getType().apply(0f, turn,
-                        Modifier.BREEDING_FACTOR);
-                    int production = (available < goodsType.getBreedingNumber()
-                        || divisor <= 0) ? 0
-                        // Deliberate use of integer division
-                        : ((available - 1) / divisor + 1) * factor;
-                    double newRatio = (double)production / output.getAmount();
-                    minimumRatio = Math.min(minimumRatio, newRatio);
-                    maximumRatio = Math.max(maximumRatio, newRatio);
-                }
-            }
-        } else {
-            for (AbstractGoods output : iterable(getOutputs())) {
-                final GoodsType goodsType = output.getType();
-                float production = sum(getUnits(),
-                                       u -> getUnitProduction(u, goodsType));
-                // Unattended production always applies for buildings!
-                production += getBaseProduction(null, goodsType, null);
-                production = applyModifiers(production, turn,
-                                            getProductionModifiers(goodsType, null));
-                production = (int)Math.floor(production);
-                // Beware!  If we ever unify this code with ColonyTile,
-                // ColonyTiles have outputs with zero amount.
-                double newRatio = production / output.getAmount();
-                minimumRatio = Math.min(minimumRatio, newRatio);
-                maximumRatio = Math.max(maximumRatio, newRatio);
-            }
-        }
-
-        // Then reduce the minimum ratio if some input is in short supply.
-        for (AbstractGoods input : iterable(getInputs())) {
-            long required = (long)Math.floor(input.getAmount() * minimumRatio);
-            long available = getAvailable(input.getType(), inputs);
-            // Do not allow auto-production to go negative.
-            if (canAutoProduce()) available = Math.max(0, available);
-            // Experts in factory level buildings may produce a
-            // certain amount of goods even when no input is available.
-            // Factories have the EXPERTS_USE_CONNECTIONS ability.
-            long minimumGoodsInput;
-            if (available < required
-                && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
-                && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
-                && ((minimumGoodsInput = getType().getExpertConnectionProduction()
-                        * count(getUnits(),
-                            matchKey(getExpertUnitType(), Unit::getType)))
-                    > available)) {
-                available = minimumGoodsInput;
-            }
-            // Scale production by limitations on availability.
-            if (available < required) {
-                minimumRatio *= (double)available / required;
-                //maximumRatio = Math.max(maximumRatio, minimumRatio);
-            }
-        }
-
-        // Check whether there is space enough to store the goods
-        // produced in order to avoid excess production.
-        if (avoidOverflow) {
-            for (AbstractGoods output : iterable(getOutputs())) {
-                double production = output.getAmount() * minimumRatio;
-                if (production <= 0) continue;
-                double headroom = (double)capacity
-                    - getAvailable(output.getType(), outputs);
-                // Clamp production at warehouse capacity
-                if (production > headroom) {
-                    minimumRatio = Math.min(minimumRatio,
-                        headroom / output.getAmount());
-                }
-                production = output.getAmount() * maximumRatio;
-                if (production > headroom) {
-                    maximumRatio = Math.min(maximumRatio, 
-                        headroom / output.getAmount());
-                }
-            }
-        }
-
-        for (AbstractGoods input : iterable(getInputs())) {
-            GoodsType type = input.getType();
-            // maximize consumption
-            int consumption = (int)Math.floor(input.getAmount()
-                * minimumRatio + EPSILON);
-            int maximumConsumption = (int)Math.floor(input.getAmount()
-                * maximumRatio);
-            result.addConsumption(new AbstractGoods(type, consumption));
-            if (consumption < maximumConsumption) {
-                result.addMaximumConsumption(new AbstractGoods(type, maximumConsumption));
-            }
-        }
-        for (AbstractGoods output : iterable(getOutputs())) {
-            GoodsType type = output.getType();
-            // minimize production, but add a magic little something
-            // to counter rounding errors
-            int production = (int)Math.floor(output.getAmount() * minimumRatio
-                + EPSILON);
-            int maximumProduction = (int)Math.floor(output.getAmount()
-                * maximumRatio);
-            result.addProduction(new AbstractGoods(type, production));
-            if (production < maximumProduction) {
-                result.addMaximumProduction(new AbstractGoods(type, maximumProduction));
-            }
-        }
-        return result;
+        final int warehouseCapacity = getColony().getWarehouseCapacity();
+        return pc.getAdjustedProductionInfo(buildingType, turn, workerAssignments, inputs, outputs, warehouseCapacity);
     }
 
     /**
@@ -574,7 +420,7 @@ public class Building extends WorkLocation
             // With a unit, unit specific bonuses apply
             ? concat(this.getModifiers(id, unitType, turn),
                      colony.getProductionModifiers(goodsType, unitType, this),
-                     getCompetenceModifiers(id, unitType, turn),
+                     getType().getCompetenceModifiers(id, unitType, turn),
                      owner.getModifiers(id, unitType, turn))
             // With no unit, only the building-specific bonuses 
             : concat(colony.getModifiers(id, type, turn),

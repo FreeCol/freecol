@@ -29,6 +29,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.NoClaimReason;
+import net.sf.freecol.common.model.production.TileProductionCalculator;
+import net.sf.freecol.common.model.production.WorkerAssignment;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -157,32 +159,17 @@ public class ColonyTile extends WorkLocation {
      * @see ProductionCache#update
      */
     public ProductionInfo getBasicProductionInfo() {
-        final Colony colony = getColony();
-        ProductionInfo pi = new ProductionInfo();
-        if (isColonyCenterTile()) {
-            forEach(getOutputs(), output -> {
-                    boolean onlyNaturalImprovements = getSpecification()
-                        .getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)
-                        && !output.getType().isFoodType();
-                    int potential = output.getAmount();
-                    if (workTile.getTileItemContainer() != null) {
-                        potential = workTile.getTileItemContainer()
-                            .getTotalBonusPotential(output.getType(), null,
-                                potential, onlyNaturalImprovements);
-                    }
-                    potential += Math.max(0, colony.getProductionBonus());
-                    AbstractGoods production
-                        = new AbstractGoods(output.getType(), potential);
-                    pi.addProduction(production);
-                });
-        } else {
-            forEach(map(getOutputs(), AbstractGoods::getType),
-                gt -> {
-                    int n = sum(getUnits(), u -> getUnitProduction(u, gt));
-                    if (n > 0) pi.addProduction(new AbstractGoods(gt, n));
-                });
-        }
-        return pi;
+        final TileProductionCalculator tpc = new TileProductionCalculator(getOwner(),
+                colony.getProductionBonus());
+        
+        final UnitType workerUnitType = getUnits().findFirst()
+                .map(Unit::getType)
+                .orElse(null);
+        
+        return tpc.getBasicProductionInfo(workTile,
+                getGame().getTurn(),
+                new WorkerAssignment(workerUnitType, getProductionType()),
+                isColonyCenterTile());
     }
 
     /**
@@ -456,30 +443,8 @@ public class ColonyTile extends WorkLocation {
     @Override
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
-        if (!canProduce(goodsType, unitType)) return Stream.<Modifier>empty();
-
-        final Tile workTile = getWorkTile();
-        final TileType type = workTile.getType();
-        final String id = goodsType.getId();
-        final Colony colony = getColony();
-        final Player owner = colony.getOwner();
-        final Turn turn = getGame().getTurn();
-        return (unitType != null)
-            // Unit modifiers apply
-            ? concat(workTile.getProductionModifiers(goodsType, unitType),
-                     colony.getProductionModifiers(goodsType, unitType, this),
-                     unitType.getModifiers(id, type, turn),
-                     ((owner == null) ? null
-                         : owner.getModifiers(id, unitType, turn)))
-            // Unattended only possible in center, colony modifiers apply
-            : (isColonyCenterTile())
-            ? concat(workTile.getProductionModifiers(goodsType, null),
-                     colony.getProductionModifiers(goodsType, null, this),
-                     colony.getModifiers(id, null, turn),
-                     ((owner == null) ? null
-                         : owner.getModifiers(id, type, turn)))
-            // Otherwise impossible
-            : Stream.<Modifier>empty();
+        return new TileProductionCalculator(getOwner(), getColony().getProductionBonus())
+                .getProductionModifiers(getGame().getTurn(), workTile, goodsType, unitType);
     }
 
     /**

@@ -19,8 +19,18 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.model.Constants.UNDEFINED;
+import static net.sf.freecol.common.util.CollectionUtils.concat;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+import static net.sf.freecol.common.util.CollectionUtils.map;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -29,9 +39,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -353,7 +361,7 @@ public final class BuildingType extends BuildableType
         amount = (int)apply(amount, null, goodsType.getId(), unitType);
         return (amount < 0) ? 0 : amount;
     }
-
+        
     /**
      * {@inheritDoc}
      */
@@ -447,6 +455,32 @@ public final class BuildingType extends BuildableType
         return buildQueueLastPos;
     }
 
+    /**
+     * Gets the production modifiers for the given type of goods and
+     * unit type.
+     *
+     * We use UnitType.getModifiers but modify this according to the
+     * competence factor of this building type.  Note that we do not modify
+     * *multiplicative* modifiers, as this would capture the master blacksmith
+     * doubling.
+     *
+     * @param id The String identifier
+     * @param turn The turn number of type {@link Turn}
+     * @param unitType The optional {@code UnitType} to produce them.
+     * @return A stream of the applicable modifiers.
+     */
+    public Stream<Modifier> getCompetenceModifiers(String id,
+        UnitType unitType, Turn turn) {
+        final float competence = getCompetenceFactor();
+        return (competence == 1.0f) // Floating comparison OK!
+            ? unitType.getModifiers(id, getType(), turn)
+            : map(unitType.getModifiers(id, getType(), turn),
+                m -> {
+                    return (m.getType() == Modifier.ModifierType.ADDITIVE)
+                        ? Modifier.makeModifier(m).setValue(m.getValue() * competence)
+                        : m;
+                });
+    }
 
     // Override FreeColObject
 

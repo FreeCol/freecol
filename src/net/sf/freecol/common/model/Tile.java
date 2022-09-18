@@ -19,6 +19,25 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.all;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.cacheInt;
+import static net.sf.freecol.common.util.CollectionUtils.cachingDoubleComparator;
+import static net.sf.freecol.common.util.CollectionUtils.concat;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.flatten;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.max;
+import static net.sf.freecol.common.util.CollectionUtils.maximize;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,11 +58,11 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.model.Constants.IntegrityType;
+import net.sf.freecol.common.model.production.TileProductionCalculator;
+import net.sf.freecol.common.model.production.WorkerAssignment;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -1712,12 +1731,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
-        if (!canProduce(goodsType, unitType)) return 0;
 
-        int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)applyModifiers(amount, getGame().getTurn(),
-                                     getProductionModifiers(goodsType, unitType));
-        return (amount < 0) ? 0 : amount;
+        final TileProductionCalculator tpc = new TileProductionCalculator(null, 0);
+        final ProductionType productionType = ProductionType.getBestProductionType(goodsType,
+                getType().getAvailableProductionTypes(unitType == null));
+        
+        final boolean colonyCenterTile = (unitType == null);
+        
+        final ProductionInfo pi = tpc.getBasicProductionInfo(this,
+                getGame().getTurn(),
+                new WorkerAssignment(unitType, productionType),
+                colonyCenterTile);
+        
+        return pi.getProduction().stream()
+                .filter(a -> a.getType().equals(goodsType))
+                .map(AbstractGoods::getAmount)
+                .findFirst()
+                .orElse(0);
     }
 
     /**
@@ -1871,11 +1901,24 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public AbstractGoods getBestFoodProduction() {
         final Comparator<AbstractGoods> goodsComp
-            = Comparator.comparingInt(ag ->
-                getPotentialProduction(ag.getType(), null));
-        return maximize(flatten(getType().getAvailableProductionTypes(true),
-                                ProductionType::getOutputs),
-                        AbstractGoods::isFoodType, goodsComp);
+        = Comparator.comparingInt(ag ->
+            getPotentialProduction(ag.getType(), null));
+    return maximize(flatten(getType().getAvailableProductionTypes(true),
+                            ProductionType::getOutputs),
+                    AbstractGoods::isFoodType, goodsComp);
+    }
+    
+    /**
+     * Get the best food type to produce here with an appropriate expert.,
+     *
+     * @return The {@code AbstractGoods} to produce.
+     */
+    public AbstractGoods getMaximumPotentialFoodProductionWithExpert() {
+        return getSpecification().getFoodGoodsTypeList().stream()
+                .map(goodsType -> new AbstractGoods(goodsType,
+                        getMaximumPotential(goodsType, getSpecification().getExpertForProducing(goodsType))))
+                .max(Comparator.comparingInt(AbstractGoods::getAmount))
+                .orElse(null);
     }
 
 

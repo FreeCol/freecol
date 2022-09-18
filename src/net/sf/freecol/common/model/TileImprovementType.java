@@ -383,21 +383,62 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * @return The increase in production
      */
     public int getImprovementValue(Tile tile, GoodsType goodsType) {
-        final UnitType colonistType
-            = getSpecification().getDefaultUnitType();
+        final UnitType colonistType = getSpecification().getDefaultUnitType();
+        return getImprovementValue(tile, goodsType, colonistType);
+    }
+    
+    /**
+     * Gets the increase in production of the given GoodsType
+     * this tile improvement type would yield at a specified tile.
+     *
+     * @param tile The {@code Tile} to be considered.
+     * @param goodsType An optional preferred {@code GoodsType}.
+     * @param unitType The unit type working on the tile.
+     * @return The increase in production
+     */
+    public int getImprovementValue(Tile tile, GoodsType goodsType, UnitType unitType) {
         int value = 0;
         if (goodsType.isFarmed()) {
             final int oldProduction = tile.getType()
-                .getPotentialProduction(goodsType, colonistType);
+                .getPotentialProduction(goodsType, unitType);
             TileType tt = getChange(tile.getType());
             if (tt == null) { // simple bonus
-                int production = tile.getPotentialProduction(goodsType, colonistType);
+                int production = tile.getPotentialProduction(goodsType, unitType);
                 if (production > 0) {
                     float chg = apply(production, null, goodsType.getId());
                     value = (int)(chg - production);
                 }
             } else { // tile type change
-                int chg = tt.getPotentialProduction(goodsType, colonistType)
+                int chg = tt.getPotentialProduction(goodsType, unitType)
+                    - oldProduction;
+                value = chg;
+            }
+        }
+        return value;
+    }
+    
+    /**
+     * Gets the increase in production of the given GoodsType
+     * this tile improvement type would yield at a specified tile.
+     *
+     * @param tile The {@code Tile} to be considered.
+     * @param goodsType An optional preferred {@code GoodsType}.
+     * @return The increase in production
+     */
+    public int getImprovementValue(TileType tileType, GoodsType goodsType, UnitType unitType) {
+        int value = 0;
+        if (goodsType.isFarmed()) {
+            final int oldProduction = tileType
+                .getPotentialProduction(goodsType, unitType);
+            TileType tt = getChange(tileType);
+            if (tt == null) { // simple bonus
+                int production = tileType.getPotentialProduction(goodsType, unitType);
+                if (production > 0) {
+                    float chg = apply(production, null, goodsType.getId());
+                    value = (int)(chg - production);
+                }
+            } else { // tile type change
+                int chg = tt.getPotentialProduction(goodsType, unitType)
                     - oldProduction;
                 value = chg;
             }

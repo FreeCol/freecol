@@ -426,7 +426,15 @@ public final class TileType extends FreeColSpecObjectType
                                       UnitType unitType) {
         if (goodsType == null) return 0;
         int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)apply(amount, null, goodsType.getId(), unitType);
+        if (unitType != null) {
+            amount = (int) unitType.apply(amount, null, goodsType.getId(), unitType);
+        } else {
+            /*
+             * XXX: The feature container is always null for TileType. What was
+             *      the desired behaviour here?
+             */
+            amount = (int)apply(amount, null, goodsType.getId(), unitType);
+        }
         return (amount < 0) ? 0 : amount;
     }
 

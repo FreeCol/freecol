@@ -19,10 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+
 import java.util.List;
 import java.util.stream.Stream;
 
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -323,14 +326,24 @@ public class TileTest extends FreeColTestCase {
                      tile2.getPotentialProduction(grain, null));
         assertEquals("Plains/grain max", 6,
                      tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains/grain/colonist", 5,
+                     tile2.getPotentialProduction(grain, colonistType));
+        assertEquals("Plains/grain/colonist max", 6,
+                     tile2.getMaximumPotential(grain, colonistType));
+        assertEquals("Plains/grain/expertFarmer", 8,
+                     tile2.getPotentialProduction(grain, expertFarmerType));
         tile2.addResource(new Resource(game, tile2, grainResource));
         assertEquals("Plains+Resource/grain", 7,
                      tile2.getPotentialProduction(grain, null));
         assertEquals("Plains+Resource/grain max", 8,
                      tile2.getMaximumPotential(grain, null));
-        assertEquals("Plains+Resource/grain/expertFarmer", 9,
+        assertEquals("Plains+Resource/grain/colonist", 7,
+                     tile2.getPotentialProduction(grain, colonistType));
+        assertEquals("Plains+Resource/grain/colonist max", 8,
+                     tile2.getMaximumPotential(grain, colonistType));
+        assertEquals("Plains+Resource/grain/expertFarmer", 12,
                      tile2.getPotentialProduction(grain, expertFarmerType));
-        assertEquals("Plains+Resource/grain/expertFarmer max", 10,
+        assertEquals("Plains+Resource/grain/expertFarmer max", 13,
                      tile2.getMaximumPotential(grain, expertFarmerType));
 
         Tile tile3 = new Tile(game, plainsForest, 1, 1);
