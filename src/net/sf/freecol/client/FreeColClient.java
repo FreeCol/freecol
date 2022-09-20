@@ -697,7 +697,9 @@ public final class FreeColClient {
      * @param specification The {@code Specification} to use.
      */
     public void addSpecificationActions(Specification specification) {
-        actionManager.addSpecificationActions(specification);
+        SwingUtilities.invokeLater(() -> {
+            actionManager.addSpecificationActions(specification);
+        });
     }
 
 
