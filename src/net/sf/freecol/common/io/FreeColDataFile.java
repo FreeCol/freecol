@@ -231,7 +231,16 @@ public class FreeColDataFile {
         if (uri == null) {
             return;
         }
-        final Resource resource = resourceFactory.createResource(key, uri);
+        
+        /*
+         * The caching key should be (and only be) the same when it's the
+         * same actual resource data (for example, the same image file).
+         * 
+         * Please note that the key is not suitable for a caching key,
+         * since the resource might get replaced by a mod.
+         */
+        final String cachingKey = uri.toString();
+        final Resource resource = resourceFactory.createResource(key, cachingKey, uri);
         
         /*
          * Rivers need new keys in order to support variations.
@@ -318,7 +327,7 @@ public class FreeColDataFile {
             .stream()
             .filter(entry -> entry.getKey() != null)
             .forEach(entry -> {
-                final ImageResource variationResource = (ImageResource) resourceFactory.createResource(imageResource.getPrimaryKey(), entry.getKey());
+                final ImageResource variationResource = (ImageResource) resourceFactory.createResource("", imageResource.getCachingKey(), entry.getKey());
                 if (variationResource != null) {
                     variationResource.addAlternativeResourceLocators(entry.getValue());
                     imageResource.addVariation(variationResource);

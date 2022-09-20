@@ -47,12 +47,12 @@ public class SZAResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      */
-    public SZAResource(String primaryKey, URI resourceLocator) {
-        super(primaryKey, resourceLocator);
+    public SZAResource(String cachingKey, URI resourceLocator) {
+        super(cachingKey, resourceLocator);
     }
 
     /**

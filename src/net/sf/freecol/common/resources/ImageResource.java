@@ -68,11 +68,11 @@ public class ImageResource extends Resource implements Cleanable {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this resource.
      */
-    public ImageResource(String primaryKey, URI resourceLocator) {
-        super(primaryKey, resourceLocator);
+    public ImageResource(String cachingKey, URI resourceLocator) {
+        super(cachingKey, resourceLocator);
     }
 
 

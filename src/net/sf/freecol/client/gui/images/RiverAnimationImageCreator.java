@@ -55,7 +55,7 @@ public final class RiverAnimationImageCreator {
         final String minorString = (magnitude <= 1) ? ".minor" : "";
         final List<Direction> minorToMajorTransitions = determineMinorToMajorRiverTransitions(tile, riverTransitions);
         
-        final String generatedKey = riverWaterImageResource.getPrimaryKey() + ".river." + minorString + directionsToString(minorToMajorTransitions) + "." + riverVariationKey + "$gen";
+        final String generatedKey = riverWaterImageResource.getCachingKey() + ".river." + minorString + directionsToString(minorToMajorTransitions) + "." + riverVariationKey + "$gen";
         final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, lib.getTileSize(), false, riverVariationNumber, () -> {
             final BufferedImage riverPebblesImage = riverPebblesImageResource.getImage(lib.getTileSize(), false);
             final BufferedImage riverWaterImage = riverWaterImageResource.getVariation(riverVariationNumber).getImage(lib.getTileSize(), false);

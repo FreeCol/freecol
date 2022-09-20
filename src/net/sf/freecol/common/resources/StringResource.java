@@ -35,12 +35,12 @@ public class StringResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
-    public StringResource(String primaryKey, URI resourceLocator) {
-        super(primaryKey, resourceLocator);
+    public StringResource(String cachingKey, URI resourceLocator) {
+        super(cachingKey, resourceLocator);
 
         this.data = resourceLocator.getPath();
         if (this.data.endsWith("\"")) { // Should always be true

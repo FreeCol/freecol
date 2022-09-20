@@ -52,13 +52,13 @@ public class FontResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      * @exception IOException if unable to read the font.
      */
-    public FontResource(String primaryKey, URI resourceLocator) throws IOException {
-        super(primaryKey, resourceLocator);
+    public FontResource(String cachingKey, URI resourceLocator) throws IOException {
+        super(cachingKey, resourceLocator);
         font = null;
         try {
             if (resourceLocator.getPath() != null

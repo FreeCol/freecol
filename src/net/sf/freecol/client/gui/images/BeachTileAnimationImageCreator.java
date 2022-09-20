@@ -47,7 +47,7 @@ public final class BeachTileAnimationImageCreator {
         final ImageResource oceanImageResource = ImageCache.getImageResource(ImageLibrary.getTerrainImageKey(type));
         final int oceanVariationNumber = oceanImageResource.getVariationNumberForTick(ticks);
         
-        final String generatedKey = oceanImageResource.getPrimaryKey() + ".beach." + beachVariationKey + "$gen";
+        final String generatedKey = oceanImageResource.getCachingKey() + ".beach." + beachVariationKey + "$gen";
         final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, lib.getTileSize(), false, oceanVariationNumber, () -> {
             final BufferedImage oceanImage = lib.getAnimatedScaledTerrainImage(type, ticks);
             final String beachMaskKey = "image.mask.beach." + beachVariationKey;

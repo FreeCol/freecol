@@ -129,7 +129,7 @@ public class ImageCache {
                                          final boolean grayscale,
                                          final int variation) {
 
-        final long cacheKey = imageHash(ir.getPrimaryKey(), size, grayscale, variation);
+        final long cacheKey = imageHash(ir.getCachingKey(), size, grayscale, variation);
         final BufferedImage cached = searchCaches(cacheKey);
         if (cached != null) {
             return cached;

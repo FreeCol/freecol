@@ -44,13 +44,13 @@ public class AudioResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      * @exception IOException if the URI does not point to recognizable audio.
      */
-    public AudioResource(String primaryKey, URI resourceLocator) throws IOException {
-        super(primaryKey, resourceLocator);
+    public AudioResource(String cachingKey, URI resourceLocator) throws IOException {
+        super(cachingKey, resourceLocator);
         
         final File file = new File(resourceLocator);
         if (!file.isDirectory()) {

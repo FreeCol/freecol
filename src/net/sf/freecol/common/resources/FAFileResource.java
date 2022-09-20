@@ -44,13 +44,13 @@ public class FAFileResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      * @exception IOException if FAFile can not be opened.
      */
-    public FAFileResource(String primaryKey, URI resourceLocator) throws IOException {
-        super(primaryKey, resourceLocator);
+    public FAFileResource(String cachingKey, URI resourceLocator) throws IOException {
+        super(cachingKey, resourceLocator);
         URL url = resourceLocator.toURL();
         FAFile = new FAFile(url.openStream());
     }

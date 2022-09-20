@@ -46,11 +46,12 @@ public class ResourceFactory {
      * Returns an instance of {@code Resource} with the
      * given {@code URI} as the parameter.
      *
-     * @param primaryKey The primary key.
+     * @param key The key part of the resource mapping.
+     * @param cachingKey The caching key.
      * @param uri The {@code URI} used when creating the instance.
      * @return The <code>Resource</code> if created.     
      */
-    public Resource createResource(String primaryKey, URI uri) {
+    public Resource createResource(String key, String cachingKey, URI uri) {
         final Resource r = resources.get(uri);
         if (r != null) { 
             return r;
@@ -69,33 +70,33 @@ public class ResourceFactory {
             final Resource resource;
             if ("urn".equals(uri.getScheme())) {
                 if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
-                    resource = new ColorResource(primaryKey, uri);
+                    resource = new ColorResource(cachingKey, uri);
                 } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
-                    resource = new FontResource(primaryKey, uri);
+                    resource = new FontResource(cachingKey, uri);
                 } else {
                     logger.log(Level.WARNING, "Unknown urn part: " + uri.getSchemeSpecificPart());
                     return null;
                 }
             } else if (pathPart.endsWith("\"") && pathPart.lastIndexOf('"', pathPart.length()-1) >= 0) {
-                resource = new StringResource(primaryKey, uri);
+                resource = new StringResource(cachingKey, uri);
             } else if (pathPart.endsWith(".faf")) {
-                resource = new FAFileResource(primaryKey, uri);
+                resource = new FAFileResource(cachingKey, uri);
             } else if (pathPart.endsWith(".sza")) {
-                resource = new SZAResource(primaryKey, uri);
+                resource = new SZAResource(cachingKey, uri);
             } else if (pathPart.endsWith(".ttf")) {
-                resource = new FontResource(primaryKey, uri);
+                resource = new FontResource(cachingKey, uri);
             } else if (pathPart.endsWith(".wav")) {
-                resource = new AudioResource(primaryKey, uri);
+                resource = new AudioResource(cachingKey, uri);
             } else if (pathPart.endsWith(".ogg")) {
                 if (pathPart.endsWith(".video.ogg")) {
-                    resource = new VideoResource(primaryKey, uri);
+                    resource = new VideoResource(cachingKey, uri);
                 } else {
-                    resource = new AudioResource(primaryKey, uri);
+                    resource = new AudioResource(cachingKey, uri);
                 }
-            } else if (primaryKey.startsWith("sound.")) {
-                resource = new AudioResource(primaryKey, uri);
+            } else if (key.startsWith("sound.")) {
+                resource = new AudioResource(cachingKey, uri);
             } else {
-                resource = new ImageResource(primaryKey, uri);
+                resource = new ImageResource(cachingKey, uri);
             }
             resources.put(uri, resource);
             return resource;

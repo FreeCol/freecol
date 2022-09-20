@@ -50,36 +50,38 @@ public abstract class Resource {
     private final URI resourceLocator;
     
     /**
-     * The primary key for the resource to be used for caching purposes.
+     * The key for the resource to be used for caching purposes.
+     * 
+     * This is used when multiple keys are pointing to the same {@code Resource}.
      */
-    private final String primaryKey;
+    private final String cachingKey;
 
 
     /**
      * Trivial constructor.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The key used for caching the image.
      */
-    protected Resource(String primaryKey) {
-        this(primaryKey, null);
+    protected Resource(String cachingKey) {
+        this(cachingKey, null);
     }
 
     /**
      * Do not use directly.
      *
-     * @param primaryKey The key for the primary version of the resource,
+     * @param cachingKey The key for the primary version of the resource,
      *      that is the key when the {@code Resource} was created.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
-    protected Resource(String primaryKey, URI resourceLocator) {
-        this.primaryKey = Objects.requireNonNull(primaryKey);
+    protected Resource(String cachingKey, URI resourceLocator) {
+        this.cachingKey = Objects.requireNonNull(cachingKey);
         this.resourceLocator = resourceLocator;
     }
 
     
     /**
-     * The primary key of the resource. This key can be used for caching
+     * The caching key of the resource. This key is used for caching
      * purposes since it will be the same for a resource no matter how
      * many keys point to the same resource.
      * 
@@ -87,8 +89,8 @@ public abstract class Resource {
      * 
      * @return The key.
      */
-    public String getPrimaryKey() {
-        return primaryKey;
+    public String getCachingKey() {
+        return cachingKey;
     }
 
     /**

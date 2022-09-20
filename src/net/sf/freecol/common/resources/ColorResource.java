@@ -51,12 +51,12 @@ public class ColorResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param primaryKey The primary key.
+     * @param cachingKey The caching key.
      * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      */
-    public ColorResource(String primaryKey, URI resourceLocator) { //throws Exception {
-        super(primaryKey, resourceLocator);
+    public ColorResource(String cachingKey, URI resourceLocator) { //throws Exception {
+        super(cachingKey, resourceLocator);
 
         String colorName = resourceLocator.getSchemeSpecificPart()
             .substring(SCHEME.length());

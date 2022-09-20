@@ -39,7 +39,7 @@ public final class DeltaAnimationImageCreator {
         final ImageResource waterImageResource = ImageCache.getImageResource("image.tile.river.water");
         final int waterVariationNumber = waterImageResource.getVariationNumberForTick(ticks);
         
-        final String generatedKey = waterImageResource.getPrimaryKey() + ".riverDelta." + direction + "." + waterVariationNumber + "$gen";
+        final String generatedKey = waterImageResource.getCachingKey() + ".riverDelta." + direction + "." + waterVariationNumber + "$gen";
         final BufferedImage result = imageCache.getCachedImageOrGenerate(generatedKey, lib.getTileSize(), false, waterVariationNumber, () -> {
             final BufferedImage riverPebblesImage = riverPebblesImageResource.getImage(lib.getTileSize(), false);
             final BufferedImage waterImage = waterImageResource.getVariation(waterVariationNumber).getImage(lib.getTileSize(), false);

@@ -80,7 +80,7 @@ public final class BaseTileTransitionImageCreator {
             // Handles missing resource gracefully.
             return null;
         }
-        if (terrainImageResource.getPrimaryKey().equals(tileImageResource.getPrimaryKey())
+        if (terrainImageResource.getCachingKey().equals(tileImageResource.getCachingKey())
                 && !renderSpecialTransition) {
             /*
              * No reason to make transitions between tiles with the same graphics.. 
@@ -119,7 +119,7 @@ public final class BaseTileTransitionImageCreator {
             final Tile neBorderingTile = borderingTile.getNeighbourOrNull(Direction.NE);
             final Tile swBorderingTile = borderingTile.getNeighbourOrNull(Direction.SW);
 
-            transitionKey = terrainImageResource.getPrimaryKey()
+            transitionKey = terrainImageResource.getCachingKey()
                     + ","
                     + (neBorderingTile != null && neBorderingTile.getType() != null ? neBorderingTile.getType().getId() : "null")
                     + ","
@@ -131,7 +131,7 @@ public final class BaseTileTransitionImageCreator {
                     + beachTransitionSw
                     + "$baseTransition$gen";
         } else {
-            transitionKey = terrainImageResource.getPrimaryKey() + "," + maskVariationNumber + "$baseTransition$gen";
+            transitionKey = terrainImageResource.getCachingKey() + "," + maskVariationNumber + "$baseTransition$gen";
         }
         
         /*
