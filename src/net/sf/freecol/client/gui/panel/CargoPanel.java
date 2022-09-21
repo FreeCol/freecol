@@ -34,13 +34,12 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
-
 /**
  * A panel that holds units and goods that represent Units and cargo
  * that are on board the currently selected ship.
  */
 public class CargoPanel extends FreeColPanel
-    implements DropTarget, PropertyChangeListener {
+        implements DropTarget, PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(CargoPanel.class.getName());
 
@@ -49,24 +48,23 @@ public class CargoPanel extends FreeColPanel
 
     private DefaultTransferHandler defaultTransferHandler = null;
 
-
     /**
      * Creates this CargoPanel.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param withTitle Should the panel have a title?
+     * @param withTitle     Should the panel have a title?
      */
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
         super(freeColClient, "CargoPanelUI",
-              new MigLayout("wrap 6, fill, insets 0"));
+                new MigLayout("wrap 6, fill, insets 0"));
 
         this.carrier = null;
-        this.defaultTransferHandler
-            = new DefaultTransferHandler(getFreeColClient(), this);
+        this.defaultTransferHandler = new DefaultTransferHandler(getFreeColClient(), this);
 
-        if (withTitle) setBorder(Utility.localizedBorder("cargoOnCarrier"));
+        if (withTitle) {
+            setBorder(Utility.localizedBorder("cargoOnCarrier"));
+        }
     }
-
 
     /**
      * Initialize this CargoPanel.
@@ -129,7 +127,6 @@ public class CargoPanel extends FreeColPanel
         repaint();
     }
 
-
     /**
      * Whether this panel is active.
      *
@@ -166,13 +163,12 @@ public class CargoPanel extends FreeColPanel
      */
     private void updateTitle() {
         Utility.localizeBorder(this, (carrier == null)
-            ? StringTemplate.key("cargoOnCarrier")
-            : StringTemplate.template("cargoPanel.cargoAndSpace")
-                .addStringTemplate("%name%",
-                    carrier.getLabel(Unit.UnitLabelType.NATIONAL))
-                .addAmount("%space%", carrier.getSpaceLeft()));
+                ? StringTemplate.key("cargoOnCarrier")
+                : StringTemplate.template("cargoPanel.cargoAndSpace")
+                        .addStringTemplate("%name%",
+                                carrier.getLabel(Unit.UnitLabelType.NATIONAL))
+                        .addAmount("%space%", carrier.getSpaceLeft()));
     }
-
 
     // Interface DropTarget
 
@@ -198,7 +194,7 @@ public class CargoPanel extends FreeColPanel
     @Override
     public Component add(Component comp, boolean editState) {
         if (carrier != null && comp instanceof CargoLabel && editState
-            && ((CargoLabel)comp).addCargo(comp, carrier, this)) {
+                && ((CargoLabel) comp).addCargo(comp, carrier, this)) {
             return comp;
         }
         return null;
@@ -212,17 +208,15 @@ public class CargoPanel extends FreeColPanel
         return carrier.getLoadableAmount(type);
     }
 
-
     // Interface PropertyChangeListener
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("CargoPanel change " + event.getPropertyName()
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+                + ": " + event.getOldValue()
+                + " -> " + event.getNewValue());
         update();
     }
-
 
     // Override Container
 
@@ -235,7 +229,6 @@ public class CargoPanel extends FreeColPanel
             ((CargoLabel) comp).removeCargo(comp, this);
         }
     }
-
 
     // Override Component
 
