@@ -61,8 +61,9 @@ public class CargoPanel extends FreeColPanel
         this.carrier = null;
         this.defaultTransferHandler = new DefaultTransferHandler(getFreeColClient(), this);
 
-        if (withTitle)
+        if (withTitle) {
             setBorder(Utility.localizedBorder("cargoOnCarrier"));
+        }
     }
 
     /**
