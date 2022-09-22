@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2015  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<freecol-specification id="19thCenturyNations">
+  <european-nation-types>
+    <european-nation-type id="model.nationType.ref" preserve="true">
+      <!-- Shorten REF sail time. -->
+      <modifier id="model.modifier.sailHighSeas"
+                type="additive" value="-1"/>
+    </european-nation-type>
+  </european-nation-types>
+
+  <nations>
+    <nation id="model.nation.belgium" color="0xaa710c"
+            nation-type="model.nationType.trade" selectable="true"
+            preferred-latitude="40" ref="model.nation.belgiumREF"/>
+    <nation id="model.nation.italy" color="0x74d496"
+            nation-type="model.nationType.naval" selectable="true"
+            preferred-latitude="25" ref="model.nation.italyREF"/>
+    <nation id="model.nation.otomanempire" color="0x842525"
+            nation-type="model.nationType.conquest" selectable="true"
+            preferred-latitude="80" starts-on-east-coast="false" 
+ref="model.nation.otomanempireREF"/>
+    <nation id="model.nation.holygermanempire" color="0xAEAEAE"
+            nation-type="model.nationType.building" selectable="true"
+            preferred-latitude="30"
+ref="model.nation.holygermanempireREF"/>
+    <nation id="model.nation.belgiumREF" color="0x93620a"
+            nation-type="model.nationType.ref"/>
+    <nation id="model.nation.italyREF" color="0x6BBB87"
+            nation-type="model.nationType.ref"/>
+    <nation id="model.nation.otomanempireREF" color="0x782020"
+            nation-type="model.nationType.ref"/>
+    <nation id="model.nation.holygermanempireREF" color="0x949494"
+            nation-type="model.nationType.ref"/>
+  </nations>
+</freecol-specification>
