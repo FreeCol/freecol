@@ -73,4 +73,3 @@ Requires Java 11, Ant, and Java SDK to build.
 ## License
 
 The source code is licensed under the GPL v2. Most of the content, like artwork, music and sound effects, are also licensed under GPL v2. Some of the content is licensed using CC BY 4.0. Please refer to the README file in the same directory as the included content for more details.
-
