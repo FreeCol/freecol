@@ -249,8 +249,14 @@ public class BuildingTest extends FreeColTestCase {
                         .append(" produced in ").append(bt.getSuffix())
                         .append(" at bonus ").append(String.valueOf(level))
                         .append(" with ").append(ut.getSuffix());
-                    assertEquals(sb.toString(), values[i][j][k],
-                                 building.getTotalProductionOf(outputType));
+                    
+                    final int totalProductionInColony = building.getTotalProductionOf(outputType);
+                    assertEquals(sb.toString(), values[i][j][k], totalProductionInColony);
+                    
+                    if (level == 0) {
+                        assertEquals("BuildingType.getPotentialProduction does not match actual production. " + sb.toString(),
+                                totalProductionInColony, bt.getPotentialProduction(outputType, ut));
+                    }
                 }
             }
         }

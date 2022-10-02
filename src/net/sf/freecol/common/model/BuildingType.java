@@ -30,6 +30,7 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.JList;
@@ -40,6 +41,9 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import net.sf.freecol.common.model.production.BuildingProductionCalculator;
+import net.sf.freecol.common.model.production.TileProductionCalculator;
+import net.sf.freecol.common.model.production.WorkerAssignment;
 
 
 /**
@@ -348,6 +352,9 @@ public final class BuildingType extends BuildableType
     /**
      * Get the amount of goods of a given goods type the given unit
      * type could produce on a tile of this tile type.
+     * 
+     * No production bonuses, like rebel colony bonus, is added.
+     * Sufficient input goods are assumed.
      *
      * @param goodsType The {@code GoodsType} to produce.
      * @param unitType An optional {@code UnitType} that is to do
@@ -356,10 +363,30 @@ public final class BuildingType extends BuildableType
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
-        if (goodsType == null) return 0;
-        int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)apply(amount, null, goodsType.getId(), unitType);
-        return (amount < 0) ? 0 : amount;
+        final BuildingProductionCalculator bpc = new BuildingProductionCalculator(null, new FeatureContainer(), 0);
+        final ProductionType productionType = ProductionType.getBestProductionType(goodsType, getAvailableProductionTypes(unitType == null));
+        
+        final int MORE_THAN_ENOUGH_INPUT_GOODS = 1000;
+        final int MORE_THAN_ENOUGH_WAREHOUSE_CAPACITY = 10000;
+        final List<AbstractGoods> inputGoods = productionType.getInputList().stream()
+                .map(ag -> new AbstractGoods(ag.getType(), MORE_THAN_ENOUGH_INPUT_GOODS))
+                .collect(Collectors.toList());
+        
+        // Allows tests to be run without having a game started:
+        final Turn turn = (getGame() != null && getGame().getTurn() != null) ? getGame().getTurn() : new Turn(1);
+        
+        final ProductionInfo pi = bpc.getAdjustedProductionInfo(this,
+                turn,
+                List.of(new WorkerAssignment(unitType, productionType)),
+                inputGoods,
+                List.of(),
+                MORE_THAN_ENOUGH_WAREHOUSE_CAPACITY);
+        
+        return pi.getProduction().stream()
+                .filter(a -> a.getType().equals(goodsType))
+                .map(AbstractGoods::getAmount)
+                .findFirst()
+                .orElse(0);
     }
         
     /**

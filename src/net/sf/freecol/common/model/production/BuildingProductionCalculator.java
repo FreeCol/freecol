@@ -369,9 +369,9 @@ public class BuildingProductionCalculator {
             ? concat(buildingType.getModifiers(id, unitType, turn),
                     ProductionUtils.getRebelProductionModifiers(colonyProductionBonus, goodsType, buildingType),
                     buildingType.getCompetenceModifiers(id, unitType, turn),
-                    owner.getModifiers(id, unitType, turn))
+                    (owner == null) ? null : owner.getModifiers(id, unitType, turn))
             // With no unit, only the building-specific bonuses 
             : concat(colonyFeatureContainer.getModifiers(id, buildingType, turn), // XXX: Can we simplify this?
-                    owner.getModifiers(id, buildingType, turn));
+                    (owner == null) ? null : owner.getModifiers(id, buildingType, turn));
     }
 }
