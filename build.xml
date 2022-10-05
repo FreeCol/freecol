@@ -577,7 +577,7 @@
             <arg value="--main-jar"/>
             <arg value="FreeCol.jar"/>
             <arg value="--arguments"/>
-            <arg value="--freecol-data app/data"/>
+            <arg value="--freecol-data $$APPDIR/data"/>
             <arg value="--app-version"/>
             <arg value="${freecol.version.macos}"/>
             <arg value="--mac-package-identifier"/>
