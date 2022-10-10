@@ -22,10 +22,7 @@ package net.sf.freecol.client.gui.dialog;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -88,8 +85,13 @@ public final class ChooseFoundingFatherDialog
         tb.setSelectedIndex(0);
 
         JPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
-        panel.add(Utility.localizedHeader("chooseFoundingFatherDialog.title",
-                                          Utility.FONTSPEC_TITLE));
+        JLabel title = Utility.localizedHeader("chooseFoundingFatherDialog.title",
+                Utility.FONTSPEC_TITLE);
+        if (title.getPreferredSize().getWidth() < 425) {
+            panel.add(title, "width 425");
+        } else {
+            panel.add(title);
+        }
         panel.add(helpButton, "tag help");
         panel.add(tb, "width 100%");
 
