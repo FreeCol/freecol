@@ -204,7 +204,24 @@ public final class QuickActionMenu extends JPopupMenu {
         }
 
         if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            if (addRoleItems(unitLabel)) this.addSeparator();
+            if (addRoleItems(unitLabel)) {
+                this.addSeparator();
+            }
+        }
+        
+        UnitTypeChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        if (uc != null) {
+            JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.clearSpeciality",
+                new ImageIcon(gui.getFixedImageLibrary()
+                    .getTinyUnitTypeImage(uc.to)));
+            menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
+            menuItem.addActionListener(unitLabel);
+            this.add(menuItem);
+            if (unit.getLocation() instanceof Building
+                && !((Building)unit.getLocation()).canAddType(uc.to)) {
+                menuItem.setEnabled(false);
+            }
+            this.addSeparator();
         }
     }
 
@@ -693,21 +710,6 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
 
-        UnitTypeChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
-        if (uc != null) {
-            if (separatorNeeded) this.addSeparator();
-            JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.clearSpeciality",
-                new ImageIcon(gui.getFixedImageLibrary()
-                    .getTinyUnitTypeImage(uc.to)));
-            menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
-            menuItem.addActionListener(unitLabel);
-            this.add(menuItem);
-            if (unit.getLocation() instanceof Building
-                && !((Building)unit.getLocation()).canAddType(uc.to)) {
-                menuItem.setEnabled(false);
-            }
-            separatorNeeded = true;
-        }
         return separatorNeeded;
     }
 
