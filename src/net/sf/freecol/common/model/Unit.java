@@ -1508,7 +1508,7 @@ public class Unit extends GoodsLocation
         }
         UnitTypeChange uc = (uct == null || !uct.appliesTo(this)) ? null
             : uct.getUnitChange(getType(), toType);
-        return (uc == null || !uc.isAvailableTo(player)) ? null : uc;
+        return (uc == null || !uc.isAvailableTo(player) || !uc.appliesTo(this)) ? null : uc;
     }
 
     /**
