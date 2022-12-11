@@ -215,7 +215,7 @@ public class ServerUnitTest extends FreeColTestCase {
         // Before
         assertEquals(0, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
-        assertEquals(5 + 5, colony.getFoodProduction());
+        assertEquals(4 + 4, colony.getFoodProduction());
         assertFalse(hasImprovement(plain58, plow));
         assertEquals(0, colony.getProductionBonus());
         assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5, 8)), soldier.getLocation());
@@ -224,10 +224,10 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         assertFalse(hasImprovement(plain58, plow));
-        assertEquals(8, colony.getGoodsCount(foodType));
+        assertEquals(6, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(0, colony.getProductionBonus());
-        assertEquals(5 + 5, colony.getFoodProduction());
+        assertEquals(4 + 4, colony.getFoodProduction());
 
         // Start Plowing
         //TileImprovement plowImprovement
@@ -244,10 +244,10 @@ public class ServerUnitTest extends FreeColTestCase {
 
         assertTrue(hasImprovement(plain58, plow));
         // Production for next turn is updated
-        assertEquals(5 + 6, colony.getFoodProduction());
+        assertEquals(4 + 5, colony.getFoodProduction());
         assertEquals(2, colony.getFoodConsumption());
         // But in only 10 - 2 == 8 are added from last turn
-        assertEquals(8 + n * 8, colony.getGoodsCount(foodType));
+        assertEquals(6 + n * 6, colony.getGoodsCount(foodType));
 
         // In game, this should happen via a Tile update
         colony.invalidateCache();
@@ -255,9 +255,9 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         assertTrue(hasImprovement(plain58, plow));
-        assertEquals(5 + 6, colony.getFoodProduction());
+        assertEquals(4 + 5, colony.getFoodProduction());
         assertEquals(2, colony.getFoodConsumption());
-        assertEquals(8 + n * 8 + 9, colony.getGoodsCount(foodType));
+        assertEquals(6 + n * 6 + 7, colony.getGoodsCount(foodType));
     }
 
     /**

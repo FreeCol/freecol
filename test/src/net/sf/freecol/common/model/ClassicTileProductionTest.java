@@ -102,17 +102,17 @@ public class ClassicTileProductionTest extends FreeColTestCase {
         if (ptc.unitType == defaultUnitType) {                                        
             final ProductionInfo piCriminal = tpc.getBasicProductionInfo(tile, new Turn(1), new WorkerAssignment(pettyCriminalUnitType, productionType), false);
             assertEquals("Petty criminals should have the same production as a Free Colonist on tiles.",
-                    getProductionAmount(pi),
-                    getProductionAmount(piCriminal));
+                    getProductionAmount(ptc.goodsType, pi),
+                    getProductionAmount(ptc.goodsType, piCriminal));
             
             final ProductionInfo piIndentured = tpc.getBasicProductionInfo(tile, new Turn(1), new WorkerAssignment(indenturedServantUnitType, productionType), false);
             assertEquals("Indentured Servants should have the same production as a Free Colonist on tiles.",
-                    getProductionAmount(pi),
-                    getProductionAmount(piIndentured));
+                    getProductionAmount(ptc.goodsType, pi),
+                    getProductionAmount(ptc.goodsType, piIndentured));
         }
         
         final List<Object> output = new ArrayList<>();
-        output.add(getProductionAmount(pi));
+        output.add(getProductionAmount(ptc.goodsType, pi));
         output.add(ptc.tileType.getId());
         output.add(ptc.goodsType.getId());
         output.add(ptc.resourceType != null ? ptc.resourceType.getId() : "");
@@ -204,8 +204,15 @@ public class ClassicTileProductionTest extends FreeColTestCase {
         return result;
     }
     
-    private int getProductionAmount(ProductionInfo pi) {
-        return pi.getProduction().isEmpty() ? 0 : pi.getProduction().get(0).getAmount();
+    private int getProductionAmount(GoodsType goodstype, ProductionInfo pi) {
+        if (pi.getProduction().isEmpty()) {
+            return 0;
+        }
+        return pi.getProduction().stream()
+                .filter(ag -> ag.getType().equals(goodstype))
+                .map(AbstractGoods::getAmount)
+                .findFirst()
+                .orElse(0);
     }
     
     private <T> List<T> nullAnd(List<T> input) {

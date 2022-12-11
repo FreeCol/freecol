@@ -247,7 +247,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
         Building pasture = colony.getBuilding(countryType);
         Unit unit = colony.getFirstUnit();
-        unit.setLocation(colony.getWorkLocationFor(unit, bellsType));
+        unit.setLocation(colony.getWorkLocationFor(unit, foodType));
 
         List<AbstractGoods> outputs = toList(pasture.getOutputs());
         assertEquals(1, outputs.size());
@@ -261,7 +261,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         colony.invalidateCache();
 
         assertEquals(99, colony.getGoodsCount(horsesType));
-        assertTrue(colony.getNetProductionOf(foodType) > 0);
+        assertTrue(colony.getNetProductionOf(foodType) > 1);
         assertEquals("Wrong horse production", 1,
             pasture.getTotalProductionOf(horsesType));
         assertEquals("Wrong maximum horse production", 1,
@@ -379,7 +379,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals(0, colony.getGoodsCount(foodType));
         assertEquals(grainType, tile.getProduction().get(0).getType());
-        assertEquals(5, tile.getProduction().get(0).getAmount());
+        assertEquals(3, tile.getProduction().get(0).getAmount());
         assertEquals(cottonType, tile.getProduction().get(1).getType());
         assertEquals(2, tile.getProduction().get(1).getAmount());
 

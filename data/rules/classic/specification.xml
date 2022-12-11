@@ -303,7 +303,7 @@
            temperature-minimum="0" temperature-maximum="15"
            altitude-minimum="1" altitude-maximum="2"/>
       <production unattended="true">
-        <output goods-type="model.goods.grain" value="5"/>
+        <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="2"/>
       </production>
       <production>
@@ -359,7 +359,7 @@
            temperature-minimum="30" temperature-maximum="40"
            altitude-minimum="1" altitude-maximum="1"/>
       <production unattended="true">
-        <output goods-type="model.goods.grain" value="4"/>
+        <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.sugar" value="3"/>
       </production>
       <production>
@@ -429,16 +429,16 @@
            temperature-minimum="10" temperature-maximum="40"
            altitude-minimum="1" altitude-maximum="2"/>
       <production unattended="true" production-level="veryHigh">
-        <output goods-type="model.goods.grain" value="3"/>
-        <output goods-type="model.goods.cotton" value="1"/>
+        <output goods-type="model.goods.grain" value="2"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
       <production unattended="true" production-level="veryLow">
         <output goods-type="model.goods.grain" value="1"/>
-        <output goods-type="model.goods.cotton" value="1"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
       <production unattended="true">
-        <output goods-type="model.goods.grain" value="2"/>
-        <output goods-type="model.goods.cotton" value="1"/>
+        <output goods-type="model.goods.grain" value="1"/>
+        <output goods-type="model.goods.ore" value="2"/>
       </production>
       <production>
         <output goods-type="model.goods.grain" value="2"/>
@@ -484,7 +484,7 @@
       <modifier id="model.modifier.defence" index="50"
                 type="percentage" value="50"/>
       <production unattended="true">
-        <output goods-type="model.goods.grain" value="3"/>
+        <output goods-type="model.goods.grain" value="2"/>
         <output goods-type="model.goods.furs" value="3"/>
       </production>
       <production>
@@ -566,7 +566,7 @@
       <modifier id="model.modifier.defence" index="50"
                 type="percentage" value="50"/>
       <production unattended="true">
-        <output goods-type="model.goods.grain" value="3"/>
+        <output goods-type="model.goods.grain" value="2"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>
@@ -628,7 +628,7 @@
                 type="percentage" value="75"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
-        <output goods-type="model.goods.furs" value="1"/>
+        <output goods-type="model.goods.sugar" value="1"/>
       </production>
       <production>
         <output goods-type="model.goods.grain" value="2"/>
@@ -661,7 +661,7 @@
       <modifier id="model.modifier.defence" index="50"
                 type="percentage" value="50"/>
       <production unattended="true" production-level="veryHigh">
-        <output goods-type="model.goods.grain" value="3"/>
+        <output goods-type="model.goods.grain" value="2"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production unattended="true" production-level="veryLow">
@@ -669,7 +669,7 @@
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production unattended="true">
-        <output goods-type="model.goods.grain" value="2"/>
+        <output goods-type="model.goods.grain" value="1"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
       <production>

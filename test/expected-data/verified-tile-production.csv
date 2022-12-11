@@ -34,3 +34,82 @@ Production;Tile Type;Goods Type;Bonus Resource;Unit Type;River Magnitude;Road;Pl
 22;model.tile.prairie;model.goods.cotton;model.resource.cotton;model.unit.masterCottonPlanter;0;0;1;0;0;0;2
 12;model.tile.prairie;model.goods.cotton;model.resource.cotton;model.unit.freeColonist;1;0;1;0;0;0;2
 24;model.tile.prairie;model.goods.cotton;model.resource.cotton;model.unit.masterCottonPlanter;1;0;1;0;0;0;2
+3;model.tile.prairie;model.goods.grain;;unattended;0;0;0;0;0;0;-2
+3;model.tile.prairie;model.goods.grain;;unattended;0;0;0;0;0;0;-1
+3;model.tile.prairie;model.goods.grain;;unattended;0;0;0;0;0;0;0
+3;model.tile.plains;model.goods.grain;;unattended;0;0;0;0;0;0;0
+3;model.tile.prairie;model.goods.grain;;unattended;2;0;0;0;0;0;0
+4;model.tile.prairie;model.goods.grain;;unattended;0;0;0;0;0;0;1
+5;model.tile.plains;model.goods.grain;;unattended;0;0;0;0;0;0;2
+6;model.tile.plains;model.goods.grain;;unattended;0;0;1;0;0;0;2
+6;model.tile.prairie;model.goods.grain;model.resource.cotton;unattended;0;0;1;0;0;0;2
+6;model.tile.prairie;model.goods.grain;;unattended;1;1;1;0;0;0;2
+3;model.tile.prairie;model.goods.cotton;;unattended;0;0;0;0;0;0;-2
+3;model.tile.prairie;model.goods.cotton;;unattended;0;0;0;0;0;0;-1
+3;model.tile.prairie;model.goods.cotton;;unattended;0;0;0;0;0;0;0
+4;model.tile.prairie;model.goods.cotton;;unattended;0;0;0;0;0;0;1
+2;model.tile.plains;model.goods.cotton;;unattended;0;0;0;0;0;0;0
+4;model.tile.plains;model.goods.cotton;;unattended;0;0;0;0;0;0;2
+4;model.tile.plains;model.goods.cotton;;unattended;0;0;1;0;0;0;2
+6;model.tile.prairie;model.goods.cotton;;unattended;1;1;1;0;0;0;2
+8;model.tile.prairie;model.goods.cotton;model.resource.cotton;unattended;0;1;1;0;0;0;2
+8;model.tile.prairie;model.goods.cotton;model.resource.cotton;unattended;2;0;0;0;0;0;0
+# savannah
+3;model.tile.savannah;model.goods.grain;model.resource.sugar;unattended;0;0;0;0;0;0;0
+6;model.tile.savannah;model.goods.sugar;model.resource.sugar;unattended;0;0;0;0;0;0;0
+5;model.tile.savannah;model.goods.grain;;model.unit.freeColonist;1;0;0;0;0;0;0
+3;model.tile.savannah;model.goods.sugar;;model.unit.freeColonist;0;0;0;0;0;0;0
+4;model.tile.savannah;model.goods.sugar;;model.unit.freeColonist;1;0;0;0;0;0;0
+# grassland
+3;model.tile.grassland;model.goods.grain;;unattended;0;0;0;0;0;0;0
+3;model.tile.grassland;model.goods.tobacco;;unattended;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.cotton;;model.unit.freeColonist;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.furs;;model.unit.freeColonist;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.lumber;;model.unit.freeColonist;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.ore;;model.unit.freeColonist;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.silver;;model.unit.freeColonist;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.sugar;;model.unit.freeColonist;0;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.cotton;;model.unit.freeColonist;1;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.furs;;model.unit.freeColonist;1;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.lumber;;model.unit.freeColonist;1;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.ore;;model.unit.freeColonist;1;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.silver;;model.unit.freeColonist;1;0;0;0;0;0;0
+0;model.tile.grassland;model.goods.sugar;;model.unit.freeColonist;1;0;0;0;0;0;0
+3;model.tile.grassland;model.goods.grain;;model.unit.freeColonist;0;0;0;0;0;0;0
+3;model.tile.grassland;model.goods.tobacco;;model.unit.freeColonist;0;0;0;0;0;0;0
+4;model.tile.grassland;model.goods.grain;;model.unit.freeColonist;1;0;0;0;0;0;0
+4;model.tile.grassland;model.goods.tobacco;;model.unit.freeColonist;1;0;0;0;0;0;0
+# desert
+1;model.tile.desert;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.desert;model.goods.ore;;unattended;0;0;0;0;0;0;0
+# tundra
+3;model.tile.tundra;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.tundra;model.goods.ore;;unattended;0;0;0;0;0;0;0
+3;model.tile.tundra;model.goods.grain;;model.unit.freeColonist;0;0;0;0;0;0;0
+2;model.tile.tundra;model.goods.ore;;model.unit.freeColonist;0;0;0;0;0;0;0
+# arctic
+0;model.tile.arctic;model.goods.grain;;unattended;0;0;0;0;0;0;0
+# broadleafForest
+2;model.tile.broadleafForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.broadleafForest;model.goods.furs;;unattended;0;0;0;0;0;0;0
+# coniferForest
+2;model.tile.coniferForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.coniferForest;model.goods.furs;;unattended;0;0;0;0;0;0;0
+# rainForest
+2;model.tile.rainForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+1;model.tile.rainForest;model.goods.sugar;;unattended;0;0;0;0;0;0;0
+# wetlandForest
+2;model.tile.wetlandForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.wetlandForest;model.goods.furs;;unattended;0;0;0;0;0;0;0
+# mixedForest
+2;model.tile.mixedForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+3;model.tile.mixedForest;model.goods.furs;;unattended;0;0;0;0;0;0;0
+# scrubForest
+1;model.tile.scrubForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.scrubForest;model.goods.furs;;unattended;0;0;0;0;0;0;0
+# borealForest
+2;model.tile.borealForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+3;model.tile.borealForest;model.goods.furs;;unattended;0;0;0;0;0;0;0
+# tropicalForest
+2;model.tile.tropicalForest;model.goods.grain;;unattended;0;0;0;0;0;0;0
+2;model.tile.tropicalForest;model.goods.furs;;unattended;0;0;0;0;0;0;0

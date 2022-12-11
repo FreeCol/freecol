@@ -587,8 +587,14 @@ public class TileImprovement extends TileItem {
         
         final Specification spec = getSpecification();
         
-        if (!isNatural()
-                && unitType == null
+        if (unitType == null
+                && isNatural()
+                && goodsType.isFoodType()) {
+            return Stream.<Modifier>empty();
+        }
+        
+        if (unitType == null
+                && !isNatural()
                 && !goodsType.isFoodType()
                 && spec.getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)) {
             return Stream.<Modifier>empty();

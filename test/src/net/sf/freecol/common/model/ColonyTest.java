@@ -59,7 +59,13 @@ public class ColonyTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType lumberGoodsType
         = spec().getGoodsType("model.goods.lumber");
-
+    
+    private static final ResourceType cottonResourceType
+        = spec().getResourceType("model.resource.cotton");
+    
+    private static final TileImprovementType plowTileImprovementType
+        = spec().getTileImprovementType("model.improvement.plow");
+    
     private static final Role soldierRole
         = spec().getRole("model.role.soldier");
 
@@ -67,6 +73,8 @@ public class ColonyTest extends FreeColTestCase {
         = spec().getTileType("model.tile.arctic");
     private static final TileType plainsTileType
         = spec().getTileType("model.tile.plains");
+    private static final TileType prairieTileType
+    = spec().getTileType("model.tile.prairie");
 
     private static final UnitType cottonPlanterType
         = spec().getUnitType("model.unit.masterCottonPlanter");
@@ -241,19 +249,30 @@ public class ColonyTest extends FreeColTestCase {
         // Add one plains tile
         Tile plainsTile = colony.getTile().getNeighbourOrNull(Direction.S);
         plainsTile.setType(plainsTileType);
-        ColonyTile colonyTile = colony.getColonyTile(plainsTile);
-        assertTrue(colonyTile.isEmpty());
+        ColonyTile plainsColonyTile = colony.getColonyTile(plainsTile);
+        assertTrue(plainsColonyTile.isEmpty());
+        
+        // Add one prairie tile
+        Tile prairieTile = colony.getTile().getNeighbourOrNull(Direction.N);
+        prairieTile.setType(prairieTileType);
+        prairieTile.addResource(new Resource(game, prairieTile, cottonResourceType));
+        ColonyTile prairieColonyTile = colony.getColonyTile(prairieTile);
+        assertTrue(prairieColonyTile.isEmpty());
 
         // colonist experience might be cotton, but the colony needs food
         colonist.setLocation(colony.getTile());
         colonist.changeWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
-        assertEquals(colonyTile, colonist.getLocation());
+        assertEquals(plainsColonyTile, colonist.getLocation());
         assertEquals(grainGoodsType, colonist.getWorkType());
 
-        // Change the center tile to plains to improve the food situation
+        // Change the center tile to plains and plow to improve the food situation
         colony.getTile().changeType(plainsTileType);
+        final TileImprovement tileImprovement = new TileImprovement(game, colony.getTile(), plowTileImprovementType, null);
+        tileImprovement.setTurnsToComplete(0);
+        colony.getTile().add(tileImprovement);
+        
         colony.invalidateCache();
         assertTrue("colony should produce more food than it consumes",
             colony.getFoodProduction() >= colony.getFoodConsumption()
@@ -264,7 +283,7 @@ public class ColonyTest extends FreeColTestCase {
         colonist.changeWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
-        assertEquals(colonyTile, colonist.getLocation());
+        assertEquals(prairieColonyTile, colonist.getLocation());
         assertEquals(cottonGoodsType, colonist.getWorkType());
 
         // colonist should still make cotton due to expertise
@@ -272,7 +291,7 @@ public class ColonyTest extends FreeColTestCase {
         colonist.changeWorkType(null);
         colonist.setType(cottonPlanterType);
         nonServerJoinColony(colonist, colony);
-        assertEquals(colonyTile, colonist.getLocation());
+        assertEquals(prairieColonyTile, colonist.getLocation());
         assertEquals(cottonGoodsType, colonist.getWorkType());
 
         // colonist produces cloth, because there is cotton now

@@ -111,7 +111,7 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testEqualFoodProductionConsumptionCase() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(desert));
+        Game game = ServerTestHelper.startServerGame(getTestMap(coniferForest));
 
         // Setting test colony
         Tile colonyTile = game.getMap().getTile(5, 8);

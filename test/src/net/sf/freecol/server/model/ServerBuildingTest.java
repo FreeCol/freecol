@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -1157,6 +1158,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getSchoolColony(2, SchoolLevel.SCHOOLHOUSE);
+        colony.addGoods(new AbstractGoods(foodType, 100));
         Building school = colony.getBuilding(schoolType);
         Iterator<Unit> units = colony.getUnitList().iterator();
 

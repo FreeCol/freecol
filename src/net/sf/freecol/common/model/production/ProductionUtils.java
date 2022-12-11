@@ -32,11 +32,7 @@ public final class ProductionUtils {
         }
         final float rebelFactor = (buildingType != null) ? buildingType.getRebelFactor() : 1.0F;
         final int bonus = (int) Math.floor(colonyProductionBonus * rebelFactor);
-        Modifier mod = new Modifier(goodsType.getId(), bonus,
-                Modifier.ModifierType.ADDITIVE,
-                Specification.SOL_MODIFIER_SOURCE);
-        mod.setModifierIndex(Modifier.COLONY_PRODUCTION_INDEX);
-        return Stream.of(mod);
+        return createRebelProductionModifierStream(Modifier.COLONY_PRODUCTION_INDEX, goodsType, bonus);
     }
     
     /**
@@ -53,6 +49,14 @@ public final class ProductionUtils {
             return Stream.<Modifier>empty();
         }
         
+        if (unitType == null && colonyProductionBonus < 0) { // unattended
+            return Stream.<Modifier>empty();
+        }
+        
+        if (unitType == null) { // unattended
+            return createRebelProductionModifierStream(Modifier.COLONYTILE_PRODUCTION_INDEX, goodsType, colonyProductionBonus);
+        }
+        
         float rebelFactor = 1.0F;
         if (unitType != null
                 && unitType.getExpertProduction() != null
@@ -67,10 +71,15 @@ public final class ProductionUtils {
         }
         
         int bonus = (int) Math.max(colonyProductionBonus, Math.floor(colonyProductionBonus * rebelFactor));
+        return createRebelProductionModifierStream(Modifier.COLONYTILE_PRODUCTION_INDEX, goodsType, bonus);
+    }
+
+
+    private static Stream<Modifier> createRebelProductionModifierStream(int modifierIndex, GoodsType goodsType, int bonus) {
         Modifier mod = new Modifier(goodsType.getId(), bonus,
                 Modifier.ModifierType.ADDITIVE,
                 Specification.SOL_MODIFIER_SOURCE);
-        mod.setModifierIndex(Modifier.COLONYTILE_PRODUCTION_INDEX);
+        mod.setModifierIndex(modifierIndex);
         return Stream.of(mod);
     }
 }

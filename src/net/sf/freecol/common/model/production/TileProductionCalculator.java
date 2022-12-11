@@ -36,7 +36,6 @@ import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.option.GameOptions;
 
 /**
  * Calculates the production for a tile.
@@ -96,25 +95,18 @@ public class TileProductionCalculator {
 
         if (colonyCenterTile) {
             forEach(workerAssignment.getProductionType().getOutputs(), output -> {
-                    boolean onlyNaturalImprovements = tile.getSpecification()
-                        .getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)
-                        && !output.getType().isFoodType();
-                    int potential = output.getAmount();
-                    if (tile.getTileItemContainer() != null) {
-                        potential = tile.getTileItemContainer()
-                            .getTotalBonusPotential(output.getType(), null,
-                                potential, onlyNaturalImprovements);
+                    int n = getCenterTileProduction(turn, tile, output.getType());
+                    if (n > 0) {
+                        pi.addProduction(new AbstractGoods(output.getType(), n));
                     }
-                    potential += Math.max(0, colonyProductionBonus);
-                    AbstractGoods production
-                        = new AbstractGoods(output.getType(), potential);
-                    pi.addProduction(production);
                 });
         } else {
             forEach(map(workerAssignment.getProductionType().getOutputs(), AbstractGoods::getType),
                 gt -> {
                     int n = getUnitProduction(turn, tile, workerAssignment, gt);
-                    if (n > 0) pi.addProduction(new AbstractGoods(gt, n));
+                    if (n > 0) {
+                        pi.addProduction(new AbstractGoods(gt, n));
+                    }
                 });
         }
         return pi;
@@ -144,6 +136,14 @@ public class TileProductionCalculator {
                 getBaseProduction(tile, workerAssignment.getProductionType(), goodsType, workerAssignment.getUnitType()),
                 turn,
                 getProductionModifiers(turn, tile, goodsType, workerAssignment.getUnitType())));
+    }
+    
+    private int getCenterTileProduction(Turn turn, Tile tile, GoodsType goodsType) {
+        final int production = tile.getBaseProduction(null, goodsType, null);
+        return Math.max(0, (int) FeatureContainer.applyModifiers(
+                production,
+                turn,
+                getCenterTileProductionModifiers(turn, tile, goodsType)));
     }
     
     /**
@@ -198,11 +198,11 @@ public class TileProductionCalculator {
             return Stream.<Modifier>empty();
         }
         return concat(tile.getProductionModifiers(goodsType, null),
-                ProductionUtils.getRebelProductionModifiersForTile(tile, colonyProductionBonus, goodsType, null),
+                ProductionUtils.getRebelProductionModifiersForTile(tile, colonyProductionBonus, goodsType, null)
                 // This does not seem to influence center tile production, but was present in the old code.
                 //colony.getModifiers(id, null, turn),
-                ((owner == null) ? null
-                    : owner.getModifiers(goodsType.getId(), tile.getType(), turn)));
+                //((owner == null) ? null : owner.getModifiers(goodsType.getId(), tile.getType(), turn))
+                );
     }
 
 }

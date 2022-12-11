@@ -312,18 +312,18 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testDesert() {
-        outputs.put(grain, 3);
-        outputs.put(cotton, 1);
+        outputs.put(grain, 2);
+        outputs.put(ore, 2);
         testProduction(inputs, outputs,
                        desert.getAvailableProductionTypes(true, "veryHigh"));
 
-        outputs.put(grain, 2);
-        outputs.put(cotton, 1);
+        outputs.put(grain, 1);
+        outputs.put(ore, 2);
         testProduction(inputs, outputs,
                        desert.getAvailableProductionTypes(true));
 
         outputs.put(grain, 1);
-        outputs.put(cotton, 1);
+        outputs.put(ore, 2);
         testProduction(inputs, outputs,
                        desert.getAvailableProductionTypes(true, "veryLow"));
 
@@ -333,7 +333,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        desert.getAvailableProductionTypes(false));
 
-        assertEquals(2, desert.getPotentialProduction(grain, null));
+        assertEquals(1, desert.getPotentialProduction(grain, null));
         assertEquals(2, getGenericPotential(desert, grain));
     }
 
@@ -421,7 +421,7 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testMixedForest() {
-        outputs.put(grain, 3);
+        outputs.put(grain, 2);
         outputs.put(furs, 3);
         testProduction(inputs, outputs,
                        mixedForest.getAvailableProductionTypes(true));
@@ -433,7 +433,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        mixedForest.getAvailableProductionTypes(false));
 
-        assertEquals(3, mixedForest.getPotentialProduction(grain, null));
+        assertEquals(2, mixedForest.getPotentialProduction(grain, null));
         assertEquals(3, getGenericPotential(mixedForest, grain));
     }
 
@@ -463,7 +463,7 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testPlains() {
-        outputs.put(grain, 5);
+        outputs.put(grain, 3);
         outputs.put(cotton, 2);
         testProduction(inputs, outputs,
                        plains.getAvailableProductionTypes(true));
@@ -474,7 +474,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        plains.getAvailableProductionTypes(false));
 
-        assertEquals(5, plains.getPotentialProduction(grain, null));
+        assertEquals(3, plains.getPotentialProduction(grain, null));
         assertEquals(5, getGenericPotential(plains, grain));
     }
 
@@ -495,7 +495,7 @@ public class ProductionTypeTest extends FreeColTestCase {
 
     public void testRainForest() {
         outputs.put(grain, 2);
-        outputs.put(furs, 1);
+        outputs.put(sugar, 1);
         testProduction(inputs, outputs,
                        rainForest.getAvailableProductionTypes(true));
 
@@ -513,7 +513,7 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testSavannah() {
-        outputs.put(grain, 4);
+        outputs.put(grain, 3);
         outputs.put(sugar, 3);
         testProduction(inputs, outputs,
                        savannah.getAvailableProductionTypes(true));
@@ -523,17 +523,17 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        savannah.getAvailableProductionTypes(false));
 
-        assertEquals(4, savannah.getPotentialProduction(grain, null));
+        assertEquals(3, savannah.getPotentialProduction(grain, null));
         assertEquals(4, getGenericPotential(savannah, grain));
     }
 
     public void testScrubForest() {
-        outputs.put(grain, 3);
+        outputs.put(grain, 2);
         outputs.put(furs, 2);
         testProduction(inputs, outputs,
                        scrubForest.getAvailableProductionTypes(true, "veryHigh"));
 
-        outputs.put(grain, 2);
+        outputs.put(grain, 1);
         outputs.put(furs, 2);
         testProduction(inputs, outputs,
                        scrubForest.getAvailableProductionTypes(true));
@@ -551,7 +551,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        scrubForest.getAvailableProductionTypes(false));
 
-        assertEquals(2, scrubForest.getPotentialProduction(grain, null));
+        assertEquals(1, scrubForest.getPotentialProduction(grain, null));
         assertEquals(2, getGenericPotential(scrubForest, grain));
     }
 
@@ -573,7 +573,7 @@ public class ProductionTypeTest extends FreeColTestCase {
     }
 
     public void testTropicalForest() {
-        outputs.put(grain, 3);
+        outputs.put(grain, 2);
         outputs.put(furs, 2);
         testProduction(inputs, outputs,
                        tropicalForest.getAvailableProductionTypes(true));
@@ -585,7 +585,7 @@ public class ProductionTypeTest extends FreeColTestCase {
         testProduction(inputs, outputs,
                        tropicalForest.getAvailableProductionTypes(false));
 
-        assertEquals(3, tropicalForest.getPotentialProduction(grain, null));
+        assertEquals(2, tropicalForest.getPotentialProduction(grain, null));
         assertEquals(3, getGenericPotential(tropicalForest, grain));
     }
 
