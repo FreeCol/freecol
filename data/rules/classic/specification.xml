@@ -1825,7 +1825,7 @@
                price="1100" skill="1" expert-production="model.goods.grain"
                recruit-probability="1" score-value="4">
       <modifier id="model.goods.grain" index="30"
-                type="additive" value="3"/>
+                type="additive" value="2"/> <!-- Documentation for the classic game says 3, but it's actually 2.  -->
     </unit-type>
     <unit-type id="model.unit.expertFisherman" extends="colonist"
                price="1000" skill="1" expert-production="model.goods.fish"
