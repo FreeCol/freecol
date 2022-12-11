@@ -1788,10 +1788,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // Try applying all possible non-natural improvements.
         final List<TileImprovementType> improvements
             = getSpecification().getTileImprovementTypeList();
-        for (TileImprovementType ti : transform(improvements, ti ->
-                (!ti.isNatural() && ti.isTileTypeAllowed(tileType)
-                    && ti.getBonus(goodsType) > 0))) {
-            potential = ti.getProductionModifier(goodsType).applyTo(potential);
+        if (canProduce(goodsType, unitType)) {
+            for (TileImprovementType ti : transform(improvements, ti ->
+                    (!ti.isNatural() && ti.isTileTypeAllowed(tileType)
+                        && ti.getBonus(goodsType) > 0))) {
+                potential = ti.getProductionModifier(goodsType).applyTo(potential);
+            }
         }
         return (int)potential;
     }

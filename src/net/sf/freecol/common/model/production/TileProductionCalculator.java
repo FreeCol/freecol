@@ -179,10 +179,10 @@ public class TileProductionCalculator {
         }
         
         return concat(tile.getProductionModifiers(goodsType, unitType),
-                     ProductionUtils.getRebelProductionModifiers(colonyProductionBonus, goodsType, null),
-                     unitType.getModifiers(goodsType.getId(), tile.getType(), turn),
-                     ((owner == null) ? null
-                         : owner.getModifiers(goodsType.getId(), unitType, turn)));
+                unitType.getModifiers(goodsType.getId(), tile.getType(), turn),
+                ((owner == null) ? null
+                    : owner.getModifiers(goodsType.getId(), unitType, turn)),
+                ProductionUtils.getRebelProductionModifiersForTile(tile, colonyProductionBonus, goodsType, unitType));
     }
 
     /**
@@ -198,7 +198,7 @@ public class TileProductionCalculator {
             return Stream.<Modifier>empty();
         }
         return concat(tile.getProductionModifiers(goodsType, null),
-                ProductionUtils.getRebelProductionModifiers(colonyProductionBonus, goodsType, null),
+                ProductionUtils.getRebelProductionModifiersForTile(tile, colonyProductionBonus, goodsType, null),
                 // This does not seem to influence center tile production, but was present in the old code.
                 //colony.getModifiers(id, null, turn),
                 ((owner == null) ? null

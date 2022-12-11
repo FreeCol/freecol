@@ -367,7 +367,7 @@ public class BuildingProductionCalculator {
         return (unitType != null)
             // With a unit, unit specific bonuses apply
             ? concat(buildingType.getModifiers(id, unitType, turn),
-                    ProductionUtils.getRebelProductionModifiers(colonyProductionBonus, goodsType, buildingType),
+                    ProductionUtils.getRebelProductionModifiersForBuilding(buildingType, colonyProductionBonus, goodsType, unitType),
                     buildingType.getCompetenceModifiers(id, unitType, turn),
                     (owner == null) ? null : owner.getModifiers(id, unitType, turn))
             // With no unit, only the building-specific bonuses 

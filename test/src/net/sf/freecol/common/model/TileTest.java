@@ -23,9 +23,14 @@ import static net.sf.freecol.common.util.CollectionUtils.any;
 import static net.sf.freecol.common.util.CollectionUtils.count;
 import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.sf.freecol.common.model.production.TileProductionCalculator;
+import net.sf.freecol.common.model.production.WorkerAssignment;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -330,7 +335,7 @@ public class TileTest extends FreeColTestCase {
                      tile2.getPotentialProduction(grain, colonistType));
         assertEquals("Plains/grain/colonist max", 6,
                      tile2.getMaximumPotential(grain, colonistType));
-        assertEquals("Plains/grain/expertFarmer", 8,
+        assertEquals("Plains/grain/expertFarmer", 7,
                      tile2.getPotentialProduction(grain, expertFarmerType));
         tile2.addResource(new Resource(game, tile2, grainResource));
         assertEquals("Plains+Resource/grain", 7,
@@ -341,9 +346,9 @@ public class TileTest extends FreeColTestCase {
                      tile2.getPotentialProduction(grain, colonistType));
         assertEquals("Plains+Resource/grain/colonist max", 8,
                      tile2.getMaximumPotential(grain, colonistType));
-        assertEquals("Plains+Resource/grain/expertFarmer", 12,
+        assertEquals("Plains+Resource/grain/expertFarmer", 11,
                      tile2.getPotentialProduction(grain, expertFarmerType));
-        assertEquals("Plains+Resource/grain/expertFarmer max", 13,
+        assertEquals("Plains+Resource/grain/expertFarmer max", 12,
                      tile2.getMaximumPotential(grain, expertFarmerType));
 
         Tile tile3 = new Tile(game, plainsForest, 1, 1);
@@ -351,6 +356,14 @@ public class TileTest extends FreeColTestCase {
                      tile3.getPotentialProduction(grain, null));
         assertEquals("Forest/grain max", 6,
                      tile3.getMaximumPotential(grain, null));
+        assertEquals("Forest/lumber/colonist", 6,
+                tile3.getPotentialProduction(lumber, colonistType));
+        assertEquals("Forest/lumber/colonist max", 8,
+                tile3.getMaximumPotential(lumber, colonistType));
+        assertEquals("Forest/lumber/expertLumberJack", 12,
+                tile3.getPotentialProduction(lumber, expertLumberJack));
+        assertEquals("Forest/lumber/expertLumberJack max", 14,
+                tile3.getMaximumPotential(lumber, expertLumberJack));
     }
 
     public void testIsTileTypeAllowed() {
@@ -677,8 +690,8 @@ public class TileTest extends FreeColTestCase {
             unit.setLocation(ct);
             unit.changeWorkType(lumber);
             int result = base * expertBonus;
-            if (t.hasRiver()) result += riverBonus;
-            if (t.hasRoad()) result += roadBonus;
+            if (t.hasRiver()) result += riverBonus * expertBonus;
+            if (t.hasRoad()) result += roadBonus * expertBonus;
             if (t.hasResource()) result += resourceBonus * expertBonus;
             assertEquals("Expert lumber production at tile " + i, result,
                 ct.getTotalProductionOf(lumber));

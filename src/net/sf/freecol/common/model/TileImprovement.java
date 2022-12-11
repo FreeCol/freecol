@@ -580,17 +580,37 @@ public class TileImprovement extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                   UnitType unitType) {
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType) {
+        if (goodsType == null || !isComplete()) {
+            return Stream.<Modifier>empty();
+        }
+        
         final Specification spec = getSpecification();
-        Modifier m;
-        return (goodsType != null && isComplete()
-            && !(/* unattended */ !isNatural() && unitType == null
+        
+        if (!isNatural()
+                && unitType == null
                 && !goodsType.isFoodType()
-                && spec.getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS))
-            && (m = getProductionModifier(goodsType)) != null)
-            ? Stream.of(m)
-            : Stream.<Modifier>empty();
+                && spec.getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)) {
+            return Stream.<Modifier>empty();
+        }
+        
+        Modifier m = getProductionModifier(goodsType);
+        if (m == null) {
+            return Stream.<Modifier>empty();
+        }
+        
+        if (unitType != null
+                && unitType.getExpertProduction() != null
+                && unitType.getExpertProduction().equals(goodsType)) {
+            final Stream<Modifier> expertMultiplicativeModifier = unitType.getModifiers(goodsType.getId(), tile.getType(), null)
+                .filter(mod -> mod.getType() == Modifier.ModifierType.MULTIPLICATIVE);
+            
+            final float expertBonus = FeatureContainer.applyModifiers(m.getValue(), null, expertMultiplicativeModifier);
+            m = Modifier.makeModifier(m);
+            m.setValue(expertBonus);
+        }
+        
+        return Stream.of(m);
     }
 
     /**

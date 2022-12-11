@@ -144,6 +144,7 @@ public class Modifier extends Feature {
     public static final int RESOURCE_PRODUCTION_INDEX = 10;
     public static final int COLONY_PRODUCTION_INDEX = 20;
     public static final int EXPERT_PRODUCTION_INDEX = 30;
+    public static final int COLONYTILE_PRODUCTION_INDEX = 35;
     public static final int FATHER_PRODUCTION_INDEX = 40;
     public static final int IMPROVEMENT_PRODUCTION_INDEX = 50;
     public static final int AUTO_PRODUCTION_INDEX = 60;
