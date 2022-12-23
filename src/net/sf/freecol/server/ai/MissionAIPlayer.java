@@ -271,7 +271,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
         final Location loc = unit.getLocation();
         final Settlement settlement = (loc == null) ? null
             : loc.getSettlement();
-        return (settlement != null && settlement.isBadlyDefended())
+        return (settlement != null && settlement.isBadlyDefended()) && unit.isDefensiveUnit()
             ? getDefendSettlementMission(aiUnit, settlement)
             : null;
     }
