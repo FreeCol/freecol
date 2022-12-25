@@ -109,80 +109,82 @@ public class ColonizationMapReader {
     public static void main(String[] args) throws Exception {
 
         if ("--palette".equals(args[0])) {
-            RandomAccessFile writer = new RandomAccessFile(args[1], "rw");
-            byte width = 58;
-            byte height = 72;
-            int size = width * height * 3 + header.length;
-            layer1 = new byte[size];
-            for (int i = 0; i < header.length; i++) {
-                layer1[i] = header[i];
-            }
-            Arrays.fill(layer1, header.length, header.length + width * height, (byte) 25); // fill with ocean
-            int ROWS = 32;
-            int COLUMNS = 8;
-            int offset = header.length + width + 1;
-            for (int y = 0; y < ROWS; y++) {
-                for (int x = 0; x < COLUMNS; x++) {
-                    byte value = (byte) (COLUMNS * y + x);
-                    if ((value & 24) == 24 && x > 2) {
-                        // undefined
-                        value = 26;
-                    }
-                    layer1[offset + x] = value;
+            try (RandomAccessFile writer = new RandomAccessFile(args[1], "rw")) {
+                byte width = 58;
+                byte height = 72;
+                int size = width * height * 3 + header.length;
+                layer1 = new byte[size];
+                for (int i = 0; i < header.length; i++) {
+                    layer1[i] = header[i];
                 }
-                offset += width;
+                Arrays.fill(layer1, header.length, header.length + width * height, (byte) 25); // fill with ocean
+                int ROWS = 32;
+                int COLUMNS = 8;
+                int offset = header.length + width + 1;
+                for (int y = 0; y < ROWS; y++) {
+                    for (int x = 0; x < COLUMNS; x++) {
+                        byte value = (byte) (COLUMNS * y + x);
+                        if ((value & 24) == 24 && x > 2) {
+                            // undefined
+                            value = 26;
+                        }
+                        layer1[offset + x] = value;
+                    }
+                    offset += width;
+                }
+                writer.write(layer1);
             }
-            writer.write(layer1);
         } else {
-            RandomAccessFile reader = new RandomAccessFile(args[0], "r");
-            try {
-                reader.readFully(header);
-            } catch (EOFException ee) {
-                System.err.println("Unable to read header of " + args[0]
-                    + ": " + ee);
-                System.exit(1);
-            }
-            System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
-            System.out.println(String.format("Map height: %02d", (int) header[HEIGHT]));
-
-            int size = header[WIDTH] * header[HEIGHT];
-            layer1 = new byte[size];
-            try {
-                reader.readFully(layer1);
-            } catch (EOFException ee) {
-                System.err.println("Unable to read data of " + args[0]
-                    + ": " + ee);
-                System.exit(1);
-            }
-
-            int index = 0;
-            for (int y = 0; y < header[HEIGHT]; y++) {
-                for (int x = 0; x < header[WIDTH]; x++) {
-                    int decimal = layer1[index] & 0xff;
-                    char terrain = tiletypes[decimal & 31];
-                    int overlay = decimal >> 5;
-                    switch(overlay) {
-                    case 1: terrain = '^'; // hill
-                        break;
-                    case 2: terrain = '~'; // minor river
-                        break;
-                    case 3: terrain = 'x'; // hill + minor river
-                        break;
-                    case 5: terrain = '*'; // mountain
-                        break;
-                    case 6: terrain = '='; // major river
-                        break;
-                    case 7: terrain = 'X'; // mountain + major river
-                        break;
-                    default:
-                        break;
-                    };
-                    System.out.print(terrain);
-                    index++;
+            try (RandomAccessFile reader = new RandomAccessFile(args[0], "r")) {
+                try {
+                    reader.readFully(header);
+                } catch (EOFException ee) {
+                    System.err.println("Unable to read header of " + args[0]
+                        + ": " + ee);
+                    System.exit(1);
+                }
+                System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
+                System.out.println(String.format("Map height: %02d", (int) header[HEIGHT]));
+    
+                int size = header[WIDTH] * header[HEIGHT];
+                layer1 = new byte[size];
+                try {
+                    reader.readFully(layer1);
+                } catch (EOFException ee) {
+                    System.err.println("Unable to read data of " + args[0]
+                        + ": " + ee);
+                    System.exit(1);
+                }
+    
+                int index = 0;
+                for (int y = 0; y < header[HEIGHT]; y++) {
+                    for (int x = 0; x < header[WIDTH]; x++) {
+                        int decimal = layer1[index] & 0xff;
+                        char terrain = tiletypes[decimal & 31];
+                        int overlay = decimal >> 5;
+                        switch(overlay) {
+                        case 1: terrain = '^'; // hill
+                            break;
+                        case 2: terrain = '~'; // minor river
+                            break;
+                        case 3: terrain = 'x'; // hill + minor river
+                            break;
+                        case 5: terrain = '*'; // mountain
+                            break;
+                        case 6: terrain = '='; // major river
+                            break;
+                        case 7: terrain = 'X'; // mountain + major river
+                            break;
+                        default:
+                            break;
+                        };
+                        System.out.print(terrain);
+                        index++;
+                    }
+                    System.out.println('\n');
                 }
                 System.out.println('\n');
             }
-            System.out.println('\n');
         }
     }
 

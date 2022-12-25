@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -397,12 +398,12 @@ public class FreeColDataFile {
         final String suffix = resourceFilename.substring(resourceFilename.lastIndexOf("."));
         final String completeRegex = Pattern.quote(prefix) + regex + Pattern.quote(suffix);
         
-        final List<Path> paths = Files.list(filePath.getParent())
-                .sorted()
-                .filter(p -> p.getFileName().toString().matches(completeRegex) && (!findVariation || !p.equals(filePath)))
-                .collect(Collectors.toList());
-        
-        return paths;
+        try (Stream<Path> pathStream = Files.list(filePath.getParent())) {
+            return pathStream
+                    .sorted()
+                    .filter(p -> p.getFileName().toString().matches(completeRegex) && (!findVariation || !p.equals(filePath)))
+                    .collect(Collectors.toList());
+        }
     }
 
     /**

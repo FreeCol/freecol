@@ -21,9 +21,10 @@ package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -34,17 +35,16 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
-
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 
 public class SerializationTest extends FreeColTestCase {
@@ -67,7 +67,9 @@ public class SerializationTest extends FreeColTestCase {
 
             FreeColSavegameFile mapFile = new FreeColSavegameFile(new File(name));
 
-            mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
+            try (InputStream in = mapFile.getSavegameInputStream()) {
+                mapValidator.validate(new StreamSource(in));
+            }
         } catch (SAXParseException e) {
             String errMsg = e.getMessage()
                 + " at line=" + e.getLineNumber()

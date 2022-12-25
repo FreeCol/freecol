@@ -175,8 +175,8 @@ public class Messages {
 
         for (File f : FreeColDirectories.getI18nMessageFileList(locale)) {
             if (!f.canRead()) continue;
-            try (InputStream in = Files.newInputStream(f.toPath())) {
-                loadMessages(in);
+            try {
+                loadMessages(Files.newInputStream(f.toPath()));
             } catch (IOException ioe) {
                 System.err.println("Failed to load messages from "
                     + f.getPath() + ": " + ioe.getMessage());
@@ -209,28 +209,28 @@ public class Messages {
      * Loads messages from a resource file into the current message bundle.
      *
      * Public for the test suite.
+     * 
+     * The {@code InputStream} gets closed in this method.
      *
      * @param is The {@code InputStream} to read from.
      * @throws IOException on failure to read from the stream.
      */
     public static void loadMessages(InputStream is) throws IOException {
-        InputStreamReader inputReader
-            = new InputStreamReader(is, StandardCharsets.UTF_8);
-        BufferedReader in = new BufferedReader(inputReader);
-
-        String line = null;
-        while((line = in.readLine()) != null) {
-            line = line.trim();
-            int index = line.indexOf('#');
-            if (index == 0) continue;
-            index = line.indexOf('=');
-            if (index > 0) {
-                String key = line.substring(0, index).trim();
-                String value = line.substring(index + 1).trim()
-                    .replace("\\n", "\n").replace("\\t", "\t");
-                messageBundle.put(key, value);
-                if (key.startsWith("FileChooser.")) {
-                    UIManager.put(key, value);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+            String line = null;
+            while((line = in.readLine()) != null) {
+                line = line.trim();
+                int index = line.indexOf('#');
+                if (index == 0) continue;
+                index = line.indexOf('=');
+                if (index > 0) {
+                    String key = line.substring(0, index).trim();
+                    String value = line.substring(index + 1).trim()
+                        .replace("\\n", "\n").replace("\\t", "\t");
+                    messageBundle.put(key, value);
+                    if (key.startsWith("FileChooser.")) {
+                        UIManager.put(key, value);
+                    }
                 }
             }
         }
