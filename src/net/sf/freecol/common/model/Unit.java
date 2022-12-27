@@ -1008,8 +1008,12 @@ public class Unit extends GoodsLocation
      * @return A military {@code Role}, or null if none found.
      */
     public Role getMilitaryRole() {
-        return first(transform(getSpecification().getMilitaryRoles(),
-                               r -> roleIsAvailable(r)));
+        final Role bestMilitaryRole = getSpecification().getMilitaryRoles()
+                .filter(r -> roleIsAvailable(r) && !r.hasAbility(Ability.SPEAK_WITH_CHIEF))
+                .sorted((a, b) -> Double.compare(b.getOffence(), a.getOffence()))
+                .findFirst().orElse(null);
+        
+        return bestMilitaryRole;
     }
 
     /**

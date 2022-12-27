@@ -1098,13 +1098,8 @@ public class ColonyPlan {
      * @param colony The {@code Colony} storing the equipment.
      * @return True if the unit was equipped.
      */
-    private static boolean fullEquipUnit(Specification spec, Unit unit,
-                                         Role role, Colony colony) {
-        return (role.isOffensive())
-            ? any(transform(spec.getMilitaryRoles(),
-                            r -> unit.roleIsAvailable(r)
-                                && colony.equipForRole(unit, r, r.getMaximumCount())))
-            : colony.equipForRole(unit, role, role.getMaximumCount());
+    private static boolean fullEquipUnit(Specification spec, Unit unit, Role role, Colony colony) {
+        return colony.equipForRole(unit, role, role.getMaximumCount());
     }
 
     /**
