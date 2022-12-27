@@ -2244,6 +2244,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             buildWishMaps(lb);
         }
         cheat(lb);
+        buyUnitsInEurope(lb);
         buildTransportMaps(lb);
 
         // Note order of operations below.  We allow rearrange et al to run
@@ -2267,6 +2268,52 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         wagonsNeeded.clear();
         goodsWishes.clear();
         workerWishes.clear();
+    }
+
+    private void buyUnitsInEurope(LogBuilder lb) {
+        /*
+         * It seems that training/recruiting units, in other cases than cheating,
+         * was removed from the code in 2012. This prevents the AI from actually
+         * using the money it's gaining. This happened in commit:
+         * 9e68ade8d2876c8135524c5b396c93d6c4d5ed1f.
+         * 
+         * The code has changed a lot since then, so I have just added the quickfix
+         * below for buying units. This code does not prioritize wishes based on
+         * multiple units going to the same location, does not support recruiting etc.
+         * 
+         * A better implementation will be added some point in the future.
+         */
+        final Player player = getPlayer();
+        final Europe europe = player.getEurope();
+        for (Wish w : getWishes()) {
+            if (!(w instanceof WorkerWish)) {
+                continue;
+            }
+            if (w.getTransportable() != null) {
+                continue;
+            }
+            
+            final WorkerWish workerWish = (WorkerWish) w;
+            final UnitType unitType = workerWish.getUnitType();
+            if (!unitType.isAvailableTo(player) ) {
+                continue;
+            }
+            
+            final int unitPrice = europe.getUnitPrice(unitType);
+            
+            if (unitPrice <= 0) {
+                continue;
+            }
+            
+            if (unitPrice > player.getGold()) {
+                return;
+            }
+            
+            final AIUnit newUnit = trainAIUnitInEurope(unitType);
+            if (newUnit != null) {
+                getWishRealizationMission(newUnit, workerWish);
+            }
+        }
     }
 
     /**
