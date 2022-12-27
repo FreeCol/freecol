@@ -1855,9 +1855,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     lb.add(", ", m);
                     updateTransport(aiUnit, oldTarget, lb);
                     reasons.put(unit, "To-work");
-                    ports.add(c);
                 }
-
+                ports.add(c);
             } else if (m instanceof IdleAtSettlementMission) {
                 reasons.put(unit, "Idle"); // already idle
             } else {
@@ -2168,9 +2167,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public Mission getWorkInsideColonyMission(AIUnit aiUnit,
                                               AIColony aiColony) {
-        if (WorkInsideColonyMission.invalidMissionReason(aiUnit) != null) return null;
         if (aiColony == null) {
             aiColony = getAIColony(aiUnit.getUnit().getColony());
+        }
+        if (WorkInsideColonyMission.invalidMissionReason(aiUnit, aiColony.getColony()) != null) {
+            return null;
         }
         return (aiColony == null) ? null
             : new WorkInsideColonyMission(getAIMain(), aiUnit, aiColony);
@@ -2287,8 +2288,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
          * 
          * A better implementation will be added some point in the future.
          */
+                
         final Player player = getPlayer();
         final Europe europe = player.getEurope();
+        
+        boolean militaryUnitBought = false;
         for (Wish w : getWishes()) {
             if (!(w instanceof WorkerWish)) {
                 continue;
@@ -2317,7 +2321,57 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             if (newUnit != null) {
                 getWishRealizationMission(newUnit, workerWish);
             }
+            
+            if (!militaryUnitBought) {
+                militaryUnitBought = true;
+                final Unit unitBought = buyDragoon();
+                if (unitBought == null) {
+                    return;
+                }
+            }
         }
+    }
+    
+    private Unit buyDragoon() {
+        final Player player = getPlayer();
+        final Role dragoonRole = getSpecification().getMilitaryRolesList().stream()
+                .filter(r -> r.hasAbility(Ability.ARMED) && r.hasAbility(Ability.MOUNTED))
+                .findFirst()
+                .orElse(null);
+        
+        if (dragoonRole == null) {
+            return null;
+        }
+        
+        final UnitType cheapestUnitType = getSpecification().getUnitTypesTrainedInEurope(getPlayer())
+            .stream()
+            .filter(ut -> ut.getPrice() > 0 && ut.getPrice() != INFINITY)
+            .sorted((a, b) -> Integer.compare(a.getPrice(), b.getPrice()))
+            .findFirst()
+            .orElse(null);
+        
+        if (cheapestUnitType == null) {
+            return null;
+        }
+        
+        final AbstractUnit au = new AbstractUnit(cheapestUnitType, dragoonRole.getId(), 1);
+        final int purchasePrice = player.getEuropeanPurchasePrice(au);
+        if (purchasePrice <= 0 || purchasePrice == INFINITY) {
+            return null;
+        }
+        if (purchasePrice > getPlayer().getGold()) {
+            return null;
+        }
+        
+        player.modifyGold(-purchasePrice);
+        
+        final AbstractUnit auForCreation = new AbstractUnit(getSpecification().getDefaultUnitType(),
+                dragoonRole.getId(), 1);                
+        final List<Unit> createdUnit = ((ServerPlayer) player).createUnits(List.of(auForCreation), player.getEurope(), getAIRandom());
+        if (createdUnit.isEmpty()) {
+            return null;
+        }
+        return createdUnit.get(0);
     }
 
     /**
