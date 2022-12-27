@@ -770,11 +770,22 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             outer: for (GoodsType gt : getSpecification().getGoodsTypeList()) {
                 if (colony.getAdjustedNetProductionOf(gt) < 0) continue;
                 int count = colony.getGoodsCount(gt);
+                
+                int exportAmount = fullExport.contains(gt) || partExport.contains(gt) ? count : -1;
+                /* 
+                 * We should strive to only transport 100 goods ... and the partExport handling below
+                 * is the complete opposite of that.
+                 * 
+                 * Raw materials should only be exported if there's a surplus production in the colony,
+                 * but that can be fixed later.
+                 *  
                 int exportAmount = (fullExport.contains(gt))
                     ? count
                     : (partExport.contains(gt))
                     ? count - colony.getExportData(gt).getExportLevel()
                     : -1;
+                */
+                
                 if (exportAmount <= 0) continue;
                 int priority = (exportAmount >= capacity)
                     ? TransportableAIObject.IMPORTANT_DELIVERY
