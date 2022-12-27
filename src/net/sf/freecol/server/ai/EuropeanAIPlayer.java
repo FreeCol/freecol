@@ -1734,6 +1734,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         if (nBuilders > 0) {
             for (AIUnit aiUnit : sort(aiUnits, builderComparator)) {
+                if (aiUnit.getUnit().isArmed() && getGame().getTurn().getNumber() > 20) {
+                    // Quickfix to avoid having all soldies being given a BuildColonyMission.
+                    continue;
+                }
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
                     ? null : m.getTarget();
                 if ((m = getBuildColonyMission(aiUnit, null)) == null)
