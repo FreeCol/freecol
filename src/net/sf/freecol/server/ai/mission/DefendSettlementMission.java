@@ -234,6 +234,11 @@ public final class DefendSettlementMission extends Mission {
         if (!aiUnit.getUnit().getOwner().hasSettlements()) {
             return Mission.TARGETNOTFOUND;
         }
+        
+        if (aiUnit.getUnit().getOwner().isIndian()) {
+            return null;
+        }
+        
         if (!aiUnit.getUnit().isDefensiveUnit()
                 || aiUnit.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF)) {
             return Mission.UNITNOTOFREQUIREDTYPE;
