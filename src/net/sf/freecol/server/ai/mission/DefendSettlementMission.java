@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Location;
@@ -226,12 +227,19 @@ public final class DefendSettlementMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidMissionReason(AIUnit aiUnit) {
-        String reason = invalidUnitReason(aiUnit);
-        return (reason != null)
-            ? reason
-            : (!aiUnit.getUnit().getOwner().hasSettlements())
-            ? Mission.TARGETNOTFOUND
-            : null;
+        final String reason = invalidUnitReason(aiUnit);
+        if (reason != null) {
+            return reason;
+        }
+        if (!aiUnit.getUnit().getOwner().hasSettlements()) {
+            return Mission.TARGETNOTFOUND;
+        }
+        if (!aiUnit.getUnit().isDefensiveUnit()
+                || aiUnit.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+            return Mission.UNITNOTOFREQUIREDTYPE;
+        }
+        
+        return null;
     }
 
     /**

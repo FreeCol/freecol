@@ -86,6 +86,7 @@ public abstract class Mission extends AIObject {
     protected static final String TARGETNOTFOUND = "target-not-found";
     protected static final String UNITNOTAPERSON = "unit-not-a-person";
     protected static final String UNITNOTOFFENSIVE = "unit-not-offensive";
+    protected static final String UNITNOTOFREQUIREDTYPE = "unit-not-required-type";
     protected static final String UNITNOTONMAP = "unit-not-on-map";
 
     /** The unit to undertake the mission. */

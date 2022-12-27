@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
@@ -271,7 +272,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
         final Location loc = unit.getLocation();
         final Settlement settlement = (loc == null) ? null
             : loc.getSettlement();
-        return (settlement != null && settlement.isBadlyDefended()) && unit.isDefensiveUnit()
+        return (settlement != null && settlement.isBadlyDefended())
             ? getDefendSettlementMission(aiUnit, settlement)
             : null;
     }
