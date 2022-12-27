@@ -880,6 +880,18 @@ public final class TransportMission extends Mission {
             case ALREADY_PRESENT:
                 break;
             case CAPACITY_EXCEEDED:
+                if (l instanceof Goods) {
+                    final Goods g = (Goods) l;
+                    final int loadableAmount = carrier.getLoadableAmount(g.getType());
+                    if (loadableAmount > 0) {
+                        g.setAmount(loadableAmount);
+                        if (!t.joinTransport(carrier, d)) {
+                            lb.add(", ", t, " NO-JOIN-PARTIAL");
+                            return CargoResult.TFAIL;
+                        }
+                        break;
+                    }
+                }
                 lb.add(", ", t, " NO-ROOM on ", carrier);
                 return CargoResult.TFAIL;
             default:
