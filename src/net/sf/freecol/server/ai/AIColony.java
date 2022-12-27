@@ -445,6 +445,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         // exported only to the extent of not filling the warehouse.
         for (GoodsType g : spec.getStorableGoodsTypeList()) {
             if (!g.isFoodType()
+                && !g.isRawMaterialForUnstorableBuildingMaterial() // lumber
                 && !g.isBuildingMaterial()
                 && !g.getMilitary()
                 && !g.isTradeGoods()) {
