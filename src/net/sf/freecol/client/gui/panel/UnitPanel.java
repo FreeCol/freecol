@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
 import java.awt.Component;
 import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
@@ -26,9 +29,10 @@ import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.server.ai.AIUnit;
 
 
 /**
@@ -118,6 +122,19 @@ public abstract class UnitPanel extends MigPanel
                     unitLabel.setTransferHandler(portPanel.getTransferHandler());
                     unitLabel.addMouseListener(portPanel.getPressListener());
                 }
+                
+                if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
+                        && FreeColDebugger.debugShowMission()
+                        && unit.getOwner().isAI()
+                        && portPanel.getFreeColClient().getFreeColServer() != null
+                        && portPanel.getFreeColClient().getFreeColServer().getAIMain() != null) {
+                    final AIUnit au = portPanel.getFreeColClient().getFreeColServer().getAIMain().getAIUnit(unit);
+                    if (au != null) {
+                        unitLabel.setToolTipText((!au.hasMission()) ? "No mission"
+                            : lastPart(au.getMission().getClass().toString(), "."));
+                    }
+                }
+                
                 add(unitLabel);
             }
         }
