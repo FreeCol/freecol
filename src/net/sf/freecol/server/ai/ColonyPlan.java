@@ -1154,10 +1154,15 @@ public class ColonyPlan {
                 if (workers.size() <= 1) break;
                 Role role = outdoorRole;
                 if (role == null) {
-                    if ((role = u.getMilitaryRole()) == null) continue;
-                }
-                if (u.getType() == role.getExpertUnit()
-                    && fullEquipUnit(spec(), u, role, col)) {
+                    for (Role r : u.getSortedMilitaryRoles()) {
+                        if (u.getType() == r.getExpertUnit() && fullEquipUnit(spec(), u, r, col)) {
+                            workers.remove(u);
+                            lb.add(u.getId(), "(", u.getType().getSuffix(),
+                                ") -> ", r.getSuffix(), "\n");
+                            break;
+                        }
+                    }
+                } else if (u.getType() == role.getExpertUnit() && fullEquipUnit(spec(), u, role, col)) {
                     workers.remove(u);
                     lb.add(u.getId(), "(", u.getType().getSuffix(),
                         ") -> ", role.getSuffix(), "\n");
@@ -1181,11 +1186,17 @@ public class ColonyPlan {
         for (Unit u : sort(workers, soldierComparator)) {
             if (workers.size() <= 1) break;
             if (!col.isBadlyDefended()) break;
-            Role role = u.getMilitaryRole();
-            if (role != null && fullEquipUnit(spec(), u, role, col)) {
-                workers.remove(u);
-                lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
-                       u.getRoleSuffix(), "\n");
+            if (u.getSkillLevel() > 0) {
+                // Stops experts from being used as soldiers
+                continue;
+            }
+            for (Role role : u.getSortedMilitaryRoles()) {
+                if (role != null && fullEquipUnit(spec(), u, role, col)) { 
+                    workers.remove(u);
+                    lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
+                            u.getRoleSuffix(), "\n");
+                    break;
+                }
             }
         }
 
@@ -1433,13 +1444,15 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
 
         // Rearm what remains as far as possible.
         for (Unit u : sort(workers, soldierComparator)) {
-            Role role = u.getMilitaryRole();
-            if (role == null) continue;
-            if (fullEquipUnit(spec(), u, role, col)) {
-                lb.add("    ", u.getId(), "(", u.getType().getSuffix(),
-                       ") -> ", u.getRoleSuffix(), "\n");
-                workers.remove(u);
-            } else break;
+            if (u.getSkillLevel() > 0) continue;
+            for (Role role : u.getSortedMilitaryRoles()) {
+                if (fullEquipUnit(spec(), u, role, col)) {
+                    lb.add("    ", u.getId(), "(", u.getType().getSuffix(),
+                           ") -> ", u.getRoleSuffix(), "\n");
+                    workers.remove(u);
+                    break;
+                }
+            }
         }
         for (Unit u : transform(col.getUnits(), u -> !u.hasDefaultRole())) {
             logger.warning("assignWorkers bogus role for " + u);

@@ -1015,6 +1015,19 @@ public class Unit extends GoodsLocation
         
         return bestMilitaryRole;
     }
+    
+    /**
+     * Gets the military roles for this unit that is not a scout.
+     *
+     * @return A sorted list of military roles for this unit, with
+     *      the best roles first.
+     */
+    public List<Role> getSortedMilitaryRoles() {
+        return getSpecification().getMilitaryRoles()
+                .filter(r -> roleIsAvailable(r) && !r.hasAbility(Ability.SPEAK_WITH_CHIEF))
+                .sorted((a, b) -> Double.compare(b.getOffence(), a.getOffence()))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Get the change in goods required to change to a new role/count.
