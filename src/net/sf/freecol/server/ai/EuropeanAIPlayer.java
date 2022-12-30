@@ -19,6 +19,29 @@
 
 package net.sf.freecol.server.ai;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.model.Constants.UNDEFINED;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.appendToMapList;
+import static net.sf.freecol.common.util.CollectionUtils.ascendingIntegerComparator;
+import static net.sf.freecol.common.util.CollectionUtils.cacheDouble;
+import static net.sf.freecol.common.util.CollectionUtils.cachingDoubleComparator;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.flatten;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
+import static net.sf.freecol.common.util.CollectionUtils.map;
+import static net.sf.freecol.common.util.CollectionUtils.mapEntriesByValue;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.maximize;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
+import static net.sf.freecol.common.util.RandomUtils.randomInt;
+import static net.sf.freecol.common.util.RandomUtils.randomInts;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,7 +68,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -66,10 +89,10 @@ import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
@@ -81,11 +104,10 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.CachingFunction;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.RandomUtils.*;
-
+import net.sf.freecol.server.ai.military.DefensiveMap;
+import net.sf.freecol.server.ai.military.MilitaryCoordinator;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -1893,6 +1915,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             " naval-carriers=", nNavalCarrier,
             ")");
         logMissions(reasons, lb);
+        
+        final Set<AIUnit> militaryUnits = getAIUnits().stream()
+                .filter(u -> !u.getUnit().isNaval() && u.getUnit().isOffensiveUnit() && !u.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF))
+                .collect(Collectors.toSet());
+        final MilitaryCoordinator militaryCoordinator = new MilitaryCoordinator(this, militaryUnits);
+        militaryCoordinator.determineMissions();
     }
 
     /**
@@ -1930,9 +1958,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     && old instanceof WorkInsideColonyMission) ? old
                 : (unit.isInColony()
                     && (m = getWorkInsideColonyMission(aiUnit, null)) != null) ? m
-
+                            
                 // Try to maintain local defence
-                : (old instanceof DefendSettlementMission) ? old
+                : (old instanceof DefendSettlementMission && old.getTarget() instanceof Colony && !((Colony) old.getTarget()).isVeryWellDefended()) ? old
                 : ((m = getDefendCurrentSettlementMission(aiUnit)) != null) ? m
 
                 // REF override
@@ -1948,7 +1976,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     && (m = getWishRealizationMission(aiUnit, null)) != null) ? m
 
                 // Ordinary defence
-                : ((m = getDefendSettlementMission(aiUnit, false)) != null) ? m
+                : ((m = getDefendSettlementMission(aiUnit, false, false)) != null) ? m
 
                 // Try nearby offence
                 : (old instanceof UnitSeekAndDestroyMission) ? old
@@ -1963,10 +1991,13 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 : ((m = getWishRealizationMission(aiUnit, null)) != null) ? m
 
                 // Another try to defend, with relaxed cost decider
-                : ((m = getDefendSettlementMission(aiUnit, true)) != null) ? m
+                : ((m = getDefendSettlementMission(aiUnit, true, false)) != null) ? m
 
                 // Another try to attack, at longer range
                 : ((m = getSeekAndDestroyMission(aiUnit, 16)) != null) ? m
+                        
+                // Try again, even for well defended colonies.
+                : ((m = getDefendSettlementMission(aiUnit, true, true)) != null) ? m
 
                 // Leftover offensive units should go out looking for trouble
                 : (old instanceof UnitWanderHostileMission) ? old
@@ -2021,17 +2052,19 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param aiUnit The {@code AIUnit} to check.
      * @param relaxed Use a relaxed cost decider to choose the target.
+     * @param includeWellDefendedSettlements If {@code true}, then colonies that
+     *      are already well defended can get a DefendSettlementMission.
      * @return A new mission, or null if impossible.
      */
-    private Mission getDefendSettlementMission(AIUnit aiUnit, boolean relaxed) {
+    public Mission getDefendSettlementMission(AIUnit aiUnit, boolean relaxed, boolean includeWellDefendedSettlements) {
         if (DefendSettlementMission.invalidMissionReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location loc = unit.getLocation();
-        double worstValue = 1000000.0;
+        double worstValue = Double.MAX_VALUE;
         Colony worstColony = null;
         for (AIColony aic : getAIColonies()) {
             Colony colony = aic.getColony();
-            if (aic.isBadlyDefended()) {
+            if (aic.isBadlyDefended() || includeWellDefendedSettlements) {
                 if (unit.isAtLocation(colony.getTile())) {
                     worstColony = colony;
                     break;
@@ -2040,8 +2073,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     unit.getCarrier(),
                     ((relaxed) ? CostDeciders.numberOfTiles() : null));
                 if (ttr >= Unit.MANY_TURNS) continue;
-                double value = colony.getDefenceRatio() * 100.0 / ttr;
-                if (worstValue > value) {
+                double value = colony.getDefenceRatio() * 10 + ttr;
+                if (value < worstValue) {
                     worstValue = value;
                     worstColony = colony;
                 }

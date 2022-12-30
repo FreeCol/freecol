@@ -2778,7 +2778,25 @@ public class Colony extends Settlement implements TradeLocation {
      */
     @Override
     public boolean isBadlyDefended() {
-        return getTotalDefencePower() < 0.95 * getUnitCount() - 2.5;
+        final double defencePower = getTotalDefencePower();
+        if (getTile().getUnits().filter(u -> u.isOffensiveUnit()).count() < 1) {
+            return true;
+        }
+        if (getTile().getUnits().filter(u -> u.isOffensiveUnit()).count() > 5) {
+            return false;
+        }
+        return defencePower < 0.95 * getUnitCount() - 2.5;
+    }
+    
+    public boolean isVeryWellDefended() {
+        final double defencePower = getTotalDefencePower();
+        if (getTile().getUnits().filter(u -> u.isOffensiveUnit()).count() < 3) {
+            return false;
+        }
+        if (getTile().getUnits().filter(u -> u.isOffensiveUnit()).count() > 5) {
+            return true;
+        }
+        return defencePower / 2 > 0.95 * getUnitCount() - 2.5;
     }
 
     /**
