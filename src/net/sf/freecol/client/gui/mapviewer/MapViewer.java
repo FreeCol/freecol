@@ -57,6 +57,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -73,6 +74,10 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.server.ai.AIObject;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
+import net.sf.freecol.server.ai.military.DefensiveMap;
+import net.sf.freecol.server.ai.military.DefensiveZone;
 
 
 /**
@@ -276,7 +281,7 @@ public final class MapViewer extends FreeColClientHolder {
         backBufferG2d.setTransform(backBufferOriginTransform);
         backBufferG2d.setClip(allRenderingClipBounds);
         backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
-        backBufferG2d.dispose();
+        backBufferG2d.dispose();        
 
         g2d.drawImage(backBufferImage, 0, 0, null);      
         final long useBuffersMs = now();
@@ -535,6 +540,8 @@ public final class MapViewer extends FreeColClientHolder {
             			null);
             }
         });
+        
+        displayDebugAiDefensiveMap(nonAnimationG2d, tcb);
 
         // Display the colony names, if needed
         long t14 = now();
@@ -579,6 +586,34 @@ public final class MapViewer extends FreeColClientHolder {
                 .append(" t15=").append(t15 - t14)
                 ;
             logger.finest(sb.toString());
+        }
+    }
+
+    private void displayDebugAiDefensiveMap(Graphics2D nonAnimationG2d, TileClippingBounds tcb) {
+        if (FreeColDebugger.debugShowDefenceMapForPlayer() != null
+                && getFreeColServer() != null
+                && getFreeColServer().getAIMain() != null) {
+            final AIObject aiObject = getFreeColServer().getAIMain().getAIObject(FreeColDebugger.debugShowDefenceMapForPlayer().getId());
+            if (aiObject != null && aiObject instanceof EuropeanAIPlayer) {
+                final EuropeanAIPlayer eap = (EuropeanAIPlayer) aiObject;
+                final DefensiveMap defensiveMap = DefensiveMap.createDefensiveMap(eap);
+                paintEachTile(nonAnimationG2d, tcb.getTopLeftDirtyTile(), tcb.getBaseTiles(), (tileG2d, tile) -> {
+                    final DefensiveZone defensiveZone = defensiveMap.getDefensiveZone(tile);
+                    if (defensiveZone == null) {
+                        return;
+                    }
+                    if (defensiveZone.getNumberOfEnemies() > 0) {
+                        tileG2d.setColor(new Color(255, 0, 0, 150));
+                    } else if (defensiveZone.isEnemiesInNeighbour()) {
+                        tileG2d.setColor(new Color(255, 100, 100, 150));
+                    } else if (defensiveZone.isExposed()) {
+                        tileG2d.setColor(new Color(255, 255, 0, 150));
+                    } else {
+                        tileG2d.setColor(new Color(0, 255, 0, 150));
+                    }
+                    tileG2d.fill(mapViewerScaledUtils.getFog());
+                });
+            }
         }
     }
 

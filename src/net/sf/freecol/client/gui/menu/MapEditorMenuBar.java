@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.action.StartMapAction;
 import net.sf.freecol.client.gui.action.ZoomInAction;
 import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.debug.FreeColDebugger;
 
 
 /**
@@ -88,6 +89,10 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         buildToolsMenu();
         buildColopediaMenu();
 
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+            add(new DebugMenu(this.freeColClient));
+        }
+        
         update();
     }
 
