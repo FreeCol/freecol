@@ -25,7 +25,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIColony;
 
@@ -36,6 +38,8 @@ public final class DefensiveZone {
 
     private final AIColony aiColony;
     private final Set<Unit> potentialEnemies = new HashSet<>();
+    private final Set<Settlement> potentialEnemySettlements = new HashSet<>();
+    
     private boolean exposedLand = false;
     private boolean exposedWater = false;
     private final Set<DefensiveZone> neighbours = new HashSet<>();
@@ -66,6 +70,10 @@ public final class DefensiveZone {
         potentialEnemies.addAll(units);
     }
     
+    public void addPotentialEnemySettlement(Settlement settlement) {
+        potentialEnemySettlements.add(settlement);
+    }
+    
     public void addNeighbour(DefensiveZone defensiveZone) {
         neighbours.add(defensiveZone);
     }
@@ -86,12 +94,6 @@ public final class DefensiveZone {
         return enemiesInNeighbour;
     }
     
-    public int getNumberOfEnemies() {
-        return (int) potentialEnemies.stream()
-                .filter(enemiesOnly())
-                .count();
-    }
-    
     public Set<Unit> getEnemies() {
         return potentialEnemies.stream()
                 .filter(enemiesOnly())
@@ -99,14 +101,21 @@ public final class DefensiveZone {
     }
     
     public int getNumberOfMilitaryEnemies() {
-        return (int) potentialEnemies.stream()
+        final int unitEnemies = (int) potentialEnemies.stream()
                 .filter(enemiesOnly())
                 .filter(u -> u.isOffensiveUnit())
                 .count();
+        
+        // Count the presence of an enemy settlement as a potential attack.
+        final int settlementEnemies = (int) potentialEnemySettlements.stream()
+                .filter(enemiesOnly())
+                .count();
+        
+        return unitEnemies + settlementEnemies;
     }
     
     public int getNumberOfPotentialMilitaryEnemies() {
-        return (int) potentialEnemies.stream()
+        final int unitEnemies = (int) potentialEnemies.stream()
                 /*
                  * TODO: This filter should be added after we have a system of trust
                  *       built in, where all AI players ally themselves (and attack)
@@ -117,6 +126,11 @@ public final class DefensiveZone {
                 */
                 .filter(u -> u.isOffensiveUnit())
                 .count();
+        
+        final int settlementEnemies = (int) potentialEnemySettlements.stream()
+                .count();
+        
+        return unitEnemies + settlementEnemies;
     }
 
     private Player getPlayer() {
@@ -131,7 +145,7 @@ public final class DefensiveZone {
         return neighbours;
     }
     
-    private Predicate<? super Unit> enemiesOnly() {
+    private Predicate<? super Ownable> enemiesOnly() {
         return u -> getPlayer().atWarWith(u.getOwner());
     }
 

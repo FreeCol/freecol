@@ -57,7 +57,6 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
-import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -602,7 +601,7 @@ public final class MapViewer extends FreeColClientHolder {
                     if (defensiveZone == null) {
                         return;
                     }
-                    if (defensiveZone.getNumberOfEnemies() > 0) {
+                    if (defensiveZone.getNumberOfMilitaryEnemies() > 0) {
                         tileG2d.setColor(new Color(255, 0, 0, 150));
                     } else if (defensiveZone.isEnemiesInNeighbour()) {
                         tileG2d.setColor(new Color(255, 100, 100, 150));

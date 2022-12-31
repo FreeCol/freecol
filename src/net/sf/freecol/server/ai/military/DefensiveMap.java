@@ -29,6 +29,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -157,7 +158,12 @@ public class DefensiveMap {
             closedMap.put(searchNode.getTile().getId(), searchNode);
             tileDefensiveZone.put(searchNode.getTile().getId(), searchNode.defensiveZone);
             
-            if (!searchNode.getTile().hasSettlement()) {
+            if (searchNode.getTile().hasSettlement()) {
+                final Settlement settlement = searchNode.getTile().getSettlement();
+                if (aiPlayer.getPlayer().getStance(settlement.getOwner()) != Stance.ALLIANCE) {
+                    searchNode.defensiveZone.addPotentialEnemySettlement(settlement);
+                }
+            } else {
                 final Set<Unit> enemyUnits = searchNode.getTile()
                         .getUnits()
                         .filter(u -> !aiPlayer.getPlayer().equals(u.getOwner())
@@ -227,7 +233,7 @@ public class DefensiveMap {
             sb.append(entry.getKey().getColony().getName());
             sb.append(": exposedLand=" + entry.getValue().isExposedLand());
             sb.append(": exposedWater=" + entry.getValue().isExposedWater());
-            sb.append(" enemies=" + entry.getValue().getNumberOfEnemies() + "\n");
+            sb.append(" enemies=" + entry.getValue().getNumberOfMilitaryEnemies() + "\n");
         }
         return sb.toString();
     }
