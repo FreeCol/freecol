@@ -157,12 +157,14 @@ public class DefensiveMap {
             closedMap.put(searchNode.getTile().getId(), searchNode);
             tileDefensiveZone.put(searchNode.getTile().getId(), searchNode.defensiveZone);
             
-            final Set<Unit> enemyUnits = searchNode.getTile()
-                    .getUnits()
-                    .filter(u -> !aiPlayer.getPlayer().equals(u.getOwner())
-                            && aiPlayer.getPlayer().getStance(u.getOwner()) != Stance.ALLIANCE)
-                    .collect(Collectors.toSet());
-            searchNode.defensiveZone.addAllPotentialEnemies(enemyUnits);
+            if (!searchNode.getTile().hasSettlement()) {
+                final Set<Unit> enemyUnits = searchNode.getTile()
+                        .getUnits()
+                        .filter(u -> !aiPlayer.getPlayer().equals(u.getOwner())
+                                && aiPlayer.getPlayer().getStance(u.getOwner()) != Stance.ALLIANCE)
+                        .collect(Collectors.toSet());
+                searchNode.defensiveZone.addAllPotentialEnemies(enemyUnits);
+            }
             
             for (Tile tile : searchNode.getTile().getSurroundingTiles(1)) {
                 if (!tile.isLand()) {
