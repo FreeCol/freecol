@@ -251,7 +251,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         final Function<Colony, TargetTuple> newTupleMapper = c -> {
             PathNode path = pathMapper.apply(c);
             return new TargetTuple(c, path,
-                UnitSeekAndDestroyMission.scorePath(aiu, path));
+                UnitSeekAndDestroyMission.scorePath(aiu, path, false));
         };
         final List<TargetTuple> targets
             = transform(flatten(player.getRebels(),

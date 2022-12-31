@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import static net.sf.freecol.common.util.CollectionUtils.count;
+
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,15 +30,14 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -200,13 +201,19 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
-    public static int scorePath(AIUnit aiUnit, PathNode path) {
+    public static int scorePath(AIUnit aiUnit, PathNode path, boolean onlySettlements) {
         Location loc = extractTarget(aiUnit, path);
-        return (loc instanceof Settlement)
-            ? scoreSettlementPath(aiUnit, path, (Settlement)loc)
-            : (loc instanceof Unit)
-            ? scoreUnitPath(aiUnit, path, (Unit)loc)
-            : Integer.MIN_VALUE;
+        if (loc instanceof Settlement) {
+            return scoreSettlementPath(aiUnit, path, (Settlement) loc);
+        }
+        if (onlySettlements) {
+            return Integer.MIN_VALUE;
+        }
+        if (loc instanceof Unit) {
+            scoreUnitPath(aiUnit, path, (Unit) loc);
+        }
+        
+        return Integer.MIN_VALUE;
     }
 
     /**
@@ -214,11 +221,10 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * {@code Tile}, optionally falling back to the nearest colony.
      *
      * @param aiUnit The {@code AIUnit} that is searching.
-     * @param deferOK Not used in this mission.
+     * @param onlySettlements Only have settlements as targets.
      * @return A suitable {@code GoalDecider}.
      */
-    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-        @SuppressWarnings("unused") boolean deferOK) {
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit, boolean onlySettlements) {
         return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
@@ -229,7 +235,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
                 public boolean hasSubGoals() { return true; }
                 @Override
                 public boolean check(Unit u, PathNode path) {
-                    int value = scorePath(aiUnit, path);
+                    int value = scorePath(aiUnit, path, onlySettlements);
                     if (bestValue < value) {
                         bestValue = value;
                         bestPath = path;
@@ -245,18 +251,17 @@ public final class UnitSeekAndDestroyMission extends Mission {
      *
      * @param aiUnit The {@code AIUnit} to find a target for.
      * @param range An upper bound on the number of moves.
-     * @param deferOK Not implemented in this mission.
+     * @param onlySettlements Only have settlements as targets.
      * @return A path to the target, or null if none found.
      */
-    private static PathNode findTargetPath(AIUnit aiUnit, int range,
-        @SuppressWarnings("unused") boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range, boolean onlySettlements) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
 
         // Can the unit legally reach a valid target from where it
         // currently is?
-        return unit.search(start, getGoalDecider(aiUnit, false),
+        return unit.search(start, getGoalDecider(aiUnit, onlySettlements),
             CostDeciders.avoidIllegal(), range, unit.getCarrier());
     }
 
@@ -265,12 +270,12 @@ public final class UnitSeekAndDestroyMission extends Mission {
      *
      * @param aiUnit The {@code AIUnit} to find a target for.
      * @param range An upper bound on the number of moves.
-     * @param deferOK Not implemented in this mission.
+     * @param onlySettlements Only have settlements as targets.
      * @return A suitable target, or null if none found.
      */
     public static Location findMissionTarget(AIUnit aiUnit, int range,
-                                             boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, range, deferOK);
+                                             boolean onlySettlements) {
+        PathNode path = findTargetPath(aiUnit, range, onlySettlements);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
     }
