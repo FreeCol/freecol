@@ -32,12 +32,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
+import net.sf.freecol.server.ai.mission.EscortUnitMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
@@ -54,6 +58,7 @@ public final class MilitaryCoordinator {
     private final DefensiveMap defensiveMap;
     
     private final Set<Unit> targetedEnemies = Collections.newSetFromMap(new IdentityHashMap<>());
+    private final Map<Settlement, List<AIUnit>> targetedEnemySettlements = new HashMap<>();
     
     /**
      * Creates a new military coordinator for the given military units.
@@ -120,7 +125,7 @@ public final class MilitaryCoordinator {
         counterattackAllEnemyUnitsReachableInTurns(dragoonUnits, 1);
         counterattackAllEnemyUnitsReachableInTurns(dragoonUnits, 2);
         
-        // TODO: Here's the place for attacking enemy colonies etc.
+        attackEnemySettlements(artilleryUnits, dragoonUnits);
         
         keepUnitsInColonies(defensiveMap.getAttackedColonies(), dragoonUnits, always());
         keepUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, always());
@@ -132,6 +137,59 @@ public final class MilitaryCoordinator {
         
         assignDefendClosestColony(otherMilitaryUnits);
         assignWanderHostile();
+    }
+
+    private void attackEnemySettlements(Set<AIUnit> artilleryUnits, Set<AIUnit> dragoonUnits) {
+        for (AIUnit artillery : new HashSet<>(artilleryUnits)) {
+            if (dragoonUnits.isEmpty()) {
+                continue;
+            }
+                
+            if (artillery.getUnit().getTile() == null) {
+                // Direct transport not supported at the moment.
+                continue;
+            }
+            final Settlement possibleTarget = (Settlement) UnitSeekAndDestroyMission.findMissionTarget(artillery, 10, true);
+            if (possibleTarget == null) {
+                continue;
+            }
+            
+            List<AIUnit> settlementAttackers = targetedEnemySettlements.get(possibleTarget);
+            if (settlementAttackers == null) {
+                settlementAttackers = new ArrayList<>();
+                targetedEnemySettlements.put(possibleTarget, settlementAttackers);
+            }
+            
+            if (settlementAttackers.size() > possibleTarget.getUnitCount()) {
+                // Too many attackers.
+                continue;
+            }
+            
+            // TODO: Perhaps support going directly to possibleTarget instead?
+            final Tile escortTargetTile = artillery.getUnit().getTile();
+            
+            final AIUnit escort = dragoonUnits.stream()
+                .sorted((a, b) -> Integer.compare(a.getUnit().getTurnsToReach(escortTargetTile), b.getUnit().getTurnsToReach(escortTargetTile)))
+                .findFirst()
+                .orElse(null);
+            
+            if (escort == null
+                    || escort.getUnit().getTurnsToReach(escortTargetTile) > 8) {
+                continue;
+            }
+            
+            artillery.setMission(new UnitSeekAndDestroyMission(artillery.getAIMain(), artillery, possibleTarget));
+            artilleryUnits.remove(artillery);
+            unusedUnits.remove(artillery);
+            
+            escort.setMission(new EscortUnitMission(escort.getAIMain(), escort, artillery.getUnit()));
+            dragoonUnits.remove(escort);
+            unusedUnits.remove(escort);
+            
+            // TODO: Consider sending a second escort if dragoonUnits.size() / 2 > artilleryUnits.size()
+
+            settlementAttackers.add(artillery);
+        }
     }
 
     private void counterattackEnemyValuableUnitsReachableInTurns(final Set<AIUnit> dragoonUnits, int turns) {
@@ -296,7 +354,7 @@ public final class MilitaryCoordinator {
     private static Set<Unit> onlyUnprotectedUnarmedSoldierUnits(Set<Unit> militaryUnits) {
         return militaryUnits.stream()
                 .filter(u -> !u.isArmed() && u.getSortedMilitaryRoles().stream().anyMatch(r -> r.getExpertUnit() == u.getType()))
-                .filter(u -> militaryUnits.stream().anyMatch(guard -> guard.getTile() == u.getTile() && guard.isOffensiveUnit()))
+                .filter(u -> militaryUnits.stream().noneMatch(guard -> guard.getTile() == u.getTile() && guard.isOffensiveUnit()))
                 .collect(Collectors.toSet());
     }
     
