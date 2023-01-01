@@ -32,7 +32,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -211,7 +210,7 @@ public final class MilitaryCoordinator {
     }
 
     private void counterattackEnemyValuableUnitsReachableInTurns(final Set<AIUnit> dragoonUnits, int turns) {
-        for (DefensiveZone defensiveZone : defensiveMap.getAttackedDefensiveZones()) {
+        for (DefensiveZone defensiveZone : defensiveMap.getDefensiveZones()) {
             final Set<Unit> unprotectedUnarmedSoldiers = identitySet(onlyUnprotectedUnarmedSoldierUnits(defensiveZone.getEnemies()));
             final Set<Unit> enemyArtillery = identitySet(onlyArtilleryUnits(defensiveZone.getEnemies()));
             
@@ -260,7 +259,7 @@ public final class MilitaryCoordinator {
     }
     
     private void counterattackAllEnemyUnitsReachableInTurns(final Set<AIUnit> dragoonUnits, int turns) {
-        for (DefensiveZone defensiveZone : defensiveMap.getAttackedDefensiveZones()) { 
+        for (DefensiveZone defensiveZone : defensiveMap.getDefensiveZones()) { 
             for (Unit enemy : defensiveZone.getEnemies()) {
                 if (targetedEnemies.contains(enemy)) {
                     continue;

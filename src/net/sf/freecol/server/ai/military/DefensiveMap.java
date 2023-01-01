@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.military;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,14 @@ public class DefensiveMap {
      */
     public DefensiveZone getDefensiveZone(Tile tile) {
         return tileDefensiveZone.get(tile.getId());
+    }
+    
+    
+    /**
+     * Returns all the defensive zones.
+     */
+    public List<DefensiveZone> getDefensiveZones() {
+        return new ArrayList<>(defensiveZones.values());
     }
     
     /**
