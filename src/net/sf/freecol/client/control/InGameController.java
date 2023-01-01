@@ -33,6 +33,7 @@ import static net.sf.freecol.common.util.Utils.deleteFile;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,6 +45,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -4949,9 +4952,10 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the current player changes.
      */
     private boolean setCurrentPlayer(Player player) {
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && currentPlayerIsMyPlayer()) {
-            getGUI().closeMenus();
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS) && currentPlayerIsMyPlayer()) {
+            getFreeColClient().getGUI().invokeNowOrWait(() -> {
+                getGUI().closeMenus();
+            });
         }
 
         final Game game = getGame();
