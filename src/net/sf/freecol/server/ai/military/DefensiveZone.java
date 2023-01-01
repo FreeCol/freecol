@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -104,11 +105,13 @@ public final class DefensiveZone {
         final int unitEnemies = (int) potentialEnemies.stream()
                 .filter(enemiesOnly())
                 .filter(u -> u.isOffensiveUnit())
+                .filter(u -> !u.getOwner().isIndian())
                 .count();
         
         // Count the presence of an enemy settlement as a potential attack.
         final int settlementEnemies = (int) potentialEnemySettlements.stream()
                 .filter(enemiesOnly())
+                .filter(s -> !(s instanceof IndianSettlement))
                 .count();
         
         return unitEnemies + settlementEnemies;
@@ -125,9 +128,11 @@ public final class DefensiveZone {
                         || getPlayer().getStance(u.getOwner()) == Stance.CEASE_FIRE)
                 */
                 .filter(u -> u.isOffensiveUnit())
+                .filter(u -> !u.getOwner().isIndian())
                 .count();
         
         final int settlementEnemies = (int) potentialEnemySettlements.stream()
+                .filter(s -> !(s instanceof IndianSettlement))
                 .count();
         
         return unitEnemies + settlementEnemies;
