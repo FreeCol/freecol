@@ -1667,7 +1667,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    protected void giveNormalMissions(LogBuilder lb) {
+    protected void giveNormalMissions(LogBuilder lb, List<AIUnit> aiUnits) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         BuildColonyMission bcm = null;
@@ -1677,7 +1677,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         nPioneers = pioneersNeeded();
         nScouts = scoutsNeeded();
 
-        List<AIUnit> aiUnits = getAIUnits();
         List<AIUnit> navalUnits = new ArrayList<>(aiUnits.size()/2);
         List<AIUnit> done = new ArrayList<>(aiUnits.size());
         List<TransportMission> transportMissions = new ArrayList<>(aiUnits.size()/2);
@@ -1951,12 +1950,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             " naval-carriers=", nNavalCarrier,
             ")");
         logMissions(reasons, lb);
-        
-        final Set<AIUnit> militaryUnits = getAIUnits().stream()
-                .filter(u -> !u.getUnit().isNaval() && u.getUnit().isOffensiveUnit() && !u.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF))
-                .collect(Collectors.toSet());
-        final MilitaryCoordinator militaryCoordinator = new MilitaryCoordinator(this, militaryUnits);
-        militaryCoordinator.determineMissions();
     }
 
     /**
@@ -2329,20 +2322,38 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         cheat(lb);
         buyUnitsInEurope(lb);
-        buildTransportMaps(lb);
 
         // Note order of operations below.  We allow rearrange et al to run
         // even when there are no movable units left because this expedites
         // mission assignment.
         List<AIUnit> aiUnits = getAIUnits();
+        final Set<AIUnit> militaryUnits = getAIUnits().stream()
+                .filter(MilitaryCoordinator.isUnitHandledByMilitaryCoordinator())
+                .collect(Collectors.toSet());
+        
+        final MilitaryCoordinator militaryCoordinator = new MilitaryCoordinator(this, militaryUnits);
+        militaryCoordinator.determineMissions();
+        
+        buildTransportMaps(lb);
+        
+        for (AIUnit mu : militaryUnits) {
+            updateTransport(mu, null, lb);
+        }
+        
+        
+        final List<AIUnit> normalAiUnits = getAIUnits().stream()
+                .filter(MilitaryCoordinator.isUnitHandledByMilitaryCoordinator().negate())
+                .collect(Collectors.toList());
         for (int i = 0; i < 3; i++) {
             rearrangeColonies(lb);
-            giveNormalMissions(lb);
+            giveNormalMissions(lb, normalAiUnits);
             bringGifts(lb);
             demandTribute(lb);
             if (aiUnits.isEmpty()) break;
             aiUnits = doMissions(aiUnits, lb);
         }
+        
+        
         lb.log(logger, Level.FINE);
 
         clearAIUnits();

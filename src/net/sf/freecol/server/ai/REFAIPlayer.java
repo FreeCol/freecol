@@ -594,7 +594,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public void giveNormalMissions(LogBuilder lb) {
+    public void giveNormalMissions(LogBuilder lb, List<AIUnit> aiUnits) {
         final Player player = getPlayer();
         final Map<Location, List<AIUnit>> idlers = new HashMap<>();
         List<AIUnit> privateers = new ArrayList<>();
@@ -880,7 +880,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         }
 
         // Fall back to the normal EuropeanAI behaviour for remaining units.
-        super.giveNormalMissions(lb);
+        super.giveNormalMissions(lb, getAIUnits());
     }
 
 

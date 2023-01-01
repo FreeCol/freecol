@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
@@ -439,5 +440,12 @@ public final class MilitaryCoordinator {
     
     private static Function<List<AIUnit>, Boolean> always() {
         return units -> true;
+    }
+    
+    public static Predicate<? super AIUnit> isUnitHandledByMilitaryCoordinator() {
+        return u -> !u.getUnit().isNaval()
+                && u.getUnit().isOffensiveUnit()
+                && !u.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF)
+                && !u.getOwner().isREF();
     }
 }
