@@ -311,7 +311,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, int range) {
         Location loc = null;
         if (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit) == null) {
-            loc = UnitSeekAndDestroyMission.findMissionTarget(aiUnit, range, false);
+            loc = UnitSeekAndDestroyMission.findMissionTarget(aiUnit, range, false, false);
         }
         return (loc == null) ? null
             : getSeekAndDestroyMission(aiUnit, loc);

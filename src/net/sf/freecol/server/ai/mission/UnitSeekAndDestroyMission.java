@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
@@ -42,6 +43,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.MissionAIPlayer;
 
 
@@ -201,9 +203,12 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
-    public static int scorePath(AIUnit aiUnit, PathNode path, boolean onlySettlements) {
+    public static int scorePath(AIUnit aiUnit, PathNode path, boolean onlySettlements, boolean noNativeSettlements) {
         Location loc = extractTarget(aiUnit, path);
         if (loc instanceof Settlement) {
+            if (noNativeSettlements && (loc instanceof IndianSettlement)) {
+                return Integer.MIN_VALUE;
+            }
             return scoreSettlementPath(aiUnit, path, (Settlement) loc);
         }
         if (onlySettlements) {
@@ -224,7 +229,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param onlySettlements Only have settlements as targets.
      * @return A suitable {@code GoalDecider}.
      */
-    private static GoalDecider getGoalDecider(final AIUnit aiUnit, boolean onlySettlements) {
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit, boolean onlySettlements, boolean noNativeSettlements) {
         return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
@@ -235,7 +240,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
                 public boolean hasSubGoals() { return true; }
                 @Override
                 public boolean check(Unit u, PathNode path) {
-                    int value = scorePath(aiUnit, path, onlySettlements);
+                    int value = scorePath(aiUnit, path, onlySettlements, noNativeSettlements);
                     if (bestValue < value) {
                         bestValue = value;
                         bestPath = path;
@@ -254,14 +259,14 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param onlySettlements Only have settlements as targets.
      * @return A path to the target, or null if none found.
      */
-    private static PathNode findTargetPath(AIUnit aiUnit, int range, boolean onlySettlements) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range, boolean onlySettlements, boolean noNativeSettlements) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
 
         // Can the unit legally reach a valid target from where it
         // currently is?
-        return unit.search(start, getGoalDecider(aiUnit, onlySettlements),
+        return unit.search(start, getGoalDecider(aiUnit, onlySettlements, noNativeSettlements),
             CostDeciders.avoidIllegal(), range, unit.getCarrier());
     }
 
@@ -274,8 +279,9 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @return A suitable target, or null if none found.
      */
     public static Location findMissionTarget(AIUnit aiUnit, int range,
-                                             boolean onlySettlements) {
-        PathNode path = findTargetPath(aiUnit, range, onlySettlements);
+                                             boolean onlySettlements,
+                                             boolean noNativeSettlements) {
+        PathNode path = findTargetPath(aiUnit, range, onlySettlements, noNativeSettlements);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
     }
@@ -433,7 +439,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findMissionTarget(getAIUnit(), 4, false);
+        return findMissionTarget(getAIUnit(), 4, false, false);
     }
 
     /**
@@ -467,11 +473,15 @@ public final class UnitSeekAndDestroyMission extends Mission {
         } else if (reason != null) {
             return lbFail(lb, false, reason);
         }
+        
+        final boolean noNativeSettlementsAttack = getAIPlayer() != null
+                && (getAIPlayer() instanceof EuropeanAIPlayer)
+                && !((EuropeanAIPlayer) getAIPlayer()).isLikesAttackingNatives();
 
         // Is there a target-of-opportunity?
         final Unit unit = getUnit();
         Location nearbyTarget = (unit.isOnCarrier()) ? null
-            : findMissionTarget(aiUnit, 1, false);
+            : findMissionTarget(aiUnit, 1, false, noNativeSettlementsAttack);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
                 setTarget(nearbyTarget);

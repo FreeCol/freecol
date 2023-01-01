@@ -104,21 +104,39 @@ public final class MilitaryCoordinator {
          */
         
         // Do not move away artillery from attacked zones:
-        keepUnitsInColonies(defensiveMap.getAttackedColonies(), artilleryUnits, always());
-        
-        // Keep at least one decent defender in every colony:
+        keepUnitsInColonies(defensiveMap.getAttackedColonies(), artilleryUnits, always());        
         keepUnitsInColonies(defensiveMap.getAttackedColonies(), dragoonUnits, maxDefenders(1));
-        keepUnitsInColonies(ourColonies, artilleryUnits, maxDefenders(1));
-        placeUnitsInColonies(ourColonies, artilleryUnits, maxDefenders(1));
-        keepUnitsInColonies(ourColonies, dragoonUnits, maxDefenders(1));
-        placeUnitsInColonies(ourColonies, dragoonUnits, maxDefenders(1));
         
-        // Don't move unmounted soldiers out of the colonies:
-        keepUnitsInColonies(ourColonies, otherMilitaryUnits, always());
-        
-        keepUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, maxArtilleries(3));
-        keepUnitsInColonies(defensiveMap.getColoniesExposedWater(), artilleryUnits, maxArtilleries(2));
-        placeUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, maxArtilleries(2));
+        if (player.isAggressive()) {
+            placeUnitsInColonies(defensiveMap.getAttackedColonies(), artilleryUnits, maxDefenders(1));
+            placeUnitsInColonies(defensiveMap.getAttackedColonies(), dragoonUnits, maxDefenders(1));
+            keepUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, maxDefenders(1));
+            placeUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, maxDefenders(1));
+            keepUnitsInColonies(defensiveMap.getThreatenedColonies(), dragoonUnits, maxDefenders(1));
+            placeUnitsInColonies(defensiveMap.getThreatenedColonies(), dragoonUnits, maxDefenders(1));
+            keepUnitsInColonies(defensiveMap.getColoniesExposedWater(), artilleryUnits, maxDefenders(1));
+            placeUnitsInColonies(defensiveMap.getColoniesExposedWater(), artilleryUnits, maxDefenders(1));
+            keepUnitsInColonies(defensiveMap.getColoniesExposedWater(), dragoonUnits, maxDefenders(1));
+            placeUnitsInColonies(defensiveMap.getColoniesExposedWater(), dragoonUnits, maxDefenders(1));
+            keepUnitsInColonies(defensiveMap.getColoniesExposedLand(), dragoonUnits, maxDefenders(1));
+            placeUnitsInColonies(defensiveMap.getColoniesExposedLand(), dragoonUnits, maxDefenders(1));
+            
+            // Don't move unmounted soldiers out of the colonies:
+            keepUnitsInColonies(ourColonies, otherMilitaryUnits, always());
+        } else {
+            // Keep at least one decent defender in every colony:
+            keepUnitsInColonies(ourColonies, artilleryUnits, maxDefenders(1));
+            placeUnitsInColonies(ourColonies, artilleryUnits, maxDefenders(1));
+            keepUnitsInColonies(ourColonies, dragoonUnits, maxDefenders(1));
+            placeUnitsInColonies(ourColonies, dragoonUnits, maxDefenders(1));
+            
+            // Don't move unmounted soldiers out of the colonies:
+            keepUnitsInColonies(ourColonies, otherMilitaryUnits, always());
+            
+            keepUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, maxArtilleries(3));
+            keepUnitsInColonies(defensiveMap.getColoniesExposedWater(), artilleryUnits, maxArtilleries(2));
+            placeUnitsInColonies(defensiveMap.getThreatenedColonies(), artilleryUnits, maxArtilleries(2));
+        }
                
         counterattackEnemyValuableUnitsReachableInTurns(dragoonUnits, 0);
         counterattackEnemyValuableUnitsReachableInTurns(dragoonUnits, 1);
@@ -149,7 +167,7 @@ public final class MilitaryCoordinator {
                 // Direct transport not supported at the moment.
                 continue;
             }
-            final Settlement possibleTarget = (Settlement) UnitSeekAndDestroyMission.findMissionTarget(artillery, 10, true);
+            final Settlement possibleTarget = (Settlement) UnitSeekAndDestroyMission.findMissionTarget(artillery, 10, true, !player.isLikesAttackingNatives());
             if (possibleTarget == null) {
                 continue;
             }

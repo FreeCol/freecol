@@ -300,6 +300,30 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         super(aiMain, xr);
     }
 
+    
+    /**
+     * Checks if this player should use military units more aggressively.
+     * 
+     * @return {@code true} if attacking other units and settlements are
+     *      preferred above defending its own colonies.
+     */
+    public boolean isAggressive() {
+        /*
+         * TODO: We need to decide where to put AI behavior parameters so that mod
+         *       authors can customize the AI feel. Perhaps just in the specification?
+         */
+        return getPlayer().getNation().getType().getId().equals("model.nationType.conquest")
+                || getPlayer().getNation().getType().getId().equals("model.nationType.immigration");
+    }
+    
+    /**
+     * Checks if this player should be attacking the natives.
+     * 
+     * @return {@code true} if native settlements should be targeted by this player.
+     */
+    public boolean isLikesAttackingNatives() {
+        return getPlayer().getNation().getType().getId().equals("model.nationType.conquest");
+    }
 
     /**
      * {@inheritDoc}

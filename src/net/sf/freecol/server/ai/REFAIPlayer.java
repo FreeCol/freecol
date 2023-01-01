@@ -251,7 +251,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         final Function<Colony, TargetTuple> newTupleMapper = c -> {
             PathNode path = pathMapper.apply(c);
             return new TargetTuple(c, path,
-                UnitSeekAndDestroyMission.scorePath(aiu, path, false));
+                UnitSeekAndDestroyMission.scorePath(aiu, path, false, false));
         };
         final List<TargetTuple> targets
             = transform(flatten(player.getRebels(),
@@ -676,7 +676,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         // - go idle in a port
         for (AIUnit aiu : land) {
             Location target = UnitSeekAndDestroyMission.findMissionTarget(aiu, 
-                seekAndDestroyRange, false);
+                seekAndDestroyRange, false, false);
             if (target != null) {
                 Integer count = targetMap.get(target);
                 if (count == null) count = 0;
