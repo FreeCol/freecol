@@ -1,3 +1,81 @@
+## FreeCol 1.0.0 (January 2, 2023) ##
+
+On this very day, 20 years ago, we made the first public release of FreeCol. Our releases have until now been marked as alpha/beta even though the number of downloads for our game has long been counted in the millions.
+
+We are extremely proud to finally announce FreeCol 1.0.0!
+
+All 0.12.0 and 0.13.0 games should continue to work with 1.0.0.
+
+
+### User-visible changes since 0.13.0-release ###
+
+#### Graphics ####
+
+* New nation specific colony graphics.
+* New forest graphics
+* New graphics for deserts.
+* New transitions between the base tiles.
+* Minor changes to other graphics.
+
+
+#### Rule changes ####
+
+* Major changes to the tile goods production so that the actual values matches the original game.
+
+
+#### Mod development ####
+
+* It's now possible to define nation specific unit types that can be recruited and purchased in Europe.
+* Added tools for easily making new base tiles from a single tiling texture.
+* A bug that prevented certain images from being overridden by mods has been fixed.
+
+
+#### AI/computer players ####
+
+* The AI now chooses better locations when constructing colonies, and also avoid placing the colonies too close to one another.
+* The AI colony development and expansion have been improved.
+* The AI can now construct docks.
+* More efficient transportation of goods.
+* The AI can now buy units from Europe without cheating.
+* The computer players will now use more advanced tactics when defending and attacking.
+* The AI no longer defends its colonies with scouts.
+* Adding a new escort mission for protecting units. This mission is used for dragoons that are escorting artillery when attacking.
+* National advantages will now change how the AI utilizes its military units. For example, the conquest advantage (spanish) will make the player focus on destroying the natives.
+* The AI will no longer equip specialists (like Elder Statemen) with muskets.
+* AI ships should no longer get stuck outside native settlements.
+
+
+#### Bugfixes ####
+
+* Several bugs that might cause the game to crash have been fixed (for example when all settlements of a native player was destroyed).
+* Fixed several issues with goto-orders that made the game hang after end of turn.
+* Fixed several issues that forced a server reconnect.
+* Fixed leaking file descriptors that crashed the game on Windows.
+* Reduces the amount of jumping around on the map while animating the moves of enemy units.
+* Accelerator keys can now be changed, saved and loaded in the preferences.
+* It's now possible to add the same goods multiple times to the same stop in the trade route panel.
+* Fixes the scaling of several different panels (preferences).
+* Scrolling on the map should now be smoother.
+* Units should no longer have their graphics clipped on the map.
+* Smoother playback of audio.
+* The colony panel is now properly updated when clearing the speciality of a worker.
+* Recursive autosave directories should no longer be created.
+* Several text template fixes.
+* Lots of other minor bugfixes.
+
+
+#### Other changes ####
+* The escape key can now be used to close most panels.
+* There are now separate volume sliders for music and sound effects.
+* Added a mod where basic buildings (level 1) needs to be constructed (except Town Hall and Carpenter's house).
+* Added a mod for having 19th century nations.
+* Treasure trains are now displayed in the cargo report panel.
+* A malfunctional AI should no longer stop the game.
+* Better handling of severe errors like out-of-memory and stack-overflow.
+* Translation updates (a total of 5191 translation strings updated in 53 different languages).
+
+
+
 ## FreeCol 0.13.0 (July 9, 2022) ##
 
 The FreeCol team are pleased to announce the release of FreeCol 0.13.0. All 0.11.x (x != 4) and 0.12.0 games should continue to work with 0.13.0, but not vice versa.
