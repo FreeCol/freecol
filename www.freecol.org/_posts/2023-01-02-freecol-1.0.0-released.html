@@ -1,0 +1,101 @@
+---
+  title: FreeCol 1.0.0 released
+  author: Stian Grenborgen 
+---
+<div align="left" style="margin-bottom: 1em;">
+    On this very day, 20 years ago, we made the first public release of FreeCol. Our releases have until now been marked as alpha/beta even though the number of downloads for our game has long been counted in the millions.
+    <br />
+    <br />
+    We are extremely proud to finally announce FreeCol 1.0.0!
+</div>
+<div align="center">
+    {% include download-button.html %}
+</div>
+<div align="left" style="margin-bottom: 1em;">
+    <br /><br />
+    Some highlighted changes since version 0.13.0 are:
+    <ul>
+        <li>New nation specific colony graphics.</li>
+        <li>Major changes to the tile goods production so that the actual values matches the original game.</li>
+        <li>Greatly improved artificial intelligence (AI) for the computer players.</li>
+        <li>Much better stability (many bug fixes).</li>
+    </ul>
+    <p align="center">
+        <img src="/images/art/settlements/large_fortress.french.withBg.png" style="width: 100%; max-width: 399px;" />
+    </p>
+</div>
+<div align="left">
+    We will continue improving the game through numerous new releases. For example, we are really close to completing great new graphics for the forests. Stay tuned for new releases!
+    <br /><br />
+    All 0.12.0 and 0.13.0 games should continue to work with 1.0.0.
+</div>
+<div align="left">
+    <br /><br />
+    <h2>All user visible changes since 0.13.0</h2>
+    
+    <strong>Graphics</strong>
+    <ul>
+        <li>New nation specific colony graphics.</li>
+        <li>New graphics for deserts.</li>
+        <li>New transitions between the base tiles.</li>
+        <li>Minor changes to other graphics.</li>
+    </ul>
+    
+    <strong>Rule changes</strong>
+    <ul>
+        <li>Major changes to the tile goods production so that the actual values matches the original game.</li>
+    </ul>
+        
+    <strong>Mod development</strong>
+    <ul>
+        <li>It's now possible to define nation specific unit types that can be recruited and purchased in Europe.</li>
+        <li>Added tools for easily making new base tiles from a single tiling texture.</li>
+        <li>A bug that prevented certain images from being overridden by mods has been fixed.</li>
+    </ul>
+        
+    <strong>AI/computer players</strong>
+    <ul>
+        <li>The AI now chooses better locations when constructing colonies, and also avoid placing the colonies too close to one another.</li>
+        <li>The AI colony development and expansion have been improved.</li>
+        <li>The AI can now construct docks.</li>
+        <li>More efficient transportation of goods.</li>
+        <li>The AI can now buy units from Europe without cheating.</li>
+        <li>The computer players will now use more advanced tactics when defending and attacking.</li>
+        <li>The AI no longer defends its colonies with scouts.</li>
+        <li>Adding a new escort mission for protecting units. This mission is used for dragoons that are escorting artillery when attacking.</li>
+        <li>National advantages will now change how the AI utilizes its military units. For example, the conquest advantage (spanish) will make the player focus on destroying the natives.</li>
+        <li>The AI will no longer equip specialists (like Elder Statemen) with muskets.</li>
+        <li>AI ships should no longer get stuck outside native settlements.</li>
+    </ul>
+        
+    <strong>Bug fixes</strong>
+    <ul>
+        <li>Several bugs that might cause the game to crash have been fixed (for example when all settlements of a native player was destroyed).</li>
+        <li>Fixed several issues with goto-orders that made the game hang after end of turn.</li>
+        <li>Fixed several issues that forced a server reconnect.</li>
+        <li>Fixed leaking file descriptors that crashed the game on Windows.</li>
+        <li>Reduces the amount of jumping around on the map while animating the moves of enemy units.</li>
+        <li>Accelerator keys can now be changed, saved and loaded in the preferences.</li>
+        <li>It's now possible to add the same goods multiple times to the same stop in the trade route panel.</li>
+        <li>Fixes the scaling of several different panels (preferences).</li>
+        <li>Scrolling on the map should now be smoother.</li>
+        <li>Units should no longer have their graphics clipped on the map.</li>
+        <li>Smoother playback of audio.</li>
+        <li>The colony panel is now properly updated when clearing the speciality of a worker.</li>
+        <li>Recursive autosave directories should no longer be created.</li>
+        <li>Several text template fixes.</li>
+        <li>Lots of other minor bugfixes.</li>
+    </ul>
+        
+    <strong>Other changes</strong>
+    <ul>
+        <li>The escape key can now be used to close most panels.</li>
+        <li>There are now separate volume sliders for music and sound effects.</li>
+        <li>Added a mod where basic buildings (level 1) needs to be constructed (except Town Hall and Carpenter's house).</li>
+        <li>Added a mod for having 19th century nations.</li>
+        <li>Treasure trains are now displayed in the cargo report panel.</li>
+        <li>A malfunctional AI should no longer stop the game.</li>
+        <li>Better handling of severe errors like out-of-memory and stack-overflow.</li>
+        <li>Translation updates (a total of 5191 translation strings updated in 53 different languages).</li>
+    </ul>
+</div>
