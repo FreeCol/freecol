@@ -1051,6 +1051,7 @@ public final class ColonyPanel extends PortPanel
                 .addNamed("%oldType%", oldType)
                 .addNamed("%newType%", newType));
             updateTilesPanel();
+            updateProduction();
         } else if (property.startsWith("model.goods.")) {
             // Changes to warehouse goods count may affect building production
             // which requires a view update.
