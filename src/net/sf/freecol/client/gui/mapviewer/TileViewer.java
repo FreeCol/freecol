@@ -747,15 +747,46 @@ public final class TileViewer extends FreeColClientHolder {
         if (tile.isForested()) {
             BufferedImage forestImage = this.lib.getScaledForestImage(tile.getType(),
                 tile.getRiverStyle());
-            g1.drawImage(forestImage,
-                0, (this.tileHeight - forestImage.getHeight()), null);
+            g1.drawImage(forestImage, 0, (this.tileHeight - forestImage.getHeight()), null);
+        } else if (getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_HIGH) {
+            drawForestCornerImages(tile, g1);
         }
+        
         // draw all remaining items
         for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
             displayTileItem(g1, tile, ti);
         }
         g1.dispose();
         g2d.drawImage(image, rop, 0, -this.halfHeight);
+    }
+
+
+    private void drawForestCornerImages(Tile tile, Graphics2D g1) {
+        drawForestCornerImageFor(tile, g1, Direction.NW, Direction.NE, Direction.N);
+        drawForestCornerImageFor(tile, g1, Direction.SW, Direction.SE, Direction.S);
+        drawForestCornerImageFor(tile, g1, Direction.NE, Direction.SE, Direction.E);
+        drawForestCornerImageFor(tile, g1, Direction.NW, Direction.SW, Direction.W);
+    }
+
+    private void drawForestCornerImageFor(Tile tile, Graphics2D g1, Direction d1, Direction d2, Direction d3) {
+        if (tile.hasRiver()) {
+            return;
+        }
+        final Tile tile1 = tile.getNeighbourOrNull(d1);
+        if (tile1 == null || !tile1.isForested()) {
+            return;
+        }
+        final Tile tile2 = tile.getNeighbourOrNull(d2);
+        if (hasSameForestedTileType(tile1, tile2)) {
+            final BufferedImage forestCornerImage = lib.getForestCornerImage(tile1.getType(), d3);
+            if (forestCornerImage != null) {
+                g1.drawImage(forestCornerImage, 0, (this.tileHeight - forestCornerImage.getHeight()), null);
+            }
+        }
+    }
+    
+    private boolean hasSameForestedTileType(Tile t1, Tile t2) {
+        return t1 != null && t2 != null && t1.isForested() && t1.getType() == t2.getType();
     }
 
     /**

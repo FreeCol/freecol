@@ -1083,6 +1083,15 @@ public final class ImageLibrary {
                                               TileImprovementStyle riverStyle) {
         return getForestImageInternal(type, riverStyle, this.tileForestSize);
     }
+    
+    public BufferedImage getForestCornerImage(TileType type, Direction corner) {
+        final String key = "image.tileforest." + type.getId() + "." + corner.toString().toLowerCase();
+        final ImageResource ir = ResourceManager.getImageResource(key, false);
+        if (ir == null) {
+            return null;
+        }
+        return imageCache.getSizedImage(key, this.tileForestSize, false, 0);
+    }
 
 
     /**
