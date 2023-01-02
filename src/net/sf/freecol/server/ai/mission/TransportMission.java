@@ -1165,6 +1165,7 @@ public final class TransportMission extends Mission {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         Cargo bestDirect = null, bestFallback = null;
         float bestDirectValue = 0.0f, bestFallbackValue = 0.0f;
+        final List<Cargo> ts = tCopy();
         for (TransportableAIObject t : euaip.getUrgentTransportables()) {
             if (t.isDisposed() || !t.carriableBy(carrier)) continue;
             Cargo cargo;
@@ -1175,6 +1176,14 @@ public final class TransportMission extends Mission {
             }
             if (cargo == null) continue;
             float value = t.getTransportPriority() / (cargo.getTurns() + 1.0f);
+            
+            if (t.getTransportDestination() != null
+                    && t.getTransportDestination().equals(target)
+                    && cargo.canQueueAt(carrier, 0, ts)) {
+                // Prioritize transports with the same destination.
+                value *= 10000;
+            }
+            
             if (cargo.isFallback()) {
                 if (bestFallbackValue < value) {
                     bestFallbackValue = value;

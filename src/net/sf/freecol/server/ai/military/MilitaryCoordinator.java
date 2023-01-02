@@ -446,6 +446,6 @@ public final class MilitaryCoordinator {
         return u -> !u.getUnit().isNaval()
                 && u.getUnit().isOffensiveUnit()
                 && !u.getUnit().hasAbility(Ability.SPEAK_WITH_CHIEF)
-                && !u.getOwner().isREF();
+                ;
     }
 }

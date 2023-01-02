@@ -1149,9 +1149,14 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         List<TransportableAIObject> urgent
             = sort(transportSupply, ValuedAIObject.descendingValueComparator);
         // Do not let the list exceed 10% of all transports
+        /* Why? This just makes the transport-mission not consider possible overlapping
+         * destinations.
+         * 
         int urge = urgent.size();
         urge = Math.max(2, (urge + 5) / 10);
         while (urgent.size() > urge) urgent.remove(urge);
+        return urgent;
+        */
         return urgent;
     }
 
