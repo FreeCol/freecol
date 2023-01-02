@@ -456,6 +456,7 @@ public final class ScoutingMission extends Mission {
             return lbFail(lb, false, AIUNITDIED);
 
         case MOVE_NO_ACCESS_EMBARK:
+            setTarget(target);
             return this;
 
         case MOVE_NO_TILE:
