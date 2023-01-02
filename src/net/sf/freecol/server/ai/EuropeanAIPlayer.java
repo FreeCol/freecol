@@ -2387,15 +2387,27 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         final Player player = getPlayer();
         final Europe europe = player.getEurope();
         
+        if (player.getEurope() == null) {
+            return;
+        }
+        
+        final long numberOfUnitsInDock = player.getEurope().getUnits().filter(unit -> !unit.isNaval()).count();
+        final long numberOfShips = getAIUnits().stream().filter(au -> au.getUnit().isNaval()).count();
+        
         if (player.getEurope() != null
-                && player.getEurope().getUnits().filter(unit -> !unit.isNaval()).count() > 6) {
+                && numberOfUnitsInDock > 6
+                && numberOfShips < 15) {            
             if (!buyShip()) {
                 return;
             }
         }
+        
+        if (numberOfUnitsInDock > 30) {
+            return;
+        }
                 
-        boolean militaryUnitBought = false;
-        if (isLikesAttackingNatives() && hasLessDragoonsThanColoniesPlusOne()) {
+        boolean militaryUnitBought = numberOfUnitsInDock >= 18;
+        if (!militaryUnitBought && isLikesAttackingNatives() && hasLessDragoonsThanColoniesPlusOne()) {
             final Unit unitBought = buyDragoon();
             if (unitBought == null) {
                 return;
