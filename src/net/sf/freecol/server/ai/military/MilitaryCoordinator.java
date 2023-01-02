@@ -283,7 +283,7 @@ public final class MilitaryCoordinator {
                     }
                     
                     final PathNode path = dragoon.getUnit().findPath(enemy.getTile()); // TODO: add max turns to the search.
-                    if (path != null & path.getTurns() <= turns) {
+                    if (path != null && path.getTurns() <= turns) {
                         dragoon.setMission(new UnitSeekAndDestroyMission(dragoon.getAIMain(), dragoon, enemy));
                         unusedUnits.remove(dragoon);
                         dragoonUnits.remove(dragoon);
