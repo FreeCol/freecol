@@ -439,13 +439,6 @@ public final class ConnectController extends FreeColClientHolder {
         FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
                 address, port, serverName);
         if (fcs == null) return false;
-
-        /*
-         * TODO: The choice of active mods with a specification should be stored in the savegame.
-         *       These mods should also be loaded in the ResourceManager (after global mods without
-         *       a specification).
-         */
-        fcs.getGame().getSpecification().loadMods(options.getActiveMods());
         
         getGUI().refreshGuiUsingClientOptions();
 
