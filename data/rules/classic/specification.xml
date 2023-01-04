@@ -1968,6 +1968,8 @@
       <default-role id="model.role.missionary"/>
       <ability id="model.ability.expertMissionary"
                value="true"/>
+      <ability id="model.ability.dressMissionary"
+               value="true"/>
       <modifier id="model.modifier.missionaryTradeBonus"
                 type="percentage" value="10"/>
     </unit-type>
