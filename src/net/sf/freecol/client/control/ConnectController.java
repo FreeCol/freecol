@@ -558,6 +558,8 @@ public final class ConnectController extends FreeColClientHolder {
 
         if (fcc.isLoggedIn()) {
             requestLogout(LogoutReason.MAIN_TITLE);
+        } else {
+            fcc.logout(false);
         }
         
         fcc.stopServer();
