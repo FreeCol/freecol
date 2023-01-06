@@ -111,67 +111,26 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     /**
      * Update the selected map file.
      *
-     * The option UI may not have been created if we just click on the
-     * map, because the text field is under mapGeneratorOptions.import.
-     * Hence the null tests against the OptionUIs.
-     *
      * @param file The new map {@code File}.
      */
     private void updateFile(File file) {
-        final OptionGroup mgo = getGroup();
         final OptionGroupUI mgoUI = getOptionUI();
-        final GUI gui = getFreeColClient().getGUI();
 
+        /*
+         * This needs to be selected first to initialize the OptionUIs we're
+         * asking for below.
+         */
+        mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_IMPORT);
+        
+        mgoUI.getOptionUI(MapGeneratorOptions.IMPORT_FILE, FileOptionUI.class).setValue(file);
+        mgoUI.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN, BooleanOptionUI.class).setValue(true);
+        mgoUI.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES, BooleanOptionUI.class).setValue(false);
+        mgoUI.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS, BooleanOptionUI.class).setValue(false);
+        mgoUI.getOptionUI(MapGeneratorOptions.IMPORT_SETTLEMENTS, BooleanOptionUI.class).setValue(false);
+        
         if (file == null) {
             mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_LAND_GENERATOR);
-        } else {
-            mgoUI.selectOption(MapGeneratorOptions.MAPGENERATOROPTIONS_IMPORT);
         }
-        
-        FileOptionUI foui = (FileOptionUI)mgoUI
-            .getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-        if (foui == null) {
-            FileOption op = mgo.getOption(MapGeneratorOptions.IMPORT_FILE,
-                                          FileOption.class);
-            foui = (FileOptionUI)OptionUI.getOptionUI(gui, op, true);
-        }
-        foui.setValue(file);
-        
-        BooleanOptionUI terrainUI = (BooleanOptionUI)mgoUI
-            .getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN);
-        if (terrainUI == null) {
-            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_TERRAIN,
-                                             BooleanOption.class);
-            terrainUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
-        }
-        terrainUI.setValue(true);
-
-        BooleanOptionUI bonusesUI = (BooleanOptionUI)mgoUI
-            .getOptionUI(MapGeneratorOptions.IMPORT_BONUSES);
-        if (bonusesUI == null) {
-            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_BONUSES,
-                                             BooleanOption.class);
-            bonusesUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
-        }
-        bonusesUI.setValue(false);
-
-        BooleanOptionUI rumourUI = (BooleanOptionUI)mgoUI
-            .getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS);
-        if (rumourUI == null) {
-            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_RUMOURS,
-                                             BooleanOption.class);
-            rumourUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
-        }
-        rumourUI.setValue(false);
-
-        BooleanOptionUI settUI = (BooleanOptionUI)mgoUI
-            .getOptionUI(MapGeneratorOptions.IMPORT_SETTLEMENTS);
-        if (settUI == null) {
-            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS,
-                                             BooleanOption.class);
-            settUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
-        }
-        settUI.setValue(false);
     }
 
     /**

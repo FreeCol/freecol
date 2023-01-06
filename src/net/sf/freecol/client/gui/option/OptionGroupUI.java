@@ -219,9 +219,13 @@ public final class OptionGroupUI extends MigPanel
             }
         }
     }
-
+    
     public OptionUI getOptionUI(String key) {
         return optionUIs.get(key);
+    }
+    
+    public <T extends OptionUI> T getOptionUI(String key, Class<T> clazz) {
+        return clazz.cast(optionUIs.get(key));
     }
 
     private void addOptionUI(Option option, boolean editable) {
