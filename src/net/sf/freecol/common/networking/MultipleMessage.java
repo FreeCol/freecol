@@ -78,6 +78,8 @@ public class MultipleMessage extends AttributeMessage {
         throws XMLStreamException, FreeColException {
         this();
         
+        setStringAttributeMap(xr.getAllAttributes());
+        
         this.messages.clear();
         while (xr.moreTags()) {
             final String mt = xr.getLocalName();
