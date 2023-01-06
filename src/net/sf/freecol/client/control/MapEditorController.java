@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -36,6 +37,7 @@ import net.sf.freecol.client.gui.panel.MiniMap; // FIXME: should go away
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -141,7 +143,12 @@ public final class MapEditorController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         final GUI gui = getGUI();
         try {
-            Specification specification = getDefaultSpecification();
+            final Specification specification = getDefaultSpecification();
+            
+            final List<FreeColModFile> mods = getClientOptions().getActiveMods();
+            final boolean specificationChanges  = mods.stream().anyMatch(m -> m.hasSpecification());
+            specification.loadMods(mods);
+            
             fcc.setMapEditor(true);
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, null, 0, null);
@@ -156,6 +163,10 @@ public final class MapEditorController extends FreeColClientHolder {
             //fcc.changeClientState(true);
             //gui.changeView((Tile)null);
             gui.startMapEditorGUI();
+            
+            if (specificationChanges) {
+                gui.showInformationPanel("mapEditor.loadedWithMods");
+            }
         } catch (IOException e) {
             gui.showErrorPanel(StringTemplate
                 .template("server.initialize"));
