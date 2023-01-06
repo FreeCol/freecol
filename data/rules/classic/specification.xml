@@ -4776,6 +4776,10 @@
         <!-- Maximum latitude -->
         <integerOption id="model.option.maximumLatitude"
                        defaultValue="90" minimumValue="-90" maximumValue="90"/>
+                       
+        <!-- Enables generation of rivers that cannot be traversed by land units. -->
+        <booleanOption id="mapGeneratorOptions.enableGreatRivers" defaultValue="false"/>
+                       
         <!-- Option for setting the number of rivers on the map
              The value indicates the number of land tile per river tile -->
         <rangeOption id="model.option.riverNumber"

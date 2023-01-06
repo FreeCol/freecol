@@ -107,6 +107,9 @@ public class MapGeneratorOptions {
     public static final String MAXIMUM_LATITUDE 
         = "model.option.maximumLatitude";
 
+    /** Option for enabling generation of great rivers. */
+    public static final String ENABLE_GREAT_RIVERS  = "mapGeneratorOptions.enableGreatRivers";
+    
     /** Option for setting the number of rivers on the map. */
     public static final String RIVER_NUMBER
         = "model.option.riverNumber";

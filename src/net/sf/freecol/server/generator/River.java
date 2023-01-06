@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.server.model.ServerRegion;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -406,6 +407,9 @@ flow:
     private void drawToMap(List<RiverSection> sections) {
         RiverSection oldSection = null;
 
+        final boolean enableGreatRivers = map.getGame().getMapGeneratorOptions()
+                .getBoolean(MapGeneratorOptions.ENABLE_GREAT_RIVERS);
+        
         for (RiverSection section : sections) {
             riverMap.put(section.getTile(), this);
             if (oldSection != null) {
@@ -414,7 +418,7 @@ flow:
             }
             Tile tile = section.getTile();
             if (tile.isLand()) {
-                if (section.getSize() >= TileImprovement.FJORD_RIVER) {
+                if (enableGreatRivers && section.getSize() >= TileImprovement.FJORD_RIVER) {
                     TileType greatRiver = map.getSpecification().getTileType("model.tile.greatRiver");
                     tile.changeType(greatRiver);
                     // changing the type resets the improvements
@@ -422,8 +426,9 @@ flow:
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile: " + section.getTile());
                 } else if (section.getSize() > TileImprovement.NO_RIVER) {
+                    final int magnitude = Math.min(section.getSize(), TileImprovement.LARGE_RIVER);
                     String style = section.encodeStyle();
-                    tile.addRiver(section.getSize(), style);
+                    tile.addRiver(magnitude, style);
                     logger.fine("Added river"
                         + "(magnitude: " + section.getSize()
                         + " style: " + style);
