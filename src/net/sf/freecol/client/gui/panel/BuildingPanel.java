@@ -159,6 +159,10 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         if (productionOutput == null) {
             if (upkeep != null) {
                 add(upkeep, "span, align center");
+            } else {
+                final JLabel nothing = new JLabel();
+                nothing.setOpaque(false);
+                add(nothing, "span, align center");
             }
         } else if (upkeep == null) {
             add(productionOutput, "span, align center");
