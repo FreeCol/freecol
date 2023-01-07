@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.plaf.DimensionUIResource;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -151,6 +152,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         } else {
             this.stringImage = null;
         }
+        
+        setSize(getPreferredSize());
     }
 
 
@@ -161,71 +164,56 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     @Override
     public void paintComponent(Graphics g) {
-        int stringWidth = (this.stringImage == null) ? 0
-            : stringImage.getWidth(null);
-        int drawImageCount = Math.min(Math.abs(getAmount()), this.maxIcons);
-        if (drawImageCount == 0) drawImageCount = 1;
-        int iconWidth = this.goodsIcon.getIconWidth();
-        int pixelsPerIcon = iconWidth / 2;
-        if (pixelsPerIcon - iconWidth < 0) {
-            pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
-        }
-        int maxSpacing = iconWidth;
+        final Dimension contentSize = getPreferredSize();
+        final int actualWidth = getWidth();
+        final int leftOffset = (contentSize.width < actualWidth) ? (actualWidth - contentSize.width) / 2 : 0;
 
-        // FIXME: Tune this: all icons are the same width, but many do
-        // not take up the whole width, eg. bells
-        boolean iconsTooFarApart = pixelsPerIcon > maxSpacing;
-        if (iconsTooFarApart) pixelsPerIcon = maxSpacing;
-        int coverage = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
-        int leftOffset = 0;
-        int width = Math.max(getWidth(), Math.max(stringWidth, coverage));
-        if (coverage < width) leftOffset = (width - coverage)/2;
-        int height = Math.max(getHeight(),
-                              this.goodsIcon.getImage().getHeight(null));
-        setSize(new Dimension(width, height));
-
-        // Draw the icons onto the image:
+        // Draws the goods icons:
+        final int drawImageCount = numberOfGoodsIconsToDisplay();
+        final int iconWidth = (goodsIcon) != null ? goodsIcon.getIconWidth() : 0;
+        final int pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
         for (int i = 0; i < drawImageCount; i++) {
             this.goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
+        // Draws the production number:
         if (this.stringImage != null) {
-            int textOffset = (width > stringWidth) ? (width - stringWidth)/2
-                                                   : 0;
-            textOffset = (textOffset >= 0) ? textOffset : 0;
-            g.drawImage(this.stringImage, textOffset,
-                        this.goodsIcon.getIconHeight()/2 - this.stringImage.getHeight(null)/2,
-                        null);
+            final int textOffsetX = (actualWidth - getProductionStringWidth()) / 2;
+            g.drawImage(stringImage,
+                    textOffsetX,
+                    (goodsIcon.getIconHeight() - stringImage.getHeight(null)) / 2,
+                    null);
         }
     }
 
-
     // Override Component
 
+    @Override
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public Dimension getPreferredSize() {
-        if (this.goodsIcon == null) return new Dimension(0, 0);
-
-        int drawImageCount = Math.max(1, Math.min(Math.abs(getAmount()),
-                                                  this.maxIcons));
-        int iconWidth = this.goodsIcon.getIconWidth();
-        int pixelsPerIcon = iconWidth / 2;
-        if (pixelsPerIcon - iconWidth < 0) {
-            pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
-        }
-        int maxSpacing = iconWidth;
-
-        // FIXME: Tune this: all icons are the same width, but many do
-        // not take up the whole width, eg. bells
-        boolean iconsTooFarApart = pixelsPerIcon > maxSpacing;
-        if (iconsTooFarApart) pixelsPerIcon = maxSpacing;
-        int width = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
-        if (this.stringImage != null) {
-            width = Math.max(this.stringImage.getWidth(null), width);
-        }
-        return new Dimension(width, goodsIcon.getImage().getHeight(null));
+        final int drawImageCount = numberOfGoodsIconsToDisplay();
+        final int iconWidth = (goodsIcon) != null ? goodsIcon.getIconWidth() : 0;
+        final int pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
+                
+        final int width = Math.max(getProductionStringWidth(), pixelsPerIcon * (drawImageCount - 1) + iconWidth);
+        final int height = this.goodsIcon.getImage().getHeight(null);
+        
+        return new Dimension(width, height);
     }
+
+    private int numberOfGoodsIconsToDisplay() {
+        return Math.max(1, Math.min(Math.abs(getAmount()), maxIcons));
+    }
+    
+    private int getProductionStringWidth() {
+        return (this.stringImage == null) ? 0 : stringImage.getWidth(null);
+    }
+
 }

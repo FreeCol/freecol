@@ -38,7 +38,6 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
@@ -149,6 +148,8 @@ public final class UnitLabel extends FreeColLabel
         this.ignoreLocation = ignoreLocation;
         this.tinyFont = freeColClient.getGUI().getFixedImageLibrary().getScaledFont("normal-plain-tiny", null);
 
+        setHorizontalAlignment(CENTER);
+        
         updateIcon();
     }
 
@@ -203,10 +204,7 @@ public final class UnitLabel extends FreeColLabel
         } else {
             Icon imageIcon = new ImageIcon(lib.getScaledUnitImage(this.unit));
             if (this.unit.getLocation() instanceof ColonyTile) {
-                Dimension tileSize = lib.scale(ImageLibrary.TILE_SIZE);
-                tileSize.width /= 2;
-                tileSize.height = imageIcon.getIconHeight();
-                setSize(tileSize);
+                setPreferredSize(new Dimension(lib.scale(ImageLibrary.TILE_SIZE).width, imageIcon.getIconHeight()));
             } else {
                 setPreferredSize(null);
             }
@@ -385,6 +383,7 @@ public final class UnitLabel extends FreeColLabel
         }
 
         super.paintComponent(g);
+        
         if (ignoreLocation) return;
 
         if (this.unit.getLocation() instanceof ColonyTile) {
@@ -396,9 +395,16 @@ public final class UnitLabel extends FreeColLabel
                 if (production > 0) {
                     ProductionLabel pl = new ProductionLabel(this.freeColClient,
                         new AbstractGoods(workType, production));
-                    g.translate(0, 10);
+
+                    final int visualOffsetY = -lib.scaleInt(5);
+                    
+                    final Dimension size = getSize();
+                    final Dimension plSize = pl.getPreferredSize();                    
+                    final int x = (size.width - plSize.width) / 2;
+                    final int y = (size.height - plSize.height) / 2 + visualOffsetY;
+                    g.translate(x, y);
                     pl.paintComponent(g);
-                    g.translate(0, -10);
+                    g.translate(-x, -y);
                 }
             }
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
