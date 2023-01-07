@@ -526,6 +526,9 @@ public class GameOptions {
         = "model.option.offensiveNavalUnitCheat";
     public static final String TRANSPORT_NAVAL_UNIT_CHEAT
         = "model.option.transportNavalUnitCheat";
+    
+    public static final String TRADE_PROFIT_MULTIPLIER_CHEAT
+        = "model.option.tradeProfitMultiplierCheat";
 
 
     // Serialization

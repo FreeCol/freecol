@@ -2698,6 +2698,10 @@ public final class Specification implements OptionContainer {
                                             GameOptions.DIFFICULTY_MONARCH, lb,
                                             1500);
         // end @compat 0.11.3
+        
+        // @compat 1.0.0
+        ret |= checkDifficultyIntegerOption(GameOptions.TRADE_PROFIT_MULTIPLIER_CHEAT, GameOptions.DIFFICULTY_CHEAT, lb, 10);
+        // end @compat 1.0.0
 
         // Ensure 2 levels of groups, and one level of leaves
         for (OptionGroup level : getDifficultyLevels()) {

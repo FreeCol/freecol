@@ -3529,6 +3529,8 @@
                          value="1"/>
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="1"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheat"
+                         value="1"/>
         </optionGroup>
       </optionGroup>
 
@@ -3719,6 +3721,8 @@
                          value="5"/>
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="5"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheat"
+                         value="2"/>
         </optionGroup>
       </optionGroup>
 
@@ -3904,6 +3908,8 @@
                          value="10"/>
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="10"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheat"
+                         value="5"/>
         </optionGroup>
       </optionGroup>
 
@@ -4083,6 +4089,8 @@
                          value="15"/>
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="15"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheat"
+                         value="10"/>
         </optionGroup>
       </optionGroup>
 
@@ -4262,6 +4270,8 @@
                          value="20"/>
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="20"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheat"
+                         value="15"/>
         </optionGroup>
       </optionGroup>
 
@@ -4535,6 +4545,8 @@
                          value="20"/>
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="20"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheat"
+                         value="15"/>
         </optionGroup>
       </optionGroup>
     </optionGroup>

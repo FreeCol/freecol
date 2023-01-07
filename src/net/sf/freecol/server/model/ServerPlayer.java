@@ -19,6 +19,27 @@
 
 package net.sf.freecol.server.model;
 
+import static net.sf.freecol.common.model.Constants.UNDEFINED;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.flatten;
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.min;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+import static net.sf.freecol.common.util.CollectionUtils.sumDouble;
+import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
+import static net.sf.freecol.common.util.RandomUtils.randomInt;
+import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +61,9 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -53,7 +76,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Disaster;
@@ -90,8 +113,8 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.ChangeSet;
@@ -107,10 +130,6 @@ import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -1286,7 +1305,8 @@ public class ServerPlayer extends Player implements TurnTaker {
                  * For example, the human player can still actively reduce the amount of
                  * money the AI gets by stopping cargo / capture colonies with custom houses.
                  */
-                modifyGold(incomeAfterTaxes * 10);
+                final int tradeProfitMultiplierCheat = getSpecification().getInteger(GameOptions.TRADE_PROFIT_MULTIPLIER_CHEAT);
+                modifyGold(incomeAfterTaxes * tradeProfitMultiplierCheat);
             } else {
                 modifyGold(incomeAfterTaxes);
             }
