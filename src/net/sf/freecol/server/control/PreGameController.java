@@ -145,7 +145,7 @@ public final class PreGameController extends Controller {
         }
         try {
             freeColServer.startGame();
-        } catch (FreeColException fce) {
+        } catch (FreeColException|RuntimeException fce) {
             return serverPlayer.clientError(fce.getMessage());
         }
 
