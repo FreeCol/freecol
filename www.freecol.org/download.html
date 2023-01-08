@@ -92,7 +92,13 @@
                                 <br /><br />
                                 Mac OS X users should download
                                 <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.0.0/freecol-1.0.0.dmg/download">freecol-1.0.0.dmg</a>.
-                                FreeCol has some problems running on Mac OS X, so you should save your game frequently. <br /><br />
+                                FreeCol has some problems running on Mac OS X, so you should save your game frequently. You might also need to get the file out of quarantine after downloading it since we have not signed the application:
+                                <br />
+                                <div style="font-family: monospace">
+                                  xattr -d com.apple.quarantine freecol-1.0.0.dmg
+                                  <br />xattr -d com.apple.quarantine FreeCol.app
+                                </div>
+                                <br />
                                 Users that know how to start a java program can download <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.0.0/freecol-1.0.0-installer.jar/download">freecol-1.0.0-installer.jar</a>. Start the installation program by running the command: &quot;java -jar freecol-1.0.0-installer.jar&quot;. This installer is recommended for Linux users. <br /><br />
                                 If you don&#39;t need a desktop icon and you know how to start a java program then you can download <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.0.0/freecol-1.0.0.zip/download">freecol-1.0.0.zip</a>.
                             </p>
