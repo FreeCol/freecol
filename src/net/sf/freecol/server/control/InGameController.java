@@ -2243,6 +2243,7 @@ public final class InGameController extends Controller {
                         serverPlayer.exploreForUnit(theFlyingDutchman));
         serverPlayer.setDead(false);
         serverPlayer.changePlayerType(PlayerType.UNDEAD);
+        serverPlayer.addAbility(new Ability(Ability.UNDEAD));
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // No one likes the undead.

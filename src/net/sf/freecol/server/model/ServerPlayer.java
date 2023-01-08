@@ -2384,7 +2384,7 @@ outer:  for (Effect effect : effects) {
             case CAPTURE_COLONY:
                 ok = isAttack && result == CombatResult.WIN
                     && colony != null
-                    && isEuropean() && defenderPlayer.isEuropean();
+                    && (isEuropean() || isUndead()) && (defenderPlayer.isEuropean() || defenderPlayer.isUndead());
                 if (ok) {
                     csCaptureColony(attackerUnit, (ServerColony)colony,
                                     random, cs);
@@ -2996,7 +2996,7 @@ outer:  for (Effect effect : effects) {
         final StringTemplate winnerNation = winner.getApparentOwnerName();
         final StringTemplate winnerLocation = winner.getLocation()
             .getLocationLabelFor(winnerPlayer);
-
+        
         // Capture the unit.  There are visibility implications for
         // both players because the captured unit might be the only
         // one on its tile, and the winner might have captured a unit
@@ -4339,13 +4339,15 @@ outer:  for (Effect effect : effects) {
                 }
             }
 
+            unit.changeOwner(newOwner);
             if (mainType != unit.getType() && !unit.changeType(mainType)) {
                 logger.warning("Type change failure: " + unit
                     + " -> " + mainType);
                 return false;
             }
+        } else {
+            unit.changeOwner(newOwner);
         }
-        unit.changeOwner(newOwner);
         if (loc != null) unit.setLocation(loc);
         if (unit.isCarrier()) {
             cs.addRemoves(See.only(this), unit, unit.getUnitList());

@@ -744,7 +744,7 @@ public class SimpleCombatModel extends CombatModel {
                         ? CombatResult.SINK_COLONY_SHIPS
                         : CombatResult.DAMAGE_COLONY_SHIPS;
 
-                    if (winnerPlayer.isEuropean()) {
+                    if (winnerPlayer.isEuropean() || winnerPlayer.isUndead()) {
                         if (loserMustDie) {
                             crs.add(CombatResult.SLAUGHTER_UNIT);
                         }
@@ -854,6 +854,9 @@ public class SimpleCombatModel extends CombatModel {
                 } else if (loser.getUnitChange(UnitChangeType.DEMOTION) != null) {
                     crs.add(CombatResult.DEMOTE_UNIT);
 
+                } else if (winner.isUndead() && !loser.isUndead() && loser.getUnitChange(UnitChangeType.UNDEAD, null, winner.getOwner()) != null) {
+                    crs.add(CombatResult.CAPTURE_UNIT);
+                    
                 // But finally, the default is to kill them.
                 } else {
                     crs.add(CombatResult.SLAUGHTER_UNIT);
