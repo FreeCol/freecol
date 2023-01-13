@@ -426,6 +426,19 @@ public class FreeColDataFile {
      */
     public static FileFilter getFileFilter(String extension) {
         String s = Messages.message("filter." + extension);
+        if (extension.equals("*")) {
+            return new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return true;
+                }
+                
+                @Override
+                public String getDescription() {
+                    return s;
+                }
+            };
+        }
         return new FileNameExtensionFilter(s, extension);
     }
 }

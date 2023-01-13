@@ -981,10 +981,10 @@ public class GUI extends FreeColClientHolder {
      * Show a save file dialog, selecting one to load.
      *
      * @param root The root directory to look in.
-     * @param extension The file extension to look for.
+     * @param extension The file extensions to look for.
      * @return The {@code File} selected, or null on error.
      */
-    public final File showLoadSaveFileDialog(File root, String extension) {
+    public final File showLoadSaveFileDialog(File root, String... extension) {
         File file = showLoadDialog(root, extension);
         if (file != null && !file.isFile()) {
             showErrorPanel(FreeCol.badFile("error.noSuchFile", file));
@@ -2060,7 +2060,7 @@ public class GUI extends FreeColClientHolder {
      * @param extension An extension to select with.
      * @return The selected {@code File}.
      */
-    public File showLoadDialog(File directory, String extension) { return null; }
+    public File showLoadDialog(File directory, String... extension) { return null; }
 
     /**
      * Show the LoadingSavegameDialog.

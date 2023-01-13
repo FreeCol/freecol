@@ -74,10 +74,10 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
                     final File root = (isMap)
                         ? FreeColDirectories.getMapsDirectory()
                         : FreeColDirectories.getSaveDirectory();
-                    final String extension = (isMap)
-                        ? FreeCol.FREECOL_MAP_EXTENSION
-                        : FreeCol.FREECOL_SAVE_EXTENSION;
-                    File f = gui.showLoadSaveFileDialog(root, extension);
+                    final String[] extensions = (isMap)
+                        ? new String[] {FreeCol.FREECOL_MAP_EXTENSION, FreeCol.FREECOL_SAVE_EXTENSION, "*"}
+                        : new String[] {FreeCol.FREECOL_SAVE_EXTENSION, "*"};
+                    File f = gui.showLoadSaveFileDialog(root, extensions);
                     if (f != null) setValue(f);
                 });
         }

@@ -2056,10 +2056,11 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public File showLoadDialog(File directory, String extension) {
-        FileFilter[] filters = new FileFilter[] {
-            FreeColDataFile.getFileFilter(extension)
-        };
+    public File showLoadDialog(File directory, String... extension) {
+        final FileFilter[] filters = new FileFilter[extension.length];
+        for (int i=0; i<extension.length; i++) {
+            filters[i] = FreeColDataFile.getFileFilter(extension[i]);
+        }
         File file = null;
         for (;;) {
             file = this.widgets.showLoadDialog(directory, filters);
@@ -2408,7 +2409,8 @@ public class SwingGUI extends GUI {
     public File showSaveDialog(File directory, String defaultName) {
         String extension = lastPart(defaultName, ".");
         FileFilter[] filters = new FileFilter[] {
-            FreeColDataFile.getFileFilter(extension)
+            FreeColDataFile.getFileFilter(extension),
+            FreeColDataFile.getFileFilter("*")
         };
         return this.widgets.showSaveDialog(directory, filters, defaultName);
     }

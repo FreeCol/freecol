@@ -296,7 +296,7 @@ public final class MapEditorController extends FreeColClientHolder {
     public void loadGame() {
         File file = getGUI()
             .showLoadSaveFileDialog(FreeColDirectories.getUserMapsDirectory(),
-                                    FreeCol.FREECOL_MAP_EXTENSION);
+                                    FreeCol.FREECOL_MAP_EXTENSION, "*");
         if (file != null) loadGame(file);
     }
 
