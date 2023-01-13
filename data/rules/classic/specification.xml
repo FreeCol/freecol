@@ -724,7 +724,7 @@
                basic-move-cost="6" basic-work-turns="4" is-elevation="true">
       <gen humidity-minimum="0" humidity-maximum="100"
            temperature-minimum="-20" temperature-maximum="40"
-           altitude-minimum="2" altitude-maximum="3"/>
+           altitude-minimum="10" altitude-maximum="19"/>
       <modifier id="model.modifier.defence" index="50"
                 type="percentage" value="100"/>
       <production unattended="true">
@@ -748,7 +748,7 @@
                is-elevation="true" can-settle="false">
       <gen humidity-minimum="0" humidity-maximum="100"
            temperature-minimum="-20" temperature-maximum="40"
-           altitude-minimum="3" altitude-maximum="3"/>
+           altitude-minimum="20" altitude-maximum="30"/>
       <modifier id="model.modifier.defence" index="50"
                 type="percentage" value="150"/>
       <production>

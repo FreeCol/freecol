@@ -1283,10 +1283,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param mountains The mountain tile type.
      * @return True if this is a good potential elevated tile.
      */
-    public boolean isGoodMountainTile(TileType mountains) {
+    public boolean isGoodMountainTile() {
         return isGoodHillTile()
             // Not too close to an existing mountain range
-            && none(getSurroundingTiles(1, 3), t -> t.getType() == mountains);
+            && none(getSurroundingTiles(1, 3), t -> t.getType().isMountains());
     }
 
     /**

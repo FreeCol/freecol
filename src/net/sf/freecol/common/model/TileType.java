@@ -46,6 +46,9 @@ public final class TileType extends FreeColSpecObjectType
     public static final String TAG = "tile-type";
 
     public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE };
+    
+    public static final int HILLS_ALTITUDE = 15;
+    public static final int MOUNTAINS_ALTITUDE = 25;
 
     /**
      * Use these tile types only for "land maps", i.e. maps that only
@@ -187,6 +190,22 @@ public final class TileType extends FreeColSpecObjectType
      */
     public int getBasicMoveCost() {
         return basicMoveCost;
+    }
+    
+    /**
+     * Checks if this {@code TileType} should be considered a hill when
+     * generating the map.
+     */
+    public boolean isHills() {
+        return altitude[0] <= HILLS_ALTITUDE && altitude[1] >= HILLS_ALTITUDE;
+    }
+
+    /**
+     * Checks if this {@code TileType} should be considered a mountain when
+     * generating the map.
+     */
+    public boolean isMountains() {
+        return altitude[0] <= MOUNTAINS_ALTITUDE && altitude[1] >= MOUNTAINS_ALTITUDE;
     }
 
     /**

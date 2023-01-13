@@ -1734,6 +1734,14 @@ public final class Specification implements OptionContainer {
     public List<TileType> getTileTypeList() {
         return tileTypeList;
     }
+    
+    public List<TileType> getHillsTileTypeList() {
+        return getTileTypeList().stream().filter(t -> t.isHills()).collect(Collectors.toList());
+    }
+    
+    public List<TileType> getMountainsTileTypeList() {
+        return getTileTypeList().stream().filter(t -> t.isMountains()).collect(Collectors.toList());
+    }
 
     /**
      * Get a tile type by identifier.

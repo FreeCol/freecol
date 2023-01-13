@@ -150,7 +150,7 @@ public class TerrainGenerator {
     /**
      * Gets a tile type fitted to the regional requirements.
      *
-     * FIXME: Can be used for mountains and rivers too.
+     * FIXME: Can be used for rivers too.
      *
      * @param game The {@code Game} to generate for.
      * @param candidates A list of {@code TileType}s to use for
@@ -459,23 +459,16 @@ public class TerrainGenerator {
             "Maximum length of mountain ranges is ", maximumLength, "\n");
         List<ServerRegion> result = new ArrayList<>(number);
 
-        // lookup the resources from specification
-        final TileType hills = spec.getTileType("model.tile.hills");
-        final TileType mountains = spec.getTileType("model.tile.mountains");
-        if (hills == null || mountains == null) {
-            throw new RuntimeException("Both Hills and Mountains TileTypes must be defined: " + spec);
-        }
-
         // Generate the mountain ranges
         List<Tile> tiles = new ArrayList<>();
-        map.forEachTile(t -> t.isGoodMountainTile(mountains),
+        map.forEachTile(t -> t.isGoodMountainTile(),
                         t -> tiles.add(t));
         randomShuffle(logger, "Randomize mountain tiles", tiles, this.random);
 
         int counter = 0;
         for (Tile startTile : tiles) {
             // isGoodMountainTile can change when new mountains are added
-            if (!startTile.isGoodMountainTile(mountains)) continue;
+            if (!startTile.isGoodMountainTile()) continue;
             
             ServerRegion mountainRegion
                 = new ServerRegion(game, RegionType.MOUNTAIN);
@@ -485,7 +478,11 @@ public class TerrainGenerator {
             Tile tile = startTile;
             for (int index = 0; index < length; index++) {
                 // Raise current tile up as mountain
-                if (tile.getType() != mountains) {
+                if (!tile.getType().isMountains()) {
+                    final TileType mountains = getRandomTileType(game, spec.getMountainsTileTypeList(), map.getLatitude(tile.getY()));
+                    if (mountains == null) {
+                        continue;
+                    }
                     tile.setType(mountains);
                     mountainRegion.addTile(tile);
                     counter++;
@@ -495,13 +492,21 @@ public class TerrainGenerator {
                 // mountain
                 for (Tile t : tile.getSurroundingTiles(1)) {
                     if (!t.isGoodHillTile()
-                        || t.getType() == mountains) continue;
+                        || t.getType().isMountains()) continue;
                     int r = this.cache.nextInt(8);
                     if (r < 2) {
+                        final TileType mountains = getRandomTileType(game, spec.getMountainsTileTypeList(), map.getLatitude(t.getY()));
+                        if (mountains == null) {
+                            continue;
+                        }
                         t.setType(mountains);
                         mountainRegion.addTile(t);
                         counter++;
                     } else if (r < 7) {
+                        final TileType hills = getRandomTileType(game, spec.getHillsTileTypeList(), map.getLatitude(t.getY()));
+                        if (hills == null) {
+                            continue;
+                        }
                         t.setType(hills);
                         mountainRegion.addTile(t);
                     }
@@ -529,6 +534,11 @@ public class TerrainGenerator {
             / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER);
         counter = 0;
         for (Tile t : tiles) {
+            final TileType mountains = getRandomTileType(game, spec.getMountainsTileTypeList(), map.getLatitude(t.getY()));
+            final TileType hills = getRandomTileType(game, spec.getHillsTileTypeList(), map.getLatitude(t.getY()));
+            if (mountains == null || hills == null) {
+                continue;
+            }
             // 25% mountains, 75% hills
             boolean m = this.cache.nextInt(4) == 0;
             t.setType((m) ? mountains : hills);
