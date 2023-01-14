@@ -195,16 +195,6 @@ public class Game extends FreeColGameObject {
     protected final HashMap<String, WeakReference<FreeColGameObject>>
         freeColGameObjects;
 
-    /**
-     * The combat model this game uses. At the moment, the only combat
-     * model available is the SimpleCombatModel, which strives to
-     * implement the combat model of the original game.  However, it is
-     * anticipated that other, more complex combat models will be
-     * implemented in future.  As soon as that happens, we will also
-     * have to make the combat model selectable.
-     */
-    protected CombatModel combatModel = null;
-
     /** The number of removed FCGOs that should trigger a cache clean. */
     private static final int REMOVE_GC_THRESHOLD = 64;
 
@@ -255,11 +245,6 @@ public class Game extends FreeColGameObject {
         this();
 
         setSpecification(specification);
-        if (specification.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
-            this.combatModel = new HitpointsCombatModel();
-        } else {
-            this.combatModel = new SimpleCombatModel();
-        }
     }
 
     /**
@@ -275,11 +260,6 @@ public class Game extends FreeColGameObject {
         this();
         
         readFromXML(xr);
-        if (specification.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
-            this.combatModel = new HitpointsCombatModel();
-        } else {
-            this.combatModel = new SimpleCombatModel();
-        }
     }
 
 
@@ -1246,16 +1226,11 @@ public class Game extends FreeColGameObject {
      * @return The {@code CombatModel}.
      */
     public final CombatModel getCombatModel() {
-        return combatModel;
-    }
-
-    /**
-     * Set the game combat model.
-     *
-     * @param newCombatModel The new {@code CombatModel} value.
-     */
-    public final void setCombatModel(final CombatModel newCombatModel) {
-        this.combatModel = newCombatModel;
+        if (specification.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+            return new HitpointsCombatModel();
+        } else {
+            return new SimpleCombatModel();
+        }
     }
 
     /**
