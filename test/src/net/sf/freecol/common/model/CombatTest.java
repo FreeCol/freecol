@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatEffectType;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.option.GameOptions;
@@ -504,10 +504,10 @@ public class CombatTest extends FreeColTestCase {
         double defence = 0 + 3 + 3;
         assertEquals(defence, combatModel.getDefencePower(regular, colonial));
 
-        List<CombatResult> crs
-            = combatModel.generateAttackResult(loseRandom, regular, colonial);
+        List<CombatEffectType> crs
+            = combatModel.generateAttackResult(loseRandom, regular, colonial).getEffects();
         checkCombat("Regular v Colonial", crs,
-            CombatResult.LOSE, CombatResult.LOSE_EQUIP);
+            CombatEffectType.LOSE, CombatEffectType.LOSE_EQUIP);
         refPlayer.csCombat(regular, colonial, crs, loseRandom, new ChangeSet());
         assertEquals(infantryRole, regular.getRole());
 
@@ -516,30 +516,30 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
 
         // slaughter King's Regular
-        crs = combatModel.generateAttackResult(winRandom, colonial, regular);
+        crs = combatModel.generateAttackResult(winRandom, colonial, regular).getEffects();
         checkCombat("Regular should be slaughtered upon losing all equipment",
-            crs, CombatResult.WIN, CombatResult.SLAUGHTER_UNIT);
+            crs, CombatEffectType.WIN, CombatEffectType.SLAUGHTER_UNIT);
 
         regular = new ServerUnit(game, tile2, french, kingsRegularType,
                                  cavalryRole);
 
-        crs = combatModel.generateAttackResult(winRandom, regular, colonial);
+        crs = combatModel.generateAttackResult(winRandom, regular, colonial).getEffects();
         checkCombat("Regular v Colonial (2)", crs,
-            CombatResult.WIN, CombatResult.LOSE_EQUIP);
+            CombatEffectType.WIN, CombatEffectType.LOSE_EQUIP);
         refPlayer.csCombat(regular, colonial, crs, winRandom, new ChangeSet());
         assertEquals(soldierRole, colonial.getRole());
 
-        crs = combatModel.generateAttackResult(winRandom, regular, colonial);
+        crs = combatModel.generateAttackResult(winRandom, regular, colonial).getEffects();
         checkCombat("Regular v Colonial (3)", crs,
-            CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.DEMOTE_UNIT);
+            CombatEffectType.WIN, CombatEffectType.LOSE_EQUIP, CombatEffectType.DEMOTE_UNIT);
         refPlayer.csCombat(regular, colonial, crs, winRandom, new ChangeSet());
         assertFalse(colonial.isArmed());
         assertEquals(veteranType, colonial.getType());
         assertEquals(spec().getDefaultRole(), colonial.getRole());
 
-        crs = combatModel.generateAttackResult(winRandom, regular, colonial);
+        crs = combatModel.generateAttackResult(winRandom, regular, colonial).getEffects();
         checkCombat("Regular v Colonial (4)", crs,
-            CombatResult.WIN, CombatResult.CAPTURE_UNIT);
+            CombatEffectType.WIN, CombatEffectType.CAPTURE_UNIT);
         refPlayer.csCombat(regular, colonial, crs, winRandom, new ChangeSet());
     }
 
@@ -579,11 +579,11 @@ public class CombatTest extends FreeColTestCase {
         il.add(0);
         random.setNextNumbers(il, true);
 
-        List<CombatResult> crs = combatModel.generateAttackResult(random,
-            soldier, defender);
+        List<CombatEffectType> crs = combatModel.generateAttackResult(random,
+            soldier, defender).getEffects();
         checkCombat("Capture convert", crs,
-                    CombatResult.WIN, CombatResult.SLAUGHTER_UNIT,
-                    CombatResult.CAPTURE_CONVERT);
+                    CombatEffectType.WIN, CombatEffectType.SLAUGHTER_UNIT,
+                    CombatEffectType.CAPTURE_CONVERT);
         assertEquals("One unit on tile", 1, tile2.getUnitList().size());
         dutch.csCombat(soldier, defender, crs, new Random(),
                        new ChangeSet());

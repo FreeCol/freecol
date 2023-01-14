@@ -112,6 +112,22 @@ public final class Specification implements OptionContainer {
             }
         }
     }
+    
+    private class AbilityReader implements ChildReader {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void readChildren(FreeColXMLReader xr)
+            throws XMLStreamException {
+            while (xr.moreTags()) {
+                Ability ability = new Ability(xr, Specification.this);
+                Specification.this.addAbility(ability);
+                Specification.this.gameAbilities.add(ability);
+            }
+        }
+    }
 
     /**
      * Options are special as they live in the allOptionGroups
@@ -455,6 +471,8 @@ public final class Specification implements OptionContainer {
 
     /** All the abilities by identifier. */
     private final Map<String, List<Ability>> allAbilities = new HashMap<>(128);
+    
+    private final List<Ability> gameAbilities = new ArrayList<>();
 
     /** A cache of the military roles in decreasing order.  Do not serialize. */
     private List<Role> militaryRoles = null;
@@ -514,6 +532,7 @@ public final class Specification implements OptionContainer {
         readerMap.put(UNIT_TYPES_TAG,
                       new TypeReader<>(UnitType.class, unitTypeList));
 
+        readerMap.put(ABILITIES_TAG, new AbilityReader());
         readerMap.put(MODIFIERS_TAG, new ModifierReader());
         readerMap.put(OPTIONS_TAG, new OptionReader());
     }
@@ -606,6 +625,11 @@ public final class Specification implements OptionContainer {
     public void prepare(Advantages advantages, String difficulty) {
         prepare(advantages, (difficulty == null) ? null
             : getDifficultyOptionGroup(difficulty));
+    }
+    
+    public boolean hasAbility(String key) {
+        List<Ability> ability = allAbilities.get(key);
+        return ability != null && ability.stream().anyMatch(a -> a.getValue());
     }
 
     /**
@@ -3103,8 +3127,9 @@ public final class Specification implements OptionContainer {
     }
         
 
-    // Serialization
+    // SerializationgameAbilities
 
+    private static final String ABILITIES_TAG = "abilities";
     private static final String BUILDING_TYPES_TAG = "building-types";
     private static final String DIFFICULTY_LEVEL_TAG = "difficulty-level";
     private static final String DISASTERS_TAG = "disasters";
@@ -3151,6 +3176,7 @@ public final class Specification implements OptionContainer {
         }
 
         // copy the order of section in specification.xml
+        writeSection(xw, ABILITIES_TAG, gameAbilities);
         writeSection(xw, MODIFIERS_TAG, specialModifiers);
         writeSection(xw, EVENTS_TAG, events);
         writeSection(xw, DISASTERS_TAG, disasters);
@@ -3167,7 +3193,7 @@ public final class Specification implements OptionContainer {
         writeSection(xw, EUROPEAN_NATION_TYPES_TAG, REFNationTypes);
         writeSection(xw, INDIAN_NATION_TYPES_TAG, indianNationTypes);
         writeSection(xw, NATIONS_TAG, nations);
-
+        
         xw.writeStartElement(OPTIONS_TAG);
         for (String id : coreOptionGroups) {
             OptionGroup og = allOptionGroups.get(id);

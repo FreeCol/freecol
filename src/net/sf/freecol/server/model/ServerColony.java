@@ -910,6 +910,11 @@ public class ServerColony extends Colony implements TurnTaker {
                 building.csCheckTeach(teacher, cs);
             }
         }
+        
+        // Repair land units (only used if they have hitpoints).
+        for (Unit unit : transform(getTile().getUnits(), u -> !u.isNaval() && u.isDamaged())) {
+            ((ServerUnit) unit).csRepairUnit(cs);
+        }
 
         // Try to update minimally.
         if (tileDirty) {

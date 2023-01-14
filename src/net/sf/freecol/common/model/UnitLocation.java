@@ -113,7 +113,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         /**
          * Either unclaimed or claimed but could be acquired.
          */
-        CLAIM_REQUIRED;
+        CLAIM_REQUIRED,
+        
+        /**
+         * The worker is damaged (not at maximum hitpoints).
+         */
+        WORKER_DAMAGED;
 
         /**
          * Get a message key describing this reason.

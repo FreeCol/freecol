@@ -21,7 +21,7 @@ package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatEffectType;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -107,7 +107,7 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // Simulate the combat
         igc.combat(dutch, privateer, galleon,
-                   fakeAttackResult(CombatResult.WIN, privateer, galleon));
+                   fakeAttackResult(CombatEffectType.WIN, privateer, galleon));
 
         // Verify that the outcome of the combat is a return to Europe
         // for repairs and also invalidation of the transport mission

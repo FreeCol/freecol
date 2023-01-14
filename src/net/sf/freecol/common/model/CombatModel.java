@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ import java.util.Set;
  */
 public abstract class CombatModel {
 
-    public static enum CombatResult {
+    public static enum CombatEffectType {
         // Special results that set the sense of the result.
         NO_RESULT,
         LOSE,
@@ -61,6 +62,45 @@ public abstract class CombatModel {
         SINK_SHIP_BOMBARD,    // Losing ship is sunk by bombardment
         SLAUGHTER_UNIT,       // Losing unit is slaughtered
     }
+    
+    public static final class CombatResult {
+        
+        private final List<CombatEffectType> effects;
+        private final int attackerHitpointsAfter;
+        private final int defenderHitpointsAfter;
+        
+        public CombatResult(List<CombatEffectType> effects) {
+            this.effects = Objects.requireNonNull(effects);
+            this.attackerHitpointsAfter = -1;
+            this.defenderHitpointsAfter = -1;
+        }
+        
+        public CombatResult(List<CombatEffectType> effects, int attackerHitpointsAfter, int defenderHitpointsAfter) {
+            this.effects = Objects.requireNonNull(effects);
+            this.attackerHitpointsAfter = attackerHitpointsAfter;
+            this.defenderHitpointsAfter = defenderHitpointsAfter;
+        }
+        
+        public List<CombatEffectType> getEffects() {
+            return effects;
+        }
+        
+        public boolean isAttackerHitpointsAffected() {
+            return attackerHitpointsAfter >= 0;
+        }
+        
+        public boolean isDefenderHitpointsAffected() {
+            return defenderHitpointsAfter >= 0;
+        }
+        
+        public int getAttackerHitpointsAfter() {
+            return attackerHitpointsAfter;
+        }
+        
+        public int getDefenderHitpointsAfter() {
+            return defenderHitpointsAfter;
+        }
+    }
 
 
     /**
@@ -90,7 +130,7 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if no defender is provided.
      */
-    public boolean combatIsAttackMeasurement(FreeColGameObject attacker,
+    protected final boolean combatIsAttackMeasurement(FreeColGameObject attacker,
                                              FreeColGameObject defender) {
         return attacker instanceof Unit && defender == null;
     }
@@ -102,7 +142,7 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if no attacker is provided.
      */
-    public boolean combatIsDefenceMeasurement(FreeColGameObject attacker,
+    protected final boolean combatIsDefenceMeasurement(FreeColGameObject attacker,
                                               FreeColGameObject defender) {
         return attacker == null && defender instanceof Unit;
     }
@@ -171,7 +211,7 @@ public abstract class CombatModel {
      * @param defender The defender object.
      * @return True if the attack is a war of independence battle for a colony.
      */
-    public boolean combatIsWarOfIndependence(FreeColGameObject attacker,
+    protected final boolean combatIsWarOfIndependence(FreeColGameObject attacker,
                                              FreeColGameObject defender) {
         if (attacker instanceof Unit
             && defender instanceof Ownable) {
@@ -262,7 +302,7 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return The results of the combat.
      */
-    public abstract List<CombatResult> generateAttackResult(Random random,
+    public abstract CombatResult generateAttackResult(Random random,
                                                             FreeColGameObject attacker,
                                                             FreeColGameObject defender);
 }

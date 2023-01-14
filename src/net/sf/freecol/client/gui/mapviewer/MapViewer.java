@@ -1029,6 +1029,28 @@ public final class MapViewer extends FreeColClientHolder {
                 unitLinesY += 2;
             }
         }
+        
+        if (unit.getHitPoints() >= 0 && unit.getHitPoints() < unit.getMaximumHitPoints()) {
+            final int offsetX = lib.scaleInt(8);
+            final int hitpointsBarWidth = lib.scaleInt(5);
+            final int hitpointsBarMargin = lib.scaleInt(5);
+            final int fullHeight = tileBounds.getHeight() - 2 * hitpointsBarMargin;
+            final int filledHeight = (int) (fullHeight * (((float) unit.getHitPoints()) / unit.getMaximumHitPoints()));
+            g2d.setColor(new Color(0, 255, 0, 255));
+            g2d.fillRect(hitpointsBarMargin + hitpointsBarWidth + offsetX,
+                    hitpointsBarMargin - this.lib.scaleInt(TileBounds.UNIT_OFFSET)
+                    + fullHeight - filledHeight,
+                    hitpointsBarWidth,
+                    filledHeight);
+            final Stroke defaultStroke = g2d.getStroke();
+            g2d.setStroke(new BasicStroke(lib.scaleInt(1)));
+            g2d.setColor(Color.BLACK);
+            g2d.drawRect(hitpointsBarMargin + hitpointsBarWidth + offsetX,
+                    hitpointsBarMargin - this.lib.scaleInt(TileBounds.UNIT_OFFSET),
+                    hitpointsBarWidth,
+                    fullHeight);
+            g2d.setStroke(defaultStroke);
+        }
 
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;

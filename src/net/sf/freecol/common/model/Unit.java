@@ -592,11 +592,12 @@ public class Unit extends GoodsLocation
     public boolean changeType(UnitType unitType) {
         if (!unitType.isAvailableTo(owner)) return false;
 
+        final double health = ((double) getHitPoints()) / getMaximumHitPoints(); 
         setType(unitType);
         if (getMovesLeft() > getInitialMovesLeft()) {
             setMovesLeft(getInitialMovesLeft());
         }
-        this.hitPoints = unitType.getHitPoints();
+        this.hitPoints = (int) (unitType.getHitPoints() * health);
         if (getTeacher() != null) {
             if (!canBeStudent(getTeacher())) {
                 getTeacher().setStudent(null);
@@ -1681,6 +1682,16 @@ public class Unit extends GoodsLocation
     public int getHitPoints() {
         return hitPoints;
     }
+    
+    /**
+     * Gets the maximum hitspoints for the unit.
+     *
+     * @return The hit points this {@code Unit} has at full health.
+     * @see UnitType#getHitPoints
+     */
+    public int getMaximumHitPoints() {
+        return type.getHitPoints();
+    }
 
     /**
      * Sets the hit points for this unit.
@@ -1697,7 +1708,7 @@ public class Unit extends GoodsLocation
      * @return True if under repair.
      */
     public boolean isDamaged() {
-        return hitPoints < this.type.getHitPoints();
+        return hitPoints < getMaximumHitPoints();
     }
 
     /**
@@ -1706,7 +1717,7 @@ public class Unit extends GoodsLocation
      * @return The number of turns left to be repaired.
      */
     public int getTurnsForRepair() {
-        return this.type.getHitPoints() - getHitPoints();
+        return getMaximumHitPoints() - getHitPoints();
     }
 
     /**
@@ -3637,7 +3648,7 @@ public class Unit extends GoodsLocation
         final TradeRoute tradeRoute = getTradeRoute();
         StringTemplate ret;
         if (player != null && player.owns(this)) {
-            if (isDamaged()) {
+            if (isDamaged() && !getSpecification().hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
                 if (full) {
                     ret = StringTemplate.label(":")
                         .add("model.unit.occupation.underRepair")
@@ -4687,6 +4698,8 @@ public class Unit extends GoodsLocation
         xw.writeAttribute(ROLE_TAG, role);
 
         xw.writeAttribute(ROLE_COUNT_TAG, roleCount);
+        
+        xw.writeAttribute(HIT_POINTS_TAG, hitPoints);
 
         if (!xw.validFor(getOwner()) && isOwnerHidden()) {
             // Pirates do not disclose national characteristics.
@@ -4728,8 +4741,6 @@ public class Unit extends GoodsLocation
             xw.writeAttribute(INDIAN_SETTLEMENT_TAG, indianSettlement);
 
             xw.writeAttribute(WORK_LEFT_TAG, workLeft);
-
-            xw.writeAttribute(HIT_POINTS_TAG, hitPoints);
 
             xw.writeAttribute(ATTRITION_TAG, attrition);
 

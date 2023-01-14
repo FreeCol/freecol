@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatEffectType;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -1329,7 +1329,7 @@ public final class InGameController extends Controller {
     public ChangeSet combat(ServerPlayer attackerPlayer,
                             FreeColGameObject attacker,
                             FreeColGameObject defender,
-                            List<CombatResult> crs) {
+                            List<CombatEffectType> crs) {
         ChangeSet cs = new ChangeSet();
         try {
             attackerPlayer.csCombat(attacker, defender, crs, random, cs);

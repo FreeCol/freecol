@@ -765,6 +765,10 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
+        if (locatable instanceof Unit && ((Unit) locatable).isDamaged()) {
+            return NoAddReason.WORKER_DAMAGED;
+        }
+        
         return (locatable instanceof Unit && ((Unit)locatable).isPerson())
             ? super.getNoAddReason(locatable)
             : NoAddReason.WRONG_TYPE;

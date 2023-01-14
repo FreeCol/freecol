@@ -38,7 +38,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatEffectType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -662,11 +662,11 @@ public class FreeColTestCase extends TestCase {
      * Repeatedly ask the CombatModel for an attack result until it
      * gives the primary one we want (WIN, LOSE, NO_RESULT).
      */
-    public List<CombatResult> fakeAttackResult(CombatResult result,
+    public List<CombatEffectType> fakeAttackResult(CombatEffectType result,
                                                FreeColGameObject attacker,
                                                FreeColGameObject defender)
     {
-        List<CombatResult> crs;
+        List<CombatEffectType> crs;
         final double delta = 0.02;
         CombatModel combatModel = getGame().getCombatModel();
         CombatOdds combatOdds = combatModel.calculateCombatOdds(attacker, defender);
@@ -675,14 +675,14 @@ public class FreeColTestCase extends TestCase {
         List<Integer> number = new ArrayList<>();
         number.add(-1);
         do {
-            p += (result == CombatResult.WIN) ? -delta : delta;
+            p += (result == CombatEffectType.WIN) ? -delta : delta;
             if (p < 0.0 || p >= 1.0) {
                 throw new IllegalStateException("f out of range: "
                                                 + Double.toString(p));
             }
             number.set(0, (int)(Integer.MAX_VALUE * p));
             mr.setNextNumbers(number, true);
-            crs = combatModel.generateAttackResult(mr, attacker, defender);
+            crs = combatModel.generateAttackResult(mr, attacker, defender).getEffects();
         } while (crs.get(0) != result);
         return crs;
     }
@@ -694,11 +694,11 @@ public class FreeColTestCase extends TestCase {
      * @param crs The list of {@code CombatResult} to check.
      * @param results The expected {@code CombatResult}s.
      */
-    public void checkCombat(String name, List<CombatResult> crs,
-                            CombatResult... results) {
+    public void checkCombat(String name, List<CombatEffectType> crs,
+                            CombatEffectType... results) {
         int i = 0;
-        for (CombatResult cr : results) {
-            CombatResult expect = (i < crs.size()) ? crs.get(i) : null;
+        for (CombatEffectType cr : results) {
+            CombatEffectType expect = (i < crs.size()) ? crs.get(i) : null;
             if (expect != cr) break;
             i++;
         }
@@ -707,11 +707,11 @@ public class FreeColTestCase extends TestCase {
             i++;
         }
         String err = name + ", failed at " + i + ":";
-        for (CombatResult cr : results) {
+        for (CombatEffectType cr : results) {
             err += " " + cr;
         }
         err += " !=";
-        for (CombatResult cr : crs) {
+        for (CombatEffectType cr : crs) {
             err += " " + cr;
         }
         fail(err);

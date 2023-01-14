@@ -19,8 +19,23 @@
 
 package net.sf.freecol.common.model;
 
-import java.lang.ref.WeakReference;
+import static net.sf.freecol.common.util.CollectionUtils.all;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.flatten;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.StringUtils.capitalize;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
 import java.io.StringReader;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -30,9 +45,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
@@ -40,13 +55,11 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -228,7 +241,6 @@ public class Game extends FreeColGameObject {
         this.spanishSuccession = false;
         this.initialActiveUnitId = null;
         this.specification = null;
-        this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
 
         this.initialized = true; // Explicit initialization needed for Games
@@ -243,6 +255,11 @@ public class Game extends FreeColGameObject {
         this();
 
         setSpecification(specification);
+        if (specification.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+            this.combatModel = new HitpointsCombatModel();
+        } else {
+            this.combatModel = new SimpleCombatModel();
+        }
     }
 
     /**
@@ -258,6 +275,11 @@ public class Game extends FreeColGameObject {
         this();
         
         readFromXML(xr);
+        if (specification.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+            this.combatModel = new HitpointsCombatModel();
+        } else {
+            this.combatModel = new SimpleCombatModel();
+        }
     }
 
 

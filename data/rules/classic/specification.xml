@@ -1795,7 +1795,7 @@
          defaults to the unit type itself! -->
     <unit-type id="colonist" abstract="true"
                offence="0" defence="1" movement="3" line-of-sight="1"
-               priority="1000">
+               priority="1000" hit-points="5">
       <ability id="model.ability.person"
                value="true"/>
       <ability id="model.ability.foundColony"
@@ -1999,7 +1999,7 @@
     </unit-type>
     <unit-type id="model.unit.indianConvert"
                skill="0" offence="0" defence="1" movement="3" line-of-sight="1"
-               maximum-attrition="8" score-value="3">
+               maximum-attrition="8" score-value="3" hit-points="5">
       <consumes id="model.goods.food" value="2"/>
       <consumes id="model.goods.bells" value="1"/>
       <ability id="model.ability.person"
@@ -2024,7 +2024,8 @@
     </unit-type>
     <unit-type id="model.unit.brave"
                offence="1" defence="1"
-               default-unit="true" movement="3" line-of-sight="1" space="1">
+               default-unit="true" movement="3" line-of-sight="1" space="1"
+               hit-points="5">
       <required-ability id="model.ability.native"/>
       <consumes id="model.goods.food" value="2"/>
       <consumes id="model.goods.rum" value="1"/>
@@ -2054,7 +2055,8 @@
                value="true"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
-               skill-taught="model.unit.veteranSoldier" skill="3">
+               skill-taught="model.unit.veteranSoldier" skill="3"
+               hit-points="5">
       <required-ability id="model.ability.independenceDeclared"/>
       <ability id="model.ability.demoteOnAllEquipLost"
                value="true"/>
@@ -2068,7 +2070,7 @@
                 type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular" extends="colonist"
-               default-unit="true" skill="4">
+               default-unit="true" skill="4" hit-points="5">
       <required-ability id="model.ability.royalExpeditionaryForce"/>
       <ability id="model.ability.refUnit"
                value="true"/>
@@ -2166,13 +2168,13 @@
       <ability id="model.ability.piracy"
                value="true"/>
     </unit-type>
-    <unit-type id="wagon" abstract="true" line-of-sight="1">
+    <unit-type id="wagon" abstract="true" line-of-sight="1" hit-points="1">
       <ability id="model.ability.foundColony"
                value="false"/>
     </unit-type>
     <unit-type id="model.unit.artillery" extends="wagon" price="500"
                offence="7" defence="5" movement="3"
-               score-value="2">
+               score-value="2" hit-points="6">
       <required-goods id="model.goods.hammers"
                       value="192"/>
       <required-goods id="model.goods.tools"
@@ -2192,7 +2194,7 @@
     </unit-type>
     <unit-type id="model.unit.damagedArtillery" extends="wagon"
                offence="5" defence="3" movement="3"
-               score-value="1">
+               score-value="1" hit-points="6">
       <ability id="model.ability.captureUnits"
                value="true"/>
       <ability id="model.ability.bombard"
