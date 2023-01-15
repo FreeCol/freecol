@@ -62,6 +62,18 @@ public class AIMessage {
         return aiUnit.getAIOwner().askServer()
             .attack(aiUnit.getUnit(), direction);
     }
+    
+    /**
+     * An AIUnit attacks the given target with a ranged attack.
+     *
+     * @param aiUnit The {@code AIUnit} to attack with.
+     * @param target The target {@code Tile} of the attack. 
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askAttackRanged(AIUnit aiUnit, Tile target) {
+        return aiUnit.getAIOwner().askServer()
+            .attackRanged(aiUnit.getUnit(), target);
+    }
 
     /**
      * An AIUnit builds a colony.

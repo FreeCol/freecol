@@ -22,4 +22,28 @@
   <abilities>
     <ability id="model.ability.hitpointsCombatModel" value="true"/>
   </abilities>
+  
+  <unit-types>
+    <unit-type id="model.unit.artillery" partial="true" attack-range="2" line-of-sight="2" />
+    <unit-type id="model.unit.damagedArtillery" partial="true" attack-range="2" line-of-sight="2" />
+    
+    <unit-type id="model.unit.caravel" partial="true" attack-range="1" hit-points="10" />
+    <unit-type id="model.unit.merchantman" partial="true" attack-range="1" hit-points="15" />
+    
+    <!-- 
+       These ships can bombard units/settlements on adjacent tiles.
+     -->
+    <unit-type id="model.unit.frigate" partial="true" attack-range="1" hit-points="25" />
+    <unit-type id="model.unit.manOWar" partial="true" attack-range="1" hit-points="35" />
+    
+    <unit-type id="model.unit.galleon" partial="true" attack-range="1" hit-points="30" />
+    
+    <!-- 
+       Please note. It's intentional that the privateer has a lower attack range than the
+       frigate, and that it will not deal defensive damage. This is done to make the frigate a
+       better deal, since a merchantman+privateer was almost always a better option in classic.
+    -->
+    <unit-type id="model.unit.privateer" partial="true" attack-range="0" hit-points="20" />
+    
+  </unit-types>
 </freecol-specification>

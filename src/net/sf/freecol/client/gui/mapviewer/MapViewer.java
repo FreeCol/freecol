@@ -306,6 +306,27 @@ public final class MapViewer extends FreeColClientHolder {
         }
         final long gotoPathMs = now();
 
+        if (mapViewerState.isRangedAttackMode()
+                && mapViewerState.getActiveUnit() != null
+                && mapViewerState.getActiveUnit().getTile() != null) {
+            final BufferedImage rangedTarget = lib.getRangedTargetCrosshair();
+            final Iterable<Tile> possibleTargets = map.getCircleTiles(mapViewerState.getActiveUnit().getTile(),
+                    true,
+                    mapViewerState.getActiveUnit().getType().getAttackRange());
+            for (Tile t : possibleTargets) {
+                if (mapViewerState.getActiveUnit().canAttackRanged(t)) {
+                    final Point point = mapViewerBounds.calculateTilePosition(t, false);
+                    if (point == null) {
+                        continue;
+                    }
+                    g2d.drawImage(rangedTarget,
+                            point.x + (tileBounds.getWidth() - rangedTarget.getWidth()) / 2,
+                            point.y + (tileBounds.getHeight() - rangedTarget.getHeight()) / 2,
+                            null);
+                }
+            }
+        }
+        
         // Draw the chat
         mapViewerState.getChatDisplay().display(g2d, mapViewerBounds.getSize());
         final long chatMs = now();

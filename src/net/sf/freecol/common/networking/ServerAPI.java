@@ -268,6 +268,17 @@ public abstract class ServerAPI {
     public boolean attack(Unit unit, Direction direction) {
         return ask(new AttackMessage(unit, direction));
     }
+    
+    /**
+     * Server query-response for ranged attacking.
+     *
+     * @param unit The {@code Unit} to perform the attack.
+     * @param target The target {@code Tile} of the attack.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean attackRanged(Unit unit, Tile target) {
+        return ask(new AttackRangedMessage(unit, target));
+    }
 
     /**
      * Server query-response for building a colony.

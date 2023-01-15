@@ -34,6 +34,7 @@ import javax.swing.JMenu;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
+import net.sf.freecol.client.gui.action.AttackRangedAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.CenterAction;
 import net.sf.freecol.client.gui.action.ChangeAction;
@@ -98,6 +99,7 @@ import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -227,6 +229,10 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_O);
 
+        if (spec.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+            menu.add(getMenuItem(AttackRangedAction.id));
+        }
+        
         menu.add(getMenuItem(SentryAction.id));
         menu.add(getMenuItem(FortifyAction.id));
 

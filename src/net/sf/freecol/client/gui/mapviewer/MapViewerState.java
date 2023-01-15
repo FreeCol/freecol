@@ -53,6 +53,8 @@ public final class MapViewerState {
     
     /** The active unit, for ViewMode.MOVE_UNITS. */
     private Unit activeUnit;
+    
+    private boolean rangedAttackMode = false;
 
     /** The chat message area. */
     private final ChatDisplay chatDisplay;
@@ -67,6 +69,14 @@ public final class MapViewerState {
         this.unitAnimator = unitAnimator;
     }
 
+    
+    public void setRangedAttackMode(boolean rangedAttackMode) {
+        this.rangedAttackMode = rangedAttackMode;
+    }
+    
+    public boolean isRangedAttackMode() {
+        return rangedAttackMode;
+    }
     
     /**
      * Sets if the cursor should be blinking.
@@ -144,6 +154,7 @@ public final class MapViewerState {
     public boolean changeGotoPath(PathNode gotoPath) {
         if (this.gotoPath == gotoPath) return false;
         this.gotoPath = gotoPath;
+        this.rangedAttackMode = false;
         return true;
     }
 
@@ -163,6 +174,7 @@ public final class MapViewerState {
      */
     public void setUnitPath(PathNode path) {
         this.unitPath = path;
+        this.rangedAttackMode = false;
     }
     
  // View Mode and associates
@@ -183,6 +195,7 @@ public final class MapViewerState {
      */
     public void setViewMode(ViewMode vm) {
         this.viewMode = vm;
+        this.rangedAttackMode = false;
     }
     
     /**
@@ -201,6 +214,7 @@ public final class MapViewerState {
      */
     public void setActiveUnit(Unit activeUnit) {
         this.activeUnit = activeUnit;
+        this.rangedAttackMode = false;
     }
 
     /**
@@ -219,6 +233,7 @@ public final class MapViewerState {
      */
     public void setSelectedTile(Tile tile) {
         this.selectedTile = tile;
+        this.rangedAttackMode = false;
     }
 
     /**

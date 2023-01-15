@@ -65,6 +65,7 @@ import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.mapviewer.GUIMessage;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
+import net.sf.freecol.client.gui.mapviewer.MapViewerState;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
@@ -416,6 +417,25 @@ public class SwingGUI extends GUI {
         this.mapViewer.getMapViewerState().setActiveUnit(newUnit);
         clearGotoPath();
         return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setRangedAttackMode(boolean rangedAttackMode) {
+        final MapViewerState mvs = this.mapViewer.getMapViewerState();
+        if (mvs.isRangedAttackMode() == rangedAttackMode) {
+            return;
+        }
+        mvs.setRangedAttackMode(rangedAttackMode);
+        refresh();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void toggleRangedAttackMode() {
+        setRangedAttackMode(!this.mapViewer.getMapViewerState().isRangedAttackMode());
     }
 
     /**
@@ -1394,6 +1414,20 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void clickAt(int count, int x, int y) {
+        if (mapViewer.getMapViewerState().isRangedAttackMode()) {
+            final Tile tile = tileAt(x, y);
+            final Unit activeUnit = mapViewer.getMapViewerState().getActiveUnit();
+            if (activeUnit == null
+                    || !activeUnit.isOffensiveUnit()
+                    || !activeUnit.canAttackRanged(tile)
+                    || activeUnit.getMovesLeft() <= 0
+                    || !getFreeColClient().currentPlayerIsMyPlayer()) {
+                return;
+            }
+            igc().attackRanged(activeUnit, tile);
+            return;
+        }
+        
         // This could be a drag, which would have already been processed
         // in @see CanvasMouseListener#mouseReleased
         if (count == 1 && isDrag(x, y)) return;

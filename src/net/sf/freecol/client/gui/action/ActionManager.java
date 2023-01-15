@@ -30,6 +30,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.UnitButton;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -136,6 +137,7 @@ public class ActionManager extends OptionGroup {
         add(new PreferencesAction(freeColClient));
         add(new SaveAndQuitAction(freeColClient));
         add(new QuitAction(freeColClient));
+        add(new AttackRangedAction(freeColClient));
         add(new ReconnectAction(freeColClient));
         add(new RenameAction(freeColClient));
         add(new ReportCargoAction(freeColClient));
@@ -236,6 +238,9 @@ public class ActionManager extends OptionGroup {
      */
     public List<UnitButton> makeUnitActionButtons(final Specification spec) {
         List<UnitButton> ret = new ArrayList<>();
+        if (spec.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+            ret.add(new UnitButton(this, AttackRangedAction.id));
+        }
         ret.add(new UnitButton(this, WaitAction.id));
         ret.add(new UnitButton(this, SkipUnitAction.id));
         ret.add(new UnitButton(this, SentryAction.id));

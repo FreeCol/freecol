@@ -1574,6 +1574,21 @@ public class GUI extends FreeColClientHolder {
      */
     public void changeView() {}
 
+    /**
+     * Sets if ranged attack mode should be activated.
+     * 
+     * @param rangedAttackMode If {@code true}, then display tiles reachable
+     *      by ranged attack and allow the attack to be performed by clicking. 
+     */
+    public void setRangedAttackMode(boolean rangedAttackMode) {}
+    
+    /**
+     * Toggles if ranged attack mode should be activated.
+     * 
+     * @see #setRangedAttackMode(boolean)
+     */
+    public void toggleRangedAttackMode() {}
+    
 
     // Zoom controls
 

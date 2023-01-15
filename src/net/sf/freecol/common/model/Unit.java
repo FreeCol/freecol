@@ -4422,6 +4422,13 @@ public class Unit extends GoodsLocation
         return getCargoCapacity();
     }
 
+    public boolean canAttackRanged(Tile tile) {
+        return getType().getAttackRange() >= getTile().getDistanceTo(tile)
+                && (
+                    tile.getSettlement() != null && tile.getSettlement().getOwner() != getOwner()
+                    || tile.getDefendingUnit(this) != null && tile.getDefendingUnit(this).getOwner() != getOwner()
+                );
+    }
 
     // Override FreeColGameObject
 

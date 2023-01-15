@@ -1566,6 +1566,21 @@ public final class InGameController extends FreeColClientHolder {
         // blocked.
         return false;
     }
+    
+    public void attackRanged(Unit unit, Tile target) {
+        if (!unit.canAttackRanged(target)) {
+            return;
+        }
+
+        if (askClearGotoOrders(unit)
+            && getGUI().confirmHostileAction(unit, target)
+            && getGUI().confirmPreCombat(unit, target)) {
+            askServer().attackRanged(unit, target);
+            // Immediately display resulting message, allowing
+            // next updateGUI to select another unit.
+            nextModelMessage();
+        }
+    }
 
     /**
      * Confirm attack or demand a tribute from a settlement, following

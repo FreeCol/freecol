@@ -102,6 +102,8 @@ public final class UnitType extends BuildableType implements Consumer {
 
     /** The maximum experience a unit of this type can accumulate. */
     private int maximumExperience = 0;
+    
+    private int attackRange = 0;
 
     /**
      * The maximum attrition this UnitType can accumulate without
@@ -253,6 +255,13 @@ public final class UnitType extends BuildableType implements Consumer {
     public int getLineOfSight() {
         return lineOfSight;
     }
+    
+    /**
+     * Sets `line of sight' (used by Introspector).
+     */
+    public void setLineOfSight(int lineOfSight) {
+        this.lineOfSight = lineOfSight;
+    }
 
     /**
      * Get the space this unit type has to carry cargo.
@@ -280,6 +289,13 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public int getHitPoints() {
         return hitPoints;
+    }
+    
+    /**
+     * Sets `hit points' (used by Introspector).
+     */
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
     }
 
     /**
@@ -662,6 +678,18 @@ public final class UnitType extends BuildableType implements Consumer {
     public int getPriority() {
         return priority;
     }
+    
+    public int getAttackRange() {
+        return attackRange;
+    }
+    
+    
+    /**
+     * Sets attack range (used by Introspector).
+     */
+    public void setAttackRange(int attackRange) {
+        this.attackRange = attackRange;
+    }
 
     /**
      * {@inheritDoc}
@@ -704,7 +732,8 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     // Serialization
-
+    
+    private static final String ATTACK_RANGE_TAG = "attack-range";
     private static final String CONSUMES_TAG = "consumes";
     private static final String DEFAULT_ROLE_TAG = "default-role";
     private static final String DEFAULT_UNIT_TAG = "default-unit";
@@ -769,6 +798,8 @@ public final class UnitType extends BuildableType implements Consumer {
         xw.writeAttribute(SPACE_TAKEN_TAG, spaceTaken);
 
         xw.writeAttribute(HIT_POINTS_TAG, hitPoints);
+        
+        xw.writeAttribute(ATTACK_RANGE_TAG, attackRange);
 
         xw.writeAttribute(MAXIMUM_EXPERIENCE_TAG, maximumExperience);
 
@@ -875,6 +906,8 @@ public final class UnitType extends BuildableType implements Consumer {
         } else
             // end @compat 0.11.3
             hitPoints = xr.getAttribute(HIT_POINTS_TAG, parent.hitPoints);
+        
+        attackRange = xr.getAttribute(ATTACK_RANGE_TAG, parent.attackRange);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_SPACE_TAKEN_TAG)) {

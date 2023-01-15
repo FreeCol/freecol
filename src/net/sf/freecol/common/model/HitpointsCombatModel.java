@@ -62,15 +62,19 @@ public class HitpointsCombatModel extends SimpleCombatModel {
             final int defenderDamage = random.nextInt((int) Math.ceil(getOffencePower(attacker, defender)) + 1);
             final int newDefenderHitpoints = defenderUnit.getHitPoints() - defenderDamage;
             if (newDefenderHitpoints > 0) {
-                final int attackerDamage = random.nextInt((int) Math.ceil(getDefencePower(attacker, defender)) + 1);
-                final int newAttackerHitpoints = attackerUnit.getHitPoints() - attackerDamage;
-                if (newAttackerHitpoints <= 0) {
-                    crs.add(CombatEffectType.LOSE);
-                    resolveAttack(defenderUnit, attackerUnit, true,
-                            // Rescaling to 0 <= r < 1
-                            // (rearrange: 0.8 * odds.win + 0.2 <= r < 1.0)
-                            (1.25 * r - 0.25 - odds.win)/(1.0 - odds.win), crs);
-                    return new CombatResult(crs, 1, newDefenderHitpoints);
+                int newAttackerHitpoints = -1;
+                if (attackerUnit.getType().getAttackRange() <= defenderUnit.getType().getAttackRange()
+                        || defenderUnit.getTile().getDistanceTo(attackerUnit.getTile()) <= defenderUnit.getType().getAttackRange()) {
+                    final int attackerDamage = random.nextInt((int) Math.ceil(getDefencePower(attacker, defender)) + 1);
+                    newAttackerHitpoints = attackerUnit.getHitPoints() - attackerDamage;
+                    if (newAttackerHitpoints <= 0) {
+                        crs.add(CombatEffectType.LOSE);
+                        resolveAttack(defenderUnit, attackerUnit, true,
+                                // Rescaling to 0 <= r < 1
+                                // (rearrange: 0.8 * odds.win + 0.2 <= r < 1.0)
+                                (1.25 * r - 0.25 - odds.win)/(1.0 - odds.win), crs);
+                        return new CombatResult(crs, 1, newDefenderHitpoints);
+                    }
                 }
                 
                 crs.add(CombatEffectType.WIN);

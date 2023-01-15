@@ -489,6 +489,10 @@ public final class ImageLibrary {
     public BufferedImage getScaledImage(String key) {
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }
+    
+    public BufferedImage getRangedTargetCrosshair() {
+        return getScaledImage("image.rangedTarget");
+    }
 
     /**
      * Get the image for the given identifier, using a given size.
