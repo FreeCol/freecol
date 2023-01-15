@@ -216,5 +216,10 @@ public abstract class MapControls extends FreeColClientHolder {
                 + panelName, ie);
         }
         return null;
+    }
+
+
+    public void clear() {
+        unitButtons.clear();
     } 
 }

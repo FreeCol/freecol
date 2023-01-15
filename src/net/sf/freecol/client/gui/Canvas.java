@@ -1154,14 +1154,16 @@ public final class Canvas extends JDesktopPane {
      * @return True if any were removed.
      */
     public boolean removeMapControls() {
-        if (this.mapControls == null) return false;
-        List<Component> components
-            = this.mapControls.getComponentsPresent();
+        if (mapControls == null) {
+            return false;
+        }
+        final List<Component> components = mapControls.getComponentsPresent();
         boolean ret = false;
-        for (Component c : this.mapControls.getComponentsPresent()) {
+        for (Component c : components) {
             removeFromCanvas(c);
             ret = true;
         }
+        mapControls.clear();
         return ret;
     }
 
