@@ -52,7 +52,10 @@ public class AttackRangedAction extends UnitAction {
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) return false;
         final Unit selectedUnit = getGUI().getActiveUnit();
-        return selectedUnit != null && selectedUnit.getType().getAttackRange() > 0 && selectedUnit.getMovesLeft() > 0;
+        return selectedUnit != null
+                && selectedUnit.getType().getAttackRange() > 0
+                && selectedUnit.getMovesLeft() > 0
+                && selectedUnit.isOffensiveUnit();
     }
 
 
