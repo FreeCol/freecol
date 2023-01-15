@@ -68,6 +68,7 @@
       <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="expert-production" type="GoodsTypeId"/>
       <xs:attribute name="hit-points" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="attack-range" type="xs:integer"/>
       <xs:attribute name="increasing-price" type="xs:nonNegativeInteger"/>
       <xs:attribute name="line-of-sight" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="maximum-attrition" type="xs:nonNegativeInteger"/>

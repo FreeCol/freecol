@@ -3,7 +3,7 @@
   <xs:annotation>
     <xs:documentation>
 
-      Copyright (C) 2002-2021  The FreeCol Team
+      Copyright (C) 2002-2023  The FreeCol Team
 
       This file is part of FreeCol.
 
@@ -20,7 +20,7 @@
       You should have received a copy of the GNU General Public License
       along with FreeCol. If not, see http://www.gnu.org/licenses
 
-      XSD for specification version 0.117
+      XSD for specification version 0.121
       CHANGELOG:
       0.26:  add capture-equipment
       0.27:  add limits
@@ -118,9 +118,11 @@
       0.118: Add optional nationType to unitOption.
       0.119: Add optional mercenary-price to unit-type.
       0.120: Add type attribute to fileOption.
+      0.121: Added abilities top level declaration for general game abilities and "attack-range" for unit-type.
     </xs:documentation>
   </xs:annotation>
 
+  <xs:include schemaLocation="spec-abilities.xsd"/>
   <xs:include schemaLocation="spec-model.xsd" />
   <xs:include schemaLocation="spec-building-types.xsd"/>
   <xs:include schemaLocation="spec-disasters.xsd"/>
@@ -144,6 +146,7 @@
   <xs:element name="freecol-specification">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="abilities"/>
         <xs:element ref="building-types"/>
         <xs:element ref="disasters"/>
         <xs:element ref="events"/>
