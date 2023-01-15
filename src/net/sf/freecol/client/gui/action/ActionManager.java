@@ -238,7 +238,7 @@ public class ActionManager extends OptionGroup {
      */
     public List<UnitButton> makeUnitActionButtons(final Specification spec) {
         List<UnitButton> ret = new ArrayList<>();
-        if (spec.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+        if (spec == null || spec.hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
             ret.add(new UnitButton(this, AttackRangedAction.id));
         }
         ret.add(new UnitButton(this, WaitAction.id));
