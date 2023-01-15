@@ -76,7 +76,7 @@ public class Introspector {
      * @exception IntrospectorException if the get-method is not available.
      */
     private Method getGetMethod() throws IntrospectorException {
-        String methodName = "get" + capitalize(field);
+        String methodName = "get" + fromSnakeCase(field);
 
         try {
             return theClass.getMethod(methodName);
@@ -95,7 +95,7 @@ public class Introspector {
      * @exception IntrospectorException if the set-method is not available.
      */
     private Method getSetMethod(Class<?> argType) throws IntrospectorException {
-        String methodName = "set" + capitalize(field);
+        String methodName = "set" + fromSnakeCase(field);
 
         try {
             return theClass.getMethod(methodName, argType);
@@ -103,6 +103,14 @@ public class Introspector {
             throw new IntrospectorException(theClass.getName()
                 + "." + methodName, e);
         }
+    }
+    
+    private static String fromSnakeCase(String nameInSnakeCase) {
+        final StringBuilder sb = new StringBuilder();
+        for (String s : nameInSnakeCase.split("-")) {
+            sb.append(capitalize(s));
+        }
+        return sb.toString();
     }
 
     /**
