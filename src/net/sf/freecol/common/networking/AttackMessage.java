@@ -97,6 +97,10 @@ public class AttackMessage extends AttributeMessage {
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }
+        
+        if (unit.getMovesLeft() <= 0) {
+            return serverPlayer.clientError("No moves left.");
+        }
 
         Tile tile;
         try {
