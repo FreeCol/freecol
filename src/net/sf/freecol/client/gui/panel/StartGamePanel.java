@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import static net.sf.freecol.common.util.CollectionUtils.count;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
@@ -36,6 +37,7 @@ import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.i18n.Messages;
@@ -131,7 +133,7 @@ public final class StartGamePanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public StartGamePanel(FreeColClient freeColClient) {
-        super(freeColClient, null, new MigLayout("fill, wrap 2", "", "[grow][][][]"));
+        super(freeColClient, null, new MigLayout("fill", "", "[grow][][][]"));
     }
 
 
@@ -175,23 +177,29 @@ public final class StartGamePanel extends FreeColPanel {
 
         refreshPlayersTable();
         tableScroll = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                                      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER) {
+            @Override
+            public Dimension getPreferredSize() {
+                final int tableWidth = getImageLibrary().scaleInt(600);
+                final int tableHeight =  getImageLibrary().scaleInt(300);
+                return new Dimension(tableWidth, tableHeight);
+            }
+        };
         tableScroll.getViewport().setOpaque(false);
 
         final int tableWidth = getImageLibrary().scaleInt(600);
         final int tableHeight =  getImageLibrary().scaleInt(300);
-        add(tableScroll, "width " + tableWidth + ":, height " + tableHeight + ":, grow");
+        add(tableScroll, "grow");
+        tableScroll.setSize(getPreferredSize());
         if (!singlePlayerGame) {
-            final int chatWidth = getImageLibrary().scaleInt(250);
-            add(chatScroll, "width " + chatWidth + ":, grow");
+            final int chatHeight = (int) (FontLibrary.getFontScaling() * 100);
+            add(chatScroll, "newline, height " + chatHeight + "px:,growx");
+            add(chat, "newline, growx");
         }
         add(mapGeneratorOptions, "newline, split 2, growx, top, sg");
         add(gameOptions, "growx, top, sg");
-        if (!singlePlayerGame) {
-            add(chat, "grow, top");
-        }
-        add(readyBox, "newline");
-        add(start, "newline, span, split 2, tag ok");
+        add(readyBox, "newline, span, split 3");
+        add(start, "tag ok");
         add(cancel, "tag cancel");
 
         if (!singlePlayerGame) {
