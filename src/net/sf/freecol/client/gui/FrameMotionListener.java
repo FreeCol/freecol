@@ -26,6 +26,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
+
 
 /**
  * The mouse adapter to handle frame movement.
@@ -65,6 +67,8 @@ public class FrameMotionListener extends MouseAdapter {
         f.getDesktopPane().getDesktopManager()
             .dragFrame(f, f.getX() - moveX, f.getY() - moveY);
         loc = p;
+        
+        f.putClientProperty(Canvas.PROPERTY_POPUP_POSITION, null);
     }
 
     /**

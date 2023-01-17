@@ -660,7 +660,7 @@ public final class Widgets {
                                    new String[] { Messages.message(tmpl) },
                                    new FreeColObject[] { displayObject },
                                    new ImageIcon[] { icon });
-        return this.canvas.showFreeColPanel(panel, pos, true);
+        return this.canvas.showFreeColPanel(panel, pos, false);
     }
 
     /**

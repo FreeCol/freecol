@@ -90,6 +90,9 @@ import net.sf.freecol.common.resources.Video;
  */
 public final class Canvas extends JDesktopPane {
 
+    public static final String PROPERTY_RESIZABLE = "Canvas.resizable";
+    public static final String PROPERTY_POPUP_POSITION = "Canvas.popupPosition";
+    
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
     /** Number of tries to find a clear spot on the canvas. */
@@ -260,9 +263,57 @@ public final class Canvas extends JDesktopPane {
             if (add) {
                 addMapControls();
             }
+            updateFrameSizesAndPositions(size);
+            
             revalidate();
             repaint();
         }
+    }
+
+    private void updateFrameSizesAndPositions(Dimension canvasSize) {
+        for (Component c : getComponents()) {
+            if (!(c instanceof JInternalFrame)) {
+                continue;
+            }
+            
+            /*
+             * Determines a new sensible size.
+             */
+            final JInternalFrame f = (JInternalFrame) c;
+            final Boolean resizeable = (Boolean) f.getClientProperty(PROPERTY_RESIZABLE);
+            final Dimension newSize;
+            if (resizeable != null && resizeable) {
+                newSize = capSizeToMaximum(f, canvasSize);
+                f.setSize(newSize);
+            } else {
+                newSize = f.getSize();
+            }
+            
+            /*
+             * Moves frames so that they are no longer out-of-bounds of the Canvas.
+             */
+            final Point loc = f.getLocation();
+            final int newX = (loc.x + newSize.width > canvasSize.width) ? canvasSize.width - newSize.width : loc.x;
+            final int newY = (loc.y + newSize.height > canvasSize.height) ? canvasSize.height - newSize.height : loc.y;
+            f.setLocation(new Point(Math.max(0, newX), Math.max(0, newY)));
+           
+            /*
+             * Maintains logical positions (like centered) after resize.
+             */
+            final PopupPosition popupPosition = (PopupPosition) f.getClientProperty(PROPERTY_POPUP_POSITION);
+            if (popupPosition == null) {
+                continue;
+            }
+            final Point p = chooseLocation(f, f.getWidth(), f.getHeight(), popupPosition);
+            f.setLocation(p);
+        }
+    }
+    
+    private Dimension capSizeToMaximum(JInternalFrame f, Dimension maxSize) {
+        final int FRAME_EMPTY_SPACE = 60;
+        final int width = Math.max(f.getMinimumSize().width, Math.min(f.getWidth(), maxSize.width - FRAME_EMPTY_SPACE));
+        final int height = Math.max(f.getMinimumSize().height, Math.min(f.getHeight(), maxSize.height - FRAME_EMPTY_SPACE));
+        return new Dimension(width, height);
     }
 
     // Frames and Windows
@@ -344,8 +395,6 @@ public final class Canvas extends JDesktopPane {
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
                                       PopupPosition popupPosition,
                                       boolean resizable) {
-        final int FRAME_EMPTY_SPACE = 60;
-
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
             : new JInternalFrame();
         Container con = f.getContentPane();
@@ -380,17 +429,19 @@ public final class Canvas extends JDesktopPane {
         f.getContentPane().add(comp);
         f.setOpaque(false);
         f.pack();
-        int width = f.getWidth();
-        int height = f.getHeight();
-        if (width > getWidth() - FRAME_EMPTY_SPACE) {
-            width = Math.min(width, getWidth());
+        
+        final Dimension size = capSizeToMaximum(f, getSize());
+        f.setSize(size);
+        
+        final Point p = chooseLocation(comp, size.width, size.height, popupPosition);
+        final Point adjustedP = adjustLocationForClearSpace(p, size.width, size.height);
+        if (popupPosition == PopupPosition.CENTERED_FORCED || p.equals(adjustedP)) {
+            f.setLocation(p);
+            f.putClientProperty(PROPERTY_POPUP_POSITION, popupPosition);
+            f.putClientProperty(PROPERTY_RESIZABLE, resizable);
+        } else {
+            f.setLocation(adjustedP);
         }
-        if (height > getHeight() - FRAME_EMPTY_SPACE) {
-            height = Math.min(height, getHeight());
-        }
-        f.setSize(width, height);
-        Point p = chooseLocation(comp, width, height, popupPosition);
-        f.setLocation(p);
         this.addToCanvas(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
 
@@ -503,6 +554,7 @@ public final class Canvas extends JDesktopPane {
         } else if (popupPosition != null) {
             switch (popupPosition) {
             case CENTERED:
+            case CENTERED_FORCED:
                 x = (getWidth() - width) / 2;
                 y = (getHeight() - height) / 2;
                 break;
@@ -519,6 +571,14 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
         }
+
+        return new Point(x, y);
+    }
+
+    private Point adjustLocationForClearSpace(Point location, int width, int height) {
+        Point p;
+        int x = location.x;
+        int y = location.y;
         if ((p = getClearSpace(x, y, width, height, MAXTRY)) != null
             && p.x >= 0 && p.x < getWidth()
             && p.y >= 0 && p.y < getHeight()) {
@@ -1351,7 +1411,7 @@ public final class Canvas extends JDesktopPane {
     public FreeColPanel showMainPanel() {
         prepareShowingMainMenu();
         this.mainPanel = new MainPanel(this.freeColClient);
-        addAsFrame(mainPanel, false, PopupPosition.CENTERED, false);
+        addAsFrame(mainPanel, false, PopupPosition.CENTERED_FORCED, false);
         this.mainPanel.requestFocus();
         return this.mainPanel;
     }

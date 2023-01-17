@@ -134,6 +134,11 @@ public class SwingGUI extends GUI {
         CENTERED,
         CENTERED_LEFT,
         CENTERED_RIGHT,
+        
+        /**
+         * Places centered even this means overlapping components.
+         */
+        CENTERED_FORCED
     }
 
     /** European subpanel classes. */
@@ -2184,7 +2189,7 @@ public class SwingGUI extends GUI {
         InformationPanel panel
             = new InformationPanel(getFreeColClient(), texts, fcos, icons);
         return this.canvas.showFreeColPanel(panel,
-            getPopupPosition(tile), true);
+            getPopupPosition(tile), false);
     }
 
     /**
