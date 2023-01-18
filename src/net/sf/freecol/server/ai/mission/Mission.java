@@ -208,7 +208,7 @@ public abstract class Mission extends AIObject {
         return (unit == null) ? "unit-null"
             : (!unit.isInitialized()) ? "unit-uninitialized"
             : (unit.isDisposed()) ? "unit-disposed"
-            : (unit.isDamaged()) ? "unit-under-repair"
+            : (unit.isDamagedAndUnderForcedRepair()) ? "unit-under-repair"
             : null;
     }
 

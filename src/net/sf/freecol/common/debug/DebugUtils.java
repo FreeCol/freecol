@@ -785,7 +785,7 @@ public class DebugUtils {
         lb.add("\n->", label, "\n");
         for (Unit u : units) {
             lb.add("\n", u.getDescription(Unit.UnitLabelType.NATIONAL));
-            if (u.isDamaged()) {
+            if (u.isDamagedAndUnderForcedRepair()) {
                 lb.add(" (", Messages.message(u.getRepairLabel()), ")");
             } else {
                 lb.add("    ");

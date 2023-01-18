@@ -512,7 +512,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Galleon should be loaded", 1,
                      galleon.getGoodsSpaceTaken());
         assertFalse("Galleon should not be repairing",
-                    galleon.isDamaged());
+                    galleon.isDamagedAndUnderForcedRepair());
         galleon.setDestination(tile3);
         assertEquals("Wrong destination for Galleon",
                      tile3, galleon.getDestination());
@@ -529,7 +529,7 @@ public class InGameControllerTest extends FreeColTestCase {
         igc.combat(dutch, privateer, galleon, crs);
 
         assertTrue("Galleon should be in Europe repairing",
-                   galleon.isDamaged());
+                   galleon.isDamagedAndUnderForcedRepair());
         assertEquals("Galleon should be empty", 0,
                      galleon.getGoodsSpaceTaken());
         assertNull("Galleon should no longer have a destination",
@@ -868,7 +868,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colony should not be disposed",
                    !colony.isDisposed());
         assertTrue("Privateer should be under repair",
-                   privateer.isDamaged());
+                   privateer.isDamagedAndUnderForcedRepair());
         assertEquals("Privateer should be in Europe", dutch.getEurope(),
                      privateer.getLocation());
 

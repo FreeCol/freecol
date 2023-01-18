@@ -1023,7 +1023,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         if (isInMission()) {
             getTile().updateIndianSettlement(owner);
             setMovesLeft(0);
-        } else if (isDamaged() && !getSpecification().hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+        } else if (isDamagedAndUnderForcedRepair()) {
             setMovesLeft(0);
         } else {
             setMovesLeft(getInitialMovesLeft());

@@ -1707,6 +1707,10 @@ public class Unit extends GoodsLocation
      *
      * @return True if under repair.
      */
+    public boolean isDamagedAndUnderForcedRepair() {
+        return isDamaged() && !getSpecification().hasAbility(Ability.HITPOINTS_COMBAT_MODEL);
+    }
+    
     public boolean isDamaged() {
         return hitPoints < getMaximumHitPoints();
     }
@@ -2351,7 +2355,7 @@ public class Unit extends GoodsLocation
         if (target == null) {
             return (getOwner().canMoveToEurope()) ? MoveType.MOVE_HIGH_SEAS
                 : MoveType.MOVE_NO_EUROPE;
-        } else if (isDamaged()) {
+        } else if (isDamagedAndUnderForcedRepair()) {
             return MoveType.MOVE_NO_REPAIR;
         }
 
@@ -2721,7 +2725,7 @@ public class Unit extends GoodsLocation
      */
     public boolean isReadyToTrade() {
         return !isDisposed()
-            && !isDamaged()
+            && !isDamagedAndUnderForcedRepair()
             && !isAtSea()
             && !isOnCarrier()
             && !isInColony()
@@ -2738,7 +2742,7 @@ public class Unit extends GoodsLocation
      */
     private boolean readyAndAble() {
         return !isDisposed()
-            && !isDamaged()
+            && !isDamagedAndUnderForcedRepair()
             && !isAtSea()
             && !isOnCarrier()
             && !isInColony()
@@ -3648,7 +3652,7 @@ public class Unit extends GoodsLocation
         final TradeRoute tradeRoute = getTradeRoute();
         StringTemplate ret;
         if (player != null && player.owns(this)) {
-            if (isDamaged() && !getSpecification().hasAbility(Ability.HITPOINTS_COMBAT_MODEL)) {
+            if (isDamagedAndUnderForcedRepair()) {
                 if (full) {
                     ret = StringTemplate.label(":")
                         .add("model.unit.occupation.underRepair")

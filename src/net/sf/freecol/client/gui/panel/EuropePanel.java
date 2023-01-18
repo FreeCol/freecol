@@ -167,7 +167,7 @@ public final class EuropePanel extends PortPanel {
          */
         @Override
         public boolean accepts(Unit unit) {
-            return unit.isNaval() && !unit.isDamaged();
+            return unit.isNaval() && !unit.isDamagedAndUnderForcedRepair();
         }
 
         /**
