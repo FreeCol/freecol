@@ -781,7 +781,7 @@ public final class Specification implements OptionContainer {
         String agesValue = "";
         if (!badAges) {
             agesValue = getText(GameOptions.AGES);
-            String a[] = agesValue.split(",");
+            String[] a = agesValue.split(",");
             badAges = a.length != NUMBER_OF_AGES-1;
             if (!badAges) {
                 try {

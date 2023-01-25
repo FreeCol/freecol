@@ -112,7 +112,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     private static final String transparentPanelUI
         = "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI";
 
-    private static final Class uiClasses[] = {
+    private static final Class[] uiClasses = {
         FreeColButtonUI.class,
         FreeColCheckBoxUI.class,
         FreeColComboBoxUI.class,

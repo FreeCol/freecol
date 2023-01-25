@@ -112,7 +112,7 @@ public class GUI extends FreeColClientHolder {
     };
 
     /** Levels (danger, finance) for confirmEuropeanTribute(). */
-    private static final String levels[] = { "low", "normal", "high" };
+    private static final String[] levels = { "low", "normal", "high" };
 
 
     /**
