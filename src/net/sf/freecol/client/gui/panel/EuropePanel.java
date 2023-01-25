@@ -592,7 +592,7 @@ public final class EuropePanel extends PortPanel {
     }
 
 
-    public static enum EuropeAction {
+    public enum EuropeAction {
         EXIT,
         RECRUIT,
         PURCHASE,

@@ -43,7 +43,7 @@ public class NationOptions extends FreeColSpecObject {
     public static final String TAG = "nationOptions";
 
     /** Type of national advantages for European players. */
-    public static enum Advantages implements Named {
+    public enum Advantages implements Named {
         NONE,
         FIXED,
         SELECTABLE;
@@ -76,7 +76,7 @@ public class NationOptions extends FreeColSpecObject {
      * Nations may be available to all players, to AI players only, or
      * to no players.
      */
-    public static enum NationState implements Named {
+    public enum NationState implements Named {
         AVAILABLE,
         AI_ONLY,
         NOT_AVAILABLE;

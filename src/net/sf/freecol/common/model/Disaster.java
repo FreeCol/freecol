@@ -45,7 +45,7 @@ public class Disaster extends FreeColSpecObjectType {
     public static final String BANKRUPTCY = "model.disaster.bankruptcy";
 
     /** Whether to apply one, many or all applicable disasters. */
-    public static enum Effects { ONE, SEVERAL, ALL };
+    public enum Effects { ONE, SEVERAL, ALL };
 
 
     /** Whether this disaster is natural.  Defaults to false. */

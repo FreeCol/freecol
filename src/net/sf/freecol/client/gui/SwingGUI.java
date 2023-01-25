@@ -129,7 +129,7 @@ import net.sf.freecol.common.util.Utils;
 public class SwingGUI extends GUI {
 
     /** A rough position to place dialogs and panels on the canvas. */
-    public static enum PopupPosition {
+    public enum PopupPosition {
         ORIGIN,
         CENTERED,
         CENTERED_LEFT,

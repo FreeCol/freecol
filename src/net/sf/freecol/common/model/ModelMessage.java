@@ -47,7 +47,7 @@ public class ModelMessage extends StringTemplate {
      * When this changes, be sure to update client-options.xml and the
      * messages file appropriately.
      */
-    public static enum MessageType implements Named {
+    public enum MessageType implements Named {
         DEFAULT(""),
         BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
         COMBAT_RESULT(null), // No option, always display

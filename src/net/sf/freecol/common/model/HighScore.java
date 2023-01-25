@@ -68,7 +68,7 @@ public class HighScore extends FreeColObject {
      * On retirement, an object will be named in honour of the
      * player.  The nature of the object depends on the player's score.
      */
-    public static enum ScoreLevel {
+    public enum ScoreLevel {
         CONTINENT(40000),
         COUNTRY(35000),
         STATE(30000),

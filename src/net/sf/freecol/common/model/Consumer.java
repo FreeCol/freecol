@@ -33,39 +33,39 @@ import java.util.stream.Stream;
 public interface Consumer {
 
     /** Compare consumers by descending priority. */
-    public static final Comparator<Consumer> COMPARATOR
+    Comparator<Consumer> COMPARATOR
         = Comparator.comparingInt(Consumer::getPriority).reversed();
 
     /**
      * Default consumption priority for the Colony when producing new
      * colonists (from food).
      */
-    public static final int POPULATION_PRIORITY = 300;
+    int POPULATION_PRIORITY = 300;
 
     /**
      * The consumption priority of the colony build queue.
      */
-    public static final int COLONY_PRIORITY = 500;
+    int COLONY_PRIORITY = 500;
 
     /**
      * Default consumption priority for buildings. Individual building
      * types may have different priorities.
      */
-    public static final int BUILDING_PRIORITY = 800;
+    int BUILDING_PRIORITY = 800;
 
     /**
      * Default consumption priority for units. Individual unit types
      * may have different priorities. Slave units, or converts, or
      * petty criminals, for example, might have a lower priority.
      */
-    public static final int UNIT_PRIORITY = 1000;
+    int UNIT_PRIORITY = 1000;
 
     /**
      * Returns a list of GoodsTypes this Consumer consumes.
      *
      * @return a {@code List} value
      */
-    public List<AbstractGoods> getConsumedGoods();
+    List<AbstractGoods> getConsumedGoods();
 
     /**
      * The priority of this Consumer. The higher the priority, the
@@ -74,7 +74,7 @@ public interface Consumer {
      *
      * @return an {@code int} value
      */
-    public int getPriority();
+    int getPriority();
 
     /**
      * Get the modifier set with the given id. The modifier most
@@ -85,5 +85,5 @@ public interface Consumer {
      * @param id The object identifier.
      * @return The stream of {@code Modifier}s found.
      */
-    public Stream<Modifier> getConsumptionModifiers(String id);
+    Stream<Modifier> getConsumptionModifiers(String id);
 }

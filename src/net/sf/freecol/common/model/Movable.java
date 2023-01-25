@@ -31,7 +31,7 @@ public interface Movable {
      *
      * @return The amount of moves this Movable has left.
      */
-    public int getMovesLeft();
+    int getMovesLeft();
 
     /**
      * Gets the amount of moves this Movable has at the beginning of
@@ -40,5 +40,5 @@ public interface Movable {
      * @return The amount of moves this Movable has at the beginning
      * of each turn.
      */
-    public int getInitialMovesLeft();
+    int getInitialMovesLeft();
 }

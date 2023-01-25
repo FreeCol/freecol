@@ -65,7 +65,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
     /** The actions for this panel. */
-    private static enum NewPanelAction {
+    private enum NewPanelAction {
         OK,
         CANCEL,
         SINGLE,

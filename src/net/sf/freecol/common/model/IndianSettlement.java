@@ -69,7 +69,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public static final String TAG = "indianSettlement";
 
     /** The level of contact between a player and this settlement. */
-    public static enum ContactLevel {
+    public enum ContactLevel {
         UNCONTACTED,     // Nothing known other than location?
         CONTACTED,       // Name, wanted-goods now visible
         VISITED,         // Skill now known

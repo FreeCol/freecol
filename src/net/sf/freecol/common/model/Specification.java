@@ -90,7 +90,7 @@ public final class Specification implements OptionContainer {
     
     // Special reader classes for spec objects
     private interface ChildReader {
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
+        void readChildren(FreeColXMLReader xr) throws XMLStreamException;
     }
 
     /**

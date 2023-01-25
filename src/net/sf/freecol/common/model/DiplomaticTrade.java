@@ -42,7 +42,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     public static final String TAG = "diplomaticTrade";
 
     /** A context for the trade. */
-    public static enum TradeContext {
+    public enum TradeContext {
         CONTACT,    /** First contact between Europeans */
         DIPLOMATIC, /** Scout negotiating */
         TRADE,      /** Carrier trading */
@@ -59,7 +59,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
 
     /** A type for the trade status. */
-    public static enum TradeStatus {
+    public enum TradeStatus {
         PROPOSE_TRADE,
         ACCEPT_TRADE,
         REJECT_TRADE

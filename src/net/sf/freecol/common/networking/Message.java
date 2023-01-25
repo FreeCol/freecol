@@ -70,7 +70,7 @@ public abstract class Message {
 
     // Convenient way to specify the relative priorities of the messages
     // types in one place.
-    public static enum MessagePriority {
+    public enum MessagePriority {
         ATTRIBUTE(-1), // N/A
         ANIMATION(0),  // Do animations first
         REMOVE(100),   // Do removes last

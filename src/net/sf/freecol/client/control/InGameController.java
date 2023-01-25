@@ -149,7 +149,7 @@ public final class InGameController extends FreeColClientHolder {
      * Selecting next unit depends on mode--- either from the active list,
      * from the going-to list, or flush going-to and end the turn.
      */
-    private static enum MoveMode {
+    private enum MoveMode {
         NEXT_ACTIVE_UNIT,
         EXECUTE_GOTO_ORDERS,
         END_TURN;

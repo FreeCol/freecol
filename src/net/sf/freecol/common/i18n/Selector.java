@@ -30,6 +30,6 @@ public interface Selector {
      * the selector (only used for error reporting)
      * @return a {@code String} value
      */
-    public String getKey(String selector, String template);
+    String getKey(String selector, String template);
 
 }

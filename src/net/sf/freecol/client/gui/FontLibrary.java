@@ -54,7 +54,7 @@ public class FontLibrary {
      * <li>HEADER -- a stylized old-fashioned typeface for headers</li>
      * </ul>
      */
-    public static enum FontType {
+    public enum FontType {
         NORMAL,
         SIMPLE,
         HEADER

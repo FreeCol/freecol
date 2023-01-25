@@ -72,7 +72,7 @@ public class Colony extends Settlement implements TradeLocation {
     /** Number of colonies that a player will trade down to. */
     public static final int TRADE_MARGIN = 5;
 
-    public static enum ColonyChangeEvent {
+    public enum ColonyChangeEvent {
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,
         BONUS_CHANGE,
@@ -82,7 +82,7 @@ public class Colony extends Settlement implements TradeLocation {
     }
 
     /** Reasons for not building a buildable. */
-    public static enum NoBuildReason {
+    public enum NoBuildReason {
         NONE,
         NOT_BUILDING,
         NOT_BUILDABLE,

@@ -65,7 +65,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
     /** The scope of a FreeCol object write. */
-    public static enum WriteScopeType {
+    public enum WriteScopeType {
         CLIENT,  // Only the client-visible information
         SERVER,  // Full server-visible information
         SAVE     // Absolutely everything needed to save the game state

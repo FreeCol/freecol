@@ -31,7 +31,7 @@ import java.util.Set;
  */
 public abstract class CombatModel {
 
-    public static enum CombatEffectType {
+    public enum CombatEffectType {
         // Special results that set the sense of the result.
         NO_RESULT,
         LOSE,

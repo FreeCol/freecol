@@ -41,7 +41,7 @@ public class Animations {
      * used as a callback for an animation to trigger painting.
      */
     public interface Procedure {
-        public void execute();
+        void execute();
     };
     
      /**

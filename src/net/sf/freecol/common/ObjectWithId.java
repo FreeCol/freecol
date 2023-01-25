@@ -31,5 +31,5 @@ public interface ObjectWithId {
      *
      * @return The object identifier.
      */
-    public String getId();
+    String getId();
 }

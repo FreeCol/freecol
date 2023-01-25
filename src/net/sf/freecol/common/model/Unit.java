@@ -189,7 +189,7 @@ public class Unit extends GoodsLocation
         !u.isNaval() && u.getState() == UnitState.SENTRY;
 
     /** A state a Unit can have. */
-    public static enum UnitState {
+    public enum UnitState {
         ACTIVE,
         FORTIFIED,
         SENTRY,
@@ -209,7 +209,7 @@ public class Unit extends GoodsLocation
     }
 
     /** Internal state for findIntermediatePort. */
-    private static enum PortMode {
+    private enum PortMode {
         LAKE,
         NO_HIGH_SEAS,
         BLOCKED,
@@ -387,7 +387,7 @@ public class Unit extends GoodsLocation
     }
 
     /** What type of unit label do we want? */
-    public static enum UnitLabelType {
+    public enum UnitLabelType {
         PLAIN,      // Just the basics
         NATIONAL,   // Add the nation
         FULL        // Add the equipment and extras
@@ -2115,7 +2115,7 @@ public class Unit extends GoodsLocation
      *
      * @see Unit#getMoveType(Direction)
      */
-    public static enum MoveType {
+    public enum MoveType {
         MOVE(null, true),
         MOVE_HIGH_SEAS(null, true),
         EXPLORE_LOST_CITY_RUMOUR(null, true),

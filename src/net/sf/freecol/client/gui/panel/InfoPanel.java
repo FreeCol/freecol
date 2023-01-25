@@ -71,7 +71,7 @@ public final class InfoPanel extends FreeColPanel
     private static final Logger logger = Logger.getLogger(InfoPanel.class.getName());
 
 
-    private static enum InfoPanelMode {
+    private enum InfoPanelMode {
         NONE, END, MAP, TILE, UNIT;
     }
 
