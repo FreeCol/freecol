@@ -284,7 +284,7 @@ public class ModelMessage extends StringTemplate {
      * @param source The source object
      * @return An object to be displayed for the message.
      */
-    static private FreeColObject getDefaultDisplay(MessageType messageType,
+    private static FreeColObject getDefaultDisplay(MessageType messageType,
                                                    FreeColGameObject source) {
         FreeColObject o = null;
         switch (messageType) {

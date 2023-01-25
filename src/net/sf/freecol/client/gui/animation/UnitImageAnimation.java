@@ -96,7 +96,7 @@ public final class UnitImageAnimation extends Animation {
      * @param direction The preferred {@code Direction}.
      * @return A list of {@code Direction}s.
      */
-    private synchronized static List<Direction> trialDirections(Direction direction) {
+    private static synchronized List<Direction> trialDirections(Direction direction) {
         if (alternatives.isEmpty()) { // Populate first time
             // Favour the closest E-W cases
             for (Direction d : Direction.allDirections) {

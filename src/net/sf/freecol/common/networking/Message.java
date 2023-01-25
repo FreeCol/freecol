@@ -60,7 +60,7 @@ public abstract class Message {
      * A map of message name to message constructors, built on the fly
      * as new messages are encountered and suitable constructors found.
      */
-    private final static Map<String, Constructor<? extends Message>> builders
+    private static final Map<String, Constructor<? extends Message>> builders
         = Collections.synchronizedMap(new HashMap<String,
             Constructor<? extends Message>>());
 
@@ -114,14 +114,14 @@ public abstract class Message {
      *
      * @return The message tag.
      */
-    abstract public String getType();
+    public abstract String getType();
     
     /**
      * Set the message tag.
      *
      * @param type The new message tag.
      */
-    abstract protected void setType(String type);
+    protected abstract void setType(String type);
     
     /**
      * Checks if an attribute is present in this message.
@@ -129,7 +129,7 @@ public abstract class Message {
      * @param key The attribute to look for.
      * @return True if the attribute is present.
      */
-    abstract protected boolean hasAttribute(String key);
+    protected abstract boolean hasAttribute(String key);
 
     /**
      * Get a string attribute value.
@@ -137,7 +137,7 @@ public abstract class Message {
      * @param key The attribute to look for.
      * @return The string value found, or null if the attribute was absent.
      */
-    abstract protected String getStringAttribute(String key);
+    protected abstract String getStringAttribute(String key);
 
     /**
      * Sets an attribute in this message.
@@ -145,35 +145,35 @@ public abstract class Message {
      * @param key The attribute to set.
      * @param value The new value of the attribute.
      */
-    abstract protected void setStringAttribute(String key, String value);
+    protected abstract void setStringAttribute(String key, String value);
 
     /**
      * Get a map of all the attributes in this message.
      *
      * @return A {@code Map} of the attributes.
      */
-    abstract protected Map<String,String> getStringAttributeMap();
+    protected abstract Map<String,String> getStringAttributeMap();
 
     /**
      * Get the number of child objects.
      *
      * @return The child count.
      */
-    abstract protected int getChildCount();
+    protected abstract int getChildCount();
 
     /**
      * Get the child objects of this message.
      *
      * @return A list of child {@code FreeColObject}s.
      */
-    abstract protected List<FreeColObject> getChildren();
+    protected abstract List<FreeColObject> getChildren();
         
     /**
      * Set the list of objects attached to this message.
      *
      * @param fcos The new list of attached {@code FreeColObject}s.
      */
-    abstract protected void setChildren(List<? extends FreeColObject> fcos);
+    protected abstract void setChildren(List<? extends FreeColObject> fcos);
 
     /**
      * Append a new child.
@@ -181,7 +181,7 @@ public abstract class Message {
      * @param <T> The child type.
      * @param fco The new child object.
      */
-    abstract protected <T extends FreeColObject> void appendChild(T fco);
+    protected abstract <T extends FreeColObject> void appendChild(T fco);
     
     /**
      * Append a multiple new children.
@@ -189,21 +189,21 @@ public abstract class Message {
      * @param <T> The child type.
      * @param fcos The new child objects.
      */
-    abstract protected <T extends FreeColObject> void appendChildren(Collection<T> fcos);
+    protected abstract <T extends FreeColObject> void appendChildren(Collection<T> fcos);
 
     /**
      * Should this message only be sent to a server by the current player?
      *
      * @return True if this is a current-player-only message.
      */
-    abstract public boolean currentPlayerMessage();
+    public abstract boolean currentPlayerMessage();
 
     /**
      * Get the priority of this type of message.
      *
      * @return The message priority.
      */
-    abstract public MessagePriority getPriority();
+    public abstract MessagePriority getPriority();
 
 
     /**
@@ -225,7 +225,7 @@ public abstract class Message {
      * @param aiPlayer The {@code AIPlayer} the message was sent to.
      * @exception FreeColException if there is a problem handling the message.
      */
-    abstract public void aiHandler(FreeColServer freeColServer,
+    public abstract void aiHandler(FreeColServer freeColServer,
                                    AIPlayer aiPlayer) throws FreeColException;
 
     /**
@@ -236,7 +236,7 @@ public abstract class Message {
      * @param freeColClient The {@code FreeColClient} to handle this message.
      * @exception FreeColException if there is a problem building the message.
      */
-    abstract public void clientHandler(FreeColClient freeColClient)
+    public abstract void clientHandler(FreeColClient freeColClient)
         throws FreeColException;
 
     /**
@@ -246,7 +246,7 @@ public abstract class Message {
      * @param serverPlayer The {@code ServerPlayer} that sent the request.
      * @return A {@code ChangeSet} defining the response.
      */
-    abstract public ChangeSet serverHandler(FreeColServer freeColServer,
+    public abstract ChangeSet serverHandler(FreeColServer freeColServer,
                                             ServerPlayer serverPlayer);
 
 

@@ -90,7 +90,7 @@ public class Map extends FreeColGameObject implements Location {
      * The number of tiles from the upper edge that are considered
      * polar by default.
      */
-    public final static int POLAR_HEIGHT = 2;
+    public static final int POLAR_HEIGHT = 2;
 
     /**
      * The layers included in the map. The RIVERS layer includes all
