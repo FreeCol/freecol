@@ -1276,8 +1276,7 @@ public final class ColonyPanel extends PortPanel
          */
         @Override
         public JToolTip createToolTip() {
-            JToolTip toolTip = new RebelToolTip(getFreeColClient(), getColony());
-            return toolTip;
+            return new RebelToolTip(getFreeColClient(), getColony());
         }
 
 

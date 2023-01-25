@@ -365,7 +365,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             super(new MigLayout("wrap 1", "", ""));
 
             this.source = source;
-            this.goodsBox = new JComboBox<>(new DefaultComboBoxModel<Goods>());
+            this.goodsBox = new JComboBox<>(new DefaultComboBoxModel<>());
             this.goodsBox.setRenderer(new GoodsBoxRenderer());
             this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -494,7 +494,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
             this.source = source;
             this.other = other;
-            this.victimBox = new JComboBox<>(new DefaultComboBoxModel<Player>());
+            this.victimBox = new JComboBox<>(new DefaultComboBoxModel<>());
             this.victimBox.setRenderer(new InciteBoxRenderer());
             this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -615,7 +615,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
             this.source = source;
             this.target = target;
-            this.stanceBox = new JComboBox<>(new DefaultComboBoxModel<Stance>());
+            this.stanceBox = new JComboBox<>(new DefaultComboBoxModel<>());
             this.stanceBox.setRenderer(new StanceBoxRenderer());
             this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -733,7 +733,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             super(new MigLayout("wrap 1", "", ""));
 
             this.source = source;
-            this.unitBox = new JComboBox<>(new DefaultComboBoxModel<Unit>());
+            this.unitBox = new JComboBox<>(new DefaultComboBoxModel<>());
             this.unitBox.setRenderer(new UnitBoxRenderer());
             this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);

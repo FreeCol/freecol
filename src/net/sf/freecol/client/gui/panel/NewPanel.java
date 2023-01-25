@@ -73,7 +73,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         START,
         META_SERVER,
         SHOW_DIFFICULTY
-    };
+    }
 
     /**
      * A particular specification to use for the new game.  If not

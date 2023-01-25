@@ -187,8 +187,8 @@ public class FreeColImageBorder extends AbstractBorder {
             return image;
         }
         final Dimension scaledDimensions = new Dimension(
-            (int) Math.round(image.getWidth() * scaleFactor),
-            (int) Math.round(image.getHeight() * scaleFactor)
+            Math.round(image.getWidth() * scaleFactor),
+            Math.round(image.getHeight() * scaleFactor)
         );
         return ir.getImage(scaledDimensions, false);
     }

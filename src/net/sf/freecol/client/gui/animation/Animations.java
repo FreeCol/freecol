@@ -42,7 +42,7 @@ public class Animations {
      */
     public interface Procedure {
         void execute();
-    };
+    }
     
      /**
      * Collect animations for a unit move.

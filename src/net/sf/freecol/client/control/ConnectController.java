@@ -154,9 +154,7 @@ public final class ConnectController extends FreeColClientHolder {
         switch (reason) {
         case DEFEATED: case QUIT:
             fcc.logout(false);
-            SwingUtilities.invokeLater(() -> {
-                mainTitle();
-            });
+            SwingUtilities.invokeLater(this::mainTitle);
             break;
         case LOGIN: // Occurs when you Open a new game during a current one
             fcc.logout(false);

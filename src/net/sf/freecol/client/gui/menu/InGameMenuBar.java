@@ -334,7 +334,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         final FontMetrics fm = g2d.getFontMetrics();
         final Rectangle2D d  = fm.getStringBounds(text, g2d);
         final int textWidth = (int) d.getWidth();
-        final int textHeight = (int) d.getHeight();;
+        final int textHeight = (int) d.getHeight();
         
         final int rightSidePaddingInPx = 10;
         final int centerHeight = getHeight() - getInsets().bottom;
