@@ -2039,6 +2039,9 @@ ok:     while (!openMap.isEmpty()) {
                     }
                     stepLog = " " + step + "_";
                 }
+                if (move.cost >= INFINITY) {
+                    continue;
+                }
                 assert move.getCost() >= 0;
                 // Tighten the bounds on a previously seen case if possible
                 if (closed != null) {
