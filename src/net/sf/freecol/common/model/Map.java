@@ -1624,14 +1624,17 @@ public class Map extends FreeColGameObject implements Location {
                 if (dst.getTile() != null && !dst.getTile().isExplored()) {
                     this.turns += 2;
                     this.movesLeft = 0;
+                    this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
                 } else {
-                    throw new RuntimeException("Invalid move candidate:"
-                        + " for " + unit + " to " + dst);
+                    this.turns = INFINITY;
+                    this.movesLeft = 0;
+                    this.cost = INFINITY;
                 }
+            } else {
+                this.turns += cd.getNewTurns();
+                this.movesLeft = cd.getMovesLeft();
+                this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
             }
-            this.turns += cd.getNewTurns();
-            this.movesLeft = cd.getMovesLeft();
-            this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
         }
 
         /**
