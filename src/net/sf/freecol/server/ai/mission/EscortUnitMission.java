@@ -214,7 +214,7 @@ public final class EscortUnitMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            lbDrop(lb, reason);
+            return lbDrop(lb, reason);
         } else if (reason != null) {
             return lbFail(lb, false, reason);
         }
