@@ -33,6 +33,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -59,6 +60,9 @@ public final class MilitaryCoordinator {
     
     private final Set<Unit> targetedEnemies = Collections.newSetFromMap(new IdentityHashMap<>());
     private final Map<Settlement, List<AIUnit>> targetedEnemySettlements = new HashMap<>();
+    
+    private final Map<String, Integer> turnsToReachCache = new HashMap<>();
+    
     
     /**
      * Creates a new military coordinator for the given military units.
@@ -196,12 +200,12 @@ public final class MilitaryCoordinator {
             final Tile escortTargetTile = artillery.getUnit().getTile();
             
             final AIUnit escort = dragoonUnits.stream()
-                .sorted((a, b) -> Integer.compare(a.getUnit().getTurnsToReach(escortTargetTile), b.getUnit().getTurnsToReach(escortTargetTile)))
+                .sorted((a, b) -> Integer.compare(getTurnsToReach(a.getUnit(), escortTargetTile), getTurnsToReach(b.getUnit(), escortTargetTile)))
                 .findFirst()
                 .orElse(null);
             
             if (escort == null
-                    || escort.getUnit().getTurnsToReach(escortTargetTile) > 8) {
+                    || getTurnsToReach(escort.getUnit(), escortTargetTile) > 8) {
                 continue;
             }
             
@@ -217,6 +221,18 @@ public final class MilitaryCoordinator {
 
             settlementAttackers.add(artillery);
         }
+    }
+    
+    private int getTurnsToReach(Unit unit, Location location) {
+        final String key = unit.getId() + "," + location.getId();
+        final Integer cachedResult = turnsToReachCache.get(key);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+        
+        final int result = unit.getTurnsToReach(location);
+        turnsToReachCache.put(key, result);
+        return result;
     }
 
     private void counterattackEnemyValuableUnitsReachableInTurns(final Set<AIUnit> dragoonUnits, int turns) {
@@ -358,10 +374,10 @@ public final class MilitaryCoordinator {
         unusedUnits.remove(unit);
     }
 
-    private static AIUnit findUnitClosestToColony(AIColony colony, Set<AIUnit> units) {
+    private AIUnit findUnitClosestToColony(AIColony colony, Set<AIUnit> units) {
         // TODO: Handle Europe, handle with/without carrier
         return units.stream()
-            .sorted((a, b) -> Integer.compare(a.getUnit().getTurnsToReach(colony.getColony().getTile()), b.getUnit().getTurnsToReach(colony.getColony().getTile())))
+            .sorted((a, b) -> Integer.compare(getTurnsToReach(a.getUnit(), colony.getColony().getTile()), getTurnsToReach(b.getUnit(), colony.getColony().getTile())))
             .findFirst()
             .orElse(null);
     }
