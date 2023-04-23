@@ -110,7 +110,7 @@ public class MapGeneratorOptions {
     /** Option for enabling generation of great rivers. */
     public static final String ENABLE_GREAT_RIVERS  = "mapGeneratorOptions.enableGreatRivers";
     
-    /** Option for setting the number of rivers on the map. */
+    /** Option for setting the number of river tiles on the map as a percentage of all possible tiles for a river. */
     public static final String RIVER_NUMBER
         = "model.option.riverNumber";
 

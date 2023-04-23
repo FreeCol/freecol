@@ -561,10 +561,7 @@ public class TerrainGenerator {
         final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = game.getMapGeneratorOptions();
         List<ServerRegion> result = new ArrayList<>();
-        final TileImprovementType riverType
-            = spec.getTileImprovementType("model.improvement.river");
-        final int number = getApproximateLandCount(game)
-            / mapOptions.getRange(MapGeneratorOptions.RIVER_NUMBER);
+        final TileImprovementType riverType = spec.getTileImprovementType("model.improvement.river");
         HashMap<Tile, River> riverMap = new HashMap<>();
         List<River> rivers = new ArrayList<>();
 
@@ -573,11 +570,19 @@ public class TerrainGenerator {
                         t -> tiles.add(t));
         randomShuffle(logger, "Randomize river tiles", tiles, this.random);
         
+        final int absoluteMaximumRiverTiles = map.getTileList(t -> riverType.isTileTypeAllowed(t.getType())).size();
+        final int softMaximumRiverTiles = (absoluteMaximumRiverTiles * mapOptions.getRange(MapGeneratorOptions.RIVER_NUMBER)) / 100;
+        
         int counter = 0;
         for (Tile tile : tiles) {
             // Any river here yet?
-            if (riverMap.get(tile) != null)
+            if (riverMap.get(tile) != null) {
                 continue;
+            }
+            
+            if (riverMap.size() > softMaximumRiverTiles) {
+                break;
+            }
 
             ServerRegion riverRegion = new ServerRegion(game, RegionType.RIVER);
             River river = new River(map, riverMap, riverRegion, this.random);
@@ -586,12 +591,11 @@ public class TerrainGenerator {
                     river.getLength(), "\n");
                 result.add(riverRegion);
                 rivers.add(river);
-                if (++counter >= number) break;
             } else {
                 lb.add("Failed to generate river at " + tile + ".\n");
             }
         }
-        lb.add("Created ", counter, " rivers of maximum ", number, "\n");
+        lb.add("Created ", counter, " rivers of maximum ", softMaximumRiverTiles, "\n");
 
         for (River river : rivers) {
             ServerRegion region = river.getRegion();

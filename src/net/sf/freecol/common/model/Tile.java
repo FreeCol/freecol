@@ -1300,7 +1300,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean isGoodRiverTile(TileImprovementType riverType) {
         return riverType.isTileTypeAllowed(getType())
             // check the river source/spring is not too close to the ocean
-            && all(getSurroundingTiles(1, 2), Tile::isLand);
+            && all(getSurroundingTiles(1, 1), Tile::isLand);
     }
 
     /**

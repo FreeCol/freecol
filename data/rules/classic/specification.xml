@@ -4797,12 +4797,12 @@
         <!-- Option for setting the number of rivers on the map
              The value indicates the number of land tile per river tile -->
         <rangeOption id="model.option.riverNumber"
-                     defaultValue="10" localizedLabels="true">
-          <rangeValue label="verySmall" value="20"/>
+                     defaultValue="30" localizedLabels="true">
+          <rangeValue label="verySmall" value="5"/>
           <rangeValue label="small" value="10"/>
-          <rangeValue label="medium" value="9"/>
-          <rangeValue label="large" value="8"/>
-          <rangeValue label="veryLarge" value="7"/>
+          <rangeValue label="medium" value="15"/>
+          <rangeValue label="large" value="20"/>
+          <rangeValue label="veryLarge" value="40"/>
         </rangeOption>
         <!-- Option for setting the number of mountains on the map
              The value indicates the number of land tile per mountain tile -->

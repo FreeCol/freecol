@@ -1238,6 +1238,7 @@ public final class Specification implements OptionContainer {
         }
         gog.save(gof, null, true);
         
+        /*
         String mtag = MapGeneratorOptions.TAG;
         File mof = FreeColDirectories
             .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
@@ -1250,6 +1251,7 @@ public final class Specification implements OptionContainer {
             mog = getOptionGroup(mtag);
         }
         mog.save(mof, null, true);
+        */
         return ret;
     }
 

@@ -82,7 +82,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
               editable);
         
         if (isEditable()) {
-            loadDefaultOptions();
             // FIXME: The update should be solved by PropertyEvent.
             
             final List<File> mapFiles = FreeColDirectories.getMapFileList();
