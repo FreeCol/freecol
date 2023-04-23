@@ -592,7 +592,7 @@ public final class InGameController extends FreeColClientHolder {
         // been captured.
         Unit active = gui.getActiveUnit();
         final boolean update = updateUnit || active == null
-                || (!active.couldMove() && !active.isInEurope())
+                || !active.isCandidateForNextActiveUnit()
                 || !getMyPlayer().owns(active);
         // Tile is displayed if no new active unit is found,
         // which is useful when the last unit might have died
@@ -1109,7 +1109,7 @@ public final class InGameController extends FreeColClientHolder {
         if (getGUI().isPanelShowing()) return;
         
         if (showDialog) {
-            List<Unit> units = transform(player.getUnits(), Unit::couldMove);
+            List<Unit> units = transform(player.getUnits(), Unit::isCandidateForNextActiveUnit);
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 getGUI().showEndTurnDialog(units,
