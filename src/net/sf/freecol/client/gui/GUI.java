@@ -1430,6 +1430,18 @@ public class GUI extends FreeColClientHolder {
     public void closeMenus() {}
 
     /**
+     * Resets the map controls in order to properly reference any
+     * newly recreated action.
+     */
+    public void resetMapControls() {}
+    
+    /**
+     * Resets the menu bar in order to properly reference any
+     * newly recreated action.
+     */
+    public void resetMenuBar() {}
+    
+    /**
      * Update the menu bar.
      *
      * Used by: InGameController.updateGUI, MapEditorController,

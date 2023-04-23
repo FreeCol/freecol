@@ -185,6 +185,11 @@ public class ActionManager extends OptionGroup {
      */
     public void addSpecificationActions(Specification spec) {
         // Initialize ImprovementActions
+        for (Option<?> o : new ArrayList<>(getOptions())) {
+            if (o instanceof ImprovementAction) {
+                remove(o.getId());
+            }
+        }
         for (TileImprovementType type : spec.getTileImprovementTypeList()) {
             if (!type.isNatural()) {
                 add(new ImprovementAction(freeColClient, type));

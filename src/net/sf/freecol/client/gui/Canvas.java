@@ -259,8 +259,8 @@ public final class Canvas extends JDesktopPane {
             logger.info("Canvas resize from " + oldSize + " to " + size);
             oldSize = size;
             canvasMapViewer.changeSize(size);
-            final boolean add = removeMapControls();
-            if (add) {
+            if (removeMapControls()) {
+                freeColClient.getGUI().updateMapControls();
                 addMapControls();
             }
             updateFrameSizesAndPositions(size);
