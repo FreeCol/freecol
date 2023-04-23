@@ -3060,7 +3060,13 @@ public final class InGameController extends FreeColClientHolder {
      */
     private boolean chooseFoundingFather(List<FoundingFather> ffs,
                                          FoundingFather ff) {
-        if (ffs == null) return false;
+        if (ffs == null) {
+            return false;
+        }
+        if (ff == null) {
+            // The player has postponed the selection.
+            return false;
+        }
 
         final Player player = getMyPlayer();
         player.setCurrentFather(ff);
