@@ -13,6 +13,13 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/**
+ * These tests save and load various game objects like the game itself,
+ * players, and tiles, and then compare the saved and loaded values to
+ * ensure they match. Use these tests as a guide to extend
+ * them for any additional game components.
+ */
 public class SQLInteractionsTests {
 
     private static final String DB_PATH = "test_db.sqlite";
