@@ -4797,7 +4797,7 @@
         <!-- Option for setting the number of rivers on the map
              The value indicates the number of land tile per river tile -->
         <rangeOption id="model.option.riverNumber"
-                     defaultValue="30" localizedLabels="true">
+                     defaultValue="15" localizedLabels="true">
           <rangeValue label="verySmall" value="5"/>
           <rangeValue label="small" value="10"/>
           <rangeValue label="medium" value="15"/>
