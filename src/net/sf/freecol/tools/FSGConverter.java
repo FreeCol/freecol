@@ -118,9 +118,9 @@ public class FSGConverter {
                 return;
             }
             in.reset();
-            if (!"<?xml".equals(new String(buf, StandardCharsets.UTF_8))) {
-                in = new BufferedInputStream(new GZIPInputStream(ins));
-            }
+//            if (!"<?xml".equals(new String(buf, StandardCharsets.UTF_8))) {
+//                in = new BufferedInputStream(new GZIPInputStream(ins));
+//            }
 
             // Support for XML comments has not been added:
             int indent = 0;
@@ -183,15 +183,16 @@ public class FSGConverter {
      * @param args The command-line parameters.
      */
     public static void main(String[] args) {
-        if (args.length >= 2 && args[0].endsWith("output:xml")) {
-            File in = new File(args[1]);
+        String[] actual_args = {"FSG_FILE:xml", "5c812fa4_Голландцы_1494.fsg"};
+        if (actual_args.length >= 2 && actual_args[0].endsWith("output:xml")) {
+            File in = new File(actual_args[1]);
             if (!in.exists()) {
                 printUsage();
                 System.exit(1);
             }
             File out;
-            if (args.length >= 3) {
-                out = new File(args[2]);
+            if (actual_args.length >= 3) {
+                out = new File(actual_args[2]);
             } else {
                 String name = in.getName();
                 String filename = name.replaceAll("." + FreeCol.FREECOL_SAVE_EXTENSION, ".xml");
