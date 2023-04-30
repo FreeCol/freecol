@@ -51,8 +51,6 @@ public final class GameOptionsDialog extends OptionsDialog {
               freeColClient.getGame().getGameOptions(), GameOptions.TAG,
               FreeColDirectories.GAME_OPTIONS_FILE_NAME, GameOptions.TAG, editable);
 
-        if (isEditable()) loadDefaultOptions();
-
         // Set special cases
         // Disable victory option "All humans defeated"
         // when playing single player

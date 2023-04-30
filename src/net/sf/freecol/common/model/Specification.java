@@ -1225,6 +1225,7 @@ public final class Specification implements OptionContainer {
      */
     public boolean updateGameAndMapOptions() {
         boolean ret = false;
+        /*
         String gtag = GameOptions.TAG;
         File gof = FreeColDirectories
             .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
@@ -1238,7 +1239,6 @@ public final class Specification implements OptionContainer {
         }
         gog.save(gof, null, true);
         
-        /*
         String mtag = MapGeneratorOptions.TAG;
         File mof = FreeColDirectories
             .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
