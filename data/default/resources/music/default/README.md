@@ -2,11 +2,17 @@ All files in this directory is licensed using [CC-BY 4.0](https://creativecommon
 
 The following works are made by Alexander Zhelanov:
 
+el-dorado.ogg
 fearless-sailors.ogg
 founders.ogg
+free-colonist.ogg
+lost-city.ogg
+rainy-day.ogg
+royal-troops.ogg
 settlers-routine.ogg
-runrise.ogg
+sunrise.ogg
 tailwind.ogg
+wagon-wheels.org
 
 
 The following works are made by Stian Grenborgen:
