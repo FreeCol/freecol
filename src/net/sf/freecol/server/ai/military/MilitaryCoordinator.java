@@ -94,11 +94,7 @@ public final class MilitaryCoordinator {
     /**
      * Determines the missions for the units this coordinator controls.
      */
-    public void determineMissions() {
-        for (AIUnit au : unusedUnits) {
-            au.setMission(null);
-        }
-        
+    public void determineMissions() {        
         final Set<AIUnit> artilleryUnits = identitySet(onlyArtillery(unusedUnits));
         final Set<AIUnit> dragoonUnits = identitySet(onlyDragoons(unusedUnits));
         final Set<AIUnit> otherMilitaryUnits = identitySet(neitherArtilleryNorDragoons(unusedUnits));
@@ -368,6 +364,7 @@ public final class MilitaryCoordinator {
     }
     
     private void placeDefender(AIUnit unit, AIColony colony) {
+        unit.setMission(null);
         unit.setMission(new DefendSettlementMission(unit.getAIMain(), unit, colony.getColony()));
         final List<AIUnit> units = defenders.get(colony);
         units.add(unit);
@@ -375,6 +372,13 @@ public final class MilitaryCoordinator {
     }
 
     private AIUnit findUnitClosestToColony(AIColony colony, Set<AIUnit> units) {
+        for (AIUnit au : units) {
+            if (au.getMission() instanceof DefendSettlementMission
+                    && au.getMission().getTarget() == colony.getColony()) {
+                return au;
+            }
+        }
+        
         // TODO: Handle Europe, handle with/without carrier
         return units.stream()
             .sorted((a, b) -> Integer.compare(getTurnsToReach(a.getUnit(), colony.getColony().getTile()), getTurnsToReach(b.getUnit(), colony.getColony().getTile())))
