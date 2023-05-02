@@ -677,7 +677,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         for (AIUnit au : getAIUnits()) {
             Mission mission = au.getMission();
             String reason = (mission == null) ? null : mission.invalidReason();
-            if (reason != null) au.setMission(null);
+            if (reason != null) au.changeMission(null);
         }
     }
 

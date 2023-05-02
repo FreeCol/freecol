@@ -168,7 +168,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue(colonyTile.getSettlement() == colony);
         assertTrue(colony.getOwner() == dutch);
         assertTrue(colony.getUnitCount() == 1);
-        aiUnit.setMission(null);
+        aiUnit.changeMission(null);
         assertEquals("DefendSettlementMission should be possible", null,
             DefendSettlementMission.invalidMissionReason(aiUnit));
         assertEquals("DefendSettlementMission should work with colony", null,
