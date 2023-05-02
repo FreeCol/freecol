@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
@@ -51,6 +53,8 @@ public class MapViewerRepaintManager {
      *      prior content has been lost.
      */
     boolean prepareBuffers(MapViewerBounds mapViewerBounds, Tile focus) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         final Dimension size = mapViewerBounds.getSize();
 
         final Tile oldFocus = this.focus;
@@ -103,6 +107,8 @@ public class MapViewerRepaintManager {
      * @return The region to redraw.
      */
     Rectangle getDirtyClipBounds() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         return dirtyRegion;
     }
 
@@ -113,6 +119,8 @@ public class MapViewerRepaintManager {
      *      time the map gets painted.
      */
     boolean isAllDirty() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         return backBufferImage == null
                 || dirtyRegion != null
                 && dirtyRegion.x == 0
@@ -130,6 +138,8 @@ public class MapViewerRepaintManager {
      * @param bounds The bounds that should be marked dirty.
      */
     public void markAsDirty(Rectangle bounds) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         if (dirtyRegion.isEmpty()) {
             this.dirtyRegion = bounds;
         } else {
@@ -143,6 +153,8 @@ public class MapViewerRepaintManager {
      * @param dirtyTile The {@code Tile} that should be repainted.
      */
     public void markAsDirty(Tile dirtyTile) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         Objects.requireNonNull(dirtyTile, "dirtyTile");
         this.dirtyTiles.add(dirtyTile);
     }
@@ -153,6 +165,8 @@ public class MapViewerRepaintManager {
      * @param dirtyTiles The {@code Tile}s that should be repainted.
      */
     public void markAsDirty(Collection<Tile> dirtyTiles) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         this.dirtyTiles.addAll(dirtyTiles);
     }
 
@@ -161,6 +175,8 @@ public class MapViewerRepaintManager {
      * method as it causes full repaints.
      */
     public void markAsDirty() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         if (backBufferImage == null) {
             /* The dirtyRegion will be defined by the next call to prepareBuffers */
             this.dirtyRegion = null;
@@ -176,6 +192,8 @@ public class MapViewerRepaintManager {
      *          has completed.
      */
     void markAsClean() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         this.dirtyRegion = new Rectangle(0, 0, 0 ,0);
     }
 
@@ -185,6 +203,8 @@ public class MapViewerRepaintManager {
      * @return The map buffer.
      */
     VolatileImage getBackBufferImage() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         return backBufferImage;
     }
 
@@ -195,6 +215,8 @@ public class MapViewerRepaintManager {
      * @return The static map buffer.
      */
     BufferedImage getNonAnimationBufferImage() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         return nonAnimationBufferImage;
     }
 
@@ -212,6 +234,8 @@ public class MapViewerRepaintManager {
      *      {@code false} allows repaints to be made again. 
      */
     public void setRepaintsBlocked(boolean repaintsBlocked) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         this.repaintsBlocked = repaintsBlocked;
     }
 
@@ -225,6 +249,8 @@ public class MapViewerRepaintManager {
      * @return True if repaints are blocked.
      */
     boolean isRepaintsBlocked(Dimension size) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         return repaintsBlocked && !isBuffersUninitialized(size);
     }
 
