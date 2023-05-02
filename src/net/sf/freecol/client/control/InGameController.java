@@ -2679,8 +2679,9 @@ public final class InGameController extends FreeColClientHolder {
     public void animateAttackHandler(Unit attacker, Unit defender,
                                      Tile attackerTile, Tile defenderTile,
                                      boolean success) {
-        getGUI().animateUnitAttack(attacker, defender,
-                                   attackerTile, defenderTile, success);
+        invokeLater(() -> {
+            getGUI().animateUnitAttack(attacker, defender, attackerTile, defenderTile, success);
+        });
     }
 
     /**
@@ -2691,7 +2692,9 @@ public final class InGameController extends FreeColClientHolder {
      * @param newTile The {@code Tile} the move ends at.
      */
     public void animateMoveHandler(Unit unit, Tile oldTile, Tile newTile) {
-        getGUI().animateUnitMove(unit, oldTile, newTile);
+        invokeLater(() -> {
+            getGUI().animateUnitMove(unit, oldTile, newTile);
+        });
     }
 
     /**
