@@ -19,33 +19,41 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.getPermutations;
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -54,8 +62,6 @@ import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.Cargo;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TransportableAIObject;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -1062,6 +1068,8 @@ public final class TransportMission extends Mission {
             optimizeCargoes(lb);
         }
 
+        queueEasilyTransportedCargo(unit);
+        
         // Replenish cargoes up to available destination capacity
         // and 50% above maximum cargoes (FIXME: longer?)
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
@@ -1072,6 +1080,8 @@ public final class TransportMission extends Mission {
             if (!queueCargo(cargo, false, lb)) break;
             euaip.claimTransportable(cargo.getTransportable());
         }
+        
+        queueEasilyTransportedCargo(unit);
     }
 
     /**
@@ -1165,8 +1175,7 @@ public final class TransportMission extends Mission {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         Cargo bestDirect = null, bestFallback = null;
         float bestDirectValue = 0.0f, bestFallbackValue = 0.0f;
-        final List<Cargo> ts = tCopy();
-        for (TransportableAIObject t : euaip.getUrgentTransportables()) {
+        for (TransportableAIObject t : euaip.getTransportables()) {
             if (t.isDisposed() || !t.carriableBy(carrier)) continue;
             Cargo cargo;
             try {
@@ -1176,13 +1185,6 @@ public final class TransportMission extends Mission {
             }
             if (cargo == null) continue;
             float value = t.getTransportPriority() / (cargo.getTurns() + 1.0f);
-            
-            if (t.getTransportDestination() != null
-                    && t.getTransportDestination().equals(target)
-                    && cargo.canQueueAt(carrier, 0, ts)) {
-                // Prioritize transports with the same destination.
-                value *= 10000;
-            }
             
             if (cargo.isFallback()) {
                 if (bestFallbackValue < value) {
@@ -1199,6 +1201,60 @@ public final class TransportMission extends Mission {
         return (bestDirect != null) ? bestDirect
             : (bestFallback != null) ? bestFallback
             : null;
+    }
+    
+    /**
+     * Queues extra transportables at the carrier's current location
+     * that shares a destination with cargo already on the transport list.
+     * 
+     * These transportables can be added to the transport list without
+     * adding extra stops.
+     * 
+     * @param carrier The carrier.
+     */
+    private void queueEasilyTransportedCargo(Unit carrier) {
+        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
+        final List<Cargo> ts = tCopy();
+        final Set<Location> existingDestinations = ts.stream()
+                .map(c -> c.getCarrierTarget())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        
+        for (TransportableAIObject t : euaip.getTransportables()) {
+            if (t.isDisposed() || !t.carriableBy(carrier)) {
+                continue;
+            }
+            if (t.getTransportSource() != carrier.getLocation()) {
+                continue;
+            }
+            if (!existingDestinations.contains(t.getTransportDestination())) {
+                continue;
+            }
+            
+            Cargo cargo;
+            try {
+                cargo = Cargo.newCargo(t, carrier);
+            } catch (FreeColException fce) {
+                cargo = null;
+            }
+            if (cargo == null) {
+                continue;
+            }
+            
+            final int spaceAvailable = carrier.getCargoCapacity() - carrier.getCargoSpaceTaken();
+            if (spaceAvailable < cargo.getNewSpace()) {
+                continue;
+            }
+            
+            if (!t.joinTransport(carrier, null)) {
+                logger.warning("Failed to add cargo there should be room for.");
+            }
+            cargo.update();
+            if (!addCargo(cargo, 0, new LogBuilder(0))) {
+                logger.warning("Failed to add cargo already on the transport.");
+            }
+            euaip.claimTransportable(t);
+        }
     }
 
     /**
