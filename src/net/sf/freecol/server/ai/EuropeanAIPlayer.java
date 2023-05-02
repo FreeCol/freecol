@@ -1795,10 +1795,21 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             done.clear();
         }
         if (nBuilders > 0) {
+            /*
+             * Temporary fix for endless amount of colonists not being assigned
+             * any mission. See BR#3322
+             */
+            final int MAX_BUILDING_MISSION_TRIES = 50;
+            
+            int tries = 0;
             for (AIUnit aiUnit : sort(aiUnits, builderComparator)) {
                 if (aiUnit.getUnit().isArmed() && getGame().getTurn().getNumber() > 20) {
                     // Quickfix to avoid having all soldies being given a BuildColonyMission.
                     continue;
+                }
+                tries++;
+                if (tries > MAX_BUILDING_MISSION_TRIES) {
+                    break;
                 }
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
                     ? null : m.getTarget();
