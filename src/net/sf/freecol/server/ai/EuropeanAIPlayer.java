@@ -1141,23 +1141,40 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
+     * Gets all transportables sorted by values.
+     *
+     * @return The transportables in descending order.
+     */
+    public List<TransportableAIObject> getTransportables() {
+        return sort(transportSupply, ValuedAIObject.descendingValueComparator);
+    }
+    
+    /**
      * Gets the most urgent transportables.
      *
-     * @return The most urgent 10% of the available transportables.
+     * @return The most urgent of the available transportables.
      */
     public List<TransportableAIObject> getUrgentTransportables() {
+        /*
         List<TransportableAIObject> urgent
             = sort(transportSupply, ValuedAIObject.descendingValueComparator);
         // Do not let the list exceed 10% of all transports
-        /* Why? This just makes the transport-mission not consider possible overlapping
-         * destinations.
-         * 
         int urge = urgent.size();
         urge = Math.max(2, (urge + 5) / 10);
         while (urgent.size() > urge) urgent.remove(urge);
         return urgent;
         */
-        return urgent;
+
+        /*
+         * Deactived the code above for now since I cannot detect any difference
+         * when activated ... and if we activate it again, please use something
+         * like this instead::
+         * 
+         * final int urgentNumber = Math.max(2, (urgent.size() + 5) / 10;
+         * return urgent.subList(0, Math.min(urgent.size(), urgentNumber));
+         */
+        
+        return List.of();
     }
 
     /**
