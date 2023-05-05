@@ -272,8 +272,7 @@ public final class DefendSettlementMission extends Mission {
      */
     @Override
     public int getBaseTransportPriority() {
-        return (getTransportDestination() == null) ? 0
-            : NORMAL_TRANSPORT_PRIORITY + 5;
+        return NORMAL_TRANSPORT_PRIORITY + 5;
     }
 
     /**
