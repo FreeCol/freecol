@@ -667,7 +667,7 @@ public class ColonyPlan {
      * Updates the build plans for this colony.
      */
     private void updateBuildableTypes() {
-        final AIPlayer euaip = getAIMain()
+        final EuropeanAIPlayer euaip = (EuropeanAIPlayer) getAIMain()
             .getAIPlayer(colony.getOwner());
         String advantage = euaip.getAIAdvantage();
         buildPlans.clear();
@@ -793,7 +793,7 @@ public class ColonyPlan {
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 ; // FIXME: decide to build a ship
             } else if (unitType.isDefensive()) {
-                if (colony.isBadlyDefended()) {
+                if (euaip.needsMoreArtillery()) {
                     prioritize(unitType, DEFENCE_WEIGHT,
                         1.0/*FIXME: how badly defended?*/);
                 }
@@ -1183,6 +1183,9 @@ public class ColonyPlan {
                     produce.indexOf(u.getType().getExpertProduction()))
                 .reversed()
                 .thenComparingInt(Unit::getExperience);
+        /* 
+         * Defence is now handled by the military coordinator.
+         * 
         for (Unit u : sort(workers, soldierComparator)) {
             if (workers.size() <= 1) break;
             if (!col.isBadlyDefended()) break;
@@ -1199,6 +1202,7 @@ public class ColonyPlan {
                 }
             }
         }
+        */
 
         // Greedy assignment of other workers to plans.
         List<AbstractGoods> buildGoods = new ArrayList<>();

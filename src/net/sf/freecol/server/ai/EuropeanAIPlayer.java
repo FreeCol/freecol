@@ -1456,6 +1456,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             if (settlement.isConnectedPort()) nPorts++;
             nWorkers += count(settlement.getAllUnitsList(), Unit::isPerson);
         }
+        
         Europe europe = player.getEurope();
         nEuropean = (europe == null) ? 0
             : count(europe.getUnits(), Unit::isPerson);
@@ -2369,11 +2370,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         
         buildTransportMaps(lb);
         
-        for (AIUnit mu : militaryUnits) {
-            updateTransport(mu, null, lb);
-        }
-        
-        
         final List<AIUnit> normalAiUnits = getAIUnits().stream()
                 .filter(MilitaryCoordinator.isUnitHandledByMilitaryCoordinator().negate())
                 .collect(Collectors.toList());
@@ -2435,12 +2431,21 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
                 
         boolean militaryUnitBought = numberOfUnitsInDock >= 18;
-        if (!militaryUnitBought && isLikesAttackingNatives() && hasLessDragoonsThanColoniesPlusOne()) {
-            final Unit unitBought = buyDragoon();
-            if (unitBought == null) {
-                return;
+        if (!militaryUnitBought) {
+            if (reallyNeedsMoreArtillery() || isLikesAttackingNatives() && needsMoreArtillery()) {
+                final Unit unitBought = buyArtillery();
+                if (unitBought == null) {
+                    return;
+                }
+                militaryUnitBought = true;
             }
-            militaryUnitBought = true;
+            if (reallyNeedsMoreDragoons() || isLikesAttackingNatives() && needsMoreDragoons()) {
+                final Unit unitBought = buyDragoon();
+                if (unitBought == null) {
+                    return;
+                }
+                militaryUnitBought = true;
+            }
         }
         
         for (Wish w : getWishes()) {
@@ -2514,8 +2519,20 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return true;
     }
 
-    private boolean hasLessDragoonsThanColoniesPlusOne() {
+    private boolean needsMoreDragoons() {
+        return 2 * (getAIColonies().size() + 1) > getAIUnits().stream().filter(au -> au.getUnit().isMounted() && au.getUnit().isArmed()).count();
+    }
+    
+    private boolean reallyNeedsMoreDragoons() {
         return getAIColonies().size() + 1 > getAIUnits().stream().filter(au -> au.getUnit().isMounted() && au.getUnit().isArmed()).count();
+    }
+    
+    public boolean reallyNeedsMoreArtillery() {
+        return getAIColonies().size() / 2 + 1 > getAIUnits().stream().filter(au -> au.getUnit().hasAbility(Ability.BOMBARD)).count();
+    }
+    
+    public boolean needsMoreArtillery() {
+        return getAIColonies().size() + 1 > getAIUnits().stream().filter(au -> au.getUnit().hasAbility(Ability.BOMBARD)).count();
     }
     
     private Unit buyDragoon() {
@@ -2558,6 +2575,35 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             return null;
         }
         return createdUnit.get(0);
+    }
+    
+    private Unit buyArtillery() {
+        final Player player = getPlayer();
+        final Europe europe = player.getEurope();
+        final UnitType cheapestArtilleryUnitType = getSpecification().getUnitTypesPurchasedInEurope(getPlayer())
+            .stream()
+            .filter(ut -> ut.getPrice() > 0 && ut.getPrice() != INFINITY)
+            .filter(ut -> ut.hasAbility(Ability.BOMBARD))
+            .filter(ut -> ut.isAvailableTo(player))
+            .sorted((a, b) -> Integer.compare(a.getPrice(), b.getPrice()))
+            .findFirst()
+            .orElse(null);
+        
+        if (cheapestArtilleryUnitType == null) {
+            return null;
+        }
+        
+        final int unitPrice = europe.getUnitPrice(cheapestArtilleryUnitType);
+        if (unitPrice > player.getGold()) {
+            return null;
+        }
+        
+        final AIUnit newUnit = trainAIUnitInEurope(cheapestArtilleryUnitType);
+        if (newUnit == null) {
+            return null;
+        }
+        
+        return newUnit.getUnit();
     }
 
     /**

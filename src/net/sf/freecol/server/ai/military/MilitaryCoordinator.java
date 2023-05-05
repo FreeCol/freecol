@@ -78,7 +78,16 @@ public final class MilitaryCoordinator {
         assert militaryUnits.stream().noneMatch(au -> au.getOwner() != player.getPlayer());
         
         this.player = player;
-        this.unusedUnits = identitySet(militaryUnits);
+        //this.unusedUnits = identitySet(militaryUnits);
+        /*
+         * TODO: Filter out units waiting for transport ... so that the transport priority
+         * accumulates during wait time. This is probably better solved by having a separate
+         * mission for transporting units from Europe to the New World.
+         */
+        this.unusedUnits = identitySet(militaryUnits.stream()
+                .filter(u -> !u.getUnit().isInEurope() || !u.hasMission())
+                .collect(Collectors.toList())
+                );
         
         this.ourColonies = getOurColoniesSortedByValue();
         this.defenders = new HashMap<>();

@@ -1090,12 +1090,14 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         // FIXME: add missionaries
 
         // Improve defence.
+        /*
         if (isBadlyDefended()) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
                 requireWorkerWish(bestDefender, true, 100, lb);
             }
         }
+        */
     }
 
     /**
@@ -1147,6 +1149,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
 
         // Add materials required to build military equipment,
         // but make sure there is a unit present that can use it.
+        /*
         if (isBadlyDefended()) {
             Role role = first(spec.getMilitaryRoles());
             Player owner = colony.getOwner();
@@ -1160,6 +1163,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
                 }
             }
         }
+        */
 
         // Drop wishes that are no longer needed.
         for (Wish wish : transform(wishes, w -> {
