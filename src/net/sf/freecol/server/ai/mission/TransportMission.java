@@ -1215,19 +1215,25 @@ public final class TransportMission extends Mission {
     private void queueEasilyTransportedCargo(Unit carrier) {
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         final List<Cargo> ts = tCopy();
-        final Set<Location> existingDestinations = ts.stream()
+
+        final Location nextDestination = ts.stream()
+                .filter(c -> c.getCarrierTarget() != null && c.getCarrierTarget().getTile() != null)
                 .map(c -> c.getCarrierTarget())
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                .findFirst()
+                .orElse(null);
+
+        if (nextDestination == null) {
+            return;
+        }
         
         for (TransportableAIObject t : euaip.getTransportables()) {
             if (t.isDisposed() || !t.carriableBy(carrier)) {
                 continue;
             }
-            if (t.getTransportSource() != carrier.getLocation()) {
+            if (!Map.isSameLocation(t.getTransportSource(), carrier.getLocation())) {
                 continue;
             }
-            if (!existingDestinations.contains(t.getTransportDestination())) {
+            if (Map.isSameLocation(nextDestination, t.getTransportDestination())) {
                 continue;
             }
             
