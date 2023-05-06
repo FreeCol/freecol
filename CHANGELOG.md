@@ -37,6 +37,7 @@ All savegames from 0.12.0 and up should continue working with 1.1.0.
 * The AI now gets less benefits on lower difficulty levels to make everything easier.
 * Escort unit missions are now immediately aborted if the protected unit gets destroyed.
 * More efficient transportation of goods and units (better utilization of the capacity of ships and wagon trains).
+* The AI now produces fewer and better colonies.
 
 ### Mod development ###
 * Allows mods to be loaded when making maps in the map editor. This allows maps to be made with new terrain types, and other resources, added by mods.
