@@ -3518,21 +3518,23 @@
         </optionGroup>
         <optionGroup id="model.difficulty.cheat" editable="false">
           <integerOption id="model.option.liftBoycottCheat"
-                         value="1"/>
+                         value="0"/>
           <integerOption id="model.option.equipScoutCheat"
-                         value="1"/>
+                         value="0"/>
           <integerOption id="model.option.equipPioneerCheat"
-                         value="1"/>
+                         value="0"/>
           <integerOption id="model.option.landUnitCheat"
-                         value="1"/>
+                         value="0"/>
           <integerOption id="model.option.offensiveLandUnitCheat"
                          value="0"/>
           <integerOption id="model.option.offensiveNavalUnitCheat"
-                         value="1"/>
+                         value="0"/>
           <integerOption id="model.option.transportNavalUnitCheat"
-                         value="1"/>
+                         value="0"/>
           <integerOption id="model.option.tradeProfitMultiplierCheat"
                          value="1"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheatTurns"
+                         value="0"/>
         </optionGroup>
       </optionGroup>
 
@@ -3722,9 +3724,11 @@
           <integerOption id="model.option.offensiveNavalUnitCheat"
                          value="5"/>
           <integerOption id="model.option.transportNavalUnitCheat"
-                         value="5"/>
+                         value="0"/>
           <integerOption id="model.option.tradeProfitMultiplierCheat"
                          value="2"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheatTurns"
+                         value="200"/>
         </optionGroup>
       </optionGroup>
 
@@ -3909,9 +3913,11 @@
           <integerOption id="model.option.offensiveNavalUnitCheat"
                          value="10"/>
           <integerOption id="model.option.transportNavalUnitCheat"
-                         value="10"/>
+                         value="4"/>
           <integerOption id="model.option.tradeProfitMultiplierCheat"
-                         value="5"/>
+                         value="4"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheatTurns"
+                         value="200"/>
         </optionGroup>
       </optionGroup>
 
@@ -4093,6 +4099,8 @@
                          value="15"/>
           <integerOption id="model.option.tradeProfitMultiplierCheat"
                          value="10"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheatTurns"
+                         value="200"/>
         </optionGroup>
       </optionGroup>
 
@@ -4273,7 +4281,9 @@
           <integerOption id="model.option.transportNavalUnitCheat"
                          value="20"/>
           <integerOption id="model.option.tradeProfitMultiplierCheat"
-                         value="15"/>
+                         value="30"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheatTurns"
+                         value="400"/>
         </optionGroup>
       </optionGroup>
 
@@ -4549,6 +4559,8 @@
                          value="20"/>
           <integerOption id="model.option.tradeProfitMultiplierCheat"
                          value="15"/>
+          <integerOption id="model.option.tradeProfitMultiplierCheatTurns"
+                         value="400"/>
         </optionGroup>
       </optionGroup>
     </optionGroup>

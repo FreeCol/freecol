@@ -1306,8 +1306,19 @@ public class ServerPlayer extends Player implements TurnTaker {
                  * For example, the human player can still actively reduce the amount of
                  * money the AI gets by stopping cargo / capture colonies with custom houses.
                  */
+                
                 final int tradeProfitMultiplierCheat = getSpecification().getInteger(GameOptions.TRADE_PROFIT_MULTIPLIER_CHEAT);
-                modifyGold(incomeAfterTaxes * tradeProfitMultiplierCheat);
+                final int tradeProfitMultiplierCheatTurns = getSpecification().getInteger(GameOptions.TRADE_PROFIT_MULTIPLIER_CHEAT_TURNS);
+                
+                /*
+                 * Linear reduction of the tradeProfitMultiplierCheat from the first year
+                 * until turn number tradeProfitMultiplierCheatTurns.
+                 */
+                final double currentMultiplier = Math.max(1.0D,
+                        tradeProfitMultiplierCheat * ((double) tradeProfitMultiplierCheatTurns - getGame().getTurn().getNumber()) / tradeProfitMultiplierCheatTurns);
+                
+                final int adjustedGoldAfterCheating = (int) (incomeAfterTaxes * currentMultiplier);
+                modifyGold(adjustedGoldAfterCheating);
             } else {
                 modifyGold(incomeAfterTaxes);
             }

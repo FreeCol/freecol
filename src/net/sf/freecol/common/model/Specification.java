@@ -2735,6 +2735,7 @@ public final class Specification implements OptionContainer {
         
         // @compat 1.0.0
         ret |= checkDifficultyIntegerOption(GameOptions.TRADE_PROFIT_MULTIPLIER_CHEAT, GameOptions.DIFFICULTY_CHEAT, lb, 10);
+        ret |= checkDifficultyIntegerOption(GameOptions.TRADE_PROFIT_MULTIPLIER_CHEAT_TURNS, GameOptions.DIFFICULTY_CHEAT, lb, 200);
         // end @compat 1.0.0
 
         // Ensure 2 levels of groups, and one level of leaves

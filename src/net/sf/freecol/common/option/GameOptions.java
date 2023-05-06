@@ -529,6 +529,8 @@ public class GameOptions {
     
     public static final String TRADE_PROFIT_MULTIPLIER_CHEAT
         = "model.option.tradeProfitMultiplierCheat";
+    public static final String TRADE_PROFIT_MULTIPLIER_CHEAT_TURNS
+        = "model.option.tradeProfitMultiplierCheatTurns";
 
 
     // Serialization
