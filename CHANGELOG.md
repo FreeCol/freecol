@@ -63,6 +63,7 @@ All savegames from 0.12.0 and up should continue working with 1.1.0.
 * Fixes activation of tile improvement actions (like "Plow") after reconnecting.
 * Allows the founding father selection to be postponed without an error message.
 * Fixed a bug that sometimes prevented the map from being redrawn properly after a unit move/attack animation.
+* Highscores can now be stored and displayed again.
 
 
 ## FreeCol 1.0.0 (January 2, 2023) ##

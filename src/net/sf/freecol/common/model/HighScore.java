@@ -380,10 +380,19 @@ public class HighScore extends FreeColObject {
                     && score > hs.getScore()) return i; // Replace score i
             }
         }
-        return (score >= 0
-            && (nScores < NUMBER_OF_HIGH_SCORES
-                || score > scores.get(nScores-1).getScore())) ? nScores-1
-            : -1;
+        if (score < 0) {
+            return -1;
+        }
+        if (nScores == 0) {
+            return 0;
+        }
+        if (nScores >= NUMBER_OF_HIGH_SCORES) {
+            if (score > scores.get(nScores-1).getScore()) {
+                return nScores - 1;
+            }
+            return -1;
+        }
+        return nScores;
     }
 
     /**
