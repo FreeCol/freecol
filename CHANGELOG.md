@@ -13,6 +13,7 @@ All savegames from 0.12.0 and up should continue working with 1.1.0.
 
 ### Graphics ###
 * New graphics for hills and mountains.
+* The standard panel background image is now both brighter and without obvious tiling artifacts on larger screens.
 
 ### Rule changes ###
 * Jesuit Missionary can now recommision itself in colonies without a church.
@@ -40,7 +41,7 @@ All savegames from 0.12.0 and up should continue working with 1.1.0.
 * The AI now produces fewer and better colonies.
 
 ### Mod development ###
-* Allows mods to be loaded when making maps in the map editor. This allows maps to be made with new terrain types, and other resources, added by mods.
+* Allow mods to be loaded when making maps in the map editor. This allows maps to be made with new terrain types, and other resources, added by mods.
 * New types of mountains and hills defined by mods are now used when generating maps. The specific type of hill/mountain is determined by the latitude.
 * Partial modifications to the specification is now possible again. This fixes a regression introduced in 0.11.x that prevented the "partial" flag from working.
 * Mods can now define new order buttons (and have them applied without having to restart the game).
