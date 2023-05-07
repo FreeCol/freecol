@@ -1,4 +1,4 @@
-## FreeCol 1.1.0 (In development) ##
+## FreeCol 1.1.0 (May 7, 2023) ##
 
 All savegames from 0.12.0 and up should continue working with 1.1.0.
 
