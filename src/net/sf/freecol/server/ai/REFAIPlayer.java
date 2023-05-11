@@ -545,7 +545,10 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
             // Collect privateers that are on the map.
             for (AIUnit aiu : privateers) {
                 Location target = aiu.getMission().getTarget();
-                if (target instanceof Unit && aiu.getUnit().hasTile()) {
+                if (target instanceof Unit
+                        && !((Unit) target).isDisposed()
+                        && target.getTile() != null
+                        && aiu.getUnit().hasTile()) {
                     naval.add(aiu);
                 } else if ((m = getTransportMission(aiu)) != null) {
                     lb.add(" notarget ", m);
