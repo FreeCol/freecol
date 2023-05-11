@@ -591,11 +591,6 @@ public class ServerPlayer extends Player implements TurnTaker {
             }
         }
 
-        // Do not surrender until at least presenceFactor of the land
-        // army has arrived on the map
-        final double presenceFactor = 2.0/3.0; // FIXME: magic number
-        if (landOnMap < presenceFactor * land) return false;
-
         // The REF is arrogant and overestimates its strength by a fudge factor
         final double refLandPower = 1.5 * calculateStrength(false);
         // Do not surrender if there is a rebel whose land army seems weaker
