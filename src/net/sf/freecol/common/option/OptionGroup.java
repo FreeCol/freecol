@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.option;
 
+import static net.sf.freecol.common.util.CollectionUtils.any;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +37,6 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -308,7 +309,13 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      */
     public Option remove(String id) {
         Option op = optionMap.remove(id);
-        if (op != null) options.remove(op);
+        options.remove(op);
+        if (op != null) {
+            options.stream()
+                    .filter(o -> o instanceof OptionGroup)
+                    .map(o -> (OptionGroup) o)
+                    .forEach(og -> og.remove(id));
+        }
         return op;
     }
 
@@ -560,6 +567,13 @@ public class OptionGroup extends AbstractOption<OptionGroup>
         // ATM OptionGroups are purely additive/overwriting.
 
         super.readChildren(xr);
+        
+        for (Option option : getOptions()) {
+            optionMap.put(option.getId(), option);
+            if (option instanceof OptionGroup) {
+                addOptionGroup((OptionGroup) option);
+            }
+        }
     }
 
     /**
