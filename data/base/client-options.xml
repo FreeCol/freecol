@@ -155,14 +155,7 @@
                        defaultValue="false"/>
         <!-- Whether to display the map controls by default or not. -->
         <booleanOption id="model.option.displayMapControls"
-                       defaultValue="true"/>
-        <!-- What type of map controls, corner or classic? -->
-        <stringOption id="model.option.mapControls"
-                      defaultValue="clientOptions.gui.mapControls.CornerMapControls">
-          <choice value="clientOptions.gui.mapControls.CornerMapControls"/>
-          <choice value="clientOptions.gui.mapControls.ClassicMapControls"/>
-        </stringOption>
-                       
+                       defaultValue="true"/>                       
         <!-- Draw the fog of war on the minimap. -->
         <booleanOption id="model.option.miniMapToggleFogOfWar"
                        defaultValue="true"/>

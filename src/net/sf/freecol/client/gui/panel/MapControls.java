@@ -196,29 +196,6 @@ public abstract class MapControls extends FreeColClientHolder {
         repaint();
     }
 
-    /**
-     * Create a new map controls instance for a FreeColClient.
-     *
-     * @param freeColClient The {@code FreeColClient} to query.
-     * @return A new {@code MapControls} or null on error.
-     */
-    public static MapControls newInstance(final FreeColClient freeColClient) {
-        final String className = freeColClient.getClientOptions()
-            .getString(ClientOptions.MAP_CONTROLS);
-        final String panelName = "net.sf.freecol.client.gui.panel."
-            + lastPart(className, ".");
-        try {
-            return (MapControls)Introspector.instantiate(panelName,
-                new Class[] { FreeColClient.class },
-                new Object[] { freeColClient });
-        } catch (Introspector.IntrospectorException ie) {
-            logger.log(Level.WARNING, "Failed in make map controls for: "
-                + panelName, ie);
-        }
-        return null;
-    }
-
-
     public void clear() {
         unitButtons.clear();
     } 

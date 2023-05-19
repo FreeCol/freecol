@@ -874,6 +874,9 @@ public class ClientOptions extends OptionGroup {
         addPercentageOption(MUSIC_VOLUME, AUDIO_GROUP, 100);
         addPercentageOption(SOUND_EFFECTS_VOLUME, AUDIO_GROUP, 100);
         // end @compat 0.13.0
+        // @compat 1.1.0
+        remove("model.option.mapControls");
+        // end @compat 1.1.0
     }
     
     private void addPercentageOption(String id, String gr, int val) {

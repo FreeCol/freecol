@@ -68,6 +68,7 @@ import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewerState;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
@@ -795,7 +796,8 @@ public class SwingGUI extends GUI {
     public void startGUI(final Dimension desiredWindowSize) {
         final FreeColClient fcc = getFreeColClient();
         final ClientOptions opts = getClientOptions();
-        this.mapControls = MapControls.newInstance(fcc);
+        this.mapControls = new CornerMapControls(fcc);
+        
         final ActionListener al = (ActionEvent ae) -> {
             final Tile tile = mapViewer.getMapViewerState().getCursorTile();
             if (tile != null) {
