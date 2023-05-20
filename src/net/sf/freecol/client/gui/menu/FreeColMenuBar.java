@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.menu;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -254,7 +255,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
         if (isOpaque()) {
             super.paintComponent(g);
         } else {
-            ImageUtils.drawTiledImage(ImageLibrary.getMenuBackground(),
+            ImageUtils.drawTiledImage(ImageLibrary.getMenuBarBackground(),
                                       g, this, getInsets());
         }
     }

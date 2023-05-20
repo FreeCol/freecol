@@ -121,6 +121,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         FreeColListUI.class,
         FreeColMenuBarUI.class,
         FreeColMenuItemUI.class,
+        FreeColMenuUI.class,
         FreeColOptionPaneUI.class,
         FreeColPanelUI.class,
         FreeColPopupMenuUI.class,
@@ -211,6 +212,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         u.put("cursor.go", ImageLibrary.getCursor());
 
         u.put("CheckBox.icon", (LazyValue) t -> FreeColCheckBoxUI.createCheckBoxIcon());
+        
+        // TODO: We might want to allow overriding font colors for the menu:
+        //u.put("Menu.foreground", java.awt.Color.WHITE);
         
         return u;
     }

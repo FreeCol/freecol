@@ -43,7 +43,7 @@ public class FreeColMenuBarUI extends BasicMenuBarUI {
     @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageUtils.drawTiledImage(ImageLibrary.getMenuBackground(),
+            ImageUtils.drawTiledImage(ImageLibrary.getMenuBarBackground(),
                                       g, c, null);
         }
     }

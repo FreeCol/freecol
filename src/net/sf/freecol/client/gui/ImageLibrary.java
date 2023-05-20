@@ -634,8 +634,12 @@ public final class ImageLibrary {
         return getUnscaledImage(key);
     }
 
-    public static BufferedImage getMenuBackground() {
+    public static BufferedImage getMenuBarBackground() {
         return getUnscaledImage("image.background.FreeColMenuBar");
+    }
+    
+    public static BufferedImage getMenuBackground() {
+        return getUnscaledImage("image.background.FreeColMenu");
     }
 
     public static BufferedImage getMiniMapBackground() {
