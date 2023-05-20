@@ -798,6 +798,17 @@ public final class Canvas extends JDesktopPane {
      */
     public void removeInGameComponents() {
         // remove listeners, they will be added when launching the new game...
+        removeKeyAndMouseListeners();
+
+        for (Component c : getComponents()) {
+            if (c instanceof CanvasMapViewer) {
+                continue;
+            }
+            removeFromCanvas(c);
+        }
+    }
+
+    private void removeKeyAndMouseListeners() {
         KeyListener[] keyListeners = getKeyListeners();
         for (KeyListener keyListener : keyListeners) {
             removeKeyListener(keyListener);
@@ -812,19 +823,14 @@ public final class Canvas extends JDesktopPane {
         for (MouseMotionListener mouseMotionListener : mouseMotionListeners) {
             removeMouseMotionListener(mouseMotionListener);
         }
-
-        for (Component c : getComponents()) {
-            if (c instanceof CanvasMapViewer) {
-                continue;
-            }
-            removeFromCanvas(c);
-        }
     }
 
     /**
      * Map editor initialization.
      */
     public void startMapEditorGUI() {
+        removeKeyAndMouseListeners();
+        
         freeColClient.updateActions();
         this.parentFrame.setMenuBar(new MapEditorMenuBar(this.freeColClient,
                 new MenuMouseMotionListener(scrolling)));
@@ -838,6 +844,8 @@ public final class Canvas extends JDesktopPane {
      * In game initializations.
      */
     public void initializeInGame() {
+        removeKeyAndMouseListeners();
+        
         this.parentFrame.setMenuBar(new InGameMenuBar(this.freeColClient,
                 new MenuMouseMotionListener(scrolling)));
         addMouseListener(new CanvasMouseListener(this.freeColClient));
