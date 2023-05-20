@@ -30,6 +30,7 @@ import java.awt.image.ColorConvertOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.awt.Insets;
+import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
 import javax.swing.JComponent;
@@ -215,11 +216,12 @@ public class ImageUtils {
      */
     public static void fillTexture(Graphics2D g2d, BufferedImage img,
                                    int x, int y, int width, int height) {
-        Rectangle anchor = new Rectangle(x, y,
-                                         img.getWidth(), img.getHeight());
+        final Rectangle anchor = new Rectangle(x, y, img.getWidth(), img.getHeight());
+        final Paint oldPaint = g2d.getPaint();
         TexturePaint paint = new TexturePaint(img, anchor);
         g2d.setPaint(paint);
         g2d.fillRect(x, y, width, height);
+        g2d.setPaint(oldPaint);
     }
     
     /**
