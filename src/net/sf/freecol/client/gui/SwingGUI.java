@@ -847,6 +847,7 @@ public class SwingGUI extends GUI {
     @Override
     public void startMapEditorGUI() {
         resetMapZoom(); // Reset zoom to the default
+        mapViewer.getMapViewerState().setActiveUnit(null);
         this.canvas.startMapEditorGUI();
         this.canvas.showMapEditorTransformPanel();
     }
