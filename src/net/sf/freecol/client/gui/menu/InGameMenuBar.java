@@ -19,12 +19,18 @@
 
 package net.sf.freecol.client.gui.menu;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
@@ -322,14 +328,16 @@ public class InGameMenuBar extends FreeColMenuBar {
             .addAmount("%tax%", player.getTax())
             .addAmount("%score%", player.getScore())
             .addStringTemplate("%year%", this.freeColClient.getGame()
-                .getTurn().getLabel()));
+            .getTurn().getLabel())).replace("|", "✧");
+        
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                              RenderingHints.VALUE_RENDER_QUALITY);
 
-        g2d.setFont(FontLibrary.getMainFont());
+        final Font font = FontLibrary.getMainFont();
+        g2d.setFont(font);
         
         final FontMetrics fm = g2d.getFontMetrics();
         final Rectangle2D d  = fm.getStringBounds(text, g2d);
@@ -338,8 +346,32 @@ public class InGameMenuBar extends FreeColMenuBar {
         
         final int rightSidePaddingInPx = 10;
         final int centerHeight = getHeight() - getInsets().bottom;
-        g2d.drawString(text,
-                getWidth() - rightSidePaddingInPx - textWidth - getInsets().right,
-                (centerHeight - textHeight) / 2 + fm.getAscent());
+        final int x = getWidth() - rightSidePaddingInPx - textWidth - getInsets().right;
+        final int y = (centerHeight - textHeight) / 2 + fm.getAscent();
+        
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        final Shape textShape = new TextLayout(text, font, g2d.getFontRenderContext()).getOutline(null);
+        final float strokeScaling = FontLibrary.getFontScaling() / 2;
+        final Stroke oldStroke = g2d.getStroke();        
+        g2d.translate(x, y);
+        
+        g2d.setStroke(new BasicStroke(strokeScaling * 4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(Color.BLACK);
+        g2d.draw(textShape);
+        
+        g2d.setStroke(new BasicStroke(strokeScaling * 2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(new Color(162, 136, 105));
+        g2d.draw(textShape);
+        
+        g2d.setStroke(new BasicStroke(strokeScaling * 1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(new Color(64, 31, 6));
+        g2d.draw(textShape);
+
+        g2d.setStroke(oldStroke);
+        g2d.setColor(new Color(222, 194, 161));
+        g2d.fill(textShape);
+        
+        g2d.translate(-x, -y);
     }
 }
