@@ -19,6 +19,9 @@
 
 package net.sf.freecol.client.gui.plaf;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -65,12 +68,18 @@ public class FreeColMenuUI extends BasicMenuUI {
 
         if (topLevelMenuItem) {
             final Insets insets = c.getInsets();
-            ImageUtils.fillTexture(((Graphics2D) g),
+            final Graphics2D g2d = (Graphics2D) g;
+            
+            final Composite oldComposite = g2d.getComposite();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+            
+            ImageUtils.fillTexture(g2d,
                     ImageLibrary.getMenuBackground(),
                     insets.left,
                     insets.top,
                     c.getWidth() - insets.right - insets.left,
                     c.getHeight() - insets.top - insets.bottom);
+            g2d.setComposite(oldComposite);
         }
         
         super.paint(g, c);
