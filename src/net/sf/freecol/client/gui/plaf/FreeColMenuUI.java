@@ -27,8 +27,10 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
 import javax.swing.JComponent;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.plaf.ComponentUI;
@@ -83,6 +85,18 @@ public class FreeColMenuUI extends BasicMenuUI {
         }
         
         super.paint(g, c);
+    }
+    
+    @Override
+    protected void paintBackground(Graphics g, JMenuItem menuItem, Color bgColor) {
+        if (!topLevelMenuItem) {
+            super.paintBackground(g, menuItem, bgColor);
+            return;
+        }
+        
+        final ButtonModel model = menuItem.getModel();
+        final Color bgColorModified = (model.isSelected()) ? new Color(255, 255, 255, 128) : bgColor;
+        super.paintBackground(g, menuItem, bgColorModified);
     }
     
     private AncestorListener createAncestorListener() {
