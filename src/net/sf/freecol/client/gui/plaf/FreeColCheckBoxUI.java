@@ -28,9 +28,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonModel;
 import javax.swing.Icon;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
@@ -81,7 +81,7 @@ public class FreeColCheckBoxUI extends MetalCheckBoxUI {
             final Graphics2D g2d = (Graphics2D) g;
             final int mainFontSize = FontLibrary.getMainFont().getSize();
             
-            final ButtonModel model = ((JCheckBox) c).getModel();
+            final ButtonModel model = ((AbstractButton) c).getModel();
             final int widgetSize = getWidgetSize();
 
             ImageUtils.fillTexture(((Graphics2D) g),
