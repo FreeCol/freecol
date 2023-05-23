@@ -191,15 +191,15 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         this.buttonGroup.add(single);
         single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
         single.addActionListener(ae -> enableComponents());
-        this.buttonGroup.add(join);
-        join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
-        join.addActionListener(ae -> enableComponents());
         this.buttonGroup.add(start);
         start.setActionCommand(String.valueOf(NewPanelAction.START));
         start.addActionListener(ae -> enableComponents());
         this.buttonGroup.add(meta);
         meta.setActionCommand(String.valueOf(NewPanelAction.META_SERVER));
         meta.addActionListener(ae -> enableComponents());
+        this.buttonGroup.add(join);
+        join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
+        join.addActionListener(ae -> enableComponents());
         single.setSelected(true);
 
         String name = getClientOptions().getText(ClientOptions.NAME);
