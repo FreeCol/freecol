@@ -2501,9 +2501,9 @@ public class GUI extends FreeColClientHolder {
      * Run out of ColonyPanel, so the tile is already displayed.
      *
      * @param colony The {@code Colony} to display.
-     * @return The response returned by the dialog.
+     * @param dialogHandler A {@code DialogHandler} for the dialog response.
      */
-    public boolean showWarehouseDialog(Colony colony) { return false; }
+    public void showWarehouseDialog(Colony colony, DialogHandler<Boolean> dialogHandler) {  }
 
     /**
      * Show the production of a unit.

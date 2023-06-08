@@ -209,9 +209,11 @@ public final class ColonyPanel extends PortPanel
     };
 
     private final ActionListener warehouseCmd = ae -> {
-        if (getGUI().showWarehouseDialog(getColony())) {
-            updateWarehousePanel();
-        }
+        getGUI().showWarehouseDialog(getColony(), updated -> {
+            if (updated) {
+                updateWarehousePanel();
+            }
+        });
     };
 
     private final ActionListener buildQueueCmd = ae -> {

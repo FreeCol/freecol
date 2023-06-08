@@ -2615,8 +2615,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean showWarehouseDialog(Colony colony) {
-        return this.widgets.showWarehouseDialog(colony);
+    public void showWarehouseDialog(Colony colony, DialogHandler<Boolean> handler) {
+        this.widgets.showWarehouseDialog(colony, handler);
     }
 
     /**

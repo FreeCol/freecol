@@ -1098,10 +1098,9 @@ public final class Widgets {
      * @param colony The {@code Colony} to display.
      * @return The response returned by the dialog.
      */
-    public boolean showWarehouseDialog(Colony colony) {
-        WarehouseDialog dialog
-            = new WarehouseDialog(this.freeColClient, getFrame(), colony);
-        return this.canvas.showFreeColDialog(dialog, null);
+    public void showWarehouseDialog(Colony colony, DialogHandler<Boolean> handler) {
+        final WarehouseDialog dialog = new WarehouseDialog(this.freeColClient, colony, handler);
+        this.canvas.showFreeColPanel(dialog, PopupPosition.CENTERED, true);
     }
 
     /**
