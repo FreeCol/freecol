@@ -390,6 +390,10 @@ public class SwingGUI extends GUI {
     private void setDragPoint(int x, int y) {
         this.dragPoint = new Point(x, y);
     }
+    
+    private void clearDrag() {
+        this.dragPoint = null;
+    }
 
     /**
      * Is mouse movement differnce above the drag threshold?
@@ -1215,6 +1219,16 @@ public class SwingGUI extends GUI {
             stopGoto();
             repaint();
         }
+        
+        final Tile tile = tileAt(x, y);
+        final Unit dragUnit = this.mapViewer.getMapViewerState().findUnitInFront(tile);
+        if (dragUnit == null || !getMyPlayer().owns(dragUnit)) {
+            clearDrag();
+            return;
+        }
+        
+        this.mapViewer.getMapViewerState().setActiveUnit(dragUnit);
+        
         setDragPoint(x, y);
         this.canvas.requestFocus();
     }
