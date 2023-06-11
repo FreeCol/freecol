@@ -76,7 +76,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      * @param building The building to display information from.
      */
     public BuildingPanel(FreeColClient freeColClient, Building building) {
-        super(new MigLayout("", "[32][32][32]", "[32][44]"));
+        super(new MigLayout("", "[16!][16!][16!]", "[16!][22!]"));
 
         this.freeColClient = freeColClient;
         this.building = building;

@@ -1705,8 +1705,7 @@ public final class ColonyPanel extends PortPanel
          * Creates this BuildingsPanel.
          */
         public BuildingsPanel() {
-            super("BuildingsPanelUI",
-                  new MigLayout("fill, wrap 4, insets 0, gap 0:10:10:push"));
+            super("BuildingsPanelUI", new MigLayout("fill, wrap 4, insets 0, gap 0:10:10:push 0:10:10:push"));
         }
 
 
