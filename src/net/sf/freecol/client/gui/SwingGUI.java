@@ -1532,7 +1532,11 @@ public class SwingGUI extends GUI {
                 setFocus(tile);
             }
         } else { // Otherwise select the tile in terrain mode on multiclick
-            if (count > 1) changeView(tile);
+            if (count > 1) {
+                changeView(tile);
+            } else {
+                setFocus(tile);
+            }
         }
     }    
 
