@@ -310,9 +310,8 @@ public final class Canvas extends JDesktopPane {
     }
     
     private Dimension capSizeToMaximum(JInternalFrame f, Dimension maxSize) {
-        final int FRAME_EMPTY_SPACE = 60;
-        final int width = Math.max(f.getMinimumSize().width, Math.min(f.getWidth(), maxSize.width - FRAME_EMPTY_SPACE));
-        final int height = Math.max(f.getMinimumSize().height, Math.min(f.getHeight(), maxSize.height - FRAME_EMPTY_SPACE));
+        final int width = Math.max(f.getMinimumSize().width, Math.min(f.getWidth(), maxSize.width));
+        final int height = Math.max(f.getMinimumSize().height, Math.min(f.getHeight(), maxSize.height));
         return new Dimension(width, height);
     }
 
