@@ -71,11 +71,14 @@ public class FreeColButtonUI extends MetalButtonUI {
             }
         };
         c.addPropertyChangeListener(pcl);
-        
+        updateStyle(c, getButtonStyle(c));
+    }
+    
+    private ButtonStyle getButtonStyle(JComponent c) {
         if (c instanceof FreeColButton) {
-            updateStyle(c, ((FreeColButton) c).getButtonStyle());
+            return ((FreeColButton) c).getButtonStyle();
         } else {
-            updateStyle(c, (ButtonStyle) c.getClientProperty(FreeColButton.BUTTON_STYLE_PROPERTY_NAME));
+            return (ButtonStyle) c.getClientProperty(FreeColButton.BUTTON_STYLE_PROPERTY_NAME);
         }
     }
     
