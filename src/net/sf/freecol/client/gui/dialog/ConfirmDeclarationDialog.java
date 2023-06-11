@@ -279,68 +279,73 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         this.label = new JLabel();
         this.label.setIcon(new ImageIcon(this.flag.getImage()));
+        this.label.setHorizontalAlignment(JLabel.CENTER);
+        this.label.setVerticalAlignment(JLabel.CENTER);
 
         // Create the main panel
-        JPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[][fill]",
                                                   "[fill]"));
-        panel.add(Utility.localizedTextArea(sure), "span");
-        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterCountry"), "span");
-        panel.add(this.countryField, "span");
-        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterNation"), "span");
-        panel.add(this.nationField, "span");
-        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.createFlag"), "span");
+        panel.add(Utility.localizedTextArea(sure));
+        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterCountry"));
+        panel.add(this.countryField);
+        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterNation"));
+        panel.add(this.nationField);
+        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.createFlag"));
 
-        panel.add(this.label, "skip, width 200, height 100");
+        panel.add(this.label, "skip, width 100%, height 100%");
 
-        addComboBox(panel, this.background, "flag.background.",
+        JPanel flagPanel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
+                "[fill]"));
+        addComboBox(flagPanel, this.background, "flag.background.",
                     this.flag.getBackground());
-        addComboBox(panel, this.decoration, "flag.decoration.",
+        addComboBox(flagPanel, this.decoration, "flag.decoration.",
                     this.flag.getDecoration());
-        addComboBox(panel, this.unionPosition, "flag.unionPosition.",
+        addComboBox(flagPanel, this.unionPosition, "flag.unionPosition.",
                     this.flag.getUnionPosition());
-        addComboBox(panel, this.unionShape, "flag.unionShape.",
+        addComboBox(flagPanel, this.unionShape, "flag.unionShape.",
                     this.flag.getUnionShape());
 
         this.stars.setSelectedIndex(this.flag.getStars() - 1);
         this.stars.addItemListener(this);
-        panel.add(Utility.localizedLabel("flag.stars.label"));
-        panel.add(this.stars);
+        flagPanel.add(Utility.localizedLabel("flag.stars.label"));
+        flagPanel.add(this.stars);
 
         this.stripes.setSelectedIndex(this.flag.getStripes() - 1);
         this.stripes.addItemListener(this);
-        panel.add(Utility.localizedLabel("flag.stripes.label"));
-        panel.add(this.stripes);
+        flagPanel.add(Utility.localizedLabel("flag.stripes.label"));
+        flagPanel.add(this.stripes);
 
         this.unionColor.setColor(this.flag.getUnionColor());
         this.unionColor.addActionListener(this);
-        panel.add(Utility.localizedLabel("flag.unionColor.label"));
-        panel.add(this.unionColor, "sg colorButton");
+        flagPanel.add(Utility.localizedLabel("flag.unionColor.label"));
+        flagPanel.add(this.unionColor, "sg colorButton");
 
         this.decorationColor.setColor(this.flag.getDecorationColor());
         this.decorationColor.addActionListener(this);
-        panel.add(Utility.localizedLabel("flag.decorationColor.label"));
-        panel.add(this.decorationColor);
+        flagPanel.add(Utility.localizedLabel("flag.decorationColor.label"));
+        flagPanel.add(this.decorationColor);
 
         this.starColor.setColor(this.flag.getStarColor());
         this.starColor.addActionListener(this);
-        panel.add(Utility.localizedLabel("flag.starColor.label"));
-        panel.add(this.starColor);
+        flagPanel.add(Utility.localizedLabel("flag.starColor.label"));
+        flagPanel.add(this.starColor);
 
         List<Color> flagColors = this.flag.getBackgroundColors();
         int colors = flagColors.size();
-        panel.add(Utility.localizedLabel("flag.backgroundColors.label"));
+        flagPanel.add(Utility.localizedLabel("flag.backgroundColors.label"));
         for (int index = 0; index < this.backgroundColors.length; index++) {
             ColorButton button = this.backgroundColors[index];
             if (index < colors) button.setColor(flagColors.get(index));
             button.addActionListener(this);
             if (index == 0) {
-                panel.add(button, "split 3, sg colorButton");
+                flagPanel.add(button, "split 3, sg colorButton");
             } else if (index % 3 == 0) {
-                panel.add(button, "skip, split 3, sg colorButton");
+                flagPanel.add(button, "skip, split 3, sg colorButton");
             } else {
-                panel.add(button, "sg colorButton");
+                flagPanel.add(button, "sg colorButton");
             }
         }
+        panel.add(flagPanel, "cell 1 0, spany");
 
         // Use the coat of arms image icon.  Is there something better?
         ImageIcon icon = new ImageIcon(getImageLibrary().getSmallNationImage(player.getNation()));
