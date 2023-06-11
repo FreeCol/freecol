@@ -116,7 +116,7 @@ public final class ColopediaPanel extends FreeColPanel
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sl, detail);
 
         add(splitPane, "grow");
-        add(okButton, "newline 20, span, tag ok");
+        add(okButton, "newline, span, tag ok");
         
         setEscapeAction(new AbstractAction() {
             @Override
