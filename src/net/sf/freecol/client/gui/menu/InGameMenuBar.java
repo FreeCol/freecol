@@ -349,29 +349,6 @@ public class InGameMenuBar extends FreeColMenuBar {
         final int x = getWidth() - rightSidePaddingInPx - textWidth - getInsets().right;
         final int y = (centerHeight - textHeight) / 2 + fm.getAscent();
         
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        final Shape textShape = new TextLayout(text, font, g2d.getFontRenderContext()).getOutline(null);
-        final float strokeScaling = FontLibrary.getFontScaling() / 2;
-        final Stroke oldStroke = g2d.getStroke();        
-        g2d.translate(x, y);
-        
-        g2d.setStroke(new BasicStroke(strokeScaling * 4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.setColor(Color.BLACK);
-        g2d.draw(textShape);
-        
-        g2d.setStroke(new BasicStroke(strokeScaling * 2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.setColor(new Color(162, 136, 105));
-        g2d.draw(textShape);
-        
-        g2d.setStroke(new BasicStroke(strokeScaling * 1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.setColor(new Color(64, 31, 6));
-        g2d.draw(textShape);
-
-        g2d.setStroke(oldStroke);
-        g2d.setColor(new Color(222, 194, 161));
-        g2d.fill(textShape);
-        
-        g2d.translate(-x, -y);
+        Utility.drawGoldenText(text, g2d, font, x, y);
     }
 }

@@ -19,12 +19,18 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.font.TextLayout;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -769,4 +775,30 @@ public final class Utility {
         comp.setToolTipText(Messages.message(template));
     }
 
+    public static void drawGoldenText(final String text, Graphics2D g2d, final Font font, final int x, final int y) {
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        final Shape textShape = new TextLayout(text, font, g2d.getFontRenderContext()).getOutline(null);
+        final float strokeScaling = FontLibrary.getFontScaling() / 2;
+        final Stroke oldStroke = g2d.getStroke();        
+        g2d.translate(x, y);
+        
+        g2d.setStroke(new BasicStroke(strokeScaling * 4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(Color.BLACK);
+        g2d.draw(textShape);
+        
+        g2d.setStroke(new BasicStroke(strokeScaling * 2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(new Color(162, 136, 105));
+        g2d.draw(textShape);
+        
+        g2d.setStroke(new BasicStroke(strokeScaling * 1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(new Color(64, 31, 6));
+        g2d.draw(textShape);
+
+        g2d.setStroke(oldStroke);
+        g2d.setColor(new Color(222, 194, 161));
+        g2d.fill(textShape);
+        
+        g2d.translate(-x, -y);
+    }
 }
