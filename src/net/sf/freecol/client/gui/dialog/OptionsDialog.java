@@ -141,12 +141,12 @@ public abstract class OptionsDialog extends FreeColPanel {
      * @param ui The {@code OptionGroupUI} to encapsulate.
      */
     private void preparePanel(String headerKey, OptionGroupUI ui) {
-        this.optionPanel = new MigPanel(new MigLayout("fill, insets 0, gap 0 0"));
+        this.optionPanel = new MigPanel(new MigLayout("fill, insets 0"));
         this.optionPanel.setOpaque(false);
-        this.optionPanel.add(ui, "grow");
+        this.optionPanel.add(ui, "grow, gap 0 0, pad 0");
         this.optionPanel.setSize(this.optionPanel.getPreferredSize());
 
-        this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
+        this.panel = new MigPanel(new MigLayout("wrap 1, fill, insets 0"));
         this.panel.add(Utility.localizedHeader(Messages.nameKey(headerKey),
                                                Utility.FONTSPEC_TITLE),
                        "span, center");
@@ -159,15 +159,10 @@ public abstract class OptionsDialog extends FreeColPanel {
      * @param c Extra choices to add beyond the default ok and cancel.
      */
     protected void initialize(JFrame frame, List<JButton> extraButtons) {
-        this.panel.add(this.optionPanel, "width 100%, height 100%, gap 0 0");
+        this.panel.add(this.optionPanel, "width 100%, height 100%, gap 0 0, pad 0");
 
-        add(panel, "grow");
-        
-        final int numberOfButtons = 1 + extraButtons.size() + (isEditable() ? 1 : 0);
-        add(okButton, "newline, span, split " + numberOfButtons + ", tag ok"); // gapbefore push
-        for (JButton button : extraButtons) {
-            add(button);
-        }
+        add(panel, "grow, gap 0 0, pad 0");
+        add(okButton, "newline, split, tag ok");
         
         if (isEditable()) {
             final JButton cancelButton = Utility.localizedButton("cancel");
@@ -180,6 +175,10 @@ public abstract class OptionsDialog extends FreeColPanel {
                         OptionsDialog.this.cancelOptionsDialog();
                     }
                 });
+        }
+        
+        for (JButton button : extraButtons) {
+            add(button, "tag left");
         }
         
         final float scaleFactor = getImageLibrary().getScaleFactor();

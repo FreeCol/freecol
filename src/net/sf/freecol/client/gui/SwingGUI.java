@@ -52,6 +52,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
+import net.miginfocom.layout.PlatformDefaults;
+import net.miginfocom.layout.UnitValue;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -216,7 +218,29 @@ public class SwingGUI extends GUI {
         this.widgets = null;
         this.dragPoint = null;
         
+        configureMigLayout(scaleFactor);
+        
         logger.info("GUI constructed using scale factor " + scaleFactor);
+    }
+
+
+    private void configureMigLayout(final float scaleFactor) {
+        /*
+         * We should avoid having platform dependent layout and behavior
+         * since this introduces platform specific bugs. Using the defaults
+         * in GNOME as the basis regardless of platform.
+         */
+        PlatformDefaults.setPlatform(PlatformDefaults.GNOME);
+        
+        /*
+         * This scales the numbers without units using the current
+         * interface scaleFactor. We can use "px" as a unit when we want to
+         * provide a size regardless of the current scaling factor.
+         */
+        PlatformDefaults.setHorizontalScaleFactor(scaleFactor);
+        PlatformDefaults.setVerticalScaleFactor(scaleFactor);
+        
+        PlatformDefaults.setMinimumButtonWidth(new UnitValue(48, UnitValue.LPX, null));
     }
 
 
@@ -1777,6 +1801,8 @@ public class SwingGUI extends GUI {
         if (this.tileViewer != null) {
             this.tileViewer.updateScaledVariables();
         }
+        
+        configureMigLayout(scaleFactor);
         
         FreeColImageBorder.setScaleFactor(scaleFactor);
         

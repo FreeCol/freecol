@@ -87,7 +87,7 @@ public class InformationPanel extends FreeColPanel {
         final float scaleFactor = fixedImageLibrary.getScaleFactor();
         final int topInset = fixedImageLibrary.getInformationPanelSkinTopInset(freeColClient.getMyPlayer());
         final int scaledTopInset = (int) (topInset * scaleFactor);
-        final int gap = (int) (10 * scaleFactor);
+        final int gap = 10;
         
         getMigLayout().setLayoutConstraints("fill, wrap 1, insets 0 0 0 0");
         getMigLayout().setColumnConstraints(gap + "[grow]" + gap);

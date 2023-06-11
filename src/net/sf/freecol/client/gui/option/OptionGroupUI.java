@@ -111,7 +111,7 @@ public final class OptionGroupUI extends MigPanel
      * @param editable Is the group editable.
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
-        super("ReportPanelUI", new MigLayout("fill"));
+        super("ReportPanelUI", new MigLayout("fill, insets 0"));
 
         this.gui = gui;
         this.group = group;

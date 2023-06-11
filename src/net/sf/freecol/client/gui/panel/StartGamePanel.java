@@ -133,7 +133,7 @@ public final class StartGamePanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public StartGamePanel(FreeColClient freeColClient) {
-        super(freeColClient, null, new MigLayout("fill", "", "[grow][][][]"));
+        super(freeColClient, null, new MigLayout("fill", "", "[grow][][]"));
     }
 
 
@@ -198,7 +198,7 @@ public final class StartGamePanel extends FreeColPanel {
         }
         add(mapGeneratorOptions, "newline, split 2, growx, top, sg");
         add(gameOptions, "growx, top, sg");
-        add(readyBox, "newline, span, split 3");
+        add(readyBox, "newline, span, split 3, tag left, gaptop unrelated");
         add(start, "tag ok");
         add(cancel, "tag cancel");
 
