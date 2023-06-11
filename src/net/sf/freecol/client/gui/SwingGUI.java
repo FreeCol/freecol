@@ -1479,7 +1479,7 @@ public class SwingGUI extends GUI {
         Unit other = null;
 
         if (!tile.isExplored()) { // Select unexplored tiles
-            changeView(tile);
+            setFocus(tile);
         } else if (tile.hasSettlement()) { // Pop up settlements if any
             Settlement settlement = tile.getSettlement();
             if (settlement instanceof Colony) {
@@ -1492,7 +1492,6 @@ public class SwingGUI extends GUI {
             } else if (settlement instanceof IndianSettlement) {
                 showIndianSettlementPanel((IndianSettlement)settlement);
             }
-            changeView(tile);
         } else if ((other = this.mapViewer.getMapViewerState().findUnitInFront(tile)) != null) {
             if (getMyPlayer().owns(other)) {
                 // If there is one of the player units present, select it,
@@ -1516,7 +1515,7 @@ public class SwingGUI extends GUI {
                 }
                 changeView(other, false);
             } else { // Select the tile under the unit if it is not ours
-                changeView(tile);
+                setFocus(tile);
             }
         } else { // Otherwise select the tile in terrain mode on multiclick
             if (count > 1) changeView(tile);
