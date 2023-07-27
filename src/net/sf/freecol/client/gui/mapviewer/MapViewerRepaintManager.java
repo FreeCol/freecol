@@ -84,9 +84,7 @@ public class MapViewerRepaintManager {
         
         updateDirtyRegionWithDirtyTiles(mapViewerBounds);
         
-        if (!oldFocus.equals(focus)) {
-            reuseNonDirtyAreasIfPossible(mapViewerBounds, oldFocus, oldFocusPoint);
-        }
+        reuseNonDirtyAreasIfPossible(mapViewerBounds, oldFocus, oldFocusPoint);
         
         return false;
     }
