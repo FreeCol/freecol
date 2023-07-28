@@ -1483,6 +1483,20 @@ public class GUI extends FreeColClientHolder {
      * @return True if scrolling can continue.
      */
     public boolean scrollMap(Direction direction) { return false; }
+    
+    /**
+     * Sets the scroll speed back to the initial value. This is needed
+     * when the scrolling stops, since the scrolling accelerates.
+     */
+    public void resetScrollSpeed() { }
+    
+    /**
+     * Paint the whole canvas now.
+     * 
+     * This should only be called for very special cases, like animations.
+     * Normally, use {@link #repaint()} instead.
+     */
+    public void paintImmediately() {}
 
 
     // Tile image manipulation

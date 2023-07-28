@@ -626,6 +626,7 @@ public class SwingGUI extends GUI {
     /**
      * Paint the whole canvas now.
      */
+    @Override
     public void paintImmediately() {
         this.canvas.paintImmediately(this.canvas.getBounds());
     }
@@ -1246,7 +1247,15 @@ public class SwingGUI extends GUI {
             final List<Direction> directions = toNonDiagonalDirections(direction);
             scrolled |= this.mapViewer.getMapViewerBounds().scrollMap(directions.get(0));
             if (scrolled) {
-                this.mapViewer.paintImmediatelyToBuffersOnly();
+                if (!this.mapViewer.getMapViewerRepaintManager().isAllDirty()
+                        && getClientOptions().isTerrainAnimationsEnabled()) {
+                    this.mapViewer.paintImmediatelyToBuffersOnly();
+                    /*
+                     * TODO: We can get better performance for diagonal scrolling, when terrain
+                     *       animations are disabled, by updating the back buffer in the
+                     *       above call.
+                     */
+                }
             }
             scrolled |=this.mapViewer.getMapViewerBounds().scrollMap(directions.get(1));
         } else {
@@ -1258,6 +1267,14 @@ public class SwingGUI extends GUI {
         }
         
         return scrolled;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetScrollSpeed() {
+        this.mapViewer.getMapViewerBounds().resetScrollSpeed();
     }
     
     private static List<Direction> toNonDiagonalDirections(Direction d) {

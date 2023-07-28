@@ -37,7 +37,7 @@ public class ScrollThread extends Thread {
     private static final Logger logger = Logger.getLogger(ScrollThread.class.getName());
 
     /** Delay between scroll steps. */
-    private static final int SCROLL_DELAY = 100; // ms
+    private static final int SCROLL_DELAY = 100; // ms -- for tile scrolling
 
     /** The enclosing client. */
     private final FreeColClient freeColClient;
@@ -84,42 +84,43 @@ public class ScrollThread extends Thread {
     @Override
     public void run() {
         final GUI gui = this.freeColClient.getGUI();
+        
         while (true) {
             if (isAborted()) {
-                return;
+                break;
             }
             final Direction d = this.direction;
             if (d == null) {
                 abort();
-                return;
+                break;
             }
             final long start = System.currentTimeMillis();
             try {
                 SwingUtilities.invokeAndWait(() -> {
                     if (!gui.scrollMap(d)) {
                         abort();
+                        return;
                     }
                 });
-            } catch (InterruptedException e) {
-                abort();
-                return;
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "Exception while scrolling", ex);
                 abort();
-                return;
+                break;
             }
 
             if (isAborted()) {
-                return;
+                break;
             }
 
             try {
                 final long time = System.currentTimeMillis() - start;
-                sleep(Math.max(5, SCROLL_DELAY - time));
+                sleep(Math.max(2, SCROLL_DELAY - time));
             } catch (InterruptedException e) {
                 abort();
-                return;
+                break;
             }
-        }
+        }     
+
+        gui.resetScrollSpeed();
     }
 }
