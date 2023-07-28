@@ -18,7 +18,7 @@ import net.sf.freecol.common.model.Direction;
 public final class Scrolling extends FreeColClientHolder {
 
     /** Space to auto-scroll. */
-    protected static final int AUTO_SCROLL_SPACE = 4;
+    protected static final int AUTO_SCROLL_SPACE = 100;
 
     /** Space to drag-scroll. */
     private static final int DRAG_SCROLL_SPACE = 100;
@@ -68,10 +68,12 @@ public final class Scrolling extends FreeColClientHolder {
     /**
      * Stop scrolling.
      */
-    private void stopScrollIfScrollIsActive() {
+    public void stopScrollIfScrollIsActive() {
         if (scrollThread != null) {
             synchronized (scrollThreadLock) {
-                scrollThread.abort();
+                if (scrollThread != null) {
+                    scrollThread.abort();
+                }
                 scrollThread = null;
             }
         }

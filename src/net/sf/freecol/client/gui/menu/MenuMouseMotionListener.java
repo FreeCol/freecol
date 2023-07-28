@@ -64,6 +64,10 @@ public class MenuMouseMotionListener implements MouseMotionListener {
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        scrolling.performAutoScrollIfActive(e);
+        if (e.getY() <= 2) {
+            scrolling.performAutoScrollIfActive(e);
+        } else {
+            scrolling.stopScrollIfScrollIsActive();
+        }
     }
 }
