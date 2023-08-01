@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -1250,6 +1251,16 @@ public class GUI extends FreeColClientHolder {
     public Tile getFocus() {
         return null;
     }
+    
+    /**
+     * Gets the current focus of the visible map given in pixels.
+     * 
+     * @return The current focus map point that is between {@code 0}
+     *   and <code>map.getWidth() * tileBounds.getWidth()</code>.
+     */
+    public Point getFocusMapPoint() {
+        return null;
+    }
 
     /**
      * Set the current focus tile.
@@ -1261,7 +1272,16 @@ public class GUI extends FreeColClientHolder {
      * @param tile The new focus {@code Tile}.
      */
     public void setFocus(Tile tile) {}
-
+    
+    /**
+     * The current focus of the visible map given in pixels.
+     * 
+     * The maximum width of the map in pixels is:
+     * <code>map.getWidth() * tileBounds.getWidth()</code>.
+     * 
+     * @param pointToFocus The new focus point.
+     */
+    public void setFocusMapPoint(Point pointToFocus) {}
 
     // Path handling
 
@@ -1480,9 +1500,11 @@ public class GUI extends FreeColClientHolder {
      * Scroll the map in a given direction.
      *
      * @param direction The {@code Direction} to scroll.
+     * @param performRepaints If {@code true}, then repaints are performed
+     *      after scrolling.
      * @return True if scrolling can continue.
      */
-    public boolean scrollMap(Direction direction) { return false; }
+    public boolean scrollMap(Direction direction, boolean performRepaints) { return false; }
     
     /**
      * Sets the scroll speed back to the initial value. This is needed
@@ -1497,7 +1519,6 @@ public class GUI extends FreeColClientHolder {
      * Normally, use {@link #repaint()} instead.
      */
     public void paintImmediately() {}
-
 
     // Tile image manipulation
 

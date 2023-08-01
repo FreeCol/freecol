@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.control;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -104,7 +105,7 @@ public final class MapEditorController extends FreeColClientHolder {
         BufferedImage image = new BufferedImage(
             width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g1 = image.createGraphics();
-        miniMap.paintMap(g1);
+        miniMap.paintEntireMinimap(g1, new Dimension(width, height));
         g1.dispose();
 
         int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);

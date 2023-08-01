@@ -263,6 +263,9 @@ public final class Canvas extends JDesktopPane {
                 freeColClient.getGUI().updateMapControls();
                 addMapControls();
             }
+            if (this.mapControls != null) {
+                this.mapControls.updateMinimap();
+            }
             updateFrameSizesAndPositions(size);
             
             revalidate();

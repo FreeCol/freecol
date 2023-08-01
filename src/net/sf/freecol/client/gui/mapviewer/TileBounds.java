@@ -28,7 +28,7 @@ import javax.swing.JLabel;
  * Bounds of the tiles to be rendered. These bounds are scaled according to the
  * zoom level of the map.
  */
-final class TileBounds {
+public final class TileBounds {
     
     /** The height offset to paint a Unit at (in pixels). */
     public static final int UNIT_OFFSET = 20,
@@ -51,19 +51,19 @@ final class TileBounds {
         this.scaleFactor = scaleFactor;
     }
     
-    int getWidth() {
+    public int getWidth() {
         return tileWidth;
     }
     
-    int getHalfWidth() {
+    public int getHalfWidth() {
         return halfWidth;
     }
     
-    int getHeight() {
+    public int getHeight() {
         return tileHeight;
     }
     
-    int getHalfHeight() {
+    public int getHalfHeight() {
         return halfHeight;
     }  
     

@@ -185,6 +185,14 @@ public abstract class MapControls extends FreeColClientHolder {
             break;
         }
     }
+    
+    /**
+     * Updates the minimap and repaints it.
+     */
+    public void updateMinimap() {
+        this.miniMap.updateCachedMinimap();
+        repaint();
+    }
 
     public void zoomIn() {
         this.miniMap.zoomIn();

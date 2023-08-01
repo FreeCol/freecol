@@ -18,7 +18,7 @@ import net.sf.freecol.common.model.Direction;
 public final class Scrolling extends FreeColClientHolder {
 
     /** Space to auto-scroll. */
-    protected static final int AUTO_SCROLL_SPACE = 100;
+    protected static final int AUTO_SCROLL_SPACE = 6;
 
     /** Space to drag-scroll. */
     private static final int DRAG_SCROLL_SPACE = 100;

@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
@@ -57,6 +58,7 @@ public class CanvasMapViewer extends JComponent {
         }
         
         paintImmediately(0, 0, getWidth(), getHeight());
+        Toolkit.getDefaultToolkit().sync();
     }
     
     @Override

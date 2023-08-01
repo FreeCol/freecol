@@ -340,13 +340,13 @@ public final class MapViewerBounds {
      * @param mapFocusPoint The new focus point.
      * @return {@code true} if the focus was updated.
      */
-    private boolean setFocusMapPoint(Point mapFocusPoint) {
+    public boolean setFocusMapPoint(Point mapFocusPoint) {
         if (this.focus == null) {
             return false;
         }
         
         final Map map = this.focus.getMap();
-        final int mapFocusPointX = inRange(tileBounds.getHalfWidth(),mapFocusPoint.x, map.getWidth() * tileBounds.getWidth());
+        final int mapFocusPointX = inRange(tileBounds.getHalfWidth(), mapFocusPoint.x, map.getWidth() * tileBounds.getWidth());
         final int mapFocusPointY = inRange(tileBounds.getHalfHeight(), mapFocusPoint.y, map.getHeight() * tileBounds.getHalfHeight() - tileBounds.getHalfHeight());
         this.mapFocusPoint = new Point(mapFocusPointX, mapFocusPointY);
         
@@ -354,8 +354,8 @@ public final class MapViewerBounds {
         final int tileY = (mapFocusPoint.y - tileBounds.getHalfHeight()) / tileBounds.getHalfHeight();
         
         this.focus = map.getTile(
-            inRange(0, tileX, map.getWidth()),
-            inRange(0, tileY, map.getHeight())
+            inRange(0, tileX, map.getWidth() - 1),
+            inRange(0, tileY, map.getHeight() - 1)
         );
 
         positionMap();
@@ -365,8 +365,11 @@ public final class MapViewerBounds {
     
     /**
      * Gets the current focus of the visible map given in pixels.
+     * 
+     * @return The current focus map point that is between {@code 0}
+     *   and <code>map.getWidth() * tileBounds.getWidth()</code>.
      */
-    public Point getMapFocusPoint() {
+    public Point getFocusMapPoint() {
         return mapFocusPoint;
     }
     
