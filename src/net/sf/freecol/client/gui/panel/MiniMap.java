@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.locks.LockSupport;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
@@ -74,7 +75,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * An image to contain the painted minimap. This is necessary in order to
      * reduce rendering time when scrolling or animating.
      */
-    private BufferedImage paintedMinimapImage = null;
+    private PrerenderedMinimap prerenderedMinimap = null;
+    
+    private volatile boolean dirty = true;
+    
+    private MinimapPainterThread minimapPainterThread = new MinimapPainterThread();
     
 
     /**
@@ -89,9 +94,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         tileSize = 4 * freeColClient.getClientOptions()
             .getInteger(ClientOptions.DEFAULT_ZOOM_LEVEL);
-
+        
         addMouseListener(this);
         addMouseMotionListener(this);
+        minimapPainterThread.start();
+        minimapPainterThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 
     /**
@@ -162,18 +169,21 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private void recreateBufferImage() {
         final Map map = getMap();
         if (map == null) {
-            this.paintedMinimapImage = null;
+            this.prerenderedMinimap = null;
             return;
         }
         
-        final Dimension size = new Dimension(tileSize * map.getWidth() + tileSize / 2,
-                tileSize * map.getHeight() / 2 + tileSize / 4);
-        this.paintedMinimapImage = Utils.getGoodGraphicsDevice()
+        final int theTileSize = tileSize;
+        final Dimension size = new Dimension(theTileSize * map.getWidth() + theTileSize / 2,
+                theTileSize * map.getHeight() / 2 + theTileSize / 4);
+        final BufferedImage nextPaintedMinimapImage = Utils.getGoodGraphicsDevice()
                 .getDefaultConfiguration()
                 .createCompatibleImage(size.width, size.height, Transparency.OPAQUE);
-        final Graphics2D g2d = paintedMinimapImage.createGraphics();
-        paintEntireMinimap(g2d, size);
+        final Graphics2D g2d = nextPaintedMinimapImage.createGraphics();
+        paintEntireMinimap(g2d, theTileSize, size);
         g2d.dispose();
+        
+        this.prerenderedMinimap = new PrerenderedMinimap(nextPaintedMinimapImage, theTileSize);
     }
 
     // Public API
@@ -182,7 +192,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * Updates the cached minimap image.
      */
     public void updateCachedMinimap() {
-        this.paintedMinimapImage = null;
+        this.dirty = true;
+        LockSupport.unpark(minimapPainterThread);
     }
     
     /**
@@ -252,25 +263,26 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             return;
         }
 
-        final BufferedImage thepaintedMinimapImage = paintedMinimapImage;
-        if (thepaintedMinimapImage == null) {
-            recreateBufferImage();
-        }
-
         final Dimension size = getSize();
-
-        final Dimension mapTileSize = getGUI().getScaledImageLibrary().scale(ImageLibrary.TILE_SIZE);
-        final int x = -focusPoint.x * tileSize / mapTileSize.width + size.width / 2;
-        final int y = -focusPoint.y * (tileSize / 2) / mapTileSize.height + size.height / 2;
-        
         g2d.setColor(ImageLibrary.getMinimapBackgroundColor());
         g2d.fillRect(0, 0, size.width, size.height);
-        g2d.drawImage(paintedMinimapImage, x, y, null);
         
-        paintMarkerForVisibleAreaOnMainMap(g2d, size, mapTileSize);
+        final PrerenderedMinimap thePrerenderedMinimap = prerenderedMinimap;
+        if (thePrerenderedMinimap == null) {
+            return;
+        }
+
+        final int theTileSize = thePrerenderedMinimap.tileSize;
+        final Dimension mapTileSize = getGUI().getScaledImageLibrary().scale(ImageLibrary.TILE_SIZE);
+        final int x = -focusPoint.x * theTileSize / mapTileSize.width + size.width / 2;
+        final int y = -focusPoint.y * (theTileSize / 2) / mapTileSize.height + size.height / 2;
+        
+        g2d.drawImage(thePrerenderedMinimap.paintedMinimapImage, x, y, null);
+        
+        paintMarkerForVisibleAreaOnMainMap(g2d, size, theTileSize, mapTileSize);
     }
 
-    private void paintMarkerForVisibleAreaOnMainMap(Graphics2D g2d, Dimension size, Dimension mapTileSize) {
+    private void paintMarkerForVisibleAreaOnMainMap(Graphics2D g2d, Dimension size, int tileSize, Dimension mapTileSize) {
         final Dimension actualMapViewDimension = getGUI().getMapViewDimension();
         if (actualMapViewDimension == null) {
             return;
@@ -293,7 +305,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      *
      * @param graphics The {@code Graphics} context within which to draw.
      */
-    public void paintEntireMinimap(Graphics graphics, Dimension size) {
+    public void paintEntireMinimap(Graphics graphics, int tileSize, Dimension size) {
         final Graphics2D g = (Graphics2D) graphics;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -346,7 +358,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 map.getHeight());
         final Tile firstTile = subMap.get(0);
         
-        paintEachTile(g, firstTile, subMap, (tileG2d, tile) -> {
+        paintEachTile(g, firstTile, tileSize, subMap, (tileG2d, tile) -> {
             if (tile.isExplored()) {
                 if (clientOptions.getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
                     g.setColor(ImageLibrary.getMinimapPoliticsColor(tile.getType()));
@@ -389,7 +401,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         });
     }
     
-    private void paintEachTile(Graphics2D g2d, Tile firstTile, List<Tile> tiles, TileRenderingCallback c) {
+    private static void paintEachTile(Graphics2D g2d, Tile firstTile, int tileSize, List<Tile> tiles, TileRenderingCallback c) {
         if (tiles.isEmpty()) {
             return;
         }
@@ -488,5 +500,33 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * @param tile The {@code Tile} to be rendered. 
          */
         void render(Graphics2D tileG2d, Tile tile);
+    }
+    
+    private static final class PrerenderedMinimap {
+        /**
+         * An image to contain the painted minimap. This is necessary in order to
+         * reduce rendering time when scrolling or animating.
+         */
+        private final BufferedImage paintedMinimapImage;
+        
+        private final int tileSize;
+
+        private PrerenderedMinimap(BufferedImage paintedMinimapImage, int tileSize) {
+            this.paintedMinimapImage = paintedMinimapImage;
+            this.tileSize = tileSize;
+        }
+    }
+    
+    private final class MinimapPainterThread extends Thread {
+        @Override
+        public void run() {
+            while (true) {
+                recreateBufferImage();
+                dirty = false;
+                while (!dirty) {
+                    LockSupport.park();
+                }
+            }
+        }
     }
 }
