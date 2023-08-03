@@ -227,7 +227,7 @@ public final class Canvas extends JDesktopPane {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         // Create key bindings for all actions
-        for (Option option : freeColClient.getActionManager().getOptions()) {
+        for (Option<?> option : freeColClient.getActionManager().getOptions()) {
             FreeColAction action = (FreeColAction)option;
             getInputMap().put(action.getAccelerator(), action.getId());
             getActionMap().put(action.getId(), action);
@@ -239,18 +239,34 @@ public final class Canvas extends JDesktopPane {
         revalidate();
         repaint();
         
-        /*
-         * TODO: Stop using hardcoded 125ms for animation. Instead, we should
-         *       define timing for every terrain animation.
-         */
         animationTimer = new Timer(125, (event) -> {
             paintJustTheMapImmediately();
         });
+        updateRepaintTimer(false);
         this.animationTimer.start();
         
         logger.info("Canvas created with bounds: " + windowBounds);
     }
 
+    
+    /**
+     * Updates the timing for repaints.
+     * 
+     * @param fastRendering If {@code true}, the repaints should happen as often
+     *      as possible. This is used for smooth scrolling.
+     */
+    public void updateRepaintTimer(boolean fastRendering) {
+        /*
+         * TODO: Stop using hardcoded 125ms for animation. Instead, we should
+         *       define timing for every terrain animation.
+         */
+        if (fastRendering) {
+            animationTimer.setDelay(4);
+        } else {
+            animationTimer.setDelay(125);
+        }
+    }
+    
     // Internals
     
     private void updateSize() {

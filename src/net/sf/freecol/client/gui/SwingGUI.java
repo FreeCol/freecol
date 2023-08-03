@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -66,6 +67,7 @@ import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.mapviewer.GUIMessage;
+import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewerState;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
@@ -633,6 +635,25 @@ public class SwingGUI extends GUI {
     public void paintImmediately() {
         this.canvas.paintImmediately(this.canvas.getBounds());
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MapAsyncPainter useMapAsyncPainter() {
+        canvas.updateRepaintTimer(true);
+        return mapViewer.useMapAsyncPainter();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stopMapAsyncPainter() {
+        canvas.updateRepaintTimer(false);
+        mapViewer.stopMapAsyncPainter();
+    }
+
 
     /**
      * Schedule a tile to be repainted.
@@ -1275,28 +1296,31 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean scrollMap(Direction direction, boolean performRepaints) {
+        if (!performRepaints
+                || this.mapViewer.getMapViewerRepaintManager().isAllDirty()
+                || !getClientOptions().isTerrainAnimationsEnabled()) {
+            return this.mapViewer.getMapViewerBounds().scrollMap(direction);
+        }
+        
+        /*
+         * TODO: We can get better performance for diagonal scrolling, when terrain
+         *       animations are disabled, by updating the back buffer and removing the
+         *       terrain animation check above.
+         */
+        
         boolean scrolled = false;
         if (Direction.longSides.contains(direction)) {
             final List<Direction> directions = toNonDiagonalDirections(direction);
             scrolled |= this.mapViewer.getMapViewerBounds().scrollMap(directions.get(0));
             if (scrolled) {
-                if (performRepaints
-                        && !this.mapViewer.getMapViewerRepaintManager().isAllDirty()
-                        && getClientOptions().isTerrainAnimationsEnabled()) {
-                    this.mapViewer.paintImmediatelyToBuffersOnly();
-                    /*
-                     * TODO: We can get better performance for diagonal scrolling, when terrain
-                     *       animations are disabled, by updating the back buffer in the
-                     *       above call.
-                     */
-                }
+                this.mapViewer.paintImmediatelyToBuffersOnly();
             }
-            scrolled |=this.mapViewer.getMapViewerBounds().scrollMap(directions.get(1));
+            scrolled |= this.mapViewer.getMapViewerBounds().scrollMap(directions.get(1));
         } else {
             scrolled |= this.mapViewer.getMapViewerBounds().scrollMap(direction);
         }
         
-        if (scrolled && performRepaints) {
+        if (scrolled) {
             paintImmediately();
         }
         

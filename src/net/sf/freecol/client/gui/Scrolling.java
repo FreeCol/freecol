@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
 import net.sf.freecol.common.model.Direction;
 
 /**
@@ -77,6 +78,7 @@ public final class Scrolling extends FreeColClientHolder {
                 scrollThread = null;
             }
         }
+        getGUI().stopMapAsyncPainter();
     }
 
     /**
@@ -88,8 +90,16 @@ public final class Scrolling extends FreeColClientHolder {
     private void scroll(MouseEvent e, int scrollSpace) {
         final Point panePoint = SwingUtilities.convertPoint((Component) e.getSource(), e.getPoint(), getRootComponent());
         final Direction direction = getScrollDirection(panePoint.x, panePoint.y, scrollSpace);
+        
         if (direction == null) {
             stopScrollIfScrollIsActive();
+            return;
+        }
+        
+        if (isAsyncPainterEnabled()) {
+            final MapAsyncPainter mapAsyncPainter = getGUI().useMapAsyncPainter();
+            mapAsyncPainter.setScrollDirection(direction);
+            return;
         }
         
         synchronized (scrollThreadLock) {
@@ -103,6 +113,10 @@ public final class Scrolling extends FreeColClientHolder {
             scrollThread.setDirection(direction);
             scrollThread.start();
         }
+    }
+    
+    private boolean isAsyncPainterEnabled() {
+        return true;
     }
     
     /**

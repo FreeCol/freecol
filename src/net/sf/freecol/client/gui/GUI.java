@@ -43,6 +43,8 @@ import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
+import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
+import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewerRepaintManager;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
@@ -1519,6 +1521,27 @@ public class GUI extends FreeColClientHolder {
      * Normally, use {@link #repaint()} instead.
      */
     public void paintImmediately() {}
+    
+    /**
+     * Enables asynchronous painting. That is, the painting of the
+     * {@link MapViewer} is performed in a thread other than the EDT
+     * (normal GUI thread).
+     * 
+     * This allows better performance and lower latency, but will sometimes
+     * produce visual artifacts when the game state changes during painting.
+     *    
+     * @see #stopMapAsyncPainter()
+     */
+    public MapAsyncPainter useMapAsyncPainter() {
+        return null;
+    }
+    
+    /**
+     * Stops asynchronous painting.
+     * 
+     * @see #useMapAsyncPainter()
+     */
+    public void stopMapAsyncPainter() {}
 
     // Tile image manipulation
 

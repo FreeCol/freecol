@@ -49,11 +49,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
@@ -143,6 +146,12 @@ public final class MapViewer extends FreeColClientHolder {
     
     private List<Rectangle> fullyRepaintedAreas = new ArrayList<>();
     
+    /**
+     * An asynchronous painter. If enabled (not null), then the {@code asyncPainter} will be
+     * used when painting this {@code MapViewer}.
+     */
+    private MapAsyncPainter asyncPainter = null;
+    
 
     /**
      * The constructor to use.
@@ -217,6 +226,34 @@ public final class MapViewer extends FreeColClientHolder {
     public Tile convertToMapTile(int x, int y) {
         return mapViewerBounds.convertToMapTile(getMap(), x, y);
     }
+
+    /**
+     * This method should only be called using {@link GUI#useMapAsyncPainter()}.
+     */
+    public MapAsyncPainter useMapAsyncPainter() {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        if (asyncPainter != null && !asyncPainter.isStopped()) {
+            return asyncPainter;
+        }
+        
+        asyncPainter = new MapAsyncPainter(this);
+        
+        return asyncPainter;
+    }
+    
+    /**
+     * This method should only be called using {@link GUI#stopMapAsyncPainter()}.
+     */
+    public void stopMapAsyncPainter() {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        final MapAsyncPainter theAsyncPainter = asyncPainter;
+        if (theAsyncPainter != null) {
+            theAsyncPainter.stop();
+        }
+        asyncPainter = null;
+    }
     
     /**
      * Displays the Map.
@@ -228,65 +265,143 @@ public final class MapViewer extends FreeColClientHolder {
     @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
                         justification="lazy load of extra tiles")
     public boolean displayMap(Graphics2D g2d, Dimension size) {
-        final long startMs = now();
-        final Rectangle clipBounds = g2d.getClipBounds();
-        if (mapViewerBounds.getFocus() == null) {
-            paintBlackBackground(g2d, clipBounds);
+        final MapAsyncPainter thePainter = asyncPainter;
+        if (thePainter != null) {
+            final BufferedImage backBufferImage = thePainter.getBackBufferImage();
+            if (backBufferImage == null) {
+                rpm.markAsDirty();
+                return paintMap(g2d, size, mapViewerBounds, true);
+            }
+            
+            g2d.setColor(Color.BLACK);
+            g2d.drawImage(backBufferImage, 0, 0, null);
+            
+            mapViewerState.getChatDisplay().display(g2d, mapViewerBounds.getSize());
+            
             return false;
         }
 
         if (rpm.isRepaintsBlocked(size)) {
             final VolatileImage backBufferImage = rpm.getBackBufferImage();
+            g2d.setColor(Color.black);
+            g2d.fillRect(0, 0, size.width, size.height);
             g2d.drawImage(backBufferImage, 0, 0, null);
+            
+            mapViewerState.getChatDisplay().display(g2d, mapViewerBounds.getSize());
+            
             return false;
         }
 
-        boolean fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(mapViewerBounds, mapViewerBounds.getFocus());
-        final Rectangle dirtyClipBounds = rpm.getDirtyClipBounds();
-        if (rpm.isAllDirty()) {
+        return paintMap(g2d, size, mapViewerBounds, true);
+    }
+    
+    /**
+     * Displays the Map.
+     *
+     * @param g2d The {@code Graphics2D} object on which to draw the Map.
+     * @param size The size of the map.
+     * @param mapViewerBounds The bounds to be used when drawing the map. This can be
+     *      a different object than {@link #getMapViewerBounds()} when painting to
+     *      buffers etc.
+     * 
+     * @return {@code true} if the entire map has been repainted.
+     */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
+                        justification="lazy load of extra tiles")
+    public boolean paintMap(Graphics2D g2d, Dimension size, MapViewerBounds mapViewerBounds) {
+        return paintMap(g2d, size, mapViewerBounds, false);
+    }
+    
+    private boolean paintMap(Graphics2D g2d, Dimension size, MapViewerBounds mapViewerBounds, boolean useBuffers) {
+        final long startMs = now();
+        
+        final Rectangle clipBounds = (useBuffers) ? g2d.getClipBounds() : new Rectangle(0, 0, size.width, size.height);
+        if (mapViewerBounds.getFocus() == null) {
+            if (g2d != null) {
+                paintBlackBackground(g2d, clipBounds);
+            }
+            return false;
+        }
+        final Rectangle dirtyClipBounds;
+        boolean fullMapRenderedWithoutUsingBackBuffer;
+        if (useBuffers) {
+            fullMapRenderedWithoutUsingBackBuffer = rpm.prepareBuffers(mapViewerBounds, mapViewerBounds.getFocus());
+            dirtyClipBounds = rpm.getDirtyClipBounds();
+            if (rpm.isAllDirty()) {
+                fullMapRenderedWithoutUsingBackBuffer = true;
+            }
+        } else {
+            dirtyClipBounds = clipBounds;
             fullMapRenderedWithoutUsingBackBuffer = true;
         }
         
-        final VolatileImage backBufferImage = rpm.getBackBufferImage();
-        final BufferedImage nonAnimationBufferImage = rpm.getNonAnimationBufferImage();
+        final VolatileImage backBufferImage;
+        final BufferedImage nonAnimationBufferImage;
+        final Graphics2D backBufferG2d;
+        final Graphics2D nonAnimationG2d;
+        if (useBuffers) {
+            backBufferImage = rpm.getBackBufferImage();
+            nonAnimationBufferImage = rpm.getNonAnimationBufferImage();
+            backBufferG2d = backBufferImage.createGraphics();
+            nonAnimationG2d = nonAnimationBufferImage.createGraphics();
+        } else {
+            backBufferImage = null;
+            nonAnimationBufferImage = null;
+            backBufferG2d = g2d;
+            nonAnimationG2d = g2d;
+        }
         
-        final Graphics2D backBufferG2d = backBufferImage.createGraphics();
         final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
 
         final Map map = getMap();
 
-        final Rectangle allRenderingClipBounds;
+        Rectangle allRenderingClipBounds;
         if (dirtyClipBounds.isEmpty()) {
             allRenderingClipBounds = clipBounds;
         } else {
             allRenderingClipBounds = clipBounds.union(dirtyClipBounds);
         }
+        
+        if (!getClientOptions().isTerrainAnimationsEnabled()) {
+            allRenderingClipBounds = dirtyClipBounds;
+        }
+        
         paintBlackBackground(backBufferG2d, allRenderingClipBounds);
         
         // Display the animated base tiles:
-        final TileClippingBounds animatedBaseTileTcb = new TileClippingBounds(map, allRenderingClipBounds);
+        final TileClippingBounds animatedBaseTileTcb = new TileClippingBounds(mapViewerBounds, map, allRenderingClipBounds);
         final long initMs = now();
-        backBufferG2d.setClip(allRenderingClipBounds);
+        if (useBuffers) {
+            backBufferG2d.setClip(allRenderingClipBounds);
+        }
         backBufferG2d.translate(animatedBaseTileTcb.clipLeftX, animatedBaseTileTcb.clipTopY);
         paintEachTile(backBufferG2d, animatedBaseTileTcb, (tileG2d, tile) -> this.tv.displayAnimatedBaseTiles(tileG2d, tile, false));
+        if (!useBuffers) {
+            backBufferG2d.translate(-animatedBaseTileTcb.clipLeftX, -animatedBaseTileTcb.clipTopY);
+        }
                
         // Display everything else:
         final long animatedBaseMs = now();
         if (!dirtyClipBounds.isEmpty()) {
-            displayToNonAnimationBufferImage(dirtyClipBounds, nonAnimationBufferImage, map);
+            displayToNonAnimationBufferImage(mapViewerBounds, dirtyClipBounds, nonAnimationG2d, map, useBuffers);
+            if (useBuffers) {
+                nonAnimationG2d.dispose();
+            }
         }
         
-        final long nonAnimatedMs = now();   
-        backBufferG2d.setTransform(backBufferOriginTransform);
-        backBufferG2d.setClip(allRenderingClipBounds);
-        backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
-        backBufferG2d.dispose();        
-
-        g2d.drawImage(backBufferImage, 0, 0, null);      
+        final long nonAnimatedMs = now();
+        if (useBuffers) {
+            backBufferG2d.setTransform(backBufferOriginTransform);
+            backBufferG2d.setClip(allRenderingClipBounds);
+            backBufferG2d.drawImage(nonAnimationBufferImage, 0, 0, null);
+            backBufferG2d.dispose();
+            g2d.drawImage(backBufferImage, 0, 0, null);
+        }
+        
         final long useBuffersMs = now();
         
         // Display cursor for selected tile or active unit
-        final Tile cursorTile = getVisibleCursorTile();
+        final Tile cursorTile = getVisibleCursorTile(mapViewerBounds);
         if (cursorTile != null && mapViewerState.getCursor().isActive() && !mapViewerState.getUnitAnimator().isUnitsOutForAnimation()) {
             /*
              * The cursor is hidden when units are animated. 
@@ -300,9 +415,9 @@ public final class MapViewer extends FreeColClientHolder {
         
         // Display goto path
         if (mapViewerState.getUnitPath() != null) {
-            displayPath(g2d, mapViewerState.getUnitPath());
+            displayPath(g2d, mapViewerState.getUnitPath(), mapViewerBounds);
         } else if (mapViewerState.getGotoPath() != null) {
-            displayPath(g2d, mapViewerState.getGotoPath());
+            displayPath(g2d, mapViewerState.getGotoPath(), mapViewerBounds);
         }
         final long gotoPathMs = now();
 
@@ -340,7 +455,9 @@ public final class MapViewer extends FreeColClientHolder {
             fullyRepaintedAreas.clear();
         }
         
-        verifyAndMarkAsClean(size, clipBounds);
+        if (useBuffers) {
+            verifyAndMarkAsClean(size, clipBounds);
+        }
         
         /*
          * Remove the check for "fullMapRenderedWithoutUsingBackBuffer" to get every repaint
@@ -391,24 +508,24 @@ public final class MapViewer extends FreeColClientHolder {
         
         final BufferedImage nonAnimationBufferImage = rpm.getNonAnimationBufferImage();
         final Map map = getMap();
-        displayToNonAnimationBufferImage(dirtyClipBounds, nonAnimationBufferImage, map);
+        final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
+        displayToNonAnimationBufferImage(mapViewerBounds, dirtyClipBounds, nonAnimationG2d, map, true);
+        nonAnimationG2d.dispose();
         if (FreeColDebugger.debugRendering()) {
             fullyRepaintedAreas.add(dirtyClipBounds);
         }
         rpm.markAsClean();
     }
 
-    private void displayToNonAnimationBufferImage(final Rectangle dirtyClipBounds, final BufferedImage nonAnimationBufferImage,
-            final Map map) {
-        final TileClippingBounds tcb = new TileClippingBounds(map, dirtyClipBounds);
-        final Graphics2D nonAnimationG2d = nonAnimationBufferImage.createGraphics();
-        displayNonAnimationImages(nonAnimationG2d, dirtyClipBounds, tcb);
-        nonAnimationG2d.dispose();
+    private void displayToNonAnimationBufferImage(MapViewerBounds mapViewerBounds, Rectangle dirtyClipBounds, Graphics2D nonAnimationG2d, Map map, boolean useBuffers) {
+        final TileClippingBounds tcb = new TileClippingBounds(mapViewerBounds, map, dirtyClipBounds);
+        displayNonAnimationImages(nonAnimationG2d, dirtyClipBounds, tcb, useBuffers);
     }
 
     private void displayNonAnimationImages(Graphics2D nonAnimationG2d,
             Rectangle clipBounds,
-            TileClippingBounds tcb) {
+            TileClippingBounds tcb,
+            boolean useBuffers) {
         
         long t0 = now();
         final Player player = getMyPlayer(); // Check, can be null in map editor
@@ -418,10 +535,12 @@ public final class MapViewer extends FreeColClientHolder {
         to be drawn in north to prevent missing parts on partial redraws,
         as they can reach below their tiles, see BR#2580 */
         
-        nonAnimationG2d.setComposite(AlphaComposite.Clear);
-        nonAnimationG2d.fill(clipBounds);
-        nonAnimationG2d.setComposite(AlphaComposite.SrcOver);
-        nonAnimationG2d.setClip(clipBounds);
+        if (useBuffers) {
+            nonAnimationG2d.setComposite(AlphaComposite.Clear);
+            nonAnimationG2d.fill(clipBounds);
+            nonAnimationG2d.setComposite(AlphaComposite.SrcOver);
+            nonAnimationG2d.setClip(clipBounds);
+        }
         nonAnimationG2d.translate(tcb.clipLeftX, tcb.clipTopY);
         
         long t1 = now();
@@ -578,6 +697,10 @@ public final class MapViewer extends FreeColClientHolder {
         
         long t15 = now();
         
+        if (!useBuffers) {
+            nonAnimationG2d.translate(-tcb.clipLeftX, -tcb.clipTopY);
+        }
+        
         if (logger.isLoggable(Level.FINEST)) {
             final long gap = now() - t0;
             final Map.Position bottomRight = tcb.getBottomRightDirtyTile();
@@ -669,7 +792,7 @@ public final class MapViewer extends FreeColClientHolder {
             }
             g2d.setTransform(baseTransform);
         }
-    }    
+    }
     
     private void paintBlackBackground(Graphics2D g2d, final Rectangle rectangle) {
         g2d.setColor(Color.black);
@@ -947,15 +1070,14 @@ public final class MapViewer extends FreeColClientHolder {
         g2d.dispose();
         return bi;
     }
-
-
+    
     /**
      * Display a path.
      *
      * @param g2d The {@code Graphics2D} to display on.
      * @param path The {@code PathNode} to display.
      */
-    private void displayPath(Graphics2D g2d, PathNode path) {
+    private void displayPath(Graphics2D g2d, PathNode path, MapViewerBounds mapViewerBounds) {
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1231,7 +1353,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @return The {@code Tile} found or null.
      */
-    private Tile getVisibleCursorTile() {
+    private Tile getVisibleCursorTile(MapViewerBounds mapViewerBounds) {
         Tile ret = mapViewerState.getCursorTile();
         return (mapViewerBounds.isTileVisible(ret)) ? ret : null;
     }
@@ -1283,8 +1405,7 @@ public final class MapViewer extends FreeColClientHolder {
     public MapViewerRepaintManager getMapViewerRepaintManager() {
         return rpm;
     }
-    
-    
+
     /**
      * Paints a single tile using the provided callback.
      * 
@@ -1374,7 +1495,6 @@ public final class MapViewer extends FreeColClientHolder {
         g2d.translate(-xt0, -yt0);
     }
     
-    
     /**
      * Calculates the tile clipping bounds from a Graphics' clipBounds.
      * 
@@ -1388,8 +1508,7 @@ public final class MapViewer extends FreeColClientHolder {
      * {@link #getExtendedTiles() extendedTiles} and
      * {@link #getSuperExtendedTiles() superExtendedTiles}.
      */
-    private final class TileClippingBounds {
-        
+    private static final class TileClippingBounds {
         private final Map.Position topLeftDirtyTile;
         private final Map.Position bottomRightDirtyTile;
         private final int clipLeftX;
@@ -1400,8 +1519,8 @@ public final class MapViewer extends FreeColClientHolder {
         private final List<Tile> extendedTiles;
         private final List<Tile> superExtendedTiles;
         
-        private TileClippingBounds(Map map, Rectangle clipBounds) {
-            // Determine which tiles need to be redrawn          
+        private TileClippingBounds(MapViewerBounds mapViewerBounds, Map map, Rectangle clipBounds) {
+            final TileBounds tileBounds = mapViewerBounds.getTileBounds();
             final int firstRowTiles = (clipBounds.y - mapViewerBounds.getTopLeftVisibleTilePoint().y) / tileBounds.getHalfHeight() - 1;
             this.clipTopY = mapViewerBounds.getTopLeftVisibleTilePoint().y + firstRowTiles * tileBounds.getHalfHeight();
             final int firstRow = mapViewerBounds.getTopLeftVisibleTile().getY() + firstRowTiles;
@@ -1412,13 +1531,12 @@ public final class MapViewer extends FreeColClientHolder {
             
             final int lastRowTiles = (clipBounds.y + clipBounds.height - mapViewerBounds.getTopLeftVisibleTilePoint().y) / tileBounds.getHalfHeight();
             final int lastRow = mapViewerBounds.getTopLeftVisibleTile().getY() + lastRowTiles;
-            
             final int lastColumnTiles = (clipBounds.x + clipBounds.width - mapViewerBounds.getTopLeftVisibleTilePoint().x) / tileBounds.getWidth();
             final int lastColumn = mapViewerBounds.getTopLeftVisibleTile().getX() + lastColumnTiles;
-            
+
             this.topLeftDirtyTile = new Map.Position(firstColumn, firstRow);
             this.bottomRightDirtyTile = new Map.Position(lastColumn, lastRow);
-            
+          
             final int subMapWidth = bottomRightDirtyTile.getX() - topLeftDirtyTile.getX() + 1;
             final int subMapHeight = bottomRightDirtyTile.getY() - topLeftDirtyTile.getY() + 1;
             
