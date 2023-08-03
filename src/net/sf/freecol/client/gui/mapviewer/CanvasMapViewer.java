@@ -58,7 +58,7 @@ public class CanvasMapViewer extends JComponent {
         }
         
         paintImmediately(0, 0, getWidth(), getHeight());
-        Toolkit.getDefaultToolkit().sync();
+        //Toolkit.getDefaultToolkit().sync();
     }
     
     @Override
