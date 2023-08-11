@@ -710,10 +710,7 @@ public final class TileViewer extends FreeColClientHolder {
                                  BufferedImage overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
-        BufferedImage image = new BufferedImage(this.tileWidth,
-            this.tileHeight+this.halfHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g1 = (Graphics2D)image.getGraphics();
-        g1.translate(0, this.halfHeight);
+        
         // layer additions and improvements according to zIndex
         List<TileItem> tileItems = new ArrayList<>(tile.getCompleteItems());
         Collections.sort(tileItems, (a, b) -> {
@@ -722,7 +719,7 @@ public final class TileViewer extends FreeColClientHolder {
         int startIndex = 0;
         for (int index = startIndex; index < tileItems.size(); index++) {
             if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {
-                displayTileItem(g1, tile, tileItems.get(index));
+                displayTileItem(g2d, tile, rop, tileItems.get(index));
                 startIndex = index + 1;
             } else {
                 startIndex = index;
@@ -731,12 +728,12 @@ public final class TileViewer extends FreeColClientHolder {
         }
         // Tile Overlays (eg. hills and mountains)
         if (overlayImage != null) {
-            g1.drawImage(overlayImage,
-                0, (this.tileHeight - overlayImage.getHeight()), null);
+            g2d.drawImage(overlayImage, rop,
+                0, (this.tileHeight - overlayImage.getHeight()));
         }
         for (int index = startIndex; index < tileItems.size(); index++) {
             if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
-                displayTileItem(g1, tile, tileItems.get(index));
+                displayTileItem(g2d, tile, rop, tileItems.get(index));
                 startIndex = index + 1;
             } else {
                 startIndex = index;
@@ -747,17 +744,15 @@ public final class TileViewer extends FreeColClientHolder {
         if (tile.isForested()) {
             BufferedImage forestImage = this.lib.getScaledForestImage(tile.getType(),
                 tile.getRiverStyle());
-            g1.drawImage(forestImage, 0, (this.tileHeight - forestImage.getHeight()), null);
+            g2d.drawImage(forestImage, rop, 0, (this.tileHeight - forestImage.getHeight()));
         } else if (getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) >= ClientOptions.GRAPHICS_QUALITY_HIGH) {
-            drawForestCornerImages(tile, g1);
+            drawForestCornerImages(tile, g2d);
         }
         
         // draw all remaining items
         for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
-            displayTileItem(g1, tile, ti);
+            displayTileItem(g2d, tile, rop, ti);
         }
-        g1.dispose();
-        g2d.drawImage(image, rop, 0, -this.halfHeight);
     }
 
 
@@ -794,14 +789,15 @@ public final class TileViewer extends FreeColClientHolder {
      *
      * @param g2d The {@code Graphics} to draw to.
      * @param tile The {@code Tile} to draw from.
+     * @param rop An optional RescaleOp for fog of war.
      * @param item The {@code TileItem} to draw.
      */
-    private void displayTileItem(Graphics2D g2d, Tile tile, TileItem item) {
+    private void displayTileItem(Graphics2D g2d, Tile tile, RescaleOp rop, TileItem item) {
         if (item instanceof TileImprovement) {
             TileImprovement ti = (TileImprovement)item;
             if (!ti.isComplete()) return;
             if (ti.isRoad()) {
-                this.rp.displayRoad(g2d, tile);
+                this.rp.displayRoad(g2d, tile, rop);
             } else if (ti.isRiver()) {
                 if (getClientOptions().isRiverAnimationEnabled()) {
                     // Painted elsewhere.
@@ -809,19 +805,20 @@ public final class TileViewer extends FreeColClientHolder {
                 }
                 final BufferedImage img = this.lib.getAnimatedScaledRiverTerrainImage(tile, 0);
                 if (img != null) {
-                    g2d.drawImage(img, 0, 0, null);
+                    g2d.drawImage(img, rop, 0, 0);
                 }
             } else {
-                BufferedImage img
-                    = this.lib.getTileImprovementImage(ti.getType().getId());
-                if (img != null) g2d.drawImage(img, 0, 0, null);
+                BufferedImage img = this.lib.getTileImprovementImage(ti.getType().getId());
+                if (img != null) g2d.drawImage(img, rop, 0, 0);
             }
         } else if (item instanceof LostCityRumour) {
             displayCenteredImage(g2d,
-                this.lib.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
+                this.lib.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR),
+                rop);
         } else if (item instanceof Resource) {
             displayCenteredImage(g2d,
-                this.lib.getScaledResourceImage((Resource)item));
+                this.lib.getScaledResourceImage((Resource)item),
+                rop);
         }
     }
 }
