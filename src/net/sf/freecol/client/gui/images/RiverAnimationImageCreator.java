@@ -79,7 +79,7 @@ public final class RiverAnimationImageCreator {
         if (minorToMajorTransitions.isEmpty()) {
             return baseMaskImage;
         }
-        final BufferedImage resultImage = new BufferedImage(baseMaskImage.getWidth(), baseMaskImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage resultImage = ImageUtils.createBufferedImage(baseMaskImage.getWidth(), baseMaskImage.getHeight());
         final Graphics2D g2d = resultImage.createGraphics();
         g2d.drawImage(baseMaskImage, 0, 0, null);
         for (Direction d : minorToMajorTransitions) {
@@ -164,7 +164,7 @@ public final class RiverAnimationImageCreator {
         final BufferedImage maskedInputImage = ImageUtils.imageWithAlphaFromMask(waterImage, riverMaskImage);
         
         
-        final BufferedImage riverAndPebblesImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage riverAndPebblesImage = ImageUtils.createBufferedImage(width, height);
         final Graphics2D g2d = riverAndPebblesImage.createGraphics();
         g2d.drawImage(pebblesImage, 0, 0, null); // TODO: Perhaps without pebbles for minor river?
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f));
@@ -180,7 +180,7 @@ public final class RiverAnimationImageCreator {
     private static BufferedImage toLargerMaskWithLessTransparency(BufferedImage riverMaskImage, int origWidth, int origHeight) {
         final int largerWidth = (int) (origWidth * 1.25f);
         final int largerHeight = (int) (origHeight * 1.25f);
-        final BufferedImage expandedRiverMaskImage = new BufferedImage(largerWidth, largerHeight, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage expandedRiverMaskImage = ImageUtils.createBufferedImage(largerWidth, largerHeight);
         final Graphics2D expandedRiverMaskImageG2d = expandedRiverMaskImage.createGraphics();
         expandedRiverMaskImageG2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         expandedRiverMaskImageG2d.drawImage(riverMaskImage, 0, 0, largerWidth, largerHeight, null);

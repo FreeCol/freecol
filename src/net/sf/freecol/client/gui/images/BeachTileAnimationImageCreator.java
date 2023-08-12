@@ -103,7 +103,7 @@ public final class BeachTileAnimationImageCreator {
             alpha = extraOcean * 10 - extraOcean * (oceanImageVariationNumber - 10);
         }
         
-        final BufferedImage resultImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage resultImage = ImageUtils.createBufferedImage(width, height);
         final Graphics2D g2d = resultImage.createGraphics();
         g2d.drawImage(beachImage, 0, 0, null);
         g2d.drawImage(maskedInputImage, 0, 0, null);

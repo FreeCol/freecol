@@ -76,6 +76,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.ImageUtils;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.military.DefensiveMap;
@@ -351,6 +352,10 @@ public final class MapViewer extends FreeColClientHolder {
             nonAnimationG2d = g2d;
         }
         
+        applyRenderingHints(g2d);
+        applyRenderingHints(backBufferG2d);
+        applyRenderingHints(nonAnimationG2d);
+        
         final AffineTransform backBufferOriginTransform = backBufferG2d.getTransform();
 
         final Map map = getMap();
@@ -483,6 +488,21 @@ public final class MapViewer extends FreeColClientHolder {
                 
         return fullMapRenderedWithoutUsingBackBuffer;
     }
+
+    private void applyRenderingHints(Graphics2D g2d) {
+        if (getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) == ClientOptions.GRAPHICS_QUALITY_LOWEST) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+            g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+            g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE);
+            g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+            g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        }
+    }
+
 
     /**
      * Paints the dirty tiles to the buffers. The screen will
@@ -922,7 +942,7 @@ public final class MapViewer extends FreeColClientHolder {
         path.closePath();
 
         // draw everything
-        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = ImageUtils.createBufferedImage(extent, extent);
         Graphics2D g2d = bi.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
                              RenderingHints.VALUE_RENDER_QUALITY);
@@ -992,8 +1012,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         int radius = Math.min(hPadding, vPadding);
 
-        BufferedImage bi = new BufferedImage(width, height,
-                                             BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = ImageUtils.createBufferedImage(width, height);
         Graphics2D g2 = bi.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,
                             RenderingHints.VALUE_RENDER_QUALITY);
@@ -1052,7 +1071,7 @@ public final class MapViewer extends FreeColClientHolder {
         cross.lineTo(offset + bar + 1, padding + bar + inset);
 
         // draw everything
-        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = ImageUtils.createBufferedImage(extent, extent);
         Graphics2D g2d = bi.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -1537,6 +1556,14 @@ public final class MapViewer extends FreeColClientHolder {
             this.topLeftDirtyTile = new Map.Position(firstColumn, firstRow);
             this.bottomRightDirtyTile = new Map.Position(lastColumn, lastRow);
           
+            /* For testing MapViewerBounds -- just ignore the logic above, and do:
+            this.topLeftDirtyTile = mapViewerBounds.getTopLeftVisibleTile();
+            //this.bottomRightDirtyTile = new Map.Position(mapViewerBounds.getTopLeftVisibleTile().x + 50, mapViewerBounds.getTopLeftVisibleTile().y + 50);
+            this.bottomRightDirtyTile = mapViewerBounds.getBottomRightVisibleTile();
+            this.clipLeftX = mapViewerBounds.getTopLeftVisibleTilePoint().x;
+            this.clipTopY = mapViewerBounds.getTopLeftVisibleTilePoint().y;
+            */
+            
             final int subMapWidth = bottomRightDirtyTile.getX() - topLeftDirtyTile.getX() + 1;
             final int subMapHeight = bottomRightDirtyTile.getY() - topLeftDirtyTile.getY() + 1;
             

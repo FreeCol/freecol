@@ -43,6 +43,7 @@ import javax.swing.Timer;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -246,7 +247,7 @@ public final class DeclarationPanel extends FreeColPanel {
             
             final Dimension originalSize = faFile.getDimension(name);
             final Dimension size = getImageLibrary().scale(originalSize);
-            imageBuffer = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+            imageBuffer = ImageUtils.createBufferedImage(size.width, size.height);
             setSize(size);
         }
 

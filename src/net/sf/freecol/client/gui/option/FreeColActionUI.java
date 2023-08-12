@@ -42,6 +42,7 @@ import javax.swing.Timer;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -98,7 +99,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         final int imageSize = (int) (9 * FontLibrary.getFontScaling());
         final int strokeSize = (int) (1 * FontLibrary.getFontScaling());
         final int circleSize = imageSize - strokeSize*2;
-        final BufferedImage bi = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage bi = ImageUtils.createBufferedImage(imageSize, imageSize);
         final Graphics2D g = bi.createGraphics();
         g.setColor(Color.RED);
         g.fillOval(strokeSize, strokeSize, circleSize, circleSize);
@@ -116,7 +117,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     public static ImageIcon getRemoveImage() {
         final int imageSize = (int) (9 * FontLibrary.getFontScaling());
         final int strokeSize = (int) (2 * FontLibrary.getFontScaling());
-        final BufferedImage bi = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage bi = ImageUtils.createBufferedImage(imageSize, imageSize);
         final Graphics2D g = bi.createGraphics();
         
         g.setColor(Color.BLACK);

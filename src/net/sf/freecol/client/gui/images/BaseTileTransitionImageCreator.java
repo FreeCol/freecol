@@ -156,7 +156,7 @@ public final class BaseTileTransitionImageCreator {
                  * result after applying the transitions for NE and SW.
                  */
                 
-                transitionTileImage = new BufferedImage(terrainImage.getWidth(), terrainImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                transitionTileImage = ImageUtils.createBufferedImage(terrainImage.getWidth(), terrainImage.getHeight());
                 final Graphics2D tranitionG2d = transitionTileImage.createGraphics();
                 
                 if (tile.isLand() || borderingTile.isLand()) {

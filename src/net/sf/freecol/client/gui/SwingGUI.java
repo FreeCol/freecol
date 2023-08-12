@@ -123,6 +123,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ImageCache;
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.Utils;
@@ -1905,7 +1906,15 @@ public class SwingGUI extends GUI {
         FreeColImageBorder.setScaleFactor(scaleFactor);
         
         ResourceManager.setMods(getClientOptions().getActiveMods());
-        prepareResources();
+        if (getClientOptions().getRange(ClientOptions.GRAPHICS_QUALITY) == ClientOptions.GRAPHICS_QUALITY_LOWEST) {
+            ImageResource.forceLowestQuality(true);
+            reloadResources();
+        } else if (ImageResource.isForceLowestQuality()) {
+            ImageResource.forceLowestQuality(false);
+            reloadResources();
+        } else {
+            prepareResources();
+        }
         
         final int fontSize = determineMainFontSizeUsingClientOptions(dpi);
         FontLibrary.setMainFontSize(fontSize);

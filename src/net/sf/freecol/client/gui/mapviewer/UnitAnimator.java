@@ -12,6 +12,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.ImageUtils;
 
 /**
  * Handles taking units of of the map rendering in order to be animated using {@code JLabel}s.
@@ -117,8 +118,7 @@ public class UnitAnimator {
         final int width = Math.max(unitImg.getWidth(), mapViewer.getTileBounds().getWidth());
         final int height = Math.max(unitImg.getHeight() + scaledUnitOffset * 2, mapViewer.getTileBounds().getHeight());
 
-        BufferedImage img = new BufferedImage(width, height,
-                                              BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = ImageUtils.createBufferedImage(width, height);
         Graphics2D g2d = img.createGraphics();
         g2d.translate((width - mapViewer.getTileBounds().getWidth()) / 2,
                 (height - mapViewer.getTileBounds().getHeight()) / 2);

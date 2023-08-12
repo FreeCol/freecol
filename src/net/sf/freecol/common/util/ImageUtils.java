@@ -25,6 +25,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.BufferedImage;
@@ -33,7 +35,11 @@ import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
+import java.awt.Transparency;
+
 import javax.swing.JComponent;
+
+import net.sf.freecol.common.resources.ImageResource;
 
 
 /**
@@ -50,14 +56,30 @@ public class ImageUtils {
      * @return The new {@code BufferedImage}.
      */
     public static BufferedImage createBufferedImage(Image image) {
-        if (image == null) return null;
-        BufferedImage result
-            = new BufferedImage(image.getWidth(null), image.getHeight(null),
-                                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = result.createGraphics();
+        if (image == null) {
+            return null;
+        }
+        final BufferedImage result = createBufferedImage(image.getWidth(null), image.getHeight(null));
+        final Graphics2D g2d = result.createGraphics();
         g2d.drawImage(image, 0, 0, null);
         g2d.dispose();
         return result;
+    }
+    
+    /**
+     * Creates a buffered image with the given size.
+     * 
+     * @param width The desired width.
+     * @param height The desired height.
+     * @return The new {@code BufferedImage}.
+     */
+    public static BufferedImage createBufferedImage(int width, int height) {
+        final GraphicsConfiguration dc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        if (ImageResource.isForceLowestQuality()) {
+            return dc.createCompatibleImage(width, height, Transparency.BITMASK);
+        } else {
+            return dc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+        }
     }
 
     /**
@@ -67,15 +89,16 @@ public class ImageUtils {
      * @return The new halved {@code BufferedImage}.
      */ 
     public static BufferedImage createGrayscaleImage(Image image) {
-        if (image == null) return null;
+        if (image == null) {
+            return null;
+        }
         final int width = image.getWidth(null), height = image.getHeight(null);
-        BufferedImage result = new BufferedImage(width, height,
-                                                 BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage result = createBufferedImage(width, height);
         Graphics2D g2d = result.createGraphics();
         g2d.drawImage(image, 0, 0, null);
         g2d.dispose();
-        ColorConvertOp filter
-            = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        
+        final ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         return filter.filter(result, null);
     }
 
@@ -89,13 +112,14 @@ public class ImageUtils {
      * @return The new halved {@code BufferedImage}.
      */ 
     public static BufferedImage createHalvedImage(Image image) {
-        if (image == null) return null;
+        if (image == null) {
+            return null;
+        }
         final int width = image.getWidth(null), height = image.getHeight(null);
-        int w = (width + 1) / 2, h = (height + 1) / 2;
-        BufferedImage result = new BufferedImage(w, h,
-                                                 BufferedImage.TYPE_INT_ARGB);
+        final int w = (width + 1) / 2, h = (height + 1) / 2;
+        final BufferedImage result = createBufferedImage(w, h);
         // For halving bilinear should most correctly average 2x2 pixels.
-        Graphics2D g2d = result.createGraphics();
+        final Graphics2D g2d = result.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(image, 0, 0, w, h, null);
         g2d.dispose();
@@ -109,12 +133,13 @@ public class ImageUtils {
      * @return The new mirrored {@code BufferedImage} object.
      */ 
     public static BufferedImage createMirroredImage(Image image) {
-        if (image == null) return null;
+        if (image == null) {
+            return null;
+        }
         final int width = image.getWidth(null);
         final int height = image.getHeight(null);
-        BufferedImage result = new BufferedImage(width, height,
-                                                 BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = result.createGraphics();
+        final BufferedImage result = createBufferedImage(width, height);
+        final Graphics2D g2d = result.createGraphics();
         g2d.drawImage(image, width, 0, -width, height, null);
         g2d.dispose();
         return result;
@@ -148,9 +173,8 @@ public class ImageUtils {
      * @return The new resized {@code BufferedImage} object.
      */ 
     public static BufferedImage createResizedImage(Image image, int width, int height, boolean interpolation) {
-        BufferedImage result = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = result.createGraphics();
+        final BufferedImage result = createBufferedImage(width, height);
+        final Graphics2D g2d = result.createGraphics();
         
         if (interpolation) {
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -249,7 +273,7 @@ public class ImageUtils {
         final int x = (width - image.getWidth(null)) / 2;
         final int y = (height - image.getHeight(null)) / 2;
         
-        final BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage centeredImage = createBufferedImage(width, height);
         final Graphics2D g = centeredImage.createGraphics();
         g.drawImage(image, x, y, null);
         g.dispose();
@@ -295,8 +319,8 @@ public class ImageUtils {
     public static BufferedImage fadeImage(Image img, float fade, float target) {
         int w = img.getWidth(null);
         int h = img.getHeight(null);
-        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
+        final BufferedImage bi = createBufferedImage(w, h);;
+        final Graphics2D g = bi.createGraphics();
         g.drawImage(img, 0, 0, null);
 
         float offset = target * (1.0f - fade);
@@ -316,7 +340,7 @@ public class ImageUtils {
      * @return An image with the opacity from the mask.
      */
     public static BufferedImage imageWithAlphaFromMask(BufferedImage image, BufferedImage mask) {
-        final BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage result = createBufferedImage(image.getWidth(), image.getHeight());
         final Graphics2D g2d = result.createGraphics();
         g2d.drawImage(image, 0, 0, null);
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN, 1.0F));

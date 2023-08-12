@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
@@ -229,6 +230,10 @@ public final class FreeColClient {
 
         // Reset the mod resources as a result of the client option update.
         ResourceManager.setMods(this.clientOptions.getActiveMods());
+        
+        if (this.clientOptions.getRange(ClientOptions.GRAPHICS_QUALITY) == ClientOptions.GRAPHICS_QUALITY_LOWEST) {
+            ImageResource.forceLowestQuality(true);
+        }
         
         /*
          * All mods are loaded, so the GUI can safely be created.

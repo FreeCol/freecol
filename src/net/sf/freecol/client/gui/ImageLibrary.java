@@ -75,6 +75,7 @@ import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.StringResource;
 import net.sf.freecol.common.resources.Video;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -1501,8 +1502,7 @@ public final class ImageLibrary {
         if (forestImage != null) {
             height = Math.max(height, forestImage.getHeight());
         }
-        BufferedImage compositeImage
-            = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage compositeImage = ImageUtils.createBufferedImage(width, height);
         Graphics2D g = compositeImage.createGraphics();
         g.drawImage(terrainImage, 0, height - terrainImage.getHeight(), null);
         if (overlayImage != null) {
@@ -1777,16 +1777,14 @@ public final class ImageLibrary {
                                      double amount, Color fill,
                                      Color foreground,
                                      boolean filled) {
-        Font font = getScaledFont("simple-bold-tiny", null);
-        FontMetrics fm = g.getFontMetrics(font);
-        int padding = scaleInt(6);
-        BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
-            fm.getMaxAscent() + fm.getMaxDescent() + padding,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
+        final Font font = getScaledFont("simple-bold-tiny", null);
+        final FontMetrics fm = g.getFontMetrics(font);
+        final int padding = scaleInt(6);
+        final int width = fm.stringWidth(text) + padding;
+        final int height = fm.getMaxAscent() + fm.getMaxDescent() + padding;
+        final BufferedImage bi = ImageUtils.createBufferedImage(width, height);
+        final Graphics2D g2 = bi.createGraphics();
         g2.setFont(font);
-        int width = bi.getWidth();
-        int height = bi.getHeight();
         g2.setColor(border);
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);
@@ -1849,8 +1847,10 @@ public final class ImageLibrary {
                                             Font font, FontMetrics fm) {
         final int width = fm.stringWidth(text) + 4;
         final int height = fm.getMaxAscent() + fm.getMaxDescent();
-        BufferedImage img = new BufferedImage(width, height,
-                                              BufferedImage.TYPE_INT_ARGB);
+        if (width <= 0 || height <= 0) {
+            return ImageUtils.createBufferedImage(1, 1);
+        }
+        final BufferedImage img = ImageUtils.createBufferedImage(width, height);
         // draw the string with selected color
         Graphics2D g = img.createGraphics();
         g.setColor(makeStringBorderColor(color));

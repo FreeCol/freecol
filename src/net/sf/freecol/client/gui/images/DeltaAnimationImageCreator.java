@@ -100,7 +100,7 @@ public final class DeltaAnimationImageCreator {
         final BufferedImage maskedPebblesImage = ImageUtils.imageWithAlphaFromMask(pebblesImage, riverPebblesMaskImage);
         final BufferedImage maskedWaterImage = ImageUtils.imageWithAlphaFromMask(waterImage, riverWaterMaskImage);
         
-        final BufferedImage riverAndPebblesImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage riverAndPebblesImage = ImageUtils.createBufferedImage(width, height);
         final Graphics2D g2d = riverAndPebblesImage.createGraphics();
         g2d.drawImage(maskedPebblesImage, 0, 0, null);
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f));

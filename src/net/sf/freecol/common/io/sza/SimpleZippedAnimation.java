@@ -44,6 +44,8 @@ import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 
+import net.sf.freecol.common.util.ImageUtils;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -83,8 +85,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         private AnimationEvent createScaledVersion(float scale) {
             final int width = (int)(getWidth() * scale);
             final int height = (int)(getHeight() * scale);
-            BufferedImage scaled = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_ARGB);
+            BufferedImage scaled = ImageUtils.createBufferedImage(width, height);
             Graphics2D g = scaled.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                                RenderingHints.VALUE_INTERPOLATION_BICUBIC);

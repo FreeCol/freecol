@@ -59,6 +59,15 @@ public class ImageResource extends Resource implements Cleanable {
         = Comparator.<BufferedImage>comparingInt(bi ->
             bi.getWidth() * bi.getHeight());
 
+    /**
+     * Experimental flag for forcing lowest quality (for now using bitmask instead of
+     * full transparency ... later perhaps also fewer colors.
+     * 
+     * We should make a separate class for image configurations if we keep this
+     * longterm.
+     */
+    private static boolean forceLowestQuality = false;
+    
     private volatile BufferedImage image = null;
     private List<URI> alternativeLocators = null;
     private List<BufferedImage> loadedImages = null;
@@ -285,6 +294,7 @@ public class ImageResource extends Resource implements Cleanable {
                 return null;
             }
 
+            
             if (canUseBitmask(uri)) {
                 final BufferedImage compatibleImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
                         .createCompatibleImage(image.getWidth(), image.getHeight(), Transparency.BITMASK);
@@ -316,6 +326,14 @@ public class ImageResource extends Resource implements Cleanable {
 
     private static boolean canUseBitmask(URI uri) {
         /* TODO: Better method for determining images that can use a bitmask. */
-        return uri.toString().contains("center") && !uri.toString().contains("mask");
+        return forceLowestQuality || uri.toString().contains("center") && !uri.toString().contains("mask");
+    }
+    
+    public static final void forceLowestQuality(boolean forceLowestQuality) {
+        ImageResource.forceLowestQuality = forceLowestQuality;
+    }
+    
+    public static final boolean isForceLowestQuality() {
+        return forceLowestQuality;
     }
 }

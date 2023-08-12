@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -156,8 +157,7 @@ public final class TileViewer extends FreeColClientHolder {
             = (overlayImage != null) ? overlayImage.getHeight()
             : (tileType.isForested()) ? this.lib.getForestedTileSize().height
             : this.tileHeight;
-        BufferedImage image = new BufferedImage(this.tileWidth, compoundHeight,
-                                                BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = ImageUtils.createBufferedImage(this.tileWidth, compoundHeight);
         Graphics2D g2d = image.createGraphics();
         g2d.translate(0, compoundHeight - this.tileHeight);
         displayAnimatedBaseTiles(g2d, tile, false);
@@ -184,8 +184,7 @@ public final class TileViewer extends FreeColClientHolder {
             : (tileType.isForested())
             ? this.lib.getForestedTileSize().height
             : this.tileHeight;
-        BufferedImage image = new BufferedImage(this.tileWidth, compoundHeight,
-                                                BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = ImageUtils.createBufferedImage(this.tileWidth, compoundHeight);
         Graphics2D g2d = image.createGraphics();
         g2d.translate(0, compoundHeight - this.tileHeight);
         displayTile(g2d, tile, player, overlayImage);
@@ -215,8 +214,7 @@ public final class TileViewer extends FreeColClientHolder {
             : ((tileType.isForested())
                 ? this.lib.getForestedTileSize().height
                 : this.tileHeight);
-        BufferedImage image = new BufferedImage(this.tileWidth, compoundHeight,
-                                                BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = ImageUtils.createBufferedImage(this.tileWidth, compoundHeight);
         Graphics2D g2d = image.createGraphics();
         g2d.translate(0, compoundHeight - this.tileHeight);
         displayColonyTile(g2d, tile, colony, overlayImage);
@@ -711,7 +709,7 @@ public final class TileViewer extends FreeColClientHolder {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
         
-        // layer additions and improvements according to zIndex
+         // layer additions and improvements according to zIndex
         List<TileItem> tileItems = new ArrayList<>(tile.getCompleteItems());
         Collections.sort(tileItems, (a, b) -> {
             return Integer.valueOf(a.getZIndex()).compareTo(b.getZIndex());
