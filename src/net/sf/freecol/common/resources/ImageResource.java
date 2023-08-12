@@ -330,7 +330,8 @@ public class ImageResource extends Resource implements Cleanable {
     }
     
     public static final void forceLowestQuality(boolean forceLowestQuality) {
-        ImageResource.forceLowestQuality = forceLowestQuality;
+        // Deactive for testing:
+        //ImageResource.forceLowestQuality = forceLowestQuality;
     }
     
     public static final boolean isForceLowestQuality() {
