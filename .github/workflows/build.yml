@@ -1,8 +1,8 @@
 name: Build
 on:
   push:
-    branches:
-      - sf-auto-merge
+    branches: #sf-auto-merge
+      - yenkhai-GenerateReportYml-create
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
