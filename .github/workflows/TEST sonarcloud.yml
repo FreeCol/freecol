@@ -1,0 +1,28 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - 'sf-auto-merge'  # Replace with your main branch name
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'  # Replace with your desired Java version
+
+# 1d1f2953373cda8a4647b11c2d19f5ef57e3d922
+      - name: SonarCloud Scan
+        run: |
+          # Replace with your SonarCloud project key and organization sonar-scanner 
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
+            -Dsonar.projectKey=tnek2802 
+            -Dsonar.organization=tnek2802
