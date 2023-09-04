@@ -19,7 +19,7 @@ jobs:
         with: # test change
           java-version: '11' # Adjust the version as needed
           distribution: 'microsoft'
-          
+
       - name: Build with Ant
         run: ant # Replace 'build' with your actual Ant build target
 
@@ -31,3 +31,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
