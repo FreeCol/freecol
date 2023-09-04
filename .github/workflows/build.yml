@@ -18,7 +18,8 @@ jobs:
         uses: actions/setup-java@v2
         with: # test change
           java-version: '11' # Adjust the version as needed
-
+          distribution: 'microsoft'
+          
       - name: Build with Ant
         run: ant # Replace 'build' with your actual Ant build target
 
