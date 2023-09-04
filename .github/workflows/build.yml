@@ -3,7 +3,7 @@ name: Build and SonarCloud
 on:
   push:
     branches:
-      - yenkhai-GenerateReportYml-create
+      - sf-auto-merge
 
 jobs:
   build-and-sonarcloud:
