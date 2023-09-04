@@ -21,10 +21,10 @@ jobs:
           distribution: 'microsoft'
 
       - name: Build with Ant
-        run: ant # Replace 'build' with your actual Ant build target
+        run: ant 
 
       - name: Run Tests with Ant
-        run: ant test # Replace 'test' with your actual Ant test target
+        run: ant test 
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
