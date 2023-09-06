@@ -101,3 +101,9 @@ jobs:
         with:
           name: build-artifact-${{ steps.generate-identifier.outputs.build-id }}
           path: build-artifacts/${{ steps.generate-identifier.outputs.build-id }}
+
+       - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
