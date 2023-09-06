@@ -36,6 +36,9 @@ jobs:
       - name: Create Artifact Directory
         run: mkdir -p build-artifacts/${{ steps.generate-identifier.outputs.build-id }}
 
+      - name: Copy JAR File
+        run: cp FreeCol.jar build-artifacts/${{ steps.generate-identifier.outputs.build-id }}
+
       - name: Generate HTML report
         id: capture-details
         run: |
