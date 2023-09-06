@@ -1,0 +1,1664 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Shiin" name="net.sf.freecol.AllTests" skipped="0" tests="430" time="23.762" timestamp="2023-09-05T11:33:03">
+  <properties>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit" />
+    <property name="ant.library.dir" value="C:\Program Files\apache-ant-1.10.14\lib" />
+    <property name="env.NUMBER_OF_PROCESSORS" value="8" />
+    <property name="java.specification.version" value="11" />
+    <property name="env.USERPROFILE" value="C:\Users\tneks" />
+    <property name="freecol.doc.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/doc" />
+    <property name="ant.project.name" value="FreeCol" />
+    <property name="sun.cpu.isalist" value="amd64" />
+    <property name="sun.jnu.encoding" value="Cp1252" />
+    <property name="env.VSCODE_INJECTION" value="1" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="env.FPS_BROWSER_APP_PROFILE_STRING" value="Internet Explorer" />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="env.CommonProgramW6432" value="C:\Program Files\Common Files" />
+    <property name="miglayout-core.jar" value="jars/miglayout-core-5.0.jar" />
+    <property name="env.OS" value="Windows_NT" />
+    <property name="DSTAMP" value="20230905" />
+    <property name="env.CHROME_CRASHPAD_PIPE_NAME" value="\\.\pipe\LOCAL\crashpad_864_IHRFDSGKWAFHBXJR" />
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-11\bin" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner net.sf.freecol.AllTests skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,C:\Users\tneks\OneDrive\Desktop\freecol\build\report\xml\TEST-net.sf.freecol.AllTests.xml crashfile=C:\Users\tneks\OneDrive\Desktop\freecol\junitvmwatcher4795052834339172949.properties propsfile=C:\Users\tneks\OneDrive\Desktop\freecol\junit17004233862476405626.properties" />
+    <property name="jdk.debug" value="release" />
+    <property name="env.VSCODE_GIT_ASKPASS_MAIN" value="c:\Users\tneks\AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\git\dist\askpass-main.js" />
+    <property name="env.ComSpec" value="C:\WINDOWS\system32\cmd.exe" />
+    <property name="sun.stderr.encoding" value="cp437" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="env.ANT_CMD_LINE_ARGS" value=" testall" />
+    <property name="java.version.date" value="2023-05-09" />
+    <property name="env.JAVA_HOME" value="C:\Program Files\Java\jdk-11" />
+    <property name="java.home" value="C:\Program Files\Java\jdk-11" />
+    <property name="env.OneDriveCommercial" value="C:\Users\tneks\OneDrive - Universiti Tunku Abdul Rahman" />
+    <property name="freecol.name" value="freecol" />
+    <property name="basedir" value="C:\Users\tneks\OneDrive\Desktop\freecol" />
+    <property name="env.ProgramFiles" value="C:\Program Files" />
+    <property name="file.separator" value="\" />
+    <property name="java.vm.compressedOopsMode" value="32-bit" />
+    <property name="env.GIT_ASKPASS" value="c:\Users\tneks\AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\git\dist\askpass.sh" />
+    <property name="sun.stdout.encoding" value="cp437" />
+    <property name="line.separator" value="&#xd;&#xa;" />
+    <property name="env.PROMPT" value="$P$G" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="env._JAVACMD" value="C:\Program Files\Java\jdk-11\bin\java.exe" />
+    <property name="env.LOCALAPPDATA" value="C:\Users\tneks\AppData\Local" />
+    <property name="freecol.src.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/src" />
+    <property name="env.USERDOMAIN_ROAMINGPROFILE" value="SHIIN" />
+    <property name="env.PROCESSOR_REVISION" value="8e0c" />
+    <property name="user.script" value="" />
+    <property name="env.PSModulePath" value="C:\Users\tneks\OneDrive\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="env.PROCESSOR_IDENTIFIER" value="Intel64 Family 6 Model 142 Stepping 12, GenuineIntel" />
+    <property name="java.runtime.version" value="11.0.0.1+3-5" />
+    <property name="env.TERM_PROGRAM_VERSION" value="1.81.1" />
+    <property name="user.name" value="tneks" />
+    <property name="isOsWindows" value="true" />
+    <property name="env.DriverData" value="C:\Windows\System32\Drivers\DriverData" />
+    <property name="env.ProgramW6432" value="C:\Program Files" />
+    <property name="env.CommonProgramFiles" value="C:\Program Files\Common Files" />
+    <property name="env.ORIGINAL_XDG_CURRENT_DESKTOP" value="undefined" />
+    <property name="env.PUBLIC" value="C:\Users\Public" />
+    <property name="ant.file.FreeCol" value="C:\Users\tneks\OneDrive\Desktop\freecol\build.xml" />
+    <property name="file.encoding" value="Cp1252" />
+    <property name="java.vendor.version" value="18.9" />
+    <property name="env.COMPUTERNAME" value="SHIIN" />
+    <property name="env.HOMEPATH" value="\Users\tneks" />
+    <property name="env.APPDATA" value="C:\Users\tneks\AppData\Roaming" />
+    <property name="env.SystemDrive" value="C:" />
+    <property name="freecol.rules.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/data/rules" />
+    <property name="env.ProgramData" value="C:\ProgramData" />
+    <property name="env.IntelliJ IDEA Community Edition" value="C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2023.2\bin;" />
+    <property name="java.io.tmpdir" value="C:\Users\tneks\AppData\Local\Temp\" />
+    <property name="java.version" value="11.0.0.1" />
+    <property name="env.Path" value="C:\Program Files\Java\jdk-11;C:\Program Files\Eclipse Adoptium\jdk-17.0.8.7-hotspot\bin;C:\Program Files\Microsoft\jdk-11.0.16.101-hotspot\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files\apache-ant-1.10.14\bin;C:\Users\tneks\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\tneks\AppData\Local\Programs\Python\Python311\;C:\Users\tneks\AppData\Local\Microsoft\WindowsApps;C:\Users\tneks\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\tneks\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-17;C:\Users\tneks\AppData\Roaming\npm;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2023.2\bin;" />
+    <property name="env.HOMEDRIVE" value="C:" />
+    <property name="env.PROCESSOR_LEVEL" value="6" />
+    <property name="env.TMP" value="C:\Users\tneks\AppData\Local\Temp" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="freecol.jar.file" value="C:\Users\tneks\OneDrive\Desktop\freecol/FreeCol.jar" />
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob" />
+    <property name="ant.home" value="C:\Program Files\apache-ant-1.10.14" />
+    <property name="sun.os.patch.level" value="" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.14 compiled on August 16 2023" />
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-11\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Java\jdk-11;C:\Program Files\Eclipse Adoptium\jdk-17.0.8.7-hotspot\bin;C:\Program Files\Microsoft\jdk-11.0.16.101-hotspot\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files\apache-ant-1.10.14\bin;C:\Users\tneks\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\tneks\AppData\Local\Programs\Python\Python311\;C:\Users\tneks\AppData\Local\Microsoft\WindowsApps;C:\Users\tneks\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\tneks\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-17;C:\Users\tneks\AppData\Roaming\npm;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2023.2\bin;;." />
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="env.LOGONSERVER" value="\\SHIIN" />
+    <property name="java.specification.maintenance.version" value="2" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="env.TERM_PROGRAM" value="vscode" />
+    <property name="cli.jar" value="jars/commons-cli-1.4.jar" />
+    <property name="sun.desktop" value="windows" />
+    <property name="ant.file.type" value="file" />
+    <property name="env.LANG" value="en_US.UTF-8" />
+    <property name="miglayout-swing.jar" value="jars/miglayout-swing-5.0.jar" />
+    <property name="java.class.path" value="C:\Users\tneks\OneDrive\Desktop\freecol\build;C:\Users\tneks\OneDrive\Desktop\freecol\test\lib\junit.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\miglayout-swing-5.0.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\miglayout-core-5.0.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\commons-cli-1.4.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\cortado-0.6.0.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\jogg-0.0.17.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\jorbis-0.0.17.jar;C:\Users\tneks\OneDrive\Desktop\freecol\jars\findbugs-annotations.jar;C:\Program Files\apache-ant-1.10.14\lib\ant-launcher.jar;C:\Program Files\apache-ant-1.10.14\lib\ant.jar;C:\Program Files\apache-ant-1.10.14\lib\ant-junit.jar;C:\Program Files\apache-ant-1.10.14\lib\ant-junit4.jar" />
+    <property name="freecol.release.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/dist" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="env.PROCESSOR_ARCHITECTURE" value="AMD64" />
+    <property name="env.GRADLE_HOME" value="C:\Gradle" />
+    <property name="user.variant" value="" />
+    <property name="user.timezone" value="" />
+    <property name="env.SystemRoot" value="C:\WINDOWS" />
+    <property name="os.name" value="Windows 10" />
+    <property name="java.vm.specification.version" value="11" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="user.country" value="US" />
+    <property name="freecol.packaging.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/packaging" />
+    <property name="env.USERDOMAIN" value="SHIIN" />
+    <property name="test" value="AllTests" />
+    <property name="freecol.metaserver.jar.file" value="C:\Users\tneks\OneDrive\Desktop\freecol/FreeCol-metaserver.jar" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="user.home" value="C:\Users\tneks" />
+    <property name="user.language" value="en" />
+    <property name="env.VSCODE_GIT_IPC_HANDLE" value="\\.\pipe\vscode-git-2625b09d13-sock" />
+    <property name="env.COLORTERM" value="truecolor" />
+    <property name="freecol.build.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/build" />
+    <property name="env.ALLUSERSPROFILE" value="C:\ProgramData" />
+    <property name="ant.java.version" value="11" />
+    <property name="cortado.jar" value="jars/cortado-0.6.0.jar" />
+    <property name="env.SESSIONNAME" value="Console" />
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment" />
+    <property name="java.awt.headless" value="true" />
+    <property name="java.target.version" value="11" />
+    <property name="freecol.main.class" value="net.sf.freecol.FreeCol" />
+    <property name="freecol.overview.file" value="C:\Users\tneks\OneDrive\Desktop\freecol/src/overview.html" />
+    <property name="env.ANT_HOME" value="C:\Program Files\apache-ant-1.10.14" />
+    <property name="TSTAMP" value="1932" />
+    <property name="env.windir" value="C:\WINDOWS" />
+    <property name="env.VSCODE_GIT_ASKPASS_EXTRA_ARGS" value="--ms-enable-electron-run-as-node" />
+    <property name="env.EFC_9048" value="1" />
+    <property name="ant.file" value="C:\Users\tneks\OneDrive\Desktop\freecol\build.xml" />
+    <property name="path.separator" value=";" />
+    <property name="env.=C:" value="C:\Users\tneks\OneDrive\Desktop\freecol" />
+    <property name="os.version" value="10.0" />
+    <property name="env.CommonProgramFiles(x86)" value="C:\Program Files (x86)\Common Files" />
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment" />
+    <property name="env.PATHEXT" value=".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL" />
+    <property name="ant.project.invoked-targets" value="testall" />
+    <property name="env._USE_CLASSPATH" value="no" />
+    <property name="freecol.data.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/data" />
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM" />
+    <property name="ant.core.lib" value="C:\Program Files\apache-ant-1.10.14\lib\ant.jar" />
+    <property name="java.vendor.url.bug" value="http://bugreport.java.com/bugreport/" />
+    <property name="TODAY" value="September 5 2023" />
+    <property name="user.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol" />
+    <property name="env.USERNAME" value="tneks" />
+    <property name="os.arch" value="amd64" />
+    <property name="env.ProgramFiles(x86)" value="C:\Program Files (x86)" />
+    <property name="env.VSCODE_GIT_ASKPASS_NODE" value="C:\Users\tneks\AppData\Local\Programs\Microsoft VS Code\Code.exe" />
+    <property name="env.ANT_OPTS" value=" " />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="java.vm.version" value="11.0.0.1+3-5" />
+    <property name="env.FPS_BROWSER_USER_PROFILE_STRING" value="Default" />
+    <property name="ant.file.type.FreeCol" value="file" />
+    <property name="env.TEMP" value="C:\Users\tneks\AppData\Local\Temp" />
+    <property name="java.class.version" value="55.0" />
+    <property name="freecol.javadoc.dir" value="C:\Users\tneks\OneDrive\Desktop\freecol/doc/javadoc" />
+    <property name="env.OneDrive" value="C:\Users\tneks\OneDrive - Universiti Tunku Abdul Rahman" />
+    <property name="ant.project.default-target" value="package" />
+  </properties>
+  <testcase classname="net.sf.freecol.common.i18n.CLDRTest" name="testRuleParsing" time="0.177" />
+  <testcase classname="net.sf.freecol.common.i18n.CLDRTest" name="testPlurals" time="0.004" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testReplaceArbitraryTag" time="0.037" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testReplaceNumber" time="0.029" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testReplaceChoicesGrammar" time="0.036" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testMessageWithSpecialChars" time="0.031" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testReplaceGarbage" time="0.032" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testAbstractUnitDescription" time="0.033" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testChangeLocaleSettings" time="0.061" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testMessageString" time="0.015" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testNestedChoices" time="0.015" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testStringTemplates" time="0.494" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testReplaceChoicesPlural" time="0.016" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testUnitDescription" time="0.039" />
+  <testcase classname="net.sf.freecol.common.i18n.MessagesTest" name="testREFMessages" time="0.011" />
+  <testcase classname="net.sf.freecol.common.io.ModTest" name="testGetRuleSets" time="0.003" />
+  <testcase classname="net.sf.freecol.common.io.ModTest" name="testAllMods" time="0.023" />
+  <testcase classname="net.sf.freecol.common.option.OptionTest" name="testGameOptions" time="0.0" />
+  <testcase classname="net.sf.freecol.common.option.OptionTest" name="testUnitListOption" time="0.0" />
+  <testcase classname="net.sf.freecol.common.option.OptionTest" name="testInheritsEditable" time="0.001" />
+  <testcase classname="net.sf.freecol.common.option.OptionTest" name="testCloneIntegerOption" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testExtendsDelete" time="0.043" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testLoadMods" time="0.043" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testExtends" time="0.071" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testModifiers" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testLoad" time="0.027" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testNationTypes" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testGetDefaultUnitType" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testGoodsTypes" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testFoundingFathers" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testRequiredAbilitiesForRoles" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testNations" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.SpecificationTest" name="testUnitAbilities" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.BaseCostDeciderTest" name="testNavalUnitMoveToTileWithSettlement" time="0.035" />
+  <testcase classname="net.sf.freecol.common.model.BaseCostDeciderTest" name="testInvalidMoveThroughTileWithSettlement" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.BaseCostDeciderTest" name="testGetRemainingMovesAndNewTurn" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.BaseCostDeciderTest" name="testGetCostLandLand" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.BaseCostDeciderTest" name="testInvalidMoveOfLandUnitToAnOceanTile" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.BaseCostDeciderTest" name="testInvalidMoveOfNavalUnitToALandTile" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testStockade" time="0.028" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testCottonClothProduction" time="0.024" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testLumberProduction" time="0.268" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testPasture" time="0.012" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testCanBuildNext" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testFortRequiresMinimumPopulation" time="0.01" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testUnitProduction" time="0.024" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testCrossProduction" time="0.145" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testPrintingPressBonus" time="0.022" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testCanAddToBuilding" time="0.026" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testToolsMusketProduction" time="0.026" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testFortressRequiresMinimumPopulation" time="0.012" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testSerialize" time="0.023" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testTownhallProduction" time="0.019" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testFactoryProduction" time="0.83" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testChurch" time="0.029" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testInitialColony" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testStockadeRequiresMinimumPopulation" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testNewspaperBonus" time="0.013" />
+  <testcase classname="net.sf.freecol.common.model.BuildingTest" name="testCanAddToSchool" time="0.014" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testCopyColony" time="0.026" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testFoundColony" time="0.017" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testTeaParty" time="0.02" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testAddUnitToColony" time="0.023" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testCurrentlyBuilding" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testBuildQueueDoesNotAcceptBuildingDoubles" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testBuildQueueAcceptsUnitDoubles" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testUpkeep" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testUnderSiege" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.ColonyTest" name="testOccupationWithFood" time="0.01" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testNoHorsesOverProduction" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testBellNetProduction" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testProductionMap" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testProductionSoldier" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testConsumers" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testProductionPioneer" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testProduction" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.ColonyProductionTest" name="testGetPotentialProduction" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testCaptureConvert" time="0.219" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testGalleonAttackedByPrivateer" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testDefendColonyWithUnarmedColonist" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testRegulars" time="0.074" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testSpanishAgainstNatives" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testColonistAttackedByVeteran" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testAttackIgnoresMovementPoints" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testAttackShipWithLandUnit" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testDefendColonyWithRevere" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.CombatTest" name="testDefendSettlement" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.DisasterTest" name="testDisastersPresent" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.EuropeTest" name="testMissionary" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.FoundingFatherTest" name="testAddAllFathers" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.FoundingFatherTest" name="testAvailableTo" time="0.011" />
+  <testcase classname="net.sf.freecol.common.model.FoundingFatherTest" name="testFeatures" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.FoundingFatherTest" name="testBellsRequired" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.GameTest" name="testGame" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.GameTest" name="testTurn" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.GameTest" name="testAddPlayer" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testGetTakeSpace" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testGetInputType" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testSetGetAmount" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testGoodsGameLocationIntInt" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testToString" time="0.01" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testBuildingMaterials" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testIsFarmedGoods" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testGetName" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testGetOutputType" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testMilitaryGoods" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testTradeGoods" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testProductionChain" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testAdjustAmount" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.GoodsTest" name="testSetOwner" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.GoodsContainerTest" name="testContainer" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.IndianSettlementTest" name="testAutomaticEquipBraves" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.IndianSettlementTest" name="testSettlementDoesNotOwnWaterTiles" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.IndianSettlementTest" name="testTradeGoodsWithSetlement" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testPaine" time="0.018" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testBolivar" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testBrebeuf" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testStuyvesant" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testBrewster" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testCortes" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testDeWitt" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testJefferson" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testMinuit" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testRevere" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.IndividualFatherTest" name="testDeLasCasas" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.LimitTest" name="testSuccessionLimits" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.LimitTest" name="testWagonTrainLimit" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.LimitTest" name="testOperand" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.LimitTest" name="testIndependenceLimits" time="0.012" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testGetTiles" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testSearchForColony" time="0.045" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testCopy" time="0.017" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testCircleIterator" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testNoPathAvailableDueToUnitInTheWay" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testGetSurroundingTiles" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testMapGameInt" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testLatitude" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testRandomDirection" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testShortestPathObstructed" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testFindPath" time="0.122" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testMoveThroughTileWithEnemyUnit" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testNoPathAvailableDueToColonyInTheWay" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testNoPathAvailableDueToCampInTheWay" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.MapTest" name="testGetReverseDirection" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.MarketTest" name="testSerialization" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.MarketTest" name="testEuropeMarketPricing" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.MarketTest" name="testTransactionListeners" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.MarketTest" name="testInitialMarket" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ModelMessageTest" name="testDefaultId" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.ModelMessageTest" name="testHashCode" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.ModelMessageTest" name="testModelMapSet2" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testScope" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testCombinedModifier" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testPercentageModifier" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testHashEquals" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testAdditiveModifier" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testTimeLimits" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testCombinePercentageModifiers" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testModifierUnknown" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testCombineMultiplicativeModifiers" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testMultiplicativeModifier" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testIncrements" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ModifierTest" name="testCombineAdditiveModifiers" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.MonarchTest" name="testTaxActionChoices" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.MonarchTest" name="testSerialize" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.MovementTest" name="testMoveAlongRoad" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.MovementTest" name="testMoveAlongRiver" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.MovementTest" name="testMoveFromPlainsToHills" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.MovementTest" name="testMoveFromPlainsToPlains" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.MovementTest" name="testScoutIndianSettlement" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.MovementTest" name="testScoutColony" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.NationTypeTest" name="testSettlementType" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.NationTypeTest" name="testIsREF" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.NationTypeTest" name="testisRef" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.NationTypeTest" name="testAdvantagesThatOnlyApplyToPersons" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.NationTypeTest" name="testHasType" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.NationTypeTest" name="testStartingUnits" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.PlayerTest" name="testAddAnotherPlayersUnit" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.PlayerTest" name="testFreecolPlayers" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.PlayerTest" name="testTension" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.PlayerTest" name="testUnits" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.PlayerTest" name="testClassicPlayers" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testOtherBuildings" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testRainForest" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testHorseProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testSavannah" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testHills" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testMarsh" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testOcean" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testSwamp" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testCoatProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testLake" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testHighSeas" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testPrairie" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testWetlandForest" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testGrassland" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testBroadleafForest" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testCrossProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testGreatRiver" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testToolsProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testMixedForest" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testBorealForest" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testBellProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testClothProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testMountains" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testArctic" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testConiferForest" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testDesert" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testHammerProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testPlains" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testMusketProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testCigarProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testTundra" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testRumProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testTropicalForest" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ProductionTypeTest" name="testScrubForest" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.RandomRangeTest" name="testRandomRange" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.RoleTest" name="testRoleComparator" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.RoleTest" name="testMilitaryRoles" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.RoleTest" name="testGoodsDifference" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.RoleTest" name="testCompatibleRoles" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.RoleTest" name="testGetRoleWithAbility" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.SchoolTest" name="testEducationOption" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.SchoolTest" name="testChangeTeachers" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.SchoolTest" name="testUpgrades" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testEmptyScope" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testMethodScope" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testCombinedScope" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testTypeScope" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testAbilityScope" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testEquality" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testMatchesNull" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.ScopeTest" name="testGameObjects" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.SerializationTest" name="testSpecification" time="0.361" />
+  <testcase classname="net.sf.freecol.common.model.SerializationTest" name="testValidation" time="0.246" />
+  <testcase classname="net.sf.freecol.common.model.SerializationTest" name="testStandardMaps" time="0.996" />
+  <testcase classname="net.sf.freecol.common.model.SerializationTest" name="testStringTemplate" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.SerializationTest" name="testDifficulty" time="0.059" />
+  <testcase classname="net.sf.freecol.common.model.SerializationTest" name="testGeneratedLists" time="0.066" />
+  <testcase classname="net.sf.freecol.common.model.SettlementTest" name="testColonyClaimsWater" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.SettlementTest" name="testLineOfSight" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.SettlementTest" name="testSettlementRadius" time="0.013" />
+  <testcase classname="net.sf.freecol.common.model.SettlementTest" name="testCanImproveUnitMilitaryRole" time="0.009" />
+  <testcase classname="net.sf.freecol.common.model.SettlementTest" name="testSettlementDoesNotClaimWater" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.SettlementTest" name="testColonyRadius" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.SoLTest" name="testSoL" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.ClassicTileProductionTest" name="testTileProduction" time="5.069" />
+  <testcase classname="net.sf.freecol.common.model.TileImprovementTest" name="testRoadWithExtras" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TileImprovementTest" name="testRiverWithExtras" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TileImprovementTest" name="testRoadNoExtras" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TileImprovementTest" name="testRiverNoExtras" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TileItemContainerTest" name="testCopyFromWithEveryThing" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testTileTypeChangeProduction" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testDefenceModifiers" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testPrimarySecondaryGoods" time="0.007" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testPotential" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testCopy" time="0.01" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testImprovements" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testMinerals" time="0.004" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testMaximumPotential" time="0.014" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testIsTileTypeAllowed" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testGetWorkAmount" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testGetBestDisembarkTile" time="0.014" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testColonyImprovements" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testConiferForest" time="0.036" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testProductionModifiers" time="0.011" />
+  <testcase classname="net.sf.freecol.common.model.TileTest" name="testZIndex" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.TradeRouteTest" name="testTradeRoute" time="0.033" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testIsColonist" time="0.011" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testUnitLosesExperienceWithRoleChange" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testUnitAvailability" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testOwnerChange" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testIndianDies" time="0.005" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testGetMovesAsString" time="0.013" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testCopy" time="0.008" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testDefaultRole" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testMissionary" time="0.019" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testUnitCanBuildColony" time="0.016" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testCarrierOwnerChange" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testTreasureTransportFee" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testFailedAddGoods" time="0.002" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testAttrition" time="0.0" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testGetLineOfSight" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testCanAdd" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.UnitTest" name="testUnitLocationAfterBuildingColony" time="0.003" />
+  <testcase classname="net.sf.freecol.common.model.UnitChangeTypeTest" name="testEmptyScope" time="0.001" />
+  <testcase classname="net.sf.freecol.common.model.UnitChangeTypeTest" name="testCreation" time="0.006" />
+  <testcase classname="net.sf.freecol.common.model.UnitChangeTypeTest" name="testAbilityScope" time="0.001" />
+  <testcase classname="net.sf.freecol.common.utils.UtilsTest" name="testComparator" time="0.001" />
+  <testcase classname="net.sf.freecol.common.utils.UtilsTest" name="testGetPermutations" time="0.001" />
+  <testcase classname="net.sf.freecol.server.SaveLoadTest" name="testDelayedLoading" time="0.865" />
+  <testcase classname="net.sf.freecol.server.SaveLoadTest" name="testImmediateLoading" time="0.644" />
+  <testcase classname="net.sf.freecol.server.SaveLoadTest" name="testImport" time="0.892" />
+  <testcase classname="net.sf.freecol.server.ai.AIColonyTest" name="testBuildersAllocation" time="0.285" />
+  <testcase classname="net.sf.freecol.server.ai.AIColonyTest" name="testBestDefender" time="0.01" />
+  <testcase classname="net.sf.freecol.server.ai.AIColonyTest" name="testBuildersAllocNoRawMatTiles" time="0.275" />
+  <testcase classname="net.sf.freecol.server.ai.AIColonyTest" name="testExpertAllocColonyHasEnoughRawMat" time="0.051" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testNativeMeetsEuropean" time="0.027" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testNativeMeetsColony" time="0.015" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testShipMeetsShip" time="0.009" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testNativeMeetsNative" time="0.018" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testNativeMeetsIndianSettlement" time="0.014" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testEuropeanMeetsIndianSettlement" time="0.034" />
+  <testcase classname="net.sf.freecol.server.ai.ContactTest" name="testEuropeanMeetsNative" time="0.009" />
+  <testcase classname="net.sf.freecol.server.ai.ColonyPlanTest" name="testGetBestWorker" time="0.096" />
+  <testcase classname="net.sf.freecol.server.ai.ColonyPlanTest" name="testBestImprovements" time="0.003" />
+  <testcase classname="net.sf.freecol.server.ai.ColonyPlanTest" name="testNoBuildRawMatTiles" time="0.02" />
+  <testcase classname="net.sf.freecol.server.ai.ColonyPlanTest" name="testReqLumberAndHammersForBuild" time="0.036" />
+  <testcase classname="net.sf.freecol.server.ai.ColonyPlanTest" name="testReqOreAndToolsWithEnoughHammersForBuild" time="0.02" />
+  <testcase classname="net.sf.freecol.server.ai.MissionAssignmentTest" name="testIsTargetValidForSeekAndDestroy" time="0.028" />
+  <testcase classname="net.sf.freecol.server.ai.MissionAssignmentTest" name="testImpossibleConditionsForTargetSelection" time="0.011" />
+  <testcase classname="net.sf.freecol.server.ai.MissionAssignmentTest" name="testSecureIndianSettlementMissionIgnoreNavalThreat" time="0.018" />
+  <testcase classname="net.sf.freecol.server.ai.MissionAssignmentTest" name="testSecureIndianSettlementMission" time="0.063" />
+  <testcase classname="net.sf.freecol.server.ai.MissionAssignmentTest" name="testAssignDefendSettlementMission" time="0.018" />
+  <testcase classname="net.sf.freecol.server.ai.REFTest" name="testCreateREFPlayer" time="0.02" />
+  <testcase classname="net.sf.freecol.server.ai.REFTest" name="testAddToREF" time="0.02" />
+  <testcase classname="net.sf.freecol.server.ai.StandardAIPlayerTest" name="testEquipBravesNotEnoughReqGoods" time="0.008" />
+  <testcase classname="net.sf.freecol.server.ai.StandardAIPlayerTest" name="testEquipBraves" time="0.01" />
+  <testcase classname="net.sf.freecol.server.ai.TensionTest" name="testTension" time="0.029" />
+  <testcase classname="net.sf.freecol.server.ai.mission.PioneeringMissionTest" name="testImprovementNoLongerValid" time="0.033" />
+  <testcase classname="net.sf.freecol.server.ai.mission.PrivateerMissionTest" name="testIsMissionValid" time="0.011" />
+  <testcase classname="net.sf.freecol.server.ai.mission.ScoutingMissionTest" name="testHorsesLost" time="0.032" />
+  <testcase classname="net.sf.freecol.server.ai.mission.TransportMissionTest" name="testGetNextStopAlreadyAtDestination" time="0.054" />
+  <testcase classname="net.sf.freecol.server.ai.mission.TransportMissionTest" name="testGetDefaultDestination" time="0.035" />
+  <testcase classname="net.sf.freecol.server.ai.mission.TransportMissionTest" name="testWagonTrain" time="0.044" />
+  <testcase classname="net.sf.freecol.server.ai.mission.TransportMissionTest" name="testGetNextStopIsColony" time="0.029" />
+  <testcase classname="net.sf.freecol.server.ai.mission.TransportMissionTest" name="testGetNextStopIsEurope" time="0.047" />
+  <testcase classname="net.sf.freecol.server.ai.mission.TransportMissionTest" name="testTransportMissionInvalidAfterCombatLost" time="0.063" />
+  <testcase classname="net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMissionTest" name="testCapturedUnitsLoseMission" time="0.006" />
+  <testcase classname="net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMissionTest" name="testDoNotPursueUnitsInColonies" time="0.006" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testWarDeclarationAffectsSettlementAlarm" time="0.012" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testArtilleryDemotedBySoldier" time="0.02" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testPeaceTreatyFromWarStance" time="0.009" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testScoutDiesNotLosesEquipment" time="0.018" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testDragoonDemotedByBrave" time="0.061" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testCeaseFireTreaty" time="0.033" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testDeclarationOfWarFromPeace" time="0.005" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testAttackColonyWithVeteran" time="0.028" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testDragoonDemotedBySoldier" time="0.011" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testAddFatherUnits" time="0.013" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testDumpGoods" time="0.017" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testAtackedNavalUnitIsDamaged" time="0.012" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testLaSalle" time="0.014" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testPocahontas" time="0.019" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testPioneerDiesNotLosesEquipment" time="0.009" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testPromotion" time="0.042" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testClearSpecialty" time="0.01" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testPeaceTreatyFromCeaseFireStance" time="0.004" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testUnitLosesExperienceWithWorkChange" time="0.007" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testEquipIndianNotEnoughReqGoods" time="0.005" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testCashInTreasure" time="0.011" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testUnitTypeChangeOnEnterColony" time="0.014" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testSoldierDemotedBySoldier" time="0.019" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testAttrition" time="0.035" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testUnarmedAttack" time="0.013" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testCarpenterHouseNationalAdvantage" time="0.012" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testCreateMission" time="0.01" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testDoAssignedWorkAmateurAndHardyPioneer" time="0.252" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testEmbark" time="0.006" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testVeteranSoldierDemotedBySoldier" time="0.013" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testLoseColonyDefenceWithRevere" time="0.035" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testBuildingBonus" time="0.019" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testColonistDemotedBySoldier" time="0.013" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testScoutDefeatedBySoldier" time="0.013" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testAddFatherBuildingEvent" time="0.009" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testAttackColonyWithBrave" time="0.066" />
+  <testcase classname="net.sf.freecol.server.control.InGameControllerTest" name="testEquipIndian" time="0.006" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testMoveTeacherOutside" time="0.038" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTeacherStoresProgress" time="0.042" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testCaseTwoTeachersWithDifferentExp" time="0.043" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testMoveTeacherInside" time="0.048" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testConcurrentUpgrade" time="0.016" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTeachingOrder" time="0.041" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTeachPettyCriminalsByMaster" time="0.049" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTeachingDoublePromotion" time="0.034" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testUniversity" time="0.029" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTwoTeachersSimple" time="0.025" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTrackerBug1616384" time="0.056" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testSingleGuyTwoTeachers2" time="0.018" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testCollege" time="0.021" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testSingleGuyTwoTeachers" time="0.032" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testSonsOfLiberty" time="0.022" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTwoTeachersOfSameKind" time="0.025" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTeachPettyCriminals" time="0.023" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testProductionBonus" time="0.017" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testPartTraining" time="0.022" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testExpertTeaching" time="0.017" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testColonialRegular" time="0.02" />
+  <testcase classname="net.sf.freecol.server.model.ServerBuildingTest" name="testTeachIndenturedServants" time="0.015" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testEqualFoodProductionConsumptionCase" time="0.009" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testDeathByStarvation" time="0.017" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testBuildingCompletion" time="0.018" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testInvalidCompletion" time="0.014" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testAvoidStarvation" time="0.012" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testNoBuildingMaterialsProductionWhenBuildingNothing" time="0.01" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testFoodConsumption" time="0.009" />
+  <testcase classname="net.sf.freecol.server.model.ServerColonyTest" name="testLibertyAndImmigration" time="0.013" />
+  <testcase classname="net.sf.freecol.server.model.ServerIndianSettlementTest" name="testHorseBreedingNoFoodAvail" time="0.02" />
+  <testcase classname="net.sf.freecol.server.model.ServerIndianSettlementTest" name="testPricing" time="0.028" />
+  <testcase classname="net.sf.freecol.server.model.ServerIndianSettlementTest" name="testHorseBreeding" time="0.01" />
+  <testcase classname="net.sf.freecol.server.model.ServerIndianSettlementTest" name="testFoodConsumption" time="0.012" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testCheckNoGameOverEnoughMoney" time="0.006" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testCheckGameOver1600Threshold" time="0.01" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testCheckNoGameOverHasColonistInNewWorld" time="0.005" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testHasExploredTile" time="0.005" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testBuyingMakesPricesRaise" time="0.008" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testCheckGameOverUnitsGoingToEurope" time="0.007" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testDutchMarket" time="0.012" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testCheckGameOverNoUnits" time="0.007" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testCheckGameOverUnitsGoingToNewWorld" time="0.005" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testSellingMakesPricesFall" time="0.005" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testMarketRecovery" time="0.028" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testLoadInColony" time="0.013" />
+  <testcase classname="net.sf.freecol.server.model.ServerPlayerTest" name="testLoadInEurope" time="0.041" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testDoAssignedWorkHardyPioneerPlowPlain" time="0.008" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testColonyProfitFromEnhancement" time="0.02" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testExposeResource" time="0.004" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testDoAssignedWorkHardyPioneerBuildRoad" time="0.01" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testUnitPromotionWorkingInWorkTile" time="0.008" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testUnitGetsExperienceThroughWork" time="0.005" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testUnitLumberDelivery" time="0.023" />
+  <testcase classname="net.sf.freecol.server.model.ServerUnitTest" name="testToggleHorses" time="0.007" />
+  <testcase classname="net.sf.freecol.server.generator.MapGeneratorTest" name="testSinglePlayerOnSmallMap" time="0.168" />
+  <testcase classname="net.sf.freecol.server.generator.MapGeneratorTest" name="testImportMap" time="1.897" />
+  <testcase classname="net.sf.freecol.server.generator.MapGeneratorTest" name="testRegions" time="0.166" />
+  <testcase classname="net.sf.freecol.server.generator.MapGeneratorTest" name="testWithNoIndians" time="0.154" />
+  <testcase classname="net.sf.freecol.server.generator.MapGeneratorTest" name="testIndianCapital" time="0.206" />
+  <testcase classname="net.sf.freecol.server.generator.MapGeneratorTest" name="testMapGenerator" time="0.207" />
+  <testcase classname="net.sf.freecol.client.control.MoveTest" name="testSimpleMove" time="3.691" />
+  <testcase classname="net.sf.freecol.client.gui.FontTest" name="testLogicalSerif" time="0.008" />
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Sep 05, 2023 7:33:03 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 267 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 25 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:03 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 255 Types, 79 Abilities, 41 BuildingTypes, 14 Disasters, 6 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 17 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:04 PM net.sf.freecol.common.i18n.Messages replaceChoices
+WARNING: Unknown key or untagged choice: 'west=westward|east=eastward|default=into the wind', selector was 'whatever', trying 'default' instead
+Sep 05, 2023 7:33:04 PM net.sf.freecol.common.i18n.Messages replaceChoices
+WARNING: No tag found: {{}}abc   {{xyz}}def{{123|567}}
+Sep 05, 2023 7:33:04 PM net.sf.freecol.common.i18n.Messages replaceChoices
+WARNING: No tag found: {{}}abc   {{xyz}}def{{123|567}}
+Sep 05, 2023 7:33:04 PM net.sf.freecol.common.i18n.Messages replaceChoices
+WARNING: No tag found: {{}}abc   {{xyz}}def{{123|567}}
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 266 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 25 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 41 UnitTypes read.
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 267 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 25 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification loadMods
+INFO: Loaded mod example
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following mod loading complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 268 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 25 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 43 UnitTypes read.
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 268 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 25 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 43 UnitTypes read.
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 267 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 25 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 255 Types, 79 Abilities, 41 BuildingTypes, 14 Disasters, 6 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 17 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:798 dutch indianConvert 0/1] to [building:794 depot/New Amsterdam]
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:798 dutch indianConvert 0/1] to [building:795 country/New Amsterdam]
+Sep 05, 2023 7:33:05 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:798 dutch indianConvert 0/1] to [building:793 chapel/New Amsterdam]
+Sep 05, 2023 7:33:07 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:268-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:250-brave [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.settlement.inca.capital) PERCENTAGE 200.0 index=50] = 3.0 odds=0.6 random(1.0)=0.0 great=true Attack WIN SLAUGHTER_UNIT CAPTURE_CONVERT
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:251 unit:250
+Sep 05, 2023 7:33:07 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:349-kingsRegular-cavalry [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.kingsRegular) ADDITIVE 4.0 index=20] [Modifier model.modifier.offence (model.role.cavalry) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 10.5 defender=unit:350-colonialRegular-dragoon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.colonialRegular) ADDITIVE 3.0 index=20] [Modifier model.modifier.defence (model.role.dragoon) ADDITIVE 2.0 index=30] = 6.0 odds=0.6363636363636364 random(1.0)=0.8500000238418579 great=false Attack LOSE LOSE_EQUIP
+Sep 05, 2023 7:33:07 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XV PEACE -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:07 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV PEACE -> WAR wrt Louis XV (symmetric)
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:350-colonialRegular-dragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.colonialRegular) ADDITIVE 3.0 index=20] [Modifier model.modifier.offence (model.role.dragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 9.0 defender=unit:349-kingsRegular-infantry [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.kingsRegular) ADDITIVE 4.0 index=20] [Modifier model.modifier.defence (model.role.infantry) ADDITIVE 1.0 index=30] = 6.0 odds=0.6 random(1.0)=0.20000000298023224 great=false Attack WIN SLAUGHTER_UNIT
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:351-kingsRegular-cavalry [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.kingsRegular) ADDITIVE 4.0 index=20] [Modifier model.modifier.offence (model.role.cavalry) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 10.5 defender=unit:350-colonialRegular-dragoon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.colonialRegular) ADDITIVE 3.0 index=20] [Modifier model.modifier.defence (model.role.dragoon) ADDITIVE 2.0 index=30] = 6.0 odds=0.6363636363636364 random(1.0)=0.20000000298023224 great=false Attack WIN LOSE_EQUIP
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:351-kingsRegular-cavalry [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.kingsRegular) ADDITIVE 4.0 index=20] [Modifier model.modifier.offence (model.role.cavalry) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 10.5 defender=unit:350-colonialRegular-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.colonialRegular) ADDITIVE 3.0 index=20] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 5.0 odds=0.6774193548387096 random(1.0)=0.20000000298023224 great=false Attack WIN LOSE_EQUIP DEMOTE_UNIT
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:351-kingsRegular-cavalry [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.kingsRegular) ADDITIVE 4.0 index=20] [Modifier model.modifier.offence (model.role.cavalry) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 10.5 defender=unit:350-veteranSoldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] = 1.5 odds=0.875 random(1.0)=0.20000000298023224 great=false Attack WIN CAPTURE_UNIT
+Sep 05, 2023 7:33:07 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:775
+Sep 05, 2023 7:33:08 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 255 Types, 79 Abilities, 41 BuildingTypes, 14 Disasters, 6 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 17 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=model.difficulty.veryEasy, 255 Types, 79 Abilities, 41 BuildingTypes, 14 Disasters, 6 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 17 Nations, 121 Options, 22 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=null, 255 Types, 79 Abilities, 41 BuildingTypes, 14 Disasters, 6 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 17 Nations, 72 Options, 16 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from InputStream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=model.difficulty.veryEasy, 255 Types, 79 Abilities, 41 BuildingTypes, 14 Disasters, 6 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 60 Modifiers, 17 Nations, 121 Options, 22 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:776 goodsContainer:778 unit:777 indianSettlement:775
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:782 goodsContainer:784 unit:783 indianSettlement:781
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:786 goodsContainer:788 unit:787 indianSettlement:785
+Sep 05, 2023 7:33:09 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:790 goodsContainer:792 unit:791 indianSettlement:789
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:775 dutch merchantman 5/5] to [tile:641 plains 6,8]
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:782 unit:781
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:775 dutch merchantman 5/5] to [tile:641 plains 6,8]
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:777 dutch galleon 6/6] to [tile:565 plains 10,4]
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:775 dutch frigate 6/6] to [tile:661 plains 6,9]
+Sep 05, 2023 7:33:15 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:15 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:15 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from stream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=model.difficulty.medium, 267 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 59 Modifiers, 25 Nations, 170 Options, 23 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer loadGame
+INFO: Game integrity test succeeded.
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer loadGame
+INFO: AI integrity test succeeded.
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:16 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:16 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from stream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=model.difficulty.medium, 267 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 59 Modifiers, 25 Nations, 170 Options, 23 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer loadGame
+INFO: Game integrity test succeeded.
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer loadGame
+INFO: AI integrity test succeeded.
+Sep 05, 2023 7:33:16 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:16 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:17 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:17 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:17 PM net.sf.freecol.common.model.Specification clean
+INFO: Specification clean following load from stream complete, starting year=1492, season year=1600, ages=[1,109,309], seasons=2, difficulty=model.difficulty.medium, 267 Types, 80 Abilities, 41 BuildingTypes, 14 Disasters, 10 EuropeanNationTypes, 2 Events, 25 FoundingFathers, 21 GoodsTypes, 8 IndianNationTypes, 59 Modifiers, 25 Nations, 170 Options, 23 Option Groups, 12 ResourceTypes, 11 Roles, 23 TileTypes, 6 TileImprovementTypes, 13 UnitChangeTypes, 42 UnitTypes read.
+Sep 05, 2023 7:33:17 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Read file test\data\test.fsg
+Sep 05, 2023 7:33:17 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:17 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:17 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> PEACE wrt Geronimo
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Geronimo UNCONTACTED -> PEACE wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> PEACE wrt Geronimo
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Geronimo UNCONTACTED -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> PEACE wrt Segoyewatha
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Segoyewatha UNCONTACTED -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> PEACE wrt Segoyewatha
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Segoyewatha UNCONTACTED -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.common.model.Monarch addToREF
+INFO: Add to dutch REF: capacity=66 spaceRequired=62 => 2 model.unit.kingsRegular (model.role.infantry)
+Sep 05, 2023 7:33:18 PM net.sf.freecol.common.model.Monarch addToREF
+INFO: Add to dutch REF: capacity=72 spaceRequired=62 => 1 model.unit.manOWar (model.role.default)
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:18 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Received: move out of turn from player: model.nation.dutch
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Received: move out of turn from player: model.nation.dutch
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Received: move out of turn from player: model.nation.dutch
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:250-privateer [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 8.0 index=10] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 12.0 defender=unit:247-galleon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 10.0 index=10] = 10.0 odds=0.5454545454545454 random(1.0)=0.5254545211791992 great=false Attack WIN DAMAGE_SHIP_ATTACK
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:249
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.ai.AIPlayer nationSummaryHandler
+INFO: Updated nation summary of player:94 for AI player:73
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.ai.AIPlayer nationSummaryHandler
+INFO: Updated nation summary of player:133 for AI player:73
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.ai.AIPlayer nationSummaryHandler
+INFO: Updated nation summary of player:208 for AI player:73
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I PEACE -> WAR wrt Atahualpa
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Atahualpa PEACE -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-artillery [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 7.0 index=10] [Modifier model.modifier.artilleryInTheOpen (model.source.artilleryInTheOpen) PERCENTAGE -75.0 index=50] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 2.625 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.5675675675675675 random(1.0)=0.5875675678253174 great=false Attack LOSE DEMOTE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-damagedArtillery [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 5.0 index=10] [Modifier model.modifier.artilleryInTheOpen (model.source.artilleryInTheOpen) PERCENTAGE -75.0 index=50] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 1.875 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.4838709677419355 random(1.0)=0.503870964050293 great=false Attack LOSE SLAUGHTER_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:247
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I WAR -> PEACE wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV WAR -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:248-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:247-freeColonist-scout [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.scout) ADDITIVE 1.0 index=30] = 2.0 odds=0.6923076923076923 random(1.0)=0.6723076701164246 great=false Attack WIN SLAUGHTER_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:247
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Atahualpa
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Atahualpa UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:259-freeColonist-dragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.dragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:260-brave [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] = 1.0 odds=0.8181818181818182 random(1.0)=0.8381817936897278 great=false Attack LOSE CAPTURE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:259-freeColonist-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:260-brave-mountedBrave [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.mountedBrave) ADDITIVE 1.0 index=30] = 2.0 odds=0.6 random(1.0)=0.6200000047683716 great=false Attack LOSE CAPTURE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:259-freeColonist [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 0.0 defender=unit:260-brave-nativeDragoon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.nativeDragoon) ADDITIVE 2.0 index=30] = 3.0 odds=0.0 random(1.0)=0.019999999552965164 great=false Attack LOSE SLAUGHTER_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:259
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I WAR -> CEASE_FIRE wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV WAR -> CEASE_FIRE wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV PEACE -> WAR wrt William I
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I PEACE -> WAR wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-veteranSoldier-dragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.dragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.75 defender=unit:271-veteranSoldier-dragoon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.dragoon) ADDITIVE 2.0 index=30] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 6.75 odds=0.5 random(1.0)=0.47999998927116394 great=false Attack WIN LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-veteranSoldier-dragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.dragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.75 defender=unit:271-veteranSoldier-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 4.5 odds=0.6 random(1.0)=0.6200000047683716 great=false Attack LOSE LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:271-veteranSoldier-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 4.5 odds=0.5 random(1.0)=0.47999998927116394 great=false Attack WIN LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:271-veteranSoldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 2.25 odds=0.6666666666666666 random(1.0)=0.6466666460037231 great=false Attack WIN CAPTURE_COLONY
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist-dragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.dragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6923076923076923 random(1.0)=0.7123076915740967 great=false Attack LOSE LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6 random(1.0)=0.6200000047683716 great=false Attack LOSE LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:248-freeColonist-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:247-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] = 1.0 odds=0.75 random(1.0)=0.7300000190734863 great=false Attack WIN CAPTURE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Too few goods
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:249-privateer [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 8.0 index=10] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 12.0 defender=unit:247-galleon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 10.0 index=10] [Modifier model.modifier.cargoPenalty (model.source.cargoPenalty) PERCENTAGE -12.5 index=50] = 8.75 odds=0.5783132530120482 random(1.0)=0.558313250541687 great=false Attack WIN LOOT_SHIP DAMAGE_SHIP_ATTACK
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Guaira PEACE -> WAR wrt William I
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I PEACE -> WAR wrt Guaira (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I WAR -> PEACE wrt Guaira
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Guaira WAR -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:248-veteranSoldier-dragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.dragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] [Modifier model.modifier.bigMovementPenalty (model.source.movementPenalty) PERCENTAGE -66.0 index=50] = 2.2950000762939453 defender=unit:247-freeColonist-pioneer.5 [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] = 1.0 odds=0.6965098704565885 random(1.0)=0.6765098571777344 great=false Attack WIN SLAUGHTER_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:247
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-pettyCriminal-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6 random(1.0)=0.5799999833106995 great=false Attack WIN LOSE_EQUIP PROMOTE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-indenturedServant-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6 random(1.0)=0.5799999833106995 great=false Attack WIN LOSE_EQUIP PROMOTE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6 random(1.0)=0.5799999833106995 great=false Attack WIN LOSE_EQUIP PROMOTE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6923076923076923 random(1.0)=0.6723076701164246 great=false Attack WIN LOSE_EQUIP PROMOTE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-colonialRegular-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.colonialRegular) ADDITIVE 3.0 index=20] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 7.5 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.7894736842105263 random(1.0)=0.769473671913147 great=false Attack WIN LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Can not clear speciality of a teacher.
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I CEASE_FIRE -> PEACE wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV CEASE_FIRE -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:249 dutch treasureTrain 1/1] to [tile:565 ocean 10,4]
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:249
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:250 dutch treasureTrain 1/1] to [tile:565 ocean 10,4]
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:271 dutch expertFarmer 1/1] to [colonyTile:251 [tile:641 plains 6,8]/New Amsterdam]
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 3.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6 random(1.0)=0.6200000047683716 great=false Attack LOSE LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 0.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.0 random(1.0)=0.019999999552965164 great=false Attack LOSE CAPTURE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:271
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:248-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:247-colonialRegular-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.colonialRegular) ADDITIVE 3.0 index=20] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 5.0 odds=0.47368421052631576 random(1.0)=0.4536842107772827 great=false Attack WIN LOSE_EQUIP DEMOTE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:248-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:247-veteranSoldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] = 1.5 odds=0.75 random(1.0)=0.7300000190734863 great=false Attack WIN CAPTURE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> PEACE wrt Guaira
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Guaira UNCONTACTED -> PEACE wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:253
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> PEACE wrt Guaira
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Guaira UNCONTACTED -> PEACE wrt Louis XIV (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Naval unit unit:250 can not embark.
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.model.Player clientError
+WARNING: Carrier: unit:248 can not carry unit:252: CAPACITY_EXCEEDED
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-veteranSoldier-soldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.soldier) ADDITIVE 2.0 index=30] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 4.5 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.6923076923076923 random(1.0)=0.7123076915740967 great=false Attack LOSE LOSE_EQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-veteranSoldier [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 0.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.0 random(1.0)=0.019999999552965164 great=false Attack LOSE CAPTURE_UNIT
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Atahualpa
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Atahualpa UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:19 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:271-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:270-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 3.0 odds=0.6666666666666666 random(1.0)=0.6466666460037231 great=false Attack WIN AUTOEQUIP_UNIT LOSE_AUTOEQUIP
+Sep 05, 2023 7:33:19 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 0.0 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.0 random(1.0)=0.019999999552965164 great=false Attack LOSE CAPTURE_UNIT
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Louis XIV
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Louis XIV UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:247-freeColonist-scout [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 0.0 index=10] [Modifier model.modifier.offence (model.role.scout) ADDITIVE 1.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 1.5 defender=unit:248-freeColonist-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] = 2.0 odds=0.42857142857142855 random(1.0)=0.44857141375541687 great=false Attack LOSE SLAUGHTER_UNIT
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:247
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification William I UNCONTACTED -> WAR wrt Atahualpa
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer csChangeStance
+INFO: Stance modification Atahualpa UNCONTACTED -> WAR wrt William I (symmetric)
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:271-veteranSoldier-dragoon [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.dragoon) ADDITIVE 2.0 index=30] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 6.75 odds=0.47058823529411764 random(1.0)=0.4505882263183594 great=false Attack WIN LOSE_EQUIP
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:271-veteranSoldier-soldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.role.soldier) ADDITIVE 1.0 index=30] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 4.5 odds=0.5714285714285714 random(1.0)=0.5514285564422607 great=false Attack WIN LOSE_EQUIP
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:271-veteranSoldier [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.unit.veteranSoldier) PERCENTAGE 50.0 index=40] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 2.25 odds=0.7272727272727273 random(1.0)=0.7072727084159851 great=false Attack WIN SLAUGHTER_UNIT
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:271
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:270-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 1.5 odds=0.8 random(1.0)=0.7799999713897705 great=false Attack WIN PILLAGE_COLONY
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: building:274
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:270-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 1.5 odds=0.8 random(1.0)=0.7799999713897705 great=false Attack WIN PILLAGE_COLONY
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:270-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 1.5 odds=0.8 random(1.0)=0.7799999713897705 great=false Attack WIN PILLAGE_COLONY
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:270-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 1.5 odds=0.8 random(1.0)=0.7799999713897705 great=false Attack WIN PILLAGE_COLONY
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Combat attacker=unit:272-brave-nativeDragoon [Modifier model.modifier.offence (model.source.baseOffence) ADDITIVE 1.0 index=10] [Modifier model.modifier.offence (model.role.nativeDragoon) ADDITIVE 3.0 index=30] [Modifier model.modifier.attackBonus (model.source.attackBonus) PERCENTAGE 50.0 index=50] = 6.0 defender=unit:270-freeColonist [Modifier model.modifier.defence (model.source.baseDefence) ADDITIVE 1.0 index=10] [Modifier model.modifier.defence (model.settlement.colony) PERCENTAGE 50.0 index=50] = 1.5 odds=0.8 random(1.0)=0.7799999713897705 great=false Attack WIN SLAUGHTER_UNIT DESTROY_COLONY
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:270
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: colonyTile:249 colonyTile:250 colonyTile:251 colonyTile:252 colonyTile:253 colonyTile:254 colonyTile:255 colonyTile:256 colonyTile:257 building:258 building:260 building:259 building:262 building:266 building:267 building:261 building:263 building:264 building:265 goodsContainer:248 colony:247
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:270
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:272 dutch pettyCriminal 0/1] to [building:258 townHall/New Amsterdam]
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: unit:271
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerColony csBuildBuilding
+INFO: New building in New Amsterdam: warehouse
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerColony csBuildBuilding
+INFO: New building in New Amsterdam: lumberMill
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerColony csBuildUnit
+INFO: New unit in New Amsterdam: freeColonist
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:250 unit:249
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:260 unit:259
+Sep 05, 2023 7:33:20 PM net.sf.freecol.common.util.LogBuilder log
+INFO: Destroying: goodsContainer:258 indianSettlement:257
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I alive, can buy colonist.
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I survives by autorecruit.
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I alive, has waiting colonist.
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I dead, no presence >= 1600
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I alive, unit unit:247 on map.
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:20 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I alive, has embarked unit.
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I dead, no presence >= 1600
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I dead, can not buy carrier.
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I alive, has embarked unit.
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.model.ServerPlayer checkForDeath
+INFO: William I dead, no presence >= 1600
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.MarketData price
+INFO: Clamped price fall for marketData:106 from 15 to 16
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Player clientError
+WARNING: Carrier not at location: New Amsterdam
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Player clientError
+WARNING: Too much goods
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Player clientError
+WARNING: Too much goods
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Unit setLocation
+WARNING: Can not add [unit:249 dutch privateer 8/8] to [tile:496 plains 1,1]
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Player clientError
+WARNING: Player William I tried to buy 10 cotton
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Player clientError
+WARNING: Carrier not in Europe: Europe
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.Player clientError
+WARNING: Can not trade boycotted goods
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:21 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:21 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Read file data\maps\M_Africa_Gilolat.fsm
+Sep 05, 2023 7:33:22 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:22 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Read file data\maps\S_AustraliaOceania_Gilolat.fsm
+Sep 05, 2023 7:33:22 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:22 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Read file data\maps\L_America_JsTheDude.fsm
+Sep 05, 2023 7:33:23 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Found savegame version 14
+Sep 05, 2023 7:33:23 PM net.sf.freecol.server.FreeColServer readGame
+INFO: Read file data\maps\S_Caribbean_Phil.fsm
+Sep 05, 2023 7:33:23 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:23 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:23 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:23 PM net.sf.freecol.common.model.LandMap <init>
+INFO: Using land generator model.option.landGeneratorType.classic to make 40x100 map with distance-to-edge=5 and min-tile#=1000
+Sep 05, 2023 7:33:24 PM net.sf.freecol.server.FreeColServer startGame
+INFO: Server starting game: PRE_GAME
+Sep 05, 2023 7:33:24 PM net.sf.freecol.client.ClientTestHelper startClient
+INFO: Debug value: true
+Sep 05, 2023 7:33:24 PM net.sf.freecol.common.resources.FontResource <init>
+INFO: Loaded font: Dialog.plain from: urn:font:Dialog-PLAIN-12
+Sep 05, 2023 7:33:25 PM net.sf.freecol.common.resources.FontResource <init>
+INFO: Loaded font: ShadowedBlack from: file:/C:/Users/tneks/OneDrive/Desktop/freecol/data/base/resources/fonts/ShadowedBlack.ttf
+Sep 05, 2023 7:33:25 PM net.sf.freecol.common.resources.FontResource <init>
+INFO: Loaded font: Serif.plain from: urn:font:Serif-PLAIN-12
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+	at net.sf.freecol.client.gui.action.FreeColAction.updateImageIcon(FreeColAction.java:276)
+	at net.sf.freecol.client.gui.action.FreeColAction.lambda$addImageIcons$0(FreeColAction.java:265)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:313)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Sep 05, 2023 7:33:27 PM net.sf.freecol.client.FreeColClient loadClientOptions
+INFO: Load default client options.
+Sep 05, 2023 7:33:27 PM net.sf.freecol.common.option.OptionGroup load
+INFO: Load OptionGroup(clientOptions) from data\base\client-options.xml succeeded
+Sep 05, 2023 7:33:27 PM net.sf.freecol.client.FreeColClient loadClientOptions
+INFO: Load client options from the action manager.
+Sep 05, 2023 7:33:27 PM net.sf.freecol.client.control.ConnectController connect
+INFO: Connected to 127.0.0.1:3541 as test
+Sep 05, 2023 7:33:27 PM net.sf.freecol.client.control.ConnectController requestLogin
+INFO: Login request for client tneks
+Sep 05, 2023 7:33:27 PM net.sf.freecol.server.FreeColServer addNewUserConnection
+INFO: Client connected from /127.0.0.1:56343
+Sep 05, 2023 7:33:27 PM net.sf.freecol.client.control.PreGameController$1 run
+INFO: Client starting game
+Sep 05, 2023 7:33:27 PM net.sf.freecol.common.networking.ReceivingThread askToStop
+INFO: ReceivingThread-FreeColServer:/127.0.0.1:56343: stopped receiving thread: connection closing
+Sep 05, 2023 7:33:27 PM net.sf.freecol.common.networking.ReceivingThread askToStop
+INFO: ReceivingThread-FreeColClient:test: stopped receiving thread: listen-disconnect
+]]></system-err>
+</testsuite>
