@@ -22,7 +22,7 @@ jobs:
         run: sudo apt-get install ant
 
       - name: Build project
-        run: ant1
+        run: ant
 
       - name: Test project
         run: ant testall
