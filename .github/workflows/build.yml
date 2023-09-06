@@ -1,37 +1,74 @@
+name: Build and Test
 
-name: Build
 on:
   push:
     branches:
-      - master
-    
-jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-      
-      - name: Run tests
-        shell: bash
-        run: |
-          ant -noinput -buildfile build.xml testall
-          
-      - name: Build artifacts
-        shell: bash
-        run: |
-          ant -noinput -buildfile build.xml nightly-release
+      - sf-auto-merge
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+jobs:
+  Build_and_Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v3
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            dist/releases/*
+          java-version: 11
+          distribution: "microsoft"
+
+      - name: Install Apache Ant
+        run: sudo apt-get install ant
+
+      - name: Build project
+        run: ant1
+
+      - name: Test project
+        run: ant testall
+    
+      # Generate a unique identifier for this build (use run_id)
+      - name: Generate Unique Identifier
+        id: generate-identifier
+        run: echo "build-id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+        
+      # Create a directory with the unique identifier
+      - name: Create Artifact Directory
+        run: mkdir -p build-artifacts/${{ steps.generate-identifier.outputs.build-id }}
+
+      - name: Generate HTML report
+        id: capture-details
+        run: |
+          # Capture the build status
+          BUILD_STATUS=$?
+
+          # Convert the numeric build status to a string
+          if [ $BUILD_STATUS -eq 0 ]; then
+            BUILD_STATUS_STRING="SUCCESS"
+          else
+            BUILD_STATUS_STRING="FAILURE"
+          fi
+
+          # Capture the commit details
+          COMMIT_HASH=$(git rev-parse HEAD)
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')
+
+          # Capture the timestamp in GMT+8 timezone
+          TIMESTAMP=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S %Z")
+
+          # Create an HTML report file with build status, commit details, and timestamp
+          echo "<html><body>" > build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "<h1>Build Report</h1>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "<p>Build Status: $BUILD_STATUS_STRING</p>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "<p>Commit Hash: <a href=\"https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_HASH\">$COMMIT_HASH</a></p>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "<p>Commit Author: $COMMIT_AUTHOR</p>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "<p>Commit Message: $COMMIT_MESSAGE</p>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "<p>Build Date: $TIMESTAMP</p>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+          echo "</body></html>" >> build-artifacts/${{ steps.generate-identifier.outputs.build-id }}/build-report.html
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact-${{ steps.generate-identifier.outputs.build-id }}  
+          path: build-artifacts/${{ steps.generate-identifier.outputs.build-id }}
