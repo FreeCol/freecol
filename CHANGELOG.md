@@ -8,7 +8,7 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 * The face of Peter Minuit now has more realistic coloring. 
 
 ### Performance ###
-* Improved rendering performance when scrolling or moving units.
+* Improved rendering performance, and especially when scrolling or moving units.
 
 ### User Interface ###
 * The mapboard scrolling is now much smoother and supports pixel-by-pixel scrolling.
