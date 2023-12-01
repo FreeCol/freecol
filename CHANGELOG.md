@@ -1,3 +1,39 @@
+## FreeCol 1.2.0 (In development) ##
+
+All savegames from 0.12.0 and up should continue working with 1.2.0.
+
+### Graphics ###
+* A new styling for the top menu bar with better contrast. This includes changes like showing the top level menus in a button like style.
+* New styling for radio and checkbox buttons.
+* The face of Peter Minuit now has more realistic coloring. 
+
+### Performance ###
+* Improved rendering performance when scrolling or moving units.
+
+### User Interface ###
+* The mapboard scrolling is now much smoother and supports pixel-by-pixel scrolling.
+* Allowing scrolling past the borders of a map so that edge tiles can also be placed in focus.
+* The warehouse dialog can now be resized.
+* Focus is now changed on the mapboard with a single mouse click.
+* Unit dragging can now only be started by clicking on the unit (in order to reduce the likelyhood of accidental goto-orders). In addition, the drag can now be started for units that are currently not the active unit.
+* The active unit is kept when opening a colony panel.
+* The colony panel now works better on small screens.
+* The panel showing the signing of the Declaration of Independence is now made larger on bigger screens.
+* Panels can now cover the entire mapboard area (this is needed for very small screens in order to show all content).
+* The confirm declaration dialog now fits on small screen.
+* Bugfix: Fixes hidden OK-button in the Colopedia on small screens. 
+* Bugfix: The height of a colony building no longer changes when a worker is added.
+
+### Bug fixes ###
+* Fixed a bug that prevented the REF computer player (AI) from completing its turn.
+* Fixed a bug preventing the REF from surrendering.
+* Unit order buttons are now hidden when in the map editor. 
+* Fixes the tab order on the new game panel.
+
+### Mod development ###
+* Adding an empty image resource file (resource:image.empty) to be used for replacing images with empty space.
+
+
 ## FreeCol 1.1.0 (May 7, 2023) ##
 
 All savegames from 0.12.0 and up should continue working with 1.1.0.
