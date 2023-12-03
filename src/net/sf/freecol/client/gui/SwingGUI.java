@@ -2403,7 +2403,13 @@ public class SwingGUI extends GUI {
      */
     @Override
     public FreeColPanel showNewPanel(Specification spec) {
-        return this.widgets.showNewPanel(spec);
+        try {
+            return this.widgets.showNewPanel(spec);
+        } catch (RuntimeException e) {
+            logger.log(Level.WARNING, "Exception while showing new game panel", e);
+            showErrorPanel(e, StringTemplate.key("error.unspecified"));
+            return null;
+        }
     }
 
     /**

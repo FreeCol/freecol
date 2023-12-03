@@ -1092,6 +1092,38 @@ public class FreeColXMLReader extends StreamReaderDelegate
         return (attrib == null) ? defaultValue
             : spec.findType(attrib, returnClass);
     }
+    
+    /**
+     * Get an initialized FreeColSpecObjectType by identifier from a stream from a
+     * specification.
+     *
+     * @param <T> The actual return type.
+     * @param spec The {@code Specification} to look in.
+     * @param attributeName the name of the attribute identifying the
+     *     {@code FreeColSpecObjectType}.
+     * @param returnClass The expected class of the return value.
+     * @param defaultValue A default value to return if the attributeName 
+     *     attribute is not present.
+     * @return The {@code FreeColSpecObjectType} found, or the
+     *     {@code defaultValue}.
+     */
+    public <T extends FreeColSpecObjectType> T getAlreadyInitializedType(Specification spec,
+        String attributeName, Class<T> returnClass, T defaultValue) {
+
+        final String id = getAttribute(attributeName, (String)null);
+        if (id == null) {
+            return defaultValue;
+        }
+        
+        final T o = spec.getAlreadyInitializedType(id, returnClass);
+        if (o == null) {
+            throw new IllegalArgumentException(String.format(
+                "The object \"%s\" of type \"%s\" was referenced from a \"%s\" attribute before being initialized.",
+                id, returnClass.getSimpleName(), attributeName
+            ));
+        }
+        return o;
+    }
 
     /**
      * Copy a FreeColObject by serializing it and reading back the result

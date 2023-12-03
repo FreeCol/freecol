@@ -258,7 +258,7 @@ public class EuropeanNationType extends NationType {
 
         final Specification spec = getSpecification();
 
-        EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
+        EuropeanNationType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG,
                                                EuropeanNationType.class, this);
 
         ref = xr.getAttribute(REF_TAG, parent.ref);
@@ -279,8 +279,7 @@ public class EuropeanNationType extends NationType {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
-                                               EuropeanNationType.class, this);
+        EuropeanNationType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, EuropeanNationType.class, this);
         if (parent != this) {
             forEachMapEntry(parent.startingUnitMap, e ->
                 startingUnitMap.put(e.getKey(), new HashMap<>(e.getValue())));

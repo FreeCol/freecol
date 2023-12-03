@@ -256,8 +256,7 @@ public abstract class NationType extends FreeColSpecObjectType {
 
         final Specification spec = getSpecification();
 
-        NationType parent = xr.getType(spec, EXTENDS_TAG,
-                                       NationType.class, this);
+        NationType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, NationType.class, this);
 
         numberOfSettlements = xr.getAttribute(NUMBER_OF_SETTLEMENTS_TAG,
             SettlementNumber.class, parent.numberOfSettlements);
@@ -281,8 +280,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        NationType parent = xr.getType(spec, EXTENDS_TAG,
-                                       NationType.class, this);
+        NationType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, NationType.class, this);
         if (parent != this) {
             if (parent.settlementTypes != null) {
                 addSettlementTypes(parent.settlementTypes);

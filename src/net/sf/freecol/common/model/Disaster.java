@@ -179,7 +179,7 @@ public class Disaster extends FreeColSpecObjectType {
 
         final Specification spec = getSpecification();
 
-        Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
+        Disaster parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, Disaster.class, this);
 
         natural = xr.getAttribute(NATURAL_TAG, parent.natural);
 
@@ -203,7 +203,7 @@ public class Disaster extends FreeColSpecObjectType {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
+        Disaster parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, Disaster.class, this);
 
         if (parent != this && !parent.getEffects().isEmpty()) {
             if (effects == null) effects = new ArrayList<>();

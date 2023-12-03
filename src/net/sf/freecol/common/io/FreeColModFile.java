@@ -33,8 +33,11 @@ import javax.xml.stream.XMLStreamException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.FreeColUserMessageException;
 import net.sf.freecol.common.ObjectWithId;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -110,6 +113,14 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
                                                    XMLStreamException {
         try (InputStream si = getSpecificationInputStream()) {
             return (si == null) ? null : new Specification(si);
+        } catch (FreeColUserMessageException e) {
+            throw e;
+        } catch (RuntimeException rte) {
+            logger.log(Level.WARNING, "Parse error while reading specification " + getId(), rte);
+            throw new FreeColUserMessageException(
+                StringTemplate.template("error.mod").add("%id%", getId()).add("%name%", Messages.getName("mod." + getId())),
+                rte
+            );
         }
     }
 

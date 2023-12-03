@@ -68,6 +68,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SplashScreen;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
+import net.sf.freecol.common.FreeColUserMessageException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -1504,6 +1505,10 @@ public final class FreeCol {
      */
     public static StringTemplate errorFromException(Exception ex,
                                                     StringTemplate fallback) {
+        if (ex instanceof FreeColUserMessageException) {
+            return ((FreeColUserMessageException) ex).getStringTemplate();
+        }
+        
         String msg;
         return (ex == null || (msg = ex.getMessage()) == null)
             ? fallback

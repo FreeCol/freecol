@@ -869,7 +869,7 @@ public final class UnitType extends BuildableType implements Consumer {
 
         final Specification spec = getSpecification();
 
-        UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
+        UnitType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, UnitType.class, this);
 
         this.baseOffence = xr.getAttribute(OFFENCE_TAG, parent.baseOffence);
 
@@ -987,7 +987,7 @@ public final class UnitType extends BuildableType implements Consumer {
         final Specification spec = getSpecification();
         defaultRole = spec.getDefaultRole();
 
-        UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
+        UnitType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, UnitType.class, this);
         if (parent != this) {
             defaultRole = parent.defaultRole;
 

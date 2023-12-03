@@ -52,6 +52,7 @@ import net.sf.freecol.common.metaserver.MetaServerUtils;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -565,48 +566,52 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         final GUI gui = getGUI();
         final String command = ae.getActionCommand();
 
-        switch (Enum.valueOf(NewPanelAction.class, command)) {
-        case OK:
-            FreeCol.setName(getSelectedName());
-            FreeCol.setAdvantages(getSelectedAdvantages());
-            FreeCol.setRules(getSelectedRules().getId());
-
-            NewPanelAction action = Enum.valueOf(NewPanelAction.class,
-                buttonGroup.getSelection().getActionCommand());
-            switch (action) {
-            case SINGLE:
-                this.specification.prepare(getSelectedAdvantages(),
-                                           this.difficulty);
-                if (cc.startSinglePlayerGame(this.specification)) return;
-                break;
-            case JOIN:
-                int joinPort = getSelectedPort(this.joinPortField);
-                if (joinPort < 0) break;
-                if (cc.joinMultiplayerGame(this.joinNameField.getText(),
-                                           joinPort)) return;
-                break;
-            case START:
-                int serverPort = getSelectedPort(this.serverPortField);
-                if (serverPort < 0) break;
-                this.specification.prepare(getSelectedAdvantages(),
-                                           this.difficulty);
-                final InetAddress serverAddress = (InetAddress) this.serverAddressBox.getSelectedItem();
-                final boolean publicServerValue = this.publicServer.isSelected()
-                        && !serverAddress.isLoopbackAddress();
-                if (cc.startMultiplayerGame(this.specification,
-                        publicServerValue, serverAddress, serverPort)) return;
-                break;
-            case META_SERVER:
-                List<ServerInfo> servers = MetaServerUtils.getServerList();
-                if (servers != null) gui.showServerListPanel(servers);
+        try {
+            switch (Enum.valueOf(NewPanelAction.class, command)) {
+            case OK:
+                FreeCol.setName(getSelectedName());
+                FreeCol.setAdvantages(getSelectedAdvantages());
+                FreeCol.setRules(getSelectedRules().getId());
+    
+                NewPanelAction action = Enum.valueOf(NewPanelAction.class,
+                    buttonGroup.getSelection().getActionCommand());
+                switch (action) {
+                case SINGLE:
+                    this.specification.prepare(getSelectedAdvantages(),
+                                               this.difficulty);
+                    if (cc.startSinglePlayerGame(this.specification)) return;
+                    break;
+                case JOIN:
+                    int joinPort = getSelectedPort(this.joinPortField);
+                    if (joinPort < 0) break;
+                    if (cc.joinMultiplayerGame(this.joinNameField.getText(),
+                                               joinPort)) return;
+                    break;
+                case START:
+                    int serverPort = getSelectedPort(this.serverPortField);
+                    if (serverPort < 0) break;
+                    this.specification.prepare(getSelectedAdvantages(),
+                                               this.difficulty);
+                    final InetAddress serverAddress = (InetAddress) this.serverAddressBox.getSelectedItem();
+                    final boolean publicServerValue = this.publicServer.isSelected()
+                            && !serverAddress.isLoopbackAddress();
+                    if (cc.startMultiplayerGame(this.specification,
+                            publicServerValue, serverAddress, serverPort)) return;
+                    break;
+                case META_SERVER:
+                    List<ServerInfo> servers = MetaServerUtils.getServerList();
+                    if (servers != null) gui.showServerListPanel(servers);
+                    break;
+                default:
+                    break;
+                }
                 break;
             default:
+                super.actionPerformed(ae);
                 break;
             }
-            break;
-        default:
-            super.actionPerformed(ae);
-            break;
+        } catch (RuntimeException e) {
+            gui.showErrorPanel(e, StringTemplate.key("error.unspecified"));
         }
     }
 

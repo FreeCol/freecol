@@ -261,8 +261,7 @@ public class IndianNationType extends NationType {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        IndianNationType parent = xr.getType(spec, EXTENDS_TAG,
-                                             IndianNationType.class, this);
+        IndianNationType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG, IndianNationType.class, this);
         if (parent != this) {
             if (parent.skills != null && !parent.skills.isEmpty()) {
                 if (skills == null) skills = new ArrayList<>();

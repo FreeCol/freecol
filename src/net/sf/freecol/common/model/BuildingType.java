@@ -629,7 +629,7 @@ public final class BuildingType extends BuildableType
 
         final Specification spec = getSpecification();
 
-        BuildingType parent = xr.getType(spec, EXTENDS_TAG,
+        BuildingType parent = xr.getAlreadyInitializedType(spec, EXTENDS_TAG,
                 BuildingType.class, this);
 
         // @compat 0.11.3

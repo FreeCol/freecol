@@ -27,7 +27,6 @@ import static net.sf.freecol.common.util.CollectionUtils.iterable;
 import static net.sf.freecol.common.util.CollectionUtils.matchKey;
 import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
 import static net.sf.freecol.common.util.CollectionUtils.none;
-import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.awt.Color;
@@ -52,6 +51,8 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.sf.freecol.common.FreeColUserMessageException;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColRules;
@@ -220,7 +221,7 @@ public final class Specification implements OptionContainer {
                     }
 
                 } else {
-                    T object = getType(id, type);
+                    T object = getAlreadyInitializedType(id, type);
                     if (object == null) {
                         object = newType(id, type);
                         addType(id, object);
@@ -610,12 +611,20 @@ public final class Specification implements OptionContainer {
                 }
                 loadedMod = true;
                 logger.info("Loaded mod " + mod.getId());
+            } catch (FreeColUserMessageException e) {
+                throw e;
             } catch (IOException|XMLStreamException ex) {
-                logger.log(Level.WARNING, "Read error in mod " + mod.getId(),
-                    ex);
+                logger.log(Level.WARNING, "Read error in mod " + mod.getId(), ex);
+                throw new FreeColUserMessageException(
+                    StringTemplate.template("error.mod").add("%id%", mod.getId()).add("%name%", Messages.getName("mod." + mod.getId())),
+                    ex
+                );
             } catch (RuntimeException rte) {
-                logger.log(Level.WARNING, "Parse error in mod " + mod.getId(),
-                    rte);
+                logger.log(Level.WARNING, "Parse error in mod " + mod.getId(), rte);
+                throw new FreeColUserMessageException(
+                    StringTemplate.template("error.mod").add("%id%", mod.getId()).add("%name%", Messages.getName("mod." + mod.getId())),
+                    rte
+                );
             }
         }
         if (loadedMod) clean("mod loading");
@@ -889,7 +898,7 @@ public final class Specification implements OptionContainer {
      * @param returnClass The expected {@code Class}.
      * @return The {@code FreeColSpecObjectType} found if any.
      */
-    private <T extends FreeColSpecObjectType> T getType(String id,
+    public <T extends FreeColSpecObjectType> T getAlreadyInitializedType(String id,
                                                         Class<T> returnClass) {
         FreeColSpecObjectType ret = getType(id);
         return (ret == null) ? null : returnClass.cast(ret);
@@ -1368,7 +1377,7 @@ public final class Specification implements OptionContainer {
     // -- Buildables --
 
     public BuildableType getBuildableType(String id) {
-        return getType(id, BuildableType.class);
+        return getAlreadyInitializedType(id, BuildableType.class);
     }
 
     // -- Buildings --
@@ -1384,7 +1393,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code BuildingType} found.
      */
     public BuildingType getBuildingType(String id) {
-        return getType(id, BuildingType.class);
+        return getAlreadyInitializedType(id, BuildingType.class);
     }
 
     // -- Disasters --
@@ -1400,7 +1409,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code Disaster} found.
      */
     public Disaster getDisaster(String id) {
-        return getType(id, Disaster.class);
+        return getAlreadyInitializedType(id, Disaster.class);
     }
 
     // -- Events --
@@ -1416,7 +1425,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code Event} found.
      */
     public Event getEvent(String id) {
-        return getType(id, Event.class);
+        return getAlreadyInitializedType(id, Event.class);
     }
 
     // -- Founding Fathers --
@@ -1432,7 +1441,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code FoundingFather} found.
      */
     public FoundingFather getFoundingFather(String id) {
-        return getType(id, FoundingFather.class);
+        return getAlreadyInitializedType(id, FoundingFather.class);
     }
 
     // -- Goods --
@@ -1519,7 +1528,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code GoodsType} found.
      */
     public GoodsType getGoodsType(String id) {
-        return getType(id, GoodsType.class);
+        return getAlreadyInitializedType(id, GoodsType.class);
     }
 
     // -- Improvements --
@@ -1535,7 +1544,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code TileImprovementType} found.
      */
     public TileImprovementType getTileImprovementType(String id) {
-        return getType(id, TileImprovementType.class);
+        return getAlreadyInitializedType(id, TileImprovementType.class);
     }
 
     // -- NationTypes --
@@ -1563,7 +1572,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code NationType} found.
      */
     public NationType getNationType(String id) {
-        return getType(id, NationType.class);
+        return getAlreadyInitializedType(id, NationType.class);
     }
 
     public NationType getDefaultNationType() {
@@ -1596,7 +1605,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code Nation} found.
      */
     public Nation getNation(String id) {
-        return getType(id, Nation.class);
+        return getAlreadyInitializedType(id, Nation.class);
     }
 
     /**
@@ -1630,7 +1639,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code ResourceType} found.
      */
     public ResourceType getResourceType(String id) {
-        return getType(id, ResourceType.class);
+        return getAlreadyInitializedType(id, ResourceType.class);
     }
 
     // -- Roles --
@@ -1660,7 +1669,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code Role} found.
      */
     public Role getRole(String id) {
-        return getType(id, Role.class);
+        return getAlreadyInitializedType(id, Role.class);
     }
 
     /**
@@ -1780,7 +1789,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code TileType} found.
      */
     public TileType getTileType(String id) {
-        return getType(id, TileType.class);
+        return getAlreadyInitializedType(id, TileType.class);
     }
 
     // -- UnitChangeTypes --
@@ -2028,7 +2037,7 @@ public final class Specification implements OptionContainer {
      * @return The {@code UnitType} found.
      */
     public UnitType getUnitType(String id) {
-        return getType(id, UnitType.class);
+        return getAlreadyInitializedType(id, UnitType.class);
     }
 
     // General type retrieval
@@ -2043,7 +2052,7 @@ public final class Specification implements OptionContainer {
      */
     public <T extends FreeColSpecObjectType> T findType(String id,
                                                         Class<T> returnClass) {
-        T o = getType(id, returnClass);
+        T o = getAlreadyInitializedType(id, returnClass);
         if (o != null) return o;
 
         if (initialized) {
@@ -3262,7 +3271,14 @@ public final class Specification implements OptionContainer {
         if (parentId != null) {
             try {
                 FreeColModFile parent = FreeColRules.getFreeColRulesFile(parentId);
-                load(parent.getSpecificationInputStream());
+                try {
+                    load(parent.getSpecificationInputStream());
+                } catch (RuntimeException|XMLStreamException e) {
+                    throw new FreeColUserMessageException(
+                        StringTemplate.template("error.mod").add("%id%", parent.getId()).add("%name%", Messages.getName("mod." + parent.getId())),
+                        e
+                    );
+                }
                 initialized = false;
             } catch (IOException e) {
                 throw new XMLStreamException("Failed to open parent specification: ", e);
