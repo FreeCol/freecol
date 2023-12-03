@@ -265,17 +265,21 @@ public abstract class NationType extends FreeColSpecObjectType {
         aggression = xr.getAttribute(AGGRESSION_TAG,
                                      AggressionLevel.class, parent.aggression);
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        settlementTypes = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            settlementTypes = null;
-        }
-
         final Specification spec = getSpecification();
         NationType parent = xr.getType(spec, EXTENDS_TAG,
                                        NationType.class, this);

@@ -969,6 +969,15 @@ public final class UnitType extends BuildableType implements Consumer {
             }
         }
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        consumption = null;
+    }
 
     /**
      * {@inheritDoc}
@@ -976,11 +985,6 @@ public final class UnitType extends BuildableType implements Consumer {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            consumption = null;
-        }
         defaultRole = spec.getDefaultRole();
 
         UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);

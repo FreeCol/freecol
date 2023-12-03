@@ -33,6 +33,7 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 ### Mod development ###
 * Adding an empty image resource file (resource:image.empty) to be used for replacing images with empty space.
 * Mods can now reference abstract types from the base rule without extending a specific base rule.
+* Added "preserve-attributes" that, if true, preserves the attributes of a specification element. This simplifies changing only the subelements. Please note that any "extends" attribute still needs to be repeated since this attributes changes the subelements.
 
 ## FreeCol 1.1.0 (May 7, 2023) ##
 

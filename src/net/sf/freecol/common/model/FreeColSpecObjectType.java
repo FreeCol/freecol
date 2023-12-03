@@ -241,6 +241,8 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     public static final String EXTENDS_TAG = "extends";
     // Denotes preservation of attributes and children.
     public static final String PRESERVE_TAG = "preserve";
+    // Denotes preservation of attributes.
+    public static final String PRESERVE_ATTRIBUTES_TAG = "preserve-attributes";
 
 
     /**
@@ -266,18 +268,24 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
         this.abstractType = xr.getAttribute(ABSTRACT_TAG, false);
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        if (this.featureContainer != null) {
+            this.featureContainer.clear();
+        }
+        ScopeContainer.clearScopes(this.scopeContainer);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            if (this.featureContainer != null) this.featureContainer.clear();
-            ScopeContainer.clearScopes(this.scopeContainer);
-        }
-
         super.readChildren(xr);
     }
 

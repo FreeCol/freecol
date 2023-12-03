@@ -654,19 +654,23 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         // end @compat 0.11.3
             exposeResourcePercent = xr.getAttribute(EXPOSE_RESOURCE_PERCENT_TAG, 0);
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        allowedWorkers = null;
+        tileTypeChanges = null;
+        disasters = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            allowedWorkers = null;
-            tileTypeChanges = null;
-            disasters = null;
-        }
-
         super.readChildren(xr);
     }
     

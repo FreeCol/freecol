@@ -1051,13 +1051,19 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * Should the game object type being read clear its containers before
      * reading the child elements?
      *
-     * Usually true, but not if the type is extending another one.
-     *
      * @return True if the containers should be cleared.
      */
     public boolean shouldClearContainers() {
-        return !hasAttribute(FreeColSpecObjectType.EXTENDS_TAG)
-            && !hasAttribute(FreeColSpecObjectType.PRESERVE_TAG);
+        return !getAttribute(FreeColSpecObjectType.PRESERVE_TAG, false);
+    }
+    
+    /**
+     * Should the attributes of the game object type be read?
+     *
+     * @return True if the attributes should be read.
+     */
+    public boolean shouldReadAttributes() {
+        return !getAttribute(FreeColSpecObjectType.PRESERVE_ATTRIBUTES_TAG, false);
     }
 
     /**

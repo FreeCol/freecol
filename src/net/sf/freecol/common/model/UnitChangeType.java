@@ -243,15 +243,19 @@ public class UnitChangeType extends FreeColSpecObjectType {
     }
 
     /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        this.changes.clear();
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            this.changes.clear();
-        }
-
         super.readChildren(xr);
     }
 

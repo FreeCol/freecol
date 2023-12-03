@@ -1276,10 +1276,24 @@ public abstract class FreeColObject
         if (xr.hasAttribute(PARTIAL_ATTRIBUTE_TAG)) {
             readFromXMLPartial(xr);
         } else {
-            readAttributes(xr);
-
+            if (xr.shouldClearContainers()) {
+                clearContainers(xr);
+            }
+            if (xr.shouldReadAttributes()) {
+                readAttributes(xr);
+            }
             readChildren(xr);
         }
+    }
+    
+    /**
+     * Clears containers before reading the object.
+     * 
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @throws XMLStreamException if there is a problem reading the stream.
+     */
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+
     }
 
     /**

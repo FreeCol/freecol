@@ -637,17 +637,21 @@ public final class TileType extends FreeColSpecObjectType
     }
 
     /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        this.disasters = null;
+        this.resourceTypes = null;
+        this.productionTypes.clear();
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            this.disasters = null;
-            this.resourceTypes = null;
-            this.productionTypes.clear();
-        }
-
         super.readChildren(xr);
     }
 

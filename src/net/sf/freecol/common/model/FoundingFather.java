@@ -286,18 +286,22 @@ public class FoundingFather extends FreeColSpecObjectType {
             weight[i] = xr.getAttribute(WEIGHT_TAG + (i + 1), 0);
         }
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        events = null;
+        units = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            events = null;
-            units = null;
-        }
-        
         super.readChildren(xr);
     }
 

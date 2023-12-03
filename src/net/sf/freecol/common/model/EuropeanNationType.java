@@ -268,12 +268,16 @@ public class EuropeanNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        startingUnitMap.clear();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            startingUnitMap.clear();
-        }
-
         final Specification spec = getSpecification();
         EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
                                                EuropeanNationType.class, this);

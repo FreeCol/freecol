@@ -244,18 +244,22 @@ public class IndianNationType extends NationType {
             xw.writeEndElement();
         }
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        skills = null;
+        regions = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            skills = null;
-            regions = null;
-        }
-
         final Specification spec = getSpecification();
         IndianNationType parent = xr.getType(spec, EXTENDS_TAG,
                                              IndianNationType.class, this);

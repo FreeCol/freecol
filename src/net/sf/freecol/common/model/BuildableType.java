@@ -381,18 +381,23 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         requiredPopulation = xr.getAttribute(REQUIRED_POPULATION_TAG,
                 DEFAULT_REQUIRED_POPULATION);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        requiredAbilities = null;
+        requiredGoods = null;
+        limits = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        if (xr.shouldClearContainers()) {
-            requiredAbilities = null;
-            requiredGoods = null;
-            limits = null;
-        }
-
         super.readChildren(xr);
     }
 

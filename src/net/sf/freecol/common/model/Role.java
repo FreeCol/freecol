@@ -523,17 +523,21 @@ public class Role extends BuildableType {
         // end @compat 0.11.3
             maximumCount = xr.getAttribute(MAXIMUM_COUNT_TAG, 1);
     }
+    
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        roleChanges = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            roleChanges = null;
-        }
-
         super.readChildren(xr);
     }
 

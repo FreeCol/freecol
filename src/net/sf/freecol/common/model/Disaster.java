@@ -187,17 +187,21 @@ public class Disaster extends FreeColSpecObjectType {
             ? xr.getAttribute(EFFECTS_TAG, Effects.class, Effects.ONE)
             : parent.numberOfEffects;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void clearContainers(FreeColXMLReader xr) throws XMLStreamException {
+        super.clearContainers(xr);
+        effects = null;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            effects = null;
-        }
-
         final Specification spec = getSpecification();
         Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
