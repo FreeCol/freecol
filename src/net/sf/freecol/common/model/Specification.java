@@ -233,8 +233,7 @@ public final class Specification implements OptionContainer {
                     // extensions to not have to re-specify all the
                     // attributes when just changing the children.
                     if (object.getId() != null
-                        && xr.getAttribute(FreeColSpecObjectType.PRESERVE_TAG,
-                                           false)) {
+                        && xr.getAttribute(FreeColSpecObjectType.PRESERVE_TAG, false)) {
                         object.readChildren(xr);
                     } else {
                         object.readFromXML(xr);
@@ -466,7 +465,15 @@ public final class Specification implements OptionContainer {
     private final List<UnitType> defaultUnitTypes = new ArrayList<>();
 
     // Other containers
-    /** All the FreeColSpecObjectType objects, indexed by identifier. */
+    
+    /**
+     * All the FreeColSpecObjectType objects, indexed by identifier.
+     * 
+     * This list include abstract types that are read from the specification files,
+     * but no longer contains the abstract types after reserialization. The reason
+     * for this is that the abstract types are needed when still applying mods
+     * that might reference the abstract type. 
+     */
     private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>(256);
 
     /** All the abilities by identifier. */
@@ -661,9 +668,6 @@ public final class Specification implements OptionContainer {
      */
     public void clean(String why) {
         logger.finest("Cleaning up specification following " + why + ".");
-
-        // Drop all abstract types
-        removeInPlace(allTypes, e -> e.getValue().isAbstractType());
 
         // Fix up the GoodsType derived attributes.  Several GoodsType
         // predicates are likely to fail until this is done.
@@ -2103,6 +2107,7 @@ public final class Specification implements OptionContainer {
                                           String... abilities) {
         return transform(allTypes.values(),
                          type -> resultType.isInstance(type)
+                             && !type.isAbstractType()
                              && any(abilities, a -> type.hasAbility(a)),
                          type -> resultType.cast(type));
     }
@@ -2121,6 +2126,7 @@ public final class Specification implements OptionContainer {
                                              String... abilities) {
         return transform(allTypes.values(),
                          type -> resultType.isInstance(type)
+                             && !type.isAbstractType()
                              && none(abilities, a -> type.hasAbility(a)),
                          type -> resultType.cast(type));
     }

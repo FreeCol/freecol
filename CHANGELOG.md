@@ -32,7 +32,7 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 
 ### Mod development ###
 * Adding an empty image resource file (resource:image.empty) to be used for replacing images with empty space.
-
+* Mods can now reference abstract types from the base rule without extending a specific base rule.
 
 ## FreeCol 1.1.0 (May 7, 2023) ##
 
