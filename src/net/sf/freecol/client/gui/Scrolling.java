@@ -11,6 +11,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
+import net.sf.freecol.common.MemoryManager;
 import net.sf.freecol.common.model.Direction;
 
 /**
@@ -116,7 +117,7 @@ public final class Scrolling extends FreeColClientHolder {
     }
     
     private boolean isAsyncPainterEnabled() {
-        return true;
+        return MemoryManager.isSmoothScrollingEnabled();
     }
     
     /**

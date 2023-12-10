@@ -88,6 +88,7 @@ import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.plaf.FreeColToolTipUI;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.MemoryManager;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
@@ -211,7 +212,7 @@ public class SwingGUI extends GUI {
         
         final float scaleFactor = determineScaleFactorUsingClientOptions(Utils.determineDpi(graphicsDevice));
         this.imageCache = new ImageCache();
-        this.scaledImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
+        this.scaledImageLibrary = new ImageLibrary(constrainToMaxMapScale(scaleFactor), this.imageCache);
         this.fixedImageLibrary = new ImageLibrary(scaleFactor, this.imageCache);
         this.tileViewer = new TileViewer(freeColClient, fixedImageLibrary);
         // Defer remaining initializations, possibly to startGUI
@@ -685,7 +686,7 @@ public class SwingGUI extends GUI {
      * Reset the map zoom and refresh the canvas.
      */
     private void resetMapZoom() {
-        if (this.scaledImageLibrary.getScaleFactor() != fixedImageLibrary.getScaleFactor()) {
+        if (this.scaledImageLibrary.getScaleFactor() != constrainToMaxMapScale(fixedImageLibrary.getScaleFactor())) {
             changeMapScale(fixedImageLibrary.getScaleFactor());
         }
     }
@@ -1465,7 +1466,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomInMap() {
-        return this.scaledImageLibrary.getScaleFactor() < ImageLibrary.MAX_SCALE;
+        return this.scaledImageLibrary.getScaleFactor() < getMaxScale();
     }
 
     /**
@@ -1475,6 +1476,10 @@ public class SwingGUI extends GUI {
     public boolean canZoomOutMap() {
         return this.scaledImageLibrary.getScaleFactor() > ImageLibrary.MIN_SCALE;
     }
+    
+    private float getMaxScale() {
+        return MemoryManager.isHighQualityGraphicsDeactivated() ? ImageLibrary.NORMAL_SCALE : ImageLibrary.MAX_SCALE;
+    }
 
     /**
      * {@inheritDoc}
@@ -1483,7 +1488,7 @@ public class SwingGUI extends GUI {
     public void zoomInMap() {
         float scale = this.scaledImageLibrary.getScaleFactor();
         float newScale = scale + ImageLibrary.SCALE_STEP;
-        if (scale < newScale && newScale <= ImageLibrary.MAX_SCALE) {
+        if (scale < newScale && newScale <= getMaxScale()) {
             changeMapScale(newScale);
         }
     }
@@ -1501,6 +1506,7 @@ public class SwingGUI extends GUI {
     }
 
     private void changeMapScale(float newScale) {
+        newScale = constrainToMaxMapScale(newScale);
         imageCache.clear();
         if (this.mapViewer != null) {
             this.mapViewer.changeScale(newScale);
@@ -1511,6 +1517,13 @@ public class SwingGUI extends GUI {
         if (this.canvas != null) {
             refresh();
         }
+    }
+    
+    private float constrainToMaxMapScale(float newScale) {
+        if (newScale > getMaxScale()) {
+            newScale = getMaxScale();
+        }
+        return newScale;
     }
     
     /**

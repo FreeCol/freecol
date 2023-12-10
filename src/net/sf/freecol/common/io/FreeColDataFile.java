@@ -50,6 +50,7 @@ import java.util.stream.Stream;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import net.sf.freecol.common.MemoryManager;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
@@ -358,12 +359,20 @@ public class FreeColDataFile {
              * Using LinkedHashMap to ensure we keep the variations in order.
              */
             final Map<URI, List<URI>> result = new LinkedHashMap<>();
-            result.put(null, findFilesWithVariationOrAlternativeSizeAsUri(filePath, false));
+            if (!MemoryManager.isHighQualityGraphicsDeactivated()) {
+                result.put(null, findFilesWithVariationOrAlternativeSizeAsUri(filePath, false));
+            } else {
+                result.put(null, List.of());
+            }
             
             final List<Path> variations = findFilesWithVariationOrAlternativeSize(filePath, true);
             for (Path variationPath : variations) {
-                result.put(variationPath.toUri(), findFilesWithVariationOrAlternativeSizeAsUri(variationPath, false));
-            }
+                if (!MemoryManager.isHighQualityGraphicsDeactivated()) {
+                    result.put(variationPath.toUri(), findFilesWithVariationOrAlternativeSizeAsUri(variationPath, false));
+                } else {
+                    result.put(variationPath.toUri(), List.of());
+                }
+            } 
             
             return result;
         } catch (IOException | URISyntaxException e) {
@@ -379,8 +388,11 @@ public class FreeColDataFile {
     }
 
     private List<URI> findFilesWithVariationOrAlternativeSizeAsUri(final Path filePath, boolean findVariation) throws IOException {
-        return findFilesWithVariationOrAlternativeSize(filePath, findVariation)
-                .stream()
+        return toUris(findFilesWithVariationOrAlternativeSize(filePath, findVariation));
+    }
+    
+    private List<URI> toUris(List<Path> paths) {
+        return paths.stream()
                 .map(p -> p.toUri())
                 .collect(Collectors.toList());
     }
