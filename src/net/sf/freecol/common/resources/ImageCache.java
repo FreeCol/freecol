@@ -39,7 +39,7 @@ public class ImageCache {
 
     private static final Logger logger = Logger.getLogger(ImageCache.class.getName());
 
-    private static final boolean DEBUG_PRINT_CACHE_SIZES_TO_STDOUT = true;
+    private static final boolean DEBUG_PRINT_CACHE_SIZES_TO_STDOUT = false;
     
     public static final String REPLACEMENT_IMAGE = "image.miscicon.delete";
 

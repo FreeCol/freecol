@@ -359,7 +359,7 @@ public class FreeColDataFile {
              * Using LinkedHashMap to ensure we keep the variations in order.
              */
             final Map<URI, List<URI>> result = new LinkedHashMap<>();
-            if (!MemoryManager.isHighQualityGraphicsDeactivated()) {
+            if (MemoryManager.isHighQualityGraphicsEnabled()) {
                 result.put(null, findFilesWithVariationOrAlternativeSizeAsUri(filePath, false));
             } else {
                 result.put(null, List.of());
@@ -367,7 +367,7 @@ public class FreeColDataFile {
             
             final List<Path> variations = findFilesWithVariationOrAlternativeSize(filePath, true);
             for (Path variationPath : variations) {
-                if (!MemoryManager.isHighQualityGraphicsDeactivated()) {
+                if (MemoryManager.isHighQualityGraphicsEnabled()) {
                     result.put(variationPath.toUri(), findFilesWithVariationOrAlternativeSizeAsUri(variationPath, false));
                 } else {
                     result.put(variationPath.toUri(), List.of());

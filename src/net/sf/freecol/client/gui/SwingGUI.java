@@ -1478,7 +1478,7 @@ public class SwingGUI extends GUI {
     }
     
     private float getMaxScale() {
-        return MemoryManager.isHighQualityGraphicsDeactivated() ? ImageLibrary.NORMAL_SCALE : ImageLibrary.MAX_SCALE;
+        return MemoryManager.isHighQualityGraphicsEnabled() ? ImageLibrary.MAX_SCALE : ImageLibrary.NORMAL_SCALE;
     }
 
     /**
