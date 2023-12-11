@@ -512,10 +512,10 @@ public final class ColonyPanel extends PortPanel
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
         add(constructionPanel, "grow, top");
-        add(inPortScroll, "span, split 3, grow, sg, height 30:80:");
-        add(cargoScroll, "grow, sg, height 30:80:");
-        add(outsideColonyScroll, "grow, sg, height 30:80:");
-        add(warehouseScroll, "span, height " + (ImageLibrary.ICON_SIZE.height) + ":" + (ImageLibrary.ICON_SIZE.height) + ":" + (2*ImageLibrary.ICON_SIZE.height) + ", growx");
+        add(inPortScroll, "span, split 3, grow, sg, height 60:160:");
+        add(cargoScroll, "grow, sg, height 60:160:");
+        add(outsideColonyScroll, "grow, sg, height 60:160:");
+        add(warehouseScroll, "span, height " + (ImageLibrary.ICON_SIZE.height * 2) + "!, growx");
         int buttonFields = 6;
         if (setGoodsButton != null) buttonFields++;
         if (traceWorkButton != null) buttonFields++;
