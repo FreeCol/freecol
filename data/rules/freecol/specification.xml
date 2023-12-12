@@ -57,6 +57,101 @@
     </building-type>
   </building-types>
 
+  <unit-change-types>
+   <unit-change-type id="model.unitChange.foundingFather">
+      <!-- Do not automatically convert natives to freeColonists -->
+      <unit-type-change id="model.unitChange.foundingFather.indianConvert"
+                        delete="true"/>
+    </unit-change-type>
+
+    <unit-change-type id="model.unitChange.clearSkill" preserve="true">
+      <!-- Allow the indianConvert to change to freeColonist using clear skill
+          after the upgradeConvert ability has been applied from recruiting
+          Bartolome De Las Casas founding Father -->
+        <unit-type-change id="model.unitChange.enterColony.indianConvert"
+                          from="model.unit.indianConvert"
+                          to="model.unit.freeColonist" probability="100">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+    </unit-change-type>
+
+    <unit-change-type id="model.unitChange.education" preserve="true">
+    <!-- Once Bartolome joins congress, native converts can be educated to
+          some outdoor work in half the time. -->
+      <unit-type-change id="model.unitChange.education.indianConvert.expertFarmer"
+                        from="model.unit.indianConvert"
+                        to="model.unit.expertFarmer"
+                        probability="100" turns="2">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+      <unit-type-change id="model.unitChange.education.indianConvert.expertFisherman"
+                        from="model.unit.indianConvert"
+                        to="model.unit.expertFisherman"
+                        probability="100" turns="2">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+      <unit-type-change id="model.unitChange.education.indianConvert.expertFurTrapper"
+                        from="model.unit.indianConvert"
+                        to="model.unit.expertFurTrapper"
+                        probability="100" turns="2">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+      <unit-type-change id="model.unitChange.education.indianConvert.masterCottonPlanter"
+                        from="model.unit.indianConvert"
+                        to="model.unit.masterCottonPlanter"
+                        probability="100" turns="3">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+      <unit-type-change id="model.unitChange.education.indianConvert.masterSugarPlanter"
+                        from="model.unit.indianConvert"
+                        to="model.unit.masterSugarPlanter"
+                        probability="100" turns="3">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+      <unit-type-change id="model.unitChange.education.indianConvert.masterTobaccoPlanter"
+                        from="model.unit.indianConvert"
+                        to="model.unit.masterTobaccoPlanter"
+                        probability="100" turns="3">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+      <unit-type-change id="model.unitChange.education.indianConvert.seasonedScout"
+                        from="model.unit.indianConvert"
+                        to="model.unit.seasonedScout"
+                        probability="100" turns="2">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.experience" preserve="true">
+      <unit-type-change id="model.unitChange.experience.masterCarpenter"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterCarpenter" probability="4"/>
+      <unit-type-change id="model.unitChange.experience.firebrandPreacher"
+                        from="model.unit.freeColonist"
+                        to="model.unit.firebrandPreacher" probability="2"/>
+      <unit-type-change id="model.unitChange.experience.elderStatesman"
+                        from="model.unit.freeColonist"
+                        to="model.unit.elderStatesman" probability="2"/>
+      <unit-type-change id="model.unitChange.experience.masterDistiller"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterDistiller" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterWeaver"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterWeaver" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterTobacconist"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterTobacconist" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterFurTrader"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterFurTrader" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterBlacksmith"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterBlacksmith" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterGunsmith"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterGunsmith" probability="3"/>
+    </unit-change-type>
+  </unit-change-types>
+
   <founding-fathers>
     <founding-father id="model.foundingFather.franciscoDeCoronado"
                      type="exploration"
