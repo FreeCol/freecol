@@ -27,6 +27,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -413,8 +414,17 @@ public final class Canvas extends JDesktopPane {
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
                                       PopupPosition popupPosition,
                                       boolean resizable) {
-        final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
-            : new JInternalFrame();
+        @SuppressWarnings("serial")
+        final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame() {
+            @Override
+            public Dimension getMinimumSize() {
+                final Dimension innerDimension = comp.getMinimumSize();
+                final Insets insets = getInsets();
+                return new Dimension(innerDimension.width + insets.left + insets.right,
+                        innerDimension.height + insets.top + insets.bottom);
+            }
+        };
+        
         Container con = f.getContentPane();
         if (con instanceof JComponent) {
             JComponent c = (JComponent)con;
