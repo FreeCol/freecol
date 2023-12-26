@@ -185,7 +185,6 @@ public final class ColonyPanel extends PortPanel
 
     private PopulationPanel populationPanel = null;
 
-    private JScrollPane tilesScroll = null;
     private TilesPanel tilesPanel = null;
 
     private JScrollPane warehouseScroll = null;
@@ -260,7 +259,7 @@ public final class ColonyPanel extends PortPanel
         super(freeColClient, new MigLayout());
 
         getMigLayout().setLayoutConstraints("fill, wrap 2, insets 2");
-        getMigLayout().setColumnConstraints("[" + getTilesScrollGuiScaledDimension().width + "px!][fill]");
+        getMigLayout().setColumnConstraints("[" + getTilesPanelGuiScaledDimension().width + "px!][fill]");
         getMigLayout().setRowConstraints("[growprio 100,shrinkprio 10][]0[]0[]"
                 + "[growprio 150,shrinkprio 50]"
                 + "[][]");
@@ -391,10 +390,6 @@ public final class ColonyPanel extends PortPanel
         populationPanel = new PopulationPanel();
 
         tilesPanel = new TilesPanel();
-        tilesScroll = new JScrollPane(tilesPanel,
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        tilesScroll.setBorder(Utility.BEVEL_BORDER);
 
         warehousePanel = new WarehousePanel();
         warehouseScroll = new JScrollPane(warehousePanel,
@@ -437,10 +432,13 @@ public final class ColonyPanel extends PortPanel
         this.colony = colony;
     }
     
-    private Dimension getTilesScrollGuiScaledDimension() {
-        final int tilesScrollWidth = 3 * getImageLibrary().getTileSize().width;
-        final int tilesScrollHeight = 3 * getImageLibrary().getTileSize().height;
-        return new Dimension(tilesScrollWidth, tilesScrollHeight);
+    private Dimension getTilesPanelGuiScaledDimension() {
+        final int tilesPanelWidth = 3 * getImageLibrary().getTileSize().width;
+        final int tilesPanelHeight = 3 * getImageLibrary().getTileSize().height;
+        final Dimension size = getImageLibrary().getTileSize();
+        final int extraHeight = size.height / 2;
+        
+        return new Dimension(tilesPanelWidth, tilesPanelHeight + extraHeight);
     }
 
     /**
@@ -504,11 +502,11 @@ public final class ColonyPanel extends PortPanel
         tilesPanel.initialize();
         warehousePanel.initialize();
 
-        final Dimension tilesScrollDimension = getTilesScrollGuiScaledDimension();
+        final Dimension tilesScrollDimension = getTilesPanelGuiScaledDimension();
         
         add(this.nameBox, "grow");
         add(netProductionPanel, "grow");
-        add(tilesScroll, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top");
+        add(tilesPanel, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top");
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
         add(constructionPanel, "grow, top");
@@ -1108,7 +1106,6 @@ public final class ColonyPanel extends PortPanel
         outsideColonyScroll = null;
         populationPanel = null;
         tilesPanel = null;
-        tilesScroll = null;
         warehousePanel = null;
         warehouseScroll = null;
 
@@ -1934,6 +1931,7 @@ public final class ColonyPanel extends PortPanel
             setBackground(Color.BLACK);
             setBorder(null);
             setLayout(null);
+            setOpaque(false);
         }
 
 
@@ -2031,13 +2029,20 @@ public final class ColonyPanel extends PortPanel
          */
         @Override
         public void paintComponent(Graphics g) {
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, getWidth(), getHeight());
-
             final Colony colony = getColony();
             if (colony != null) {
+                final Dimension size = getImageLibrary().getTileSize();
+                final int topOffset = topOffset(size);
+                g.translate(0, topOffset);
                 getGUI().displayColonyTiles((Graphics2D)g, tiles, colony);
+                g.translate(0, -topOffset);
             }
+        }
+
+
+        private int topOffset(final Dimension tileSize) {
+            final int topOffset = tileSize.height / 4;
+            return topOffset;
         }
 
         /**
@@ -2066,9 +2071,10 @@ public final class ColonyPanel extends PortPanel
                 setOpaque(false);
                 // Size and position:
                 Dimension size = getImageLibrary().getTileSize();
+                final int topOffset = topOffset(size);
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
-                    (x + y) * size.height / 2);
+                    (x + y) * size.height / 2 + topOffset);
             }
 
 
