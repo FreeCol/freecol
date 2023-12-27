@@ -33,6 +33,7 @@
       <rangeOption id="model.option.displayScaling"
                    defaultValue="0" localizedLabels="true">
         <rangeValue label="model.option.displayScaling.automatic" value="0"/>
+        <rangeValue label="model.option.displayScaling.75" value="75"/>
         <rangeValue label="model.option.displayScaling.100" value="100"/>
         <rangeValue label="model.option.displayScaling.125" value="125"/>
         <rangeValue label="model.option.displayScaling.150" value="150"/>
