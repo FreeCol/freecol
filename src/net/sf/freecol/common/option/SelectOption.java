@@ -19,8 +19,11 @@
 
 package net.sf.freecol.common.option;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -28,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -105,6 +107,30 @@ public class SelectOption extends IntegerOption {
      */
     public void addItemValue(Integer key, String value) {
         itemValues.put(key, value);
+    }
+    
+    /**
+     * Add a new key,value pair to this option at the given index.
+     *
+     * @param index The index in the list of item values.
+     * @param key The key to add.
+     * @param value The value to add.
+     */
+    public void setItemValueAtIndex(int index, Integer key, String value) {
+        final LinkedHashMap<Integer, String> oldItemValues = new LinkedHashMap<>(itemValues);
+        
+        itemValues.clear();
+        int currentIndex = 0;
+        for (Entry<Integer, String> entry : oldItemValues.entrySet()) {
+            if (index == currentIndex) {
+                itemValues.put(key, value);
+            }
+            itemValues.put(entry.getKey(), entry.getValue());
+            currentIndex++;
+        }
+        if (index >= itemValues.size()) {
+            itemValues.put(key, value);
+        }
     }
 
     /**

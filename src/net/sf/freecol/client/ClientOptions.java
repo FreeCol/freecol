@@ -876,6 +876,10 @@ public class ClientOptions extends OptionGroup {
         // end @compat 0.13.0
         // @compat 1.1.0
         remove("model.option.mapControls");
+        final RangeOption op = getOption(DISPLAY_SCALING, RangeOption.class);
+        if (!op.getItemValues().containsKey(75)) {
+            op.setItemValueAtIndex(1, 75, "model.option.displayScaling.75");
+        }
         // end @compat 1.1.0
     }
     
