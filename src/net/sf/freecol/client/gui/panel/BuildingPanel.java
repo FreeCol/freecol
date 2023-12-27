@@ -76,14 +76,27 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      * @param building The building to display information from.
      */
     public BuildingPanel(FreeColClient freeColClient, Building building) {
-        super(new MigLayout("", "[32!][32!][32!]", "[32!][44!]"));
-
+        super(new MigLayout("", layoutConstraintString(building), "push[32!][44!]"));
         this.freeColClient = freeColClient;
         this.building = building;
 
         setToolTipText(" ");
     }
 
+    private static String layoutConstraintString(Building building) {
+        return "push" + layoutWorkerString(building) + "push";
+    }
+
+    private static String layoutWorkerString(Building building) {
+        if (building.getUnitCapacity() < 2) {
+            return "[64!]";
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (int i=0; i<building.getUnitCapacity(); i++) {
+            sb.append("[32!]");
+        }
+        return sb.toString();
+    }
 
     private ImageLibrary getImageLibrary() {
         return this.freeColClient.getGUI().getFixedImageLibrary();
