@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -38,6 +39,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Float;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -1217,22 +1219,32 @@ public final class MapViewer extends FreeColClientHolder {
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && player != null && !player.owns(unit)
-            && unit.getOwner().isAI()
-            && getFreeColServer() != null
-            && getFreeColServer().getAIMain() != null
-            && (au = getFreeColServer().getAIMain().getAIUnit(unit)) != null) {
+                && player != null && !player.owns(unit)
+                && unit.getOwner().isAI()
+                && getFreeColServer() != null
+                && getFreeColServer().getAIMain() != null
+                && (au = getFreeColServer().getAIMain().getAIUnit(unit)) != null) {
             if (FreeColDebugger.debugShowMission()) {
-                g2d.setColor(Color.WHITE);
-                g2d.drawString((!au.hasMission()) ? "No mission"
-                    : lastPart(au.getMission().getClass().toString(), "."),
-                    0, 0);
+                final String missionString = (!au.hasMission()) ? "No mission" : lastPart(au.getMission().getClass().toString(), ".");
+                drawDebugText(g2d, missionString, 0, 0);
             }
             if (FreeColDebugger.debugShowMissionInfo() && au.hasMission()) {
-                g2d.setColor(Color.WHITE);
-                g2d.drawString(au.getMission().toString(), 0, 25);
+                drawDebugText(g2d, au.getMission().toStringForDebugExtraMissionInfo(), 0, 25);
             }
         }
+    }
+    
+    private void drawDebugText(Graphics2D g2d, String text, int x, int y) {
+        final FontMetrics fm = g2d.getFontMetrics();
+        final Rectangle2D textBoundingBox = fm.getStringBounds(text, g2d);
+        g2d.setColor(new Color(0, 0, 0, 128));
+        g2d.fillRect((int) (x + textBoundingBox.getX()),
+                (int) (y + textBoundingBox.getY()),
+                (int) (textBoundingBox.getWidth()),
+                (int) (textBoundingBox.getHeight()));
+        
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(text, x, y);
     }
 
     /**

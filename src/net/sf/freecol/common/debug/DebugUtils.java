@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Map;
@@ -1239,5 +1240,24 @@ public class DebugUtils {
         lb.add("\nLast Tribute = ", sis.getLastTribute());
 
         freeColClient.getGUI().showInformationPanel(lb.toString());
+    }
+    
+    public static String locationDisplayString(Location target) {
+        if (target == null) {
+            return "No target";
+        }
+        if (target.getTile() == null) {
+            return target.toString();
+        }
+        
+        final String tileCoordinates = "(" + target.getTile().getX() + ", " + target.getTile().getY() + ")";
+        if (target instanceof Settlement) {
+            return ((Settlement) target).getName() + " " + tileCoordinates;
+        }
+        if (target instanceof Tile) {
+            return tileCoordinates;
+        }
+        
+        return target.toString();
     }
 }

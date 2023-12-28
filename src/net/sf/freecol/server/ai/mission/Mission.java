@@ -19,37 +19,39 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import static net.sf.freecol.common.util.CollectionUtils.cachingIntComparator;
+import static net.sf.freecol.common.util.CollectionUtils.maximize;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
 import java.util.Comparator;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.StringUtils.*;
-
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
@@ -1062,5 +1064,15 @@ public abstract class Mission extends AIObject {
         lb.add(lastPart(getClass().getName(), "."), "@", hashCode(),
                "-", aiUnit.getUnit(), "->", getTarget());
         return lb.toString();
+    }
+   
+    /**
+     * A short string explaining the status of the mission.
+     * 
+     * This is used by "Display additional AI mission information" in the debug menu.
+     */
+    public String toStringForDebugExtraMissionInfo() {
+        final String targetString = DebugUtils.locationDisplayString(getTarget());
+        return "-> " + targetString;
     }
 }
