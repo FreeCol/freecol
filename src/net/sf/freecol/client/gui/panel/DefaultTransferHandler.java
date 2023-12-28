@@ -363,6 +363,10 @@ public final class DefaultTransferHandler extends TransferHandler {
     private boolean importGoods(JComponent comp, GoodsLabel label,
                                 UnitLabel oldSelectedUnit) {
         Goods goods = label.getGoods();
+        
+        if (!(comp instanceof UnitLabel) && !(comp instanceof DropTarget)) {
+            return importFail(comp, "goods");
+        }
 
         // Special handling for goods amount.
         if (label.isSuperFullChosen()) {
@@ -398,8 +402,18 @@ public final class DefaultTransferHandler extends TransferHandler {
                 int alt = ((DropTarget)comp).suggested(goods.getType());
                 if (alt >= 0 && alt < defaultAmount) defaultAmount = alt;
             }
-            int amount = getAmount(goods.getType(), goods.getAmount(),
-                                   defaultAmount, false);
+            
+            if (comp instanceof DropTarget) {
+                // Verifies that goods can be imported before showing the dialog.
+                final int origAmount = goods.getAmount();
+                DropTarget target = (DropTarget) comp;
+                goods.setAmount(defaultAmount);
+                if (defaultAmount <= 0 || !target.accepts(goods)) {
+                    return importFail(comp, "unacceptable goods pre dialog (" + goods + ")");
+                }
+                goods.setAmount(origAmount);
+            }
+            final int amount = getAmount(goods.getType(), goods.getAmount(), defaultAmount, false);
             if (amount <= 0) {
                 return importFail(comp, "weird goods amount (" + amount + ")");
             }
@@ -412,7 +426,6 @@ public final class DefaultTransferHandler extends TransferHandler {
 
         if (comp instanceof UnitLabel) {
             return equipUnitIfPossible((UnitLabel)comp, goods);
-
         } else if (comp instanceof DropTarget) {
             DropTarget target = (DropTarget)comp;
             if (!target.accepts(goods)) {
@@ -434,7 +447,22 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @return True if the import succeeds.
      */
     private boolean importMarket(JComponent comp, MarketLabel label) {
+        if (!(comp instanceof UnitLabel) && !(comp instanceof CargoPanel)) {
+            return false;
+        }
+        
         if (label.isPartialChosen()) {
+            if (comp instanceof CargoPanel) {
+                // Verifies that goods can be imported before showing the dialog.
+                final CargoPanel cargoPanel = (CargoPanel) comp;
+                if (cargoPanel.getCarrier() == null) {
+                    return false;
+                }
+                if (cargoPanel.getCarrier().getLoadableAmount(label.getType()) <= 0) {
+                    return false;
+                }
+            }
+            
             int amount = getAmount(label.getType(), label.getAmount(), -1, true);
             if (amount <= 0) return false;
             label.setAmount(amount);
