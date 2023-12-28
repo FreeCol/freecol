@@ -70,7 +70,9 @@ public final class GoodsLabel extends AbstractGoodsLabel
         final GoodsType type = goods.getType();
         final Specification spec = goods.getGame().getSpecification();
 
-        if (getAmount() < GoodsContainer.CARGO_SIZE) setPartialChosen(true);
+        if (getAmount() < GoodsContainer.CARGO_SIZE) {
+            setAmountType(AmountType.PARTIAL);
+        }
 
         setForeground(ImageLibrary.getGoodsColor(type, goods.getAmount(),
                                                  location));

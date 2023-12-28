@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
 import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.label.AbstractGoodsLabel.AmountType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.OSUtils;
 
@@ -146,17 +147,14 @@ public final class DragListener extends MouseAdapter {
                         }
                     }
                 }
-                label.setSuperFullChosen(true);
+                label.setAmountType(AmountType.SUPER_FULL);
                 label.setAmount(sum);
             } else if (e.isShiftDown()) {
-                label.setSuperFullChosen(false);
-                label.setPartialChosen(true);
+                label.setAmountType(AmountType.PARTIAL);
             } else if (e.isControlDown()) {
-                label.setSuperFullChosen(false);
-                label.setFullChosen(true);
+                label.setAmountType(AmountType.FULL);
             } else {
-                label.setSuperFullChosen(false);
-                label.setPartialChosen(false);
+                label.setAmountType(AmountType.DEFAULT);
                 label.setDefaultAmount();
             }
         } else if (comp instanceof UnitLabel) {

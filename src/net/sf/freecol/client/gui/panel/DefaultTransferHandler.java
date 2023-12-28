@@ -58,6 +58,7 @@ import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.label.AbstractGoodsLabel.AmountType;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -76,6 +77,7 @@ import net.sf.freecol.common.model.Unit;
 public final class DefaultTransferHandler extends TransferHandler {
 
     private static final Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
+    
 
     /**
      * This is the default drag handler for drag and drop operations that
@@ -89,7 +91,9 @@ public final class DefaultTransferHandler extends TransferHandler {
 
         private void updatePartialChosen(JComponent comp, boolean partial) {
             if (comp instanceof AbstractGoodsLabel) {
-                ((AbstractGoodsLabel)comp).setPartialChosen(partial);
+                if (partial) {
+                    ((AbstractGoodsLabel)comp).setAmountType(AmountType.PARTIAL);
+                }
             }
         }
 
