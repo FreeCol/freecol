@@ -138,6 +138,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         FreeColTransparentPanelUI.class,
         FreeColSpinnerUI.class
     };
+    
+    private static float scaleFactor = 1;
 
 
     /**
@@ -256,6 +258,17 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 u.put(key, defaultFont);
             }
         }
+    }
+    
+    public static void setScaleFactor(float scaleFactor) {
+        FreeColLookAndFeel.scaleFactor = scaleFactor;
+        final UIDefaults u = UIManager.getLookAndFeelDefaults();
+        final int scrollbarWidth = (int) (17 * scaleFactor);
+        u.put("ScrollBar.width", scrollbarWidth);
+    }
+    
+    public static float getScaleFactor() {
+        return scaleFactor;
     }
 
     /**

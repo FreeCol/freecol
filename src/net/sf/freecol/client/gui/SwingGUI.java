@@ -780,6 +780,7 @@ public class SwingGUI extends GUI {
             throw new FreeColException("Unable to create main font: "
                 + fontName);
         }
+        FreeColLookAndFeel.setScaleFactor(fixedImageLibrary.getScaleFactor());
         FreeColLookAndFeel.installFont(font);
         Utility.initStyleContext(font);
     }
@@ -1933,6 +1934,7 @@ public class SwingGUI extends GUI {
         FontLibrary.setMainFontSize(fontSize);
         
         final Font font = FontLibrary.getMainFont();
+        FreeColLookAndFeel.setScaleFactor(scaleFactor);
         FreeColLookAndFeel.installFont(font);
         FreeColToolTipUI.setFontScaling(FontLibrary.getFontScaling());
         Utility.initStyleContext(font);
