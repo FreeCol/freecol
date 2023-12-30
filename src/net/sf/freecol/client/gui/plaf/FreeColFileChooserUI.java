@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -40,6 +41,14 @@ public class FreeColFileChooserUI extends MetalFileChooserUI {
 
     public FreeColFileChooserUI(JFileChooser filechooser) {
         super(filechooser);
+    }
+    
+    @Override
+    public void installUI(JComponent c) {
+        super.installUI(c);
+        final Dimension d = getPreferredSize(c);
+        final float scaleFactor = FreeColLookAndFeel.getScaleFactor();
+        c.setPreferredSize(new Dimension((int) (d.width * scaleFactor), (int) (d.height * scaleFactor)));
     }
 
     @Override
