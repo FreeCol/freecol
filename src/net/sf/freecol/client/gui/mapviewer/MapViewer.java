@@ -1225,26 +1225,49 @@ public final class MapViewer extends FreeColClientHolder {
                 && getFreeColServer().getAIMain() != null
                 && (au = getFreeColServer().getAIMain().getAIUnit(unit)) != null) {
             if (FreeColDebugger.debugShowMission()) {
-                final String missionString = (!au.hasMission()) ? "No mission" : lastPart(au.getMission().getClass().toString(), ".");
-                drawDebugText(g2d, missionString, 0, 0);
-            }
-            if (FreeColDebugger.debugShowMissionInfo() && au.hasMission()) {
-                drawDebugText(g2d, au.getMission().toStringForDebugExtraMissionInfo(), 0, 25);
+                String missionString = (!au.hasMission())
+                        ? "No mission"
+                        : au.getMission().getClass().getSimpleName().replaceAll("Mission$", "");
+                final Font origFont = g2d.getFont();
+                if (FreeColDebugger.debugShowMissionInfo() && au.hasMission()) {
+                    missionString += "\n" + au.getMission().toStringForDebugExtraMissionInfo();
+                    g2d.setFont(origFont.deriveFont(origFont.getSize2D() * 2 / 3));
+                }
+                drawCenteredMultilineDebugText(g2d, missionString, 0, 0);
+                g2d.setFont(origFont);
             }
         }
     }
     
-    private void drawDebugText(Graphics2D g2d, String text, int x, int y) {
+    private void drawCenteredMultilineDebugText(Graphics2D g2d, String text, int x, int y) {
         final FontMetrics fm = g2d.getFontMetrics();
-        final Rectangle2D textBoundingBox = fm.getStringBounds(text, g2d);
-        g2d.setColor(new Color(0, 0, 0, 128));
-        g2d.fillRect((int) (x + textBoundingBox.getX()),
-                (int) (y + textBoundingBox.getY()),
-                (int) (textBoundingBox.getWidth()),
-                (int) (textBoundingBox.getHeight()));
+        final String[] lines = text.split("\n");
+        final Rectangle2D[] lineTextBoundingBoxes = new Rectangle2D[lines.length];
         
-        g2d.setColor(Color.WHITE);
-        g2d.drawString(text, x, y);
+        Dimension allTextBoundingBox = new Dimension(0, 0);
+        int backgroundOffsetY = 0;
+        for (int i=0; i<lines.length; i++) {
+            Rectangle2D lineTextBoundingBox = fm.getStringBounds(lines[i], g2d);
+            lineTextBoundingBoxes[i] = lineTextBoundingBox;
+            allTextBoundingBox = new Dimension((int) Math.max(allTextBoundingBox.width, lineTextBoundingBox.getWidth()),
+                    (int) (allTextBoundingBox.height + lineTextBoundingBox.getHeight()));
+            if ((int) lineTextBoundingBox.getY() < backgroundOffsetY) {
+                backgroundOffsetY = (int) lineTextBoundingBox.getY(); 
+            }
+        }
+        
+        final int tileCenterX = (tileBounds.getWidth() - allTextBoundingBox.width) / 2;
+        
+        g2d.setColor(new Color(0, 0, 0, 128));
+        g2d.fillRect(x + tileCenterX, y + backgroundOffsetY, allTextBoundingBox.width, allTextBoundingBox.height);
+        
+        int offsetY = 0;
+        for (int i=0; i<lines.length; i++) {
+            g2d.setColor(Color.WHITE);
+            final int centerX = (int) (allTextBoundingBox.getWidth() - lineTextBoundingBoxes[i].getWidth()) / 2;
+            g2d.drawString(lines[i], x + centerX + tileCenterX, y + offsetY);
+            offsetY += lineTextBoundingBoxes[i].getHeight();
+        }
     }
 
     /**

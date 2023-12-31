@@ -1073,6 +1073,6 @@ public abstract class Mission extends AIObject {
      */
     public String toStringForDebugExtraMissionInfo() {
         final String targetString = DebugUtils.locationDisplayString(getTarget());
-        return "-> " + targetString;
+        return targetString;
     }
 }

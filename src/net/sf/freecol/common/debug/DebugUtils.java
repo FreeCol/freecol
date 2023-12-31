@@ -1252,7 +1252,11 @@ public class DebugUtils {
         
         final String tileCoordinates = "(" + target.getTile().getX() + ", " + target.getTile().getY() + ")";
         if (target instanceof Settlement) {
-            return ((Settlement) target).getName() + " " + tileCoordinates;
+            return ((Settlement) target).getName() + "\n " + tileCoordinates;
+        }
+        if (target instanceof Unit) {
+            final Unit unit = (Unit) target;
+            return Messages.message(unit.getLabel()) + "\n" + tileCoordinates;
         }
         if (target instanceof Tile) {
             return tileCoordinates;

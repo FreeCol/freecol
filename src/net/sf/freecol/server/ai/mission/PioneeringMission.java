@@ -806,6 +806,6 @@ public final class PioneeringMission extends Mission {
     public String toStringForDebugExtraMissionInfo() {
         final String targetString = DebugUtils.locationDisplayString(getTarget());
         final String tileImprovement = (tileImprovementPlan != null) ? Messages.message(tileImprovementPlan.getType().getNameKey()) : "No plan";
-        return "-> " + tileImprovement + " at " + targetString;
+        return tileImprovement + " at " + targetString;
     }
 }
