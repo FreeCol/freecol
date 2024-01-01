@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.dialog;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.logging.Logger;
@@ -113,7 +112,7 @@ public final class WarehouseDialog extends FreeColPanel {
     }
 
     private JPanel createWarehousePanel(FreeColClient freeColClient, Colony colony) {
-        final JPanel warehousePanel = new JPanel(new WrapLayout(FlowLayout.CENTER, 0, 0));
+        final JPanel warehousePanel = new JPanel(new WrapLayout());
         warehousePanel.setOpaque(false);
         final List<GoodsType> goodsTypes = freeColClient.getGame().getSpecification().getStorableGoodsTypeList();
         int preferredWidth = 0;
