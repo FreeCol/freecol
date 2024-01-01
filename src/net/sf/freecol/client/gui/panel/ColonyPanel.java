@@ -686,10 +686,10 @@ public final class ColonyPanel extends PortPanel
         add(cargoScroll, "grow, height 100!");
         add(warehouseScroll, "span, split, height 48!, growx");
         if (setGoodsButton != null) {
-            add(setGoodsButton);
+            add(setGoodsButton, "height 48!, gap 0 0 0 0");
         }
         if (traceWorkButton != null) {
-            add(traceWorkButton);
+            add(traceWorkButton, "height 48!, gap 0 0 0 0");
         }
         add(okButton, "gapbefore push, height 48!"); // tag ok
 
