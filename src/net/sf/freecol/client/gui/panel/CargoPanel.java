@@ -19,10 +19,16 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
+
+import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -47,6 +53,7 @@ public class CargoPanel extends FreeColPanel
     private Unit carrier;
 
     private DefaultTransferHandler defaultTransferHandler = null;
+    private boolean withStyling; 
 
     /**
      * Creates this CargoPanel.
@@ -54,15 +61,18 @@ public class CargoPanel extends FreeColPanel
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param withTitle     Should the panel have a title?
      */
-    public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
+    public CargoPanel(FreeColClient freeColClient, boolean withTitle, boolean withStyling) {
         super(freeColClient, "CargoPanelUI",
-                new MigLayout("wrap 6, fill, insets 0"));
+                new MigLayout("wrap 6, gap 0 0, insets 0", "[79!, center][79!, center][79!, center][79!, center][79!, center][79!, center]", "[100!]"));
 
         this.carrier = null;
         this.defaultTransferHandler = new DefaultTransferHandler(getFreeColClient(), this);
+        this.withStyling = withStyling;
 
         if (withTitle) {
             setBorder(Utility.localizedBorder("cargoOnCarrier"));
+        } else {
+            setBorder(null);
         }
     }
 
@@ -115,6 +125,9 @@ public class CargoPanel extends FreeColPanel
 
             for (Goods g : carrier.getGoodsList()) {
                 GoodsLabel label = new GoodsLabel(fcc, g);
+                label.setHorizontalTextPosition(JLabel.CENTER);
+                label.setVerticalTextPosition(JLabel.BOTTOM);
+                label.setForeground(Color.WHITE);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(dl);
@@ -162,6 +175,9 @@ public class CargoPanel extends FreeColPanel
      * Update the title of this CargoPanel.
      */
     private void updateTitle() {
+        if (getBorder() == null) {
+            return;
+        }
         Utility.localizeBorder(this, (carrier == null)
                 ? StringTemplate.key("cargoOnCarrier")
                 : StringTemplate.template("cargoPanel.cargoAndSpace")
@@ -243,5 +259,28 @@ public class CargoPanel extends FreeColPanel
         removePropertyChangeListeners();
 
         defaultTransferHandler = null;
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        final Dimension size = getSize();
+        final BufferedImage available = getImageLibrary().getScaledCargoHold(true);
+        final BufferedImage unavailable = getImageLibrary().getScaledCargoHold(false);
+        final int availableHolds = (carrier != null) ? carrier.getCargoCapacity() : 0;
+        if (withStyling) {
+            int x = 0;
+            for (int i=0; i<availableHolds; i++) {
+                g.drawImage(available, x, 0, null);
+                x += available.getWidth();
+            }
+            while (x < size.width) {
+                g.drawImage(unavailable, x, 0, null);
+                x += unavailable.getWidth();
+            }
+            g.drawImage(unavailable, x, 0, null);
+        }
+        
     }
 }

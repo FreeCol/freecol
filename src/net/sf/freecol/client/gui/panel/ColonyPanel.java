@@ -32,17 +32,32 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.channels.ClosedByInterruptException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -58,9 +73,14 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
@@ -71,13 +91,17 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.mapviewer.TileBounds;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.client.gui.tooltip.RebelToolTip;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
@@ -98,6 +122,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -108,28 +133,13 @@ import net.sf.freecol.common.model.WorkLocation;
  * the colony which is why we need to call getColony().getSpecification()
  * to get the spec that corresponds to the good types in this colony.
  * <p>
- * Panel Layout:
- * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
- * |--------------------------------------------------------|
- * | nameBox           |         netProductionPanel         |
- * |--------------------------------------------------------|
- * | tilesPanel        | buildingsPanel                     |
- * |-------------------|                                    |
- * | populationPanel   |                                    |
- * |-------------------|                                    |
- * | constructionPanel |                                    |
- * |--------------------------------------------------------|
- * | inPortPanel     | cargoPanel      | outsideColonyPanel |
- * |--------------------------------------------------------|
- * |                      warehousePanel                    |
- * |--------------------------------------------------------|
  */
 public final class ColonyPanel extends PortPanel
     implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(ColonyPanel.class.getName());
 
-    /** The height of the area in which autoscrolling should happen. */
+    /** The height of the area in whichcomponentRe autoscrolling should happen. */
     public static final int SCROLL_AREA_HEIGHT = 40;
 
     /** The speed of the scrolling. */
@@ -142,14 +152,14 @@ public final class ColonyPanel extends PortPanel
     private JButton fillButton
         = Utility.localizedButton("load");
 
-    private JButton warehouseButton
-        = Utility.localizedButton("colonyPanel.warehouse");
+    private JButton warehouseButton = new FreeColButton(Messages.message("colonyPanel.warehouse"))
+            .withButtonStyle(ButtonStyle.SIMPLE);
 
-    private JButton buildQueueButton
-        = Utility.localizedButton("colonyPanel.buildQueue");
+    private JButton buildQueueButton = new FreeColButton(Messages.message("colonyPanel.buildQueue"))
+            .withButtonStyle(ButtonStyle.SIMPLE);
 
-    private JButton colonyUnitsButton
-        = Utility.localizedButton("colonyPanel.colonyUnits");
+    private JButton colonyUnitsButton = new FreeColButton(Messages.message("colonyPanel.colonyUnits"))
+            .withButtonStyle(ButtonStyle.SIMPLE);
 
     // Only present in debug mode
     private JButton setGoodsButton = null;
@@ -258,11 +268,9 @@ public final class ColonyPanel extends PortPanel
     public ColonyPanel(FreeColClient freeColClient, Colony colony) {
         super(freeColClient, new MigLayout());
 
-        getMigLayout().setLayoutConstraints("fill, wrap 2, insets 2");
-        getMigLayout().setColumnConstraints("[" + getTilesPanelGuiScaledDimension().width + "px!][fill]");
-        getMigLayout().setRowConstraints("[growprio 100,shrinkprio 10][]0[]0[]"
-                + "[growprio 150,shrinkprio 50]"
-                + "[][]");
+        getMigLayout().setLayoutConstraints("fill, wrap 2, insets 0, gap 0 0");
+        getMigLayout().setColumnConstraints("[fill][474!]");
+        getMigLayout().setRowConstraints("[]0[]0[][growprio 150,shrinkprio 50][][]");
         
         final Player player = getMyPlayer();
         // Do not just use colony.getOwner() == getMyPlayer() because
@@ -271,8 +279,7 @@ public final class ColonyPanel extends PortPanel
         editable = colony.getOwner().getId().equals(player.getId());
 
         // Only enable the set goods button in debug mode when not spying
-        if (editable
-            && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+        if (editable && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             setGoodsButton = Utility.localizedButton("colonyPanel.setGoods");
             traceWorkButton = Utility.localizedButton("colonyPanel.traceWork");
         }
@@ -359,33 +366,68 @@ public final class ColonyPanel extends PortPanel
         netProductionPanel.setOpaque(false);
 
         buildingsPanel = new BuildingsPanel();
+        buildingsPanel.setOpaque(false);
         buildingsScroll = new JScrollPane(buildingsPanel,
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER) {
+
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(1, 1);
+            }
+        };
+        
+        /*
+         * Dirty workaround for scrollbar flickering and missing layouts. In the future, we
+         * should instead use the JScrollBar directly from the buildingsPanel (and integrate
+         * with the layout manager) rather than relying on JScrollPane.
+         */
+        buildingsScroll.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                final Dimension preferredSize = buildingsPanel.getLayout().preferredLayoutSize(buildingsPanel);
+                final Dimension viewportSize = buildingsScroll.getViewport().getSize();
+                if (!preferredSize.equals(buildingsPanel.getSize())) {
+                    buildingsPanel.setSize(preferredSize);
+                    buildingsScroll.validate();
+                }
+                if (preferredSize.width <= viewportSize.width
+                        && preferredSize.height <= viewportSize.height) {
+                    buildingsScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                } else {
+                    buildingsScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                }
+            }
+        });
+        
         buildingsScroll.getVerticalScrollBar().setUnitIncrement(16);
         buildingsScroll.getViewport().setOpaque(false);
-        buildingsPanel.setOpaque(false);
-        buildingsScroll.setBorder(Utility.ETCHED_BORDER);
+        buildingsScroll.setBorder(null);
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
         cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        cargoScroll.setBorder(Utility.ETCHED_BORDER);
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        cargoScroll.setBorder(null);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
 
         inPortPanel = new ColonyInPortPanel();
-        inPortScroll = new JScrollPane(inPortPanel);
+        inPortScroll = new JScrollPane(inPortPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
-        inPortScroll.setBorder(Utility.ETCHED_BORDER);
+        inPortScroll.setBorder(null);
+        inPortScroll.setOpaque(false);
+        inPortScroll.getViewport().setOpaque(false);
 
         outsideColonyPanel = new OutsideColonyPanel();
         outsideColonyScroll = new JScrollPane(outsideColonyPanel,
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         outsideColonyScroll.getVerticalScrollBar().setUnitIncrement(16);
-        outsideColonyScroll.setBorder(Utility.ETCHED_BORDER);
+        outsideColonyScroll.setBorder(null);
+        outsideColonyScroll.setOpaque(false);
+        outsideColonyScroll.getViewport().setOpaque(false);
 
         populationPanel = new PopulationPanel();
 
@@ -395,7 +437,7 @@ public final class ColonyPanel extends PortPanel
         warehouseScroll = new JScrollPane(warehousePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        warehouseScroll.setBorder(Utility.ETCHED_BORDER);
+        warehouseScroll.setBorder(FreeColImageBorder.colonyWarehouseBorder);
 
         InputMap nameIM = new ComponentInputMap(this.nameBox);
         nameIM.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
@@ -403,16 +445,18 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(this.nameBox,
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
-        if (getGUI().getMapViewDimension().height < 770) {
+        if (getGUI().getMapViewDimension().height < 700) {
             /*
-             * Reduces the border size so that the Colony panel
-             * can get slightly bigger.
+             * TODO: Remove all borders and show the panel covering the
+             *       entire screen (except for the menu bar.
              */
-            setBorder(FreeColImageBorder.panelWithoutShadowBorder);
         }
-        
+
+        setBorder(FreeColImageBorder.innerColonyPanelBorder);
         initialize(colony);
-        getGUI().restoreSavedSize(this, new Dimension(1050, 675));
+
+        final Dimension startingSize = freeColClient.getGUI().getFixedImageLibrary().scale(new Dimension(1280, 700));
+        getGUI().restoreSavedSize(this, startingSize);
         
         setEscapeAction(new AbstractAction() {
             @Override
@@ -421,8 +465,108 @@ public final class ColonyPanel extends PortPanel
             }
         });
     }
+    
+    /**
+     * Paints parts of the background/skins for the ColonyPanel. In the future
+     * we will probably want to generalize this approach in order to allow
+     * mods to define complex skins.
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        /*
+         * Painting the backgrounds here avoids the need for a JLayeredPane (since we
+         * want different backgrounds to overlay with partial transparency).
+         */
+        
+        final Dimension size = getSize();
+        
+        final BufferedImage colonyDocks = getImageLibrary().getColonyDocks();
+        if (colonyDocks != null) {
+            final int docksBottomLeftX = inPortScroll.getX();
+            final int docksBottomLeftY = inPortScroll.getY() + inPortScroll.getHeight();
+            int y = docksBottomLeftY - colonyDocks.getHeight();
+            g.drawImage(colonyDocks, docksBottomLeftX, y, null);
+            
+            final BufferedImage colonyDocksSky = getImageLibrary().getColonyDocksSky();
+            if (colonyDocksSky != null) {
+                while (y > 0) {
+                    y -= colonyDocksSky.getHeight();
+                    g.drawImage(colonyDocksSky, docksBottomLeftX, y, null);
+                }
+            }
+            
+        }
+        
+        final BufferedImage unavailable = getImageLibrary().getScaledCargoHold(false);
+        if (unavailable != null) {
+            final int cargoHoldTopRightX = cargoScroll.getX() + cargoScroll.getWidth();
+            final int cargoHoldTopRightY = cargoScroll.getY();
+            g.drawImage(unavailable, cargoHoldTopRightX, cargoHoldTopRightY, null);
+        }
+        
+        final BufferedImage upperRightBackground = getImageLibrary().getColonyUpperRightBackground();
+        if (upperRightBackground != null) {
+            final Insets insets = getInsets();
+            g.drawImage(upperRightBackground, size.width - upperRightBackground.getWidth() - insets.right, insets.top, null);
+        }
+        
+        final BufferedImage nwBorder = getImageLibrary().getScaledImage("image.border.wooden.nw");
+        final BufferedImage wBorder = getImageLibrary().getScaledImage("image.border.wooden.w");
+        if (nwBorder != null && wBorder != null) {
+            final int x = okButton.getX() + okButton.getWidth();
+            int y = okButton.getY();
+            g.drawImage(nwBorder, 
+                    x,
+                    y,
+                    null);
+            y += nwBorder.getHeight();
+            
+            while (y < size.height) {
+                g.drawImage(wBorder, 
+                        x,
+                        y,
+                        null);
+                y += wBorder.getHeight();
+            }
+        }
+        
+        final BufferedImage sBorder = getImageLibrary().getScaledImage("image.border.wooden.s");
+        if (sBorder != null) {
+            int x = 0;
+            int y = warehouseScroll.getY() + warehouseScroll.getHeight();
+            while (x < size.width) {
+                g.drawImage(sBorder, x, y, null);
+                x += sBorder.getWidth();
+            }
+        }
+        
+        if (nwBorder != null && wBorder != null) {
+            int x = warehouseScroll.getX() - nwBorder.getWidth();
+            int y = warehouseScroll.getY();
+            g.drawImage(nwBorder, x, y, null);
+            y += nwBorder.getHeight();
+            
+            while (y < size.height) {
+                g.drawImage(wBorder, 
+                        x,
+                        y,
+                        null);
+                y += wBorder.getHeight();
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Border getFrameBorder() {
+        return FreeColImageBorder.outerColonyPanelBorder;
+    }
 
-
+    
     /**
      * Set the current colony.
      *
@@ -436,7 +580,7 @@ public final class ColonyPanel extends PortPanel
         final int tilesPanelWidth = 3 * getImageLibrary().getTileSize().width;
         final int tilesPanelHeight = 3 * getImageLibrary().getTileSize().height;
         final Dimension size = getImageLibrary().getTileSize();
-        final int extraHeight = size.height / 2;
+        final int extraHeight = tilesPanelTopOffset(size);
         
         return new Dimension(tilesPanelWidth, tilesPanelHeight + extraHeight);
     }
@@ -503,29 +647,51 @@ public final class ColonyPanel extends PortPanel
         warehousePanel.initialize();
 
         final Dimension tilesScrollDimension = getTilesPanelGuiScaledDimension();
+        add(buildingsScroll, "span 1 4, grow");
         
-        add(this.nameBox, "grow");
-        add(netProductionPanel, "grow");
-        add(tilesPanel, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top");
-        add(buildingsScroll, "span 1 3, grow");
-        add(populationPanel, "grow");
-        add(constructionPanel, "grow, top");
-        add(inPortScroll, "span, split 3, grow, sg, height 60:160:");
-        add(cargoScroll, "grow, sg, height 60:160:");
-        add(outsideColonyScroll, "grow, sg, height 60:160:");
-        add(warehouseScroll, "span, height " + (ImageLibrary.ICON_SIZE.height * 2) + "!, growx");
-        int buttonFields = 6;
-        if (setGoodsButton != null) buttonFields++;
-        if (traceWorkButton != null) buttonFields++;
-        add(unloadButton, "span, split " + Integer.toString(buttonFields)
-            + ", align center");
-        add(fillButton);
-        add(warehouseButton);
-        add(buildQueueButton);
-        add(colonyUnitsButton);
-        if (setGoodsButton != null) add(setGoodsButton);
-        if (traceWorkButton != null) add(traceWorkButton);
-        add(okButton, "gapbefore push"); // tag ok
+        // TODO: Display the name:
+        //add(this.nameBox, "grow, span");
+        
+        JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1", "[center]"));
+        upperRightPanel.setOpaque(false);
+        upperRightPanel.add(tilesPanel, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top, center");
+        
+        final FreeColImageBorder border = FreeColImageBorder.innerColonyPanelBorder;
+        final Insets borderInsets = border.getBorderInsets(this);
+        upperRightPanel.add(netProductionPanel, "grow");
+        
+        // TODO: Display the numbers in new components:
+        //add(populationPanel, "grow");
+        
+        final JPanel buttonPanel = new JPanel(new MigLayout("fill, wrap 1, gap 0 0, ins 0", "", ""));
+        buttonPanel.setOpaque(false);
+        
+        /*
+         * TODO: Don't think we need these, but they can be added to the
+         *       in-port panel if we do.
+         */ 
+        //buttonPanel.add(unloadButton);
+        //buttonPanel.add(fillButton);
+        
+        buttonPanel.add(buildQueueButton, "sg");
+        buttonPanel.add(warehouseButton, "sg");
+        buttonPanel.add(colonyUnitsButton, "sg");
+        
+        upperRightPanel.add(buttonPanel, "sgy, split 2, left");
+        upperRightPanel.add(constructionPanel, "sgy, grow, top");
+        add(upperRightPanel, "span 1 3, grow, gapbefore 53, width 400!");
+        
+        add(inPortScroll, "span, grow, height 96!, gaptop push");
+        add(outsideColonyScroll, "grow, height 96!");
+        add(cargoScroll, "grow, height 100!");
+        add(warehouseScroll, "span, split, height 48!, growx");
+        if (setGoodsButton != null) {
+            add(setGoodsButton);
+        }
+        if (traceWorkButton != null) {
+            add(traceWorkButton);
+        }
+        add(okButton, "gapbefore push, height 48!"); // tag ok
 
         update();
     }
@@ -1133,7 +1299,7 @@ public final class ColonyPanel extends PortPanel
          * @param freeColClient The {@code FreeColClient} for the game.
          */
         public ColonyCargoPanel(FreeColClient freeColClient) {
-            super(freeColClient, true);
+            super(freeColClient, false, true);
         }
 
 
@@ -1296,18 +1462,23 @@ public final class ColonyPanel extends PortPanel
      * A panel that holds UnitLabels that represent Units that are standing in
      * front of a colony.
      */
-    public final class OutsideColonyPanel extends UnitPanel
-        implements DropTarget {
+    public final class OutsideColonyPanel extends UnitPanel implements DropTarget {
 
         /**
          * Create this OutsideColonyPanel.
          */
         public OutsideColonyPanel() {
             super("OutsideColonyPanelUI",
-                  new MigLayout("wrap 3, fill, insets 0"), ColonyPanel.this,
+                  new MigLayout("ins 0, gapy 0, align center bottom", "", "[bottom]"),
+                  ColonyPanel.this,
                   null, ColonyPanel.this.isEditable());
 
-            setBorder(Utility.localizedBorder("colonyPanel.outsideColony"));
+            /*
+             * TODO: Decide if we need to have a title for "Outside the colony". If so,
+             *       make it nicer than this one.
+             */
+            //setBorder(Utility.localizedBorder("colonyPanel.outsideColony"));
+            setOpaque(false);
         }
 
 
@@ -1447,10 +1618,15 @@ public final class ColonyPanel extends PortPanel
          * Creates this ColonyInPortPanel.
          */
         public ColonyInPortPanel() {
-            super(new MigLayout("wrap 3, fill, insets 0"), ColonyPanel.this,
+            super(new MigLayout("ins 0, gapy 0, align center bottom", "", "[bottom]"), ColonyPanel.this,
                   null, ColonyPanel.this.isEditable());
 
-            setBorder(Utility.localizedBorder("colonyPanel.inPort"));
+            /*
+             * TODO: Decide if we need to have a title for "In port". If so,
+             *       make it nicer than this one.
+             */
+            //setTitleInsidePanel(Messages.message("colonyPanel.inPort"));
+            setOpaque(false);
         }
 
 
@@ -1582,8 +1758,8 @@ public final class ColonyPanel extends PortPanel
                 int count = colony.getGoodsCount(goodsType);
                 if (count >= threshold) {
                     Goods goods = new Goods(game, colony, goodsType, count);
-                    GoodsLabel goodsLabel
-                        = new GoodsLabel(getFreeColClient(), goods);
+                    GoodsLabel goodsLabel = new GoodsLabel(getFreeColClient(), goods);
+                    goodsLabel.setForeground(Color.WHITE);
                     if (ColonyPanel.this.isEditable()) {
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);
@@ -1680,6 +1856,14 @@ public final class ColonyPanel extends PortPanel
             removeAll();
             setLayout(null);
         }
+        
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            final BufferedImage colonyWarehouseBackground = getImageLibrary().getColonyWarehouseBackground();
+            ImageUtils.drawTiledImage(colonyWarehouseBackground, g, this, getInsets());
+        }
     }
 
 
@@ -1702,7 +1886,8 @@ public final class ColonyPanel extends PortPanel
          * Creates this BuildingsPanel.
          */
         public BuildingsPanel() {
-            super("BuildingsPanelUI", new MigLayout("fill, wrap 4, insets 0, gap 0:10:10:push 0:10:10:push"));
+            // TODO: Use different seeds per colony for BuildingsLayoutManager?
+            super("BuildingsPanelUI", new BuildingsLayoutManager());
         }
 
 
@@ -1713,11 +1898,37 @@ public final class ColonyPanel extends PortPanel
             final Colony colony = getColony();
             if (colony == null) return;
             cleanup();
-
-            for (Building building : sort(colony.getBuildings())) {
-                ASingleBuildingPanel aSBP = new ASingleBuildingPanel(building);
-                aSBP.initialize();
-                add(aSBP);
+            
+            final List<BuildingType> allBuildableTypes = getSpecification().getBuildingTypeList().stream()
+                    .filter(bt -> bt.getUpgradesFrom() == null)
+                    .collect(Collectors.toList());
+            final Random random = new Random(13 * getColony().getTile().getX() + 23 * getColony().getTile().getY());
+            Collections.shuffle(allBuildableTypes, random);
+            
+            Map<BuildingType, List<Building>> constructedBuildings = colony.getBuildings().stream().collect(Collectors.groupingBy(g -> g.getType().getFirstLevel()));
+            for (BuildingType bt : allBuildableTypes) {
+                if (bt.isDefenceType()) {
+                    continue;
+                }
+                if (bt.hasAbility(Ability.PRODUCE_IN_WATER)) {
+                    continue;
+                }
+                final List<Building> btBuildings = constructedBuildings.get(bt);
+                if (btBuildings == null) {
+                    final JPanel emptyPlot = new EmptyBuildingSite();
+                    final Dimension size = getImageLibrary().determineMaxSizeUsingSizeFromAllLevels(bt, colony.getOwner());
+                    emptyPlot.setMinimumSize(size);
+                    emptyPlot.setPreferredSize(size);
+                    emptyPlot.setSize(size);
+                    add(emptyPlot);
+                } else {
+                    if (btBuildings.size() != 1) {
+                        throw new IllegalStateException("Expected at most one building of each type.");
+                    }
+                    ASingleBuildingPanel aSBP = new ASingleBuildingPanel(btBuildings.get(0));
+                    aSBP.initialize();
+                    add(aSBP);
+                }
             }
 
             update();
@@ -1906,6 +2117,34 @@ public final class ColonyPanel extends PortPanel
                 ColonyPanel.this.updateProduction();
             }
         }
+        
+        public final class EmptyBuildingSite extends JPanel{
+            EmptyBuildingSite() {
+                setOpaque(false);
+            }
+            
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                final ImageLibrary lib = getImageLibrary();
+                final BufferedImage image = lib.getScaledBuildingEmptyLandImage();
+                final Dimension size = getSize();
+                g.drawImage(image,
+                        (size.width - image.getWidth()) / 2,
+                        size.height - image.getHeight(),
+                        this);
+            }
+        }
+    }
+    
+    private int tilesPanelTopOffset(final Dimension tileSize) {
+        /*
+         * TODO: tileSize.height / 2 is needed to avoid clipping mountains,
+         *       but that takes a lot of space. Perhaps make the tile render
+         *       above the border (and clip when the panel is displayed
+         *       without them)?
+         */
+        final int topOffset = tileSize.height / 4;
+        return topOffset;
     }
 
     /**
@@ -2032,17 +2271,11 @@ public final class ColonyPanel extends PortPanel
             final Colony colony = getColony();
             if (colony != null) {
                 final Dimension size = getImageLibrary().getTileSize();
-                final int topOffset = topOffset(size);
+                final int topOffset = tilesPanelTopOffset(size);
                 g.translate(0, topOffset);
                 getGUI().displayColonyTiles((Graphics2D)g, tiles, colony);
                 g.translate(0, -topOffset);
             }
-        }
-
-
-        private int topOffset(final Dimension tileSize) {
-            final int topOffset = tileSize.height / 4;
-            return topOffset;
         }
 
         /**
@@ -2071,7 +2304,7 @@ public final class ColonyPanel extends PortPanel
                 setOpaque(false);
                 // Size and position:
                 Dimension size = getImageLibrary().getTileSize();
-                final int topOffset = topOffset(size);
+                final int topOffset = tilesPanelTopOffset(size);
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
                     (x + y) * size.height / 2 + topOffset);

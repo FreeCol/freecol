@@ -649,7 +649,7 @@ public final class EuropePanel extends PortPanel {
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
         inPortPanel = new EuropeInPortPanel();
-        cargoPanel = new CargoPanel(freeColClient, true);
+        cargoPanel = new CargoPanel(freeColClient, true, false);
         europeanDocksPanel = new EuropeanDocksPanel();
         marketPanel = new MarketPanel(this);
         log = new TransactionLog();

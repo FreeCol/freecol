@@ -821,6 +821,36 @@ public final class ImageLibrary {
         final String key = getBuildingTypeKey(buildingType);
         return this.imageCache.getScaledImage(key, scale, false);
     }
+    
+    public BufferedImage getScaledCargoHold(boolean available) {
+        final String key = "image.cargohold." + (available ? "available" : "unavailable");
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyDocks() {
+        final String key = "image.colony.docks.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyDocksSky() {
+        final String key = "image.colony.docks.sky.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyUpperRightBackground() {
+        final String key = "image.colony.upperRight.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyWarehouseBackground() {
+        final String key = "image.colony.warehouse.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getScaledBuildingEmptyLandImage() {
+        final String key = "image.buildingicon.model.building.BuildingSite";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
 
     private BufferedImage getScaledBuildingTypeImage(BuildingType buildingType,
                                                      Player player,
@@ -831,6 +861,26 @@ public final class ImageLibrary {
             key = extraKey;
         }
         return this.imageCache.getScaledImage(key, scale, false);
+    }
+    
+    public Dimension determineMaxSizeUsingSizeFromAllLevels(BuildingType buildingType, Player player) {        
+        int maxWidth = 0;
+        int maxHeight = 0;
+        while (buildingType.getUpgradesFrom() != null) {
+            buildingType = buildingType.getUpgradesFrom();
+        }
+        do {
+            final Image buildingImage = getScaledBuildingTypeImage(buildingType, player, getScaleFactor());
+            if (buildingImage.getWidth(null) > maxWidth) {
+                maxWidth = buildingImage.getWidth(null);
+            }
+            if (buildingImage.getHeight(null) > maxHeight) {
+                maxHeight = buildingImage.getHeight(null);
+            }
+            buildingType = buildingType.getUpgradesTo();
+        } while (buildingType != null);
+        
+        return new Dimension(maxWidth, maxHeight);
     }
 
     public BufferedImage getScaledBuildingImage(Building building) {

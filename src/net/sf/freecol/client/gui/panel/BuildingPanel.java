@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.tooltip.*;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
@@ -189,15 +190,15 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             unitLabels.add(unitLabel);
             add(unitLabel);
         }
-
-        ImageLibrary lib = getImageLibrary();
-        Image buildingImage = lib.getScaledBuildingImage(building);
-        setPreferredSize(new Dimension(buildingImage.getWidth(null), 
-                                       buildingImage.getHeight(null)));
+        
+        final BufferedImage image = getImageLibrary().getScaledBuildingImage(building);
+        setMinimumSize(new Dimension(image.getWidth(), image.getHeight()));
+        
+        final Dimension preferredSize = getImageLibrary().determineMaxSizeUsingSizeFromAllLevels(building.getType(), building.getOwner());
+        setPreferredSize(preferredSize);
         revalidate();
         repaint();
     }
-
 
     /**
      * Get the building this panel displays.
@@ -252,8 +253,13 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-        ImageLibrary lib = getImageLibrary();
-        g.drawImage(lib.getScaledBuildingImage(building), 0, 0, this);
+        final ImageLibrary lib = getImageLibrary();
+        final BufferedImage image = lib.getScaledBuildingImage(building);
+        final Dimension size = getSize();
+        g.drawImage(image,
+                (size.width - image.getWidth()) / 2,
+                size.height - image.getHeight(),
+                this);
     }
 
 
