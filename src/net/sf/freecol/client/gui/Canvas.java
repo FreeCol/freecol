@@ -432,7 +432,10 @@ public final class Canvas extends JDesktopPane {
             c.setBorder(null);
         }
 
-        if (comp.getBorder() != null) {
+        if (comp instanceof FreeColPanel
+                && ((FreeColPanel) comp).getFrameBorder() != null) {
+            f.setBorder(((FreeColPanel) comp).getFrameBorder());
+        } else if (comp.getBorder() != null) {
             if (comp.getBorder() instanceof EmptyBorder) {
                 f.setBorder(Utility.blankBorder(10, 10, 10, 10));
             } else {

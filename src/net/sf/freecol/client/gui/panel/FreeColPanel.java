@@ -37,6 +37,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -268,6 +269,14 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         final Specification spec = getSpecification();
         return getImageLibrary().getSmallUnitTypeImage(au.getType(spec),
                                                        au.getRoleId(), false);
+    }
+    
+    /**
+     * A border to be used around the frame containing this panel.
+     * @return The border, if any, or {@code null}.
+     */
+    public Border getFrameBorder() {
+        return null;
     }
 
 
