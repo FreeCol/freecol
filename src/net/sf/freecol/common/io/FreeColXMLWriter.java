@@ -385,6 +385,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      */
     public void writeAttribute(String attributeName, Object value)
         throws XMLStreamException {
+        logger.log(Level.WARNING, "Writing attribute:" + attributeName + ", with value of: " + String.valueOf(value));
         xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
     }
 
