@@ -362,7 +362,6 @@ public final class UnitLabel extends FreeColLabel
         updateIcon();
     }
 
-
     // Override JComponent
 
     /**
@@ -372,15 +371,6 @@ public final class UnitLabel extends FreeColLabel
     public void paintComponent(Graphics g) {
         final Player player = this.freeColClient.getMyPlayer();
         final ImageLibrary lib = getImageLibrary();
-        if (ignoreLocation || selected
-            || (!this.unit.isCarrier()
-                && this.unit.getState() != UnitState.SENTRY)) {
-            setEnabled(true);
-        } else if (!player.owns(this.unit) && this.unit.getColony() == null) {
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
 
         super.paintComponent(g);
         
