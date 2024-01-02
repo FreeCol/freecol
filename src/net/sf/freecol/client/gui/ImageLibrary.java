@@ -801,6 +801,12 @@ public final class ImageLibrary {
             ? getBuildingTypeImage((BuildingType)buildable, size)
             : getUnitTypeImage((UnitType)buildable, size);
     }
+    
+    public BufferedImage getBuildableTypeImage(BuildableType buildable, Player player, Dimension size) {
+        return (buildable instanceof BuildingType)
+                ? getBuildingTypeImage((BuildingType)buildable, player, size)
+                        : getUnitTypeImage((UnitType)buildable, size);
+    }
 
     public BufferedImage getSmallBuildableTypeImage(BuildableType buildable,
                                                     Player player) {
@@ -808,6 +814,39 @@ public final class ImageLibrary {
         return (buildable instanceof BuildingType)
             ? getScaledBuildingTypeImage((BuildingType)buildable, player, scale)
             : getUnitTypeImage((UnitType)buildable, scale);
+    }
+    
+    public BufferedImage getSmallBuildableTypeImageWithWithSize(BuildableType buildable, Player player, Dimension maxSize) {
+        final BufferedImage image = getSmallBuildableTypeImageWithMaxSize(buildable, player, maxSize);
+        return ImageUtils.createCenteredImage(image, maxSize);
+    }
+    
+    public BufferedImage getSmallBuildableTypeImageWithMaxSize(BuildableType buildable, Player player, Dimension maxSize) {
+        final BufferedImage image = getSmallBuildableTypeImage(buildable, player);
+        final double widthProportion = image.getWidth() / maxSize.width;
+        final double heightProportion = image.getHeight() / maxSize.height;
+        if (widthProportion >= heightProportion) {
+            if (image.getWidth() > maxSize.width) {
+                return getBuildableTypeImage(buildable, player, new Dimension(maxSize.width, 0));
+            } else {
+                return image;
+            }
+        } else {
+            if (image.getHeight() > maxSize.height) {
+                return getBuildableTypeImage(buildable, player, new Dimension(0, maxSize.height));
+            } else {
+                return image;
+            }
+        }
+    }
+    
+    private BufferedImage getBuildingTypeImage(BuildingType buildingType, Player player, Dimension size) {
+        String key = getBuildingTypeKey(buildingType);
+        final String extraKey = key + "." + player.getNationResourceKey();
+        if (ResourceManager.getImageResource(extraKey, false) != null) {
+            key = extraKey;
+        }
+        return this.imageCache.getSizedImage(key, size, false);
     }
 
     public BufferedImage getBuildingTypeImage(BuildingType buildingType,
@@ -822,36 +861,6 @@ public final class ImageLibrary {
         return this.imageCache.getScaledImage(key, scale, false);
     }
     
-    public BufferedImage getScaledCargoHold(boolean available) {
-        final String key = "image.cargohold." + (available ? "available" : "unavailable");
-        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
-    }
-    
-    public BufferedImage getColonyDocks() {
-        final String key = "image.colony.docks.background";
-        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
-    }
-    
-    public BufferedImage getColonyDocksSky() {
-        final String key = "image.colony.docks.sky.background";
-        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
-    }
-    
-    public BufferedImage getColonyUpperRightBackground() {
-        final String key = "image.colony.upperRight.background";
-        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
-    }
-    
-    public BufferedImage getColonyWarehouseBackground() {
-        final String key = "image.colony.warehouse.background";
-        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
-    }
-    
-    public BufferedImage getScaledBuildingEmptyLandImage() {
-        final String key = "image.buildingicon.model.building.BuildingSite";
-        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
-    }
-
     private BufferedImage getScaledBuildingTypeImage(BuildingType buildingType,
                                                      Player player,
                                                      float scale) {
@@ -894,7 +903,38 @@ public final class ImageLibrary {
                                           building.getOwner(),
                                           this.scaleFactor * SMALL_SCALE);
     }
+    
+    public BufferedImage getScaledBuildingEmptyLandImage() {
+        final String key = "image.buildingicon.model.building.BuildingSite";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
 
+    // Colony Panel
+    
+    public BufferedImage getScaledCargoHold(boolean available) {
+        final String key = "image.cargohold." + (available ? "available" : "unavailable");
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyDocks() {
+        final String key = "image.colony.docks.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyDocksSky() {
+        final String key = "image.colony.docks.sky.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyUpperRightBackground() {
+        final String key = "image.colony.upperRight.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
+    
+    public BufferedImage getColonyWarehouseBackground() {
+        final String key = "image.colony.warehouse.background";
+        return this.imageCache.getScaledImage(key, this.scaleFactor, false);
+    }
 
     // Goods image handling
 

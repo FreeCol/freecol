@@ -454,7 +454,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private class DefaultBuildQueueCellRenderer
         implements ListCellRenderer<BuildableType> {
 
-        private final Dimension buildingDimension = new Dimension(-1, 48);
+        private final Dimension buildingDimension = new Dimension(100, 48);
 
 
         public DefaultBuildQueueCellRenderer() {}
@@ -475,9 +475,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (isSelected) {
                 panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
             }
-
-            JLabel imageLabel = new JLabel(new ImageIcon(getImageLibrary()
-                    .getBuildableTypeImage(value, buildingDimension)));
+            
+            JLabel imageLabel = new JLabel(new ImageIcon(getImageLibrary().getSmallBuildableTypeImageWithWithSize(value, colony.getOwner(), buildingDimension)));
+            
             JLabel nameLabel = new JLabel(Messages.getName(value));
             String reason = lockReasons.get(value);
             panel.add(imageLabel, "span 1 2");

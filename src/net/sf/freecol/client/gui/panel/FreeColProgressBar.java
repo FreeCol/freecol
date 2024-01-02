@@ -120,7 +120,13 @@ public class FreeColProgressBar extends JPanel {
         this.image = (goodsType == null) ? null
             : (lib.getGoodsTypeImage(goodsType,
                     new Dimension(-1, iconHeight)));
-        this.font = FontLibrary.getScaledFont("simple-plain-tiny");
+        
+        Font font = FontLibrary.getScaledFont("simple-plain-tiny");
+        final int maxFontSize = lib.scaleInt(17);
+        if (font.getSize() > maxFontSize) {
+            font = font.deriveFont((float) maxFontSize);
+        }
+        this.font = font;
 
         final int padding = (int) (5 * lib.getScaleFactor());
         final int width = (int) (200 * lib.getScaleFactor());

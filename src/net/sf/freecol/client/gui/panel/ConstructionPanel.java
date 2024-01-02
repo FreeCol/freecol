@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -29,6 +30,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -81,7 +83,7 @@ public class ConstructionPanel extends MigPanel
     public ConstructionPanel(FreeColClient freeColClient,
                              Colony colony, boolean openBuildQueue) {
         super("ConstructionPanelUI",
-            new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
+            new MigLayout("fill, gapy 2:1, wrap 2", "push[]10[center]push", "[center]"));
 
         this.freeColClient = freeColClient;
         this.colony = colony;
@@ -150,7 +152,14 @@ public class ConstructionPanel extends MigPanel
         removeAll();
         final ImageLibrary lib = this.freeColClient.getGUI()
             .getFixedImageLibrary();
-        final Font font = FontLibrary.getScaledFont("normal-plain-smaller", null);
+        
+        Font font = FontLibrary.getScaledFont("normal-plain-smaller", null);
+        Font fontTitle = FontLibrary.getScaledFont("normal-plain-smaller", null);
+        final int maxFontSize = lib.scaleInt(17);
+        if (font.getSize() > maxFontSize) {
+            font = font.deriveFont((float) maxFontSize);
+            fontTitle = fontTitle.deriveFont((float) maxFontSize);
+        }
 
         if (buildable == null) {
             String clickToBuild = Messages.message(getDefaultLabel());
@@ -159,37 +168,40 @@ public class ConstructionPanel extends MigPanel
                 JLabel label0 = new JLabel(
                     clickToBuild.substring(0, breakingPoint));
                 label0.setFont(font);
-                add(label0, "span, align center");
+                label0.setForeground(getForeground());
+                add(label0, "span, align center bottom");
                 JLabel label1 = new JLabel(
                     clickToBuild.substring(breakingPoint + 1));
                 label1.setFont(font);
-                add(label1, "span, align center");
+                label1.setForeground(getForeground());
+                add(label1, "span, align center top");
             } else {
                 JLabel label = new JLabel(clickToBuild);
                 label.setFont(font);
+                label.setForeground(getForeground());
                 add(label, "span, align center");
             }
         } else {
-            int turns = colony.getTurnsToComplete(buildable);
-            Image image = lib.getSmallBuildableTypeImage(buildable, colony.getOwner());
+            final JPanel infoPanel = new JPanel(new MigLayout("wrap 1", "[center]"));
+            infoPanel.setOpaque(false);
+            
+            final Image image = lib.getSmallBuildableTypeImageWithWithSize(buildable, colony.getOwner(), new Dimension(lib.scaleInt(100), lib.scaleInt(96)));
             add(new JLabel(new ImageIcon(image)), "spany");
-            JLabel label0 = Utility.localizedLabel(buildable.getCurrentlyBuildingLabel());
-            label0.setFont(font);
-            add(label0);
-            JLabel label1 = Utility.localizedLabel(StringTemplate
-                .template("constructionPanel.turnsToComplete")
-                .addName("%number%", Turn.getTurnsText(turns)));
-            label1.setFont(font);
-            add(label1);
+            
+            final JLabel label0 = Utility.localizedLabel(buildable.getCurrentlyBuildingLabel());
+            label0.setFont(fontTitle);
+            label0.setForeground(getForeground());
+            infoPanel.add(label0);
 
             for (AbstractGoods ag : buildable.getRequiredGoodsList()) {
                 int amountNeeded = ag.getAmount();
                 int amountAvailable = colony.getGoodsCount(ag.getType());
                 int amountProduced = colony.getAdjustedNetProductionOf(ag.getType());
-                add(new FreeColProgressBar(this.freeColClient, ag.getType(), 0,
+                infoPanel.add(new FreeColProgressBar(this.freeColClient, ag.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");
             }
+            add(infoPanel);
         }
 
         revalidate();
