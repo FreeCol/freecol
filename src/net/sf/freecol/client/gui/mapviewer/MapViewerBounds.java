@@ -305,6 +305,19 @@ public final class MapViewerBounds {
         }
         return new Point(p.x + tileBounds.getWidth(), p.y);
     }
+    
+    /**
+     * Gets the center position of the given {@code Tile} on the visible map.
+     *
+     * @param tile The {@code Tile} to check.
+     * @return The centerposition of the given {@code Tile}.
+     */
+    public Point calculateCenterTilePosition(Tile tile) {
+        if (!isTileVisible(tile)) return null;
+
+        final Point p = tileToPoint(tile);
+        return new Point(p.x + tileBounds.getHalfWidth(), p.y + tileBounds.getHalfHeight());
+    }
 
     /**
      * Sets the focus tile.

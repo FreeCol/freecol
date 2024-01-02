@@ -1887,8 +1887,7 @@ public final class ColonyPanel extends PortPanel
                 int count = colony.getGoodsCount(goodsType);
                 if (count >= threshold) {
                     Goods goods = new Goods(game, colony, goodsType, count);
-                    GoodsLabel goodsLabel = new GoodsLabel(getFreeColClient(), goods);
-                    goodsLabel.setForeground(Color.WHITE);
+                    GoodsLabel goodsLabel = new GoodsLabel(getFreeColClient(), goods, true);
                     if (ColonyPanel.this.isEditable()) {
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);

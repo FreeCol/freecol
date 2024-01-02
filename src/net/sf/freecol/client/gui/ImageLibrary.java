@@ -397,22 +397,30 @@ public final class ImageLibrary {
      * @param goodsType The {@code GoodsType} to use.
      * @param amount The amount of goods.
      * @param location The {@code Location} for the goods.
+     * @param whiteForeground If the color should be white (or bright) so that
+     *     it works on a black background.
      * @return A suitable {@code Color}.
      */
     public static Color getGoodsColor(GoodsType goodsType, int amount,
-                                      Location location) {
+                                      Location location, boolean whiteForeground) {
+        final String foreground = (whiteForeground) ? "whiteForeground" : "foreground";
+        final String prefix = "color." + foreground + ".GoodsLabel.";
         final String key = (!goodsType.limitIgnored()
             && location instanceof Colony
             && ((Colony)location).getWarehouseCapacity() < amount)
-            ? "color.foreground.GoodsLabel.capacityExceeded"
+            ? prefix + "capacityExceeded"
             : (location instanceof Colony && goodsType.isStorable()
                 && ((Colony)location).getExportData(goodsType).getExported())
-            ? "color.foreground.GoodsLabel.exported"
+            ? prefix + "exported"
             : (amount == 0)
-            ? "color.foreground.GoodsLabel.zeroAmount"
+            ? prefix + "zeroAmount"
             : (amount < 0)
-            ? "color.foreground.GoodsLabel.negativeAmount"
-            : "color.foreground.GoodsLabel.positiveAmount";
+            ? prefix + "negativeAmount"
+            : prefix + "positiveAmount";
+        
+        if (whiteForeground) {
+            return getColor(key, Color.WHITE);
+        }
         return getColor(key, Color.BLACK);
     }
 
@@ -1038,9 +1046,9 @@ public final class ImageLibrary {
      * @param pt The {@code PathType}
      * @return The {@code BufferedImage}.
      */
-    public static BufferedImage getPathImage(PathType pt) {
+    public BufferedImage getPathImage(PathType pt) {
         return (pt == null) ? null
-            : getUnscaledImage(pt.getImageKey());
+            : this.imageCache.getScaledImage(pt.getImageKey(), this.scaleFactor, false);
     }
 
     /**
@@ -1049,7 +1057,7 @@ public final class ImageLibrary {
      * @param u The {@code Unit}
      * @return The {@code BufferedImage}.
      */
-    public static BufferedImage getPathImage(Unit u) {
+    public BufferedImage getPathImage(Unit u) {
         return (u == null) ? null
             : getPathImage(PathType.getPathType(u));
     }
@@ -1060,9 +1068,9 @@ public final class ImageLibrary {
      * @param pt The {@code PathType}
      * @return The {@code BufferedImage}.
      */
-    private static BufferedImage getPathNextTurnImage(PathType pt) {
+    private BufferedImage getPathNextTurnImage(PathType pt) {
         return (pt == null) ? null
-            : getUnscaledImage(pt.getNextTurnImageKey());
+            : this.imageCache.getScaledImage(pt.getNextTurnImageKey(), this.scaleFactor, false);
     }
 
     /**
@@ -1071,7 +1079,7 @@ public final class ImageLibrary {
      * @param u The {@code Unit}
      * @return The {@code BufferedImage}.
      */
-    public static BufferedImage getPathNextTurnImage(Unit u) {
+    public BufferedImage getPathNextTurnImage(Unit u) {
         return (u == null) ? null
             : getPathNextTurnImage(PathType.getPathType(u));
     }

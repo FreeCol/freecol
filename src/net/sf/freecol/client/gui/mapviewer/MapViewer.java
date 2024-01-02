@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.mapviewer;
 
-import static net.sf.freecol.common.util.StringUtils.lastPart;
 import static net.sf.freecol.common.util.Utils.now;
 
 import java.awt.AlphaComposite;
@@ -39,8 +38,8 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Float;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
@@ -1109,16 +1108,16 @@ public final class MapViewer extends FreeColClientHolder {
             if (point == null) continue;
 
             BufferedImage image = (p.isOnCarrier())
-                ? ImageLibrary.getPathImage(ImageLibrary.PathType.NAVAL)
+                ? lib.getPathImage(ImageLibrary.PathType.NAVAL)
                 : (mapViewerState.getActiveUnit() != null)
-                ? ImageLibrary.getPathImage(mapViewerState.getActiveUnit())
+                ? lib.getPathImage(mapViewerState.getActiveUnit())
                 : null;
 
             BufferedImage turns = null;
             if (mapViewerScaledUtils.getFontTiny() != null) {
                 if (debug) { // More detailed display
                     if (mapViewerState.getActiveUnit() != null) {
-                        image = ImageLibrary.getPathNextTurnImage(mapViewerState.getActiveUnit());
+                        image = lib.getPathNextTurnImage(mapViewerState.getActiveUnit());
                     }
                     turns = this.lib.getStringImage(g2d,
                         Integer.toString(p.getTurns())

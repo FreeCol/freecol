@@ -168,7 +168,7 @@ public final class ReportTradePanel extends ReportPanel {
                 goodsLabel.setBorder((first) ? Utility.getTopCellBorder()
                     : Utility.getCellBorder());
                 goodsLabel.setForeground(ImageLibrary.getGoodsColor(goodsType, amount,
-                                                             colony));
+                                                             colony, false));
                 ExportData ed = colony.getExportData(goodsType);
                 if (ed.getExported()) {
                     goodsLabel.setToolTipText(Messages.message(StringTemplate
@@ -181,7 +181,7 @@ public final class ReportTradePanel extends ReportPanel {
                 int production = colony.getNetProductionOf(goodsType);
                 JLabel productionLabel = createNumberLabel(production, true);
                 productionLabel.setForeground(ImageLibrary.getGoodsColor(goodsType,
-                        production, colony));
+                        production, colony, false));
                 Collection<StringTemplate> warnings
                     = colony.getProductionWarnings(goodsType);
                 if (!warnings.isEmpty()) {
