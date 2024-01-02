@@ -301,11 +301,9 @@ public final class Canvas extends JDesktopPane {
              * Determines a new sensible size.
              */
             final JInternalFrame f = (JInternalFrame) c;
-            if (f.getContentPane() != null
-                    && f.getContentPane().getComponentCount() > 0
-                    && f.getContentPane().getComponent(0) instanceof FreeColPanel) {
-                FreeColPanel fcp = (FreeColPanel) f.getContentPane().getComponent(0);
-                fcp.refreshLayout();
+            final FreeColPanel panel = getFreeColPanel(f);
+            if (panel != null) {
+                panel.refreshLayout();
             }
         }
         updateFrameSizesAndPositions(getSize());
@@ -321,6 +319,13 @@ public final class Canvas extends JDesktopPane {
              * Determines a new sensible size.
              */
             final JInternalFrame f = (JInternalFrame) c;
+            final FreeColPanel panel = getFreeColPanel(f);
+            if (panel != null && panel.isFullscreen()) {
+                f.setSize(canvasSize);
+                f.setLocation(0, 0);
+                continue;
+            }
+            
             final Boolean resizeable = (Boolean) f.getClientProperty(PROPERTY_RESIZABLE);
             final Dimension newSize;
             if (resizeable != null && resizeable) {
@@ -348,6 +353,20 @@ public final class Canvas extends JDesktopPane {
             final Point p = chooseLocation(f, f.getWidth(), f.getHeight(), popupPosition);
             f.setLocation(p);
         }
+    }
+
+
+    private FreeColPanel getFreeColPanel(final JInternalFrame f) {
+        if (f.getContentPane() == null) {
+            return null;
+        }
+        if (f.getContentPane().getComponentCount() <= 0) {
+            return null;
+        }
+        if (!(f.getContentPane().getComponent(0) instanceof FreeColPanel)) {
+            return null;
+        }
+        return (FreeColPanel) f.getContentPane().getComponent(0);
     }
     
     private Dimension capSizeToMaximum(JInternalFrame f, Dimension maxSize) {
@@ -446,6 +465,17 @@ public final class Canvas extends JDesktopPane {
             }
         };
         
+        final boolean fullscreenPanel;
+        if (comp instanceof FreeColPanel) {
+            fullscreenPanel = ((FreeColPanel) comp).isFullscreen();
+        } else {
+            fullscreenPanel = false;
+        }
+        
+        if (fullscreenPanel) {
+            resizable = false;
+        }
+        
         Container con = f.getContentPane();
         if (con instanceof JComponent) {
             JComponent c = (JComponent)con;
@@ -467,9 +497,12 @@ public final class Canvas extends JDesktopPane {
             f.setBorder(null);
         }
 
-        final FrameMotionListener fml = new FrameMotionListener(f);
-        comp.addMouseMotionListener(fml);
-        comp.addMouseListener(fml);
+        if (!fullscreenPanel) {
+            final FrameMotionListener fml = new FrameMotionListener(f);
+            comp.addMouseMotionListener(fml);
+            comp.addMouseListener(fml);
+        }
+        
         if (f.getUI() instanceof BasicInternalFrameUI) {
             BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
             biu.setNorthPane(null);
@@ -482,19 +515,30 @@ public final class Canvas extends JDesktopPane {
         f.setOpaque(false);
         f.pack();
         
-        final Dimension size = capSizeToMaximum(f, getSize());
+        final Dimension size;
+        if (fullscreenPanel) {
+            size = getSize();
+        } else {
+            size = capSizeToMaximum(f, getSize());
+        }
         f.setSize(size);
         
-        final Point p = chooseLocation(comp, size.width, size.height, popupPosition);
-        final Point adjustedP = adjustLocationForClearSpace(p, size.width, size.height);
-        if (popupPosition == PopupPosition.CENTERED_FORCED || p.equals(adjustedP)) {
-            f.setLocation(p);
-            f.putClientProperty(PROPERTY_POPUP_POSITION, popupPosition);
-            f.putClientProperty(PROPERTY_RESIZABLE, resizable);
+        if (fullscreenPanel) {
+            f.setLocation(0, 0);
         } else {
-            f.setLocation(adjustedP);
+            final Point p = chooseLocation(comp, size.width, size.height, popupPosition);
+            final Point adjustedP = adjustLocationForClearSpace(p, size.width, size.height);
+            if (popupPosition == PopupPosition.CENTERED_FORCED || p.equals(adjustedP)) {
+                f.setLocation(p);
+                f.putClientProperty(PROPERTY_POPUP_POSITION, popupPosition);
+                f.putClientProperty(PROPERTY_RESIZABLE, resizable);
+            } else {
+                f.setLocation(adjustedP);
+            }
         }
-        this.addToCanvas(f, MODAL_LAYER);
+        
+        final Integer layer = (fullscreenPanel) ? PALETTE_LAYER : MODAL_LAYER;
+        this.addToCanvas(f, layer);
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);

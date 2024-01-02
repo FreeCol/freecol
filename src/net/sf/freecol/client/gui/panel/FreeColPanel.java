@@ -287,6 +287,14 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     public void refreshLayout() {
         
     }
+    
+    /**
+     * Checks if this panel should be displayed in fullscreen mode.
+     * @return {@code false} unless overriden by a subclass.
+     */
+    public boolean isFullscreen() {
+        return false;
+    }
 
     // Interface ActionListener
 

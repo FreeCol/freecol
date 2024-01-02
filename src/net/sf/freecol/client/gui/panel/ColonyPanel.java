@@ -71,6 +71,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
@@ -188,6 +189,8 @@ public final class ColonyPanel extends PortPanel
 
     private JScrollPane warehouseScroll = null;
     private WarehousePanel warehousePanel = null;
+    
+    private boolean fullscreen = false;
 
     // The action commands
 
@@ -435,20 +438,25 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(this.nameBox,
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
-        if (getGUI().getMapViewDimension().height < 700) {
+        if (getGUI().getMapViewDimension().height < getImageLibrary().scaleInt(700)) {
             /*
              * TODO: Remove all borders and show the panel covering the
              *       entire screen (except for the menu bar.
              */
+            fullscreen = true;
+            setPreferredSize(getGUI().getMapViewDimension());
+            setBorder(BorderFactory.createEmptyBorder());
+        } else {
+            setBorder(FreeColImageBorder.innerColonyPanelBorder);
         }
-
-        setBorder(FreeColImageBorder.innerColonyPanelBorder);
 
         setColony(colony);
         initialize();
         
-        final Dimension startingSize = getFreeColClient().getGUI().getFixedImageLibrary().scale(new Dimension(1280, 700));
-        getGUI().restoreSavedSize(this, startingSize);
+        if (!fullscreen) {
+            final Dimension startingSize = getFreeColClient().getGUI().getFixedImageLibrary().scale(new Dimension(1280, 700));
+            getGUI().restoreSavedSize(this, startingSize);
+        }
         
         setEscapeAction(new AbstractAction() {
             @Override
@@ -566,7 +574,14 @@ public final class ColonyPanel extends PortPanel
      */
     @Override
     public Border getFrameBorder() {
+        if (fullscreen) {
+            return BorderFactory.createEmptyBorder();
+        }
         return FreeColImageBorder.outerColonyPanelBorder;
+    }
+    
+    public boolean isFullscreen() {
+        return fullscreen;
     }
 
     
