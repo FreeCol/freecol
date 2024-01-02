@@ -19,8 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -236,5 +238,16 @@ public class ConstructionPanel extends MigPanel
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         update();
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        final Color oldColor = g.getColor();
+        g.setColor(new Color(0, 0, 0, 128));
+        final Dimension size = getSize();
+        g.fillRect(0, 0, size.width, size.height);
+        g.setColor(oldColor);
     }
 }
