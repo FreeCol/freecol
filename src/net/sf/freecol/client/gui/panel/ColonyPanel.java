@@ -37,6 +37,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -501,6 +502,9 @@ public final class ColonyPanel extends PortPanel
         
         final Graphics2D g2d = (Graphics2D) g;
         
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
         /*
          * Painting the backgrounds here avoids the need for a JLayeredPane (since we
          * want different backgrounds to overlay with partial transparency).
