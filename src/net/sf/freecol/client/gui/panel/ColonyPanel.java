@@ -31,6 +31,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -46,6 +47,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -497,6 +499,8 @@ public final class ColonyPanel extends PortPanel
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
+        final Graphics2D g2d = (Graphics2D) g;
+        
         /*
          * Painting the backgrounds here avoids the need for a JLayeredPane (since we
          * want different backgrounds to overlay with partial transparency).
@@ -531,7 +535,70 @@ public final class ColonyPanel extends PortPanel
         final BufferedImage upperRightBackground = getImageLibrary().getColonyUpperRightBackground();
         if (upperRightBackground != null) {
             final Insets insets = getInsets();
-            g.drawImage(upperRightBackground, size.width - upperRightBackground.getWidth() - insets.right, insets.top, null);
+            int x = size.width - upperRightBackground.getWidth() - insets.right;
+            int y = insets.top;
+            g.drawImage(upperRightBackground, x, y, null);
+            
+            Font numberFont = FontLibrary.getUnscaledFont(Utility.FONTSPEC_TITLE, "1").deriveFont((float) getImageLibrary().scaleInt(32));
+            final Font origFont = g.getFont();
+            g.setFont(numberFont);
+            
+            FontMetrics fm = g2d.getFontMetrics();
+            final String colonySize = "" + colony.getUnitCount();
+            double centerY = (fm.getAscent() - fm.getDescent() - fm.getLeading()) / 2;
+            
+            final int colonySizeX = getImageLibrary().scaleInt(100);
+            final int colonySizeY = getImageLibrary().scaleInt(40);
+            final double colonySizeCenterX = -fm.getStringBounds(colonySize, g2d).getWidth() / 2;
+            g.drawString(
+                colonySize,
+                (int) (x + colonySizeCenterX + colonySizeX),
+                (int) (y + centerY + colonySizeY)
+            );
+            
+            final String bonus;
+            final int grow = colony.getPreferredSizeChange();
+            if (grow > 9) {
+                bonus = ">9";
+            } else if (grow >= 0) {
+                bonus = "+" + grow;
+            } else {
+                bonus = "" + grow;
+            }
+            final int colonyBonusX = getImageLibrary().scaleInt(404);
+            final double colonyBonusCenterX = -fm.getStringBounds(bonus, g2d).getWidth() / 2;
+            g.drawString(
+                    bonus,
+                    (int) (x + colonyBonusCenterX + colonyBonusX),
+                    (int) (y + centerY + colonySizeY)
+                );
+            
+            numberFont = numberFont.deriveFont((float) getImageLibrary().scaleInt(18));
+            g.setFont(numberFont);
+            fm = g2d.getFontMetrics();
+            centerY = (fm.getAscent() - fm.getDescent() - fm.getLeading()) / 2;
+            
+            final String rebelPercentage = colony.getSonsOfLiberty() + "%";
+            final int rebelPercentageX = getImageLibrary().scaleInt(101);
+            final int rebelPercentageY = getImageLibrary().scaleInt(193);
+            final double rebelPercentageCenterX = -fm.getStringBounds(rebelPercentage, g2d).getWidth() / 2;
+            g.drawString(
+                    rebelPercentage,
+                    (int) (x + rebelPercentageCenterX + rebelPercentageX),
+                    (int) (y + centerY + rebelPercentageY)
+                );
+            
+            final String royalistPercentage = (100 - colony.getSonsOfLiberty()) + "%";
+            final int royalistPercentageX = getImageLibrary().scaleInt(407);
+            final double royalistPercentageCenterX = -fm.getStringBounds(royalistPercentage, g2d).getWidth() / 2;
+            g.drawString(
+                    royalistPercentage,
+                    (int) (x + royalistPercentageCenterX + royalistPercentageX),
+                    (int) (y + centerY + rebelPercentageY)
+                );
+            
+            
+            g.setFont(origFont);
         }
         
         final BufferedImage nwBorder = getImageLibrary().getScaledImage("image.border.wooden.nw");
@@ -673,7 +740,21 @@ public final class ColonyPanel extends PortPanel
         // TODO: Display the name:
         //add(this.nameBox, "grow, span");
         
-        JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1", "[center]"));
+        JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1", "[center]")) {
+            {
+                /*
+                 * XXX: This hack has been used before for creating the tooltip,
+                 *      but there have to be another better solution.
+                 */
+                setToolTipText(" ");
+            }
+            
+            @Override
+            public JToolTip createToolTip() {
+                JToolTip toolTip = new RebelToolTip(getFreeColClient(), getColony());
+                return toolTip;
+            }
+        };
         upperRightPanel.setOpaque(false);
         upperRightPanel.add(tilesPanel, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top, center");
 
