@@ -278,7 +278,15 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     public Border getFrameBorder() {
         return null;
     }
-
+    
+    /**
+     * Refreshes the layout after scaling and/or font changes.
+     * 
+     * Subclasses can extend this method to handle the change.
+     */
+    public void refreshLayout() {
+        
+    }
 
     // Interface ActionListener
 

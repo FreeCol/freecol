@@ -289,6 +289,27 @@ public final class Canvas extends JDesktopPane {
             repaint();
         }
     }
+    
+    public void refreshAllFrames() {
+        final Component[] components = getComponents();
+        for (Component c : components) {
+            if (!(c instanceof JInternalFrame)) {
+                continue;
+            }
+            
+            /*
+             * Determines a new sensible size.
+             */
+            final JInternalFrame f = (JInternalFrame) c;
+            if (f.getContentPane() != null
+                    && f.getContentPane().getComponentCount() > 0
+                    && f.getContentPane().getComponent(0) instanceof FreeColPanel) {
+                FreeColPanel fcp = (FreeColPanel) f.getContentPane().getComponent(0);
+                fcp.refreshLayout();
+            }
+        }
+        updateFrameSizesAndPositions(getSize());
+    }
 
     private void updateFrameSizesAndPositions(Dimension canvasSize) {
         for (Component c : getComponents()) {

@@ -23,6 +23,7 @@ import static net.sf.freecol.common.util.CollectionUtils.dump;
 import static net.sf.freecol.common.util.CollectionUtils.sort;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -33,8 +34,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -46,15 +45,10 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.nio.channels.ClosedByInterruptException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -73,14 +67,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
-import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
@@ -91,7 +81,6 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.mapviewer.TileBounds;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.client.gui.tooltip.RebelToolTip;
 import net.sf.freecol.common.debug.DebugUtils;
@@ -410,6 +399,7 @@ public final class ColonyPanel extends PortPanel
         cargoScroll.setBorder(null);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
+        constructionPanel.setForeground(Color.WHITE);
 
         inPortPanel = new ColonyInPortPanel();
         inPortScroll = new JScrollPane(inPortPanel,
@@ -453,9 +443,11 @@ public final class ColonyPanel extends PortPanel
         }
 
         setBorder(FreeColImageBorder.innerColonyPanelBorder);
-        initialize(colony);
 
-        final Dimension startingSize = freeColClient.getGUI().getFixedImageLibrary().scale(new Dimension(1280, 700));
+        setColony(colony);
+        initialize();
+        
+        final Dimension startingSize = getFreeColClient().getGUI().getFixedImageLibrary().scale(new Dimension(1280, 700));
         getGUI().restoreSavedSize(this, startingSize);
         
         setEscapeAction(new AbstractAction() {
@@ -464,6 +456,17 @@ public final class ColonyPanel extends PortPanel
                 okButton.doClick();
             }
         });
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void refreshLayout() {
+        final Colony theColony = colony;
+        closeColonyPanel();
+        getGUI().showColonyPanel(theColony, null);
     }
     
     /**
@@ -587,17 +590,9 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * Initialize the entire panel.
-     *
-     * We can arrive here normally when a colony panel is created,
-     * or when an existing colony panel is changed via the colony name
-     * menu in the nameBox.
-     *
-     * @param colony The {@code Colony} to be displayed.
      */
-    private void initialize(Colony colony) {
+    private void initialize() {
         cleanup();
-
-        setColony(colony);
 
         addPropertyChangeListeners();
         addMouseListeners();
@@ -655,16 +650,13 @@ public final class ColonyPanel extends PortPanel
         JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1", "[center]"));
         upperRightPanel.setOpaque(false);
         upperRightPanel.add(tilesPanel, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top, center");
-        
+
         final FreeColImageBorder border = FreeColImageBorder.innerColonyPanelBorder;
         final Insets borderInsets = border.getBorderInsets(this);
         upperRightPanel.add(netProductionPanel, "grow");
         
         // TODO: Display the numbers in new components:
         //add(populationPanel, "grow");
-        
-        final JPanel buttonPanel = new JPanel(new MigLayout("fill, wrap 1, gap 0 0, ins 0", "", ""));
-        buttonPanel.setOpaque(false);
         
         /*
          * TODO: Don't think we need these, but they can be added to the
@@ -673,27 +665,33 @@ public final class ColonyPanel extends PortPanel
         //buttonPanel.add(unloadButton);
         //buttonPanel.add(fillButton);
         
-        buttonPanel.add(buildQueueButton, "sg");
-        buttonPanel.add(warehouseButton, "sg");
-        buttonPanel.add(colonyUnitsButton, "sg");
-        
-        upperRightPanel.add(buttonPanel, "sgy, split 2, left");
-        upperRightPanel.add(constructionPanel, "sgy, grow, top");
-        add(upperRightPanel, "span 1 3, grow, gapbefore 53, width 400!");
+        upperRightPanel.add(constructionPanel, "grow, top, wmax 350, height 100");
+        add(upperRightPanel, "span 1 3, growy, gapbefore 53, width 400!");
         
         add(inPortScroll, "span, grow, height 96!, gaptop push");
         add(outsideColonyScroll, "grow, height 96!");
         add(cargoScroll, "grow, height 100!");
         add(warehouseScroll, "span, split, height 48!, growx");
+        
+        add(wrapWithBorder(warehouseButton), "height 48!, gap 0 0 0 0");
+        
         if (setGoodsButton != null) {
-            add(setGoodsButton, "height 48!, gap 0 0 0 0");
+            add(wrapWithBorder(setGoodsButton), "height 48!, gap 0 0 0 0");
         }
         if (traceWorkButton != null) {
-            add(traceWorkButton, "height 48!, gap 0 0 0 0");
+            add(wrapWithBorder(traceWorkButton), "height 48!, gap 0 0 0 0");
         }
+
         add(okButton, "gapbefore push, height 48!"); // tag ok
 
         update();
+    }
+    
+    private JPanel wrapWithBorder(JComponent c) {
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(FreeColImageBorder.woodenPanelBorder);
+        panel.add(c);
+        return panel;
     }
 
     /**

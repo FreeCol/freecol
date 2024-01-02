@@ -1951,6 +1951,8 @@ public class SwingGUI extends GUI {
             resetMapControls();
         }
         
+        canvas.refreshAllFrames();
+        
         refresh();
     }
 
