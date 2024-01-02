@@ -2015,7 +2015,9 @@ public final class ColonyPanel extends PortPanel
                     super.initialize();
 
                     addMouseListener(releaseListener);
-                    addMouseListener(buildQueueListener);
+                    if (getBuilding().hasAbility(Ability.BUILD)) {
+                        addMouseListener(buildQueueListener);
+                    }
                     setTransferHandler(defaultTransferHandler);
                 }
             }
