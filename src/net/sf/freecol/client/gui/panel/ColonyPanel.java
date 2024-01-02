@@ -42,6 +42,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -71,7 +72,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
@@ -390,16 +390,19 @@ public final class ColonyPanel extends PortPanel
                 }
             }
         });
-        
         buildingsScroll.getVerticalScrollBar().setUnitIncrement(16);
         buildingsScroll.getViewport().setOpaque(false);
         buildingsScroll.setBorder(null);
+        buildingsScroll.getViewport().addMouseListener(frameMoveDispatchListener);
+        buildingsScroll.getViewport().addMouseMotionListener(frameMoveDispatchListener);
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
         cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         cargoScroll.setBorder(null);
+        cargoPanel.addMouseListener(frameMoveDispatchListener);
+        cargoPanel.addMouseMotionListener(frameMoveDispatchListener);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
         constructionPanel.setForeground(Color.WHITE);
@@ -412,6 +415,8 @@ public final class ColonyPanel extends PortPanel
         inPortScroll.setBorder(null);
         inPortScroll.setOpaque(false);
         inPortScroll.getViewport().setOpaque(false);
+        inPortPanel.addMouseListener(frameMoveDispatchListener);
+        inPortPanel.addMouseMotionListener(frameMoveDispatchListener);
 
         outsideColonyPanel = new OutsideColonyPanel();
         outsideColonyScroll = new JScrollPane(outsideColonyPanel,
@@ -421,6 +426,8 @@ public final class ColonyPanel extends PortPanel
         outsideColonyScroll.setBorder(null);
         outsideColonyScroll.setOpaque(false);
         outsideColonyScroll.getViewport().setOpaque(false);
+        outsideColonyPanel.addMouseListener(frameMoveDispatchListener);
+        outsideColonyPanel.addMouseMotionListener(frameMoveDispatchListener);
 
         populationPanel = new PopulationPanel();
 
@@ -431,6 +438,8 @@ public final class ColonyPanel extends PortPanel
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         warehouseScroll.setBorder(FreeColImageBorder.colonyWarehouseBorder);
+        warehousePanel.addMouseListener(frameMoveDispatchListener);
+        warehousePanel.addMouseMotionListener(frameMoveDispatchListener);
 
         InputMap nameIM = new ComponentInputMap(this.nameBox);
         nameIM.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
@@ -1893,7 +1902,6 @@ public final class ColonyPanel extends PortPanel
                     }
                 };
 
-
         /**
          * Creates this BuildingsPanel.
          */
@@ -1955,6 +1963,7 @@ public final class ColonyPanel extends PortPanel
                     ((ASingleBuildingPanel)component).cleanup();
                 }
             }
+            
             removeAll();
         }
 
@@ -2017,6 +2026,9 @@ public final class ColonyPanel extends PortPanel
                     addMouseListener(releaseListener);
                     if (getBuilding().hasAbility(Ability.BUILD)) {
                         addMouseListener(buildQueueListener);
+                    } else {
+                        addMouseListener(frameMoveDispatchListener);
+                        addMouseMotionListener(frameMoveDispatchListener);
                     }
                     setTransferHandler(defaultTransferHandler);
                 }
@@ -2031,6 +2043,8 @@ public final class ColonyPanel extends PortPanel
 
                 removeMouseListener(releaseListener);
                 removeMouseListener(buildQueueListener);
+                removeMouseListener(frameMoveDispatchListener);
+                removeMouseMotionListener(frameMoveDispatchListener);
                 setTransferHandler(null);
                 removeAll();
             }
@@ -2573,4 +2587,52 @@ public final class ColonyPanel extends PortPanel
             }
         }
     }
+    
+    private final MouseAdapter frameMoveDispatchListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            dispatchTo(e, ColonyPanel.this);
+        }
+
+        private void dispatchTo(MouseEvent e, Component target){
+            final Component source = (Component) e.getSource();
+            MouseEvent targetEvent = SwingUtilities.convertMouseEvent(source, e, target);
+            target.dispatchEvent(targetEvent);
+        }
+    };
 }
