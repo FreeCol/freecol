@@ -438,13 +438,12 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(this.nameBox,
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
-        if (getGUI().getMapViewDimension().height < getImageLibrary().scaleInt(700)) {
+        if (getGUI().getMapViewDimension().height < getImageLibrary().scaleInt(850)) {
             /*
              * TODO: Remove all borders and show the panel covering the
              *       entire screen (except for the menu bar.
              */
             fullscreen = true;
-            setPreferredSize(getGUI().getMapViewDimension());
             setBorder(BorderFactory.createEmptyBorder());
         } else {
             setBorder(FreeColImageBorder.innerColonyPanelBorder);
