@@ -537,7 +537,7 @@ public final class Canvas extends JDesktopPane {
             }
         }
         
-        final Integer layer = (fullscreenPanel) ? PALETTE_LAYER : MODAL_LAYER;
+        final Integer layer = MODAL_LAYER;
         this.addToCanvas(f, layer);
         f.setName(comp.getClass().getSimpleName());
 
