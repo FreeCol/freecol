@@ -68,6 +68,8 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     /** Labels for any units present. */
     private final List<UnitLabel> unitLabels = new ArrayList<>();
+    
+    private final Dimension unscaledMinimumWorkerAndProductionSize;
 
 
     /**
@@ -77,9 +79,10 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      * @param building The building to display information from.
      */
     public BuildingPanel(FreeColClient freeColClient, Building building) {
-        super(new MigLayout("", layoutConstraintString(building), "push[32!][44!]"));
+        super(new MigLayout("ins 0 0 0 0, gap 0 0", layoutConstraintString(building), "0:push[32!, bottom]0[58!, bottom]"));
         this.freeColClient = freeColClient;
         this.building = building;
+        this.unscaledMinimumWorkerAndProductionSize = new Dimension(Math.max(64, building.getUnitCapacity() * 32), 90);
 
         setToolTipText(" ");
     }
@@ -191,13 +194,20 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             add(unitLabel);
         }
         
-        final BufferedImage image = getImageLibrary().getScaledBuildingImage(building);
-        setMinimumSize(new Dimension(image.getWidth(), image.getHeight()));
+        final Dimension minimumWorkerAndProductionSize = getImageLibrary().scale(unscaledMinimumWorkerAndProductionSize);
         
-        final Dimension preferredSize = getImageLibrary().determineMaxSizeUsingSizeFromAllLevels(building.getType(), building.getOwner());
-        setPreferredSize(preferredSize);
+        final BufferedImage image = getImageLibrary().getScaledBuildingImage(building);
+        final Dimension minimumSizeForImage = new Dimension(image.getWidth(), image.getHeight());
+        setMinimumSize(largestWidthAndHeight(minimumWorkerAndProductionSize, minimumSizeForImage));
+        
+        final Dimension preferredSizeForImage = getImageLibrary().determineMaxSizeUsingSizeFromAllLevels(building.getType(), building.getOwner());
+        setPreferredSize(largestWidthAndHeight(minimumWorkerAndProductionSize, preferredSizeForImage));
         revalidate();
         repaint();
+    }
+
+    private Dimension largestWidthAndHeight(Dimension d1, Dimension d2) {
+        return new Dimension(Math.max(d1.width, d2.width), Math.max(d1.height, d2.height));
     }
 
     /**
