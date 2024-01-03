@@ -125,9 +125,11 @@ public class CargoPanel extends FreeColPanel
 
             for (Goods g : carrier.getGoodsList()) {
                 GoodsLabel label = new GoodsLabel(fcc, g);
-                label.setHorizontalTextPosition(JLabel.CENTER);
-                label.setVerticalTextPosition(JLabel.BOTTOM);
-                label.setForeground(Color.WHITE);
+                if (withStyling) {
+                    label.setHorizontalTextPosition(JLabel.CENTER);
+                    label.setVerticalTextPosition(JLabel.BOTTOM);
+                    label.setForeground(Color.WHITE);
+                }
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(dl);
