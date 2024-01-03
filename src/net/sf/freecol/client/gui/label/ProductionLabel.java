@@ -54,9 +54,6 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /** Whether to display positive integers with a "+" sign. */
     private boolean drawPlus;
 
-    /** The compressed width of the ProductionLabel. */
-    private int compressedWidth = -1;
-
     /** The goodsIcon for this type of production. */
     private final ImageIcon goodsIcon;
 
@@ -117,8 +114,6 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         this.goodsIcon = (ag.getType() == null) ? null
             : new ImageIcon(lib.getScaledGoodsTypeImage(ag.getType()));
-        this.compressedWidth = (this.goodsIcon == null) ? 0
-            : this.goodsIcon.getIconWidth() * 2;
 
         setFont(lib.getScaledFont("simple-bold-tiny", null));
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
@@ -164,14 +159,13 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     @Override
     public void paintComponent(Graphics g) {
-        final Dimension contentSize = getPreferredSize();
         final int actualWidth = getWidth();
-        final int leftOffset = (contentSize.width < actualWidth) ? (actualWidth - contentSize.width) / 2 : 0;
 
         // Draws the goods icons:
         final int drawImageCount = numberOfGoodsIconsToDisplay();
-        final int iconWidth = (goodsIcon) != null ? goodsIcon.getIconWidth() : 0;
-        final int pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
+        final int pixelsPerIcon = determinePixelsPerIcon();
+        final int goodsImagesWidth = pixelsPerIcon * (drawImageCount - 1) + this.goodsIcon.getIconWidth();
+        final int leftOffset = (goodsImagesWidth < actualWidth) ? (actualWidth - goodsImagesWidth) / 2 : 0;
         for (int i = 0; i < drawImageCount; i++) {
             this.goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
@@ -183,6 +177,19 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                     textOffsetX,
                     (goodsIcon.getIconHeight() - stringImage.getHeight(null)) / 2,
                     null);
+        }
+    }
+    
+    public int determinePixelsPerIcon() {
+        if (goodsIcon == null) {
+            return 0;
+        }
+        
+        final int amount = Math.max(1, Math.abs(getAmount()));
+        if (amount <= maxIcons) {
+            return goodsIcon.getIconWidth() / amount;
+        } else {
+            return this.goodsIcon.getIconWidth() / 16;
         }
     }
 
@@ -200,7 +207,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     public Dimension getPreferredSize() {
         final int drawImageCount = numberOfGoodsIconsToDisplay();
         final int iconWidth = (goodsIcon) != null ? goodsIcon.getIconWidth() : 0;
-        final int pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
+        final int pixelsPerIcon = determinePixelsPerIcon();
                 
         final int width = Math.max(getProductionStringWidth(), pixelsPerIcon * (drawImageCount - 1) + iconWidth);
         final int height = this.goodsIcon.getImage().getHeight(null);
