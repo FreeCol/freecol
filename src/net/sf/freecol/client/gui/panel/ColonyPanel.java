@@ -89,6 +89,9 @@ import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
+import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalAlignment;
+import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalGap;
+import net.sf.freecol.client.gui.panel.WrapLayout.LayoutStyle;
 import net.sf.freecol.client.gui.tooltip.RebelToolTip;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -360,7 +363,9 @@ public final class ColonyPanel extends PortPanel
         this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"),
                                        "selectNext2");
 
-        netProductionPanel = new JPanel(new MigLayout("align center, center, nogrid"));
+        netProductionPanel = new JPanel(new WrapLayout()
+                .withLayoutStyle(LayoutStyle.PREFER_BOTTOM)
+                .withHorizontalGap(HorizontalGap.AUTO_BOTTOM, 0, getImageLibrary().scaleInt(5)));
         netProductionPanel.setOpaque(false);
 
         buildingsPanel = new BuildingsPanel();
@@ -744,7 +749,7 @@ public final class ColonyPanel extends PortPanel
         // TODO: Display the name:
         //add(this.nameBox, "grow, span");
         
-        JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1", "[center]")) {
+        JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1, ins 7 7 7 7, gap 0 0", "[center]")) {
             {
                 /*
                  * XXX: This hack has been used before for creating the tooltip,
@@ -764,7 +769,7 @@ public final class ColonyPanel extends PortPanel
 
         final FreeColImageBorder border = FreeColImageBorder.innerColonyPanelBorder;
         final Insets borderInsets = border.getBorderInsets(this);
-        upperRightPanel.add(netProductionPanel, "grow");
+        upperRightPanel.add(netProductionPanel, "grow, wmax 384, height 68!");
         
         // TODO: Display the numbers in new components:
         //add(populationPanel, "grow");
@@ -776,8 +781,8 @@ public final class ColonyPanel extends PortPanel
         //buttonPanel.add(unloadButton);
         //buttonPanel.add(fillButton);
         
-        upperRightPanel.add(constructionPanel, "grow, top, wmax 350, height 100");
-        add(upperRightPanel, "span 1 3, growy, gapbefore 53, width 400!");
+        upperRightPanel.add(constructionPanel, "grow, top, wmax 367, height 90");
+        add(upperRightPanel, "span 1 3, growy, gapbefore 53, width 400!, wmax 400");
         
         add(inPortScroll, "span, grow, height 96!, gaptop push");
         add(outsideColonyScroll, "grow, height 96!");

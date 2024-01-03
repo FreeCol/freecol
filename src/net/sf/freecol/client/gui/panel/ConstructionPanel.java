@@ -85,7 +85,7 @@ public class ConstructionPanel extends MigPanel
     public ConstructionPanel(FreeColClient freeColClient,
                              Colony colony, boolean openBuildQueue) {
         super("ConstructionPanelUI",
-            new MigLayout("fill, gapy 2:1, wrap 2", "push[]10[center]push", "[center]"));
+            new MigLayout("fill, ins 0 0 0 0, gapy 0, wrap 2", "push[]10[center]push", "[center]"));
 
         this.freeColClient = freeColClient;
         this.colony = colony;
