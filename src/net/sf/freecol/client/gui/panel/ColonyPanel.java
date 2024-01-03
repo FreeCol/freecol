@@ -774,13 +774,6 @@ public final class ColonyPanel extends PortPanel
         // TODO: Display the numbers in new components:
         //add(populationPanel, "grow");
         
-        /*
-         * TODO: Don't think we need these, but they can be added to the
-         *       in-port panel if we do.
-         */ 
-        //buttonPanel.add(unloadButton);
-        //buttonPanel.add(fillButton);
-        
         upperRightPanel.add(constructionPanel, "grow, top, wmax 367, height 90");
         add(upperRightPanel, "span 1 3, growy, gapbefore 53, width 400!, wmax 400");
         
@@ -798,8 +791,17 @@ public final class ColonyPanel extends PortPanel
             add(wrapWithBorder(traceWorkButton), "height 48!, gap 0 0 0 0");
         }
 
+        /*
+         * Don't think we need these, but they can be added to the
+         * in-port panel if we do. For now, adding them with zero
+         * size in order to keep the accelerator keys (and we should
+         * keep those):
+         */
+        add(unloadButton, "wmax 0, height 0, gap 0 0 0 0");
+        add(fillButton, "wmax 0, height 0, gap 0 0 0 0");
+        
         add(okButton, "gapbefore push, height 48!"); // tag ok
-
+        
         update();
     }
     
