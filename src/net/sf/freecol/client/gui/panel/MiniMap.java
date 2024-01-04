@@ -390,6 +390,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                     g.fill(settlementPath);
                 }
                 if (!freeColClient.isMapEditor()
+                    && freeColClient.getMyPlayer() != null
                     && !freeColClient.getMyPlayer().canSee(tile)
                     && clientOptions.getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
                     Color blackTransparent = new Color(0, 0, 0, 100);
