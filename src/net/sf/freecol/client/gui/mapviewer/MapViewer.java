@@ -1098,53 +1098,70 @@ public final class MapViewer extends FreeColClientHolder {
      * @param path The {@code PathNode} to display.
      */
     private void displayPath(Graphics2D g2d, PathNode path, MapViewerBounds mapViewerBounds) {
-        final boolean debug = FreeColDebugger
-            .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
-
-        for (PathNode p = path; p != null; p = p.next) {
-            Tile tile = p.getTile();
-            if (tile == null) continue;
-            Point point = mapViewerBounds.calculateTilePosition(tile, false);
-            if (point == null) continue;
-
-            BufferedImage image = (p.isOnCarrier())
-                ? lib.getPathImage(ImageLibrary.PathType.NAVAL)
-                : (mapViewerState.getActiveUnit() != null)
-                ? lib.getPathImage(mapViewerState.getActiveUnit())
-                : null;
-
-            BufferedImage turns = null;
-            if (mapViewerScaledUtils.getFontTiny() != null) {
-                if (debug) { // More detailed display
-                    if (mapViewerState.getActiveUnit() != null) {
-                        image = lib.getPathNextTurnImage(mapViewerState.getActiveUnit());
-                    }
-                    turns = this.lib.getStringImage(g2d,
-                        Integer.toString(p.getTurns())
-                        + "/" + Integer.toString(p.getMovesLeft()),
-                        Color.WHITE, mapViewerScaledUtils.getFontTiny());
-                } else {
-                    turns = (p.getTurns() <= 0) ? null
-                        : this.lib.getStringImage(g2d,
-                            Integer.toString(p.getTurns()),
-                            Color.WHITE, mapViewerScaledUtils.getFontTiny());
-                }
-                g2d.setColor((turns == null) ? Color.GREEN : Color.RED);
-            }
-
-            g2d.translate(point.x, point.y);
-            if (image == null) {
-                g2d.fillOval(tileBounds.getHalfWidth(), tileBounds.getHalfHeight(), 10, 10);
-                g2d.setColor(Color.BLACK);
-                g2d.drawOval(tileBounds.getHalfWidth(), tileBounds.getHalfHeight(), 10, 10);
-            } else {
-                this.tv.displayCenteredImage(g2d, image);
-                if (turns != null) {
-                    this.tv.displayCenteredImage(g2d, turns);
-                }
-            }
-            g2d.translate(-point.x, -point.y);
+        if (path == null || path.next == null) {
+            return;
         }
+        
+        final Stroke defaultStroke = g2d.getStroke();
+        final Color oldColor = g2d.getColor();
+        final Font oldFont = g2d.getFont();
+        g2d.setStroke(new BasicStroke(lib.scaleInt(5), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setFont(mapViewerScaledUtils.getFontNormal());
+
+        Point previousPoint = null;
+        for (PathNode p = path; p != null; p = p.next) {
+            final Tile newTile = p.getTile();
+            if (newTile == null) {
+                previousPoint = null;
+                continue;
+            }
+            
+            final Point nextPoint = mapViewerBounds.calculateCenterTilePosition(newTile);
+            if (nextPoint == null) {
+                previousPoint = null;
+                continue;
+            }
+            
+            final Color pathLineColor = (p.getTurns() > 0) ? new Color(255, 255, 0, 128) : new Color(0, 255, 0, 128);
+            g2d.setColor(pathLineColor);
+            
+            if (previousPoint != null) {
+                g2d.drawLine(previousPoint.x, previousPoint.y, nextPoint.x, nextPoint.y);
+            }
+            previousPoint = nextPoint;
+
+        }
+        
+        g2d.setStroke(new BasicStroke(lib.scaleInt(2)));
+        final FontMetrics fm = g2d.getFontMetrics();
+        final int fontCenterY = (fm.getAscent() - fm.getDescent() - fm.getLeading()) / 2;
+        for (PathNode p = path; p != null; p = p.next) {
+            final Tile newTile = p.getTile();
+            if (newTile == null) {
+                continue;
+            }
+            final Point newP = mapViewerBounds.calculateCenterTilePosition(newTile);
+            if (newP == null) {
+                continue;
+            }
+           
+            final int r = lib.scaleInt(20);
+            final Color pathBgColor = (p.getTurns() > 0) ? new Color(255, 255, 0, 255) : new Color(0, 255, 0, 255);
+            g2d.setColor(pathBgColor);
+            g2d.fillOval(newP.x - r/2, newP.y - r/2, r, r);
+            g2d.setColor(new Color(0, 0, 0, 128));
+            g2d.drawOval(newP.x - r/2, newP.y - r/2, r, r);
+            
+            if (mapViewerScaledUtils.getFontTiny() != null && p.getTurns() > 0) {
+                final String text = Integer.toString(p.getTurns());
+                final Rectangle2D bounds = fm.getStringBounds(text, g2d);
+                g2d.setColor(new Color(0, 0, 0));
+                g2d.drawString(text, newP.x - (int) bounds.getWidth() / 2, newP.y + fontCenterY);
+            }
+        }
+        g2d.setStroke(defaultStroke);
+        g2d.setColor(oldColor);
+        g2d.setFont(oldFont);
     }
 
     /**
