@@ -420,10 +420,10 @@ public final class MapViewer extends FreeColClientHolder {
         final long cursorTileMs = now();
         
         // Display goto path
-        if (mapViewerState.getUnitPath() != null) {
-            displayPath(g2d, mapViewerState.getUnitPath(), mapViewerBounds);
-        } else if (mapViewerState.getGotoPath() != null) {
+        if (mapViewerState.getGotoPath() != null) {
             displayPath(g2d, mapViewerState.getGotoPath(), mapViewerBounds);
+        } else if (mapViewerState.getUnitPath() != null) {
+            displayPath(g2d, mapViewerState.getUnitPath(), mapViewerBounds);
         }
         final long gotoPathMs = now();
 

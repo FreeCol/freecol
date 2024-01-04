@@ -559,7 +559,10 @@ public class SwingGUI extends GUI {
      */
     private void updateUnitPath() {
         final Unit active = getActiveUnit();
-        if (active == null) return;
+        if (active == null) {
+            setUnitPath(null);
+            return;
+        }
 
         Location destination = active.getDestination();
         PathNode path = null;
@@ -1222,8 +1225,8 @@ public class SwingGUI extends GUI {
                 updateGotoTile(tile);
                 traverseGotoPath();
             }
-            updateUnitPath();
         }
+        updateUnitPath();
         repaint();
     }
 
@@ -1241,7 +1244,11 @@ public class SwingGUI extends GUI {
     @Override
     public void traverseGotoPath() {
         final Unit unit = getActiveUnit();
-        if (unit == null || !isGotoStarted()) return;
+        if (unit == null || !isGotoStarted()) {
+            return;
+        }
+        
+        setUnitPath(null);
 
         final PathNode path = stopGoto();
         if (path == null) {
@@ -1250,8 +1257,7 @@ public class SwingGUI extends GUI {
             igc().goToTile(unit, path);
             refresh();
         }
-        // Only update the path if the unit is still active
-        if (unit == getActiveUnit()) updateUnitPath();
+        updateUnitPath();
         repaint();
     }
 
