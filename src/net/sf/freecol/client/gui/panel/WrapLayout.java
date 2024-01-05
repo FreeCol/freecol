@@ -96,6 +96,7 @@ public class WrapLayout implements LayoutManager {
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.CENTER;
     private LayoutStyle layoutStyle = LayoutStyle.BALANCED;
     private HorizontalGap horizontalGap = HorizontalGap.AUTO;
+    private Dimension forceComponentSize = null;
     
     private int minHorizontalGap = 0;
     private int minVerticalGap = 0;
@@ -164,6 +165,17 @@ public class WrapLayout implements LayoutManager {
         this.minHorizontalGap = minHorizontalGap;
         this.horizontalGap = Objects.requireNonNull(horizontalGap, "horizontalGap");
         this.maxHorizontalGap = maxHorizontalGap;
+        return this;
+    }
+    
+    /**
+     * Forces all child components to have the given size.
+     * 
+     * @param forceComponentSize The component size.
+     * @return This object, in order to support method chaining.
+     */
+    public WrapLayout withForceComponentSize(Dimension forceComponentSize) {
+        this.forceComponentSize = forceComponentSize;
         return this;
     }
 
@@ -259,6 +271,9 @@ public class WrapLayout implements LayoutManager {
         Dimension currentRowSize = new Dimension(0, 0);
         for (Component component : getVisibleComponents(target, layoutBottomToTop)) {
             Dimension d = preferred ? component.getPreferredSize() : component.getMinimumSize();
+            if (forceComponentSize != null) {
+                d = forceComponentSize;
+            }
 
             // Can't add the component to current row. Start a new row.
             if (currentRowSize.width + d.width > maxWidth) {
