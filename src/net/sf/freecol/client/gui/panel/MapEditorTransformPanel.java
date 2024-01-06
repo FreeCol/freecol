@@ -26,7 +26,6 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -46,6 +46,9 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
+import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalAlignment;
+import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalGap;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
@@ -272,7 +275,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, null, new BorderLayout());
 
-        listPanel = new JPanel(new GridLayout(2, 0));
+        final Dimension terrainSize = ImageLibrary.scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_OVERLAY_SIZE), ImageLibrary.SMALLER_SCALE);
+        listPanel = new JPanel(new WrapLayout()
+                .withForceComponentSize(terrainSize)
+                .withHorizontalAlignment(HorizontalAlignment.LEFT)
+                .withHorizontalGap(HorizontalGap.AUTO));
 
         group = new ButtonGroup();
         //Add an invisible, move button to de-select all others
@@ -281,12 +288,25 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
         JScrollPane sl = new JScrollPane(listPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         sl.getViewport().setOpaque(false);
-        add(sl);
+        listPanel.setSize(new Dimension(terrainSize.width * 3, 0));
+        add(sl, BorderLayout.CENTER);
+        setBorder(BorderFactory.createEmptyBorder());
+        revalidate();
+        repaint();
     }
 
-
+    @Override
+    public String getFrameTitle() {
+        return Messages.message("mapEditorTransformPanel.title");
+    }
+    
+    @Override
+    public PopupPosition getFramePopupPosition() {
+        return PopupPosition.UPPER_RIGHT;
+    }
+    
     /**
      * Get the last used native nation.
      *
@@ -314,10 +334,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         final Specification spec = getSpecification();
         final Dimension terrainSize = ImageLibrary
-            .scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE,
+            .scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_OVERLAY_SIZE),
                             ImageLibrary.SMALLER_SCALE);
         final Dimension riverSize = ImageLibrary
-            .scaleDimension(ImageLibrary.TILE_SIZE,
+            .scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_SIZE),
                             ImageLibrary.SMALLER_SCALE);
 
         for (TileType type : spec.getTileTypeList()) {

@@ -31,6 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalIconFactory;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -223,7 +224,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         
         // TODO: We might want to allow overriding font colors for the menu:
         //u.put("Menu.foreground", java.awt.Color.WHITE);
-        
+
         return u;
     }
 
@@ -265,6 +266,12 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         final UIDefaults u = UIManager.getLookAndFeelDefaults();
         final int scrollbarWidth = (int) (17 * scaleFactor);
         u.put("ScrollBar.width", scrollbarWidth);
+        
+        int internalFrameIconSize = (int) (16 * scaleFactor);
+        u.put("InternalFrame.closeIcon", (LazyValue) t -> MetalIconFactory.getInternalFrameCloseIcon(internalFrameIconSize));
+        u.put("InternalFrame.maximizeIcon", (LazyValue) t -> MetalIconFactory. getInternalFrameMaximizeIcon(internalFrameIconSize));
+        u.put("InternalFrame.iconifyIcon", (LazyValue) t -> MetalIconFactory.getInternalFrameMinimizeIcon(internalFrameIconSize));
+        u.put("InternalFrame.minimizeIcon", (LazyValue) t -> MetalIconFactory.getInternalFrameAltMaximizeIcon(internalFrameIconSize));
     }
     
     public static float getScaleFactor() {

@@ -99,6 +99,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
         minimapPainterThread.start();
         minimapPainterThread.setPriority(Thread.NORM_PRIORITY - 1);
+        setOpaque(false);
     }
 
     /**

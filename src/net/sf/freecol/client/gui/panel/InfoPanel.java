@@ -34,9 +34,11 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,6 +48,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -85,7 +88,7 @@ public final class InfoPanel extends FreeColPanel
     private static final int PRODUCTION = 4;
 
     /** Preferred size for non-skinned panel. */
-    public static final Dimension PREFERRED_SIZE = new Dimension(260, 130);
+    public static final Dimension PREFERRED_SIZE = new Dimension(250, 138);
     
     /** The image library to use for the font. */
     private final ImageLibrary lib;
@@ -150,19 +153,19 @@ public final class InfoPanel extends FreeColPanel
             };
     }
     
-    public void updateLayoutIfNeeded() {
+    public void updateLayoutIfNeeded(boolean newUseSkin) {
         final Font newFont = this.lib.getScaledFont("normal-plain-tiny", null);
-        final Image newSkin = (useSkin) ? this.lib.getScaledImage("image.skin.InfoPanel")
+        final Image newSkin = (newUseSkin) ? this.lib.getScaledImage("image.skin.InfoPanel")
             : null;
         
-        if (newFont == font && newSkin == skin) {
+        if (useSkin == newUseSkin && newFont == font && newSkin == skin) {
             // No change.
             return;
         }
 
         this.font = newFont;
         this.skin = newSkin;
-        
+        this.useSkin = newUseSkin;
 
         if (this.skin != null) {
             setBorder(null);
@@ -170,6 +173,10 @@ public final class InfoPanel extends FreeColPanel
             // skin is output in overridden paintComponent(), which calls
             // its parent, which will display panels added here
             setOpaque(false);
+        } else if (!useSkin) {
+            setSize(this.lib.scale(PREFERRED_SIZE));
+            setBorder(BorderFactory.createEmptyBorder());
+            setOpaque(true);
         } else {
             setSize(this.lib.scale(PREFERRED_SIZE));
             setBorder(FreeColImageBorder.panelWithoutShadowBorder);
@@ -203,9 +210,10 @@ public final class InfoPanel extends FreeColPanel
             panel.setLocation(lib.scaleInt(pl.getInt("panel.x")), lib.scaleInt(pl.getInt("panel.y")));
             panel.setSize(lib.scaleInt(pl.getInt("panel.width")), lib.scaleInt(pl.getInt("panel.height")));
         } else {
-            final int y = (this.getHeight() - panel.getHeight()/2) / 2;
+            final int y = (this.getHeight() - panel.getHeight()) / 2;
             final int x = (this.getWidth() - panel.getWidth()) / 2;
-            panel.setLocation(x, y);
+            panel.setSize(lib.scale(PREFERRED_SIZE));
+            panel.setLocation(0, 0);
         }
  
         this.removeAll();
@@ -473,14 +481,21 @@ public final class InfoPanel extends FreeColPanel
      * Update this {@code InfoPanel} to end turn mode.
      */
     public void update() {
-        boolean updated = false;
-        InfoPanelMode oldMode = changeMode(InfoPanelMode.END);
-        if (oldMode != InfoPanelMode.END) {
-            fillEndPanel();
-            updated = true;
+        if (getFreeColClient().isMapEditor()) {
+            changeMode(InfoPanelMode.NONE);
+            removeAll();
+            revalidate();
+            repaint();
+        } else {
+            boolean updated = false;
+            InfoPanelMode oldMode = changeMode(InfoPanelMode.END);
+            if (oldMode != InfoPanelMode.END) {
+                fillEndPanel();
+                updated = true;
+            }
+            logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
+                    + oldMode + " -> " + this.mode);
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
-            + oldMode + " -> " + this.mode);
     }
         
     /**
@@ -575,6 +590,15 @@ public final class InfoPanel extends FreeColPanel
         }
     }
 
+    @Override
+    public PopupPosition getFramePopupPosition() {
+        return PopupPosition.LOWER_RIGHT;
+    }
+    
+    @Override
+    public String getFrameTitle() {
+        return Messages.message("infoPanel.title");
+    }
 
     // Override JComponent
 

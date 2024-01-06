@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -90,6 +91,8 @@ public final class UnitButton extends FreeColButton {
 
             if (bi != null) {
                 setSize(bi.getIconWidth(), bi.getIconHeight());
+                setPreferredSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
+                setMinimumSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
             } else {
                 logger.warning("Action " + a + " has no BUTTON_IMAGE");
             }
@@ -127,7 +130,9 @@ public final class UnitButton extends FreeColButton {
                 final ImageIcon bi = (ImageIcon) e.getNewValue();
                 button.setIcon(bi);
                 if (bi != null) {
-                    button.setSize(bi.getIconWidth(), bi.getIconHeight());
+                    button.setSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
+                    button.setMinimumSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
+                    button.setPreferredSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
                 }
                 button.repaint();
             } else if (FreeColAction.BUTTON_ROLLOVER_IMAGE.equals(e.getPropertyName())) {

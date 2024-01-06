@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -35,8 +34,8 @@ import java.util.stream.Collectors;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -84,15 +83,19 @@ public final class CornerMapControls extends MapControls {
     private Image miniMapSkin;
 
     private MiniMapPanelSkin miniMapPanelSkin;
-
-
+    
+    private boolean oldUseSkin = false;
+    
+    private boolean forceUpdate = false;
+    
+    
     /**
      * The basic constructor.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public CornerMapControls(final FreeColClient freeColClient) {
-        super(freeColClient, true);
+        super(freeColClient);
 
         this.lib = freeColClient.getGUI().getFixedImageLibrary();
         this.compassRose = this.lib.getCompassRose();
@@ -116,15 +119,7 @@ public final class CornerMapControls extends MapControls {
                 }
             });
     
-        this.miniMapPanel = new JPanel();
-        this.miniMapPanel.setFocusable(false);
-        /**
-         * In order to make the setLocation setup work, we need to set
-         * the layout to null first, then set the size of the minimap,
-         * and then its location.
-         */
-        this.miniMapPanel.setLayout(null);
-
+        this.miniMapPanel = new MiniMapFreeColPanel(freeColClient);
         this.miniMapPanelSkin = new MiniMapPanelSkin();
         
         // Add buttons:
@@ -148,42 +143,57 @@ public final class CornerMapControls extends MapControls {
     public void updateLayoutIfNeeded() {
         super.updateLayoutIfNeeded();
         
-        final BufferedImage newMinimapSkin = this.lib.getMiniMapSkin();
-        if (this.miniMapSkin == newMinimapSkin) {
+        BufferedImage newMinimapSkin = this.lib.getMiniMapSkin();
+        if (!forceUpdate && oldUseSkin == isUseSkin() && (!oldUseSkin || this.miniMapSkin == newMinimapSkin)) {
             // No update necessary.
             return;
+        } else if (!isUseSkin()) {
+            newMinimapSkin = null;
+            final MigLayout layout = new MigLayout("ins 0 0 0 0, gap 0 0");
+            this.miniMapPanel.setLayout(layout);
+            layout.addLayoutComponent(this.miniMap, "newline, grow, shrink, span, w 100%, h 100%");
+        } else {
+            this.miniMapPanel.setLayout(null);
         }
+
+        this.oldUseSkin = isUseSkin();
         this.miniMapSkin = newMinimapSkin;
+        this.forceUpdate = false;
         
         
-        int width = this.lib.scaleInt(MINI_MAP_WIDTH),
-                height = this.lib.scaleInt(MINI_MAP_HEIGHT);
-        this.miniMap.setSize(width, height);
-        
+        int width = this.lib.scaleInt(MINI_MAP_WIDTH);
+        int height = this.lib.scaleInt(MINI_MAP_HEIGHT);
+        this.miniMap.setSize(new Dimension(width, height));
         if (this.miniMapSkin != null) {
             width = this.miniMapSkin.getWidth(null);
             height = this.miniMapSkin.getHeight(null);
-            this.miniMapPanel.setBorder(null);
+            //this.miniMapPanel.setBorder(null);
             this.miniMapPanel.setSize(width, height);
+            this.miniMapPanelSkin.setLocation(0, 0);
             this.miniMapPanelSkin.setSize(width, height);
             this.miniMapPanel.setOpaque(false);
         } else {
             this.miniMapPanel.setOpaque(true);
-            this.miniMap.setBorder(new BevelBorder(BevelBorder.RAISED));
+            //this.miniMap.setBorder(new BevelBorder(BevelBorder.RAISED));
         }
 
-        final PropertyList pl = ResourceManager.getPropertyList("image.skin.MiniMap.properties");
-        this.miniMap.setLocation(
-                this.lib.scaleInt(pl.getInt("minimap.x")),
-                this.lib.scaleInt(pl.getInt("minimap.y")));
-        this.miniMap.setSize(
-                this.lib.scaleInt(pl.getInt("minimap.width")),
-                this.lib.scaleInt(pl.getInt("minimap.height")));
-        
-        centerComponentOnCoordinate(miniMapToggleBorders, pl, "politicalButton");
-        centerComponentOnCoordinate(miniMapToggleFogOfWarButton, pl, "fogOfWarButton");
-        centerComponentOnCoordinate(miniMapZoomInButton, pl, "zoomInButton");
-        centerComponentOnCoordinate(miniMapZoomOutButton, pl, "zoomOutButton");
+        if (isUseSkin()) {
+            final PropertyList pl = ResourceManager.getPropertyList("image.skin.MiniMap.properties");
+            this.miniMap.setLocation(
+                    this.lib.scaleInt(pl.getInt("minimap.x")),
+                    this.lib.scaleInt(pl.getInt("minimap.y")));
+            this.miniMap.setSize(
+                    this.lib.scaleInt(pl.getInt("minimap.width")),
+                    this.lib.scaleInt(pl.getInt("minimap.height")));
+            
+            centerComponentOnCoordinate(miniMapToggleBorders, pl, "politicalButton");
+            centerComponentOnCoordinate(miniMapToggleFogOfWarButton, pl, "fogOfWarButton");
+            centerComponentOnCoordinate(miniMapZoomInButton, pl, "zoomInButton");
+            centerComponentOnCoordinate(miniMapZoomOutButton, pl, "zoomOutButton");
+        } else {
+            this.miniMapPanel.setPreferredSize(new Dimension(width, height));
+            getGUI().restoreSavedSize(this.miniMapPanel, new Dimension(width, height));
+        }
 
         miniMapPanel.revalidate();
         miniMapPanel.repaint();
@@ -199,55 +209,58 @@ public final class CornerMapControls extends MapControls {
      * {@inheritDoc}
      */
     @Override
-    public List<Component> getComponentsToAdd(Dimension newSize) {
-        List<Component> ret = new ArrayList<>();
+    public List<JComponent> getComponentsToAdd(Dimension newSize) {
+        List<JComponent> ret = new ArrayList<>();
         if (getGame() == null) return ret;
         
         final int cw = newSize.width;
         final int ch = newSize.height;
-
-        if (!this.infoPanel.isShowing()) {
-            this.infoPanel.setLocation(cw - this.infoPanel.getWidth(),
-                                       ch - this.infoPanel.getHeight());
+        
+        if (!this.infoPanel.isShowing() && !this.miniMapPanel.isShowing()) {
+            forceUpdate = true;
+            updateLayoutIfNeeded();
+            
+            if (!this.getFreeColClient().isMapEditor()) {
+                this.infoPanel.setLocation(cw - this.infoPanel.getWidth(), ch - this.infoPanel.getHeight());
+                this.miniMapPanel.setLocation(0, ch - this.miniMapPanel.getHeight());
+            }
             this.infoPanel.refresh();
             ret.add(this.infoPanel);
-        }
-        
-        if (!this.miniMapPanel.isShowing()) {
-            this.miniMapPanel.setLocation(0, ch - this.miniMapPanel.getHeight());
             ret.add(this.miniMapPanel);
         }
-
-        final boolean rose = getClientOptions()
-            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
-        if (rose && !this.compassRose.isShowing()) {
-            this.compassRose.setLocation(cw - this.compassRose.getWidth() - 20, 20);
-            ret.add(this.compassRose);
-        }
         
-        ret.addAll(this.unitButtons.stream().filter(b -> !b.isShowing()).collect(Collectors.toList()));
-
-        if (!this.unitButtons.isEmpty() && !this.getFreeColClient().isMapEditor()) {
-            final int UNSCALED_SPACE_BETWEEN_BUTTONS = 5;
-            final int spaceBetweenButtons = lib.scaleInt(UNSCALED_SPACE_BETWEEN_BUTTONS);
-            final Dimension buttonsDimension = calculateTotalDimension(unitButtons, spaceBetweenButtons);
+        if (!this.getFreeColClient().isMapEditor()) {
+            final boolean rose = getClientOptions()
+                .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
+            if (rose && !this.compassRose.isShowing()) {
+                this.compassRose.setLocation(cw - this.compassRose.getWidth() - 20, 20);
+                ret.add(this.compassRose);
+            }
             
-            final int totalWidth = buttonsDimension.width + this.miniMapPanel.getWidth() + this.infoPanel.getWidth();
-            if (totalWidth < newSize.width) {
-                final Point firstButtonPoint = calculateFirstPosition(newSize, unitButtons, spaceBetweenButtons, buttonsDimension);
-                layoutUnitButtons(unitButtons, buttonsDimension, firstButtonPoint, spaceBetweenButtons);
-            } else {
-                final int numberInTopRow = this.unitButtons.size() / 2;
+            ret.addAll(this.unitButtons.stream().filter(b -> !b.isShowing()).collect(Collectors.toList()));
+    
+            if (!this.unitButtons.isEmpty()) {
+                final int UNSCALED_SPACE_BETWEEN_BUTTONS = 5;
+                final int spaceBetweenButtons = lib.scaleInt(UNSCALED_SPACE_BETWEEN_BUTTONS);
+                final Dimension buttonsDimension = calculateTotalDimension(unitButtons, spaceBetweenButtons);
                 
-                final List<UnitButton> bottomRowButtons = unitButtons.subList(numberInTopRow, unitButtons.size());
-                final Dimension buttonsBottomRowDimension = calculateTotalDimension(bottomRowButtons, spaceBetweenButtons);
-                final Point firstButtonBottomRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsBottomRowDimension);
-                layoutUnitButtons(bottomRowButtons,buttonsDimension, firstButtonBottomRowPoint, spaceBetweenButtons);
-
-                final List<UnitButton> topRowButtons = unitButtons.subList(0, numberInTopRow);
-                final Dimension buttonsTopRowDimension = calculateTotalDimension(topRowButtons, spaceBetweenButtons);
-                final Point firstButtonTopRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsTopRowDimension);
-                layoutUnitButtons(topRowButtons, buttonsDimension, new Point(firstButtonTopRowPoint.x, firstButtonBottomRowPoint.y - buttonsTopRowDimension.height - spaceBetweenButtons), spaceBetweenButtons);
+                final int totalWidth = buttonsDimension.width + this.miniMapPanel.getWidth() + this.infoPanel.getWidth();
+                if (totalWidth < newSize.width) {
+                    final Point firstButtonPoint = calculateFirstPosition(newSize, unitButtons, spaceBetweenButtons, buttonsDimension);
+                    layoutUnitButtons(unitButtons, buttonsDimension, firstButtonPoint, spaceBetweenButtons);
+                } else {
+                    final int numberInTopRow = this.unitButtons.size() / 2;
+                    
+                    final List<UnitButton> bottomRowButtons = unitButtons.subList(numberInTopRow, unitButtons.size());
+                    final Dimension buttonsBottomRowDimension = calculateTotalDimension(bottomRowButtons, spaceBetweenButtons);
+                    final Point firstButtonBottomRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsBottomRowDimension);
+                    layoutUnitButtons(bottomRowButtons,buttonsDimension, firstButtonBottomRowPoint, spaceBetweenButtons);
+    
+                    final List<UnitButton> topRowButtons = unitButtons.subList(0, numberInTopRow);
+                    final Dimension buttonsTopRowDimension = calculateTotalDimension(topRowButtons, spaceBetweenButtons);
+                    final Point firstButtonTopRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsTopRowDimension);
+                    layoutUnitButtons(topRowButtons, buttonsDimension, new Point(firstButtonTopRowPoint.x, firstButtonBottomRowPoint.y - buttonsTopRowDimension.height - spaceBetweenButtons), spaceBetweenButtons);
+                }
             }
         }
         return ret;
@@ -286,10 +299,10 @@ public final class CornerMapControls extends MapControls {
      * {@inheritDoc}
      */
     @Override
-    public List<Component> getComponentsPresent() {
-        List<Component> ret = new ArrayList<>();
-        if (this.infoPanel.isShowing()) ret.add(this.infoPanel);
-        if (this.miniMapPanel.isShowing()) ret.add(this.miniMapPanel);
+    public List<JComponent> getComponentsPresent() {
+        List<JComponent> ret = new ArrayList<>();
+        ret.add(this.infoPanel);
+        ret.add(this.miniMapPanel);
         final boolean rose = getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
         if (rose && this.compassRose.isShowing()) ret.add(this.compassRose);

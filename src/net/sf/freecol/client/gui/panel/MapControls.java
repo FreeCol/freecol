@@ -19,23 +19,20 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import static net.sf.freecol.common.util.StringUtils.lastPart;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.ClientOptions;
+import javax.swing.JComponent;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.Introspector;
 
 
 /**
@@ -64,6 +61,7 @@ public abstract class MapControls extends FreeColClientHolder {
     /** The buttons to control unit actions. */
     protected final List<UnitButton> unitButtons = new ArrayList<>();
 
+    private boolean useSkin;
 
     /**
      * The basic constructor.
@@ -71,9 +69,10 @@ public abstract class MapControls extends FreeColClientHolder {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param useSkin Use a skin or not in the info panel.
      */
-    protected MapControls(final FreeColClient freeColClient, boolean useSkin) {
+    protected MapControls(final FreeColClient freeColClient) {
         super(freeColClient);
 
+        this.useSkin = !this.getFreeColClient().isMapEditor();
         this.infoPanel = new InfoPanel(freeColClient, useSkin);
         this.infoPanel.setFocusable(false);
 
@@ -89,12 +88,17 @@ public abstract class MapControls extends FreeColClientHolder {
         this.miniMapZoomInButton = miniButtons.remove(0);
     }
 
+    
+    public boolean isUseSkin() {
+        return useSkin;
+    }
 
     /**
      * Updates the layout with possibly a new skin and/or size.
      */
     public void updateLayoutIfNeeded() {
-        infoPanel.updateLayoutIfNeeded();
+        this.useSkin = !this.getFreeColClient().isMapEditor();
+        infoPanel.updateLayoutIfNeeded(this.useSkin);
     }
     
     /**
@@ -122,7 +126,7 @@ public abstract class MapControls extends FreeColClientHolder {
      * @param size The {@code Dimension} of the canvas.
      * @return A list of {@code Component}s to add to the canvas.
      */
-    public abstract List<Component> getComponentsToAdd(Dimension size);
+    public abstract List<JComponent> getComponentsToAdd(Dimension size);
 
     /**
      * Prepare and return a list of map controls components to remove
@@ -130,7 +134,7 @@ public abstract class MapControls extends FreeColClientHolder {
      *
      * @return A list of {@code Component}s to remove from the canvas.
      */
-    public abstract List<Component> getComponentsPresent();
+    public abstract List<JComponent> getComponentsPresent();
     
 
     // Simple public routines

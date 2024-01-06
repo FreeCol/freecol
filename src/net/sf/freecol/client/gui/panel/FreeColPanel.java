@@ -24,15 +24,12 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -44,6 +41,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
@@ -295,6 +293,22 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     public boolean isFullscreen() {
         return false;
     }
+    
+    /**
+     * Allows subclasses to define a frame title.
+     * @return The title, if defined by a subclass.
+     */
+    public String getFrameTitle() {
+       return null; 
+    }
+    
+    /**
+     * Allows subclasses to define a default frame popup position.
+     * @return The title, if defined by a subclass.
+     */
+    public PopupPosition getFramePopupPosition() {
+        return null;
+    }
 
     // Interface ActionListener
 
@@ -313,31 +327,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
 
     // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        // removeNotify gets called when a JPanel has no parent any
-        // more, that is the best opportunity available for JPanels
-        // to be given a chance to remove leak generating references.
-
-        if (okButton == null) return; // Been here before
-
-        // We need to make sure the layout is cleared because some
-        // versions of MigLayout are leaky.
-        setLayout(null);
-
-        okButton.removeActionListener(this);
-        okButton = null;
-
-        for (MouseListener listener : getMouseListeners()) {
-            removeMouseListener(listener);
-        }
-    }
 
     /**
      * {@inheritDoc}

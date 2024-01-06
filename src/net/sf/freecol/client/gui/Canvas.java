@@ -51,10 +51,13 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
+import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.client.ClientOptions;
@@ -69,9 +72,11 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
 // Special case panels, TODO: can we move these to Widgets?
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
+import net.sf.freecol.client.gui.panel.MiniMapFreeColPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
@@ -467,7 +472,11 @@ public final class Canvas extends JDesktopPane {
         
         final boolean fullscreenPanel;
         if (comp instanceof FreeColPanel) {
-            fullscreenPanel = ((FreeColPanel) comp).isFullscreen();
+            final FreeColPanel freeColPanel = (FreeColPanel) comp;
+            fullscreenPanel = freeColPanel.isFullscreen();
+            if (popupPosition == null) {
+                popupPosition = freeColPanel.getFramePopupPosition();
+            }
         } else {
             fullscreenPanel = false;
         }
@@ -483,18 +492,27 @@ public final class Canvas extends JDesktopPane {
             c.setBorder(null);
         }
 
-        if (comp instanceof FreeColPanel
-                && ((FreeColPanel) comp).getFrameBorder() != null) {
-            f.setBorder(((FreeColPanel) comp).getFrameBorder());
-        } else if (comp.getBorder() != null) {
-            if (comp.getBorder() instanceof EmptyBorder) {
-                f.setBorder(Utility.blankBorder(10, 10, 10, 10));
+        if (!toolBox) {
+            if (comp instanceof FreeColPanel
+                    && ((FreeColPanel) comp).getFrameBorder() != null) {
+                f.setBorder(((FreeColPanel) comp).getFrameBorder());
+            } else if (comp.getBorder() != null) {
+                if (comp.getBorder() instanceof EmptyBorder) {
+                    f.setBorder(Utility.blankBorder(10, 10, 10, 10));
+                } else {
+                    f.setBorder(comp.getBorder());
+                    comp.setBorder(Utility.blankBorder(5, 5, 5, 5));
+                }
             } else {
-                f.setBorder(comp.getBorder());
-                comp.setBorder(Utility.blankBorder(5, 5, 5, 5));
+                f.setBorder(null);
             }
-        } else {
-            f.setBorder(null);
+        }
+        if (comp instanceof FreeColPanel) {
+            final FreeColPanel panel = (FreeColPanel) comp;
+            final String title = panel.getFrameTitle();
+            if (title != null) {
+                f.setTitle(panel.getFrameTitle());
+            }
         }
 
         if (!fullscreenPanel) {
@@ -503,18 +521,30 @@ public final class Canvas extends JDesktopPane {
             comp.addMouseListener(fml);
         }
         
-        if (f.getUI() instanceof BasicInternalFrameUI) {
+        if (!toolBox && f.getUI() instanceof BasicInternalFrameUI) {
+            f.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
             BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
             biu.setNorthPane(null);
             biu.setSouthPane(null);
             biu.setWestPane(null);
             biu.setEastPane(null);
+        } else {
+            f.setMaximizable(true);
+            f.setClosable(true);
+            f.setIconifiable(true);
         }
+        
+        f.addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                savePositionAndSize(comp, f);
+            }
+        });
 
         f.getContentPane().add(comp);
         f.setOpaque(false);
         f.pack();
-        
+
         final Dimension size;
         if (fullscreenPanel) {
             size = getSize();
@@ -528,6 +558,7 @@ public final class Canvas extends JDesktopPane {
         } else {
             final Point p = chooseLocation(comp, size.width, size.height, popupPosition);
             final Point adjustedP = adjustLocationForClearSpace(p, size.width, size.height);
+            
             if (popupPosition == PopupPosition.CENTERED_FORCED || p.equals(adjustedP)) {
                 f.setLocation(p);
                 f.putClientProperty(PROPERTY_POPUP_POSITION, popupPosition);
@@ -662,6 +693,19 @@ public final class Canvas extends JDesktopPane {
                 x = ((getWidth() - width) * 3) / 4;
                 y = (getHeight() - height) / 2;
                 break;
+            case LOWER_LEFT:
+                x = 0;
+                y = getHeight() - height;
+                break;
+            case LOWER_RIGHT:
+                x = getWidth() - width;
+                y = getHeight() - height;
+                break;
+            case UPPER_RIGHT:
+                x = getWidth() - width;
+                y = 0;
+                break;
+            case UPPER_LEFT:
             case ORIGIN:
                 x = y = 0;
                 break;
@@ -874,13 +918,25 @@ public final class Canvas extends JDesktopPane {
      */
     private void notifyClose(Component c, JInternalFrame jif) {
         if (c instanceof FreeColPanel) {
-            FreeColPanel fcp = (FreeColPanel)c;
+            FreeColPanel fcp = (FreeColPanel) c;
             fcp.firePropertyChange("closing", false, true);
-            
+
+            if (nothingShowing()
+                    // These are added/removed as a part of "updateMenuBar"
+                    && !(c instanceof InfoPanel) && !(c instanceof MiniMapFreeColPanel)) {
+                updateMenuBar();
+            }
+        }
+    }
+    
+    private void savePositionAndSize(Component c, JInternalFrame jif) {
+        if (c instanceof FreeColPanel) {
+            FreeColPanel fcp = (FreeColPanel) c;
+            if (fcp.isFullscreen()) {
+                return;
+            }
             savePosition(fcp, jif.getLocation());
             saveSize(fcp, fcp.getSize());
-
-            if (nothingShowing()) updateMenuBar();
         }
     }
 
@@ -896,6 +952,15 @@ public final class Canvas extends JDesktopPane {
         // remove listeners, they will be added when launching the new game...
         removeKeyAndMouseListeners();
 
+        for (JInternalFrame f : getAllFrames()) {
+            final FreeColPanel fcp = getFreeColPanel(f);
+            if (fcp != null) {
+                removeFromCanvas(fcp);
+            } else {
+                removeFromCanvas(f);
+            }
+        }
+        
         for (Component c : getComponents()) {
             if (c instanceof CanvasMapViewer) {
                 continue;
@@ -965,6 +1030,10 @@ public final class Canvas extends JDesktopPane {
      * @param d The {@code Dimension} to use as default.
      */
     public void restoreSavedSize(Component comp, Dimension d) {
+        if (comp instanceof FreeColPanel && ((FreeColPanel) comp).isFullscreen()) {
+            return;
+        }
+        
         final Dimension pref = comp.getPreferredSize();
         final Dimension sugg = (d == null) ? pref : d;
         boolean save = false;
@@ -1030,10 +1099,11 @@ public final class Canvas extends JDesktopPane {
         if (panel.endsWith("Panel")) {
             for (Component c1 : getComponents()) {
                 if (c1 instanceof JInternalFrame) {
-                    for (Component c2 : ((JInternalFrame)c1).getContentPane()
-                             .getComponents()) {
+                    final JInternalFrame jif = (JInternalFrame) c1;
+                    for (Component c2 : jif.getContentPane().getComponents()) {
                         if (panel.equals(c2.getClass().getName())) {
-                            notifyClose(c2, (JInternalFrame)c1);
+                            savePositionAndSize(c2, jif);
+                            notifyClose(c2, jif);
                             return;
                         }
                     }
@@ -1117,6 +1187,22 @@ public final class Canvas extends JDesktopPane {
         }
         return null;
     }
+    
+    public boolean isAddedAsPanelFrameOrIcon(Component component) {
+        for (JInternalFrame f : getAllFrames()) {
+            for (Component c2 : f.getContentPane().getComponents()) {
+                if (component == c2) {
+                    return true;
+                }
+            }
+        }
+        for (Component c1 : getComponents()) {
+            if (component == c1) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Gets any currently displayed component matching a predicate.
@@ -1167,6 +1253,10 @@ public final class Canvas extends JDesktopPane {
 
         final Rectangle updateBounds = comp.getBounds();
         final JInternalFrame jif = getInternalFrame(comp);
+
+        if (jif != null) {
+            savePositionAndSize(comp, jif);
+        }
         if (jif != null && jif != comp) {
             jif.dispose();
         } else {
@@ -1303,13 +1393,30 @@ public final class Canvas extends JDesktopPane {
      * @return True if any were added.
      */
     public boolean addMapControls() {
-        if (this.mapControls == null) return false;
-        List<Component> components
-            = this.mapControls.getComponentsToAdd(this.oldSize);
-        for (Component c : components) {
-            addToCanvas(c, JLayeredPane.MODAL_LAYER);
+        if (this.mapControls == null) {
+            return false;
+        }
+        final List<JComponent> components = this.mapControls.getComponentsToAdd(this.oldSize);
+        if (hasAtLeastOneMapControlFrom(components)) {
+            return false;
+        }
+        for (JComponent c : components) {
+            if (freeColClient.isMapEditor()) {
+                addAsFrame(c, true, null, true);
+            } else {
+                addToCanvas(c, JLayeredPane.MODAL_LAYER);
+            }
         }
         return !components.isEmpty();
+    }
+    
+    private boolean hasAtLeastOneMapControlFrom(List<JComponent> components) {
+        for (JComponent c : components) {
+            if (isAddedAsPanelFrameOrIcon(c)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1321,7 +1428,7 @@ public final class Canvas extends JDesktopPane {
         if (mapControls == null) {
             return false;
         }
-        final List<Component> components = mapControls.getComponentsPresent();
+        final List<JComponent> components = mapControls.getComponentsPresent();
         boolean ret = false;
         for (Component c : components) {
             removeFromCanvas(c);
@@ -1340,6 +1447,7 @@ public final class Canvas extends JDesktopPane {
     public void closeMenus() {
         for (JInternalFrame jif : getAllFrames()) {
             for (Component c : jif.getContentPane().getComponents()) {
+                savePositionAndSize(c, jif);
                 notifyClose(c, jif);
             }
             jif.dispose();
@@ -1531,11 +1639,8 @@ public final class Canvas extends JDesktopPane {
      * Display the map editor transform panel.
      */
     public void showMapEditorTransformPanel() {
-        MapEditorTransformPanel panel
-            = new MapEditorTransformPanel(this.freeColClient);
-        JInternalFrame f = addAsFrame(panel, true, PopupPosition.CENTERED,
-                                      false);
-        f.setLocation(f.getX(), 50); // move up to near the top
+        final MapEditorTransformPanel panel = new MapEditorTransformPanel(this.freeColClient);
+        addAsFrame(panel, true, null, true);
         repaint();
     }
 
