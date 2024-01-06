@@ -135,7 +135,6 @@ public final class FreeCol {
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
-    private static final long MEGA = 1000000; // Metric
 
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";
@@ -161,7 +160,10 @@ public final class FreeCol {
     public static final float   GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "11";
-    private static final long   MEMORY_MIN = 2000000000; // a bit less than 2GB
+    private static final long   MEMORY_MIN = 536500000; // a bit less than 512MB
+    private static final long   MEMORY_MIN_IN_MB = 512; // a bit less than 512MB
+    private static final long   SOFT_MEMORY_MIN = 2000000000; // a bit less than 2GB
+    private static final long   SOFT_MEMORY_MIN_IN_GB = 2;
     private static final String META_SERVER_ADDRESS = "meta.freecol.org";
     private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
@@ -326,7 +328,15 @@ public final class FreeCol {
             // Memory message is in Mbytes, hence division by MEGA.
             fatal(StringTemplate.template("main.memory")
                 .addAmount("%memory%", MEMORY_MAX)
-                .addAmount("%minMemory%", MEMORY_MIN / MEGA));
+                .addAmount("%minMemory%", MEMORY_MIN_IN_MB));
+        }
+        if (memoryCheck && MEMORY_MAX < SOFT_MEMORY_MIN) {
+            System.err.println();
+            System.err.println();
+            System.err.println(Messages.message(StringTemplate.template("main.memoryLow")
+                .addAmount("%memory%", MEMORY_MAX)
+                .add("%minMemory%", SOFT_MEMORY_MIN_IN_GB + "G")));
+            System.err.println();
         }
 
         // Having parsed the command line args, we know where the user
