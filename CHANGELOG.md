@@ -3,26 +3,36 @@
 All savegames from 0.12.0 and up should continue working with 1.2.0.
 
 ### Graphics ###
+* Massive redesign of the colony panel with background images and other styling
 * A new styling for the top menu bar with better contrast. This includes changes like showing the top level menus in a button like style.
 * New styling for radio and checkbox buttons.
 * The face of Peter Minuit now has more realistic coloring. 
 
 ### Performance ###
 * Improved rendering performance, and especially when scrolling or moving units.
+* Allow to run FreeCol with only 512MB memory. Please keep in mind that 2GB is still needed for higher resolution, smoother scroll and high rendering quality.
+* Better handling of memory -- for example prioritized automatic clearing of caches when running low on memory.
 
 ### User Interface ###
+* Allow the minimap and other map controls to be resized in the map editor.
 * The mapboard scrolling is now much smoother and supports pixel-by-pixel scrolling.
 * Allowing scrolling past the borders of a map so that edge tiles can also be placed in focus.
+* It's now possible to use 75% display scaling. This can be used when playing on very small screens where fixed size dialogs would otherwise be larger than the screen.
 * The warehouse dialog can now be resized.
 * Focus is now changed on the mapboard with a single mouse click.
 * Unit dragging can now only be started by clicking on the unit (in order to reduce the likelyhood of accidental goto-orders). In addition, the drag can now be started for units that are currently not the active unit.
 * The active unit is kept when opening a colony panel.
 * The colony panel now works better on small screens.
+* The build queue is no longer displayed when clicking on other buildings than the carpenter type of buildings. 
+* The colony panel can now be more easily dragged by clicking-and-dragging almost anywhere on the colony panel's open spaces.
+* Various fixes and a new visualization of goto-paths.
+* Buildings are now randomly distributed in the colony based on the available space, and can be of different sizes.
 * The panel showing the signing of the Declaration of Independence is now made larger on bigger screens.
 * Panels can now cover the entire mapboard area (this is needed for very small screens in order to show all content).
 * The confirm declaration dialog now fits on small screen.
 * Bugfix: Fixes hidden OK-button in the Colopedia on small screens. 
 * Bugfix: The height of a colony building no longer changes when a worker is added.
+* Bugfix: Lots of small rendering differences between different systems (DPI and OS) have been fixed.
 
 ### Bug fixes ###
 * Fixed a bug that prevented the REF computer player (AI) from completing its turn.
