@@ -97,6 +97,10 @@ public final class Scrolling extends FreeColClientHolder {
             return;
         }
         
+        if (getMap() == null) {
+            return;
+        }
+        
         if (isAsyncPainterEnabled()) {
             final MapAsyncPainter mapAsyncPainter = getGUI().useMapAsyncPainter();
             mapAsyncPainter.setScrollDirection(direction);
