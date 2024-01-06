@@ -7,6 +7,8 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 import java.util.concurrent.locks.LockSupport;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -21,6 +23,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class MapAsyncPainter {
 
+    private static final Logger logger = Logger.getLogger(MapAsyncPainter.class.getName());
+    
     /**
      * Activates debug output to STDOUT explaining how prerendered images
      * are produced and consumed.
@@ -259,8 +263,23 @@ public final class MapAsyncPainter {
         
         @Override
         public void run() {
+            final int MAX_EXCEPTIONS = 100;
+            int reportedExceptions = 0;
             while (!aborted) {
-                paint();
+                try {
+                    paint();
+                } catch (Exception e) {
+                    if (reportedExceptions < MAX_EXCEPTIONS) { 
+                        logger.log(Level.WARNING, "Unhandled exception while painting.", e);
+                        reportedExceptions++;
+                        if (reportedExceptions == MAX_EXCEPTIONS) {
+                            logger.severe("Stopped logging exceptions from the async painting thread since there have been produced too many.");
+                        }
+                    }
+                    try {
+                        Thread.sleep(MAX_EXCEPTIONS);
+                    } catch (InterruptedException e1) {}
+                }
             }
         }
         
