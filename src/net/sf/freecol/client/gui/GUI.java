@@ -1158,6 +1158,18 @@ public class GUI extends FreeColClientHolder {
      */
     public void startMapEditorGUI() {}
 
+    /**
+     * Shows the map editor transform panel.
+     */
+    public void enableEditorTransformPanel(boolean shouldDisplayPanel) {}
+    
+    /**
+     * Checks if the map editor transform panel is being displayed.
+     */
+    public boolean isShowingMapEditorTransformPanel() {
+        return false;
+    }
+    
 
     // Animation handling
 

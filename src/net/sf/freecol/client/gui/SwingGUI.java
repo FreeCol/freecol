@@ -60,6 +60,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.control.SoundController;
+import net.sf.freecol.client.gui.action.MapEditorTransformPanelAction;
 import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special dialogs and panels
@@ -71,12 +72,14 @@ import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewerState;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
+import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.PurchasePanel;
 import net.sf.freecol.client.gui.panel.RecruitPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
@@ -123,6 +126,7 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.AudioResource;
 import net.sf.freecol.common.resources.ImageCache;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -831,7 +835,7 @@ public class SwingGUI extends GUI {
         this.mapViewer.getMapViewerBounds().setFocus(tile);
 
         enableMapControls(false);
-        enableMapControls(getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        enableMapControls(getGame() != null && getGame().getMap() != null && getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
 
         refresh();
     }
@@ -916,7 +920,30 @@ public class SwingGUI extends GUI {
         resetMapZoom(); // Reset zoom to the default
         mapViewer.getMapViewerState().setActiveUnit(null);
         this.canvas.startMapEditorGUI();
-        this.canvas.showMapEditorTransformPanel();
+        enableEditorTransformPanel(getGame() != null && getGame().getMap() != null);
+        enableMapControls(getGame() != null && getGame().getMap() != null && getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        updateMenuBar();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void enableEditorTransformPanel(boolean shouldDisplayPanel) {
+        final MapEditorTransformPanel panel = this.canvas.getExistingFreeColPanel(MapEditorTransformPanel.class);
+        if (shouldDisplayPanel && panel == null) {
+            this.canvas.showMapEditorTransformPanel();
+        } else if (!shouldDisplayPanel && panel != null) {
+            this.canvas.removeFromCanvas(panel);
+        } // else: ignore.
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isShowingMapEditorTransformPanel() {
+        return this.canvas.isAddedAsPanelFrameOrIcon(MapEditorTransformPanel.class);
     }
 
 

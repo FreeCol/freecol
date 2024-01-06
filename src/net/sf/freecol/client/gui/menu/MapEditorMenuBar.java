@@ -33,6 +33,7 @@ import net.sf.freecol.client.gui.action.DisplayGridAction;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.action.MapControlsAction;
+import net.sf.freecol.client.gui.action.MapEditorTransformPanelAction;
 import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.NewEmptyMapAction;
 import net.sf.freecol.client.gui.action.OpenAction;
@@ -130,6 +131,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.setMnemonic(KeyEvent.VK_V);
 
         menu.add(getCheckBoxMenuItem(MapControlsAction.id));
+        menu.add(getCheckBoxMenuItem(MapEditorTransformPanelAction.id));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
 

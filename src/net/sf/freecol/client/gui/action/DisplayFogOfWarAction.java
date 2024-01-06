@@ -31,7 +31,7 @@ import net.sf.freecol.common.option.GameOptions;
 /**
  * An action to toggle the display of national borders.
  */
-public class DisplayFogOfWarAction extends SelectableAction {
+public class DisplayFogOfWarAction extends SelectableOptionAction {
 
     public static final String id = "displayFogOfWarAction";
 

@@ -21,18 +21,18 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.AbstractButton;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
 
 /**
- * An action to toggle the display of national borders.
+ * An action for displaying the map controls.
  */
-public class DisplayBordersAction extends SelectableOptionAction {
+public class MapEditorTransformPanelAction extends SelectableAction {
 
-    public static final String id = "displayBordersAction";
+    public static final String id = "mapEditorTransformPanelAction";
 
 
     /**
@@ -40,13 +40,22 @@ public class DisplayBordersAction extends SelectableOptionAction {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      */
-    public DisplayBordersAction(FreeColClient freeColClient) {
-        super(freeColClient, id, ClientOptions.DISPLAY_BORDERS);
-
-        setSelected(shouldBeSelected());
+    public MapEditorTransformPanelAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+        setSelected(isSelected());
     }
 
 
+    @Override
+    protected boolean shouldBeEnabled() {
+        return freeColClient.isMapEditor() && getGame() != null && getGame().getMap() != null;
+    }
+
+    @Override
+    protected boolean shouldBeSelected() {
+        return getGUI().isShowingMapEditorTransformPanel();
+    }
+    
     // Interface ActionListener
 
     /**
@@ -54,8 +63,6 @@ public class DisplayBordersAction extends SelectableOptionAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());
-        setOption(isSelected());
-        getGUI().refresh();
+        getGUI().enableEditorTransformPanel(isEnabled() && isSelected());
     }
 }

@@ -22,7 +22,9 @@ package net.sf.freecol.client.gui.action;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 
@@ -68,6 +70,8 @@ public class NewEmptyMapAction extends MapboardAction {
         Map map = getFreeColClient().getFreeColServer()
             .generateEmptyMap(size.width, size.height);
         Tile tile = map.getTile(size.width/2, size.height/2);
+        getGUI().enableEditorTransformPanel(true);
+        getGUI().enableMapControls(getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         getGUI().setFocus(tile);
         getGUI().updateMenuBar();
         getGUI().refresh();

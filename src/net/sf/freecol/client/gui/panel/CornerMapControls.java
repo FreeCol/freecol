@@ -32,8 +32,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
@@ -301,8 +303,13 @@ public final class CornerMapControls extends MapControls {
     @Override
     public List<JComponent> getComponentsPresent() {
         List<JComponent> ret = new ArrayList<>();
-        ret.add(this.infoPanel);
-        ret.add(this.miniMapPanel);
+        
+        if (isShowingOrIconified(this.infoPanel)) {
+            ret.add(this.infoPanel);
+        }
+        if (isShowingOrIconified(this.miniMapPanel)) {
+            ret.add(this.miniMapPanel);
+        }
         final boolean rose = getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
         if (rose && this.compassRose.isShowing()) ret.add(this.compassRose);
@@ -310,5 +317,13 @@ public final class CornerMapControls extends MapControls {
             if (ub.isShowing()) ret.add(ub);
         }
         return ret;
+    }
+        
+    private boolean isShowingOrIconified(JComponent panel) {
+        final JInternalFrame f = (JInternalFrame) SwingUtilities.getAncestorOfClass(JInternalFrame.class, panel);
+        if (f != null && f.isIcon()) {
+            return true;
+        }
+        return panel.isShowing();
     }
 }

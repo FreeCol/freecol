@@ -119,6 +119,7 @@ public class ActionManager extends OptionGroup {
         add(new LoadAction(freeColClient));
         add(new MapControlsAction(freeColClient));
         add(new MapEditorAction(freeColClient));
+        add(new MapEditorTransformPanelAction(freeColClient));
         add(new MiniMapToggleViewAction(freeColClient));
         add(new MiniMapToggleViewAction(freeColClient, true));
         add(new MiniMapToggleFogOfWarAction(freeColClient));

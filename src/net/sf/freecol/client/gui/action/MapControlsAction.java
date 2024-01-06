@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractButton;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
@@ -30,7 +28,7 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * An action for displaying the map controls.
  */
-public class MapControlsAction extends SelectableAction {
+public class MapControlsAction extends SelectableOptionAction {
 
     public static final String id = "mapControlsAction";
 
@@ -55,10 +53,20 @@ public class MapControlsAction extends SelectableAction {
     @Override
     public void update() {
         super.update();
-
-        getGUI().enableMapControls(isEnabled() && isSelected());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean shouldBeEnabled() { 
+        return super.shouldBeEnabled() && getGame() != null && getGame().getMap() != null;
+    }
+    
+    @Override
+    protected boolean shouldBeSelected() {
+        return getOption();
+    }
 
     // Interface ActionListener
 
@@ -67,8 +75,7 @@ public class MapControlsAction extends SelectableAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        setSelected(((AbstractButton)ae.getSource()).isSelected());
+        getGUI().enableMapControls(isEnabled() && isSelected());
         setOption(isSelected());
-        update();
     }
 }

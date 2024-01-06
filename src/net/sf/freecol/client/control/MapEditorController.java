@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MiniMap; // FIXME: should go away
@@ -48,6 +49,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
+import net.sf.freecol.common.resources.AudioResource;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerGame;
@@ -164,6 +167,11 @@ public final class MapEditorController extends FreeColClientHolder {
             //fcc.changeClientState(true);
             //gui.changeView((Tile)null);
             gui.startMapEditorGUI();
+            final AudioResource defaultPlaylist = ResourceManager.getAudioResource("sound.music.playlist.default", true);
+            if (defaultPlaylist != null) {
+                getFreeColClient().getSoundController().setDefaultPlaylist(defaultPlaylist.getAllAudio());
+            }
+            getFreeColClient().getSoundController().playMusic(null);
             
             if (specificationChanges) {
                 gui.showInformationPanel("mapEditor.loadedWithMods");
@@ -327,6 +335,8 @@ public final class MapEditorController extends FreeColClientHolder {
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();
                             gui.setFocus(game.getMap().getTile(1,1));
+                            gui.enableEditorTransformPanel(true);
+                            gui.enableMapControls(getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
                             gui.updateMenuBar();
                             gui.refresh();
                         });

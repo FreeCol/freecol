@@ -1167,6 +1167,13 @@ public final class Canvas extends JDesktopPane {
      *     requested type, or null if none found.
      */
     public <T extends FreeColPanel> T getExistingFreeColPanel(Class<T> type) {
+        for (JInternalFrame f : getAllFrames()) {
+            for (Component c2 : f.getContentPane().getComponents()) {
+                if (type.isAssignableFrom(c2.getClass())) {
+                    return type.cast(c2);
+                }
+            }
+        }
         for (Component c1 : getComponents()) {
             if (c1 instanceof JInternalFrame) {
                 for (Component c2 : ((JInternalFrame)c1).getContentPane()
@@ -1186,6 +1193,22 @@ public final class Canvas extends JDesktopPane {
             }
         }
         return null;
+    }
+    
+    public boolean isAddedAsPanelFrameOrIcon(Class<?> clazz) {
+        for (JInternalFrame f : getAllFrames()) {
+            for (Component c2 : f.getContentPane().getComponents()) {
+                if (clazz.isAssignableFrom(c2.getClass())) {
+                    return true;
+                }
+            }
+        }
+        for (Component c1 : getComponents()) {
+            if (clazz.isAssignableFrom(c1.getClass())) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public boolean isAddedAsPanelFrameOrIcon(Component component) {

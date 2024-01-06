@@ -34,7 +34,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * Display text over tiles.
  */
-public final class DisplayTileTextAction extends SelectableAction {
+public final class DisplayTileTextAction extends SelectableOptionAction {
 
     public static final String id = "displayTileTextAction.";
 

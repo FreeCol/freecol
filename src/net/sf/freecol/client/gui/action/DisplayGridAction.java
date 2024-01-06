@@ -30,7 +30,7 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * An action to toggle the display of the map grid.
  */
-public class DisplayGridAction extends SelectableAction {
+public class DisplayGridAction extends SelectableOptionAction {
 
     public static final String id = "displayGridAction";
 
