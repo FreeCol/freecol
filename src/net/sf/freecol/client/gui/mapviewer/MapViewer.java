@@ -1282,7 +1282,7 @@ public final class MapViewer extends FreeColClientHolder {
             g2d.setColor(Color.WHITE);
             final int centerX = (int) (allTextBoundingBox.getWidth() - lineTextBoundingBoxes[i].getWidth()) / 2;
             g2d.drawString(lines[i], x + centerX + tileCenterX, y + offsetY);
-            offsetY += lineTextBoundingBoxes[i].getHeight();
+            offsetY += (int) lineTextBoundingBoxes[i].getHeight();
         }
     }
 
