@@ -916,6 +916,27 @@ public final class ImageLibrary {
         final String key = "image.buildingicon.model.building.BuildingSite";
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }
+    
+    /**
+     * Gets an UNCACHED image of the "outside colony"-background based on the given defensive building.
+     * 
+     * The result have to be cached by the caller of this method as long as the image is needed.
+     * 
+     * @param defensiveBuilding The building to get the graphics for.
+     * @param size The size of the background.
+     * @return The image, resized to the given {@code size} without honoring the aspect ratio.
+     */
+    public static BufferedImage getUncachedOutsideColonyBackground(BuildingType defensiveBuilding, Dimension size) {
+        if (defensiveBuilding == null) {
+            return null;
+        }
+        final String key = "image.buildingOutside.background." + defensiveBuilding.getId();
+        final ImageResource ir = ResourceManager.getImageResource(key, false);
+        if (ir == null) {
+            return null;
+        }
+        return ir.getSizedImageIgnoringProportions(size);
+    }
 
     // Colony Panel
     

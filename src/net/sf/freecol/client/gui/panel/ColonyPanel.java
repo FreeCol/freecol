@@ -48,11 +48,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -89,7 +90,6 @@ import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
-import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalAlignment;
 import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalGap;
 import net.sf.freecol.client.gui.panel.WrapLayout.LayoutStyle;
 import net.sf.freecol.client.gui.tooltip.RebelToolTip;
@@ -144,6 +144,8 @@ public final class ColonyPanel extends PortPanel
     /** The speed of the scrolling. */
     public static final int SCROLL_SPEED = 40;
 
+    final Map<BuildingType, BufferedImage> cachedDefensiveBuildingImage = new HashMap<>();
+    
     // Buttons
     private JButton unloadButton
         = Utility.localizedButton("unload");
@@ -532,6 +534,29 @@ public final class ColonyPanel extends PortPanel
                 }
             }
             
+        }
+        
+        final List<Building> defensiveBuildings = colony.getBuildings()
+                .stream()
+                .filter(b -> b.getType().isDefenceType())
+                .sorted(Comparator.comparing(Building::getId)) // Stable sort. Might add a z-index property later.
+                .collect(Collectors.toList());
+        
+        for (Building defensiveBuilding : defensiveBuildings) {
+            final Dimension outsideColonySize = outsideColonyScroll.getSize();
+            BufferedImage outsideColonyImage = cachedDefensiveBuildingImage.get(defensiveBuilding.getType());
+            if (outsideColonyImage == null
+                    || outsideColonyImage.getWidth() != outsideColonySize.width
+                    || outsideColonyImage.getHeight() != outsideColonySize.height) {
+                outsideColonyImage = ImageLibrary.getUncachedOutsideColonyBackground(defensiveBuilding.getType(), outsideColonySize);
+                cachedDefensiveBuildingImage.put(defensiveBuilding.getType(), outsideColonyImage);
+            } 
+            if (outsideColonyImage == null) {
+                continue;
+            }
+            final int x = outsideColonyScroll.getX();
+            final int y = outsideColonyScroll.getY();
+            g.drawImage(outsideColonyImage, x, y, null);
         }
         
         final BufferedImage unavailable = getImageLibrary().getScaledCargoHold(false);

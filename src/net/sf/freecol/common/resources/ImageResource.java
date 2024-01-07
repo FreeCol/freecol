@@ -189,6 +189,37 @@ public class ImageResource extends Resource implements Cleanable {
     private synchronized boolean haveAlternatives() {
         return this.loadedImages != null;
     }
+    
+    /**
+     * Returns an image that has been forcefully scaled to the given size.
+     * 
+     * @param size The {@code Dimension} of the requested image.
+     * @return The {@code BufferedImage} with the exact dimension. When there
+     *      are alternative sizes, the image with the closest aspect ratio is
+     *      chosen to get the least amount distortion possible. 
+     */
+    public BufferedImage getSizedImageIgnoringProportions(Dimension size) {
+        BufferedImage img = getImage();
+        if (img == null) {
+            return null;
+        }
+        if (loadedImages == null || loadedImages.isEmpty()) {
+            return createResizedImage(img, size.width, size.height, true);
+        }
+        
+        final double targetAspectRatio = ((double) size.width) / size.height;
+        final BufferedImage img2 = loadedImages.stream().min((a, b) -> {
+            final double aspectDiffA = targetAspectRatio - ((double) a.getWidth()) / a.getHeight();
+            final double aspectDiffB = targetAspectRatio - ((double) b.getWidth()) / b.getHeight();
+            if (Math.abs(aspectDiffA) > Math.abs(aspectDiffB)) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }).orElseThrow();
+        
+        return createResizedImage(img2, size.width, size.height, true);
+    }
 
     /**
      * Gets the image using the specified dimension.
