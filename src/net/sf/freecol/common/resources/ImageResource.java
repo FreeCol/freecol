@@ -203,6 +203,9 @@ public class ImageResource extends Resource implements Cleanable {
         if (img == null) {
             return null;
         }
+        if (size.width == img.getWidth() && size.height == img.getHeight()) {
+            return img;
+        }
         if (loadedImages == null || loadedImages.isEmpty()) {
             return createResizedImage(img, size.width, size.height, true);
         }
