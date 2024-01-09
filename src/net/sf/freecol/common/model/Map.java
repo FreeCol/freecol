@@ -74,7 +74,7 @@ import net.sf.freecol.common.util.LogBuilder;
  * In theory, a {@link Game} might contain several Map instances
  * connected by the HighSeas.
  */
-public class Map extends FreeColGameObject implements Location {
+public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
@@ -832,6 +832,11 @@ public class Map extends FreeColGameObject implements Location {
             if (predicate.test(t)) ret.add(t);
         }
         return ret;
+    }
+
+    @Override
+    public Iterator<Tile> iterator() {
+        return Collections.unmodifiableList(tileList).iterator();
     }
 
     /**
