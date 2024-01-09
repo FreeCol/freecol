@@ -3143,7 +3143,7 @@
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
-      <region id="model.region.west" />
+      <region id="model.region.center" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" extends="camp"
                         number-of-settlements="average" aggression="average">
@@ -3154,16 +3154,17 @@
       <region id="model.region.northWest" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" extends="camp"
-                        number-of-settlements="low" aggression="high">
+                        number-of-settlements="high" aggression="low">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
       <skill id="model.unit.masterCottonPlanter" probability="10"/>
       <skill id="model.unit.expertFurTrapper" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <region id="model.region.southEast" />
+      <region id="model.region.south" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" extends="village"
-                        number-of-settlements="low" aggression="low">
+                        number-of-settlements="low" aggression="high">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
@@ -3178,7 +3179,7 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFarmer" probability="3"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
-      <region id="model.region.northEast" />
+      <region id="model.region.north" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" extends="village"
                         number-of-settlements="average" aggression="average">
@@ -3190,10 +3191,10 @@
       <skill id="model.unit.expertFisherman" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
-      <region id="model.region.north" />
+      <region id="model.region.northEast" />
     </indian-nation-type>
     <indian-nation-type id="city" abstract="true" extends="default"
-                        number-of-settlements="high">
+                        number-of-settlements="low">
       <skill id="model.unit.expertSilverMiner" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
@@ -3203,7 +3204,6 @@
                         aggression="low">
       <skill id="model.unit.expertOreMiner" probability="10"/>
       <region id="model.region.southWest" />
-      <region id="model.region.south" />
       <settlement id="model.settlement.inca" capital="false"
                   claimable-radius="2" extra-claimable-radius="2"
                   minimum-size="8" maximum-size="12"
@@ -3247,8 +3247,7 @@
                         aggression="high">
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
-      <region id="model.region.center" />
-      <region id="model.region.east" />
+      <region id="model.region.west" />
       <settlement id="model.settlement.aztec" capital="false"
                   claimable-radius="2" extra-claimable-radius="2"
                   minimum-size="8" maximum-size="12"
