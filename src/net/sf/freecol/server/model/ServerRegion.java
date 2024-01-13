@@ -375,128 +375,101 @@ public class ServerRegion extends Region {
         
         int[] xDelimiterThirds = findXForThirdsOfLand(map, 0, yDelimiterThirds[0]);
         
-        ServerRegion northWest = (ServerRegion)fixed.get("model.region.northWest");
-        if (northWest == null) {
-            northWest = new ServerRegion(map, "model.region.northWest", RegionType.LAND, null);
-            lb.add("+NW");
-        }
+        map.removeRegionsByKey("model.region.northWest");
+        final ServerRegion northWest = new ServerRegion(map, "model.region.northWest", RegionType.LAND, null);
         northWest.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 0,
                 0,
                 xDelimiterThirds[0],
                 yDelimiterThirds[0]
                 )));
-        result.add(northWest);
+        map.addRegion(northWest);
 
-        ServerRegion north = (ServerRegion)fixed.get("model.region.north");
-        if (north == null) {
-            north = new ServerRegion(map, "model.region.north",RegionType.LAND, null);
-            lb.add("+N");
-        }
+        map.removeRegionsByKey("model.region.north");
+        final ServerRegion north = new ServerRegion(map, "model.region.north",RegionType.LAND, null);
         north.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 xDelimiterThirds[0],
                 0,
                 xDelimiterThirds[1] - xDelimiterThirds[0],
                 yDelimiterThirds[0]
                 )));
-        result.add(north);
+        map.addRegion(north);
 
-        ServerRegion northEast = (ServerRegion)fixed.get("model.region.northEast");
-        if (northEast == null) {
-            northEast = new ServerRegion(map, "model.region.northEast", RegionType.LAND, null);
-            lb.add("+NE");
-        }
+        map.removeRegionsByKey("model.region.northEast");
+        final ServerRegion northEast = new ServerRegion(map, "model.region.northEast", RegionType.LAND, null);
         northEast.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 xDelimiterThirds[1],
                 0,
                 Integer.MAX_VALUE,
                 yDelimiterThirds[0]
                 )));
-        result.add(northEast);
+        map.addRegion(northEast);
 
         
         xDelimiterThirds = findXForThirdsOfLand(map, yDelimiterThirds[0], yDelimiterThirds[1]);
         
-        ServerRegion west = (ServerRegion)fixed.get("model.region.west");
-        if (west == null) {
-            west = new ServerRegion(map, "model.region.west", RegionType.LAND, null);
-            lb.add("+W");
-        }
+        map.removeRegionsByKey("model.region.west");
+        final ServerRegion west = new ServerRegion(map, "model.region.west", RegionType.LAND, null);
         west.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 0,
                 yDelimiterThirds[0],
                 xDelimiterThirds[0],
                 yDelimiterThirds[1] - yDelimiterThirds[0]
                 )));
-        result.add(west);
+        map.addRegion(west);
 
-        ServerRegion center = (ServerRegion)fixed.get("model.region.center");
-        if (center == null) {
-            center = new ServerRegion(map, "model.region.center", RegionType.LAND, null);
-            lb.add("+center");
-        }
+        map.removeRegionsByKey("model.region.center");
+        final ServerRegion center = new ServerRegion(map, "model.region.center", RegionType.LAND, null);
         center.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 xDelimiterThirds[0],
                 yDelimiterThirds[0],
                 xDelimiterThirds[1] - xDelimiterThirds[0],
                 yDelimiterThirds[1] - yDelimiterThirds[0]
                 )));
-        result.add(center);
+        map.addRegion(center);
 
-        ServerRegion east = (ServerRegion)fixed.get("model.region.east");
-        if (east == null) {
-            east = new ServerRegion(map, "model.region.east", RegionType.LAND, null);
-            lb.add("+E");
-        }
+        map.removeRegionsByKey("model.region.east");
+        final ServerRegion east = new ServerRegion(map, "model.region.east", RegionType.LAND, null);
         east.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 xDelimiterThirds[1],
                 yDelimiterThirds[0],
                 Integer.MAX_VALUE,
                 yDelimiterThirds[1] - yDelimiterThirds[0]
                 )));
-        result.add(east);
+        map.addRegion(east);
 
         
         xDelimiterThirds = findXForThirdsOfLand(map, yDelimiterThirds[1], map.getHeight() - 1);
         
-        ServerRegion southWest = (ServerRegion)fixed.get("model.region.southWest");
-        if (southWest == null) {
-            southWest = new ServerRegion(map, "model.region.southWest", RegionType.LAND, null);
-            lb.add("+SW");
-        }
+        map.removeRegionsByKey("model.region.southWest");
+        final ServerRegion southWest = new ServerRegion(map, "model.region.southWest", RegionType.LAND, null);
         southWest.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 0,
                 yDelimiterThirds[1],
                 xDelimiterThirds[0],
                 Integer.MAX_VALUE
                 )));
-        result.add(southWest);
+        map.addRegion(southWest);
 
-        ServerRegion south = (ServerRegion)fixed.get("model.region.south");
-        if (south == null) {
-            south = new ServerRegion(map, "model.region.south", RegionType.LAND, null);
-            lb.add("+S");
-        }
+        map.removeRegionsByKey("model.region.south");
+        final ServerRegion south = new ServerRegion(map, "model.region.south", RegionType.LAND, null);
         south.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 xDelimiterThirds[0],
                 yDelimiterThirds[1],
                 xDelimiterThirds[1] - xDelimiterThirds[0],
                 Integer.MAX_VALUE
                 )));
-        result.add(south);
+        map.addRegion(south);
 
-        ServerRegion southEast = (ServerRegion)fixed.get("model.region.southEast");
-        if (southEast == null) {
-            southEast = new ServerRegion(map, "model.region.southEast", RegionType.LAND, null);
-            lb.add("+SE");
-        }
+        map.removeRegionsByKey("model.region.southEast");
+        final ServerRegion southEast = new ServerRegion(map, "model.region.southEast", RegionType.LAND, null);
         southEast.bounds.setBounds(ensureWithinMap(map, new Rectangle(
                 xDelimiterThirds[1],
                 yDelimiterThirds[1],
                 Integer.MAX_VALUE,
                 Integer.MAX_VALUE
                 )));
-        result.add(southEast);
+        map.addRegion(southEast);
 
         boolean allOceans = true;
         ServerRegion pacific = (ServerRegion)fixed.get("model.region.pacific");

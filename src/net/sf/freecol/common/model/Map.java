@@ -619,6 +619,17 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
             this.regions.add(region);
         }
     }
+    
+    /**
+     * Remove a region from this map.
+     *
+     * @param region The {@code Region} to be removed.
+     */
+    public void removeRegion(final Region region) {
+        synchronized (this.regions) {
+            this.regions.remove(region);
+        }
+    }
 
     /**
      * Clear the regions list.
@@ -653,6 +664,16 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
     public Region getRegionByKey(final String key) {
         return (key == null) ? null
             : find(getRegions(), matchKeyEquals(key, Region::getKey));
+    }
+    
+    public void removeRegionsByKey(final String key) {
+        synchronized (this.regions) {
+            for (Region region : new ArrayList<>(regions)) {
+                if (key.equals(region.getKey())) {
+                    removeRegion(region);
+                }
+            }
+        }
     }
 
     /**
