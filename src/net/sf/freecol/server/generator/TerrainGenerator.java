@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
@@ -931,6 +932,13 @@ public class TerrainGenerator {
 
         // Probably only needed on import of old maps.
         map.fixupRegions();
+        
+        if (importMap != null) {
+            for (Area importMapArea : importMap.getGame().getAreas()) {
+                game.addArea(new Area(game, importMapArea));
+            }
+        }
+        game.generateDefaultAreas();
 
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they

@@ -28,11 +28,11 @@ import net.sf.freecol.client.FreeColClient;
 
 
 /**
- * An action for displaying the map editor tile transform panel.
+ * An action for displaying the map editor toolbox.
  */
-public class MapEditorTransformPanelAction extends SelectableAction {
+public class MapEditorToolboxPanelAction extends SelectableAction {
 
-    public static final String id = "mapEditorTransformPanelAction";
+    public static final String id = "mapEditorToolboxPanelAction";
 
 
     /**
@@ -40,7 +40,7 @@ public class MapEditorTransformPanelAction extends SelectableAction {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      */
-    public MapEditorTransformPanelAction(FreeColClient freeColClient) {
+    public MapEditorToolboxPanelAction(FreeColClient freeColClient) {
         super(freeColClient, id);
         setSelected(isSelected());
     }
@@ -53,7 +53,7 @@ public class MapEditorTransformPanelAction extends SelectableAction {
 
     @Override
     protected boolean shouldBeSelected() {
-        return getGUI().isShowingMapEditorTransformPanel();
+        return getGUI().isShowingMapEditorToolboxPanel();
     }
     
     // Interface ActionListener
@@ -63,6 +63,6 @@ public class MapEditorTransformPanelAction extends SelectableAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getGUI().enableEditorTransformPanel(isEnabled() && isSelected());
+        getGUI().enableEditorToolboxPanel(isEnabled() && isSelected());
     }
 }

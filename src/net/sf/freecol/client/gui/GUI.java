@@ -41,6 +41,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
@@ -1159,6 +1160,18 @@ public class GUI extends FreeColClientHolder {
     public void startMapEditorGUI() {}
 
     /**
+     * Shows the map editor toolbox panel.
+     */
+    public void enableEditorToolboxPanel(boolean shouldDisplayPanel) {}
+
+    /**
+     * Checks if the map editor toolbox panel is being displayed.
+     */
+    public boolean isShowingMapEditorToolboxPanel() {
+        return false;
+    }
+    
+    /**
      * Shows the map editor transform panel.
      */
     public void enableEditorTransformPanel(boolean shouldDisplayPanel) {}
@@ -1961,6 +1974,19 @@ public class GUI extends FreeColClientHolder {
      * @return The panel shown.
      */
     public FreeColPanel showColonyPanel(Colony colony, Unit unit) { return null; }
+    
+    /**
+     * Displays a {@code FreeColPanel} at a generalized position.
+     *
+     * @param panel {@code FreeColPanel}, panel to show
+     * @param toolBox Should be set to true if the resulting frame is
+     *     used as a toolbox (that is: it should not be counted as a
+     *     frame).
+     * @param popupPosition {@code PopupPosition} The generalized
+     *     position to place the panel.
+     * @param resizable Should the panel be resizable?
+     */
+    public void showFreeColPanel(FreeColPanel panel, boolean toolBox, PopupPosition popupPosition, boolean resizable) { }
 
     /**
      * Show a colopedia panel.

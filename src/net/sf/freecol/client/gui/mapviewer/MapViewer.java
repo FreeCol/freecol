@@ -64,6 +64,7 @@ import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
@@ -390,9 +391,10 @@ public final class MapViewer extends FreeColClientHolder {
         final long animatedBaseMs = now();
         if (!dirtyClipBounds.isEmpty()) {
             displayToNonAnimationBufferImage(mapViewerBounds, dirtyClipBounds, nonAnimationG2d, map, useBuffers);
-            if (useBuffers) {
-                nonAnimationG2d.dispose();
-            }
+        }
+        
+        if (useBuffers) {
+            nonAnimationG2d.dispose();
         }
         
         final long nonAnimatedMs = now();
@@ -702,6 +704,10 @@ public final class MapViewer extends FreeColClientHolder {
         });
         
         displayDebugAiDefensiveMap(nonAnimationG2d, tcb);
+        
+        if (getFreeColClient().isMapEditor()) {
+            displayAreasInMapEditor(nonAnimationG2d, tcb);
+        }
 
         // Display the colony names, if needed
         long t14 = now();
@@ -751,6 +757,32 @@ public final class MapViewer extends FreeColClientHolder {
                 ;
             logger.finest(sb.toString());
         }
+    }
+
+
+    private void displayAreasInMapEditor(Graphics2D nonAnimationG2d, TileClippingBounds tcb) {
+        final Object oldAntialiasingHint = nonAnimationG2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+
+        final Composite oldComposite = nonAnimationG2d.getComposite();
+        nonAnimationG2d.setColor(Color.BLACK);
+        nonAnimationG2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+         
+        final Color oldColor = nonAnimationG2d.getColor();
+        
+        paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
+            // This can easily be optimized if slow on some systems.
+            final List<Area> areas = getGame().getAreas();
+            // TODO: Support showing multiple areas by drawing in a checkered/blinds pattern.
+            final Area area = areas.stream().filter(a -> a.containsTile(tile)).findAny().orElse(null);
+            if (area != null) {
+                tileG2d.setColor(area.getColor());
+                tileG2d.fill(mapViewerScaledUtils.getFog());
+            }
+        });
+        nonAnimationG2d.setColor(oldColor);
+        nonAnimationG2d.setComposite(oldComposite);
+        nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAntialiasingHint);
     }
 
     private void displayDebugAiDefensiveMap(Graphics2D nonAnimationG2d, TileClippingBounds tcb) {

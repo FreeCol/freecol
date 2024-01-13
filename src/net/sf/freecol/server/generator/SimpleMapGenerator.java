@@ -19,11 +19,30 @@
 
 package net.sf.freecol.server.generator;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.descendingListLengthComparator;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
+import static net.sf.freecol.common.util.CollectionUtils.isNull;
+import static net.sf.freecol.common.util.CollectionUtils.map;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.minimize;
+import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
+import static net.sf.freecol.common.util.RandomUtils.randomInt;
+import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
+
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -37,10 +56,11 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Game;
@@ -51,8 +71,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -69,8 +87,7 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
+import net.sf.freecol.common.util.RandomUtils.RandomIntCache;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerIndianSettlement;
@@ -95,41 +112,6 @@ public class SimpleMapGenerator implements MapGenerator {
      * pole cannot be spawned on.
      */
     private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
-
-   
-    private static class Territory {
-        public ServerRegion region;
-        public Tile tile;
-        public final Player player;
-        public int numberOfSettlements;
-
-        public Territory(Player player, Tile tile) {
-            this.player = player;
-            this.tile = tile;
-        }
-
-        public Territory(Player player, ServerRegion region) {
-            this.player = player;
-            this.region = region;
-        }
-
-        public Tile getCenterTile(Map map) {
-            if (tile != null) return tile;
-            int[] xy = region.getCenter();
-            return map.getTile(xy[0], xy[1]);
-        }
-
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return player + " territory at " + region;
-        }
-    }
 
     /** The random number source. */
     private final Random random;
@@ -317,164 +299,117 @@ public class SimpleMapGenerator implements MapGenerator {
                                        LogBuilder lb) {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
-        final boolean importSettlements = game.getMapGeneratorOptions()
-            .getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS);
-        if (importSettlements && importMap != null) {
-            if (importIndianSettlements(map, importMap, lb)) return;
-            // Fall through and create them
+        final boolean importSettlements = game.getMapGeneratorOptions() .getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS);
+        if (importSettlements && importMap != null && importIndianSettlements(map, importMap, lb)) {
+            return;
         }
         
-        float shares = 0f;
         List<IndianSettlement> settlements = new ArrayList<>();
-        HashMap<String, Territory> territoryMap = new HashMap<>();
-
-        List<Player> players = game.getLiveNativePlayerList();
-        List<Player> indians = new ArrayList<>(players.size());
-        for (Player player : players) {
-            switch (player.getNationType().getNumberOfSettlements()) {
-            case HIGH:
-                shares += 4;
-                break;
-            case AVERAGE:
-                shares += 3;
-                break;
-            case LOW:
-                shares += 2;
-                break;
-            }
-            indians.add(player);
-            List<String> regionKeys
-                = ((IndianNationType)player.getNationType()).getRegions();
-            Territory territory = null;
-            if (regionKeys == null || regionKeys.isEmpty()) {
-                territory = new Territory(player, map.getRandomLandTile(random));
-                territoryMap.put(player.getId(), territory);
-            } else {
-                for (String key : regionKeys) {
-                    if (territoryMap.get(key) == null) {
-                        ServerRegion region = (ServerRegion)map.getRegionByKey(key);
-                        if (region == null) {
-                            territory = new Territory(player, map.getRandomLandTile(random));
-                        } else {
-                            territory = new Territory(player, region);
-                        }
-                        territoryMap.put(key, territory);
-                        lb.add("Allocated region ", key,
-                            " for ", player, ".\n");
-                        break;
-                    }
-                }
-                if (territory == null) {
-                    lb.add("Failed to allocate preferred region ",
-                        first(regionKeys), " for ", player.getNation(), "\n");
-                    outer: for (String key : regionKeys) {
-                        Territory otherTerritory = territoryMap.get(key);
-                        for (String otherKey : ((IndianNationType) otherTerritory.player.getNationType())
-                                 .getRegions()) {
-                            if (territoryMap.get(otherKey) == null) {
-                                ServerRegion foundRegion = otherTerritory.region;
-                                otherTerritory.region = (ServerRegion)map.getRegionByKey(otherKey);
-                                territoryMap.put(otherKey, otherTerritory);
-                                territory = new Territory(player, foundRegion);
-                                territoryMap.put(key, territory);
-                                break outer;
-                            }
-                        }
-                    }
-                    if (territory == null) {
-                        lb.add("Unable to find free region for ",
-                            player.getName(), "\n");
-                        territory = new Territory(player, map.getRandomLandTile(random));
-                        territoryMap.put(player.getId(), territory);
-                    }
-                }
-            }
+        final List<Player> nativePlayers = game.getLiveNativePlayerList();
+        if (nativePlayers.isEmpty()) {
+            return;
         }
-        if (indians.isEmpty()) return;
-
+        
         // Examine all the non-polar settleable tiles in a random
         // order picking out as many as possible suitable tiles for
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
-        List<Tile> allTiles = map.getShuffledTiles(random);
+        final List<Tile> allTiles = map.getShuffledTiles(random);
         final int minDistance = spec.getRange(GameOptions.SETTLEMENT_NUMBER);
-        List<Tile> settlementTiles = new ArrayList<>();
+        
+        final Set<Tile> settlementTiles = new LinkedHashSet<>();
         for (Tile tile : allTiles) {
-            if (!tile.isPolar()
-                && suitableForNativeSettlement(tile)
-                && none(settlementTiles, t -> t.getDistanceTo(tile) < minDistance))
-                settlementTiles.add(tile);
-        }
-        randomShuffle(logger, "Settlement tiles", settlementTiles, random);
-
-        // Check number of settlements.
-        int settlementsToPlace = settlementTiles.size();
-        float share = settlementsToPlace / shares;
-        if (settlementTiles.size() < indians.size()) {
-            // FIXME: something drastic to boost the settlement number
-            lb.add("There are only ", settlementTiles.size(),
-                " settlement sites.\n",
-                " This is smaller than ", indians.size(),
-                " the number of tribes.\n");
-        }
-
-        // Find the capitals
-        List<Territory> territories
-            = new ArrayList<>(territoryMap.values());
-        int settlementsPlaced = 0;
-        for (Territory territory : territories) {
-            switch (territory.player.getNationType().getNumberOfSettlements()) {
-            case HIGH:
-                territory.numberOfSettlements = Math.round(4 * share);
-                break;
-            case AVERAGE:
-                territory.numberOfSettlements = Math.round(3 * share);
-                break;
-            case LOW:
-                territory.numberOfSettlements = Math.round(2 * share);
-                break;
+            if (tile.isPolar()) {
+                continue;
             }
-            int radius = territory.player.getNationType().getCapitalType()
-                .getClaimableRadius();
-            IndianSettlement is = placeCapital(map, territory, radius,
-                new ArrayList<>(settlementTiles), lb);
-            if (is != null) {
-                settlements.add(is);
-                settlementsPlaced++;
-                settlementTiles.remove(is.getTile());
+            if (!suitableForNativeSettlement(tile)) {
+                continue;
             }
+            if (any(settlementTiles, t -> t.getDistanceTo(tile) < minDistance)) {
+                continue;
+            }
+            settlementTiles.add(tile);
         }
-
-        // Sort tiles from the edges of the map inward
-        settlementTiles.sort(Tile.edgeDistanceComparator);
-
-        // Now place other settlements
-        while (!settlementTiles.isEmpty() && !territories.isEmpty()) {
-            Tile tile = settlementTiles.remove(0);
-            if (tile.getOwner() != null) continue; // No close overlap
-
-            Territory territory = getClosestTerritory(tile, territories);
-            int radius = territory.player.getNationType().getSettlementType(false)
-                .getClaimableRadius();
-            // Insist that the settlement can not be linear
-            if (territory.player.getClaimableTiles(tile, radius).size()
-                > 2 * radius + 1) {
-                String name = (territory.region == null) ? "default region"
-                    : territory.region.toString();
-                lb.add("Placing a ", territory.player,
-                    " camp in region: ", name,
-                    " at tile: ", tile, "\n");
-                settlements.add(placeIndianSettlement(territory.player,
-                                                      false, tile, map, lb));
-                settlementsPlaced++;
-                territory.numberOfSettlements--;
-                if (territory.numberOfSettlements <= 0) {
-                    territories.remove(territory);
+        
+        final java.util.Map<Player, Set<Tile>> designatedArea = new HashMap<>();
+        for (Player player : nativePlayers) {
+            final Area area = map.getGame().getNationStartingArea(player.getNation());
+            if (area != null && !area.isEmpty()) {
+                final Set<Tile> settlementTilesForNation = area.getTiles().stream()
+                        .filter(t -> settlementTiles.contains(t))
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                if (settlementTilesForNation.isEmpty()) {
+                    logger.warning("No settlements for nationType=" + player.getNationId());
                 }
-
+                designatedArea.put(player, settlementTilesForNation);
             }
         }
+        for (Player player : nativePlayers) {
+            if (designatedArea.containsKey(player)) {
+                continue;
+            }
 
+            final IndianNationType indianNationType = (IndianNationType) player.getNationType();
+            final List<Rectangle> otherRegions = indianNationType.getRegions().stream()
+                    .map(key -> ((ServerRegion) map.getRegionByKey(key)).getBounds())
+                    .filter(bounds -> !bounds.isEmpty())
+                    .collect(Collectors.toList());
+                        
+            if (otherRegions.isEmpty()) {
+                logger.warning("No area or regions found for nationType=" + player.getNationId());
+                continue;
+            }
+            
+            final Set<Tile> settlementTilesForNation = settlementTiles.stream()
+                    .filter(t -> otherRegions.stream().anyMatch(bounds -> bounds.contains(t.getX(), t.getY())))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            
+            if (settlementTilesForNation.isEmpty()) {
+                logger.warning("No settlements in region for nationType=" + player.getNationId());
+            }
+            designatedArea.put(player, settlementTilesForNation);
+        }
+        
+        // Place the capitals:
+        for (Player player : nativePlayers) {
+            final Set<Tile> allowedPlacements = designatedArea.get(player);
+            if (allowedPlacements == null) {
+                continue;
+            }
+            for (Tile settlementTile : new ArrayList<>(settlementTiles)) {
+                if (!allowedPlacements.contains(settlementTile)) {
+                    continue;
+                }
+                
+                final IndianSettlement capital = placeIndianSettlement(player, true, settlementTile, map, lb);
+                settlements.add(capital);
+                settlementTiles.remove(settlementTile);
+                break;
+            }
+        }
+        
+        for (Tile settlementTile : settlementTiles) {
+            final List<Player> players = new ArrayList<>(designatedArea.keySet());
+            Collections.shuffle(players, random);
+            
+            final Player owner = players.stream().filter(p -> {
+                    final Set<Tile> tiles = designatedArea.get(p);
+                    if (tiles == null) {
+                        return false;
+                    }
+                    return tiles.contains(settlementTile);
+                })
+                .findFirst()
+                .orElse(null);
+            
+            if (owner == null) {
+                continue;
+            }
+            
+            final IndianSettlement settlement = placeIndianSettlement(owner, false, settlementTile, map, lb);
+            settlements.add(settlement);
+        }
+        
         // Grow some more tiles.
         // FIXME: move the magic numbers below to the spec
         // Also collect the skills provided
@@ -566,8 +501,6 @@ public class SimpleMapGenerator implements MapGenerator {
                     " x ", iss.get(0).getLearnableSkill().getSuffix());
             }
         }
-        lb.add("\nCreated ", settlementsPlaced,
-            " Indian settlements of maximum ", settlementsToPlace, ".\n");
     }
 
     /**
@@ -612,58 +545,6 @@ public class SimpleMapGenerator implements MapGenerator {
             if (ret != null) return ret;
         }
         return null;
-    }
-
-    /**
-     * Find the closest territory to a given tile from a list of choices.
-     *
-     * @param tile The {@code Tile} to search from.
-     * @param territories The list of {@code Territory}s to choose from.
-     * @return The closest {@code Territory} found, or null if none.
-     */
-    private Territory getClosestTerritory(final Tile tile,
-                                          List<Territory> territories) {
-        final Map map = tile.getMap();
-        final Comparator<Territory> comp = Comparator.comparingInt(t ->
-            map.getDistance(tile, t.getCenterTile(map)));
-        return minimize(territories, comp);
-    }
-
-    /**
-     * Place a native capital in a territory.
-     *
-     * @param map The {@code Map} to place the settlement in.
-     * @param territory The {@code Territory} within the map.
-     * @param radius The settlement radius.
-     * @param tiles A list of {@code Tile}s to select from.
-     * @param lb A {@code LogBuilder} to log to.
-     * @return The {@code IndianSettlement} placed, or null if
-     *     none placed.
-     */
-    private IndianSettlement placeCapital(final Map map, Territory territory,
-                                          int radius, List<Tile> tiles,
-                                          LogBuilder lb) {
-        final Tile center = territory.getCenterTile(map);
-        final Predicate<Tile> terrPred = t ->
-            territory.player.getClaimableTiles(t, radius).size()
-                >= (2 * radius + 1) * (2 * radius + 1) / 2;
-        final Comparator<Tile> comp
-            = Comparator.comparingInt(t -> t.getDistanceTo(center));
-        // Choose a tile that is free and half the expected tile claims
-        // can succeed, preventing capitals on small islands.
-        Tile t = first(transform(tiles, terrPred, Function.<Tile>identity(),
-                                 comp));
-        if (t == null) return null;
-
-        String name = (territory.region == null) ? "default region"
-            : territory.region.toString();
-        lb.add("Placing the ", territory.player,
-            " capital in region: ", name, " at tile: ", t, "\n");
-        IndianSettlement is = placeIndianSettlement(territory.player,
-                                                    true, t, map, lb);
-        territory.numberOfSettlements--;
-        territory.tile = t;
-        return is;
     }
 
     /**
@@ -1132,7 +1013,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // Create terrain.
         Map map = new TerrainGenerator(this.random)
             .generateMap(game, importMap, landMap, lb);
-
+        
         // Decorate the map.
         makeNativeSettlements(map, importMap, lb);
         makeLostCityRumours(map, importMap, lb);

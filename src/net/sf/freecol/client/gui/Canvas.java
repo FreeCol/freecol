@@ -75,6 +75,7 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MapEditorToolboxPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MiniMapFreeColPanel;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -693,6 +694,10 @@ public final class Canvas extends JDesktopPane {
                 x = ((getWidth() - width) * 3) / 4;
                 y = (getHeight() - height) / 2;
                 break;
+            case LEFT:
+                x = 0;
+                y = (getHeight() - height) / 2;
+                break;
             case LOWER_LEFT:
                 x = 0;
                 y = getHeight() - height;
@@ -704,6 +709,10 @@ public final class Canvas extends JDesktopPane {
             case UPPER_RIGHT:
                 x = getWidth() - width;
                 y = 0;
+                break;
+            case RIGHT:
+                x = getWidth() - width;
+                y = (getHeight() - height) / 2;
                 break;
             case UPPER_LEFT:
             case ORIGIN:
@@ -1316,7 +1325,7 @@ public final class Canvas extends JDesktopPane {
         dialogRemove(dialog);
         return response;
     }
-
+    
     /**
      * Displays a {@code FreeColPanel} at a generalized position.
      *
@@ -1327,10 +1336,29 @@ public final class Canvas extends JDesktopPane {
      * @return The panel.
      */
     public FreeColPanel showFreeColPanel(FreeColPanel panel,
-                                         PopupPosition popupPosition,
-                                         boolean resizable) {
+            PopupPosition popupPosition,
+            boolean resizable) {
+        return showFreeColPanel(panel, false, popupPosition, resizable);
+    }
+
+    /**
+     * Displays a {@code FreeColPanel} at a generalized position.
+     *
+     * @param panel {@code FreeColPanel}, panel to show
+     * @param toolBox Should be set to true if the resulting frame is
+     *     used as a toolbox (that is: it should not be counted as a
+     *     frame).
+     * @param popupPosition {@code PopupPosition} The generalized
+     *     position to place the panel.
+     * @param resizable Should the panel be resizable?
+     * @return The panel.
+     */
+    public FreeColPanel showFreeColPanel(FreeColPanel panel,
+            boolean toolBox,
+            PopupPosition popupPosition,
+            boolean resizable) {
         repaint();
-        addAsFrame(panel, false, popupPosition, resizable);
+        addAsFrame(panel, toolBox, popupPosition, resizable);
         panel.requestFocus();
         freeColClient.getActionManager().update();
         return panel;
@@ -1666,7 +1694,15 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, true, null, true);
         repaint();
     }
-
+    
+    /**
+     * Display the map editor toolbox panel.
+     */
+    public void showMapEditorToolboxPanel() {
+        final MapEditorToolboxPanel panel = new MapEditorToolboxPanel(this.freeColClient);
+        addAsFrame(panel, true, null, true);
+        repaint();
+    }
 
     // Override JComponent
     public void paintJustTheMapImmediately() {

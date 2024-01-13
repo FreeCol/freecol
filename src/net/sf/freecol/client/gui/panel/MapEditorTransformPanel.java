@@ -45,11 +45,14 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalAlignment;
 import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalGap;
+import net.sf.freecol.client.gui.panel.mapeditor.ChooseAreaModificationPanel;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -258,6 +261,37 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             t.removeLostCityRumour();
         }
     }
+    
+    public static final class AssignAreaTransform extends MapTransform {
+        private Area area;
+
+        private AssignAreaTransform(Area area) {
+            this.area = area;
+        }
+
+        public Area getArea() {
+            return area;
+        }
+        
+        public void setArea(Area area) {
+            this.area = area;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void transform(Tile t) {
+            if (area == null) {
+                return;
+            }
+            if (area.containsTile(t)) {
+                area.removeTile(t);
+            } else {
+                area.addTile(t);
+            }
+        }
+    }
 
     /** A native nation to use for native settlement type and skill. */
     private static Nation nativeNation;
@@ -265,6 +299,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private final JPanel listPanel;
     private JToggleButton settlementButton;
     private final ButtonGroup group;
+    
+    private final ChooseAreaModificationPanel chooseAreaModificationPanel;
 
 
     /**
@@ -275,6 +311,17 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, null, new BorderLayout());
 
+        final MapEditorController ctlr = getFreeColClient().getMapEditorController();
+        final DialogHandler<Area> areaModificationHandler = (area) -> {
+            ctlr.setCurrentArea(area);
+            final MapTransform currentMapTransform = ctlr.getMapTransform();
+            if (currentMapTransform instanceof AssignAreaTransform) {
+                final AssignAreaTransform assignAreaTransform = (AssignAreaTransform) currentMapTransform;
+                assignAreaTransform.setArea(area);
+            }
+        };
+        this.chooseAreaModificationPanel = new ChooseAreaModificationPanel(freeColClient, areaModificationHandler );
+        
         final Dimension terrainSize = ImageLibrary.scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_OVERLAY_SIZE), ImageLibrary.SMALLER_SCALE);
         listPanel = new JPanel(new WrapLayout()
                 .withForceComponentSize(terrainSize)
@@ -304,7 +351,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     
     @Override
     public PopupPosition getFramePopupPosition() {
-        return PopupPosition.UPPER_RIGHT;
+        return PopupPosition.RIGHT;
     }
     
     /**
@@ -375,6 +422,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getImageLibrary().getSettlementTypeImage(settlementType, riverSize),
                 Messages.message("settlement"),
                 new SettlementTransform()));
+        
+        listPanel.add(buildButton(getImageLibrary().getScaledImage("image.icon.mapEditor.selectArea"),
+                Messages.message("mapEditorTransformPanel.selectArea"),
+                new AssignAreaTransform(null)));
     }
 
     /**
@@ -412,6 +463,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                             .showRiverStyleDialog(ImageLibrary
                                 .getRiverStyleKeys(all));
                         if (style != null) rst.setStyle(style);
+                    }
+                    if (mt instanceof AssignAreaTransform) {
+                        getGUI().showFreeColPanel(chooseAreaModificationPanel, true, null, true);
+                        newMapTransform = null;
                     }
                     newMapTransform = mt;
                 }

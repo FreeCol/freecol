@@ -41,6 +41,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
@@ -68,11 +69,15 @@ public final class MapEditorController extends FreeColClientHolder {
     /** Map height in MapGeneratorOptionsDialog. */
     private static final int MINI_MAP_THUMBNAIL_FINAL_HEIGHT = 64;
 
+    private MapEditorTool currentTool = MapEditorTool.PAINTBRUSH;
+    
     /**
      * The transform that should be applied to a {@code Tile}
      * that is clicked on the map.
      */
     private MapTransform currentMapTransform = null;
+    
+    private Area currentArea = null;
 
 
     /**
@@ -213,6 +218,18 @@ public final class MapEditorController extends FreeColClientHolder {
     public MapTransform getMapTransform() {
         return currentMapTransform;
     }
+    
+    public MapEditorTool getCurrentTool() {
+        return currentTool;
+    }
+    
+    public void setCurrentArea(Area currentArea) {
+        this.currentArea = currentArea;
+    }
+    
+    public Area getCurrentArea() {
+        return currentArea;
+    }
 
     /**
      * Transforms the given {@code Tile} using the
@@ -330,6 +347,7 @@ public final class MapEditorController extends FreeColClientHolder {
                     Specification spec = getDefaultSpecification();
                     Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
                                                        spec, freeColServer);
+                    game.generateDefaultAreas();
                     fcc.setGame(game);
                     requireNativeNations(game);
                     SwingUtilities.invokeLater(() -> {

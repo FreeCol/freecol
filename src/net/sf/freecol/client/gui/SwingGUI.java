@@ -42,7 +42,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -60,7 +59,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.control.SoundController;
-import net.sf.freecol.client.gui.action.MapEditorTransformPanelAction;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special dialogs and panels
@@ -72,13 +71,14 @@ import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewerState;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
-import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
+import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MapEditorToolboxPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.PurchasePanel;
 import net.sf.freecol.client.gui.panel.RecruitPanel;
@@ -126,7 +126,6 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.AudioResource;
 import net.sf.freecol.common.resources.ImageCache;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -149,6 +148,8 @@ public class SwingGUI extends GUI {
         LOWER_RIGHT,
         UPPER_LEFT,
         UPPER_RIGHT,
+        LEFT,
+        RIGHT,
         
         /**
          * Places centered even this means overlapping components.
@@ -920,9 +921,31 @@ public class SwingGUI extends GUI {
         resetMapZoom(); // Reset zoom to the default
         mapViewer.getMapViewerState().setActiveUnit(null);
         this.canvas.startMapEditorGUI();
+        enableEditorToolboxPanel(getGame() != null && getGame().getMap() != null);
         enableEditorTransformPanel(getGame() != null && getGame().getMap() != null);
         enableMapControls(getGame() != null && getGame().getMap() != null && getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         updateMenuBar();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void enableEditorToolboxPanel(boolean shouldDisplayPanel) {
+        final MapEditorToolboxPanel panel = this.canvas.getExistingFreeColPanel(MapEditorToolboxPanel.class);
+        if (shouldDisplayPanel && panel == null) {
+            this.canvas.showMapEditorToolboxPanel();
+        } else if (!shouldDisplayPanel && panel != null) {
+            this.canvas.removeFromCanvas(panel);
+        } // else: ignore.
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isShowingMapEditorToolboxPanel() {
+        return this.canvas.isAddedAsPanelFrameOrIcon(MapEditorToolboxPanel.class);
     }
     
     /**
@@ -2094,6 +2117,18 @@ public class SwingGUI extends GUI {
         }
         if (unit != null) panel.setSelectedUnit(unit);
         return panel;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void showFreeColPanel(FreeColPanel panel, boolean toolBox, PopupPosition popupPosition, boolean resizable) {
+        if (canvas.isAddedAsPanelFrameOrIcon(panel)) {
+            panel.requestFocus();
+        } else {
+            canvas.showFreeColPanel(panel, toolBox, popupPosition, resizable);
+        }
     }
 
     /**
