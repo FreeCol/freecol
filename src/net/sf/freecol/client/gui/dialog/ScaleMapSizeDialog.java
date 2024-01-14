@@ -138,8 +138,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         Object value = getValue();
         if (options.get(0).equals(value)) {
             checkFields();
-            return new Dimension(Integer.parseInt(inputHeight.getText()),
-                                 Integer.parseInt(inputWidth.getText()));
+            return new Dimension(Integer.parseInt(inputWidth.getText()), Integer.parseInt(inputHeight.getText()));
         }
         return null;
     }
