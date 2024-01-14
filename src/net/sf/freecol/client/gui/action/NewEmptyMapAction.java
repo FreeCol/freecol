@@ -70,10 +70,10 @@ public class NewEmptyMapAction extends MapboardAction {
         Map map = getFreeColClient().getFreeColServer()
             .generateEmptyMap(size.width, size.height);
         Tile tile = map.getTile(size.width/2, size.height/2);
-        getGUI().enableEditorTransformPanel(true);
-        getGUI().enableMapControls(getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        getGUI().removeInGameComponents();
+        getGUI().startMapEditorGUI();
+        getGUI().refresh();
         getGUI().setFocus(tile);
-        getGUI().updateMenuBar();
         getGUI().refresh();
     }
 }

@@ -366,6 +366,7 @@ public final class MapEditorController extends FreeColClientHolder {
         final GUI gui = getGUI();
 
         fcc.setMapEditor(true);
+        getGUI().removeInGameComponents();
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         final File theFile = file;
@@ -382,10 +383,8 @@ public final class MapEditorController extends FreeColClientHolder {
                     requireNativeNations(game);
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();
+                            getGUI().startMapEditorGUI();
                             gui.setFocus(game.getMap().getTile(1,1));
-                            gui.enableEditorTransformPanel(true);
-                            gui.enableMapControls(getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
-                            gui.updateMenuBar();
                             gui.refresh();
                         });
                 } catch (FileNotFoundException fnfe) {
