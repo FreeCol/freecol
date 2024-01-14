@@ -19,16 +19,19 @@
 
 package net.sf.freecol.client.gui.panel.mapeditor;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.WrapLayout;
@@ -58,23 +61,38 @@ public final class ChooseAreaModificationPanel extends FreeColPanel {
         
         final JPanel areasPanel = new JPanel(new WrapLayout()
                 .withHorizontalAlignment(HorizontalAlignment.CENTER)
+                .withAllComponentsWithTheSameSize(true)
                 ) {
             @Override
             public Dimension getMinimumSize() {
                 return new Dimension(1, 1);
             }
         };
-        areasPanel.setOpaque(false);
+        areasPanel.setOpaque(false);       
         
+        final MapEditorController ctlr = getFreeColClient().getMapEditorController();
         final ButtonGroup bg = new ButtonGroup();
         for (Area a : freeColClient.getGame().getAreas()) {
+            final JPanel areaPanel = new JPanel(new BorderLayout());
+            areaPanel.setOpaque(false);
+            
             final String title = (a.getNameKey() != null) ? Messages.message(a.getNameKey()) : a.getName();
             final JToggleButton areaButton = new JToggleButton(title);
             areaButton.addActionListener((e) -> {
                 dialogHandler.handle(a);
             });
             bg.add(areaButton);
-            areasPanel.add(areaButton);
+            areaPanel.add(areaButton, BorderLayout.NORTH);
+            final JCheckBox visible = new JCheckBox();
+            visible.setSelected(ctlr.isAreaVisible(a));
+            visible.setHorizontalAlignment(JCheckBox.CENTER);
+            visible.addActionListener((e) -> {
+                ctlr.setAreaVisible(a, visible.isSelected());
+                getGUI().refresh();
+            });
+            
+            areaPanel.add(visible, BorderLayout.SOUTH);
+            areasPanel.add(areaPanel);
         }
 
         add(areasPanel, "grow, shrink");

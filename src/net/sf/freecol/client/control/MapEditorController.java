@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -80,6 +81,7 @@ public final class MapEditorController extends FreeColClientHolder {
     private Area currentArea = null;
     
     private boolean displayAreas = false;
+    private java.util.Map<Area, Boolean> visibleAreas = new HashMap<>();
 
 
     /**
@@ -231,6 +233,15 @@ public final class MapEditorController extends FreeColClientHolder {
     
     public Area getCurrentArea() {
         return currentArea;
+    }
+    
+    public boolean isAreaVisible(Area area) {
+        final Boolean b = visibleAreas.get(area);
+        return (b == null || b);
+    }
+    
+    public void setAreaVisible(Area area, boolean visible) {
+        visibleAreas.put(area, visible);
     }
     
     /**

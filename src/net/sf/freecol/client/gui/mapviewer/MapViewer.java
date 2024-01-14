@@ -58,6 +58,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.GUI.ViewMode;
@@ -764,7 +765,8 @@ public final class MapViewer extends FreeColClientHolder {
         if (!getFreeColClient().isMapEditor()) {
             return;
         }
-        if (!getFreeColClient().getMapEditorController().isDisplayAreas()) {
+        final MapEditorController mec = getFreeColClient().getMapEditorController();
+        if (!mec.isDisplayAreas()) {
             return;
         }
         
@@ -782,6 +784,7 @@ public final class MapViewer extends FreeColClientHolder {
             // This can easily be optimized if slow on some systems.
             final List<Area> areas = getGame().getAreas().stream()
                     .filter(a -> a.containsTile(tile))
+                    .filter(a -> mec.isAreaVisible(a))
                     .collect(Collectors.toList());
             if (areas.isEmpty()) {
                 return;
