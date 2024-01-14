@@ -267,22 +267,43 @@ public class CargoPanel extends FreeColPanel
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
+        if (!withStyling) {
+            return;
+        }
+        
         final Dimension size = getSize();
+        
+        final int cargoHoldsPerRow = 6;
         final BufferedImage available = getImageLibrary().getScaledCargoHold(true);
         final BufferedImage unavailable = getImageLibrary().getScaledCargoHold(false);
-        final int availableHolds = (carrier != null) ? carrier.getCargoCapacity() : 0;
-        if (withStyling) {
+        
+        final int totalAvailableHolds = (carrier != null) ? carrier.getCargoCapacity() : 0;
+        final int rows = totalAvailableHolds / cargoHoldsPerRow + ((totalAvailableHolds % cargoHoldsPerRow > 0) ? 1 : 0);
+
+        if (rows == 0) {
             int x = 0;
-            for (int i=0; i<availableHolds; i++) {
-                g.drawImage(available, x, 0, null);
-                x += available.getWidth();
-            }
             while (x < size.width) {
                 g.drawImage(unavailable, x, 0, null);
                 x += unavailable.getWidth();
             }
             g.drawImage(unavailable, x, 0, null);
+            return;
         }
         
+        int y = 0;
+        for (int row=0; row<rows; row++) {
+            final int availableHolds = (row < rows - 1) ? cargoHoldsPerRow : totalAvailableHolds - cargoHoldsPerRow * row;
+            int x = 0;
+            for (int i=0; i<availableHolds; i++) {
+                g.drawImage(available, x, y, null);
+                x += available.getWidth();
+            }
+            while (x < size.width) {
+                g.drawImage(unavailable, x, y, null);
+                x += unavailable.getWidth();
+            }
+            g.drawImage(unavailable, x, y, null);
+            y += available.getHeight();
+        }        
     }
 }
