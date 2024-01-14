@@ -97,6 +97,7 @@ public class WrapLayout implements LayoutManager {
     private LayoutStyle layoutStyle = LayoutStyle.BALANCED;
     private HorizontalGap horizontalGap = HorizontalGap.AUTO;
     private Dimension forceComponentSize = null;
+    private boolean allComponentsWithTheSameSize = false;
     
     private int minHorizontalGap = 0;
     private int minVerticalGap = 0;
@@ -176,6 +177,20 @@ public class WrapLayout implements LayoutManager {
      */
     public WrapLayout withForceComponentSize(Dimension forceComponentSize) {
         this.forceComponentSize = forceComponentSize;
+        this.allComponentsWithTheSameSize = false;
+        return this;
+    }
+    
+    /**
+     * Uses the biggest preferred/minimum size for all child components.
+     * 
+     * @param allComponentsWithTheSameSize {@code true} if all components should
+     *      get the same same.
+     * @return This object, in order to support method chaining.
+     */
+    public WrapLayout withAllComponentsWithTheSameSize(boolean allComponentsWithTheSameSize) {
+        this.allComponentsWithTheSameSize = allComponentsWithTheSameSize;
+        this.forceComponentSize = null;
         return this;
     }
 
@@ -267,12 +282,28 @@ public class WrapLayout implements LayoutManager {
         final List<Row> rows = new ArrayList<>();
         final Dimension currentLayoutSize = new Dimension(0, 0);
         
+        Dimension sharedComponentSize = forceComponentSize;
+        if (allComponentsWithTheSameSize) {
+            sharedComponentSize = new Dimension(0, 0);
+            for (Component component : getVisibleComponents(target, layoutBottomToTop)) {
+                final Dimension d = preferred ? component.getPreferredSize() : component.getMinimumSize();
+                if (d.width > sharedComponentSize.width) {
+                    sharedComponentSize.width = d.width;
+                }
+                if (d.height > sharedComponentSize.height) {
+                    sharedComponentSize.height = d.height;
+                }
+            }
+        }
+        
         List<Child> currentChildren = new ArrayList<>();
         Dimension currentRowSize = new Dimension(0, 0);
         for (Component component : getVisibleComponents(target, layoutBottomToTop)) {
-            Dimension d = preferred ? component.getPreferredSize() : component.getMinimumSize();
-            if (forceComponentSize != null) {
-                d = forceComponentSize;
+            final Dimension d;
+            if (sharedComponentSize != null) {
+                d = sharedComponentSize;
+            } else {
+                d = preferred ? component.getPreferredSize() : component.getMinimumSize();
             }
 
             // Can't add the component to current row. Start a new row.
