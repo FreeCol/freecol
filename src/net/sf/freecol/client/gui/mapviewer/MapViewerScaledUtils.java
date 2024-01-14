@@ -115,6 +115,10 @@ final class MapViewerScaledUtils {
         return fog;
     }
     
+    GeneralPath getBaseTileOutline() {
+        return fog;
+    }
+    
     Stroke getGridStroke() {
         return gridStroke;
     }

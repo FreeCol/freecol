@@ -32,6 +32,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
@@ -49,6 +50,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 
@@ -770,15 +772,45 @@ public final class MapViewer extends FreeColClientHolder {
          
         final Color oldColor = nonAnimationG2d.getColor();
         
+        final GeneralPath baseTileOutline = mapViewerScaledUtils.getBaseTileOutline();
         paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             // This can easily be optimized if slow on some systems.
-            final List<Area> areas = getGame().getAreas();
-            // TODO: Support showing multiple areas by drawing in a checkered/blinds pattern.
-            final Area area = areas.stream().filter(a -> a.containsTile(tile)).findAny().orElse(null);
-            if (area != null) {
-                tileG2d.setColor(area.getColor());
-                tileG2d.fill(mapViewerScaledUtils.getFog());
+            final List<Area> areas = getGame().getAreas().stream()
+                    .filter(a -> a.containsTile(tile))
+                    .collect(Collectors.toList());
+            if (areas.isEmpty()) {
+                return;
             }
+            if (areas.size() == 1) {
+                final Area area = areas.get(0);
+                tileG2d.setColor(area.getColor());
+                tileG2d.fill(baseTileOutline);
+                return;
+            }
+            
+            final Shape oldClip = tileG2d.getClip();
+            final Stroke oldStroke = tileG2d.getStroke();
+            tileG2d.setClip(baseTileOutline);
+            
+            final int stepSize = lib.scaleInt(4);
+            tileG2d.setStroke(new BasicStroke(stepSize));
+            
+            int step = 0;
+            int index = 0;
+            while (step * stepSize < tileBounds.getHeight()) {
+                final Area area = areas.get(index);
+                tileG2d.setColor(area.getColor());
+                tileG2d.drawLine(0, step*stepSize, tileBounds.getWidth(), step*stepSize);
+                
+                step++;
+                index++;
+                if (index == areas.size()) {
+                    index = 0;
+                }
+            }
+            
+            tileG2d.setClip(oldClip);
+            tileG2d.setStroke(oldStroke);
         });
         nonAnimationG2d.setColor(oldColor);
         nonAnimationG2d.setComposite(oldComposite);
