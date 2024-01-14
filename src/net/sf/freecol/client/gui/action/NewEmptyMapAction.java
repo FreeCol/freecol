@@ -21,12 +21,14 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Random;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.server.model.ServerGame;
 
 
 /**
@@ -65,11 +67,18 @@ public class NewEmptyMapAction extends MapboardAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        Dimension size = getGUI().showMapSizeDialog();
-        if (size == null) return;
-        Map map = getFreeColClient().getFreeColServer()
-            .generateEmptyMap(size.width, size.height);
-        Tile tile = map.getTile(size.width/2, size.height/2);
+        final Dimension size = getGUI().showMapSizeDialog();
+        if (size == null) {
+            return;
+        }
+        
+        final FreeColClient fcc = getFreeColClient();
+        final ServerGame game = new ServerGame(fcc.getMapEditorController().getDefaultSpecification(), new Random());
+        fcc.getFreeColServer().setGame(game);
+        fcc.setGame(game);
+        
+        final Map map = fcc.getFreeColServer().generateEmptyMap(size.width, size.height);
+        final Tile tile = map.getTile(size.width/2, size.height/2);
         getGUI().removeInGameComponents();
         getGUI().startMapEditorGUI();
         getGUI().refresh();

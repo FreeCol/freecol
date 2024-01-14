@@ -27,13 +27,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MiniMap; // FIXME: should go away
@@ -282,11 +282,14 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void newMap() {
         final FreeColServer freeColServer = getFreeColServer();
-        final ServerGame serverGame = freeColServer.getGame();
 
         getGUI().removeInGameComponents();
         getGUI().showMapGeneratorOptionsDialog(true, mgo -> {
             if (mgo != null) {
+                final ServerGame serverGame = new ServerGame(getDefaultSpecification(), new Random());
+                getFreeColClient().getFreeColServer().setGame(serverGame);
+                getFreeColClient().setGame(serverGame);
+                
                 serverGame.setMapGeneratorOptions(mgo);
                 freeColServer.generateMap(false);
                 requireNativeNations(serverGame);
