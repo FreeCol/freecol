@@ -78,6 +78,8 @@ public final class MapEditorController extends FreeColClientHolder {
     private MapTransform currentMapTransform = null;
     
     private Area currentArea = null;
+    
+    private boolean displayAreas = false;
 
 
     /**
@@ -229,6 +231,23 @@ public final class MapEditorController extends FreeColClientHolder {
     
     public Area getCurrentArea() {
         return currentArea;
+    }
+    
+    /**
+     * Checks if areas should be displayed while editing.
+     * @return {@code true} if the areas should be displayed.
+     */
+    public boolean isDisplayAreas() {
+        return displayAreas;
+    }
+    
+    /**
+     * Sets if areas should be displayed while editing.
+     * @param displayAreas {@code true} if the areas should be displayed.
+     */
+    public void setDisplayAreas(boolean displayAreas) {
+        this.displayAreas = displayAreas;
+        getGUI().refresh();
     }
 
     /**

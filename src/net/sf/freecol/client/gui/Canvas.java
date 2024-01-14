@@ -539,6 +539,9 @@ public final class Canvas extends JDesktopPane {
             @Override
             public void internalFrameClosing(InternalFrameEvent e) {
                 savePositionAndSize(comp, f);
+                if (comp instanceof FreeColPanel) {
+                    ((FreeColPanel) comp).onFrameClosing();
+                }
             }
         });
 

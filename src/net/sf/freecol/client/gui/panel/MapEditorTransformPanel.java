@@ -467,6 +467,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     if (mt instanceof AssignAreaTransform) {
                         getGUI().showFreeColPanel(chooseAreaModificationPanel, true, null, true);
                         newMapTransform = null;
+                        ctlr.setDisplayAreas(true);
                     }
                     newMapTransform = mt;
                 }

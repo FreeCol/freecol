@@ -309,6 +309,14 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     public PopupPosition getFramePopupPosition() {
         return null;
     }
+    
+    /**
+     * Allows subclasses to execute code when the frame is closed
+     * using the "X" button (in the map editor).
+     */
+    public void onFrameClosing() {
+        
+    }
 
     // Interface ActionListener
 

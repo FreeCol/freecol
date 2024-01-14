@@ -88,4 +88,10 @@ public final class ChooseAreaModificationPanel extends FreeColPanel {
         return Messages.message("mapEditor.chooseAreaModificationPanel.title");
     }
     
+    @Override
+    public void onFrameClosing() {
+        super.onFrameClosing();
+        getFreeColClient().getMapEditorController().setDisplayAreas(false);
+    }
+    
 }

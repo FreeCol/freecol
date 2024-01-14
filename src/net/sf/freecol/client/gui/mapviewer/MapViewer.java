@@ -707,9 +707,7 @@ public final class MapViewer extends FreeColClientHolder {
         
         displayDebugAiDefensiveMap(nonAnimationG2d, tcb);
         
-        if (getFreeColClient().isMapEditor()) {
-            displayAreasInMapEditor(nonAnimationG2d, tcb);
-        }
+        displayAreasInMapEditor(nonAnimationG2d, tcb);
 
         // Display the colony names, if needed
         long t14 = now();
@@ -763,6 +761,13 @@ public final class MapViewer extends FreeColClientHolder {
 
 
     private void displayAreasInMapEditor(Graphics2D nonAnimationG2d, TileClippingBounds tcb) {
+        if (!getFreeColClient().isMapEditor()) {
+            return;
+        }
+        if (!getFreeColClient().getMapEditorController().isDisplayAreas()) {
+            return;
+        }
+        
         final Object oldAntialiasingHint = nonAnimationG2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
