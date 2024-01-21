@@ -59,7 +59,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.control.SoundController;
-import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special dialogs and panels
@@ -73,7 +72,6 @@ import net.sf.freecol.client.gui.mapviewer.MapViewerState;
 import net.sf.freecol.client.gui.mapviewer.TileViewer;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
-import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
@@ -93,6 +91,7 @@ import net.sf.freecol.client.gui.plaf.FreeColToolTipUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.MemoryManager;
 import net.sf.freecol.common.debug.DebugUtils;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.metaserver.ServerInfo;
@@ -2037,23 +2036,28 @@ public class SwingGUI extends GUI {
         }
         
         final int displayScaling = getClientOptions().getInteger(ClientOptions.DISPLAY_SCALING);
-        if (displayScaling == 0) {
-            int fontSize = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
-            
-            final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
-            if (screenHeight < 900) {
-                fontSize = Math.min(14, fontSize);
-            } else if (screenHeight < 1050) {
-                fontSize = Math.min(18, fontSize);
-            }
-                    
-            logger.info("Automatic font size: " + fontSize + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");        
-            return fontSize;
+        final float scaleFactor = determineScaleFactorUsingClientOptions(dpi);
+        final int fontSizeUsingScaling = (int) (FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * scaleFactor);
+        
+        if (displayScaling != 0) {
+            logger.info("Font size based on manual display scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ")");
+            return fontSizeUsingScaling;
         }
         
-        final int fontSize = (int) (FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * (displayScaling / 100f));
-        logger.info("Font size based on manual display scaling: " + fontSize + " (reported DPI: " + dpi + ")");        
-        return fontSize;
+        int fontSizeUsingDpi = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
+        final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
+        if (screenHeight < 900) {
+            fontSizeUsingDpi = Math.min(14, fontSizeUsingDpi);
+        } else if (screenHeight < 1050) {
+            fontSizeUsingDpi = Math.min(18, fontSizeUsingDpi);
+        }
+        
+        if (fontSizeUsingDpi >= fontSizeUsingScaling * 0.25f) {
+            return fontSizeUsingScaling;
+        }
+                
+        logger.info("Automatic font size: " + fontSizeUsingDpi + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");        
+        return fontSizeUsingDpi;        
     }
 
     private float determineScaleFactorUsingClientOptions(final int dpi) {
@@ -2073,7 +2077,12 @@ public class SwingGUI extends GUI {
                 scaleFactor = 2F;
             }
             
-            final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
+            final int screenHeight;
+            if (FreeColDebugger.isAutomaticRescalingOnWindowResize()) {
+                screenHeight = (canvas != null && canvas.getParentFrame() != null) ? canvas.getParentFrame().getHeight() : graphicsDevice.getDisplayMode().getHeight();
+            } else {
+                screenHeight = graphicsDevice.getDisplayMode().getHeight();
+            }
             if (screenHeight < 720) {
                 scaleFactor = 0.75F;
             } else if (screenHeight < 900) {
@@ -2871,5 +2880,20 @@ public class SwingGUI extends GUI {
     @Override
     public boolean canGameChangingModsBeAdded() {
         return getFreeColClient().getGame() == null;
+    }
+    
+    @Override
+    public void refreshScaleFactorIfNecessary() {
+        if (!FreeColDebugger.isAutomaticRescalingOnWindowResize()) {
+            return;
+        }
+        
+        final int dpi = Utils.determineDpi(graphicsDevice);
+        final float scaleFactor = determineScaleFactorUsingClientOptions(dpi);
+        if (Math.abs(getFixedImageLibrary().getScaleFactor() - scaleFactor) <= 0.1) {
+            return;
+        }
+        
+        refreshGuiUsingClientOptions();
     }
 }

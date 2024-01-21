@@ -114,6 +114,16 @@ public class FreeColDebugger {
     public static boolean isInDebugMode() {
         return FreeColDebugger.debugMode != 0;
     }
+    
+    /**
+     * Checks if automatic changing of the scaleFactor on window resize
+     * has been enabled.
+     * 
+     * @return {@code true} if any debug mode is enabled.
+     */
+    public static boolean isAutomaticRescalingOnWindowResize() {
+        return FreeColDebugger.debugMode != 0;    
+    }
 
     /**
      * Is a particular debug mode enabled in this game?

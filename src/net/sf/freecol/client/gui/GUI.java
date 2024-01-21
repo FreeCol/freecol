@@ -2639,4 +2639,11 @@ public class GUI extends FreeColClientHolder {
     public void emergencyPurge() {
 
     }
+
+    /**
+     * Updates the scaleFactor, if necessary, after the window has been resized. 
+     */
+    public void refreshScaleFactorIfNecessary() {
+
+    }
 }

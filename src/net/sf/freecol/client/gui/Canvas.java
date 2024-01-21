@@ -277,6 +277,8 @@ public final class Canvas extends JDesktopPane {
     // Internals
     
     private void updateSize() {
+        freeColClient.getGUI().refreshScaleFactorIfNecessary();
+        
         Dimension size = getSize();
         if (oldSize.width != size.width || oldSize.height != size.height) {
             logger.info("Canvas resize from " + oldSize + " to " + size);
