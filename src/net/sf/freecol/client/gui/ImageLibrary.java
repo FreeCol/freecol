@@ -927,10 +927,12 @@ public final class ImageLibrary {
      * @return The image, resized to the given {@code size} without honoring the aspect ratio.
      */
     public static BufferedImage getUncachedOutsideColonyBackground(BuildingType defensiveBuilding, Dimension size) {
+        final String key;
         if (defensiveBuilding == null) {
-            return null;
+            key = "image.buildingOutside.background.default";
+        } else {
+            key = "image.buildingOutside.background." + defensiveBuilding.getId();
         }
-        final String key = "image.buildingOutside.background." + defensiveBuilding.getId();
         final ImageResource ir = ResourceManager.getImageResource(key, false);
         if (ir == null) {
             return null;

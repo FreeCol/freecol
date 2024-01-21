@@ -542,21 +542,12 @@ public final class ColonyPanel extends PortPanel
                 .sorted(Comparator.comparing(Building::getId)) // Stable sort. Might add a z-index property later.
                 .collect(Collectors.toList());
         
+        if (defensiveBuildings.isEmpty()) {
+            paintOutsideColonyBackground(g2d, null);
+        }
+        
         for (Building defensiveBuilding : defensiveBuildings) {
-            final Dimension outsideColonySize = outsideColonyScroll.getSize();
-            BufferedImage outsideColonyImage = cachedDefensiveBuildingImage.get(defensiveBuilding.getType());
-            if (outsideColonyImage == null
-                    || outsideColonyImage.getWidth() != outsideColonySize.width
-                    || outsideColonyImage.getHeight() != outsideColonySize.height) {
-                outsideColonyImage = ImageLibrary.getUncachedOutsideColonyBackground(defensiveBuilding.getType(), outsideColonySize);
-                cachedDefensiveBuildingImage.put(defensiveBuilding.getType(), outsideColonyImage);
-            } 
-            if (outsideColonyImage == null) {
-                continue;
-            }
-            final int x = outsideColonyScroll.getX();
-            final int y = outsideColonyScroll.getY();
-            g.drawImage(outsideColonyImage, x, y, null);
+            paintOutsideColonyBackground(g2d, defensiveBuilding.getType());
         }
         
         final BufferedImage unavailable = getImageLibrary().getScaledCargoHold(false);
@@ -679,6 +670,23 @@ public final class ColonyPanel extends PortPanel
                 y += wBorder.getHeight();
             }
         }
+    }
+    
+    private void paintOutsideColonyBackground(Graphics2D g2d, BuildingType buildingType) {
+        final Dimension outsideColonySize = outsideColonyScroll.getSize();
+        BufferedImage outsideColonyImage = cachedDefensiveBuildingImage.get(buildingType);
+        if (outsideColonyImage == null
+                || outsideColonyImage.getWidth() != outsideColonySize.width
+                || outsideColonyImage.getHeight() != outsideColonySize.height) {
+            outsideColonyImage = ImageLibrary.getUncachedOutsideColonyBackground(buildingType, outsideColonySize);
+            cachedDefensiveBuildingImage.put(buildingType, outsideColonyImage);
+        } 
+        if (outsideColonyImage == null) {
+            return;
+        }
+        final int x = outsideColonyScroll.getX();
+        final int y = outsideColonyScroll.getY();
+        g2d.drawImage(outsideColonyImage, x, y, null);
     }
     
     /**
