@@ -901,12 +901,18 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getScaledBuildingImage(Building building) {
+        if (building == null) {
+            return null;
+        }
         return getScaledBuildingTypeImage(building.getType(),
                                           building.getOwner(),
                                           this.scaleFactor);
     }
 
     public BufferedImage getSmallBuildingImage(Building building) {
+        if (building == null) {
+            return null;
+        }
         return getScaledBuildingTypeImage(building.getType(),
                                           building.getOwner(),
                                           this.scaleFactor * SMALL_SCALE);
@@ -947,12 +953,12 @@ public final class ImageLibrary {
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }
     
-    public BufferedImage getColonyDocks() {
+    public BufferedImage getColonyDocksBackground() {
         final String key = "image.colony.docks.background";
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }
     
-    public BufferedImage getColonyDocksSky() {
+    public BufferedImage getColonyDocksSkyBackground() {
         final String key = "image.colony.docks.sky.background";
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }

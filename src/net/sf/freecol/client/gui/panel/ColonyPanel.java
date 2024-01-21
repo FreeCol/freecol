@@ -519,21 +519,35 @@ public final class ColonyPanel extends PortPanel
         
         final Dimension size = getSize();
         
-        final BufferedImage colonyDocks = getImageLibrary().getColonyDocks();
-        if (colonyDocks != null) {
+        final BufferedImage colonyDocksBackground = getImageLibrary().getColonyDocksBackground();
+        if (colonyDocksBackground != null) {
             final int docksBottomLeftX = inPortScroll.getX();
             final int docksBottomLeftY = inPortScroll.getY() + inPortScroll.getHeight();
-            int y = docksBottomLeftY - colonyDocks.getHeight();
-            g.drawImage(colonyDocks, docksBottomLeftX, y, null);
+            int y = docksBottomLeftY - colonyDocksBackground.getHeight();
+            g.drawImage(colonyDocksBackground, docksBottomLeftX, y, null);
             
-            final BufferedImage colonyDocksSky = getImageLibrary().getColonyDocksSky();
-            if (colonyDocksSky != null) {
+            final BufferedImage colonyDocksSkyBackground = getImageLibrary().getColonyDocksSkyBackground();
+            if (colonyDocksSkyBackground != null) {
                 while (y > 0) {
-                    y -= colonyDocksSky.getHeight();
-                    g.drawImage(colonyDocksSky, docksBottomLeftX, y, null);
+                    y -= colonyDocksSkyBackground.getHeight();
+                    g.drawImage(colonyDocksSkyBackground, docksBottomLeftX, y, null);
                 }
             }
             
+        }
+        
+        final Building docksBuilding = colony.getBuildings()
+                .stream()
+                .filter(b -> b.hasAbility(Ability.PRODUCE_IN_WATER))
+                .sorted(Comparator.comparing(Building::getId)) // Stable sort, but there should only be one value.
+                .findFirst()
+                .orElse(null);
+        final BufferedImage docks = getImageLibrary().getScaledBuildingImage(docksBuilding);
+        if (docks != null) {
+            final int docksBottomLeftX = inPortScroll.getX();
+            final int docksBottomLeftY = inPortScroll.getY() + inPortScroll.getHeight();
+            final int y = docksBottomLeftY - docks.getHeight();
+            g.drawImage(docks, docksBottomLeftX, y, null);
         }
         
         final List<Building> defensiveBuildings = colony.getBuildings()
