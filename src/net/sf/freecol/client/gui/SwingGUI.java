@@ -2074,7 +2074,9 @@ public class SwingGUI extends GUI {
             }
             
             final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
-            if (screenHeight < 900) {
+            if (screenHeight < 720) {
+                scaleFactor = 0.75F;
+            } else if (screenHeight < 900) {
                 scaleFactor = 1F;
             } else if (screenHeight < 1050) {
                 scaleFactor = Math.min(1.25F, scaleFactor);
