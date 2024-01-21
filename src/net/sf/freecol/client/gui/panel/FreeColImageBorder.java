@@ -27,6 +27,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -273,6 +274,39 @@ public class FreeColImageBorder extends AbstractBorder {
     public Insets getBorderInsets(Component c) {
         ensureInitialized();
         return getBorderInsets(c, null);
+    }
+    
+    /**
+     * Returns spaces that are open on this border.
+     * 
+     * @param c The component having the border.
+     * @return A list of areas that can be considered out-of-bounds for this border.
+     */
+    public List<Rectangle> getOpenSpace(Component c) {
+        ensureInitialized();
+        
+        final List<Rectangle> openSpace = new ArrayList<>();
+        
+        /*
+         * For now, only the top part of the border is handled. Feel free to extend this method.
+         */
+        
+        if (topStartImage != null && topStartImage.getHeight() < max(getHeight(topImage), getHeight(topEndImage))) {
+            final int openSpaceHeight = max(getHeight(topImage), getHeight(topEndImage)) - topStartImage.getHeight();
+            openSpace.add(new Rectangle(0, 0, topStartImage.getWidth(), openSpaceHeight));
+        }
+        if (topImage != null && topImage.getHeight() < max(getHeight(topStartImage), getHeight(topEndImage))) {
+            final int openSpaceHeight = max(getHeight(topStartImage), getHeight(topEndImage)) - topImage.getHeight();
+            final int x = getWidth(topStartImage);
+            final int width = c.getWidth() - getWidth(topStartImage) - getWidth(topEndImage);
+            openSpace.add(new Rectangle(x, 0, width, openSpaceHeight));
+        }
+        if (topEndImage != null && topEndImage.getHeight() < max(getHeight(topStartImage), getHeight(topImage))) {
+            final int openSpaceHeight = max(getHeight(topStartImage), getHeight(topImage)) - topEndImage.getHeight();
+            openSpace.add(new Rectangle(c.getWidth() - topEndImage.getWidth(), 0, topEndImage.getWidth(), openSpaceHeight));
+        }
+        
+        return openSpace;
     }
 
     /**
