@@ -1989,9 +1989,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
         if (unit.isNaval()) {
             ret = (old instanceof PrivateerMission) ? old
-                : ((m = getPrivateerMission(aiUnit, null)) != null) ? m
+                : (!unit.isInEurope() && (m = getPrivateerMission(aiUnit, null)) != null) ? m
                 : (old instanceof TransportMission) ? old
                 : ((m = getTransportMission(aiUnit)) != null) ? m
+                : ((m = getPrivateerMission(aiUnit, null)) != null) ? m
                 : (old instanceof UnitSeekAndDestroyMission) ? old
                 : ((m = getSeekAndDestroyMission(aiUnit, 8)) != null) ? m
                 : (old instanceof UnitWanderHostileMission) ? old
