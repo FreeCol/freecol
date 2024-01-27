@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.generator;
 
-import static net.sf.freecol.common.model.Constants.INFINITY;
 import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
 import static net.sf.freecol.common.util.CollectionUtils.any;
 import static net.sf.freecol.common.util.CollectionUtils.descendingListLengthComparator;
@@ -29,7 +28,6 @@ import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
 import static net.sf.freecol.common.util.CollectionUtils.isNull;
 import static net.sf.freecol.common.util.CollectionUtils.map;
 import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
-import static net.sf.freecol.common.util.CollectionUtils.minimize;
 import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
@@ -39,7 +37,6 @@ import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -48,21 +45,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Area;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -74,12 +62,8 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.GameOptions;
@@ -88,8 +72,6 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.RandomUtils.RandomIntCache;
-import net.sf.freecol.server.model.ServerBuilding;
-import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
@@ -130,6 +112,36 @@ public class SimpleMapGenerator implements MapGenerator {
         this.random = random;
         this.cache = new RandomIntCache(logger, "simpleMap", random,
                                         1 << 16, 512);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map generateEmptyMap(Game game, int width, int height, LogBuilder lb) {
+        final LandMap landMap = new LandMap(width, height, this.cache);
+        return new TerrainGenerator(this.random).generateMap(game, null, landMap, lb);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map generateMap(Game game, Map importMap, boolean generateEuropeanPlayerUnits, LogBuilder lb) {
+        final LandMap landMap = (importMap != null)
+            ? new LandMap(importMap, this.cache)
+            : new LandMap(game.getMapGeneratorOptions(), this.cache);
+
+        final Map map = new TerrainGenerator(this.random).generateMap(game, importMap, landMap, lb);
+        
+        makeNativeSettlements(map, importMap, lb);
+        makeLostCityRumours(map, importMap, lb);
+        if (generateEuropeanPlayerUnits) {
+            createEuropeanUnits(map, game.getLiveEuropeanPlayerList());
+        }
+        lb.shrink("\n");
+        return map;
     }
 
 
@@ -619,408 +631,8 @@ public class SimpleMapGenerator implements MapGenerator {
                 spec.getUnitTypesWithAbility(Ability.EXPERT_SCOUT), random);
     }
 
-    /**
-     * Sample a list of tiles to pick spread out starting positions.
-     * Shuffle the result or clear it if there were too few tiles.
-     *
-     * @param tiles The list of {@code Tile}s to sample.
-     * @param number The number of players, which determines the spacing.
-     * @return True if there were enough tiles in the list.
-     */
-    private boolean sampleTiles(List<Tile> tiles, int number) {
-        final int n = tiles.size();
-        final int step = n / number;
-        if (step <= 1) {
-            tiles.clear();
-            return false;
-        }
-        List<Tile> samples = new ArrayList<>();
-        // The offset start prevents selecting right on the poles
-        for (int i = step/2; i < n; i += step) {
-            samples.add(tiles.get(i));
-        }
-        tiles.clear();
-        tiles.addAll(samples);
-        randomShuffle(logger, "Starting tiles", tiles, random);
-        return true;
-    }
-
-    /**
-     * Find the best historical starting position for a player from lists
-     * of tiles.
-     *
-     * @param player The {@code Player} to find a tile for.
-     * @param map The {@code Map} to search.
-     * @param east A list of starting {@code Tile}s on the east of the map.
-     * @param west A list of starting {@code Tile}s on the west of the map.
-     * @return The best {@code Tile} found, or null if none suitable.
-     */
-    private Tile findHistoricalStartingPosition(final Player player,
-                                                final Map map,
-                                                List<Tile> east,
-                                                List<Tile> west) {
-        final Nation nation = player.getNation();
-        final int latY = map.getRow(nation.getPreferredLatitude());
-        List<Tile> tiles = (nation.getStartsOnEastCoast()) ? east : west;
-        if (tiles.isEmpty()) return null;
-        final ToIntFunction<Tile> dist = t -> Math.abs(t.getY() - latY);
-        final Comparator<Tile> closest = Comparator.comparingInt(dist);
-        Tile ret = minimize(tiles, closest);
-        tiles.remove(ret); // chosen tile is no longer a candidate
-        return ret;
-    }
-
-    /**
-     * Create two ships, one with a colonist, for each player, and
-     * select suitable starting positions.
-     *
-     * @param map The {@code Map} to place the european units on.
-     * @param players The players to create {@code Settlement}s
-     *      and starting locations for. That is; both indian and
-     *      european players.
-     * @param lb A {@code LogBuilder} to log to.
-     */
-    private void createEuropeanUnits(Map map, List<Player> players,
-                                     LogBuilder lb) {
-        final Game game = map.getGame();
-        final Specification spec = game.getSpecification();
-        final int positionType = spec.getInteger(GameOptions.STARTING_POSITIONS);
-        // Split out the non-REF players
-        final Predicate<Player> notREF = (Player p) -> !p.isREF();
-        List<Player> europeanPlayers = transform(players, notREF);
-        final int number = europeanPlayers.size();
-        if (europeanPlayers.isEmpty()) {
-            throw new RuntimeException("No players to generate units for!");
-        }
-
-        // Make lists of candidate starting tiles on the east and west
-        // of the map, then break them up by land and "sea" (revisit
-        // if we get a map with a lake on the edge)
-        List<Tile> eastTiles = new ArrayList<>();
-        List<Tile> westTiles = new ArrayList<>();
-        List<Tile> eastLandTiles = new ArrayList<>();
-        List<Tile> westLandTiles = new ArrayList<>();
-        List<Tile> eastSeaTiles = new ArrayList<>();
-        List<Tile> westSeaTiles = new ArrayList<>();
-        map.collectStartingTiles(eastTiles, westTiles);
-        for (Tile t : eastTiles) {
-            if (t.isLand()) eastLandTiles.add(t); else eastSeaTiles.add(t);
-        }
-        for (Tile t : westTiles) {
-            if (t.isLand()) westLandTiles.add(t); else westSeaTiles.add(t);
-        }
-
-        // Now consider what type of positions we are selecting from
-        switch (positionType) {
-        case GameOptions.STARTING_POSITIONS_CLASSIC:
-            // Break the lists up into at least <number> candidate
-            // positions and shuffle.  Empty the relevant list on failure.
-            sampleTiles(eastLandTiles, number);
-            sampleTiles(eastSeaTiles, number);
-            sampleTiles(westLandTiles, number);
-            sampleTiles(westSeaTiles, number);
-            break;
-        case GameOptions.STARTING_POSITIONS_RANDOM:
-            // Random starts are the same as classic but do not
-            // distinguish between east and west
-            eastLandTiles.addAll(westLandTiles);
-            eastSeaTiles.addAll(westSeaTiles);
-            sampleTiles(eastLandTiles, number);
-            sampleTiles(eastSeaTiles, number);
-            break;
-        case GameOptions.STARTING_POSITIONS_HISTORICAL:
-            break; // Historic positions retain all the possible tiles
-        }
-
-        // For each player, find the units, which determines whether
-        // to start at sea.
-        List<Tile> startingTiles = new ArrayList<>();
-        List<Unit> carriers = new ArrayList<>();
-        List<Unit> passengers = new ArrayList<>();
-        List<Unit> otherNaval = new ArrayList<>();
-        for (Player player : europeanPlayers) {
-            lb.add("For player ", player, ", ");
-            carriers.clear();
-            passengers.clear();
-            otherNaval.clear();
-            List<AbstractUnit> unitList = ((EuropeanNationType)player.getNationType())
-                .getStartingUnits();
-            for (AbstractUnit startingUnit : unitList) {
-                UnitType type = startingUnit.getType(spec);
-                Role role = startingUnit.getRole(spec);
-                Unit newUnit = new ServerUnit(game, null, player, type, role);
-                newUnit.setName(player.getNameForUnit(type, random));
-                if (newUnit.isNaval()) {
-                    if (newUnit.canCarryUnits()) {
-                        newUnit.setState(Unit.UnitState.ACTIVE);
-                        carriers.add(newUnit);
-                    } else {
-                        otherNaval.add(newUnit);
-                    }
-                } else {
-                    newUnit.setState(Unit.UnitState.SENTRY);
-                    passengers.add(newUnit);
-                }
-            }
-            boolean startEast = player.getNation().getStartsOnEastCoast();
-            boolean startAtSea = !carriers.isEmpty();
-            lb.add("found ", carriers.size(), " carriers, ",
-                passengers.size(), " passengers, ",
-                otherNaval.size(), " other naval units, starting ",
-                (startAtSea) ? "at sea" : "on land", " to the ",
-                (startEast) ? "east" : "west");
-
-            // Select a starting position from the available tiles
-            Tile start = null;
-            switch (positionType) {
-            case GameOptions.STARTING_POSITIONS_CLASSIC:
-                // Classic mode respects coast preference, the lists
-                // are pre-sampled and shuffled
-                start = ((startAtSea)
-                    ? ((startEast) ? eastSeaTiles : westSeaTiles)
-                    : ((startEast) ? eastLandTiles : westLandTiles)).remove(0);
-                break;
-            case GameOptions.STARTING_POSITIONS_RANDOM:
-                // Random mode is as classic but ignores coast
-                // preference, the east lists already contain the west
-                start = ((startAtSea) ? eastSeaTiles : eastLandTiles).remove(0);
-                break;
-            case GameOptions.STARTING_POSITIONS_HISTORICAL:
-                start = (startAtSea)
-                    ? findHistoricalStartingPosition(player, map,
-                        eastSeaTiles, westSeaTiles)
-                    : findHistoricalStartingPosition(player, map,
-                        eastLandTiles, westLandTiles);
-                break;
-            }
-            if (start == null) {
-                throw new RuntimeException("Failed to find start tile "
-                    + ((startAtSea) ? "at sea" : "on land")
-                    + " for player " + player);
-            }
-            player.setEntryTile(start);
-            lb.add(" at starting tile ", start);
-
-            final Europe europe = player.getEurope();
-            if (startAtSea) { // All aboard!
-                for (Unit u : carriers) {
-                    u.setLocation(start);
-                    ((ServerPlayer)player).exploreForUnit(u);
-                }
-                passengers: for (Unit unit : passengers) {
-                    for (Unit carrier : carriers) {
-                        if (carrier.canAdd(unit)) {
-                            unit.setLocation(carrier);
-                            continue passengers;
-                        }
-                    }
-                    // no space left on carriers
-                    unit.setLocation(europe);
-                }
-            } else { // Land ho!
-                for (Unit u : passengers) {
-                    u.setLocation(start);
-                    ((ServerPlayer)player).exploreForUnit(u);
-                }
-            }
-            for (Unit u : otherNaval) {
-                u.setLocation(europe);
-            }
-
-            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
-                createDebugUnits(map, player, start, lb);
-                spec.setInteger(GameOptions.STARTING_MONEY, 10000);
-            }
-
-            // Start our REF player entry tile somewhere near to our
-            // starting tile, but do not place their units.
-            // They are assumed to always be on naval transport.
-            final Player ourREF = player.getREFPlayer();
-            if (ourREF == null) continue; // Some tests do not generate REFs
-            final int threshold = 10;
-            final int startY = start.getY();
-            final Predicate<Tile> closeSeaTile
-                = t -> !t.isLand() && Math.abs(t.getY() - startY) < threshold;
-            List<Tile> refTiles = (startEast) ? eastTiles : westTiles;
-            start = getRandomMember(logger, ourREF + " start",
-                                    transform(refTiles, closeSeaTile), random);
-                
-            ourREF.setEntryTile(start);
-            lb.add(" with REF at ", start, ".\n");
-        }
-    }
-
-    private Tile findTileFor(Map map, int row, int start, boolean startAtSea,
-                             LogBuilder lb) {
-        Tile tile = null;
-        Tile ret = null;
-        int offset = (start == 0) ? 1 : -1;
-        for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
-            tile = map.getTile(x, row);
-            if (tile.isDirectlyHighSeasConnected()) {
-                if (startAtSea != tile.isLand()) ret = tile;
-            } else {
-                break; // Previous tile is a potential candidate
-            }
-        }
-        if (ret == null) lb.add("No suitable tile in row ", row, ".\n");
-        return ret;
-    }
-
-    private List<Unit> createDebugUnits(Map map, Player player, Tile startTile,
-                                        LogBuilder lb) {
-        final Game game = map.getGame();
-        final Specification spec = game.getSpecification();
-        List<Unit> ret = new ArrayList<>(20);
-        // In debug mode give each player a few more units and a colony.
-        UnitType unitType = spec.getUnitType("model.unit.galleon");
-        Unit galleon = new ServerUnit(game, startTile, player, unitType);
-        galleon.setName(player.getNameForUnit(unitType, random));
-        ret.add(galleon);
-        unitType = spec.getUnitType("model.unit.privateer");
-        Unit privateer = new ServerUnit(game, startTile, player, unitType);
-        ret.add(privateer);
-        privateer.setName(player.getNameForUnit(unitType, random));
-        ((ServerPlayer)player).exploreForUnit(privateer);
-        unitType = spec.getUnitType("model.unit.freeColonist");
-        ret.add(new ServerUnit(game, galleon, player, unitType));
-        unitType = spec.getUnitType("model.unit.veteranSoldier");
-        ret.add(new ServerUnit(game, galleon, player, unitType));
-        unitType = spec.getUnitType("model.unit.jesuitMissionary");
-        ret.add(new ServerUnit(game, galleon, player, unitType));
-
-        Tile colonyTile = null;
-        for (Tile tempTile : map.getCircleTiles(startTile, true, INFINITY)) {
-            if (tempTile.isPolar()) continue; // No initial polar colonies
-            if (player.canClaimToFoundSettlement(tempTile)) {
-                colonyTile = tempTile;
-                break;
-            }
-        }
-
-        if (colonyTile == null) {
-            lb.add("Could not find a debug colony site.\n");
-            return ret;
-        }
-        colonyTile.setType(find(spec.getTileTypeList(), t -> !t.isWater()));
-        unitType = spec.getUnitType("model.unit.expertFarmer");
-        Unit buildColonyUnit = new ServerUnit(game, colonyTile,
-                                              player, unitType);
-        ret.add(buildColonyUnit);
-        String colonyName = Messages.message(player.getNationLabel())
-            + " " + Messages.message("Colony");
-        Colony colony = new ServerColony(game, player, colonyName, colonyTile);
-        player.addSettlement(colony);
-        colony.placeSettlement(true);
-        for (Tile tile : transform(colonyTile.getSurroundingTiles(1,1), t ->
-                (!t.hasSettlement()
-                    && (t.getOwner() == null || !t.getOwner().isEuropean())))) {
-            tile.changeOwnership(player, colony);
-            if (tile.hasLostCityRumour()) tile.removeLostCityRumour();
-        }
-        buildColonyUnit.setLocation(colony);
-        Tile ct = buildColonyUnit.getWorkTile();
-        if (ct != null) {
-            for (TileType t : transform(spec.getTileTypeList(),
-                                        tt -> !tt.isWater())) {
-                ct.setType(t);
-                TileImprovementType plowType = map.getSpecification()
-                    .getTileImprovementType("model.improvement.plow");
-                TileImprovement plow = new TileImprovement(game, ct, plowType, null);
-                plow.setTurnsToComplete(0);
-                ct.add(plow);
-                break;
-            }
-        }
-        BuildingType schoolType = spec.getBuildingType("model.building.schoolhouse");
-        Building schoolhouse = new ServerBuilding(game, colony, schoolType);
-        colony.addBuilding(schoolhouse);
-
-        unitType = spec.getUnitType("model.unit.elderStatesman");
-        Unit statesman = new ServerUnit(game, colonyTile, player, unitType);
-        ret.add(statesman);
-        statesman.setLocation(colony.getWorkLocationFor(statesman,
-                statesman.getType().getExpertProduction()));
-
-        unitType = spec.getUnitType("model.unit.expertLumberJack");
-        Unit lumberjack = new ServerUnit(game, colony, player, unitType);
-        ret.add(lumberjack);
-        Tile lt = lumberjack.getWorkTile();
-        if (lt != null) {
-            TileType tt = find(spec.getTileTypeList(), TileType::isForested);
-            if (tt != null) lt.setType(tt);
-            lumberjack.changeWorkType(lumberjack.getType()
-                .getExpertProduction());
-        }
-
-        unitType = spec.getUnitType("model.unit.masterCarpenter");
-        ret.add(new ServerUnit(game, colony, player, unitType));
-
-        unitType = spec.getUnitType("model.unit.seasonedScout");
-        Unit scout = new ServerUnit(game, colonyTile, player, unitType);
-        ret.add(scout);
-        ((ServerPlayer)player).exploreForUnit(scout);
-
-        unitType = spec.getUnitType("model.unit.veteranSoldier");
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-        unitType = spec.getUnitType("model.unit.artillery");
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-        unitType = spec.getUnitType("model.unit.treasureTrain");
-        Unit train = new ServerUnit(game, colonyTile, player, unitType);
-        ret.add(train);
-        train.setTreasureAmount(10000);
-        unitType = spec.getUnitType("model.unit.wagonTrain");
-        Unit wagon = new ServerUnit(game, colonyTile, player, unitType);
-        ret.add(wagon);
-        GoodsType cigarsType = spec.getGoodsType("model.goods.cigars");
-        Goods cigards = new Goods(game, wagon, cigarsType, 5);
-        wagon.add(cigards);
-        unitType = spec.getUnitType("model.unit.jesuitMissionary");
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-        ret.add(new ServerUnit(game, colonyTile, player, unitType));
-
-        ((ServerPlayer)player).exploreForSettlement(colony);
-        return ret;
-    }
-
-
-    // Implement MapGenerator
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map generateEmptyMap(Game game, int width, int height,
-                                LogBuilder lb) {
-        return new TerrainGenerator(this.random)
-            .generateMap(game, null,
-                         new LandMap(width, height, this.cache), lb);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map generateMap(Game game, Map importMap, boolean generateEuropeanPlayerUnits, LogBuilder lb) {
-        // Create land map.
-        LandMap landMap = (importMap != null)
-            ? new LandMap(importMap, this.cache)
-            : new LandMap(game.getMapGeneratorOptions(), this.cache);
-
-        // Create terrain.
-        Map map = new TerrainGenerator(this.random)
-            .generateMap(game, importMap, landMap, lb);
-        
-        // Decorate the map.
-        makeNativeSettlements(map, importMap, lb);
-        makeLostCityRumours(map, importMap, lb);
-        if (generateEuropeanPlayerUnits) {
-            createEuropeanUnits(map, game.getLiveEuropeanPlayerList(), lb);
-        }
-        lb.shrink("\n");
-        return map;
+    private void createEuropeanUnits(Map map, List<Player> liveEuropeanPlayerList) {
+        final EuropeanStartingPositionsGenerator startPosGenerator = new EuropeanStartingPositionsGenerator(random);
+        startPosGenerator.createEuropeanUnits(map, liveEuropeanPlayerList);
     }
 }
