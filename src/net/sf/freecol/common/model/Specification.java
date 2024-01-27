@@ -3088,6 +3088,12 @@ public final class Specification implements OptionContainer {
                        Boolean.FALSE, BooleanOption.class);
         // end @compat 0.11.6
 
+        // @compat 1.1.0
+        ret |= checkOp(GameOptions.MAP_DEFINED_STARTING_POSITIONS,
+                GameOptions.GAMEOPTIONS_MAP,
+                Boolean.TRUE, BooleanOption.class);        
+        // end @compat 1.1.0
+        
         // SAVEGAME_VERSION == 14
         return ret;
     }

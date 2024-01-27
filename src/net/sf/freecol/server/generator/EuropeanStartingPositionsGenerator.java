@@ -8,10 +8,13 @@ import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
 import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -20,6 +23,7 @@ import java.util.stream.StreamSupport;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -78,6 +82,8 @@ class EuropeanStartingPositionsGenerator {
         if (europeanPlayers.isEmpty()) {
             throw new RuntimeException("No players to generate units for!");
         }
+        
+        Collections.shuffle(europeanPlayers, random);
 
         final java.util.Map<Player, StartingUnits> playerStartingUnits = determineStartingUnits(europeanPlayers);
         final java.util.Map<Player, Tile> playerStartingTiles = determineStartingTiles(map, europeanPlayers, playerStartingUnits);
@@ -100,7 +106,138 @@ class EuropeanStartingPositionsGenerator {
     }
 
     private java.util.Map<Player, Tile> determineStartingTiles(Map map, List<Player> europeanPlayers, java.util.Map<Player, StartingUnits> playerStartingUnits) {
-        return determineStartingTilesWithoutUsingPredeterminedPositions(map, europeanPlayers, playerStartingUnits);
+        final Specification spec = map.getSpecification();
+        final Game game = map.getGame();
+        
+        final boolean mapDefinedStartingPositionsAvailable = isMapDefinedStartingPositionsAvailableFor(europeanPlayers, game);
+        
+        if (!mapDefinedStartingPositionsAvailable) {
+            return determineStartingTilesWithoutUsingPredeterminedPositions(map, europeanPlayers, playerStartingUnits);
+        }
+
+        final int positionType = spec.getInteger(GameOptions.STARTING_POSITIONS);
+        switch (positionType) {
+        case GameOptions.STARTING_POSITIONS_CLASSIC:
+            return playerMapStartingAreaAndEnsureDistance(europeanPlayers, playerStartingUnits, game);
+        case GameOptions.STARTING_POSITIONS_RANDOM:
+            return randomMapStartingArea(europeanPlayers, playerStartingUnits, game);
+        case GameOptions.STARTING_POSITIONS_HISTORICAL:
+            return playerMapStartingArea(europeanPlayers, playerStartingUnits, game);
+        default:
+            throw new IllegalStateException("Unknown positionType=" + positionType);
+        }
+    }
+
+
+    private java.util.Map<Player, Tile> playerMapStartingAreaAndEnsureDistance(List<Player> europeanPlayers,
+            java.util.Map<Player, StartingUnits> playerStartingUnits, final Game game) {
+        final int MINIMUM_DISTANCE_BETWEEN_PLAYERS = 10;
+        final int MAX_TRIES = 10;
+        for (int i=0; i<MAX_TRIES; i++) {
+            final java.util.Map<Player, Tile> startingTiles = playerMapStartingArea(europeanPlayers, playerStartingUnits, game);
+            final boolean satisfiesMinimumDistance = startingTiles.values().stream()
+                    .noneMatch(t -> startingTiles.values().stream().anyMatch(t2 -> t != t2 && t.getDistanceTo(t2) < MINIMUM_DISTANCE_BETWEEN_PLAYERS));
+            if (satisfiesMinimumDistance) {
+                return startingTiles;
+            }
+        }
+        logger.info("Not able to secure minimum starting distance between European players.");
+        return playerMapStartingArea(europeanPlayers, playerStartingUnits, game);
+    }
+
+
+    private java.util.Map<Player, Tile> playerMapStartingArea(List<Player> europeanPlayers, java.util.Map<Player, StartingUnits> playerStartingUnits, final Game game) {
+        final java.util.Map<Player, Tile> startingTiles = new HashMap<>();
+        for (Player player : europeanPlayers) {
+            final StartingUnits startingUnits = playerStartingUnits.get(player);
+            final boolean prefersLand = startingUnits.getCarriers().isEmpty();
+            final Area startingArea = game.getNationStartingArea(player.getNation());
+            
+            List<Tile> possibleStartingTiles = startingArea.getTiles().stream()
+                    .filter(t -> t.isLand() == prefersLand)
+                    .collect(Collectors.toList());
+            if (possibleStartingTiles.isEmpty()) {
+                possibleStartingTiles = startingArea.getTiles();
+            }
+            
+            final int randomIndex = random.nextInt(possibleStartingTiles.size());
+            final Tile startingTile = possibleStartingTiles.get(randomIndex);
+            startingTiles.put(player, startingTile);
+        }
+        return startingTiles;
+    }
+    
+    private java.util.Map<Player, Tile> randomMapStartingArea(List<Player> europeanPlayers, java.util.Map<Player, StartingUnits> playerStartingUnits, final Game game) {
+        final java.util.Map<Player, Tile> startingTiles = new HashMap<>();
+        
+        final Set<Tile> tilesToChooseFrom = new HashSet<>();
+        for (Player player : europeanPlayers) {
+            final Area startingArea = game.getNationStartingArea(player.getNation());
+            if (startingArea != null) {
+                tilesToChooseFrom.addAll(startingArea.getTiles());
+            }
+        }
+        
+        final List<Tile> randomLandTilesToChooseFrom = tilesToChooseFrom.stream()
+                .filter(t -> t.isLand())
+                .collect(Collectors.toList());
+        Collections.shuffle(randomLandTilesToChooseFrom, random);
+        int indexLand = 0;
+        
+        final List<Tile> randomOceanTilesToChooseFrom = tilesToChooseFrom.stream()
+                .filter(t -> !t.isLand())
+                .collect(Collectors.toList());
+        Collections.shuffle(randomOceanTilesToChooseFrom, random);
+        int indexOcean = 0;
+        
+        for (Player player : europeanPlayers) {
+            final StartingUnits startingUnits = playerStartingUnits.get(player);
+            final boolean prefersLand = startingUnits.getCarriers().isEmpty();
+            final Tile startingTile;
+            if (prefersLand && indexLand < randomLandTilesToChooseFrom.size()) {
+                startingTile = randomLandTilesToChooseFrom.get(indexLand);
+                indexLand++;
+            } else if (!prefersLand && indexOcean < randomOceanTilesToChooseFrom.size()) {
+                startingTile = randomOceanTilesToChooseFrom.get(indexOcean);
+                indexOcean++;
+            } else if (indexLand < randomLandTilesToChooseFrom.size()) {
+                startingTile = randomLandTilesToChooseFrom.get(indexLand);
+                indexLand++;
+            } else {
+                startingTile = randomOceanTilesToChooseFrom.get(indexOcean);
+                indexOcean++;
+            }
+            
+            startingTiles.put(player, startingTile);
+        }
+        return startingTiles;
+    }
+
+
+    private boolean isMapDefinedStartingPositionsAvailableFor(List<Player> europeanPlayers, Game game) {
+        final Specification spec = game.getSpecification();
+        boolean mapDefinedStartingPositions = spec.getBoolean(GameOptions.MAP_DEFINED_STARTING_POSITIONS);
+        final int positionType = spec.getInteger(GameOptions.STARTING_POSITIONS);
+        
+        int numAreas = 0;
+        if (mapDefinedStartingPositions) {
+            for (Player player : europeanPlayers) {
+                final Area area = game.getNationStartingArea(player.getNation());
+                if (area == null || area.getTiles().isEmpty()) {
+                    logger.info("No map defined starting area for: " + player.getNationId());
+                    if (positionType == GameOptions.STARTING_POSITIONS_CLASSIC
+                            || positionType == GameOptions.STARTING_POSITIONS_HISTORICAL) {
+                        break;
+                    }
+                    continue;
+                }
+                numAreas++;
+            }
+        }
+        if (numAreas < europeanPlayers.size()) {
+            mapDefinedStartingPositions = false;
+        }
+        return mapDefinedStartingPositions;
     }
 
     private java.util.Map<Player, Tile> determineStartingTilesWithoutUsingPredeterminedPositions(Map map, List<Player> europeanPlayers, java.util.Map<Player, StartingUnits> playerStartingUnits) {

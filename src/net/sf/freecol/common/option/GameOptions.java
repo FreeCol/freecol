@@ -100,6 +100,11 @@ public class GameOptions {
     public static final String TELEPORT_REF
         = "model.option.teleportREF";
 
+    /**
+     * Use map defined starting positions (if available).
+     */
+    public static final String MAP_DEFINED_STARTING_POSITIONS = "model.option.mapDefinedStartingPositions";
+    
     /** How to determine the starting positions of European players. */
     public static final String STARTING_POSITIONS
         = "model.option.startingPositions";
