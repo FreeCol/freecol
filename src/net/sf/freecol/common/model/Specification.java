@@ -1556,6 +1556,12 @@ public final class Specification implements OptionContainer {
     public List<EuropeanNationType> getEuropeanNationTypes() {
         return europeanNationTypes;
     }
+    
+    public List<EuropeanNationType> getVisibleEuropeanNationTypes() {
+        return europeanNationTypes.stream()
+                .filter(type -> !"model.nationType.optionOnly".equals(type.getId()))
+                .collect(Collectors.toList());
+    }
 
     public List<EuropeanNationType> getREFNationTypes() {
         return REFNationTypes;

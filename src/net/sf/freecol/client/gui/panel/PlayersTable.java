@@ -708,8 +708,7 @@ public final class PlayersTable extends JTable {
         TableColumn advantagesColumn = tcm.getColumn(ADVANTAGE_COLUMN);
         switch (nationOptions.getNationalAdvantages()) {
         case SELECTABLE:
-            advantagesColumn.setCellEditor(new AdvantageCellEditor(spec
-                    .getEuropeanNationTypes()));
+            advantagesColumn.setCellEditor(new AdvantageCellEditor(spec.getVisibleEuropeanNationTypes()));
             break;
         case FIXED:
             break; // Do nothing

@@ -84,13 +84,11 @@ public class NationTypeDetailPanel
                     getName(), null));
 
         List<NationType> nations = new ArrayList<>();
-        nations.addAll(getSpecification().getEuropeanNationTypes());
+        nations.addAll(getSpecification().getVisibleEuropeanNationTypes());
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
         ImageIcon icon = new ImageIcon(ImageUtils.createCenteredImage(getImageLibrary().getLibertyImage(), getListItemIconSize()));
         for (NationType type : nations) {
-            // Suppress special case.  FIXME: This is a kludge
-            if ("model.nationType.optionOnly".equals(type.getId())) continue;
             parent.add(buildItem(type, icon));
         }
         root.add(parent);
