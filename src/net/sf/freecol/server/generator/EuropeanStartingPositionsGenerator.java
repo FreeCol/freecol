@@ -115,6 +115,17 @@ class EuropeanStartingPositionsGenerator {
             return determineStartingTilesWithoutUsingPredeterminedPositions(map, europeanPlayers, playerStartingUnits);
         }
 
+        final java.util.Map<Player, Tile> startingPositions = determineStartingTilesUsingMapDefinedPositions(europeanPlayers, playerStartingUnits, game);
+        if (startingPositions.size() < playerStartingUnits.size()) {
+            logger.info("Unable to use map defined starting positions - possibly caused by overlapping nation areas.");
+            return determineStartingTilesWithoutUsingPredeterminedPositions(map, europeanPlayers, playerStartingUnits);
+        }
+        return startingPositions;
+    }
+
+
+    private java.util.Map<Player, Tile> determineStartingTilesUsingMapDefinedPositions(List<Player> europeanPlayers, java.util.Map<Player, StartingUnits> playerStartingUnits, Game game) {
+        final Specification spec = game.getSpecification();
         final int positionType = spec.getInteger(GameOptions.STARTING_POSITIONS);
         switch (positionType) {
         case GameOptions.STARTING_POSITIONS_CLASSIC:
@@ -160,9 +171,15 @@ class EuropeanStartingPositionsGenerator {
                 possibleStartingTiles = startingArea.getTiles();
             }
             
-            final int randomIndex = random.nextInt(possibleStartingTiles.size());
-            final Tile startingTile = possibleStartingTiles.get(randomIndex);
-            startingTiles.put(player, startingTile);
+            while (!possibleStartingTiles.isEmpty()) { 
+                final int randomIndex = random.nextInt(possibleStartingTiles.size());
+                final Tile startingTile = possibleStartingTiles.get(randomIndex);
+                if (!startingTiles.values().contains(startingTile)) {
+                    startingTiles.put(player, startingTile);
+                    break;
+                }
+                possibleStartingTiles.remove(randomIndex);
+            }
         }
         return startingTiles;
     }
