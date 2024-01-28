@@ -13,8 +13,12 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 * Allow to run FreeCol with only 512MB memory. Please keep in mind that 2GB is still needed for higher resolution, smoother scroll and high rendering quality.
 * Better handling of memory -- for example prioritized automatic clearing of caches when running low on memory.
 
+### Rule Changes ###
+* Adding the four extra nations to the classic ruleset. These nations are deactivated by default. Having them as a part of the classic ruleset make it easier to play a game with the classic rules, while still having additional players.
+* Bugfix: Fixed a bug that made native settlements be scattered all over the map instead of being grouped by nation (this happened mostly on small maps).
+* Bugfix for "Shippable wagons mod": Wagon trains can now be built when the shippable wagons mod has been enabled.
+
 ### User Interface ###
-* Allow the minimap and other map controls to be resized in the map editor.
 * The mapboard scrolling is now much smoother and supports pixel-by-pixel scrolling.
 * Allowing scrolling past the borders of a map so that edge tiles can also be placed in focus.
 * It's now possible to use 75% display scaling. This can be used when playing on very small screens where fixed size dialogs would otherwise be larger than the screen.
@@ -33,12 +37,22 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 * Bugfix: Fixes hidden OK-button in the Colopedia on small screens. 
 * Bugfix: The height of a colony building no longer changes when a worker is added.
 * Bugfix: Lots of small rendering differences between different systems (DPI and OS) have been fixed.
+* Bugfix: Caps the automatic font size at no more than 25% larger than the current scaleFactor.
+* Bugfix: Hides the display of the "option only"-nation type from the start game panel
+* Bugfix: Fixes the tab order on the new game panel.
 
-### Bug fixes ###
-* Fixed a bug that prevented the REF computer player (AI) from completing its turn.
-* Fixed a bug preventing the REF from surrendering.
-* Unit order buttons are now hidden when in the map editor. 
-* Fixes the tab order on the new game panel.
+### Map Editor ###
+* Allow the minimap and other map controls to be resized in the map editor.
+* The areas for native nations can now be defined in the map editor. These areas mark the allowed locations for native settlements for each nations. Overlapping areas are allowed, since proper distance between native settlements are still checked, and can be used for having a random element to the overlap/size of each nation. In addition, it's still possible to define specific settlements that will be used if "Import settlements" is checked when starting a new game.
+* The starting areas for European nations can now be defined in the map editor. A random tile in each nation's starting area is used when starting a new game. The areas may overlap.
+* Unit order buttons are now hidden when in the map editor.
+* Bugfix: Fixes a bug where map width was used for height, and the other way around, when scaling a map in the map editor.
+* Bugfix: A new game is now always loaded before importing or generating a new map. This fixes lots of issues caused by stuff from the old map leaking into the new one.
+
+### AI/computer players ###
+* Bugfix: Fixed a bug that prevented the REF computer player (AI) from completing its turn.
+* Bugfix: Fixed a bug preventing the REF from surrendering.
+* Bugfix: Fixed a bug where the AI sometimes sent ships back and forth to Europe without doing anything.
 
 ### Mod development ###
 * Adding an empty image resource file (resource:image.empty) to be used for replacing images with empty space.
@@ -46,6 +60,7 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 * Added "preserve-attributes" that, if true, preserves the attributes of a specification element. This simplifies changing only the subelements. Please note that any "extends" attribute still needs to be repeated since this attributes changes the subelements.
 * The game now displays mod initialization errors to the user in the new game and start game dialogs.
 * An exception is now thrown if a referenced type is used before it's defined.
+
 
 ## FreeCol 1.1.0 (May 7, 2023) ##
 
