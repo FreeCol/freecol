@@ -33,5 +33,5 @@ public interface Named {
      *
      * @return The name of the {@code Named}.
      */
-    public String getNameKey();
+    String getNameKey();
 }

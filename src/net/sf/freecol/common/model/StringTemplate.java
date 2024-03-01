@@ -63,7 +63,7 @@ public class StringTemplate extends FreeColObject {
      * value of the key, or LABEL, a separator string that will be
      * used to join the replacement values.
      */
-    public static enum TemplateType { NAME, KEY, TEMPLATE, LABEL }
+    public enum TemplateType { NAME, KEY, TEMPLATE, LABEL }
 
     /** The TemplateType of this StringTemplate. Defaults to KEY. */
     private TemplateType templateType = TemplateType.KEY;

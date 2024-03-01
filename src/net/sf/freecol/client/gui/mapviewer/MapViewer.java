@@ -106,7 +106,7 @@ public final class MapViewer extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(MapViewer.class.getName());
 
-    private static enum BorderType { COUNTRY, REGION }
+    private enum BorderType { COUNTRY, REGION }
 
     /**
      * Calculates what part of the {@link Map} is visible on screen. This includes handling

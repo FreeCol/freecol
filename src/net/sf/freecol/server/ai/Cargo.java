@@ -58,7 +58,7 @@ public final class Cargo {
     private static final int MAX_TRY = 3;
 
     /** The actions to perform at the target. */
-    public static enum CargoMode {
+    public enum CargoMode {
         LOAD,       // Go to target and load transportable
         UNLOAD,     // Go to target and unload transportable
         PICKUP,     // Go to drop node target, transportable unit to embark

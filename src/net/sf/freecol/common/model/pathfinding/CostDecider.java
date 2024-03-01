@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public interface CostDecider {
 
-    public static final int ILLEGAL_MOVE = -1;
+    int ILLEGAL_MOVE = -1;
     
     /**
      * Determines the cost of a single move.
@@ -45,7 +45,7 @@ public interface CostDecider {
      * @return The cost of moving the given unit from the
      *     {@code oldLocation} to the {@code newLocation}.
      */
-    public int getCost(Unit unit, Location oldLocation, Location newLocation,
+    int getCost(Unit unit, Location oldLocation, Location newLocation,
                        int movesLeftBefore);
     
     /**
@@ -54,13 +54,13 @@ public interface CostDecider {
      * 
      * @return The number of moves left.
      */
-    public int getMovesLeft();
+    int getMovesLeft();
 
     /**
      * Gets the number of turns consumed.
      * This method should be called after invoking {@link #getCost}.
      * 
      * @return The number of turns consumed.
-     */    
-    public int getNewTurns();    
+     */
+    int getNewTurns();
 }

@@ -54,7 +54,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     public static final String TAG = "monarch";
 
     /** Constants describing monarch actions. */
-    public static enum MonarchAction {
+    public enum MonarchAction {
         NO_ACTION,
         RAISE_TAX_ACT,
         RAISE_TAX_WAR,

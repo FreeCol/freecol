@@ -35,7 +35,7 @@ public interface ColopediaDetailPanel<T> {
      *
      * @param root a {@code DefaultMutableTreeNode}
      */
-    public void addSubTrees(DefaultMutableTreeNode root);
+    void addSubTrees(DefaultMutableTreeNode root);
 
     /**
      * Builds the details panel for the given identifier.
@@ -43,6 +43,6 @@ public interface ColopediaDetailPanel<T> {
      * @param id The object identifier to display.
      * @param panel the detail panel to build
      */
-    public void buildDetail(String id, JPanel panel);
+    void buildDetail(String id, JPanel panel);
 
 }

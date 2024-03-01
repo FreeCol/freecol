@@ -77,7 +77,7 @@ public final class TransportMission extends Mission {
 
     private static final String tag = "AI transport";
     
-    private static enum CargoResult {
+    private enum CargoResult {
         TCONTINUE,  // Cargo should continue
         TDONE,      // Cargo completed successfully
         TFAIL,      // Cargo failed badly

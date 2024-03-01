@@ -166,7 +166,7 @@ public final class FreeColServer {
     public static final String DEFAULT_SPEC = "freecol";
 
     /** The server is either starting, loading, being played, or ending. */
-    public static enum ServerState {
+    public enum ServerState {
         PRE_GAME(0),
         LOAD_GAME(0),
         IN_GAME(1),

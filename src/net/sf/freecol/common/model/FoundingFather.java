@@ -41,7 +41,7 @@ public class FoundingFather extends FreeColSpecObjectType {
 
     public static final String TAG = "founding-father";
 
-    public static enum FoundingFatherType {
+    public enum FoundingFatherType {
         TRADE,
         EXPLORATION,
         MILITARY,

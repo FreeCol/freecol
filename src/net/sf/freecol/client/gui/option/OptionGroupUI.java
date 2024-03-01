@@ -84,7 +84,7 @@ public final class OptionGroupUI extends MigPanel
             Option option = (Option)node.getUserObject();
             return Messages.getName(option.getId());
         }
-    };
+    }
             
     private final List<OptionUpdater> optionUpdaters = new ArrayList<>();
 

@@ -30,7 +30,7 @@ public interface Locatable {
      *
      * @return The location of this {@code Locatable}.
      */
-    public Location getLocation();
+    Location getLocation();
 
     /**
      * Sets the location for this {@code Locatable}.
@@ -39,14 +39,14 @@ public interface Locatable {
      *     {@code Locatable}.
      * @return True if the location change succeeds.
      */
-    public boolean setLocation(Location newLocation);
+    boolean setLocation(Location newLocation);
 
     /**
      * Is this locatable in Europe.
      *
      * @return True if the {@code Locatable} is in {@code Europe}.
      */
-    public boolean isInEurope();
+    boolean isInEurope();
 
     /**
      * Get the {@code Tile} where this {@code Locatable} is
@@ -55,7 +55,7 @@ public interface Locatable {
      * @return The {@code Tile} where this {@code Locatable}
      *     is located, if any.
      */
-    public Tile getTile();
+    Tile getTile();
 
     /**
      * Gets the number of cargo slots consumed when this
@@ -63,5 +63,5 @@ public interface Locatable {
      *
      * @return The number of cargo slots required.
      */
-    public int getSpaceTaken();
+    int getSpaceTaken();
 }

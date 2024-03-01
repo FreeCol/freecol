@@ -80,7 +80,7 @@ public class Europe extends UnitLocation
      * The following constant should be used when the random choice
      * behaviour is desired.
      */
-    public static enum MigrationType {
+    public enum MigrationType {
         NORMAL,     // Unit decided to migrate
         RECRUIT,    // Player is paying
         FOUNTAIN,   // As a result of a Fountain of Youth discovery

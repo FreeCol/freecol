@@ -33,7 +33,7 @@ public interface TransactionListener {
      * @param amount The amount of goods which have been purchased
      * @param price The unit price of the goods
      */
-    public void logPurchase(GoodsType goodsType, int amount, int price);
+    void logPurchase(GoodsType goodsType, int amount, int price);
 
     /**
      * Logs a sale
@@ -43,5 +43,5 @@ public interface TransactionListener {
      * @param price The unit price of the goods
      * @param tax The tax which has been applied
      */
-    public void logSale(GoodsType goodsType, int amount, int price, int tax);
+    void logSale(GoodsType goodsType, int amount, int price, int tax);
 }

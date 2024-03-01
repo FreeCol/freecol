@@ -1022,7 +1022,7 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     // Lumber and cross production data contributed by Lone_Wolf in BR#2981.
-    private static int lumberProd[][][] = {
+    private static int[][][] lumberProd = {
         { // carpenterHouse
             { 0, 0, 0, 1, 4 }, // -2
             { 0, 0, 1, 2, 5 }, // -1
@@ -1045,7 +1045,7 @@ public class BuildingTest extends FreeColTestCase {
 
     // Cross production is very like lumber production, with the addition of
     // the unattended production.
-    private static int crossProd[][][] = {
+    private static int[][][] crossProd = {
         { // church
             { 2, 2, 2, 3, 6 }, // -2
             { 2, 2, 3, 4, 7 }, // -1
@@ -1067,7 +1067,7 @@ public class BuildingTest extends FreeColTestCase {
     }
     
     // Factory production data contributed by Lone_Wolf in BR#2979.
-    private static int factoryProd[][][] = {
+    private static int[][][] factoryProd = {
         { // house
             { 0, 0, 0, 1, 2 }, // -2
             { 0, 0, 1, 2, 4 }, // -1

@@ -35,9 +35,9 @@ public interface Location extends ObjectWithId {
     // "Rank" constants for location ordering.
     // Tile ranks are distinct and non-negative.
     // Other locations devolve to {europe,highseas,tile} rank.
-    public static final int LOCATION_RANK_NOWHERE = -3;
-    public static final int LOCATION_RANK_EUROPE = -2;
-    public static final int LOCATION_RANK_HIGHSEAS = -1;
+    int LOCATION_RANK_NOWHERE = -3;
+    int LOCATION_RANK_EUROPE = -2;
+    int LOCATION_RANK_HIGHSEAS = -1;
     
     /**
      * Gets the identifier of this {@code Location}.
@@ -46,21 +46,21 @@ public interface Location extends ObjectWithId {
      * @see FreeColGameObject#getId
      */
     @Override
-    public String getId();
+    String getId();
 
     /**
      * Gets the Tile associated with this Location.
      *
      * @return The Tile associated with this Location, or null if none found.
      */
-    public Tile getTile();
+    Tile getTile();
 
     /**
      * Get a label for this location.
      *
      * @return A label for this location.
      */
-    public StringTemplate getLocationLabel();
+    StringTemplate getLocationLabel();
 
     /**
      * Get a label for this location for a particular player.
@@ -68,7 +68,7 @@ public interface Location extends ObjectWithId {
      * @param player The {@code Player} to return the name for.
      * @return A label for this location.
      */
-    public StringTemplate getLocationLabelFor(Player player);
+    StringTemplate getLocationLabelFor(Player player);
 
     /**
      * Adds a {@code Locatable} to this Location.
@@ -76,7 +76,7 @@ public interface Location extends ObjectWithId {
      * @param locatable The {@code Locatable} to add to this Location.
      * @return True if the locatable was added.
      */
-    public boolean add(Locatable locatable);
+    boolean add(Locatable locatable);
 
     /**
      * Removes a {@code Locatable} from this Location.
@@ -85,7 +85,7 @@ public interface Location extends ObjectWithId {
      *     Location.
      * @return True if the locatable was removed.
      */
-    public boolean remove(Locatable locatable);
+    boolean remove(Locatable locatable);
 
     /**
      * Checks if this {@code Location} contains the specified
@@ -94,7 +94,7 @@ public interface Location extends ObjectWithId {
      * @param locatable The {@code Locatable} to test the presence of.
      * @return True if the locatable is present at this location.
      */
-    public boolean contains(Locatable locatable);
+    boolean contains(Locatable locatable);
 
     /**
      * Checks whether or not the specified locatable may be added to this
@@ -103,28 +103,28 @@ public interface Location extends ObjectWithId {
      * @param locatable The {@code Locatable} to add.
      * @return True if the locatable can be added to this location.
      */
-    public boolean canAdd(Locatable locatable);
+    boolean canAdd(Locatable locatable);
 
     /**
      * Gets the number of units at this Location.
      *
      * @return The number of units at this Location.
      */
-    public int getUnitCount();
+    int getUnitCount();
 
     /**
      * Gets a stream of all the units present at this location.
      *
      * @return A stream of all the units at this location.
      */
-    public Stream<Unit> getUnits();
+    Stream<Unit> getUnits();
 
     /**
      * Gets a list of all the units present at this location.
      *
      * @return A list of all the units at this location.
      */
-    public List<Unit> getUnitList();
+    List<Unit> getUnitList();
 
     /**
      * Gets the {@code GoodsContainer} this {@code Location} use
@@ -133,7 +133,7 @@ public interface Location extends ObjectWithId {
      * @return The {@code GoodsContainer} or {@code null} if the
      *     {@code Location} cannot store any goods.
      */
-    public GoodsContainer getGoodsContainer();
+    GoodsContainer getGoodsContainer();
 
     /**
      * Gets the {@code Settlement} this {@code Location} is
@@ -141,7 +141,7 @@ public interface Location extends ObjectWithId {
      *
      * @return The associated {@code Settlement}, or null if none.
      */
-    public Settlement getSettlement();
+    Settlement getSettlement();
 
     /**
      * Get the colony at this location.
@@ -149,7 +149,7 @@ public interface Location extends ObjectWithId {
      * @return A {@code Colony} at this location if any, or null
      *     if none found.
      */
-    public Colony getColony();
+    Colony getColony();
 
     /**
      * Gets the native settlement at this location.
@@ -157,7 +157,7 @@ public interface Location extends ObjectWithId {
      * @return The {@code IndianSettlement} at this location if
      *     any, or null if none found.
      */
-    public IndianSettlement getIndianSettlement();
+    IndianSettlement getIndianSettlement();
 
     /**
      * Promote this location to a more meaningful one if possible.
@@ -167,7 +167,7 @@ public interface Location extends ObjectWithId {
      *
      * @return A more meaningful {@code Location}, or this one.
      */
-    public Location up();
+    Location up();
 
     /**
      * Get a integer for this location, for the benefit of location
@@ -175,14 +175,14 @@ public interface Location extends ObjectWithId {
      *
      * @return A suitable integer.
      */
-    public int getRank();
+    int getRank();
         
     /**
      * Get a short description of this location.
      *
      * @return A short description.
      */
-    public String toShortString();
+    String toShortString();
 
 
     /**
@@ -191,7 +191,7 @@ public interface Location extends ObjectWithId {
      * @param loc The {@code Location} to improve.
      * @return The improved {@code Location}.
      */
-    public static Location upLoc(Location loc) {
+    static Location upLoc(Location loc) {
         return (loc == null) ? null : loc.up();
     }
 
@@ -201,7 +201,7 @@ public interface Location extends ObjectWithId {
      * @param loc A {@code Location} to check.
      * @return The integer rank of the given location.
      */
-    public static int rankOf(Location loc) {
+    static int rankOf(Location loc) {
         return (loc == null) ? Location.LOCATION_RANK_NOWHERE : loc.getRank();
     }
 
@@ -210,7 +210,7 @@ public interface Location extends ObjectWithId {
      *
      * @return A key for image lookup, null by default.
      */
-    public default String getLocationImageKey() {
+    default String getLocationImageKey() {
         return null;
     }
 }

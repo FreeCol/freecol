@@ -32,11 +32,11 @@ public interface OptionUpdater {
      * Updates the value of the {@link net.sf.freecol.common.option.Option}
      * this object keeps.
      */
-    public void updateOption();
+    void updateOption();
 
     /**
      * Reset with the value from the option.
      */
-    public void reset();
+    void reset();
 
 }

@@ -46,7 +46,7 @@ public class NativeTrade extends FreeColGameObject {
         = StringTemplate.template("");
 
     /** The type of native trade command. */
-    public static enum NativeTradeAction {
+    public enum NativeTradeAction {
         // Requests from European trader
         OPEN(false, true),         // Start a new trade session
         CLOSE(true, true),         // End an existing session

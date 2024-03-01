@@ -76,7 +76,7 @@ public class OSUtils {
      *
      * @param url The URL to launch
      */
-    final public static void launchBrowser(String url) {
+    public static final void launchBrowser(String url) {
         // Use Desktop Class first
         try {
             URI uri = java.net.URI.create(url);
@@ -104,7 +104,7 @@ public class OSUtils {
      *
      * @see #launchBrowser(String)
      */
-    final private static String[] getBrowserExecString(String url) {
+    private static final String[] getBrowserExecString(String url) {
         if (onMacOSX()) {
             // Apple Macintosh, Safari is the main browser
             return new String[] { "open" , "-a", "Safari", url };

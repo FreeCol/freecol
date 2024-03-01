@@ -34,13 +34,13 @@ public interface MapLayerGenerator {
      * @param game a {@code Game} value
      * @return a {@code boolean} value
      */
-    public boolean generateLayer(Game game);
+    boolean generateLayer(Game game);
 
     /**
      * Returns the Layer this MapLayerGenerator is able to generate.
      *
      * @return a {@code Layer} value
      */
-    public Layer getLayer();
+    Layer getLayer();
 
 }

@@ -49,7 +49,7 @@ public class River {
      * Possible direction changes for a river.
      * @see net.sf.freecol.common.model.Map
      */
-    private static enum DirectionChange {
+    private enum DirectionChange {
         STRAIGHT_AHEAD,
         RIGHT_TURN,
         LEFT_TURN;

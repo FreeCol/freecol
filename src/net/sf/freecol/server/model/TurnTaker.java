@@ -37,5 +37,5 @@ public interface TurnTaker {
      * @param lb A {@code LogBuilder} to log to.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs);
+    void csNewTurn(Random random, LogBuilder lb, ChangeSet cs);
 } 

@@ -96,12 +96,12 @@ public class Player extends FreeColGameObject implements Nameable {
     //
 
     /** Types of players. */
-    public static enum PlayerType {
+    public enum PlayerType {
         NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD, RETIRED
     }
 
     /** Colony value categories. */
-    public static enum ColonyValueCategory {
+    public enum ColonyValueCategory {
         A_OVERRIDE, // override slot containing showstopper NoValueType values
         A_PROD,     // general production level
         A_TILE,     // strangeness with the tile
@@ -127,7 +127,7 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /** Special return values for showstopper getColonyValue fail. */
-    public static enum NoValueType {
+    public enum NoValueType {
         BOGUS(-1),       // bad value from canClaimToFoundSettlementReason
         TERRAIN(-2),     // can not settle on tile (e.g. moutain, water)
         RUMOUR(-3),      // LCR present
@@ -3341,7 +3341,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * to found a settlement or just to be used by one, including the
      * double negative NONE == "no reason" case.
      */
-    public static enum NoClaimReason implements Named {
+    public enum NoClaimReason implements Named {
         NONE,            // Actually, tile can be claimed
         TERRAIN,         // Not on settleable terrain
         RUMOUR,          // Europeans can not claim tiles with LCR

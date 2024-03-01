@@ -84,19 +84,19 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      * Possible actions by the unit travelling along a path in consideration
      * of the next tile.
      */
-    private static enum MoveStep { FAIL, BYLAND, BYWATER, EMBARK, DISEMBARK };
+    private enum MoveStep { FAIL, BYLAND, BYWATER, EMBARK, DISEMBARK };
 
     /**
      * The number of tiles from the upper edge that are considered
      * polar by default.
      */
-    public final static int POLAR_HEIGHT = 2;
+    public static final int POLAR_HEIGHT = 2;
 
     /**
      * The layers included in the map. The RIVERS layer includes all
      * natural tile improvements that are not resources.
      */
-    public static enum Layer {
+    public enum Layer {
         NONE, LAND, TERRAIN, REGIONS, RIVERS, RESOURCES, RUMOURS, NATIVES, ALL;
     };
 

@@ -55,7 +55,7 @@ public class NameCache {
     private static final String[] DEFAULT_SEASON_IDS
         = { "model.season.spring.name", "model.season.autumn.name" };
     
-    private final static String CIBOLA_PREFIX
+    private static final String CIBOLA_PREFIX
         = "nameCache.lostCityRumour.cityName.";
 
     /** Cities of Cibola. */

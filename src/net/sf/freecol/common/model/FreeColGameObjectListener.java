@@ -33,14 +33,14 @@ public interface FreeColGameObjectListener {
      * @param id The object identifier.
      * @param fcgo The new {@code FreeColGameObject}.
      */
-    public void setFreeColGameObject(String id, FreeColGameObject fcgo);
+    void setFreeColGameObject(String id, FreeColGameObject fcgo);
 
     /**
      * Notify a listener (if any) of that an object has gone.
      *
      * @param id The object identifier.
      */
-    public void removeFreeColGameObject(String id);
+    void removeFreeColGameObject(String id);
 
     /**
      * Notify a listener (if any) of that an object has changed owner.
@@ -49,6 +49,6 @@ public interface FreeColGameObjectListener {
      * @param oldOwner The old owning {@code Player}.
      * @param newOwner The new owning {@code Player}.
      */
-    public void ownerChanged(FreeColGameObject source,
+    void ownerChanged(FreeColGameObject source,
                              Player oldOwner, Player newOwner);
 }

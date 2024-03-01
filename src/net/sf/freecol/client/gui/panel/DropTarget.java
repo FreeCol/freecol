@@ -34,7 +34,7 @@ public interface DropTarget {
      * @param goods The {@code Goods} to check.
      * @return True if the goods are acceptable.
      */
-    public default boolean accepts(Goods goods) {
+    default boolean accepts(Goods goods) {
         return false;
     }
 
@@ -44,7 +44,7 @@ public interface DropTarget {
      * @param goodsType The {@code GoodsType} to check.
      * @return True if the goods type is acceptable.
      */
-    public default boolean accepts(GoodsType goodsType) {
+    default boolean accepts(GoodsType goodsType) {
         return false;
     }
 
@@ -54,7 +54,7 @@ public interface DropTarget {
      * @param unit The {@code Unit} to check.
      * @return True if the unit is acceptable.
      */
-    public default boolean accepts(Unit unit) {
+    default boolean accepts(Unit unit) {
         return false;
     }
 
@@ -71,7 +71,7 @@ public interface DropTarget {
      *     currently selected carrier.
      * @return The component argument on success, null on failure.
      */
-    public Component add(Component comp, boolean editState);
+    Component add(Component comp, boolean editState);
 
     /**
      * Get a suggested amount of goods to add, used when partial
@@ -80,7 +80,7 @@ public interface DropTarget {
      * @param goodsType The {@code GoodsType} proposed to add.
      * @return A good amount of goods to add.
      */
-    public default int suggested(GoodsType goodsType) {
+    default int suggested(GoodsType goodsType) {
         return -1; // Not applicable
     }
 }

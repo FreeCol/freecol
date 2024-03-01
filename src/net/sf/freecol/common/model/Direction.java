@@ -44,7 +44,7 @@ public enum Direction implements Named {
     W  (-1,  0, -1,  0),
     NW ( 0, -1, -1, -1);
 
-    public final static int NUMBER_OF_DIRECTIONS = values().length;
+    public static final int NUMBER_OF_DIRECTIONS = values().length;
 
     public static final List<Direction> allDirections
         = makeUnmodifiableList(Direction.N, Direction.NE,

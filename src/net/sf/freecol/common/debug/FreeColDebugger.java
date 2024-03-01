@@ -49,7 +49,7 @@ public class FreeColDebugger {
     private static final Logger logger = Logger.getLogger(FreeColDebugger.class.getName());
 
     /** The debug modes, any of which may be active. */
-    public static enum DebugMode {
+    public enum DebugMode {
         COMMS, // Trace print full c-s communications, and verbose
                // (non-i18n) server errors.
         DESYNC,// Check frequently for desynchronization

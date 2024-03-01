@@ -161,7 +161,7 @@ public class Modifier extends Feature {
     public static final int ROLE_COMBAT_INDEX = 30;
     public static final int GENERAL_COMBAT_INDEX = 50;
 
-    public static enum ModifierType {
+    public enum ModifierType {
         ADDITIVE,
         MULTIPLICATIVE,
         PERCENTAGE

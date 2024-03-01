@@ -38,7 +38,7 @@ public interface CargoLabel {
      * @param cargoPanel The CargoPanel to affect.
      * @return True if the component was added.
      */
-    public boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel);
+    boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel);
 
 
     /**
@@ -47,7 +47,7 @@ public interface CargoLabel {
      * @param comp The Component to remove.
      * @param cargoPanel The {@link CargoPanel} to affect.
      */
-    public default void removeCargo(Component comp, CargoPanel cargoPanel) {
+    default void removeCargo(Component comp, CargoPanel cargoPanel) {
         cargoPanel.update();
     }
 

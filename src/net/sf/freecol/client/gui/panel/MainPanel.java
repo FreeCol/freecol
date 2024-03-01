@@ -101,8 +101,7 @@ public final class MainPanel extends FreeColPanel {
     }
     
     private JButton createImportantButton(Action action) {
-        final FreeColButton button = new FreeColButton(ButtonStyle.IMPORTANT, action);
-        return button;
+        return new FreeColButton(ButtonStyle.IMPORTANT, action);
     }
 
 

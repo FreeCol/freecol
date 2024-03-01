@@ -146,7 +146,7 @@ public class ServerPlayer extends Player implements TurnTaker {
     public static final int ALARM_TILE_IN_USE = 2;
 
     // checkForDeath result type
-    public static enum DeadCheck {
+    public enum DeadCheck {
         IS_DEAD,
         IS_DEFEATED,
         IS_AUTORECRUIT,

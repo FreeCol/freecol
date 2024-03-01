@@ -73,7 +73,7 @@ public class Game extends FreeColGameObject {
     public static final String TAG = "game";
 
     /** Reasons for logging out. */
-    public static enum LogoutReason {
+    public enum LogoutReason {
         DEFEATED,   // Game over, player lost
         LOGIN,      // Logging in again FIXME: this should go away
         LOGOUT,     // Player quits but game continues
@@ -84,7 +84,7 @@ public class Game extends FreeColGameObject {
     };
     
     /** State for the FCGO iterator, out here because it has to be static. */
-    private static enum FcgoState {
+    private enum FcgoState {
         INVALID,
         VALID,
         CONSUMED,

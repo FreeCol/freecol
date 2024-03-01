@@ -32,7 +32,7 @@ public interface Ownable {
      *
      * @return The {@code Player} controlling this {@code Ownable}.
      */
-    public Player getOwner();
+    Player getOwner();
 
     /**
      * Sets the owner of this {@code Ownable}.
@@ -41,5 +41,5 @@ public interface Ownable {
      *     of this {@code Ownable}.
      * @exception UnsupportedOperationException if not implemented.
      */
-    public void setOwner(Player p);
+    void setOwner(Player p);
 }

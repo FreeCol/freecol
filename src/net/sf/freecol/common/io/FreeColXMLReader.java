@@ -90,7 +90,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 "ProcessingInstruction", "Space", "StartDocument",
                 "StartElement" });
 
-    public static enum ReadScope {
+    public enum ReadScope {
         SERVER,     // Loading the game in the server
         NORMAL,     // Normal interning read
         NOINTERN,   // Do not intern any object that are read

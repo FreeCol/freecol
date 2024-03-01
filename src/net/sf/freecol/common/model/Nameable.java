@@ -30,13 +30,13 @@ public interface Nameable {
      *
      * @return The name of the {@code Nameable}.
      */
-    public String getName();
+    String getName();
 
     /**
      * Sets the name for this {@code Nameable}.
      *
      * @param newName The new name for the {@code Nameable}.
      */
-    public void setName(String newName);
+    void setName(String newName);
 
 }

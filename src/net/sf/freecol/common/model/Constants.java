@@ -28,13 +28,13 @@ package net.sf.freecol.common.model;
 public interface Constants {
 
     /** Generic "huge" value. */
-    public static final int INFINITY = Integer.MAX_VALUE;
+    int INFINITY = Integer.MAX_VALUE;
 
     /** Generic "unsure" value. */
-    public static final int UNDEFINED = Integer.MIN_VALUE;
+    int UNDEFINED = Integer.MIN_VALUE;
 
     /** The result of checkIntegrity. */
-    public static enum IntegrityType {
+    enum IntegrityType {
         INTEGRITY_FAIL(-1),
         INTEGRITY_FIXED(0),
         INTEGRITY_GOOD(1);
@@ -92,69 +92,69 @@ public interface Constants {
     };
     
     /** Actions when an armed unit contacts a settlement. */
-    public static enum ArmedUnitSettlementAction {
+    enum ArmedUnitSettlementAction {
         SETTLEMENT_ATTACK,
         SETTLEMENT_TRIBUTE,
     }
 
     /** Actions when dealing with a boycott. */
-    public static enum BoycottAction {
+    enum BoycottAction {
         BOYCOTT_PAY_ARREARS,
         BOYCOTT_DUMP_CARGO
     }
 
     /** Actions when claiming land. */
-    public static enum ClaimAction {
+    enum ClaimAction {
         CLAIM_ACCEPT,
         CLAIM_STEAL
     }
 
     /** Actions surrounding native demands at colonies. */
-    public static enum IndianDemandAction {
+    enum IndianDemandAction {
         INDIAN_DEMAND_ACCEPT,
         INDIAN_DEMAND_REJECT,
         INDIAN_DEMAND_DONE
     }
     
     /** Actions with a missionary at a native settlement. */
-    public static enum MissionaryAction {
+    enum MissionaryAction {
         MISSIONARY_ESTABLISH_MISSION,
         MISSIONARY_DENOUNCE_HERESY,
         MISSIONARY_INCITE_INDIANS
     }
 
     /** Actions in scouting a colony. */
-    public static enum ScoutColonyAction {
+    enum ScoutColonyAction {
         SCOUT_COLONY_NEGOTIATE,
         SCOUT_COLONY_SPY,
         SCOUT_COLONY_ATTACK
     }
 
     /** Actions in scouting a native settlement. */
-    public static enum ScoutIndianSettlementAction {
+    enum ScoutIndianSettlementAction {
         SCOUT_SETTLEMENT_SPEAK,
         SCOUT_SETTLEMENT_TRIBUTE,
         SCOUT_SETTLEMENT_ATTACK
     }
 
     /** Price used to denote claiming land by stealing it. */
-    public static final int STEAL_LAND = -1;
+    int STEAL_LAND = -1;
 
     /** Choice of sales action at a native settlement. */
-    public static enum TradeAction {
+    enum TradeAction {
         BUY,
         SELL,
         GIFT
     }
 
     /** Actions when buying from the natives. */
-    public static enum TradeBuyAction {
+    enum TradeBuyAction {
         BUY,
         HAGGLE
     }
 
     /** Actions when selling to the natives. */
-    public static enum TradeSellAction {
+    enum TradeSellAction {
         SELL,
         HAGGLE,
         GIFT

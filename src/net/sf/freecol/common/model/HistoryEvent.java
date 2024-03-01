@@ -35,7 +35,7 @@ public class HistoryEvent extends StringTemplate {
 
     public static final String TAG = "historyEvent";
 
-    public static enum HistoryEventType implements Named {
+    public enum HistoryEventType implements Named {
         DISCOVER_NEW_WORLD,
         DISCOVER_REGION,
         MEET_NATION,
