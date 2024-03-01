@@ -326,6 +326,12 @@
         </copy>
         <copy file="${freecol.packaging.dir}/common/freecol.sh"
               tofile="${freecol.release.dir}/base/${freecol.name}/freecol"/>
+        <setpermissions mode="755">
+            <file file="${freecol.release.dir}/base/${freecol.name}/freecol"/>
+        </setpermissions>
+        <setpermissions permissions="OWNER_READ,OWNER_WRITE,OWNER_EXECUTE,OTHERS_READ,OTHERS_EXECUTE,GROUP_READ,GROUP_EXECUTE">
+            <file file="${freecol.release.dir}/base/${freecol.name}/freecol.cmd"/>
+        </setpermissions>
     </target>
 
     <target name="prepareSourceFiles" depends="initDist">
