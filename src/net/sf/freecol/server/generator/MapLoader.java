@@ -35,7 +35,7 @@ public interface MapLoader {
      * @param layer a {@code Layer} value
      * @return a {@code Layer} value
      */
-    public Layer loadMap(Game game, Layer layer);
+    Layer loadMap(Game game, Layer layer);
 
 
     /**
@@ -43,6 +43,6 @@ public interface MapLoader {
      *
      * @return a {@code Layer} value
      */
-    public Layer getHighestLayer();
+    Layer getHighestLayer();
 
 }

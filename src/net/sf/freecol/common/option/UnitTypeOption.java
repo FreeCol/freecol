@@ -46,7 +46,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * FIXME: replace with Predicates.
      */
-    public static enum TypeSelector {
+    public enum TypeSelector {
         UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS
     }
 

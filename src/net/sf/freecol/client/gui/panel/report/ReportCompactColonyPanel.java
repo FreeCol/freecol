@@ -86,7 +86,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
     private static class ColonySummary {
 
         /** Types of production for a given goods type. */
-        public static enum ProductionStatus {
+        public enum ProductionStatus {
             FAIL,        // Negative production and below low alarm level
             BAD,         // Negative production
             NONE,        // No production at all

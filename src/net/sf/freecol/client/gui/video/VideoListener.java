@@ -27,5 +27,5 @@ public interface VideoListener {
     /**
      * Called when a playback has stopped.
      */
-    public void stopped();
+    void stopped();
 }

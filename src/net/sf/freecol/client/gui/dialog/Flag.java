@@ -123,7 +123,7 @@ public class Flag {
         public Set<UnionPosition> getUnionPositions() {
             return this.unionPositions;
         }
-    };
+    }
 
     /**
      * The shape of the "union", which generally depends on the
@@ -135,7 +135,7 @@ public class Flag {
         CHEVRON,
         BEND,
         RHOMBUS
-    };
+    }
 
     /**
      * The position of the "union", which depends on the alignment of

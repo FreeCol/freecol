@@ -91,7 +91,7 @@ public final class Specification implements OptionContainer {
     
     // Special reader classes for spec objects
     private interface ChildReader {
-        public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
+        void readChildren(FreeColXMLReader xr) throws XMLStreamException;
     }
 
     /**
@@ -794,7 +794,7 @@ public final class Specification implements OptionContainer {
         String agesValue = "";
         if (!badAges) {
             agesValue = getText(GameOptions.AGES);
-            String a[] = agesValue.split(",");
+            String[] a = agesValue.split(",");
             badAges = a.length != NUMBER_OF_AGES-1;
             if (!badAges) {
                 try {

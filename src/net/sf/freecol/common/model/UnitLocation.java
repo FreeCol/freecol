@@ -53,7 +53,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     private static final Logger logger = Logger.getLogger(UnitLocation.class.getName());
 
-    public static enum NoAddReason {
+    public enum NoAddReason {
         /**
          * No reason why Locatable can not be added.
          */

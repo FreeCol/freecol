@@ -68,7 +68,7 @@ public class Tension implements Named {
     /** 
      * Constants for describing alarm levels.
      */
-    public static enum Level { 
+    public enum Level {
         HAPPY(100),
         CONTENT(600), 
         DISPLEASED(700),

@@ -27,9 +27,9 @@ import java.util.Arrays;
 
 public class ColonizationSaveGameReader {
 
-    private final static int PLAYER_DATA = 0x9e;
-    private final static int COLONY_DATA = 0x186;
-    private final static String[] NATIONS = {
+    private static final int PLAYER_DATA = 0x9e;
+    private static final int COLONY_DATA = 0x186;
+    private static final String[] NATIONS = {
         "English", "French", "Spanish", "Dutch"
     };
 

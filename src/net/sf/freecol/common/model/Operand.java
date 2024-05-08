@@ -50,11 +50,11 @@ public class Operand extends Scope {
 
     private static final Logger logger = Logger.getLogger(Operand.class.getName());
 
-    public static enum OperandType {
+    public enum OperandType {
         UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, YEAR, OPTION, NONE
     }
 
-    public static enum ScopeLevel {
+    public enum ScopeLevel {
         SETTLEMENT, PLAYER, GAME, NONE
     }
 

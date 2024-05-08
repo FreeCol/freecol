@@ -56,7 +56,7 @@ public class LostCityRumour extends TileItem {
     private static int rumourNothing = -1;
 
     /** Constants describing types of Lost City Rumours. */
-    public static enum RumourType {
+    public enum RumourType {
         NO_SUCH_RUMOUR,
         BURIAL_GROUND,
         EXPEDITION_VANISHES,

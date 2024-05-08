@@ -253,7 +253,7 @@ public final class BaseTileTransitionImageCreator {
             return null;
         }
         final ImageResource terrainImageResource;
-        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();;
+        final boolean notABeachTransition = borderingTile.isLand() || !borderingTile.isLand() && !tile.isLand();
         if (notABeachTransition) {
             terrainImageResource = ImageCache.getImageResource(ImageLibrary.getTerrainImageKey(borderingTile.getType()));
         } else {

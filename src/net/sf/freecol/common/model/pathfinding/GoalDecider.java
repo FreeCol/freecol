@@ -47,7 +47,7 @@ public interface GoalDecider {
      * @return The {@code PathNode} where the {@code Tile}
      *     returned by {@code pathNode.getTile()} is the goal.
      */
-    public PathNode getGoal();
+    PathNode getGoal();
     
     /**
      * Determines whether this {@code GoalDecider} has any
@@ -56,7 +56,7 @@ public interface GoalDecider {
      * @return {@code true} if there are any sub goals
      *     and {@code false} otherwise.
      */
-    public boolean hasSubGoals();
+    boolean hasSubGoals();
     
     /**
      * Checks whether the given {@code PathNode} is a
@@ -74,5 +74,5 @@ public interface GoalDecider {
      *     {@code true} and {@link #hasSubGoals()} returns
      *     {@code false}.
      */
-    public boolean check(Unit u, PathNode pathNode);
+    boolean check(Unit u, PathNode pathNode);
 }

@@ -38,7 +38,7 @@ public interface MessageHandler {
      * @return A reply message, if any.
      * @exception FreeColException if the message is malformed.
      */
-    public Message handle(Connection connection, Message message)
+    Message handle(Connection connection, Message message)
         throws FreeColException;
 
     /**
@@ -50,6 +50,6 @@ public interface MessageHandler {
      * @exception XMLStreamException if there is a problem reading the
      *     message.
      */
-    public Message read(Connection connection)
+    Message read(Connection connection)
         throws FreeColException, XMLStreamException;
 }

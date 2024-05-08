@@ -39,7 +39,7 @@ public final class DisplayTileTextAction extends SelectableOptionAction {
     public static final String id = "displayTileTextAction.";
 
     // FIXME: make ClientOptions use enum
-    public static enum DisplayText {
+    public enum DisplayText {
         EMPTY, NAMES, OWNERS, REGIONS;
 
         public String getKey() {

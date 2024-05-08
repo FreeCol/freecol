@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public interface Mission {
 
-    public static enum MissionState {
+    enum MissionState {
         /**
          * Mission is in progress.
          */
@@ -61,7 +61,7 @@ public interface Mission {
      *
      * @return a {@code MissionState} value
      */
-    public MissionState doMission();
+    MissionState doMission();
 
 
     /**
@@ -72,7 +72,7 @@ public interface Mission {
      *
      * @return a {@code boolean} value
      */
-    public boolean isValid();
+    boolean isValid();
 
 
     /**
@@ -80,7 +80,7 @@ public interface Mission {
      *
      * @return an {@code Unit} value
      */
-    public Unit getUnit();
+    Unit getUnit();
 
     /**
      * This method writes an XML-representation of this object to
@@ -90,5 +90,5 @@ public interface Mission {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException;
+    void toXML(FreeColXMLWriter xw) throws XMLStreamException;
 }

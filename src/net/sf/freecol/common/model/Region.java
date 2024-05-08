@@ -56,7 +56,7 @@ public class Region extends FreeColGameObject implements Nameable {
     public static final String PACIFIC_KEY = "model.region.pacific";
 
     /** The type of region. */
-    public static enum RegionType implements Named {
+    public enum RegionType implements Named {
         OCEAN(false),
         COAST(false),
         LAKE(false),

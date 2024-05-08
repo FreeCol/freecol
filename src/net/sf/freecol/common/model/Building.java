@@ -50,7 +50,7 @@ public class Building extends WorkLocation
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
 
-    private final static double EPSILON = 0.0001;
+    private static final double EPSILON = 0.0001;
 
     public static final String TAG = "building";
     

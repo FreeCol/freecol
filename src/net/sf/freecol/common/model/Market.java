@@ -56,7 +56,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Constant for specifying the access to this {@code Market}
      * when selling goods.
      */
-    public static enum Access {
+    public enum Access {
         EUROPE,
         CUSTOM_HOUSE,
     }

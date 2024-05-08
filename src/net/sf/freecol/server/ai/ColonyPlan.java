@@ -128,7 +128,7 @@ public class ColonyPlan {
     private static final int PRODUCTION_TURNOVER_TURNS = 5;
 
     /** The profile of the colony (a sort of general flavour). */
-    private static enum ProfileType {
+    private enum ProfileType {
         OUTPOST,
         SMALL,
         MEDIUM,

@@ -56,7 +56,7 @@ import net.sf.freecol.common.option.GameOptions;
  * Calculates the production for a building of a given type.
  */
 public class BuildingProductionCalculator {
-    private final static double EPSILON = 0.0001;
+    private static final double EPSILON = 0.0001;
     
 
     private Player owner;
