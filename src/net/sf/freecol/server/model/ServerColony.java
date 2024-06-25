@@ -685,6 +685,8 @@ public class ServerColony extends Colony implements TurnTaker {
         boolean newUnitBorn = false;
         GoodsContainer container = getGoodsContainer();
         container.saveState();
+        
+        invalidateCache();
 
         // Check for learning by experience
         for (WorkLocation wl : getCurrentWorkLocationsList()) {

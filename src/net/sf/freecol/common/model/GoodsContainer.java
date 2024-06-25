@@ -242,6 +242,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 this.storedGoods.put(type, newAmount);
             }
         }
+        
+        invalidateCache();
+        
         return true;
     }
 
@@ -291,7 +294,16 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 this.storedGoods.remove(type);
             }
         }
+        
+        invalidateCache();
+        
         return removedGoods;
+    }
+
+    private void invalidateCache() {
+        if (parent != null && (parent instanceof GoodsLocation)) {
+            ((GoodsLocation) parent).invalidateCache();
+        }
     }
 
     /**
@@ -310,6 +322,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 this.storedGoods.put(goodsType, newAmount);
             }
         }
+        invalidateCache();
     }
 
     /**
@@ -319,6 +332,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         synchronized (this.storedGoods) {
             this.storedGoods.clear();
         }
+        invalidateCache();
     }
 
     /**
@@ -353,6 +367,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             forEachMapEntry(this.storedGoods, hiPred,
                             e -> this.storedGoods.put(e.getKey(), newAmount));
         }
+        invalidateCache();
     }
 
     /**
