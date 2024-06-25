@@ -19,11 +19,15 @@
 
 package net.sf.freecol.server.networking;
 
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +35,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -274,8 +277,12 @@ public final class Server extends Thread {
             logger.fine("Wait for Server.run to complete.");
         }
 
-        for (Connection c : transform(this.connections.values(),
-                                      Connection::isAlive)) c.disconnect();
+        final List<Connection> oldConnections = new ArrayList<>(this.connections.values());
+        for (Connection c : oldConnections) {
+            if (c.isAlive()) {
+                c.disconnect();
+            }
+        }
         this.connections.clear();
 
         this.freeColServer.removeFromMetaServer();
