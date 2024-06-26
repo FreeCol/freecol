@@ -2933,8 +2933,15 @@ public class Colony extends Settlement implements TradeLocation {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
         final int present = returnPresent(goodsType, turns);
-        final ExportData ed = getExportData(goodsType);
-        int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
+        final int capacity;
+        if (getSpecification().getBoolean(GameOptions.ENHANCED_TRADE_ROUTES)) {
+            final ExportData ed = getExportData(goodsType);
+            capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
+        } else if (goodsType.limitIgnored()) {
+            return Integer.MAX_VALUE;
+        } else {
+            capacity = getWarehouseCapacity();
+        }
         return Math.max(0, capacity - present);
     }
 
