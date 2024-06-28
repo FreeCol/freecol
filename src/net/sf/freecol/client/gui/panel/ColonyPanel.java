@@ -201,6 +201,9 @@ public final class ColonyPanel extends PortPanel
     private JScrollPane warehouseScroll = null;
     private WarehousePanel warehousePanel = null;
     
+    private JPanel upperRightPanel = null;
+    private BufferedImage colonyTitleImage = null;
+    
     private boolean fullscreen = false;
 
     // The action commands
@@ -684,6 +687,16 @@ public final class ColonyPanel extends PortPanel
                 y += wBorder.getHeight();
             }
         }
+        
+        if (fullscreen) {
+            if (colonyTitleImage == null) {
+                colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner());
+            }
+            final int x = upperRightPanel.getX() + (upperRightPanel.getWidth() - colonyTitleImage.getWidth()) / 2;
+            final int y = inPortScroll.getY() - colonyTitleImage.getHeight();
+            
+            g.drawImage(colonyTitleImage, x, y, null);
+        }
     }
     
     private void paintOutsideColonyBackground(Graphics2D g2d, BuildingType buildingType) {
@@ -711,7 +724,38 @@ public final class ColonyPanel extends PortPanel
         if (fullscreen) {
             return BorderFactory.createEmptyBorder();
         }
-        return FreeColImageBorder.outerColonyPanelBorder;
+        
+        final FreeColImageBorder normalBorder = FreeColImageBorder.outerColonyPanelBorder;
+        final FreeColBorder titleBorder = new FreeColBorder() {
+            @Override
+            public List<Rectangle> getOpenSpace(Component c) {
+                return normalBorder.getOpenSpace(c);
+            }
+            
+            @Override
+            public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+                if (colonyTitleImage == null) {
+                    colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner());
+                }
+                final int imageY = normalBorder.getTopLeftCornerInsetY() - colonyTitleImage.getHeight();
+                final int paddingX = getImageLibrary().scaleInt(23);
+                final int paddingY = getImageLibrary().scaleInt(5);
+                g.drawImage(colonyTitleImage, paddingX, imageY - paddingY, null);
+                normalBorder.paintBorder(c, g, x, y, width, height);
+            }
+
+            @Override
+            public Insets getBorderInsets(Component c) {
+                return normalBorder.getBorderInsets(c);
+            }
+
+            @Override
+            public boolean isBorderOpaque() {
+                return normalBorder.isBorderOpaque();
+            }
+            
+        };
+        return titleBorder;
     }
     
     public boolean isFullscreen() {
@@ -796,7 +840,7 @@ public final class ColonyPanel extends PortPanel
         // TODO: Display the name:
         //add(this.nameBox, "grow, span");
         
-        JPanel upperRightPanel = new JPanel(new MigLayout("wrap 1, ins 7 7 7 7, gap 0 0", "[center]")) {
+        upperRightPanel = new JPanel(new MigLayout("wrap 1, ins 7 7 7 7, gap 0 0", "[center]")) {
             {
                 /*
                  * XXX: This hack has been used before for creating the tooltip,

@@ -31,6 +31,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.gui.images.ColorizedImageCreator;
 import net.sf.freecol.client.gui.images.ImageCreators;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Ability;
@@ -972,6 +974,56 @@ public final class ImageLibrary {
         final String key = "image.colony.warehouse.background";
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }
+    
+    public BufferedImage createColonyTitleImage(Graphics2D g2d, String title, Player owner) {
+        final Color backgroundColor = owner.getNationColor();
+        final Color foregroundColor = makeForegroundColor(backgroundColor);
+        
+        final Font font = FontLibrary.getScaledFont("header-plain-large", title);
+        final FontMetrics fm = g2d.getFontMetrics(font);
+        final int textWidth = fm.stringWidth(title);
+        final int textHeight = fm.getMaxAscent() + fm.getMaxDescent();
+
+        final ColorizedImageCreator cic = imageCreators.getColorizedImageCreator();
+        final BufferedImage westImage = cic.getColorizedImage("image.colony.banner.w", FontLibrary.getFontScaling() / 2, backgroundColor);
+        final BufferedImage centerImage = cic.getColorizedImage("image.colony.banner.center", FontLibrary.getFontScaling() / 2, backgroundColor);
+        final BufferedImage eastImage = cic.getColorizedImage("image.colony.banner.e", FontLibrary.getFontScaling() / 2, backgroundColor);
+
+        int imageWidth = (westImage != null) ? westImage.getWidth() : 0;
+        imageWidth += (eastImage != null) ? eastImage.getWidth() : 0;
+        final int numCenterImages = Math.max(0, (int) Math.ceil((textWidth - imageWidth / 2) / ((double) centerImage.getWidth())));
+        imageWidth += centerImage.getWidth() * numCenterImages;
+        
+        final BufferedImage result = ImageUtils.createBufferedImage(imageWidth, centerImage.getHeight());
+        final Graphics2D resultG2D = result.createGraphics();
+        try {
+            resultG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            int x = 0;
+            if (westImage != null) {
+                resultG2D.drawImage(westImage, x, 0, null);
+                x += westImage.getWidth();
+            }
+            for (int i=0; i<numCenterImages; i++) {
+                resultG2D.drawImage(centerImage, x, 0, null);
+                x += centerImage.getWidth();
+            }
+            if (eastImage != null) {
+                resultG2D.drawImage(eastImage, x, 0, null);
+                x += eastImage.getWidth();
+            }
+            x = (imageWidth - textWidth) / 2;
+            final int y = (centerImage.getHeight() - textHeight) / 2 + fm.getAscent();
+
+            resultG2D.setFont(font);
+            resultG2D.setColor(foregroundColor);
+            resultG2D.drawString(title, x, y);
+        } finally {
+            resultG2D.dispose();
+        }
+
+        return result;
+    }
+   
 
     // Goods image handling
 

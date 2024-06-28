@@ -13,6 +13,7 @@ public final class ImageCreators {
     private final BeachTileAnimationImageCreator beachTileAnimationImageCreator;
     private final RiverAnimationImageCreator riverAnimationImageCreator;
     private final DeltaAnimationImageCreator deltaAnimationImageCreator;
+    private final ColorizedImageCreator colorizedImageCreator;
     
 
     public ImageCreators(ImageLibrary lib, ImageCache imageCache) {
@@ -20,6 +21,7 @@ public final class ImageCreators {
         this.beachTileAnimationImageCreator = new BeachTileAnimationImageCreator(lib, imageCache);
         this.riverAnimationImageCreator = new RiverAnimationImageCreator(lib, imageCache);
         this.deltaAnimationImageCreator = new DeltaAnimationImageCreator(lib, imageCache);
+        this.colorizedImageCreator = new ColorizedImageCreator(imageCache);
     }
     
     
@@ -37,5 +39,9 @@ public final class ImageCreators {
     
     public DeltaAnimationImageCreator getDeltaAnimationImageCreator() {
         return deltaAnimationImageCreator;
+    }
+    
+    public ColorizedImageCreator getColorizedImageCreator() {
+        return colorizedImageCreator;
     }
 }

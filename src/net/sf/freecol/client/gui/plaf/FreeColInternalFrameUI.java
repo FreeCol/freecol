@@ -33,6 +33,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalInternalFrameUI;
 
+import net.sf.freecol.client.gui.panel.FreeColBorder;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 
 public class FreeColInternalFrameUI extends MetalInternalFrameUI {
@@ -147,11 +148,11 @@ public class FreeColInternalFrameUI extends MetalInternalFrameUI {
         
         private boolean isOutOfBounds(MouseEvent e) {
             final Border border = frame.getBorder();
-            if (!(border instanceof FreeColImageBorder) ) {
+            if (!(border instanceof FreeColBorder) ) {
                 return false;
             }
             
-            final List<Rectangle> bounds = ((FreeColImageBorder) border).getOpenSpace(frame);
+            final List<Rectangle> bounds = ((FreeColBorder) border).getOpenSpace(frame);
             return bounds.stream().anyMatch(b -> b.contains(e.getPoint()));
         }
         

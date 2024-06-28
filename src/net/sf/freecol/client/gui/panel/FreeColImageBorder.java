@@ -41,7 +41,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * A border created from a set of images. 
  */
-public class FreeColImageBorder extends AbstractBorder {
+public class FreeColImageBorder extends AbstractBorder implements FreeColBorder {
 
     private static final List<FreeColImageBorder> borders = new ArrayList<>();
     
@@ -282,6 +282,7 @@ public class FreeColImageBorder extends AbstractBorder {
      * @param c The component having the border.
      * @return A list of areas that can be considered out-of-bounds for this border.
      */
+    @Override
     public List<Rectangle> getOpenSpace(Component c) {
         ensureInitialized();
         
@@ -307,6 +308,20 @@ public class FreeColImageBorder extends AbstractBorder {
         }
         
         return openSpace;
+    }
+    
+    /**
+     * Determines the inset of the top left corner.
+     */
+    public int getTopLeftCornerInsetY() {
+        final int top = max(
+                getHeight(topImage),
+                getHeight(topStartImage),
+                getHeight(topEndImage),
+                getHeight(topLeftCornerImage),
+                getHeight(topRightCornerImage)
+            );
+        return top - getHeight(topLeftCornerImage);
     }
 
     /**
