@@ -690,7 +690,7 @@ public final class ColonyPanel extends PortPanel
         
         if (fullscreen) {
             if (colonyTitleImage == null) {
-                colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner());
+                colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner(), false);
             }
             final int x = upperRightPanel.getX() + (upperRightPanel.getWidth() - colonyTitleImage.getWidth()) / 2;
             final int y = inPortScroll.getY() - colonyTitleImage.getHeight();
@@ -735,7 +735,7 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
                 if (colonyTitleImage == null) {
-                    colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner());
+                    colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner(), true);
                 }
                 final int borderOverlapY = getImageLibrary().scaleInt(6);
                 final int imageY = normalBorder.getTopLeftCornerInsetY() - colonyTitleImage.getHeight() + borderOverlapY;

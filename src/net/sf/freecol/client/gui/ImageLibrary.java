@@ -975,7 +975,7 @@ public final class ImageLibrary {
         return this.imageCache.getScaledImage(key, this.scaleFactor, false);
     }
     
-    public BufferedImage createColonyTitleImage(Graphics2D g2d, String title, Player owner) {
+    public BufferedImage createColonyTitleImage(Graphics2D g2d, String title, Player owner, boolean poles) {
         final Color backgroundColor = owner.getNationColor();
         final Color foregroundColor = makeForegroundColor(backgroundColor);
         
@@ -998,8 +998,15 @@ public final class ImageLibrary {
         final int numCenterImages = Math.max(0, (int) Math.ceil((textWidth - imageWidth / 2) / ((double) centerImage.getWidth())));
         imageWidth += centerImage.getWidth() * numCenterImages;
         
-        final int imageHeight = poleLeft.getHeight();
-        final int y = (poleLeft.getHeight() - centerImage.getHeight()) / 2;
+        final int imageHeight;
+        final int y;
+        if (poles) {
+            imageHeight = poleLeft.getHeight();
+            y = (poleLeft.getHeight() - centerImage.getHeight()) / 2;
+        } else {
+            imageHeight = centerImage.getHeight();
+            y = 0;
+        }
         
         final BufferedImage result = ImageUtils.createBufferedImage(imageWidth, imageHeight);
         final Graphics2D resultG2D = result.createGraphics();
@@ -1018,7 +1025,7 @@ public final class ImageLibrary {
             if (westImage != null) {
                 resultG2D.drawImage(westImage, x, y, null);
                 
-                if (poleLeft != null) {
+                if (poles && poleLeft != null) {
                     resultG2D.drawImage(poleLeft, x, 0, null);
                 }
                 
@@ -1030,7 +1037,7 @@ public final class ImageLibrary {
             }
             if (eastImage != null) {
                 resultG2D.drawImage(eastImage, x, y, null);
-                if (poleRight != null) {
+                if (poles && poleRight != null) {
                     resultG2D.drawImage(poleRight, x, 0, null);
                 }
                 x += eastImage.getWidth();
