@@ -2427,8 +2427,12 @@ public class Unit extends GoodsLocation
                     return (allowMoveFrom(from))
                         ? MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT
                         : MoveType.MOVE_NO_ACCESS_WATER;
-                } else if (settlement instanceof IndianSettlement
-                    && hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+                } else if (settlement instanceof IndianSettlement && hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+                    final IndianSettlement is = (IndianSettlement) settlement;
+                    if (!from.isLand() && is.getContactLevel(owner) == IndianSettlement.ContactLevel.UNCONTACTED) {
+                        return MoveType.MOVE_NO_ACCESS_CONTACT;
+                    }
+                                    
                     return (allowMoveFrom(from))
                         ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
                         : MoveType.MOVE_NO_ACCESS_WATER;
