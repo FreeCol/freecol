@@ -33,7 +33,6 @@ import static net.sf.freecol.common.util.Utils.deleteFile;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,8 +44,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -4491,6 +4488,7 @@ public final class InGameController extends FreeColClientHolder {
                 .addAmount("%amount%", Turn.getSeasonNumber()));
         }
         player.clearNationCache();
+        
         return true;
     }
 
@@ -5027,6 +5025,7 @@ public final class InGameController extends FreeColClientHolder {
 
             player.resetIterators();
             updateGUI(player.getFallbackTile(), false);
+            getGUI().refresh();
         }
         return true;
     }
