@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -130,7 +131,9 @@ public final class Server extends Thread {
      * @return The {@code Connection}.
      */
     public Connection getConnection(Socket socket) {
-        return this.connections.get(socket);
+        synchronized (connections) {
+            return this.connections.get(socket);
+        }
     }
 
     /**
@@ -140,7 +143,9 @@ public final class Server extends Thread {
      */
     public void addDummyConnection(Connection connection) {
         if (!this.running) return;
-        this.connections.put(new Socket(), connection);
+        synchronized (connections) {
+            this.connections.put(new Socket(), connection);
+        }
     }
 
     /**
@@ -150,7 +155,9 @@ public final class Server extends Thread {
      */
     public void addConnection(Connection connection) {
         if (!this.running) return;
-        this.connections.put(connection.getSocket(), connection);
+        synchronized (connections) {
+            this.connections.put(connection.getSocket(), connection);
+        }
     }
 
     /**
@@ -159,7 +166,9 @@ public final class Server extends Thread {
      * @param connection The connection that should be removed.
      */
     public void removeConnection(Connection connection) {
-        this.connections.remove(connection.getSocket());
+        synchronized (connections) {
+            this.connections.remove(connection.getSocket());
+        }
     }
 
     /**
@@ -168,8 +177,10 @@ public final class Server extends Thread {
      * @param mh The {@code MessageHandler} to use.
      */
     public void setMessageHandlerToAllConnections(MessageHandler mh) {
-        for (Connection c : this.connections.values()) {
-            c.setMessageHandler(mh);
+        synchronized (connections) {
+            for (Connection c : this.connections.values()) {
+                c.setMessageHandler(mh);
+            }
         }
     }
 
@@ -181,8 +192,14 @@ public final class Server extends Thread {
      *     to send to.
      */
     public void sendToAll(Message message, Connection exceptConnection) {
-        for (Connection conn : transform(connections.values(),
-                                         c -> c != exceptConnection)) {
+        final Collection<Connection> currentConnections;
+        synchronized (connections) {
+            currentConnections = connections.values();
+        }
+        for (Connection conn : currentConnections) {
+            if (conn == exceptConnection) {
+                continue;
+            }
 
             if (conn.isAlive()) {
                 try {
@@ -277,13 +294,20 @@ public final class Server extends Thread {
             logger.fine("Wait for Server.run to complete.");
         }
 
-        final List<Connection> oldConnections = new ArrayList<>(this.connections.values());
+        final List<Connection> oldConnections;
+        synchronized (connections) {
+            oldConnections= new ArrayList<>(this.connections.values());
+        }
+        
         for (Connection c : oldConnections) {
             if (c.isAlive()) {
                 c.disconnect();
             }
         }
-        this.connections.clear();
+        
+        synchronized (connections) {
+            this.connections.clear();
+        }
 
         this.freeColServer.removeFromMetaServer();
         logger.fine("Server shutdown.");
