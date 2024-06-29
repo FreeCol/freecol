@@ -737,10 +737,10 @@ public final class ColonyPanel extends PortPanel
                 if (colonyTitleImage == null) {
                     colonyTitleImage = getImageLibrary().createColonyTitleImage(((Graphics2D) g), colony.getName(), getColony().getOwner());
                 }
-                final int imageY = normalBorder.getTopLeftCornerInsetY() - colonyTitleImage.getHeight();
+                final int borderOverlapY = getImageLibrary().scaleInt(6);
+                final int imageY = normalBorder.getTopLeftCornerInsetY() - colonyTitleImage.getHeight() + borderOverlapY;
                 final int paddingX = getImageLibrary().scaleInt(23);
-                final int paddingY = getImageLibrary().scaleInt(5);
-                g.drawImage(colonyTitleImage, paddingX, imageY - paddingY, null);
+                g.drawImage(colonyTitleImage, paddingX, imageY, null);
                 normalBorder.paintBorder(c, g, x, y, width, height);
             }
 

@@ -985,38 +985,53 @@ public final class ImageLibrary {
         final int textHeight = fm.getMaxAscent() + fm.getMaxDescent();
 
         final ColorizedImageCreator cic = imageCreators.getColorizedImageCreator();
-        final BufferedImage westImage = cic.getColorizedImage("image.colony.banner.w", FontLibrary.getFontScaling() / 2, backgroundColor);
-        final BufferedImage centerImage = cic.getColorizedImage("image.colony.banner.center", FontLibrary.getFontScaling() / 2, backgroundColor);
-        final BufferedImage eastImage = cic.getColorizedImage("image.colony.banner.e", FontLibrary.getFontScaling() / 2, backgroundColor);
+        final float bannerScaleFactor = FontLibrary.getFontScaling() / 2;
+        final BufferedImage westImage = cic.getColorizedImage("image.colony.banner.w", bannerScaleFactor, backgroundColor);
+        final BufferedImage centerImage = cic.getColorizedImage("image.colony.banner.center", bannerScaleFactor, backgroundColor);
+        final BufferedImage eastImage = cic.getColorizedImage("image.colony.banner.e", bannerScaleFactor, backgroundColor);
+        
+        final BufferedImage poleLeft = this.imageCache.getScaledImage("image.colony.banner.pole.w", bannerScaleFactor, false);
+        final BufferedImage poleRight = this.imageCache.getScaledImage("image.colony.banner.pole.e", bannerScaleFactor, false);
 
         int imageWidth = (westImage != null) ? westImage.getWidth() : 0;
         imageWidth += (eastImage != null) ? eastImage.getWidth() : 0;
         final int numCenterImages = Math.max(0, (int) Math.ceil((textWidth - imageWidth / 2) / ((double) centerImage.getWidth())));
         imageWidth += centerImage.getWidth() * numCenterImages;
         
-        final BufferedImage result = ImageUtils.createBufferedImage(imageWidth, centerImage.getHeight());
+        final int imageHeight = poleLeft.getHeight();
+        final int y = (poleLeft.getHeight() - centerImage.getHeight()) / 2;
+        
+        final BufferedImage result = ImageUtils.createBufferedImage(imageWidth, imageHeight);
         final Graphics2D resultG2D = result.createGraphics();
         try {
             resultG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             int x = 0;
             if (westImage != null) {
-                resultG2D.drawImage(westImage, x, 0, null);
+                resultG2D.drawImage(westImage, x, y, null);
+                
+                if (poleLeft != null) {
+                    resultG2D.drawImage(poleLeft, x, 0, null);
+                }
+                
                 x += westImage.getWidth();
             }
             for (int i=0; i<numCenterImages; i++) {
-                resultG2D.drawImage(centerImage, x, 0, null);
+                resultG2D.drawImage(centerImage, x, y, null);
                 x += centerImage.getWidth();
             }
             if (eastImage != null) {
-                resultG2D.drawImage(eastImage, x, 0, null);
+                resultG2D.drawImage(eastImage, x, y, null);
+                if (poleRight != null) {
+                    resultG2D.drawImage(poleRight, x, 0, null);
+                }
                 x += eastImage.getWidth();
             }
             x = (imageWidth - textWidth) / 2;
-            final int y = (centerImage.getHeight() - textHeight) / 2 + fm.getAscent();
+            final int textY = y + (centerImage.getHeight() - textHeight) / 2 + fm.getAscent();
 
             resultG2D.setFont(font);
             resultG2D.setColor(foregroundColor);
-            resultG2D.drawString(title, x, y);
+            resultG2D.drawString(title, x, textY);
         } finally {
             resultG2D.dispose();
         }
