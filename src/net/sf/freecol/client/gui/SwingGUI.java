@@ -2188,7 +2188,17 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showDeclarationPanel(Runnable afterClosing) {
-        this.widgets.showDeclarationPanel(afterClosing);
+        mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(true);
+        try {
+            this.widgets.showDeclarationPanel(() -> {
+                mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
+                refresh();
+                afterClosing.run();
+            });
+        } catch (RuntimeException e) {
+            mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
+            throw e;
+        }
     }
 
     /**

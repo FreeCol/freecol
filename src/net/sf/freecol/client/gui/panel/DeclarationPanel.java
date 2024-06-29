@@ -240,6 +240,7 @@ public final class DeclarationPanel extends FreeColPanel {
          * @param name The name to be used when making the signature.
          */
         public void initialize(String name) {
+            name = faFile.onlyValidCharacters(name);
             name = getAbbreviatedName(name);
 
             points = faFile.getPoints(name);
