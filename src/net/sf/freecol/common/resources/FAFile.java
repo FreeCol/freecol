@@ -71,7 +71,7 @@ public class FAFile {
             final char c = text.charAt(i);
             FALetter fl = getLetter(c);
             if (fl == null) {
-                logger.warning("Missing character in FAF: " + fl);
+                logger.warning("Missing character in FAF: " + c);
                 continue;
             }
             sb.append(c);
