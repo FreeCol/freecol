@@ -1345,6 +1345,7 @@ public class SwingGUI extends GUI {
         }
         
         this.mapViewer.getMapViewerState().setActiveUnit(dragUnit);
+        updateMapControls();
         
         setDragPoint(x, y);
         this.canvas.requestFocus();
