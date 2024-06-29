@@ -4783,8 +4783,13 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
-        if (askServer().rename((FreeColGameObject)object, name)) {
-            updateGUI(null, false);
+        if (askServer().rename((FreeColGameObject) object, name)) {
+            invokeLater(() -> {
+                final GUI gui = getGUI();
+                gui.updateMapControls();
+                gui.updateMenuBar();
+                gui.refresh();
+            });
             return true;
         }
         return false;
