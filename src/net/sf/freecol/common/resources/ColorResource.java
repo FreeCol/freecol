@@ -101,7 +101,11 @@ public class ColorResource extends Resource {
     private static Color createColor(String colorName) {
         if (isHexString(colorName)) {
             try {
-                int col = Integer.decode(colorName);
+                /*
+                 * We have to read the value as a long and then cast it in order
+                 * to avoid overflow when specifying the alpha.
+                 */
+                final int col = (int) Long.decode(colorName).longValue();
                 return new Color(col, colorName.length() > 8);
             } catch (NumberFormatException e) {
                 logger.warning("Failed to decode hex colour string: "
