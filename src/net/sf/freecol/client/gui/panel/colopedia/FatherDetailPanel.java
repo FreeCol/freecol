@@ -147,16 +147,9 @@ public class FatherDetailPanel
                 .addStringTemplate(turn.getLabel());
         }
 
-        panel.add(header, "span, align center, wrap 40");
+        panel.add(header, "span, align center, wrap");
         panel.add(label, "top");
         JTextArea description = Utility.localizedTextArea(template, 20);
         panel.add(description, "top, growx, wmin 0");
-
-        Dimension hSize = header.getPreferredSize(),
-            lSize = label.getPreferredSize(),
-            dSize = description.getPreferredSize(), size = new Dimension();
-        size.setSize(lSize.getWidth() + dSize.getWidth() + 20,
-            hSize.getHeight() + lSize.getHeight() + 10);
-        panel.setPreferredSize(size);            
     }
 }

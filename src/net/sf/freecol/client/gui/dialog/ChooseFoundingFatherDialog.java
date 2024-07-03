@@ -91,7 +91,7 @@ public final class ChooseFoundingFatherDialog
         panel.add(Utility.localizedHeader("chooseFoundingFatherDialog.title",
                                           Utility.FONTSPEC_TITLE));
         panel.add(helpButton, "tag help");
-        panel.add(tb, "width 100%");
+        panel.add(tb, "width 100%, height 400!");
 
         List<ChoiceItem<FoundingFather>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), (FoundingFather)null)
