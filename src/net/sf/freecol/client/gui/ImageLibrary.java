@@ -931,17 +931,22 @@ public final class ImageLibrary {
      * The result have to be cached by the caller of this method as long as the image is needed.
      * 
      * @param defensiveBuilding The building to get the graphics for.
+     * @param nation The nation (if a nation specific iamge is available).
      * @param size The size of the background.
      * @return The image, resized to the given {@code size} without honoring the aspect ratio.
      */
-    public static BufferedImage getUncachedOutsideColonyBackground(BuildingType defensiveBuilding, Dimension size) {
+    public static BufferedImage getUncachedOutsideColonyBackground(BuildingType defensiveBuilding, String nation, Dimension size) {
         final String key;
         if (defensiveBuilding == null) {
             key = "image.buildingOutside.background.default";
         } else {
             key = "image.buildingOutside.background." + defensiveBuilding.getId();
         }
-        final ImageResource ir = ResourceManager.getImageResource(key, false);
+        
+        ImageResource ir = ResourceManager.getImageResource(key + "." + nation, false);
+        if (ir == null) {
+            ir = ResourceManager.getImageResource(key, false);
+        }
         if (ir == null) {
             return null;
         }

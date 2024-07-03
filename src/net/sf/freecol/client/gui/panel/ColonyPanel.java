@@ -705,7 +705,7 @@ public final class ColonyPanel extends PortPanel
         if (outsideColonyImage == null
                 || outsideColonyImage.getWidth() != outsideColonySize.width
                 || outsideColonyImage.getHeight() != outsideColonySize.height) {
-            outsideColonyImage = ImageLibrary.getUncachedOutsideColonyBackground(buildingType, outsideColonySize);
+            outsideColonyImage = ImageLibrary.getUncachedOutsideColonyBackground(buildingType, getColony().getOwner().getNationResourceKey(), outsideColonySize);
             cachedDefensiveBuildingImage.put(buildingType, outsideColonyImage);
         } 
         if (outsideColonyImage == null) {
