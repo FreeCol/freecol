@@ -3362,13 +3362,13 @@
             nation-type="model.nationType.apache"/>
     <nation id="model.nation.tupi" color="0x045c04"
             nation-type="model.nationType.tupi"/>
-    <nation id="model.nation.dutchREF" color="0xcc5500"
+    <nation id="model.nation.dutchREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.frenchREF" color="0x6050dc"
+    <nation id="model.nation.frenchREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.englishREF" color="0xde3163"
+    <nation id="model.nation.englishREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.spanishREF" color="0xffdf00"
+    <nation id="model.nation.spanishREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
             
     <nation id="model.nation.portuguese" color="0x00ff00"
@@ -3380,17 +3380,17 @@
     <nation id="model.nation.danish" color="0xff00bf"
             nation-type="model.nationType.agriculture" selectable="true"
             preferred-latitude="-64" ref="model.nation.danishREF"/>
-    <nation id="model.nation.russian" color="0xffffff"
+    <nation id="model.nation.russian" color="0xaaaaaa"
             nation-type="model.nationType.furTrapping" selectable="true"
             preferred-latitude="-55" starts-on-east-coast="false"
             ref="model.nation.russianREF"/>
-    <nation id="model.nation.portugueseREF" color="0xbfff00"
+    <nation id="model.nation.portugueseREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.swedishREF" color="0x367588"
+    <nation id="model.nation.swedishREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.danishREF" color="0x91006d"
+    <nation id="model.nation.danishREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.russianREF" color="0xbebebe"
+    <nation id="model.nation.russianREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
   </nations>
 
