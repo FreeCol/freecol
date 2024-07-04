@@ -119,7 +119,7 @@
         <!-- Option for autoscrolling when hitting the boundaries of the
              mapboard. -->
         <booleanOption id="model.option.autoScroll"
-                       defaultValue="false"/>
+                       defaultValue="true"/>
         <!-- Whether to display the grid by default or not. -->
         <booleanOption id="model.option.displayGrid"
                        defaultValue="false"/>
