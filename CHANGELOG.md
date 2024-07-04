@@ -46,7 +46,7 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * Bugfix: An error message is now properly displayed if trying to contact natives with a scout onboard a ship.
 * Bugfix: Solved an issue with the Founding Father panel missing the OK button in some languages. 
 * Bugfix: REF color is now white for all REF players and Russia is grey (only if the game was started using this version or later). 
-* BUgfix: Fixes an issue where the unit info panel displays outdated info. The bug could be reproduced by right-clicking on a tile and then selecting a unit.
+* Bugfix: Fixes an issue where the unit info panel displays outdated info. The bug could be reproduced by right-clicking on a tile and then selecting a unit.
 
 ### Map Editor ###
 * Allow the minimap and other map controls to be resized in the map editor.
