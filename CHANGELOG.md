@@ -1,8 +1,9 @@
-## FreeCol 1.2.0 (In development) ##
+## FreeCol 1.2.0 (4th of July, 2024) ##
 
-All savegames from 0.12.0 and up should continue working with 1.2.0.
+All savegames (without mods) from 0.12.0 and up should continue working with 1.2.0.
 
 ### Graphics ###
+* Awesome new building graphics from Misiulo.
 * Massive redesign of the colony panel with background images and other styling
 * A new styling for the top menu bar with better contrast. This includes changes like showing the top level menus in a button like style.
 * New styling for radio and checkbox buttons.
@@ -15,6 +16,7 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 
 ### Rule Changes ###
 * Adding the four extra nations to the classic ruleset. These nations are deactivated by default. Having them as a part of the classic ruleset make it easier to play a game with the classic rules, while still having additional players.
+* Deactivates being able to starve out native settlements.
 * Bugfix: Fixed a bug that made native settlements be scattered all over the map instead of being grouped by nation (this happened mostly on small maps).
 * Bugfix for "Shippable wagons mod": Wagon trains can now be built when the shippable wagons mod has been enabled.
 
@@ -34,12 +36,17 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 * The panel showing the signing of the Declaration of Independence is now made larger on bigger screens.
 * Panels can now cover the entire mapboard area (this is needed for very small screens in order to show all content).
 * The confirm declaration dialog now fits on small screen.
+* 6688 translation string updated (in total) for 38 languages.
 * Bugfix: Fixes hidden OK-button in the Colopedia on small screens. 
 * Bugfix: The height of a colony building no longer changes when a worker is added.
 * Bugfix: Lots of small rendering differences between different systems (DPI and OS) have been fixed.
 * Bugfix: Caps the automatic font size at no more than 25% larger than the current scaleFactor.
 * Bugfix: Hides the display of the "option only"-nation type from the start game panel
 * Bugfix: Fixes the tab order on the new game panel.
+* Bugfix: An error message is now properly displayed if trying to contact natives with a scout onboard a ship.
+* Bugfix: Solved an issue with the Founding Father panel missing the OK button in some languages. 
+* Bugfix: REF color is now white for all REF players and Russia is grey (only if the game was started using this version or later). 
+* BUgfix: Fixes an issue where the unit info panel displays outdated info. The bug could be reproduced by right-clicking on a tile and then selecting a unit.
 
 ### Map Editor ###
 * Allow the minimap and other map controls to be resized in the map editor.
@@ -60,6 +67,11 @@ All savegames from 0.12.0 and up should continue working with 1.2.0.
 * Added "preserve-attributes" that, if true, preserves the attributes of a specification element. This simplifies changing only the subelements. Please note that any "extends" attribute still needs to be repeated since this attributes changes the subelements.
 * The game now displays mod initialization errors to the user in the new game and start game dialogs.
 * An exception is now thrown if a referenced type is used before it's defined.
+
+### Other bug fixes ###
+* Fixed an issue that prevented the Declaration of Independence if the player name had non-ascii characters.
+* Allows automated trade routes to unload goods in colonies with more than 100 goods. In addition, unloading food is now always allowed.
+* Fixes an issue where moving goods into/out from a colony messes up the production. The most noticeable effect of this bug was colonists starving to death while a new colonist was born.
 
 
 ## FreeCol 1.1.0 (May 7, 2023) ##
