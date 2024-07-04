@@ -1,0 +1,109 @@
+---
+  title: FreeCol 1.2.0 released
+  author: Stian Grenborgen 
+---
+<div align="left" style="margin-bottom: 1em;">
+    This release features a new Colony panel with improved building graphics. In addition, there are lots of nice improvements and essential bug fixes.
+    
+    <p align="center">
+        <img src="/images/colony-panel.jpg" style="width: 100%; max-width: 580px;" />
+    </p>
+</div>
+<div align="left">
+    All savegames (without mods) from 0.12.0 and up should continue working with 1.2.0.
+</div>
+<div align="center">
+    <br />
+    {% include download-button.html %}
+</div>
+<div align="left">
+    <br />
+    <h2>User visible changes since 1.1.0</h2>
+    
+    <strong>Graphics</strong>
+    <ul>
+        <li>Awesome new building graphics from Misiulo.</li>
+        <li>Massive redesign of the colony panel with background images and other styling</li>
+        <li>A new styling for the top menu bar with better contrast. This includes changes like showing the top level menus in a button like style.</li>
+        <li>New styling for radio and checkbox buttons.</li>
+        <li>The face of Peter Minuit now has more realistic coloring. </li>
+    </ul>
+
+    <strong>Performance</strong>
+    <ul>
+        <li>Improved rendering performance, and especially when scrolling or moving units.</li>
+        <li>Allow to run FreeCol with only 512MB memory. Please keep in mind that 2GB is still needed for higher resolution, smoother scroll and high rendering quality.</li>
+        <li>Better handling of memory -- for example prioritized automatic clearing of caches when running low on memory.</li>
+    </ul>
+
+    <strong>Rule Changes</strong>
+    <ul>
+        <li>Adding the four extra nations to the classic ruleset. These nations are deactivated by default. Having them as a part of the classic ruleset make it easier to play a game with the classic rules, while still having additional players.</li>
+        <li>Deactivates being able to starve out native settlements.</li>
+        <li>Bugfix: Fixed a bug that made native settlements be scattered all over the map instead of being grouped by nation (this happened mostly on small maps).</li>
+        <li>Bugfix for "Shippable wagons mod": Wagon trains can now be built when the shippable wagons mod has been enabled.</li>
+    </ul>
+
+    <strong>User Interface</strong>
+    <ul>
+        <li>The mapboard scrolling is now much smoother and supports pixel-by-pixel scrolling.</li>
+        <li>Allowing scrolling past the borders of a map so that edge tiles can also be placed in focus.</li>
+        <li>It's now possible to use 75% display scaling. This can be used when playing on very small screens where fixed size dialogs would otherwise be larger than the screen.</li>
+        <li>The warehouse dialog can now be resized.</li>
+        <li>Focus is now changed on the mapboard with a single mouse click.</li>
+        <li>Unit dragging can now only be started by clicking on the unit (in order to reduce the likelyhood of accidental goto-orders). In addition, the drag can now be started for units that are currently not the active unit.</li>
+        <li>The active unit is kept when opening a colony panel.</li>
+        <li>The colony panel now works better on small screens.</li>
+        <li>The build queue is no longer displayed when clicking on other buildings than the carpenter type of buildings. </li>
+        <li>The colony panel can now be more easily dragged by clicking-and-dragging almost anywhere on the colony panel's open spaces.</li>
+        <li>Various fixes and a new visualization of goto-paths.</li>
+        <li>Buildings are now randomly distributed in the colony based on the available space, and can be of different sizes.</li>
+        <li>The panel showing the signing of the Declaration of Independence is now made larger on bigger screens.</li>
+        <li>Panels can now cover the entire mapboard area (this is needed for very small screens in order to show all content).</li>
+        <li>The confirm declaration dialog now fits on small screen.</li>
+        <li>6688 translation string updated (in total) for 38 languages.</li>
+        <li>Bugfix: Fixes hidden OK-button in the Colopedia on small screens. </li>
+        <li>Bugfix: The height of a colony building no longer changes when a worker is added.</li>
+        <li>Bugfix: Lots of small rendering differences between different systems (DPI and OS) have been fixed.</li>
+        <li>Bugfix: Caps the automatic font size at no more than 25% larger than the current scaleFactor.</li>
+        <li>Bugfix: Hides the display of the "option only"-nation type from the start game panel</li>
+        <li>Bugfix: Fixes the tab order on the new game panel.</li>
+        <li>Bugfix: An error message is now properly displayed if trying to contact natives with a scout onboard a ship.</li>
+        <li>Bugfix: Solved an issue with the Founding Father panel missing the OK button in some languages. </li>
+        <li>Bugfix: REF color is now white for all REF players and Russia is grey (only if the game was started using this version or later). </li>
+        <li>Bugfix: Fixes an issue where the unit info panel displays outdated info. The bug could be reproduced by right-clicking on a tile and then selecting a unit.</li>
+    </ul>
+
+    <strong>Map Editor</strong>
+    <ul>
+        <li>Allow the minimap and other map controls to be resized in the map editor.</li>
+        <li>The areas for native nations can now be defined in the map editor. These areas mark the allowed locations for native settlements for each nations. Overlapping areas are allowed, since proper distance between native settlements are still checked, and can be used for having a random element to the overlap/size of each nation. In addition, it's still possible to define specific settlements that will be used if "Import settlements" is checked when starting a new game.</li>
+        <li>The starting areas for European nations can now be defined in the map editor. A random tile in each nation's starting area is used when starting a new game. The areas may overlap.</li>
+        <li>Unit order buttons are now hidden when in the map editor.</li>
+        <li>Bugfix: Fixes a bug where map width was used for height, and the other way around, when scaling a map in the map editor.</li>
+        <li>Bugfix: A new game is now always loaded before importing or generating a new map. This fixes lots of issues caused by stuff from the old map leaking into the new one.</li>
+    </ul>
+
+    <strong>AI/computer players</strong>
+    <ul>
+        <li>Bugfix: Fixed a bug that prevented the REF computer player (AI) from completing its turn.</li>
+        <li>Bugfix: Fixed a bug preventing the REF from surrendering.</li>
+        <li>Bugfix: Fixed a bug where the AI sometimes sent ships back and forth to Europe without doing anything.</li>
+    </ul>
+
+    <strong>Mod development</strong>
+    <ul>
+        <li>Adding an empty image resource file (resource:image.empty) to be used for replacing images with empty space.</li>
+        <li>Mods can now reference abstract types from the base rule without extending a specific base rule.</li>
+        <li>Added "preserve-attributes" that, if true, preserves the attributes of a specification element. This simplifies changing only the subelements. Please note that any "extends" attribute still needs to be repeated since this attributes changes the subelements.</li>
+        <li>The game now displays mod initialization errors to the user in the new game and start game dialogs.</li>
+        <li>An exception is now thrown if a referenced type is used before it's defined.</li>
+    </ul>
+
+    <strong>Other bug fixes</strong>
+    <ul>
+        <li>Fixed an issue that prevented the Declaration of Independence if the player name had non-ascii characters.</li>
+        <li>Allows automated trade routes to unload goods in colonies with more than 100 goods. In addition, unloading food is now always allowed.</li>
+        <li>Fixes an issue where moving goods into/out from a colony messes up the production. The most noticeable effect of this bug was colonists starving to death while a new colonist was born.</li>
+    </ul>
+</div>
