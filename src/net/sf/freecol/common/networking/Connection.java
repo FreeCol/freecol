@@ -95,6 +95,8 @@ public class Connection implements Closeable {
 
     /** The subthread to read the input. */
     private ReceivingThread receivingThread;
+    
+    private final Object receivingThreadLock = new Object();
 
     /** The message handler to process incoming messages with. */
     private MessageHandler messageHandler = null;
@@ -586,10 +588,12 @@ public class Connection implements Closeable {
      * Close this connection.
      */
     public void close() {
-        if (this.receivingThread != null) {
-            this.receivingThread.askToStop("connection closing");
-            this.receivingThread.interrupt();
-            this.receivingThread = null;
+        synchronized (receivingThreadLock) {
+            if (this.receivingThread != null) {
+                this.receivingThread.askToStop("connection closing");
+                this.receivingThread.interrupt();
+                this.receivingThread = null;
+            }
         }
 
         // Close the socket before the input stream.  Socket closure will
