@@ -530,6 +530,8 @@
             <arg value="FreeCol.jar"/>
             <arg value="--win-dir-chooser"/>
             <arg value="--win-menu"/>
+            <arg value="--win-menu-group"/>
+            <arg value="FreeCol"/>
             <arg value="--win-shortcut"/>
             <arg value="--arguments"/>
             <arg value="--freecol-data app/data"/>
@@ -537,6 +539,8 @@
             <arg value="${freecol.version}"/>
             <arg value="--icon"/>
             <arg file="packaging/icons/freecol.ico"/>
+            <arg value="--add-launcher"/>
+            <arg value="FreeCol (2GB memory)=packaging/launchers/win-fixed-mem.properties"/>
         </exec>
     	
         <mkdir dir="${freecol.release.dir}/releases"/>
