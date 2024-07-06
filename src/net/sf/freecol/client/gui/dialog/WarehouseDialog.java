@@ -128,7 +128,6 @@ public final class WarehouseDialog extends FreeColPanel {
     
     private JScrollPane scrollPaneWithHiddenBorder(final JPanel warehousePanel) {
         final JScrollPane scrollPane = new JScrollPane(warehousePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         return scrollPane;

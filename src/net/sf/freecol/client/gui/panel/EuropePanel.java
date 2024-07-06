@@ -689,30 +689,24 @@ public final class EuropePanel extends PortPanel {
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        toAmericaScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        toEuropeScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane inPortScroll = new JScrollPane(inPortPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        cargoScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane docksScroll = new JScrollPane(europeanDocksPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        docksScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane marketScroll = new JScrollPane(marketPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane logScroll = new JScrollPane(log,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
         toAmericaPanel.setBorder(Utility.localizedBorder("sailingToAmerica"));
         toEuropePanel.setBorder(Utility.localizedBorder("sailingToEurope"));

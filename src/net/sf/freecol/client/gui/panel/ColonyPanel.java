@@ -406,7 +406,6 @@ public final class ColonyPanel extends PortPanel
                 }
             }
         });
-        buildingsScroll.getVerticalScrollBar().setUnitIncrement(16);
         buildingsScroll.getViewport().setOpaque(false);
         buildingsScroll.setBorder(null);
         buildingsScroll.getViewport().addMouseListener(frameMoveDispatchListener);
@@ -427,7 +426,6 @@ public final class ColonyPanel extends PortPanel
         inPortScroll = new JScrollPane(inPortPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
         inPortScroll.setBorder(null);
         inPortScroll.setOpaque(false);
         inPortScroll.getViewport().setOpaque(false);
@@ -438,7 +436,6 @@ public final class ColonyPanel extends PortPanel
         outsideColonyScroll = new JScrollPane(outsideColonyPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        outsideColonyScroll.getVerticalScrollBar().setUnitIncrement(16);
         outsideColonyScroll.setBorder(null);
         outsideColonyScroll.setOpaque(false);
         outsideColonyScroll.getViewport().setOpaque(false);

@@ -96,7 +96,6 @@ public final class ColopediaPanel extends FreeColPanel
             }
         };
 
-        sl.getVerticalScrollBar().setUnitIncrement(16);
         sl.getViewport().setOpaque(false);
 
         detailPanel = new MigPanel("ColopediaPanelUI");
@@ -104,7 +103,6 @@ public final class ColopediaPanel extends FreeColPanel
         JScrollPane detail = new JScrollPane(detailPanel,
                                              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        detail.getVerticalScrollBar().setUnitIncrement(16);
         detail.getViewport().setOpaque(false);
         
         select(id);
