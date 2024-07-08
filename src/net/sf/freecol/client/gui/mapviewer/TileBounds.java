@@ -65,20 +65,5 @@ public final class TileBounds {
     
     public int getHalfHeight() {
         return halfHeight;
-    }  
-    
-    /**
-     * Gets the position where a unitLabel located at tile should be drawn.
-     *
-     * @param unitLabel The unit label.
-     * @param tileP The position of the {@code Tile} on the screen.
-     * @return The position where to put the label, null if tileP is null.
-     */
-    Point calculateUnitLabelPositionInTile(JLabel unitLabel,
-                                                  Point tileP) {
-        if (tileP == null) return null;
-        int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
-        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2;
-        return new Point(labelX, labelY);
     }
 }

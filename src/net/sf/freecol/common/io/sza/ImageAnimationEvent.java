@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.io.sza;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 /**
  * An event describing that the given image should
@@ -31,7 +31,7 @@ public interface ImageAnimationEvent extends AnimationEvent {
      * Returns the image this event contains.
      * @return The image to be displayed. 
      */
-    public Image getImage();
+    public BufferedImage getImage();
     
     /**
      * Returns the duration the image should be displayed.

@@ -52,6 +52,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -1369,6 +1370,23 @@ public final class MapViewer extends FreeColClientHolder {
         int unitY = (tileBounds.getHeight() - unitImage.getHeight()) / 2
             - this.lib.scaleInt(TileBounds.UNIT_OFFSET);
         return new Point(unitX, unitY);
+    }
+    
+    /**
+     * Gets the position where a unitLabel located at tile should be drawn.
+     *
+     * @param unitLabel The unit label.
+     * @param tileP The position of the {@code Tile} on the screen.
+     * @return The position where to put the label, null if tileP is null.
+     */
+    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+        if (tileP == null) {
+            return null;
+        }
+        final int labelX = tileP.x + (tileBounds.getWidth() - unitLabel.getWidth()) / 2;
+        final int labelY = tileP.y + (tileBounds.getHeight() - unitLabel.getHeight()) / 2 - this.lib.scaleInt(TileBounds.UNIT_OFFSET);
+        
+        return new Point(labelX, labelY);
     }
 
     /**

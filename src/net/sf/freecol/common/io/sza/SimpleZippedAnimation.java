@@ -107,7 +107,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
          * {@inheritDoc}
          */
         @Override
-        public Image getImage() {
+        public BufferedImage getImage() {
             return this.image;
         }
         

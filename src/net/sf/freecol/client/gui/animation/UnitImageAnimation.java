@@ -19,7 +19,10 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -175,12 +178,18 @@ public final class UnitImageAnimation extends Animation {
             long time = System.nanoTime();
             if (event instanceof ImageAnimationEvent) {
                 final ImageAnimationEvent ievent = (ImageAnimationEvent)event;
-                Image image = ievent.getImage();
+                BufferedImage image = ievent.getImage();
                 if (mirror) {
                     // FIXME: Add mirroring functionality to SimpleZippedAnimation
                     image = createMirroredImage(image);
                 }
+                final Dimension origSize = unitLabel.getSize();
                 icon.setImage(image);
+                final Dimension newSize = new Dimension(image.getWidth(), image.getHeight());
+                unitLabel.setSize(newSize);
+                final Point newLoc = unitLabel.getLocation();
+                newLoc.translate((origSize.width - newSize.width) / 2, (origSize.height - newSize.height) / 2);
+                unitLabel.setLocation(newLoc);
                 paintCallback.execute(); // paint now
 
                 // Time accounting

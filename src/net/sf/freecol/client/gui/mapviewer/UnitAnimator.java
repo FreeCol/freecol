@@ -1,6 +1,5 @@
 package net.sf.freecol.client.gui.mapviewer;
 
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.ImageUtils;
 
 /**
  * Handles taking units of of the map rendering in order to be animated using {@code JLabel}s.
@@ -101,8 +99,8 @@ public class UnitAnimator {
      * @return The {@code Point} to position the label.
      */
     public Point getAnimationPosition(JLabel unitLabel, Tile tile) {
-        return mapViewer.getTileBounds().calculateUnitLabelPositionInTile(unitLabel,
-            mapViewer.getMapViewerBounds().calculateTilePosition(tile, false));
+        final Point tilePosition = mapViewer.getMapViewerBounds().calculateTilePosition(tile, false);
+        return mapViewer.calculateUnitLabelPositionInTile(unitLabel, tilePosition);
     }
     
     /**
@@ -112,22 +110,13 @@ public class UnitAnimator {
      * @return A {@code JLabel} to use in animation.
      */
     private JLabel createUnitAnimationLabel(Unit unit) {
-        final BufferedImage unitImg =  this.lib.getScaledUnitImage(unit);
-        
-        final int scaledUnitOffset = (int) (TileBounds.UNIT_OFFSET * lib.getScaleFactor());
-        final int width = Math.max(unitImg.getWidth(), mapViewer.getTileBounds().getWidth());
-        final int height = Math.max(unitImg.getHeight() + scaledUnitOffset * 2, mapViewer.getTileBounds().getHeight());
+        final BufferedImage unitImg = this.lib.getScaledUnitImage(unit);
 
-        BufferedImage img = ImageUtils.createBufferedImage(width, height);
-        Graphics2D g2d = img.createGraphics();
-        g2d.translate((width - mapViewer.getTileBounds().getWidth()) / 2,
-                (height - mapViewer.getTileBounds().getHeight()) / 2);
+        final JLabel label = new JLabel(new ImageIcon(unitImg));
+        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setVerticalAlignment(JLabel.CENTER);
+        label.setSize(unitImg.getWidth(), unitImg.getHeight());
 
-        mapViewer.displayUnit(g2d, unit);
-
-        final JLabel label = new JLabel(new ImageIcon(img));
-        label.setSize(width, height);
-        g2d.dispose();
         return label;
     }
 }
