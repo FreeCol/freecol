@@ -982,7 +982,6 @@ public class SwingGUI extends GUI {
                                          attacker, defender,
                                          attackerTile, defenderTile,
                                          success, getMapScale()));
-        refreshTilesForUnit(attacker, attackerTile, defenderTile);
     }
     
     /**
@@ -992,35 +991,8 @@ public class SwingGUI extends GUI {
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         animations(Animations.unitMove(getFreeColClient(),
                 unit, srcTile, dstTile, getMapScale()));
-        refreshTilesForUnit(unit, srcTile, dstTile);
     }
     
-    /**
-     * Refreshes and repaints the unit and tiles.
-     * 
-     * @param unit The {@code Unit} that may have moved, and which we should
-     *      use the line-of-sight for invalidating tiles.
-     * @param srcTile The source for the unit.
-     * @param dstTile The destination tile for the unit.
-     */
-    private void refreshTilesForUnit(Unit unit, Tile srcTile, Tile dstTile) {
-        if (unit != null && srcTile != null) {
-            final List<Tile> possibleDirtyTiles = srcTile.getSurroundingTiles(0, unit.getLineOfSight());
-            mapViewer.getMapViewerRepaintManager().markAsDirty(possibleDirtyTiles);
-        }
-        if (unit != null && dstTile != null) {
-            final List<Tile> possibleDirtyTiles = dstTile.getSurroundingTiles(0, unit.getLineOfSight());
-            mapViewer.getMapViewerRepaintManager().markAsDirty(possibleDirtyTiles);
-        }
-        
-        if (this.mapControls != null) {
-            this.mapControls.updateMinimap();
-        }
-        
-        repaint();
-    }
-
-
     // Dialog primitives
 
     /**
