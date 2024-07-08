@@ -465,7 +465,7 @@ public final class MapViewerBounds {
      */
     public Rectangle calculateDrawnTileBounds(Tile tile) {
         if (!isTileVisible(tile)) {
-            return new Rectangle(0, 0, 0, 0);
+            return new Rectangle(0, 0, -1, -1);
         }
             
         final Point p = tileToPoint(tile);
