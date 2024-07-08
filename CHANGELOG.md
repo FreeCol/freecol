@@ -1,3 +1,15 @@
+## FreeCol 1.2.1 (In development) ##
+
+All savegames (without mods) from 0.12.0 and up should continue working with 1.2.1.
+
+### User Interface ###
+* 10 in now the minimum font size. This mitigates the effect from low reported DPI on macos when a non-native resolution is used.
+* Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
+
+### Performance ###
+* Unit movements are now faster (area redrawn when moving is reduced).
+
+
 ## FreeCol 1.2.0 (4th of July, 2024) ##
 
 All savegames (without mods) from 0.12.0 and up should continue working with 1.2.0.
