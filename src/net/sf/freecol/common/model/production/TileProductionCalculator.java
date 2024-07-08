@@ -23,6 +23,8 @@ import static net.sf.freecol.common.util.CollectionUtils.concat;
 import static net.sf.freecol.common.util.CollectionUtils.forEach;
 import static net.sf.freecol.common.util.CollectionUtils.map;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.sf.freecol.common.model.AbstractGoods;
@@ -33,7 +35,10 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionCache;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.ProductionType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
 
@@ -78,10 +83,15 @@ public class TileProductionCalculator {
      * @return The raw production of this colony tile.
      * @see ProductionCache#update
      */
-    public ProductionInfo getBasicProductionInfo(Tile tile,
+    public ProductionInfo getBasicProductionInfo(Tile tile, Turn turn, WorkerAssignment workerAssignment, boolean colonyCenterTile) {
+        return getBasicProductionInfo(tile, turn, workerAssignment, colonyCenterTile, List.of());
+    }
+    
+    private ProductionInfo getBasicProductionInfo(Tile tile,
             Turn turn,
             WorkerAssignment workerAssignment,
-            boolean colonyCenterTile) {
+            boolean colonyCenterTile,
+            List<TileImprovementType> additionalTileImprovements) {
         ProductionInfo pi = new ProductionInfo();
         
         if (workerAssignment.getProductionType() == null) {
@@ -95,7 +105,7 @@ public class TileProductionCalculator {
 
         if (colonyCenterTile) {
             forEach(workerAssignment.getProductionType().getOutputs(), output -> {
-                    int n = getCenterTileProduction(turn, tile, output.getType());
+                    int n = getCenterTileProduction(turn, tile, output.getType(), additionalTileImprovements);
                     if (n > 0) {
                         pi.addProduction(new AbstractGoods(output.getType(), n));
                     }
@@ -103,13 +113,75 @@ public class TileProductionCalculator {
         } else {
             forEach(map(workerAssignment.getProductionType().getOutputs(), AbstractGoods::getType),
                 gt -> {
-                    int n = getUnitProduction(turn, tile, workerAssignment, gt);
+                    int n = getUnitProduction(turn, tile, workerAssignment, gt, additionalTileImprovements);
                     if (n > 0) {
                         pi.addProduction(new AbstractGoods(gt, n));
                     }
                 });
         }
         return pi;
+    }
+    
+    public MaximumPotentialProduction getMaximumPotentialProduction(GoodsType goodsType, Tile tile, UnitType unitType) {
+        final Specification spec = tile.getSpecification();
+        final Turn turn = new Turn(1);
+        final boolean colonyCenterTile = (unitType == null);
+        final TileType originalTileType = tile.getType();
+        final ProductionType originalProductionType = ProductionType.getBestProductionType(goodsType, originalTileType.getAvailableProductionTypes(colonyCenterTile));
+        
+        final ProductionInfo result = getBasicProductionInfo(tile, turn, new WorkerAssignment(unitType, originalProductionType), colonyCenterTile);
+        MaximumPotentialProduction maximumPotentialProduction = new MaximumPotentialProduction(result, List.of());
+        int currentMaximumPotentialProduction = productionOfGoodsType(goodsType, result);
+        
+        final List<TileImprovementType> tileTypeChanging = spec.getTileImprovementTypeList()
+                .stream()
+                .filter(tit -> !tit.isNatural() && tit.isTileTypeAllowed(originalTileType) && tit.isChangeType())
+                .collect(Collectors.toList());
+        
+        for (TileImprovementType tit : getNormalImprovements(spec, originalTileType)) {
+            final ProductionInfo newResult = getBasicProductionInfo(tile, turn, new WorkerAssignment(unitType, originalProductionType), colonyCenterTile, List.of(tit));
+            final int amount = productionOfGoodsType(goodsType, newResult);
+            if (amount > currentMaximumPotentialProduction) {
+                currentMaximumPotentialProduction = amount;
+                maximumPotentialProduction = new MaximumPotentialProduction(newResult, List.of(tit));
+            }
+        }
+        
+        for (TileImprovementType tileTypeChange : tileTypeChanging) {
+            final TileType newTileType = tileTypeChange.getChange(originalTileType);
+            final ProductionType newProductionType = ProductionType.getBestProductionType(goodsType, newTileType.getAvailableProductionTypes(colonyCenterTile));
+            for (TileImprovementType tit : getNormalImprovements(spec, newTileType)) {
+                final ProductionInfo newResult = getBasicProductionInfo(tile, turn, new WorkerAssignment(unitType, newProductionType), colonyCenterTile, List.of(tileTypeChange, tit));
+                final int amount = productionOfGoodsType(goodsType, newResult);
+                if (amount > currentMaximumPotentialProduction) {
+                    currentMaximumPotentialProduction = amount;
+                    maximumPotentialProduction = new MaximumPotentialProduction(newResult, List.of(tileTypeChange, tit));
+                }
+            }
+            final ProductionInfo newResult = getBasicProductionInfo(tile, turn, new WorkerAssignment(unitType, newProductionType), colonyCenterTile, List.of(tileTypeChange));
+            final int amount = productionOfGoodsType(goodsType, newResult);
+            if (amount > currentMaximumPotentialProduction) {
+                currentMaximumPotentialProduction = amount;
+                maximumPotentialProduction = new MaximumPotentialProduction(newResult, List.of(tileTypeChange));
+            }
+        }
+        
+        return maximumPotentialProduction;
+    }
+    
+    private static List<TileImprovementType> getNormalImprovements(Specification spec, TileType tileType) {
+        return spec.getTileImprovementTypeList()
+                .stream()
+                .filter(tit -> !tit.isNatural() && tit.isTileTypeAllowed(tileType) && !tit.isChangeType())
+                .collect(Collectors.toList());
+    }
+
+    private static int productionOfGoodsType(GoodsType goodsType, ProductionInfo newResult) {
+        return newResult.getProduction().stream()
+                .filter(a -> a.getType().equals(goodsType))
+                .map(AbstractGoods::getAmount)
+                .findFirst()
+                .orElse(0);
     }
     
     /**
@@ -125,44 +197,58 @@ public class TileProductionCalculator {
      * @param goodsType The {@code GoodsType} to check the production of.
      * @return The maximum return from this unit.
      */
-    public int getUnitProduction(Turn turn, Tile tile, WorkerAssignment workerAssignment, GoodsType goodsType) {
+    public int getUnitProduction(Turn turn, Tile tile, WorkerAssignment workerAssignment, GoodsType goodsType, List<TileImprovementType> additionalTileImprovements) {
         if (workerAssignment == null
                 || workerAssignment.getProductionType().getOutputs().noneMatch(g -> goodsType.equals(g.getType()))
                 || workerAssignment.getUnitType() == null) {
             return 0;
         }
-
-        return Math.max(0, (int) FeatureContainer.applyModifiers(
-                getBaseProduction(tile, workerAssignment.getProductionType(), goodsType, workerAssignment.getUnitType()),
-                turn,
-                getProductionModifiers(turn, tile, goodsType, workerAssignment.getUnitType())));
-    }
-    
-    private int getCenterTileProduction(Turn turn, Tile tile, GoodsType goodsType) {
-        final int production = tile.getBaseProduction(null, goodsType, null);
+        
+        final TileType newTileType = getResultingTileType(tile.getType(), additionalTileImprovements);
+        final int production = getBaseProduction(newTileType, workerAssignment.getProductionType(), goodsType, workerAssignment.getUnitType());
         return Math.max(0, (int) FeatureContainer.applyModifiers(
                 production,
                 turn,
-                getCenterTileProductionModifiers(turn, tile, goodsType)));
+                getProductionModifiers(turn, tile, goodsType, workerAssignment.getUnitType(), additionalTileImprovements)));
+    }
+    
+    private int getCenterTileProduction(Turn turn, Tile tile, GoodsType goodsType, List<TileImprovementType> additionalTileImprovements) {
+        final TileType newTileType = getResultingTileType(tile.getType(), additionalTileImprovements);
+        final int production = newTileType.getBaseProduction(null, goodsType, null);
+        return Math.max(0, (int) FeatureContainer.applyModifiers(
+                production,
+                turn,
+                getCenterTileProductionModifiers(turn, tile, goodsType, additionalTileImprovements)));
     }
     
     /**
      * Get the base production exclusive of any bonuses.
      *
-     * @param tile The tile where the production is happening.
+     * @param tileType The tile type where the production is happening.
      * @param productionType An optional {@code ProductionType} to use,
      *     if null the best available one is used.
      * @param goodsType The {@code GoodsType} to produce.
      * @param unitType An optional {@code UnitType} to use.
      * @return The base production due to tile type and resources.
      */
-    private int getBaseProduction(Tile tile, ProductionType productionType,
+    private int getBaseProduction(TileType tileType, ProductionType productionType,
                                  GoodsType goodsType, UnitType unitType) {
-        if (tile == null || goodsType == null || !goodsType.isFarmed()) {
+        if (tileType == null || goodsType == null || !goodsType.isFarmed()) {
             return 0;
         }
-        final int amount = tile.getBaseProduction(productionType, goodsType, unitType);
+        final int amount = tileType.getBaseProduction(productionType, goodsType, unitType);
         return (amount < 0) ? 0 : amount;
+    }
+    
+    private TileType getResultingTileType(TileType originalTileType, List<TileImprovementType> additionalTileImprovements) {
+        final List<TileImprovementType> tileTypeChange = additionalTileImprovements.stream().filter(tit -> tit.isChangeType()).collect(Collectors.toList());
+        if (tileTypeChange.size() > 1) {
+            throw new IllegalArgumentException("Only the last tile type change should be included in additionalTileImprovements");
+        }
+        if (tileTypeChange.isEmpty()) {
+            return originalTileType;
+        }
+        return tileTypeChange.get(0).getChange(originalTileType);
     }
     
     /**
@@ -173,16 +259,34 @@ public class TileProductionCalculator {
      * @param unitType The optional {@code UnitType} to produce them.
      * @return A stream of the applicable modifiers.
      */
-    public Stream<Modifier> getProductionModifiers(Turn turn, Tile tile, GoodsType goodsType, UnitType unitType) {
-        if (unitType == null || !tile.canProduce(goodsType, unitType)) {
+    public Stream<Modifier> getProductionModifiers(Turn turn, Tile tile, GoodsType goodsType, UnitType unitType, List<TileImprovementType> additionalTileImprovements) {
+        final TileType newTileType = getResultingTileType(tile.getType(), additionalTileImprovements);
+        final boolean tileTypeChanged = (newTileType != tile.getType());
+        
+        final Stream<Modifier> productionModifiers;
+        if (!tileTypeChanged) {
+            productionModifiers = tile.getProductionModifiers(goodsType, unitType);
+        } else if (tile.getTileItemContainer() != null) {
+            productionModifiers = tile.getTileItemContainer().getProductionModifiersWithoutResource(goodsType, null);
+        } else {
+            productionModifiers = Stream.of();
+        }
+        
+        if (tileTypeChanged && !newTileType.canProduce(goodsType, unitType)
+                || !tile.canProduce(goodsType, unitType)) {
             return Stream.<Modifier>empty();
         }
         
-        return concat(tile.getProductionModifiers(goodsType, unitType),
-                unitType.getModifiers(goodsType.getId(), tile.getType(), turn),
-                ((owner == null) ? null
-                    : owner.getModifiers(goodsType.getId(), unitType, turn)),
-                ProductionUtils.getRebelProductionModifiersForTile(tile, colonyProductionBonus, goodsType, unitType));
+        Stream<Modifier> additionalProductionModifiers = additionalTileImprovements.stream()
+                .filter(tit -> !tit.isChangeType())
+                .flatMap(tit -> tit.getProductionModifiers(goodsType, unitType, newTileType, 1));
+        
+        return concat(productionModifiers,
+                additionalProductionModifiers,
+                (unitType != null) ? unitType.getModifiers(goodsType.getId(), newTileType, turn) : Stream.of(),
+                (owner != null && unitType != null) ? owner.getModifiers(goodsType.getId(), unitType, turn) : Stream.of(),
+                //(owner != null && unitType == null) ? owner.getModifiers(goodsType.getId(), tile.getType(), turn) : Stream.of()
+                ProductionUtils.getRebelProductionModifiersForTile(((!tileTypeChanged) ? tile : null), colonyProductionBonus, goodsType, unitType));
     }
 
     /**
@@ -193,16 +297,29 @@ public class TileProductionCalculator {
      * @param unitType The optional {@code UnitType} to produce them.
      * @return A stream of the applicable modifiers.
      */
-    public Stream<Modifier> getCenterTileProductionModifiers(Turn turn, Tile tile, GoodsType goodsType) {
-        if (!tile.canProduce(goodsType, null)) {
-            return Stream.<Modifier>empty();
-        }
-        return concat(tile.getProductionModifiers(goodsType, null),
-                ProductionUtils.getRebelProductionModifiersForTile(tile, colonyProductionBonus, goodsType, null)
-                // This does not seem to influence center tile production, but was present in the old code.
-                //colony.getModifiers(id, null, turn),
-                //((owner == null) ? null : owner.getModifiers(goodsType.getId(), tile.getType(), turn))
-                );
+    public Stream<Modifier> getCenterTileProductionModifiers(Turn turn, Tile tile, GoodsType goodsType, List<TileImprovementType> additionalTileImprovements) {        
+        return getProductionModifiers(turn, tile, goodsType, null, additionalTileImprovements);
     }
-
+    
+    public static class MaximumPotentialProduction {
+        private ProductionInfo productionInfo;
+        private List<TileImprovementType> tileImprovementType;
+        
+        public MaximumPotentialProduction(ProductionInfo productionInfo, List<TileImprovementType> tileImprovementType) {
+            this.productionInfo = productionInfo;
+            this.tileImprovementType = tileImprovementType;
+        }
+        
+        public ProductionInfo getProductionInfo() {
+            return productionInfo;
+        }
+        
+        public List<TileImprovementType> getTileImprovementType() {
+            return tileImprovementType;
+        }
+        
+        public int getAmount(GoodsType goodsType) {
+            return productionOfGoodsType(goodsType, productionInfo);
+        }
+    }
 }

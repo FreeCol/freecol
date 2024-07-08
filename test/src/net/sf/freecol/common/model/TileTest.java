@@ -134,6 +134,8 @@ public class TileTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.expertFarmer");
     private static final UnitType expertLumberJack
         = spec().getUnitType("model.unit.expertLumberJack");
+    
+    private static final UnitType expertSilverMiner = spec().getUnitType("model.unit.expertSilverMiner");
 
 
     private class Work {
@@ -309,61 +311,39 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
 
         Tile tile1 = new Tile(game, mountains, 0, 0);
-        assertEquals("Mountain/food", 0,
-                     tile1.getPotentialProduction(food, colonistType));
-        assertEquals("Mountain/food max", 0,
-                     tile1.getMaximumPotential(food, colonistType));
-        assertEquals("Mountain/silver", 1,
-                     tile1.getPotentialProduction(silver, colonistType));
-        assertEquals("Mountain/silver max", 2,
-                     tile1.getMaximumPotential(silver, colonistType));
+        assertEquals("Mountain/food", 0, tile1.getPotentialProduction(food, colonistType));
+        assertEquals("Mountain/food max", 0, tile1.getMaximumPotential(food, colonistType));
+        assertEquals("Mountain/silver", 1, tile1.getPotentialProduction(silver, colonistType));
+        assertEquals("Mountain/silver max", 4, tile1.getMaximumPotential(silver, colonistType));
         tile1.addResource(new Resource(game, tile1, silverResource));
-        assertEquals("Mountain+Resource/food", 0,
-                     tile1.getPotentialProduction(food, colonistType));
-        assertEquals("Mountain+Resource/silver", 3,
-                     tile1.getPotentialProduction(silver, colonistType));
-        assertEquals("Mountain+Resource/silver max", 4,
-                     tile1.getMaximumPotential(silver, colonistType));
+        assertEquals("Mountain+Resource/food", 0, tile1.getPotentialProduction(food, colonistType));
+        assertEquals("Mountain+Resource/silver", 3, tile1.getPotentialProduction(silver, colonistType));
+        assertEquals("Mountain+Resource/silver max", 6, tile1.getMaximumPotential(silver, colonistType));
+        assertEquals("Mountain+Resource/silver+expert max", 12, tile1.getMaximumPotential(silver, expertSilverMiner));
 
         // grain-max should equal grain-potential + 1 (ploughing improvement)
         Tile tile2 = new Tile(game, plains, 0, 1);
-        assertEquals("Plains/grain", 3,
-                     tile2.getPotentialProduction(grain, null));
-        assertEquals("Plains/grain max", 4,
-                     tile2.getMaximumPotential(grain, null));
-        assertEquals("Plains/grain/colonist", 5,
-                     tile2.getPotentialProduction(grain, colonistType));
-        assertEquals("Plains/grain/colonist max", 6,
-                     tile2.getMaximumPotential(grain, colonistType));
-        assertEquals("Plains/grain/expertFarmer", 7,
-                     tile2.getPotentialProduction(grain, expertFarmerType));
+        assertEquals("Plains/grain", 3, tile2.getPotentialProduction(grain, null));
+        assertEquals("Plains/grain max", 6, tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains/grain/colonist", 5, tile2.getPotentialProduction(grain, colonistType));
+        assertEquals("Plains/grain/colonist max", 8, tile2.getMaximumPotential(grain, colonistType));
+        assertEquals("Plains/grain/expertFarmer", 7, tile2.getPotentialProduction(grain, expertFarmerType));
         tile2.addResource(new Resource(game, tile2, grainResource));
-        assertEquals("Plains+Resource/grain", 5,
-                     tile2.getPotentialProduction(grain, null));
-        assertEquals("Plains+Resource/grain max", 6,
-                     tile2.getMaximumPotential(grain, null));
-        assertEquals("Plains+Resource/grain/colonist", 7,
-                     tile2.getPotentialProduction(grain, colonistType));
-        assertEquals("Plains+Resource/grain/colonist max", 8,
-                     tile2.getMaximumPotential(grain, colonistType));
-        assertEquals("Plains+Resource/grain/expertFarmer", 11,
-                     tile2.getPotentialProduction(grain, expertFarmerType));
-        assertEquals("Plains+Resource/grain/expertFarmer max", 12,
-                     tile2.getMaximumPotential(grain, expertFarmerType));
+        assertEquals("Plains+Resource/grain", 5, tile2.getPotentialProduction(grain, null));
+        assertEquals("Plains+Resource/grain max", 8, tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains+Resource/grain/colonist", 7, tile2.getPotentialProduction(grain, colonistType));
+        assertEquals("Plains+Resource/grain/colonist max", 10, tile2.getMaximumPotential(grain, colonistType));
+        assertEquals("Plains+Resource/grain/expertFarmer", 11, tile2.getPotentialProduction(grain, expertFarmerType));
+        assertEquals("Plains+Resource/grain/expertFarmer max", 16, tile2.getMaximumPotential(grain, expertFarmerType));
 
         Tile tile3 = new Tile(game, plainsForest, 1, 1);
-        assertEquals("Forest/grain", 2,
-                     tile3.getPotentialProduction(grain, null));
-        assertEquals("Forest/grain max", 4,
-                     tile3.getMaximumPotential(grain, null));
-        assertEquals("Forest/lumber/colonist", 6,
-                tile3.getPotentialProduction(lumber, colonistType));
-        assertEquals("Forest/lumber/colonist max", 8,
-                tile3.getMaximumPotential(lumber, colonistType));
-        assertEquals("Forest/lumber/expertLumberJack", 12,
-                tile3.getPotentialProduction(lumber, expertLumberJack));
-        assertEquals("Forest/lumber/expertLumberJack max", 14,
-                tile3.getMaximumPotential(lumber, expertLumberJack));
+        assertEquals("Forest/grain", 2, tile3.getPotentialProduction(grain, null));
+        assertEquals("Forest/grain max", 6, tile3.getMaximumPotential(grain, null));
+        assertEquals("Forest/grain/colonist max", 8, tile3.getMaximumPotential(grain, colonistType));
+        assertEquals("Forest/lumber/colonist", 6, tile3.getPotentialProduction(lumber, colonistType));
+        assertEquals("Forest/lumber/colonist max", 10, tile3.getMaximumPotential(lumber, colonistType));
+        assertEquals("Forest/lumber/expertLumberJack", 12, tile3.getPotentialProduction(lumber, expertLumberJack));
+        assertEquals("Forest/lumber/expertLumberJack max", 20, tile3.getMaximumPotential(lumber, expertLumberJack));
     }
 
     public void testIsTileTypeAllowed() {

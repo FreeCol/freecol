@@ -404,6 +404,15 @@ public class TileItemContainer extends FreeColGameObject {
                 ti -> ti.getProductionModifiers(goodsType, unitType));
         }
     }
+    
+    public Stream<Modifier> getProductionModifiersWithoutResource(GoodsType goodsType,
+            UnitType unitType) {
+        synchronized (tileItems) {
+            return tileItems.stream()
+                    .filter(ti -> !(ti instanceof Resource))
+                    .flatMap(ti -> ti.getProductionModifiers(goodsType, unitType));
+        }
+    }
 
     /**
      * Does this container contain an item that allows the tile to

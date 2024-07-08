@@ -92,7 +92,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             List<Modifier> modifiers = new ArrayList<>();
             for (TileImprovementType improvementType :
                      getSpecification().getTileImprovementTypeList()) {
-                Modifier productionModifier = improvementType.getProductionModifier(type);
+                Modifier productionModifier = improvementType.getProductionModifier(type, 1);
                 if (productionModifier != null) {
                     improvements.add(improvementType);
                     modifiers.add(productionModifier);

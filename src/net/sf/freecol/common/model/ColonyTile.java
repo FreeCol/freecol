@@ -444,7 +444,7 @@ public class ColonyTile extends WorkLocation {
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
         return new TileProductionCalculator(getOwner(), getColony().getProductionBonus())
-                .getProductionModifiers(getGame().getTurn(), workTile, goodsType, unitType);
+                .getProductionModifiers(getGame().getTurn(), workTile, goodsType, unitType, List.of());
     }
 
     /**

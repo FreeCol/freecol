@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +33,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.Map.Layer;
-import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -319,14 +319,7 @@ public class TileImprovement extends TileItem {
      * @return A production {@code Modifier}, or null if none applicable.
      */
     private Modifier getProductionModifier(GoodsType goodsType) {
-        final Modifier modifier = (isComplete()) ? type.getProductionModifier(goodsType) : null;
-        if (modifier == null || modifier.getValue() == 0 || magnitude <= 0) {
-            return modifier;
-        }
-        
-        final Modifier modifierWithMagnitudeBonus = Modifier.makeModifier(modifier);
-        modifierWithMagnitudeBonus.setValue(modifierWithMagnitudeBonus.getValue() * magnitude);
-        return modifierWithMagnitudeBonus;
+        return (isComplete()) ? type.getProductionModifier(goodsType, magnitude) : null;
     }
 
     /**
@@ -585,38 +578,7 @@ public class TileImprovement extends TileItem {
             return Stream.<Modifier>empty();
         }
         
-        final Specification spec = getSpecification();
-        
-        if (unitType == null
-                && isNatural()
-                && goodsType.isFoodType()) {
-            return Stream.<Modifier>empty();
-        }
-        
-        if (unitType == null
-                && !isNatural()
-                && !goodsType.isFoodType()
-                && spec.getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)) {
-            return Stream.<Modifier>empty();
-        }
-        
-        Modifier m = getProductionModifier(goodsType);
-        if (m == null) {
-            return Stream.<Modifier>empty();
-        }
-        
-        if (unitType != null
-                && unitType.getExpertProduction() != null
-                && unitType.getExpertProduction().equals(goodsType)) {
-            final Stream<Modifier> expertMultiplicativeModifier = unitType.getModifiers(goodsType.getId(), tile.getType(), null)
-                .filter(mod -> mod.getType() == Modifier.ModifierType.MULTIPLICATIVE);
-            
-            final float expertBonus = FeatureContainer.applyModifiers(m.getValue(), null, expertMultiplicativeModifier);
-            m = Modifier.makeModifier(m);
-            m.setValue(expertBonus);
-        }
-        
-        return Stream.of(m);
+        return type.getProductionModifiers(goodsType, unitType, tile.getType(), magnitude);
     }
 
     /**

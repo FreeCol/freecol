@@ -31,7 +31,6 @@ import static net.sf.freecol.common.util.CollectionUtils.flatten;
 import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
 import static net.sf.freecol.common.util.CollectionUtils.isNotNull;
 import static net.sf.freecol.common.util.CollectionUtils.matchKey;
-import static net.sf.freecol.common.util.CollectionUtils.max;
 import static net.sf.freecol.common.util.CollectionUtils.maximize;
 import static net.sf.freecol.common.util.CollectionUtils.none;
 import static net.sf.freecol.common.util.CollectionUtils.sum;
@@ -60,6 +59,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.production.TileProductionCalculator;
+import net.sf.freecol.common.model.production.TileProductionCalculator.MaximumPotentialProduction;
 import net.sf.freecol.common.model.production.WorkerAssignment;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1766,40 +1766,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Gets the maximum potential for producing the given type of
-     * goods with a given unit if this tile is (perhaps changed to)
-     * a given tile type.
-     *
-     * @param goodsType The {@code GoodsType} to check.
-     * @param unitType A {@code UnitType} to do the work.
-     * @param tileType A {@code TileType} to change to.
-     * @return The maximum potential.
-     */
-    private int getMaximumPotential(GoodsType goodsType, UnitType unitType,
-                                    TileType tileType) {
-        float potential = tileType.getPotentialProduction(goodsType, unitType);
-        if (tileType == getType()) { // Handle the resource in the noop case
-            Resource resource = (tileItemContainer == null) ? null
-                : tileItemContainer.getResource();
-            if (resource != null) {
-                potential = resource.applyBonus(goodsType, unitType,
-                                                (int)potential);
-            }
-        }
-        // Try applying all possible non-natural improvements.
-        final List<TileImprovementType> improvements
-            = getSpecification().getTileImprovementTypeList();
-        if (canProduce(goodsType, unitType)) {
-            for (TileImprovementType ti : transform(improvements, ti ->
-                    (!ti.isNatural() && ti.isTileTypeAllowed(tileType)
-                        && ti.getBonus(goodsType) > 0))) {
-                potential = ti.getProductionModifier(goodsType).applyTo(potential);
-            }
-        }
-        return (int)potential;
-    }
-
-    /**
-     * Gets the maximum potential for producing the given type of
      * goods.  The maximum potential is the potential of a tile after
      * the tile has been plowed/built road on.
      *
@@ -1808,23 +1774,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The maximum potential.
      */
     public int getMaximumPotential(GoodsType goodsType, UnitType unitType) {
-        // If we consider maximum potential to the effect of having
-        // all possible improvements done, iterate through the
-        // improvements and get the bonuses of all related ones.  If
-        // there are options to change TileType using an improvement,
-        // consider that too.
-        final List<TileImprovementType> improvements
-            = getSpecification().getTileImprovementTypeList();
-
-        // Collect all the possible tile type changes.
-        List<TileType> tileTypes = transform(improvements,
-            ti -> !ti.isNatural() && ti.getChange(getType()) != null,
-            ti -> ti.getChange(getType()));
-        tileTypes.add(0, getType()); //...including the noop case.
-
-        // Find the maximum production under each tile type change.
-        return max(tileTypes, tt ->
-                   getMaximumPotential(goodsType, unitType, tt));
+        final TileProductionCalculator tpc = new TileProductionCalculator(null, 2);
+        final MaximumPotentialProduction maximumPotentialProduction = tpc.getMaximumPotentialProduction(goodsType, this, unitType);
+        return maximumPotentialProduction.getAmount(goodsType);
     }
 
     /**
@@ -1919,6 +1871,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return getSpecification().getFoodGoodsTypeList().stream()
                 .map(goodsType -> new AbstractGoods(goodsType,
                         getMaximumPotential(goodsType, getSpecification().getExpertForProducing(goodsType))))
+                .max(Comparator.comparingInt(AbstractGoods::getAmount))
+                .orElse(null);
+    }
+    
+    public AbstractGoods getMaximumPotentialUnattendedFoodProduction() {
+        return getSpecification().getFoodGoodsTypeList().stream()
+                .map(goodsType -> new AbstractGoods(goodsType, getMaximumPotential(goodsType, null)))
                 .max(Comparator.comparingInt(AbstractGoods::getAmount))
                 .orElse(null);
     }
