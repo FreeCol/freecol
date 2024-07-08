@@ -2054,11 +2054,12 @@ public class SwingGUI extends GUI {
         }
         
         if (fontSizeUsingDpi >= fontSizeUsingScaling * 0.25f) {
+            logger.info("Using font size from scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
             return fontSizeUsingScaling;
         }
                 
-        logger.info("Automatic font size: " + fontSizeUsingDpi + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");        
-        return fontSizeUsingDpi;        
+        logger.info("Automatic font size: " + fontSizeUsingDpi + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
+        return Math.max(10, fontSizeUsingDpi);        
     }
 
     private float determineScaleFactorUsingClientOptions(final int dpi) {
