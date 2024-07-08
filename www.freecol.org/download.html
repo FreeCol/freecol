@@ -34,7 +34,20 @@
                                             freecol-1.2.0.dmg
                                         </a>
                                     </td>
-                                    <td class="cBody">Package for MacOSX</td>
+                                    <td class="cBody">Package for macOs M1/M2</td>
+                                </tr>
+                                <tr class="cBody">
+                                    <td class="cBody">
+                                        <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.2.0/FreeCol-1.2.0-intel.dmg/download">
+                                            <img src="images/mac-bz2.png" border="0" alt="MACOSX" width="32" height="32" />
+                                        </a>
+                                    </td>
+                                    <td class="cBody" width="200">
+                                        <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.2.0/FreeCol-intel-1.2.0.dmg/download">
+                                            freecol-intel-1.2.0.dmg
+                                        </a>
+                                    </td>
+                                    <td class="cBody">Package for macOs Intel</td>
                                 </tr>
                                 <tr class="cBody">
                                     <td class="cBody">
@@ -90,12 +103,20 @@
                                 <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.2.0/freecol-1.2.0-with-java.exe/download">freecol-1.2.0-with-java.exe</a>.
                                 You can run the file directly or save it to disk. If you choose the latter then just double-click the file once it&#39;s downloaded.
                                 <br /><br />
-                                Mac OS X users should download
-                                <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.2.0/FreeCol-1.2.0.dmg/download">freecol-1.2.0.dmg</a>.
-                                FreeCol has some problems running on Mac OS X, so you should save your game frequently. You might also need to get the file out of quarantine after downloading it since we have not signed the application:
+                                macOs users should download either
+                                <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.2.0/FreeCol-1.2.0.dmg/download">freecol-1.2.0.dmg</a> (M1/M2)
+                                or <a href="https://sourceforge.net/projects/freecol/files/freecol/freecol-1.2.0/FreeCol-intel-1.2.0.dmg/download">freecol-intel-1.2.0.dmg</a> (Intel). The latter is for older macs.
+                                FreeCol has some problems running on macOs, so you should save your game frequently. You might also need to get the file out of quarantine after downloading it since we have not signed the application for the M1/M2 package:
                                 <br />
                                 <div style="font-family: monospace">
                                   xattr -d com.apple.quarantine FreeCol-1.2.0.dmg
+                                  <br />xattr -d com.apple.quarantine FreeCol.app
+                                </div>
+                                <br />
+                                ...and for the Intel package:
+                                <br /><br />
+                                <div style="font-family: monospace">
+                                  xattr -d com.apple.quarantine FreeCol-intel-1.2.0.dmg
                                   <br />xattr -d com.apple.quarantine FreeCol.app
                                 </div>
                                 <br />
@@ -126,29 +147,10 @@
                                 </script>
                                 Please submit bugs through the SourceForge <a href="https://sourceforge.net/p/freecol/bugs/">bug tracker</a> and request new features by using the <a href="https://sourceforge.net/p/freecol/improvement-requests/">feature request tracker</a>.</p>
                                 
-                            <h4>The latest test pre-release of the next version of FreeCol:</h4>
-                            <br />
-                            <div class="graded_block">
-                                <table border="0" cellspacing="0" cellpadding="5">
-                                    <tbody>
-                                      <tr class="cBody">
-                                        <td class="cBody">
-                                          <a href="https://github.com/FreeCol/freecol/releases">
-                                            <img src="images/download2.png" border="0" alt="" width="32" height="32" />
-                                          </a>
-                                        </td>
-                                        <td class="cBody">
-                                          <a href="https://github.com/FreeCol/freecol/releases">FreeCol latest nightly release
-                                          </a>
-                                        </td>
-                                        <td class="cBody">
-                                            Installers on GitHub download page
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            Each nightly release includes platform independent installers and source files. Stability is not guaranteed. If you want to contribute you can:
+                            <h4>The latest development version of FreeCol:</h4>
+                            You can download the <a href="https://github.com/FreeCol/freecol/releases/tag/latest">latest development build</a> if you would like to test the game or try changes
+                            before they are included in an official version. The development build includes platform independent installers and source files, but you will manually have to install
+                            Java. If you want to contribute you can:
                             <ul>
                                 <li>Report any bugs you find to our <a href="https://sourceforge.net/p/freecol/bugs/">Bug Tracker</a>.</li>
                                 <li>Suggest features or improvements in our <a href="https://sourceforge.net/p/freecol/improvement-requests/">Improvement Requests Tracker</a>.</li>
