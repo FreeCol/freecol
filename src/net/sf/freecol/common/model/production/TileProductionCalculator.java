@@ -267,7 +267,7 @@ public class TileProductionCalculator {
         if (!tileTypeChanged) {
             productionModifiers = tile.getProductionModifiers(goodsType, unitType);
         } else if (tile.getTileItemContainer() != null) {
-            productionModifiers = tile.getTileItemContainer().getProductionModifiersWithoutResource(goodsType, null);
+            productionModifiers = tile.getTileItemContainer().getProductionModifiersWithoutResource(goodsType, unitType);
         } else {
             productionModifiers = Stream.of();
         }
