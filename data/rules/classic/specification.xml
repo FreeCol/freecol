@@ -4741,7 +4741,7 @@
         <!-- Whether experts have connections, producing without raw
              materials in factories -->
         <booleanOption id="model.option.expertsHaveConnections"
-                       defaultValue="true"/>
+                       defaultValue="false"/>
         <!-- Can colonies be founded during the war of independence? -->
         <booleanOption id="model.option.foundColonyDuringRebellion"
                        defaultValue="false"/>
