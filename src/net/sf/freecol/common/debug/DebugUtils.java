@@ -1266,6 +1266,18 @@ public class DebugUtils {
         final Tile serverTile = serverGame.getFreeColGameObject(tile.getId(), Tile.class);
         final ColonyPlan colonyPlan = new StandardColonyPlanner().createPlan(serverTile);
         final ServerPlayer serverPlayer = serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId(), ServerPlayer.class);
+        
+        for (TileImprovementPlan tip : colonyPlan.getTileImprovements()) {
+            final Tile tipTarget = tip.getTarget();
+            final TileImprovement ti = new TileImprovement(serverGame, tipTarget, tip.getType(), null);
+            ti.setTurnsToComplete(0);
+            tipTarget.add(ti);
+            final TileType changeType = ti.getChange(tipTarget.getType());
+            if (changeType != null) {
+                tipTarget.changeType(changeType);
+            }
+        }
+        
         final ServerColony serverColony = new ServerColony(serverGame, serverPlayer, "Debug", serverTile);
         serverTile.setSettlement(serverColony);
 
@@ -1276,16 +1288,6 @@ public class DebugUtils {
             final BuildingType bt = (BuildingType) buildableType;
             final ServerBuilding serverBuilding = new ServerBuilding(serverGame, serverColony, bt);
             serverColony.addBuilding(serverBuilding);
-        }
-        for (TileImprovementPlan tip : colonyPlan.getTileImprovements()) {
-            final Tile tipTarget = tip.getTarget();
-            final TileImprovement ti = new TileImprovement(serverGame, tipTarget, tip.getType(), null);
-            ti.setTurnsToComplete(0);
-            tipTarget.add(ti);
-            final TileType changeType = ti.getChange(tipTarget.getType());
-            if (changeType != null) {
-                tipTarget.changeType(changeType);
-            }
         }
         
         serverColony.addLiberty(10000);
