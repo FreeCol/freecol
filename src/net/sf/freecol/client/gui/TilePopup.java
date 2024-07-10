@@ -19,6 +19,10 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
@@ -49,7 +53,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -366,7 +369,17 @@ public final class TilePopup extends JPopupMenu {
                 DebugUtils.dumpTile(freeColClient, tile);
             });
         add(dumpItem);
+        
+        if (freeColClient.getFreeColServer() != null) {
+            final JMenuItem debugCreateIdealColony = new JMenuItem("Create Ideal Colony");
+            debugCreateIdealColony.setOpaque(false);
+            debugCreateIdealColony.addActionListener((ActionEvent ae) -> {
+                DebugUtils.createColonyFromAiColonyPlan(freeColClient, tile);
+            });
+            add(debugCreateIdealColony);
+        }
     }
+
 
     /**
      * Adds a unit entry to this popup.

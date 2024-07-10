@@ -42,9 +42,11 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -59,6 +61,8 @@ import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
@@ -66,6 +70,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.GameOptions;
@@ -78,10 +84,16 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.colony.ColonyPlan;
+import net.sf.freecol.server.ai.colony.PlannedWorkLocation;
+import net.sf.freecol.server.ai.colony.StandardColonyPlanner;
+import net.sf.freecol.server.ai.colony.TileImprovementPlan;
+import net.sf.freecol.server.ai.colony.WorkerPlan;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -1240,6 +1252,67 @@ public class DebugUtils {
         lb.add("\nLast Tribute = ", sis.getLastTribute());
 
         freeColClient.getGUI().showInformationPanel(lb.toString());
+    }
+    
+    /**
+     * Creates a new colony from the ideal AI {@code ColonyPlan}.
+     * 
+     * @param freeColClient The client.
+     * @param tile The {@code Tile} to create the colony on.
+     */
+    public static void createColonyFromAiColonyPlan(FreeColClient freeColClient, Tile tile) {
+        final FreeColServer fcs = freeColClient.getFreeColServer();
+        final ServerGame serverGame = fcs.getGame();
+        final Tile serverTile = serverGame.getFreeColGameObject(tile.getId(), Tile.class);
+        final ColonyPlan colonyPlan = new StandardColonyPlanner().createPlan(serverTile);
+        final ServerPlayer serverPlayer = serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId(), ServerPlayer.class);
+        final ServerColony serverColony = new ServerColony(serverGame, serverPlayer, "Debug", serverTile);
+        serverTile.setSettlement(serverColony);
+
+        for (BuildableType buildableType : colonyPlan.getBuildables()) {
+            if (!(buildableType instanceof BuildingType)) {
+                continue;
+            }
+            final BuildingType bt = (BuildingType) buildableType;
+            final ServerBuilding serverBuilding = new ServerBuilding(serverGame, serverColony, bt);
+            serverColony.addBuilding(serverBuilding);
+        }
+        for (TileImprovementPlan tip : colonyPlan.getTileImprovements()) {
+            final Tile tipTarget = tip.getTarget();
+            final TileImprovement ti = new TileImprovement(serverGame, tipTarget, tip.getType(), null);
+            ti.setTurnsToComplete(0);
+            tipTarget.add(ti);
+            final TileType changeType = ti.getChange(tipTarget.getType());
+            if (changeType != null) {
+                tipTarget.changeType(changeType);
+            }
+        }
+        
+        serverColony.addLiberty(10000);
+        
+        final ChangeSet cs = new ChangeSet();
+        for (WorkerPlan wp : colonyPlan.getWorkers()) {
+            final PlannedWorkLocation plannedWorkLocation = wp.getPlannedWorkLocation();
+            final Location workLocation;
+            if (plannedWorkLocation.getBuildingType() != null) {
+                workLocation = serverColony.getBuilding(plannedWorkLocation.getBuildingType());
+            } else {
+                serverPlayer.csClaimLand(wp.getPlannedWorkLocation().getTile(), serverColony, 0, cs);
+                final ColonyTile colonyTile = serverColony.getColonyTile(plannedWorkLocation.getTile());
+                workLocation = colonyTile;
+            }
+            final ServerUnit serverUnit = new ServerUnit(serverGame, serverTile, serverPlayer, wp.getUnitType());
+            serverUnit.setRole(serverGame.getSpecification().getDefaultRole());
+            serverUnit.setLocation(workLocation);
+            if (!wp.getProductionTypes().isEmpty()) {
+                serverUnit.changeWorkType(wp.getProductionTypes().get(0));
+            }
+        }
+        
+        final Set<Tile> visible = serverColony.getVisibleTileSet();
+        cs.add(See.only(serverPlayer), visible);
+        cs.add(See.perhaps(), serverColony.getOwnedTiles());
+        serverGame.sendToAll(cs);
     }
     
     public static String locationDisplayString(Location target) {
