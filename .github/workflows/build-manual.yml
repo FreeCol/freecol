@@ -93,6 +93,7 @@ jobs:
         shell: bash
         run: |
           ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION -Dprint.manual.is.up.to.date=true -Dprint.devmanual.is.up.to.date=true mac-complete-installer
+          codesign --force -s - --deep dist/releases/FreeCol-$FREECOL_VERSION.dmg
         env:
           FREECOL_VERSION: ${{ github.event.inputs.release_version }}
       
@@ -119,6 +120,7 @@ jobs:
         shell: bash
         run: |
           ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION -Dprint.manual.is.up.to.date=true -Dprint.devmanual.is.up.to.date=true mac-complete-installer
+          codesign --force -s - --deep dist/releases/FreeCol-$FREECOL_VERSION.dmg
         env:
           FREECOL_VERSION: ${{ github.event.inputs.release_version }}
       
