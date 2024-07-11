@@ -1466,8 +1466,21 @@ public class Unit extends GoodsLocation
         if (student != null) {
             result = getSpecification()
                 .getNeededTurnsOfTraining(getType(), student.getType());
+            
+            /*
+             * Allows mod to apply modifiers to the number of turns:
+             */
+            final Turn turn = getGame().getTurn();
+            result = (int) FeatureContainer.applyModifiers(result, turn, concat(
+                    getModifiers(Modifier.EDUCATION_TEACHING_TURNS, getType(), turn),
+                    (getColony() != null) ? getColony().getModifiers(Modifier.EDUCATION_TEACHING_TURNS, getType(), turn) : Stream.of()
+                    ));
+            
             if (getColony() != null) {
                 result -= getColony().getProductionBonus();
+            }
+            if (result <= 0) {
+                result = 1;
             }
         }
         return result;
