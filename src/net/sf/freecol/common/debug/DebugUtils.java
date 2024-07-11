@@ -1311,6 +1311,9 @@ public class DebugUtils {
             }
         }
         
+        serverPlayer.addSettlement(serverColony);
+        serverColony.placeSettlement(true);
+        
         final Set<Tile> visible = serverColony.getVisibleTileSet();
         cs.add(See.only(serverPlayer), visible);
         cs.add(See.perhaps(), serverColony.getOwnedTiles());
