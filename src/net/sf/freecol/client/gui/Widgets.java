@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
@@ -43,7 +44,6 @@ import net.sf.freecol.client.gui.dialog.EmigrationDialog;
 import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.FreeColChoiceDialog;
-import net.sf.freecol.client.gui.dialog.FreeColConfirmDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColStringInputDialog;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
@@ -231,10 +231,23 @@ public final class Widgets {
      */
     public boolean confirm(StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey, PopupPosition pos) {
-        FreeColConfirmDialog dialog
-            = new FreeColConfirmDialog(this.freeColClient, getFrame(), true,
-                                       tmpl, icon, okKey, cancelKey);
-        return this.canvas.showFreeColDialog(dialog, pos);
+        try {
+            this.canvas.modalDialogAdd();
+            final String ok = Messages.message(okKey);
+            final String cancel = Messages.message(cancelKey);
+            final int result = JOptionPane.showInternalOptionDialog(canvas,
+                    Messages.message(tmpl),
+                    null,
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    icon,
+                    new Object[] { ok, cancel },
+                    cancel);
+            
+            return (result == 0);
+        } finally {
+            this.canvas.modalDialogRemove();
+        }
     }
 
     /**

@@ -56,14 +56,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
-import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.mapviewer.CanvasMapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
@@ -84,7 +81,6 @@ import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 
@@ -164,6 +160,8 @@ public final class Canvas extends JDesktopPane {
      * A timer triggering repaints in order to display animations on the {@link CanvasMapViewer}.
      */
     private Timer animationTimer;
+    
+    private int displayedModalDialogs = 0;
 
 
     /**
@@ -1129,6 +1127,22 @@ public final class Canvas extends JDesktopPane {
         }
         dialogs.add(fcd);
     }
+    
+    /**
+     * Should be called before displaying a modal. Remember to call {@link #modalDialogRemove}
+     * afterwards in a finally-block.
+     */
+    public void modalDialogAdd() {
+        logger.fine("Displaying modal dialog.");
+        displayedModalDialogs++;
+        if (displayedModalDialogs == 1) {
+            freeColClient.getActionManager().update();
+            repaint();
+        }
+        if  (displayedModalDialogs > 1) {
+            logger.warning("Displaying more than one modal dialog at the same time.");
+        }
+    }
 
     /**
      * Remove a dialog from the current dialog list.
@@ -1141,6 +1155,24 @@ public final class Canvas extends JDesktopPane {
             this.mapViewer.getMapViewerState().setCursorBlinking(true);
         }
         if (nothingShowing()) updateMenuBar();
+    }
+    
+    
+    /**
+     * Should be called after a modal dialog has been removed.
+     * @see #modalDialogAdd
+     */
+    public void modalDialogRemove() {
+        logger.fine("Modal dialog dismissed.");
+        displayedModalDialogs--;
+        if (displayedModalDialogs == 0) {
+            freeColClient.getActionManager().update();
+            repaint();
+        }
+    }
+    
+    public int getDisplayedModalDialogs() {
+        return displayedModalDialogs;
     }
 
     /**

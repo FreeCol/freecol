@@ -26,6 +26,10 @@ package net.sf.freecol.client.gui;
  */
 public interface DialogHandler<T> {
 
+    /**
+     * This method gets called when the response is ready.
+     * @param response The response, or {@code null} if the user cancelled.
+     */
     void handle(T response);
 
 };

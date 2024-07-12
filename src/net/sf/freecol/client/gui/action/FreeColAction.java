@@ -362,7 +362,7 @@ public abstract class FreeColAction extends AbstractAction
      *     is not visible.
      */
     protected boolean shouldBeEnabled() {
-        return !getGUI().isClientOptionsDialogShowing();
+        return !getGUI().isDialogShowing();
     }
 
     /**

@@ -1795,13 +1795,13 @@ public class GUI extends FreeColClientHolder {
 
 
     /**
-     * Checks if a client options dialog is present.
+     * Checks if a dialog is showing.
      *
      * Used by: FreeColAction.shouldBeEnabled
      *
-     * @return True if the client options are showing.
+     * @return True if at least one dialog is showing.
      */
-    public boolean isClientOptionsDialogShowing() {
+    public boolean isDialogShowing() {
         return false;
     }
 

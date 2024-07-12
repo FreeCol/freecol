@@ -1747,8 +1747,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean isClientOptionsDialogShowing() {
-        return this.canvas.getExistingFreeColDialog(ClientOptionsDialog.class) != null;
+    public boolean isDialogShowing() {
+        return this.canvas.getDisplayedModalDialogs() > 0 || this.canvas.getExistingFreeColDialog(ClientOptionsDialog.class) != null;
     }
 
     /**
