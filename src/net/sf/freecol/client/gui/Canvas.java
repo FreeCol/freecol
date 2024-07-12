@@ -233,13 +233,7 @@ public final class Canvas extends JDesktopPane {
         setLayout(null);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        // Create key bindings for all actions
-        for (Option<?> option : freeColClient.getActionManager().getOptions()) {
-            FreeColAction action = (FreeColAction)option;
-            getInputMap().put(action.getAccelerator(), action.getId());
-            getActionMap().put(action.getId(), action);
-        }
-        
+
         this.parentFrame.setVisible(true);
         
         updateSize();

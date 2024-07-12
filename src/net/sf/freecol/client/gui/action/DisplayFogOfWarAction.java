@@ -47,18 +47,6 @@ public class DisplayFogOfWarAction extends SelectableOptionAction {
         setSelected(shouldBeSelected());
     }
 
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());
-        setOption(isSelected());
-        getGUI().refresh();
-    }
     
     @Override
     protected boolean shouldBeEnabled() {

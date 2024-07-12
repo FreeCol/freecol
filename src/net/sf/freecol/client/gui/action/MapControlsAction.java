@@ -76,6 +76,5 @@ public class MapControlsAction extends SelectableOptionAction {
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().enableMapControls(isEnabled() && isSelected());
-        setOption(isSelected());
     }
 }

@@ -19,10 +19,6 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
@@ -44,18 +40,5 @@ public class DisplayBordersAction extends SelectableOptionAction {
         super(freeColClient, id, ClientOptions.DISPLAY_BORDERS);
 
         setSelected(shouldBeSelected());
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());
-        setOption(isSelected());
-        getGUI().refresh();
     }
 }

@@ -19,10 +19,11 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 
 
 /**
@@ -33,8 +34,6 @@ public abstract class SelectableOptionAction extends SelectableAction {
     public static final String id = "selectableOptionAction";
 
     private final String optionId;
-
-    protected boolean selected = false;
 
 
     /**
@@ -88,5 +87,14 @@ public abstract class SelectableOptionAction extends SelectableAction {
      */
     protected boolean shouldBeSelected() {
         return getOption();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        setOption(isSelected());
+        getGUI().refresh();
     }
 }
