@@ -27,14 +27,15 @@ import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalInternalFrameUI;
 
+import net.sf.freecol.client.gui.Canvas.ToolBoxFrame;
 import net.sf.freecol.client.gui.panel.FreeColBorder;
-import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 
 public class FreeColInternalFrameUI extends MetalInternalFrameUI {
 
@@ -44,6 +45,26 @@ public class FreeColInternalFrameUI extends MetalInternalFrameUI {
 
     public static ComponentUI createUI(JComponent b)    {
         return new FreeColInternalFrameUI((JInternalFrame)b);
+    }
+    
+    @Override
+    public void installUI(JComponent c) {
+        super.installUI(c);
+        
+        final JInternalFrame f = (JInternalFrame) c;
+        final boolean toolBox = (f instanceof ToolBoxFrame);
+        
+        if (!toolBox) {
+            f.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+            setNorthPane(null);
+            setSouthPane(null);
+            setWestPane(null);
+            setEastPane(null);
+        } else {
+            f.setMaximizable(true);
+            f.setClosable(true);
+            f.setIconifiable(true);
+        }
     }
     
     @Override

@@ -110,7 +110,7 @@ public final class Canvas extends JDesktopPane {
         = (java.awt.Cursor)UIManager.get("cursor.go");
     
     /** A class for frames being used as tool boxes. */
-    private static class ToolBoxFrame extends JInternalFrame {}
+    public static class ToolBoxFrame extends JInternalFrame {}
 
     /** The game client. */
     private final FreeColClient freeColClient;
@@ -530,16 +530,6 @@ public final class Canvas extends JDesktopPane {
             f.setClosable(true);
             f.setIconifiable(true);
         }
-        
-        f.addInternalFrameListener(new InternalFrameAdapter() {
-            @Override
-            public void internalFrameClosing(InternalFrameEvent e) {
-                savePositionAndSize(comp, f);
-                if (comp instanceof FreeColPanel) {
-                    ((FreeColPanel) comp).onFrameClosing();
-                }
-            }
-        });
 
         f.getContentPane().add(comp);
         f.setOpaque(false);
