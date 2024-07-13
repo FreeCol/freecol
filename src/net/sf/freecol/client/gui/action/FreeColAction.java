@@ -118,6 +118,7 @@ public abstract class FreeColAction extends AbstractAction
 
     private int orderButtonImageCount = 0;
     private List<String> imageIconKeys = new ArrayList<>();
+    private boolean canvasKeyBinding = false;
 
     /**
      * Creates a new {@code FreeColAction}.
@@ -415,6 +416,24 @@ public abstract class FreeColAction extends AbstractAction
     public String getEnabledBy() {
         /* FreeColAction cannot be enabled/disabled by other options. */
         return null;
+    }
+    
+    /**
+     * Checks if this action should have its accelerator key added to the {@code Canvas}.
+     * @return {@code true} if the accelerator key should be added to the {@code Canvas}. This
+     *      is typically used when this action is not used in any menu.
+     */
+    public boolean isCanvasKeyBinding() {
+        return canvasKeyBinding;
+    }
+    
+    /**
+     * Defines if this action should have its accelerator key added to the {@code Canvas}.
+     * @param canvasKeyBinding {@code true} if the accelerator key should be added to the
+     *      {@code Canvas}. This is typically used when this action is not used in any menu.
+     */
+    public void setCanvasKeyBinding(boolean canvasKeyBinding) {
+        this.canvasKeyBinding = canvasKeyBinding;
     }
 
 

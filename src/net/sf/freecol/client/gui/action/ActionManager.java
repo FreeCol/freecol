@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.util.logging.Logger;
-
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -211,6 +211,17 @@ public class ActionManager extends OptionGroup {
         return (hasOption(id, FreeColAction.class))
             ? getOption(id, FreeColAction.class)
             : null;
+    }
+    
+    /***
+     * Gets all registered {@code FreeColAction}s.
+     * @return The list of all actions.
+     */
+    public List<FreeColAction> getFreeColActions() {
+        return getOptions().stream()
+                .filter(o -> o instanceof FreeColAction)
+                .map(o -> (FreeColAction) o)
+                .collect(Collectors.toList());
     }
 
     /**

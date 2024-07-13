@@ -61,6 +61,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
+import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.mapviewer.CanvasMapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
@@ -81,6 +82,7 @@ import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 
@@ -231,6 +233,15 @@ public final class Canvas extends JDesktopPane {
         setLayout(null);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+        // Create key bindings for all actions
+        for (FreeColAction action  : freeColClient.getActionManager().getFreeColActions()) {
+            if (!action.isCanvasKeyBinding()) {
+                continue;
+            }
+            getInputMap().put(action.getAccelerator(), action.getId());
+            getActionMap().put(action.getId(), action);
+        }
+
 
         this.parentFrame.setVisible(true);
         

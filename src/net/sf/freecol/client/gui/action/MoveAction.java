@@ -47,6 +47,8 @@ public class MoveAction extends MapboardAction {
         super(freeColClient, id + direction);
 
         this.direction = direction;
+        
+        setCanvasKeyBinding(true);
     }
 
     /**
