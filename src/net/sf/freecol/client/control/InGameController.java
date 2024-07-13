@@ -1701,7 +1701,7 @@ public final class InGameController extends FreeColClientHolder {
         for (Unit u : disembarkable) changeState(u, UnitState.ACTIVE);
         if (disembarkable.size() == 1) {
             if (getGUI().confirm(tile, StringTemplate.key("disembark.text"),
-                                 disembarkable.get(0), "ok", "cancel")) {
+                                 disembarkable.get(0), "ok", "cancel", true)) {
                 moveDirection(disembarkable.get(0), direction, false);
             }
         } else {
@@ -1787,7 +1787,7 @@ public final class InGameController extends FreeColClientHolder {
         final Tile tile = now.getNeighbourOrNull(direction);
         if (!getGUI().confirm(now,
                 StringTemplate.key("exploreLostCityRumour.text"), unit,
-                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
+                "exploreLostCityRumour.yes", "exploreLostCityRumour.no", true)) {
             if (unit.getDestination() != null) askClearGotoOrders(unit);
             return false;
         }
@@ -1796,7 +1796,7 @@ public final class InGameController extends FreeColClientHolder {
         if (tile.getLostCityRumour().getType() == LostCityRumour.RumourType.MOUNDS
             && !getGUI().confirm(now,
                 StringTemplate.key("exploreMoundsRumour.text"), unit,
-                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
+                "exploreLostCityRumour.yes", "exploreLostCityRumour.no", true)) {
             askServer().declineMounds(unit, direction); // LCR goes away
             return false;
         }
@@ -1835,7 +1835,7 @@ public final class InGameController extends FreeColClientHolder {
             } else if (getGUI().confirm(oldTile, StringTemplate
                     .template("highseas.text")
                     .addAmount("%number%", unit.getSailTurns()),
-                    unit, "highseas.yes", "highseas.no")) {
+                    unit, "highseas.yes", "highseas.no", true)) {
                 return moveTowardEurope(unit, unit.getOwner().getEurope());
             }
         }
@@ -1871,7 +1871,7 @@ public final class InGameController extends FreeColClientHolder {
             } else if (getGUI().confirm(unit.getTile(), StringTemplate
                     .template("learnSkill.text")
                     .addNamed("%skill%", skill),
-                    unit, "learnSkill.yes", "learnSkill.no")) {
+                    unit, "learnSkill.yes", "learnSkill.no", true)) {
                 if (askServer().learnSkill(unit, direction)) {
                     if (unit.isDisposed()) {
                         showInformationPanel(is, "learnSkill.die");
@@ -2549,7 +2549,7 @@ public final class InGameController extends FreeColClientHolder {
                         .addAmount("%amount%", toUnload - atStop)
                         .addNamed("%goods%", goods);
                     if (!getGUI().confirm(unit.getTile(), template,
-                                          unit, "yes", "no")) {
+                                          unit, "yes", "no", true)) {
                         if (atStop == 0) continue;
                         amount = atStop;
                     }
@@ -2813,7 +2813,7 @@ public final class InGameController extends FreeColClientHolder {
             StringTemplate warnings = tile.getBuildColonyWarnings(unit);
             if (!warnings.isEmpty()
                 && !getGUI().confirm(tile, warnings, unit,
-                                     "buildColony.yes", "buildColony.no")) {
+                                     "buildColony.yes", "buildColony.no", true)) {
                 return false;
             }
         }
@@ -3038,7 +3038,7 @@ public final class InGameController extends FreeColClientHolder {
                     .addAmount("%fee%", percent);
             }
             if (!getGUI().confirm(unit.getTile(), template, unit,
-                                  "accept", "reject")) return false;
+                                  "accept", "reject", true)) return false;
         }
 
         UnitWas unitWas = new UnitWas(unit);
@@ -3153,7 +3153,7 @@ public final class InGameController extends FreeColClientHolder {
             && !getGUI().confirm(unit.getTile(), StringTemplate
                 .template("clearOrders.text")
                 .addAmount("%turns%", unit.getWorkTurnsLeft()),
-                unit, "ok", "cancel")) {
+                unit, "ok", "cancel", true)) {
             return false;
         }
 
@@ -3194,7 +3194,7 @@ public final class InGameController extends FreeColClientHolder {
                 .addStringTemplate("%oldUnit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addNamed("%unit%", newType),
-                unit, "ok", "cancel")) {
+                unit, "ok", "cancel", true)) {
             return false;
         }
 
@@ -3358,7 +3358,7 @@ public final class InGameController extends FreeColClientHolder {
             && !getGUI().confirmLeaveColony(unit)) return false;
         final Tile tile = (getGUI().isPanelShowing()) ? null : unit.getTile();
         if (!getGUI().confirm(tile, StringTemplate.key("disbandUnit.text"),
-                              unit, "disbandUnit.yes", "cancel"))
+                              unit, "disbandUnit.yes", "cancel", true))
             return false;
 
         // Try to disband
@@ -3720,7 +3720,7 @@ public final class InGameController extends FreeColClientHolder {
                             .template("missionarySettlement.inciteConfirm")
                             .addStringTemplate("%enemy%", enemy.getNationLabel())
                             .addAmount("%amount%", gold),
-                            unit, "yes", "no")) {
+                            unit, "yes", "no", true)) {
                         askServer().incite(unit, is, enemy, gold);
                     }
                 });
@@ -4649,7 +4649,7 @@ public final class InGameController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         invokeLater(() -> {
                 if (getGUI().confirm("reconnect.text",
-                                     "reconnect.no", "reconnect.yes")) {
+                                     "reconnect.no", "reconnect.yes", false)) {
                     logger.finest("Reconnect quit.");
                     fcc.getConnectController().requestLogout(LogoutReason.QUIT);
                 } else {
@@ -4826,7 +4826,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!getClientOptions().getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE)
             || !file.exists()
             || getGUI().confirm("saveConfirmationDialog.areYouSure.text",
-                                "ok", "cancel")) {
+                                "ok", "cancel", false)) {
             FreeColDirectories.setSavegameFile(file.getPath());
             return saveGame(file);
         }
@@ -5054,14 +5054,14 @@ public final class InGameController extends FreeColClientHolder {
             } else {
                 if (player.getPlayerType() != Player.PlayerType.UNDEAD
                     && getGUI().confirm("defeatedSinglePlayer.text",
-                                        "defeatedSinglePlayer.yes", "quit")) {
+                                        "defeatedSinglePlayer.yes", "quit", true)) {
                     askServer().enterRevengeMode();
                     return true;
                 }
                 reason = LogoutReason.DEFEATED;
             }
         } else {
-            if (!getGUI().confirm("defeated.text", "defeated.yes", "quit")) {
+            if (!getGUI().confirm("defeated.text", "defeated.yes", "quit", true)) {
                 reason = LogoutReason.DEFEATED;
             }
         }

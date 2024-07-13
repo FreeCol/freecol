@@ -137,12 +137,13 @@ public class GUI extends FreeColClientHolder {
      * @param textKey A string to use as the message key.
      * @param okKey A key for the message on the "ok" button.
      * @param cancelKey A key for the message on the "cancel" button.
+     * @param defaultOk The OK button gets the focus if {@code true}, else
+     *      it's the cancel button that gets focused.
      * @return True if the "ok" button was selected.
      */
-    public final boolean confirm(String textKey,
-                                 String okKey, String cancelKey) {
+    public final boolean confirm(String textKey, String okKey, String cancelKey, boolean defaultOk) {
         return confirm(null, StringTemplate.key(textKey), (ImageIcon)null,
-                       okKey, cancelKey, false);
+                       okKey, cancelKey, defaultOk);
     }
 
     /**
@@ -156,7 +157,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(StringTemplate template,
                                  String okKey, String cancelKey) {
         return confirm(null, template, (ImageIcon)null,
-                       okKey, cancelKey, false);
+                       okKey, cancelKey, true);
     }
 
     /**
@@ -174,7 +175,7 @@ public class GUI extends FreeColClientHolder {
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
-        return confirm(tile, template, icon, okKey, cancelKey, false);
+        return confirm(tile, template, icon, okKey, cancelKey, true);
     }
 
     /**
@@ -192,7 +193,7 @@ public class GUI extends FreeColClientHolder {
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
-        return confirm(tile, template, icon, okKey, cancelKey, false);
+        return confirm(tile, template, icon, okKey, cancelKey, true);
     }
 
     /**
@@ -203,13 +204,15 @@ public class GUI extends FreeColClientHolder {
      * @param unit A unit to make an icon for the dialog from.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
+     * @param defaultOk The OK button gets the focus if {@code true}, else
+     *      it's the cancel button that gets focused.
      * @return True if the "ok" button was selected.
      */
     public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
-                                 String okKey, String cancelKey) {
+                                 String okKey, String cancelKey, boolean defaultOk) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
-        return confirm(tile, template, icon, okKey, cancelKey, false);
+        return confirm(tile, template, icon, okKey, cancelKey, defaultOk);
     }
 
     /**
@@ -246,7 +249,7 @@ public class GUI extends FreeColClientHolder {
             : null;
         return template == null
             || confirm(unit.getTile(), template, unit,
-                       "abandonEducation.yes", "abandonEducation.no");
+                       "abandonEducation.yes", "abandonEducation.no", true);
     }
 
     /**
@@ -264,7 +267,7 @@ public class GUI extends FreeColClientHolder {
             .addStringTemplate("%unit%",
                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
             .addName("%route%", tr.getName());
-        return confirm(unit.getTile(), template, unit, "yes", "no");
+        return confirm(unit.getTile(), template, unit, "yes", "no", true);
     }
 
     /**
@@ -357,7 +360,7 @@ public class GUI extends FreeColClientHolder {
         StringTemplate t = StringTemplate.template(messageId)
             .addStringTemplate("%nation%", enemy.getNationLabel());
         return confirm(attacker.getTile(), t, attacker,
-                       "confirmHostile.yes", "cancel");
+                       "confirmHostile.yes", "cancel", false);
     }
 
     /**
@@ -402,7 +405,7 @@ public class GUI extends FreeColClientHolder {
             .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
             .addStringTemplate("%nation%", other.getNationLabel());
         return (confirm(is.getTile(), t, attacker,
-                        "confirmTribute.yes", "confirmTribute.no")) ? 1 : -1;
+                        "confirmTribute.yes", "confirmTribute.no", true)) ? 1 : -1;
     }
 
     /**
@@ -431,7 +434,7 @@ public class GUI extends FreeColClientHolder {
      */
     public boolean confirmStopGame() {
         return confirm("stopCurrentGame.text",
-                       "stopCurrentGame.yes", "stopCurrentGame.no");
+                       "stopCurrentGame.yes", "stopCurrentGame.no", false);
     }
 
     /**
@@ -1224,7 +1227,7 @@ public class GUI extends FreeColClientHolder {
      * @param okKey A key for the message on the "ok" button.
      * @param cancelKey A key for the message on the "cancel" button.
      * @param defaultOk The OK button gets the focus if {@code true}, else
-     *      it's the cancel button that gets focused.  
+     *      it's the cancel button that gets focused.
      * @return True if the "ok" button was selected.
      */
     public boolean confirm(Tile tile, StringTemplate template, ImageIcon icon,

@@ -818,7 +818,7 @@ public final class FreeColClient {
         final FreeColServer freeColServer = getFreeColServer();
         if (freeColServer != null ) {
             if (!getGUI().confirm("stopServer.text", "stopServer.yes",
-                                  "stopServer.no")) return false;
+                                  "stopServer.no", true)) return false;
             stopServer();
         }
         return true;
@@ -981,7 +981,7 @@ public final class FreeColClient {
      * Quits the application.
      */
     public void askToQuit() {
-        if (gui.confirm("quitDialog.areYouSure.text", "ok", "cancel")) {
+        if (gui.confirm("quitDialog.areYouSure.text", "ok", "cancel", false)) {
             Player player = getMyPlayer();
             if (player == null) { // If no player, must be already logged out
                 quit();
@@ -996,7 +996,7 @@ public final class FreeColClient {
      * Retire from the game.
      */
     public void retire() {
-        if (gui.confirm("retireDialog.areYouSure.text", "ok", "cancel")) {
+        if (gui.confirm("retireDialog.areYouSure.text", "ok", "cancel", false)) {
             final Player player = getMyPlayer();
             player.changePlayerType(Player.PlayerType.RETIRED);
             final boolean highScore = askServer().retire();

@@ -204,7 +204,7 @@ public final class EuropePanel extends PortPanel {
                     if (!getGUI().confirm(null, StringTemplate
                             .template("europePanel.leaveColonists")
                             .addStringTemplate("%newWorld%", locName),
-                            unit, "ok", "cancel")) return null;
+                            unit, "ok", "cancel", true)) return null;
                 }
 
                 igc().moveTo(unit, dest);
