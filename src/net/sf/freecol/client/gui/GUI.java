@@ -142,7 +142,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(String textKey,
                                  String okKey, String cancelKey) {
         return confirm(null, StringTemplate.key(textKey), (ImageIcon)null,
-                       okKey, cancelKey);
+                       okKey, cancelKey, false);
     }
 
     /**
@@ -156,7 +156,7 @@ public class GUI extends FreeColClientHolder {
     public final boolean confirm(StringTemplate template,
                                  String okKey, String cancelKey) {
         return confirm(null, template, (ImageIcon)null,
-                       okKey, cancelKey);
+                       okKey, cancelKey, false);
     }
 
     /**
@@ -174,7 +174,7 @@ public class GUI extends FreeColClientHolder {
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
-        return confirm(tile, template, icon, okKey, cancelKey);
+        return confirm(tile, template, icon, okKey, cancelKey, false);
     }
 
     /**
@@ -192,7 +192,7 @@ public class GUI extends FreeColClientHolder {
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
-        return confirm(tile, template, icon, okKey, cancelKey);
+        return confirm(tile, template, icon, okKey, cancelKey, false);
     }
 
     /**
@@ -209,7 +209,7 @@ public class GUI extends FreeColClientHolder {
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
-        return confirm(tile, template, icon, okKey, cancelKey);
+        return confirm(tile, template, icon, okKey, cancelKey, false);
     }
 
     /**
@@ -1223,11 +1223,12 @@ public class GUI extends FreeColClientHolder {
      * @param icon An {@code ImageIcon} to display in dialog.
      * @param okKey A key for the message on the "ok" button.
      * @param cancelKey A key for the message on the "cancel" button.
+     * @param defaultOk The OK button gets the focus if {@code true}, else
+     *      it's the cancel button that gets focused.  
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(Tile tile, StringTemplate template,
-                           ImageIcon icon,
-                           String okKey, String cancelKey) {
+    public boolean confirm(Tile tile, StringTemplate template, ImageIcon icon,
+            String okKey, String cancelKey, boolean defaultOk) {
         return false;
     }
 

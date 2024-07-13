@@ -1000,9 +1000,8 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
-                           String okKey, String cancelKey) {
-        return this.widgets.confirm(tmpl, icon, okKey, cancelKey,
-                                    getPopupPosition(tile));
+                           String okKey, String cancelKey, boolean defaultOk) {
+        return this.widgets.confirm(tmpl, icon, okKey, cancelKey,getPopupPosition(tile), defaultOk);
     }
 
     /**

@@ -51,6 +51,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -63,6 +64,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
 import net.sf.freecol.client.gui.mapviewer.CanvasMapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -1132,7 +1134,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param fcd The dialog to add.
      */
-    public void dialogAdd(FreeColDialog<?> fcd) {
+    private void dialogAdd(FreeColDialog<?> fcd) {
         if (fcd.isModal()) {
             this.mapViewer.getMapViewerState().setCursorBlinking(false);
         }
@@ -1173,12 +1175,34 @@ public final class Canvas extends JDesktopPane {
      * Should be called after a modal dialog has been removed.
      * @see #modalDialogAdd
      */
-    public void modalDialogRemove() {
+    private void modalDialogRemove() {
         logger.fine("Modal dialog dismissed.");
         displayedModalDialogs--;
         if (displayedModalDialogs == 0) {
             freeColClient.getActionManager().update();
             repaint();
+        }
+    }
+    
+    /**
+     * Displays a modal dialog and returns the answer.
+     * @param <T> The return type.
+     * @param dialog The dialog to be displayed.
+     * @return The return from the dialog.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T displayModalDialog(FreeColModalDialog<T> dialog) {
+        try {
+            modalDialogAdd();
+            return (T) JOptionPane.showInternalInputDialog(this,
+                    dialog,
+                    null,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    null);
+        } finally {
+            modalDialogRemove();
         }
     }
     

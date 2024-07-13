@@ -27,10 +27,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
@@ -45,6 +49,7 @@ import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.FreeColChoiceDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
 import net.sf.freecol.client.gui.dialog.FreeColStringInputDialog;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
@@ -74,6 +79,8 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FindSettlementPanel;
+import net.sf.freecol.client.gui.panel.FreeColButton;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
@@ -86,6 +93,7 @@ import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 import net.sf.freecol.client.gui.panel.colopedia.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.report.CompactLabourReport;
@@ -227,27 +235,38 @@ public final class Widgets {
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      * @param pos A {@code PopupPosition} for the dialog.
+     * @param defaultOk The OK button gets the focus if {@code true}, else
+     *      it's the cancel button that gets focused.
      * @return True if the user clicked the "ok"-button.
      */
     public boolean confirm(StringTemplate tmpl, ImageIcon icon,
-                           String okKey, String cancelKey, PopupPosition pos) {
-        try {
-            this.canvas.modalDialogAdd();
-            final String ok = Messages.message(okKey);
-            final String cancel = Messages.message(cancelKey);
-            final int result = JOptionPane.showInternalOptionDialog(canvas,
-                    Messages.message(tmpl),
-                    null,
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.PLAIN_MESSAGE,
-                    icon,
-                    new Object[] { ok, cancel },
-                    cancel);
+                           String okKey, String cancelKey, PopupPosition pos,
+                           boolean defaultOk) {
+        final FreeColModalDialog<Boolean> dialog = new FreeColModalDialog<Boolean>(api -> {
+            final JPanel content = new JPanel(new MigLayout("fill"));
+            if (icon != null) {
+                content.add(new JLabel(icon), "split 2, gap 0 20 0 unrel");
+            }
+            content.add(Utility.localizedTextArea(tmpl), "gap 0 0 0 unrel");
             
-            return (result == 0);
-        } finally {
-            this.canvas.modalDialogRemove();
-        }
+            final JButton okButton = new FreeColButton(Messages.message(okKey)).withButtonStyle(ButtonStyle.IMPORTANT);
+            final JButton cancelButton = new FreeColButton(Messages.message(cancelKey));
+            okButton.addActionListener(ae -> {
+                api.setValue(Boolean.TRUE);
+            });
+            cancelButton.addActionListener(ae -> {
+                api.setValue(null);
+            });
+
+            content.add(okButton, "newline, split 2, tag ok");
+            content.add(cancelButton, "tag cancel");
+            
+            api.setInitialFocusComponent((defaultOk) ? okButton : cancelButton);
+            
+            return content;
+        });
+        
+        return (canvas.displayModalDialog(dialog) != null);
     }
 
     /**
@@ -287,11 +306,33 @@ public final class Widgets {
     public String getInput(StringTemplate tmpl, String defaultValue,
                            String okKey, String cancelKey,
                            PopupPosition pos) {
-        FreeColStringInputDialog dialog
-            = new FreeColStringInputDialog(this.freeColClient, getFrame(), true,
-                                           tmpl, defaultValue,
-                                           okKey, cancelKey);
-        return this.canvas.showFreeColDialog(dialog, pos);
+        
+        final FreeColModalDialog<String> dialog = new FreeColModalDialog<String>(api -> {
+            final JPanel content = new JPanel(new MigLayout("fill"));
+            content.add(Utility.localizedTextArea(tmpl));
+            final JTextField input = new JTextField(defaultValue != null ? defaultValue : "");
+            content.add(input, "newline, growx");
+            input.addActionListener(ae -> {
+                api.setValue(input.getText());
+            });
+            
+            final JButton okButton = new FreeColButton(Messages.message(okKey)).withButtonStyle(ButtonStyle.IMPORTANT);
+            final JButton cancelButton = new FreeColButton(Messages.message(cancelKey));
+            okButton.addActionListener(ae -> {
+                api.setValue(input.getText());
+            });
+            cancelButton.addActionListener(ae -> {
+                api.setValue(null);
+            });
+            content.add(okButton, "newline, split 2, tag ok");
+            content.add(cancelButton, "tag cancel");
+            
+            api.setInitialFocusComponent(input);
+            
+            return content;
+        });
+        
+        return canvas.displayModalDialog(dialog);
     }
 
 

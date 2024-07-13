@@ -19,29 +19,31 @@
 
 package net.sf.freecol.client.gui.plaf;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.miginfocom.swing.MigLayout;
-
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
+import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.util.ImageUtils;
@@ -61,6 +63,58 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     /** Trivial internal constructor. */
     private FreeColOptionPaneUI() {}
 
+    
+    @Override
+    protected void installComponents() {
+        if (!(optionPane.getMessage() instanceof FreeColModalDialog )) {
+            super.installComponents();
+            return;
+        }
+        
+        /*
+         * FreeColModalDialog overrides the normal UI and behaviour of the JOptionPane:
+         */
+        
+        @SuppressWarnings("unchecked")
+        final FreeColModalDialog<Object> dialog = (FreeColModalDialog<Object>) optionPane.getMessage();
+        final JPanel content = dialog.createContent(new ModalApi<Object>() {
+            @Override
+            public void setValue(Object value) {
+                optionPane.setInputValue(value);
+                optionPane.setValue(value);
+            }
+            
+            @Override
+            public void setInitialFocusComponent(Component component) {
+                FreeColOptionPaneUI.this.initialFocusComponent = component;
+            }
+        });
+        
+        if (initialFocusComponent != null) {
+            /*
+             * Workaround for bug JDK-5018574 (Unable to set focus to another component in JOptionPane).
+             * https://bugs.java.com/bugdatabase/view_bug?bug_id=5018574
+             * 
+             * This workaround only handles JInternalFrame as there's no need to use FreeColModalDialog
+             * for non-internal frames.
+             */
+            content.setFocusable(true);
+            initialFocusComponent.addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    final Component c = e.getComponent();
+                    if (c.isShowing() && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                content.setFocusable(false);
+                                c.requestFocus();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        optionPane.add(content);
+    }    
 
     /**
      * Choose the number of columns for the OptionPane buttons.
