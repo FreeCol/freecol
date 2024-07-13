@@ -46,6 +46,8 @@ public class DebugAction extends FreeColAction {
 
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
                 KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK));
+        
+        setCanvasKeyBinding(true);
     }
 
 
