@@ -3,12 +3,21 @@
 All savegames (without mods) from 0.12.0 and up should continue working with 1.2.1.
 
 ### User Interface ###
+* Changes the default for most confirm dialogs to OK instead of Cancel.
+* Lots of dialogs, that where previously popups outside the game window, have now moved into the main game window.
 * 10 in now the minimum font size. This mitigates the effect from low reported DPI on macos when a non-native resolution is used.
 * Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
 * Bugfix: Attack animations are now played in the correct position.
+* Bugfix: Fixes an issue where goods that has been sold is still displayed in the unit info panel.
 
 ### Performance ###
 * Unit movements are now faster (area redrawn when moving is reduced).
+
+### Rule Changes ###
+* Disabling "Experts have connections" for the classic ruleset.
+
+### Mod development ###
+* Allow mods to add modifiers ("model.modifier.education.teaching.turns") for the education teaching time. Scope checks are applied to the teacher.
 
 
 ## FreeCol 1.2.0 (4th of July, 2024) ##
