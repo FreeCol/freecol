@@ -22,10 +22,13 @@ package net.sf.freecol.client.gui;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -50,6 +53,7 @@ import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.FreeColChoiceDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
+import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
 import net.sf.freecol.client.gui.dialog.FreeColStringInputDialog;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
@@ -282,14 +286,69 @@ public final class Widgets {
      * @return The corresponding member of the values array to the selected
      *     option, or null if no choices available.
      */
-    public <T> T getChoice(StringTemplate tmpl, ImageIcon icon,
-                           String cancelKey, List<ChoiceItem<T>> choices,
-                           PopupPosition pos) {
-        if (choices.isEmpty()) return null;
-        FreeColChoiceDialog<T> dialog
-            = new FreeColChoiceDialog<>(this.freeColClient, getFrame(), true,
-                                        tmpl, icon, cancelKey, choices);
-        return this.canvas.showFreeColDialog(dialog, pos);
+    public <T> T getChoice(StringTemplate tmpl, ImageIcon icon, String cancelKey, List<ChoiceItem<T>> choices, PopupPosition pos) {
+        if (choices.isEmpty()) {
+            return null;
+        }
+
+        final List<ChoiceItem<T>> allChoices = new ArrayList<>(choices);
+        if (cancelKey != null) {
+            ChoiceItem<T> cancelOption = new ChoiceItem<>(Messages.message(cancelKey), (T) null).cancelOption();
+            final boolean hasDefault = allChoices.stream().anyMatch(ChoiceItem::isDefault);
+            if (!hasDefault) {
+                cancelOption = cancelOption.defaultOption();
+            }
+            allChoices.add(cancelOption);
+        }
+        
+        final FreeColModalDialog<T> dialog = new FreeColModalDialog<T>(api -> {
+            final JPanel content = new JPanel(new MigLayout("fill, wrap 4"));
+            if (icon != null) {
+                content.add(new JLabel(icon), "split 2, gap 0 20 0 unrel");
+            }
+            content.add(Utility.localizedTextArea(tmpl), "gap 0 0 0 unrel, wrap");
+            
+            int i = 0;
+            boolean sameSize = allChoices.size() > 4;
+            for (ChoiceItem<T> ci : allChoices) {
+                final JButton button = createButtonFromChoiceItem(api, ci);
+                
+                List<String> layout = new ArrayList<>();
+                if (i % 4 == 0) {
+                    layout.add("newline, split 4");
+                }
+                if (sameSize) {
+                    layout.add("sg");
+                } else {
+                    if (ci.isOK()) {
+                        layout.add("tag ok");
+                    }
+                    if (ci.isCancel()) {
+                        layout.add("tag cancel");
+                    }
+                }
+                final String layoutStr = layout.stream().reduce((a, b) -> a + ", " + b).orElse(null);
+                content.add(button, layoutStr);
+                i++;
+            }
+
+            return content;
+        });
+        
+        return canvas.displayModalDialog(dialog);
+    }
+
+    private <T> JButton createButtonFromChoiceItem(ModalApi<T> api, ChoiceItem<T> ci) {
+        final ButtonStyle style = (ci.isOK()) ? ButtonStyle.IMPORTANT : ButtonStyle.SIMPLE;
+        final JButton button = new FreeColButton(ci.toString(), ci.getIcon()).withButtonStyle(style);
+        button.addActionListener(ae -> {
+           api.setValue(ci.getObject()); 
+        });
+        if (ci.isDefault()) {
+            api.setInitialFocusComponent(button);
+        }
+        button.setEnabled(ci.isEnabled());
+        return button;
     }
 
     /**

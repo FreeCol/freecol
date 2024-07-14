@@ -636,7 +636,7 @@ public class GUI extends FreeColClientHolder {
                 .addAmount("%amount%", price);
             choices.add(new ChoiceItem<>(Messages.message(pay),
                                          ClaimAction.CLAIM_ACCEPT,
-                                         player.checkGold(price)));
+                                         player.checkGold(price)).okOption().defaultOption());
         } else {
             template = StringTemplate.template("indianLand.unknown");
         }
