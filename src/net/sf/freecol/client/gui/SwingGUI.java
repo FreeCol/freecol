@@ -2224,9 +2224,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showEndTurnDialog(final List<Unit> units,
-                                  DialogHandler<Boolean> handler) {
-        this.widgets.showEndTurnDialog(units, handler);
+    public void showEndTurnDialog(final List<Unit> units) {
+        this.widgets.showEndTurnDialog(units);
     }
 
     /**

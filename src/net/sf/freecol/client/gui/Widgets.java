@@ -624,11 +624,9 @@ public final class Widgets {
      * @param units A list of {@code Unit}s that could still move.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
-    public void showEndTurnDialog(List<Unit> units,
-                                  DialogHandler<Boolean> handler) {
-        new DialogCallback<>(new EndTurnDialog(this.freeColClient,
-                                               getFrame(), units),
-                             null, handler);
+    public void showEndTurnDialog(List<Unit> units) {
+        final EndTurnDialog endTurnPanel = new EndTurnDialog(this.freeColClient, units);
+        this.canvas.showFreeColPanel(endTurnPanel, PopupPosition.LEFT, true);
     }
 
     /**

@@ -5,6 +5,7 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 ### User Interface ###
 * Changes the default for most confirm dialogs to OK instead of Cancel.
 * Lots of dialogs, that where previously popups outside the game window, have now moved into the main game window.
+* The end turn panel can now be resized.
 * 10 in now the minimum font size. This mitigates the effect from low reported DPI on macos when a non-native resolution is used.
 * Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
 * Bugfix: Attack animations are now played in the correct position.

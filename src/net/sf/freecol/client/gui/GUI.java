@@ -2091,10 +2091,8 @@ public class GUI extends FreeColClientHolder {
      * Show a dialog for the end of turn.
      *
      * @param units A list of {@code Unit}s that can still move.
-     * @param handler A callback to handle the user selected end turn state.
      */
-    public void showEndTurnDialog(final List<Unit> units,
-                                  DialogHandler<Boolean> handler) {}
+    public void showEndTurnDialog(final List<Unit> units) {}
 
     /**
      * Show an error panel.

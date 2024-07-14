@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -46,24 +46,115 @@ import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 
 /**
- * Centers the map on a known settlement or colony.  Pressing ENTER
- * opens a panel if appropriate.
+ * Displays units that have no orders and allows the player to
+ * either end turn immediately or stop to give them orders. 
  */
-public final class EndTurnDialog extends FreeColConfirmDialog {
+public final class EndTurnDialog extends FreeColPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EndTurnDialog.class.getName());
 
+    /** The list of units to display. */
+    private final JList<UnitWrapper> unitList;
+
+
+    /**
+     * Creates a new dialog.
+     * 
+     * @param freeColClient The {@code FreeColClient}
+     * @param units The list of units that still have moves left.
+     */
+    public EndTurnDialog(FreeColClient freeColClient, List<Unit> units) {
+        super(freeColClient, null, new MigLayout("wrap 1, fill", "[align center]", "[][][growprio 200][]"));
+
+        final JLabel header = Utility.localizedHeader(Messages.nameKey("endTurnDialog"), Utility.FONTSPEC_TITLE);       
+        
+        JTextArea text = Utility.localizedTextArea(StringTemplate
+            .template("endTurnDialog.areYouSure")
+            .addAmount("%number%", units.size()));
+
+        DefaultListModel<UnitWrapper> model = new DefaultListModel<>();
+        for (Unit unit : units) {
+            model.addElement(new UnitWrapper(unit));
+        }
+
+        final int numUnitRows = Math.min(4, units.size());
+        
+        this.unitList = new JList<>(model);
+        this.unitList.setVisibleRowCount(numUnitRows);
+        this.unitList.setCellRenderer(new UnitCellRenderer());
+        this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "select");
+        this.unitList.getActionMap().put("select", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    selectUnit();
+                }
+            });
+        
+        this.unitList.addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (e.getValueIsAdjusting()) return;
+                    selectUnit();
+                }
+            });
+
+        JScrollPane listScroller = new JScrollPane(this.unitList);
+        
+        add(header, "growx, shrinkx");
+        add(text, "newline 20, growx, shrinkx, wmin 100");
+        add(listScroller, "newline 10, grow, shrink");
+        
+        final JButton okButton = Utility.localizedButton("ok").withButtonStyle(ButtonStyle.IMPORTANT);
+        okButton.addActionListener(ae -> {
+            getGUI().removeComponent(this);
+            getFreeColClient().getInGameController().endTurn(false);
+        });
+        add(okButton, "newline, split 2, tag ok");
+        
+        final JButton cancelButton = Utility.localizedButton("cancel");
+        cancelButton.addActionListener(ae -> {
+            getGUI().removeComponent(this);
+        });
+        add(cancelButton, "tag cancel");
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                cancelButton.doClick();
+            }
+        });
+    }
+
+    /**
+     * Select the current unit in the list.
+     */
+    private void selectUnit() {
+        final UnitWrapper wrapper = this.unitList.getSelectedValue();
+        if (wrapper != null && wrapper.unit != null) {
+            if (wrapper.unit.isInEurope()) {
+                getGUI().showEuropePanel();
+            } else {
+                getGUI().changeView(wrapper.unit, false);
+                if (wrapper.unit.getColony() != null) {
+                    getGUI().showColonyPanel(wrapper.unit.getColony(), wrapper.unit);
+                }
+            }
+        }
+    }
+    
+    
     /**
      * We need to wrap the Unit class in order to make the JList
      * support keystroke navigation.  JList.getNextMatch uses the
@@ -84,12 +175,6 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                 .getLocationLabelFor(unit.getOwner()));
         }
 
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String toString() {
             return name;
@@ -102,16 +187,8 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             
         }
 
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public Component getListCellRendererComponent(JList<? extends UnitWrapper> list,
-                                                      UnitWrapper value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
+                UnitWrapper value, int index, boolean isSelected, boolean cellHasFocus) {
             final JLabel imageLabel = new JLabel();
             imageLabel.setIcon(new ImageIcon(getImageLibrary().getSmallerUnitImage(value.unit)));
             imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -156,91 +233,6 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                 }
             }
             return new Dimension(largestWidth, largestHeight);
-        }
-    }
-
-
-    /** The list of units to display. */
-    private final JList<UnitWrapper> unitList;
-
-
-    /**
-     * The constructor to use.
-     * 
-     * @param freeColClient The freecol client.
-     * @param frame The owner frame.
-     * @param units The unit list.
-     */
-    public EndTurnDialog(FreeColClient freeColClient, JFrame frame, List<Unit> units) {
-        super(freeColClient, frame);
-
-        final Player player = getMyPlayer();
-
-        JLabel header = Utility.localizedHeader(Messages.nameKey("endTurnDialog"),
-                                                Utility.FONTSPEC_TITLE);
-        JTextArea text = Utility.localizedTextArea(StringTemplate
-            .template("endTurnDialog.areYouSure")
-            .addAmount("%number%", units.size()));
-
-        DefaultListModel<UnitWrapper> model = new DefaultListModel<>();
-        for (Unit unit : units) {
-            model.addElement(new UnitWrapper(unit));
-        }
-
-        this.unitList = new JList<>(model);
-        this.unitList.setCellRenderer(new UnitCellRenderer());
-        this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),
-                                        "select");
-        this.unitList.getActionMap().put("select", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    selectUnit();
-                }
-            });
-        this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"),
-                                        "quit");
-        this.unitList.getActionMap().put("quit", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    EndTurnDialog.this.setValue(options.get(1));
-                }
-            });
-        this.unitList.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    if (e.getValueIsAdjusting()) return;
-                    selectUnit();
-                }
-            });
-        JScrollPane listScroller = new JScrollPane(this.unitList);
-
-        JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
-                                                  "[align center]"));
-        panel.add(header);
-        panel.add(text, "newline 20");
-        panel.add(listScroller, "newline 10");
-        panel.setSize(panel.getPreferredSize());
-
-        ImageIcon icon = new ImageIcon(
-            getImageLibrary().getScaledNationImage(player.getNation()));
-        initializeConfirmDialog(frame, false, panel, icon, "ok", "cancel");
-    }
-
-    /**
-     * Select the current unit in the list.
-     */
-    private void selectUnit() {
-        UnitWrapper wrapper = this.unitList.getSelectedValue();
-        if (wrapper != null && wrapper.unit != null) {
-            if (wrapper.unit.isInEurope()) {
-                getGUI().showEuropePanel();
-            } else {
-                getGUI().changeView(wrapper.unit, false);
-                if (wrapper.unit.getColony() != null) {
-                    getGUI().showColonyPanel(wrapper.unit.getColony(),
-                                             wrapper.unit);
-                }
-            }
         }
     }
 }

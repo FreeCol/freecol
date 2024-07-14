@@ -1109,12 +1109,7 @@ public final class InGameController extends FreeColClientHolder {
             List<Unit> units = transform(player.getUnits(), Unit::isCandidateForNextActiveUnit);
             if (!units.isEmpty()) {
                 // Modal dialog takes over
-                getGUI().showEndTurnDialog(units,
-                    (Boolean value) -> {
-                        if (value != null && value) {
-                            endTurn(false);
-                        }
-                    });
+                getGUI().showEndTurnDialog(units);
                 return;
             }
         }
