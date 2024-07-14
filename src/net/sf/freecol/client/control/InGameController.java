@@ -4326,6 +4326,7 @@ public final class InGameController extends FreeColClientHolder {
             nti = null;
         }
         askServer().nativeTrade(NativeTradeAction.CLOSE, nt);
+        getGUI().updateMapControls();
     }
 
     /**
