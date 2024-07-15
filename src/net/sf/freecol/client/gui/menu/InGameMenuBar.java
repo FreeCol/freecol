@@ -328,7 +328,7 @@ public class InGameMenuBar extends FreeColMenuBar {
             .addAmount("%tax%", player.getTax())
             .addAmount("%score%", player.getScore())
             .addStringTemplate("%year%", this.freeColClient.getGame()
-            .getTurn().getLabel())).replace("|", "✧");
+            .getTurn().getLabel())).replace("|", "\u2727"); // ✧
         
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
