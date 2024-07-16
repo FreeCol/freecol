@@ -19,17 +19,21 @@
 
 package net.sf.freecol.client.gui.dialog;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
@@ -41,74 +45,77 @@ import net.sf.freecol.common.model.Tile;
 /**
  * Dialog to display on first contact with a native player.
  */
-public class FirstContactDialog extends FreeColConfirmDialog {
+public class FirstContactDialog extends FreeColPanel {
 
     private static final String BASE_KEY = "firstContactDialog.meeting.";
     private static final String NATIVES = "natives";
     private static final String TUTORIAL_KEY = BASE_KEY + NATIVES + ".tutorial";
-
+    
+    
     /**
      * Create an FirstContactDialog.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param frame The owner frame.
      * @param player The {@code Player} making contact.
      * @param other The {@code Player} to contact.
      * @param tile An optional {@code Tile} on offer.
      * @param settlementCount The number of settlements the other
      *     player has.
      */
-    public FirstContactDialog(FreeColClient freeColClient, JFrame frame,
-            Player player, Player other, Tile tile, int settlementCount) {
-        super(freeColClient, frame);
-
-        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
-        panel.setOpaque(false);
+    public FirstContactDialog(FreeColClient freeColClient, Player player, Player other,
+            Tile tile, int settlementCount, DialogHandler<Boolean> handler) {
+        super(freeColClient, null, new MigLayout("wrap 1, fill", "[center]", "[]unrel[]unrel[growprio 200]unrel[]"));
 
         String headerKey = BASE_KEY + other.getNation().getSuffix();
-        if (!Messages.containsKey(headerKey)) headerKey = BASE_KEY + NATIVES;
-        JLabel header = Utility.localizedHeaderLabel(headerKey,
-                                                     SwingConstants.LEADING,
-                                                     Utility.FONTSPEC_SUBTITLE);
-        JLabel image = new JLabel(new ImageIcon(ImageLibrary
-                .getMeetingImage(other)));
+        if (!Messages.containsKey(headerKey)) {
+            headerKey = BASE_KEY + NATIVES;
+        }
+        final JLabel header = Utility.localizedHeaderLabel(headerKey, SwingConstants.LEADING, Utility.FONTSPEC_SUBTITLE);
+        final JLabel image = new JLabel(new ImageIcon(ImageLibrary.getMeetingImage(other)));
         image.setOpaque(false);
 
-        JTextArea tutorial = null;
-        if (!player.hasContactedIndians() && freeColClient.tutorialMode()) {
-            tutorial = Utility.localizedTextArea(TUTORIAL_KEY);
-        }
-
-        String messageId = (tile != null)
-            ? "firstContactDialog.welcomeOffer.text"
-            : "firstContactDialog.welcomeSimple.text";
-        String type = ((IndianNationType)other.getNationType())
-            .getSettlementTypeKey(true);
-        JTextArea text = Utility.localizedTextArea(StringTemplate
+        final String messageId = (tile != null) ? "firstContactDialog.welcomeOffer.text" : "firstContactDialog.welcomeSimple.text";
+        final String type = ((IndianNationType)other.getNationType()).getSettlementTypeKey(true);
+        final JTextArea text = Utility.localizedTextArea(StringTemplate
             .template(messageId)
             .addStringTemplate("%nation%", other.getNationLabel())
             .addName("%camps%", Integer.toString(settlementCount))
             .add("%settlementType%", type));
 
         // Resize the text areas to better match the image.
-        int columns = (int)Math.floor(text.getColumns()
-            * image.getPreferredSize().getWidth()
-            / text.getPreferredSize().getWidth());
+        final int columns = (int) Math.floor(text.getColumns() * image.getPreferredSize().getWidth() / text.getPreferredSize().getWidth());
         text.setColumns(columns);
         text.setSize(text.getPreferredSize());
-        if (tutorial != null) {
-            tutorial.setColumns(columns);
-            tutorial.setSize(tutorial.getPreferredSize());
-        }
 
-        panel.add(header);
-        panel.add(image);
-        if (tutorial != null) panel.add(tutorial);
-        panel.add(text);
-        panel.setSize(panel.getPreferredSize());
-
-        ImageIcon icon = new ImageIcon(getImageLibrary()
-            .getScaledNationImage(other.getNation()));
-        initializeConfirmDialog(frame, false, panel, icon, "yes", "no");
+        add(header);
+        add(image);
+        add(text, "grow, wmin 100");
+        
+        final JButton okButton = Utility.localizedButton("yes").withButtonStyle(ButtonStyle.IMPORTANT);
+        okButton.addActionListener(ae -> {
+            getGUI().removeComponent(this);
+            handler.handle(Boolean.TRUE);
+        });
+        add(okButton, "newline, split 3, tag ok");
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                okButton.doClick();
+            }
+        });
+        
+        final JButton cancelButton = Utility.localizedButton("no");
+        cancelButton.addActionListener(ae -> {
+            getGUI().removeComponent(this);
+            handler.handle(Boolean.FALSE);
+        });
+        add(cancelButton, "tag cancel");
+        
+        final JButton helpButton = Utility.localizedButton("help");
+        helpButton.addActionListener(ae -> {
+            getGUI().showInformationPanel(TUTORIAL_KEY); 
+        });
+        add(helpButton, "tag help");
     }
 }

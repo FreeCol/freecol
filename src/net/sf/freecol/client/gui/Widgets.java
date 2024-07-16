@@ -707,10 +707,8 @@ public final class Widgets {
                                        Tile tile, int settlementCount,
                                        PopupPosition pos,
                                        DialogHandler<Boolean> handler) {
-        new DialogCallback<>(new FirstContactDialog(this.freeColClient,
-                                                    getFrame(), player, other,
-                                                    tile, settlementCount),
-                             pos, handler);
+        final FirstContactDialog dialog = new FirstContactDialog(this.freeColClient, player, other, tile, settlementCount, handler);
+        this.canvas.showFreeColPanel(dialog, pos, true);
     }
 
     /**
