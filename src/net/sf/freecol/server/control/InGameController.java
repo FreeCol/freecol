@@ -2041,6 +2041,11 @@ public final class InGameController extends Controller {
                     : current.getName()) + "'s!");
         }
 
+        final ChangeSet cs = new ChangeSet();
+        if (debugOnlyAITurns > 0 && !serverPlayer.isAI()) {
+            Session.completeAll(cs);
+        }
+        
         /*
          * XXX: A hack for ensuring that sessions are handled in the same turn. We
          *      should look into a better solution.
@@ -2053,7 +2058,6 @@ public final class InGameController extends Controller {
             logger.log(Level.SEVERE, "Waiting for end session interrupted.", e);
         }
 
-        ChangeSet cs = new ChangeSet();
         for (;;) {
             current.csEndTurn(cs);
             logger.finest("Ending turn for " + current.getName());
