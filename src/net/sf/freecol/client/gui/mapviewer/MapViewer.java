@@ -554,7 +554,7 @@ public final class MapViewer extends FreeColClientHolder {
             TileClippingBounds tcb,
             boolean useBuffers) {
         
-        long t0 = now();
+        long startMs = now();
         final Player player = getMyPlayer(); // Check, can be null in map editor
         final ClientOptions options = getClientOptions();
         
@@ -570,7 +570,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         nonAnimationG2d.translate(tcb.clipLeftX, tcb.clipTopY);
         
-        long t1 = now();
+        long initMs = now();
         
         paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.displayTileWithBeach(tileG2d, tile));
         
@@ -578,7 +578,7 @@ public final class MapViewer extends FreeColClientHolder {
                 RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Display the borders
-        long t2 = now();
+        long baseTileMs = now();
         paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (getClientOptions().isRiverAnimationEnabled()
                     && (tile.hasRiver() || tv.hasRiverDelta(tile))) {
@@ -588,23 +588,21 @@ public final class MapViewer extends FreeColClientHolder {
         });
 
         // Draw the grid, if needed
-        long t3 = now();
+        long tileTransitionsMs = now();
         displayGrid(nonAnimationG2d, options, tcb);
         
         // Paint full region borders
-        long t4 = now();
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
             paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.REGION, true));
         }
 
         // Paint full country borders
-        long t5 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
             paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, true));
         }
 
         // Apply fog of war to flat parts of all tiles
-        long t6 = now();
+        long gridAndBordersMs = now();
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_OFF);
         final RescaleOp fow;
@@ -632,11 +630,11 @@ public final class MapViewer extends FreeColClientHolder {
         }
         
         // Display unknown tile borders:
-        long t7 = now();
+        long fogOfWarMs = now();
         paintEachTile(nonAnimationG2d, tcb, (tileG2d, tile) -> this.tv.displayUnknownTileBorder(tileG2d, tile));
 
         // Display the Tile overlays
-        long t8 = now();
+        long nonExplored = now();
         final int colonyLabels = options.getInteger(ClientOptions.DISPLAY_COLONY_LABELS);
         boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
         paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
@@ -652,7 +650,7 @@ public final class MapViewer extends FreeColClientHolder {
         });
         
         // Paint transparent region borders
-        long t9 = now();
+        long tileOverlaysMs = now();
         nonAnimationG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
@@ -660,13 +658,12 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Paint transparent country borders
-        long t10 = now();
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
             paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> displayTerritorialBorders(tileG2d, tile, BorderType.COUNTRY, false));
         }
 
         // Display units
-        long t12 = now();
+        long transparentBordersMs = now();
         nonAnimationG2d.setColor(Color.BLACK);
         final boolean revengeMode = getGame().isInRevengeMode();
         if (!revengeMode) {
@@ -693,7 +690,7 @@ public final class MapViewer extends FreeColClientHolder {
             });
         }
         
-        long t13 = now();
+        long unitsMs = now();
         paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
             if (!tile.isExplored()) {
                 return;
@@ -712,7 +709,7 @@ public final class MapViewer extends FreeColClientHolder {
         displayAreasInMapEditor(nonAnimationG2d, tcb);
 
         // Display the colony names, if needed
-        long t14 = now();
+        long aboveAndCloudsMs = now();
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
             paintEachTileWithExtendedImageSize(nonAnimationG2d, tcb, (tileG2d, tile) -> {
                 final Settlement settlement = tile.getSettlement();
@@ -724,14 +721,14 @@ public final class MapViewer extends FreeColClientHolder {
             });
         }
         
-        long t15 = now();
+        long colonyNamesMs = now();
         
         if (!useBuffers) {
             nonAnimationG2d.translate(-tcb.clipLeftX, -tcb.clipTopY);
         }
         
         if (logger.isLoggable(Level.FINEST)) {
-            final long gap = now() - t0;
+            final long gap = now() - startMs;
             final Map.Position bottomRight = tcb.getBottomRightDirtyTile();
             final Map.Position topLeft = tcb.getTopLeftDirtyTile();
             final double avg = ((double)gap)
@@ -742,20 +739,17 @@ public final class MapViewer extends FreeColClientHolder {
             .append(" for ").append(tcb.getTopLeftDirtyTile())
             .append(" to ").append(tcb.getBottomRightDirtyTile())
                 .append(" average ").append(avg)
-                .append(" t1=").append(t1 - t0)
-                .append(" t2=").append(t2 - t1)
-                .append(" t3=").append(t3 - t2)
-                .append(" t4=").append(t4 - t3)
-                .append(" t5=").append(t5 - t4)
-                .append(" t6=").append(t6 - t5)
-                .append(" t7=").append(t7 - t6)
-                .append(" t8=").append(t8 - t7)
-                .append(" t9=").append(t9 - t8)
-                .append(" t10=").append(t10 - t9)
-                .append(" t12=").append(t12 - t10)
-                .append(" t13=").append(t13 - t12)
-                .append(" t14=").append(t14 - t13)
-                .append(" t15=").append(t15 - t14)
+                .append(" init=").append(initMs - startMs)
+                .append(" baseTile=").append(baseTileMs - initMs)
+                .append(" tileTransitions=").append(tileTransitionsMs - baseTileMs)
+                .append(" gridAndBorders=").append(gridAndBordersMs - tileTransitionsMs)
+                .append(" fogOfWar=").append(fogOfWarMs - gridAndBordersMs)
+                .append(" nonExplored=").append(nonExplored - fogOfWarMs)
+                .append(" tileOverlays=").append(tileOverlaysMs - nonExplored)
+                .append(" transparentBorders=").append(transparentBordersMs - tileOverlaysMs)
+                .append(" units=").append(unitsMs - transparentBordersMs)
+                .append(" aboveAndClouds=").append(aboveAndCloudsMs - unitsMs)
+                .append(" colonyNames=").append(colonyNamesMs - aboveAndCloudsMs)
                 ;
             logger.finest(sb.toString());
         }
