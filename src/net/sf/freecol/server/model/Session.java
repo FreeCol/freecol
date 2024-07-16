@@ -98,6 +98,15 @@ public abstract class Session {
     }
     
     /**
+     * Checks if there are still unresolved sessions.
+     */
+    public static boolean waitingForSession() {
+        synchronized (allSessions) {
+            return allSessions.values().stream().anyMatch(s -> !s.isComplete());
+        }
+    }
+    
+    /**
      * Is this session complete?
      *
      * @return True if the session is complete.

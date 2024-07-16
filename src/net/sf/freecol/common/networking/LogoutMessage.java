@@ -30,6 +30,7 @@ import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.Session;
 
 
 /**
@@ -147,6 +148,10 @@ public class LogoutMessage extends AttributeMessage {
 
         // Confirm the logout with the given reason.
         if (cs == null) cs = new ChangeSet();
+        
+        // TODO: Do other players need to know about the results?
+        Session.completeAll(new ChangeSet());
+        
         cs.add(See.only(serverPlayer), new LogoutMessage(serverPlayer, reason));
 
         // Update the metaserver

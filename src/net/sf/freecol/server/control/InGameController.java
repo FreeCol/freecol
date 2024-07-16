@@ -2041,6 +2041,18 @@ public final class InGameController extends Controller {
                     : current.getName()) + "'s!");
         }
 
+        /*
+         * XXX: A hack for ensuring that sessions are handled in the same turn. We
+         *      should look into a better solution.
+         */
+        try {
+            while (Session.waitingForSession()) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, "Waiting for end session interrupted.", e);
+        }
+
         ChangeSet cs = new ChangeSet();
         for (;;) {
             current.csEndTurn(cs);
