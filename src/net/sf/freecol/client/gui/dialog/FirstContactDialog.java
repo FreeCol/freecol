@@ -91,7 +91,7 @@ public class FirstContactDialog extends FreeColPanel {
         add(image);
         add(text, "grow, wmin 100");
         
-        final JButton okButton = Utility.localizedButton("yes").withButtonStyle(ButtonStyle.IMPORTANT);
+        okButton = Utility.localizedButton("yes").withButtonStyle(ButtonStyle.IMPORTANT);
         okButton.addActionListener(ae -> {
             getGUI().removeComponent(this);
             handler.handle(Boolean.TRUE);

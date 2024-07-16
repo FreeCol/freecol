@@ -116,7 +116,7 @@ public final class EndTurnDialog extends FreeColPanel {
         add(text, "newline 20, growx, shrinkx, wmin 100");
         add(listScroller, "newline 10, grow, shrink");
         
-        final JButton okButton = Utility.localizedButton("ok").withButtonStyle(ButtonStyle.IMPORTANT);
+        okButton = Utility.localizedButton("ok").withButtonStyle(ButtonStyle.IMPORTANT);
         okButton.addActionListener(ae -> {
             getGUI().removeComponent(this);
             getFreeColClient().getInGameController().endTurn(false);
