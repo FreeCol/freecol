@@ -2467,17 +2467,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
-                                                 FreeColGameObject other,
-                                                 DiplomaticTrade agreement,
-                                                 StringTemplate comment) {
+    public void showNegotiationDialog(FreeColGameObject our, FreeColGameObject other, DiplomaticTrade agreement,
+            StringTemplate comment, DialogHandler<DiplomaticTrade> handler) {
         if ((!(our instanceof Unit) && !(our instanceof Colony))
             || (!(other instanceof Unit) && !(other instanceof Colony))
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        return this.widgets.showNegotiationDialog(our, other, agreement,
-            comment, getPopupPosition(((Location)our).getTile()));
+        this.widgets.showNegotiationDialog(our, other, agreement, comment, getPopupPosition(((Location)our).getTile()), handler);
     }
 
     /**

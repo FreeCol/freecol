@@ -476,14 +476,12 @@ public final class InGameController extends FreeColClientHolder {
     private void showNegotiationDialog(final Unit unit,
         final Settlement settlement, final DiplomaticTrade agreement,
         final StringTemplate comment, final Direction direction) {
-        final Player player = unit.getOwner();
         invokeLater(() -> {
-                DiplomaticTrade dt = getGUI()
-                    .showNegotiationDialog(unit, settlement, agreement, comment);
-                if (direction != null && dt != null
-                    && dt.getStatus() != TradeStatus.REJECT_TRADE) {
-                    moveDiplomacy(unit, direction, dt);
-                }
+                getGUI().showNegotiationDialog(unit, settlement, agreement, comment, (dt) -> {
+                    if (direction != null && dt != null && dt.getStatus() != TradeStatus.REJECT_TRADE) {
+                        moveDiplomacy(unit, direction, dt);
+                    }
+                });
             });
     }
 
@@ -3323,13 +3321,13 @@ public final class InGameController extends FreeColClientHolder {
         case PROPOSE_TRADE:
             invokeLater(() -> {
                     StringTemplate template = agreement.getReceiveMessage(otherPlayer);
-                    DiplomaticTrade ourAgreement = getGUI()
-                        .showNegotiationDialog(our, other, agreement, template);
-                    if (ourAgreement == null) {
-                        ourAgreement = agreement;
-                        ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
-                    }
-                    askServer().diplomacy(our, other, ourAgreement);
+                    getGUI().showNegotiationDialog(our, other, agreement, template, (ourAgreement) -> {
+                        if (ourAgreement == null) {
+                            ourAgreement = agreement;
+                            ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
+                        }
+                        askServer().diplomacy(our, other, ourAgreement);                        
+                    });
                 });
             break;
         default:

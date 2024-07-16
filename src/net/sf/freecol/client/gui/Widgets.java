@@ -905,17 +905,11 @@ public final class Widgets {
      * @param comment An optional {@code StringTemplate} containing a
      *     commentary message.
      * @param pos A {@code PopupPosition} for the dialog.
-     * @return An updated agreement.
      */
-    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
-                                                 FreeColGameObject other,
-                                                 DiplomaticTrade agreement,
-                                                 StringTemplate comment,
-                                                 PopupPosition pos) {
-        NegotiationDialog dialog
-            = new NegotiationDialog(this.freeColClient, getFrame(),
-                                    our, other, agreement, comment);
-        return this.canvas.showFreeColDialog(dialog, pos);
+    public FreeColPanel showNegotiationDialog(FreeColGameObject our, FreeColGameObject other, DiplomaticTrade agreement,
+            StringTemplate comment, PopupPosition pos, DialogHandler<DiplomaticTrade> handler) {
+        final NegotiationDialog dialog = new NegotiationDialog(this.freeColClient, our, other, agreement, comment, handler);
+        return this.canvas.showFreeColPanel(dialog, pos, true);
     }
 
     /**

@@ -23,6 +23,7 @@ import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -35,10 +36,8 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -51,8 +50,11 @@ import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.panel.FreeColButton;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -113,7 +115,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
  * | --------------- |
  * TODO: Improve layout description
  */
-public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
+public final class NegotiationDialog extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
 
@@ -147,7 +149,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     private String exchangeMessage;
 
     /** Responses. */
-    private ChoiceItem<DiplomaticTrade> send = null, accept = null;
+    private FreeColButton send = null, accept = null;
 
 
     /**
@@ -162,10 +164,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * @param comment An optional {@code StringTemplate}
      *     commentary message.
      */
-    public NegotiationDialog(FreeColClient freeColClient, JFrame frame,
+    public NegotiationDialog(FreeColClient freeColClient,
                              FreeColGameObject our, FreeColGameObject other,
-                             DiplomaticTrade agreement, StringTemplate comment) {
-        super(freeColClient, frame);
+                             DiplomaticTrade agreement, StringTemplate comment,
+                             DialogHandler<DiplomaticTrade> handler) {
+        super(freeColClient, null, new MigLayout("wrap 3, fill", "[][growprio 200][align right]", ""));
 
         final Player player = getMyPlayer();
         final Unit ourUnit = (our instanceof Unit) ? (Unit)our : null;
@@ -258,104 +261,138 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Build Layout of Diplomatic Trade Dialog
          */
-        JPanel panel = new MigPanel(new MigLayout("wrap 3",
-                                                  "[30%|40%|30%]", ""));
+
         // Main Panel Header
-        panel.add(Utility.localizedHeader("negotiationDialog.title."
+        add(Utility.localizedHeader("negotiationDialog.title."
                                           + agreement.getContext().getKey(),
                                           Utility.FONTSPEC_TITLE),
                 "span 3, center");
 
         // Panel contents Header row
+        //JLabel labelDemandMessage = new JLabel(Messages.message(this.demand));
         JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
         Font font = FontLibrary.getScaledFont("normal-bold-tiny");
         labelDemandMessage.setFont(font);
-        panel.add(labelDemandMessage);
+        add(labelDemandMessage, "width 50:50:100%, grow");
         JTextArea blank = new JTextArea(" ");
         blank.setVisible(false);
-        panel.add(blank, "");
+        add(blank, "");
+        
         JTextArea labelOfferMessage = Utility.localizedTextArea(this.offer);
+        labelOfferMessage.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         labelOfferMessage.setFont(font);
-        panel.add(labelOfferMessage);
+        add(labelOfferMessage, "width 50:50:100%, grow");
 
         // Panel contents
         // TODO: Expand center panel so that contents fill cell horizontally. 
-        panel.add(this.goldDemandPanel); // Left pane
-        JPanel centerPanel = new MigPanel(new MigLayout("wrap 1"));
-        centerPanel.setMinimumSize(new Dimension(250, 50));
+        add(this.goldDemandPanel, "sg item"); // Left pane
+        JPanel centerPanel = new MigPanel(new MigLayout("wrap 1, fill"));
+        centerPanel.setOpaque(false);
+        //centerPanel.setMinimumSize(new Dimension(250, 50));
         if (tutorial != null) {
             // Display only if tutorial variable contents overriden
             //      Can only occur if: First Contact with a forgeign Nation
             JTextArea tutArea = Utility.localizedTextArea(tutorial, 30);
-            centerPanel.add(tutArea, "center");
+            centerPanel.add(tutArea, "top, wmin 200");
         }
         JScrollPane scroll = new JScrollPane(this.summary,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
-        centerPanel.add(scroll, "top, width 100%");
-        panel.add(centerPanel, "spany, top"); // Center pane
-        panel.add(this.goldOfferPanel); // Right pane
+        centerPanel.add(scroll, "top, width 100%, wmin 200, grow");
+        add(centerPanel, "spany 3, top, growx"); // Center pane
+        add(this.goldOfferPanel, "sg item"); // Right pane
 
         if (this.colonyDemandPanel != null) {
-            panel.add(this.colonyDemandPanel);
-            panel.add(this.colonyOfferPanel);
+            add(this.colonyDemandPanel, "sg item");
+            add(this.colonyOfferPanel, "sg item");
         }
         if (this.stancePanel != null) {
-            panel.add(this.stancePanel, "skip");
+            add(this.stancePanel, "skip, sg item");
         }
         if (this.goodsDemandPanel != null) {
-            panel.add(this.goodsDemandPanel);
-            panel.add(this.goodsOfferPanel);
+            add(this.goodsDemandPanel, "sg item");
+            add(this.goodsOfferPanel, "sg item");
         }
         if (this.inciteDemandPanel != null) {
-            panel.add(this.inciteDemandPanel);
-            panel.add(this.inciteOfferPanel);
+            add(this.inciteDemandPanel, "sg item");
+            add(this.inciteOfferPanel, "sg item");
         }
         if (this.unitDemandPanel != null) {
-            panel.add(this.unitDemandPanel);
-            panel.add(this.unitOfferPanel);
+            add(this.unitDemandPanel, "sg item");
+            add(this.unitOfferPanel, "sg item");
         }
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-            panel.add(new JLabel("Version = " + agreement.getVersion()));
+            add(new JLabel("Version = " + agreement.getVersion()));
         }
 
-        String str;
-        List<ChoiceItem<DiplomaticTrade>> c = choices();
-        if (agreement.getVersion() > 0) { // A new offer can not be accepted
-            str = Messages.message("negotiationDialog.accept");
-            c.add(this.accept = new ChoiceItem<>(str, (DiplomaticTrade)null));
-        }
-        str = Messages.message("negotiationDialog.send");
-        c.add(this.send = new ChoiceItem<>(str,
-                (DiplomaticTrade)null).okOption());
-        if (agreement.getVersion() > 0 || context != TradeContext.CONTACT) {
-            str = Messages.message("negotiationDialog.cancel");
-            c.add(new ChoiceItem<>(str,
-                    (DiplomaticTrade)null).cancelOption().defaultOption());
-        }
         updateDialog(false);
 
+        /*
         ImageIcon icon = new ImageIcon((otherColony != null)
                 ? getImageLibrary().getScaledSettlementImage(otherColony)
                 : getImageLibrary().getScaledUnitImage(otherUnit));
-        initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DiplomaticTrade getResponse() {
-        Object value = getValue();
-        TradeStatus s = (value == null) ? TradeStatus.REJECT_TRADE
-                : (value == this.accept) ? TradeStatus.ACCEPT_TRADE
-                : (value == this.send) ? TradeStatus.PROPOSE_TRADE
-                : TradeStatus.REJECT_TRADE;
-        agreement.setStatus(s);
-        return agreement;
+                */
+        /*
+        final JPanel empty = new JPanel();
+        empty.setOpaque(false);
+        add(empty, "newline, grow 200 200");
+        */
+        
+        int numButtons = 0;
+        if (agreement.getVersion() > 0) { // A new offer can not be accepted
+            accept = new FreeColButton(Messages.message("negotiationDialog.accept")).withButtonStyle(ButtonStyle.IMPORTANT);
+            accept.addActionListener(ae -> {
+                getGUI().removeComponent(this);
+                agreement.setStatus(TradeStatus.ACCEPT_TRADE);
+                handler.handle(agreement);
+            });
+            okButton = accept;
+            numButtons++;
+        }
+        
+        send = new FreeColButton(Messages.message("negotiationDialog.send"));
+        if (accept == null) {
+            send.withButtonStyle(ButtonStyle.IMPORTANT);
+            okButton = send;
+        }
+        send.addActionListener(ae -> {
+            getGUI().removeComponent(this);
+            agreement.setStatus(TradeStatus.PROPOSE_TRADE);
+            handler.handle(agreement);
+        });
+        numButtons++;
+        
+        final FreeColButton cancel;
+        if (agreement.getVersion() > 0 || context != TradeContext.CONTACT) {
+            cancel = new FreeColButton(Messages.message("negotiationDialog.cancel"));
+            cancel.addActionListener(ae -> {
+                getGUI().removeComponent(this);
+                agreement.setStatus(TradeStatus.REJECT_TRADE);
+                handler.handle(agreement);
+            });
+            numButtons++;
+        } else {
+            cancel = null;
+        }
+        
+        add(send, "newline, span 3, split " + numButtons + ((accept == null) ? ", tag ok " : ", tag next"));
+        if (accept != null) {
+            add(accept, "tag ok");
+        }
+        if (cancel != null) {
+            add(cancel, "tag cancel");
+            setEscapeAction(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    cancel.doClick();
+                }
+            });
+        }
+        
+        setSize(getPreferredSize());
+        // TOD: keybind ENTER + ESC
     }
 
     /**
@@ -1164,7 +1201,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             } else {
                 stanceBox.addItem(Stance.CEASE_FIRE);
             }
-            if (stance != Stance.PEACE && stance != Stance.UNCONTACTED) {
+            if (stance != Stance.PEACE) {
                 stanceBox.addItem(Stance.PEACE);
             }
             if (stance == Stance.PEACE) {

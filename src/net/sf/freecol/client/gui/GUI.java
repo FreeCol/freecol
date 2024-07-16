@@ -2286,12 +2286,9 @@ public class GUI extends FreeColClientHolder {
      * @param agreement The current {@code DiplomaticTrade} agreement.
      * @param comment An optional {@code StringTemplate} containing a
      *     commentary message.
-     * @return The negotiated {@code DiplomaticTrade} agreement.
      */
-    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
-                                                 FreeColGameObject other,
-                                                 DiplomaticTrade agreement,
-                                                 StringTemplate comment) { return null; }
+    public void showNegotiationDialog(FreeColGameObject our, FreeColGameObject other, DiplomaticTrade agreement,
+            StringTemplate comment, DialogHandler<DiplomaticTrade> handler) {}
 
     /**
      * Show the NewPanel.

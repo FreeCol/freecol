@@ -4259,7 +4259,7 @@ outer:  for (Effect effect : effects) {
             // accepts the tile offer, we can verify that the offer
             // was made.
             DiplomacySession ds = new DiplomacySession(tile.getFirstUnit(),
-                tile.getOwningSettlement(), FreeCol.getTimeout(false));
+                tile.getOwningSettlement(), FreeCol.getTimeout(true));  // TODO: Timeout in multiplayer
             ds.register();
             ds.setAgreement(DiplomaticTrade
                 .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT,
@@ -4295,7 +4295,7 @@ outer:  for (Effect effect : effects) {
         // Initial agreement goes first to this player
         DiplomaticTrade agreement = DiplomaticTrade
             .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT, this, other);
-        final long timeout = FreeCol.getTimeout(false);
+        final long timeout = FreeCol.getTimeout(true); // TODO: Timeout in multiplayer
         DiplomacySession session = (settlement == null)
             ? new DiplomacySession(unit, otherUnit, timeout)
             : new DiplomacySession(unit, settlement, timeout);
