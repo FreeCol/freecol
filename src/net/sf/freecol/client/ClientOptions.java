@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FullscreenDisplayModeOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -122,6 +123,12 @@ public class ClientOptions extends OptionGroup {
 
     private static final String DISPLAY_GROUP
         = "clientOptions.display";
+    
+    /**
+     * Option to control the display mode in fullscreen
+     */
+    public static final String DISPLAY_MODE_FULLSCREEN
+        = "model.option.fullscreenDisplayMode";
 
     /**
      * Option to control the display scale factor.
@@ -879,6 +886,14 @@ public class ClientOptions extends OptionGroup {
         final RangeOption op = getOption(DISPLAY_SCALING, RangeOption.class);
         if (!op.getItemValues().containsKey(75)) {
             op.setItemValueAtIndex(1, 75, "model.option.displayScaling.75");
+        }
+        // end @compat 1.1.0
+        // @compat 1.1.0
+        if (!hasOption(DISPLAY_MODE_FULLSCREEN, FullscreenDisplayModeOption.class)) {
+            final FullscreenDisplayModeOption dmf = new FullscreenDisplayModeOption(null);
+            dmf.setGroup(DISPLAY_GROUP);
+            dmf.setValue(null);
+            add(op);
         }
         // end @compat 1.1.0
     }

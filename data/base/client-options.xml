@@ -29,6 +29,8 @@
     </optionGroup>
 
     <optionGroup id="clientOptions.display" >
+      <fullscreenDisplayModeOption id="model.option.fullscreenDisplayMode" defaultValue="" />
+      
       <!-- Control the display scale -->
       <rangeOption id="model.option.displayScaling"
                    defaultValue="0" localizedLabels="true">

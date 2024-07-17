@@ -771,6 +771,7 @@ public class SwingGUI extends GUI {
     @Override
     public void changeWindowedMode() {
         this.canvas.toggleFrame();
+        refreshGuiUsingClientOptions();
     }
 
     /** 
@@ -883,6 +884,8 @@ public class SwingGUI extends GUI {
                                  desiredWindowSize, this.mapViewer,
                                  this.mapControls);
         this.widgets = new Widgets(fcc, this.canvas);
+        
+        refreshGuiUsingClientOptions();
 
         // Now that there is a canvas, prepare for language changes.
         opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)

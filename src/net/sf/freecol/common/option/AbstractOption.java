@@ -249,6 +249,9 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
         } else if (AudioMixerOption.TAG.equals(tag)) {
             option = new AudioMixerOption(spec);
 
+        } else if (FullscreenDisplayModeOption.TAG.equals(tag)) {
+            option = new FullscreenDisplayModeOption(spec);
+
         } else if (BooleanOption.TAG.equals(tag)) {
             option = new BooleanOption(spec);
 
