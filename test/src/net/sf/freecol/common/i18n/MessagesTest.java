@@ -161,7 +161,7 @@ public class MessagesTest extends FreeColTestCase {
             .addName("xyz");
         assertEquals("Food / xyz", Messages.message(t2));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         assertEquals("New Amsterdam", colony.getName());
 
         StringTemplate t3 = StringTemplate.template("model.building.locationLabel")

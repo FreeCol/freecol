@@ -207,7 +207,7 @@ public class MovementTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         tile3.setExplored(dutch, true);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         assertEquals(tile1.getColony(), colony);
 
         Unit colonist = new ServerUnit(game, tile2, french, colonistType);

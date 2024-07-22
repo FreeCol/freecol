@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -43,8 +41,6 @@ import net.sf.freecol.server.ai.WorkerWish;
  * Mission for realizing a {@code Wish}.
  */
 public final class WishRealizationMission extends Mission {
-
-    private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
     public static final String TAG = "wishRealizationMission";
 

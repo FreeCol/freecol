@@ -72,7 +72,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         game.changeMap(getTestMap(true));
 
         final int pop = 5;
-        Colony colony = getStandardColony(pop);
+        Colony colony = createStandardColony(pop);
         Player player = colony.getOwner();
 
         // Zero to start
@@ -159,7 +159,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
 
@@ -180,7 +180,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
         unit.setType(nativeConvertType);
@@ -222,7 +222,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertNotNull(jeffersonModifier);
         assertTrue(jeffersonModifier.appliesTo(townHallType));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
         Building townHall = colony.getBuilding(townHallType);
         clearWorkLocation(townHall);
@@ -246,7 +246,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Unit unit = colony.getUnitList().get(0);
         Player player = colony.getOwner();
         Player iroquois = getGame().getPlayerByNationId("model.nation.iroquois");
@@ -284,7 +284,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
         Building townHall = colony.getBuilding(townHallType);
         clearWorkLocation(townHall);
@@ -333,7 +333,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap());
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Player player = colony.getOwner();
         Unit colonist = colony.getUnitList().get(0);
 
@@ -363,7 +363,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
 
         // The custom house is not buildable initially

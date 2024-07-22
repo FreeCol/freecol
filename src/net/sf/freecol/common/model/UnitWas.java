@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.util.Utils;
@@ -31,8 +30,6 @@ import net.sf.freecol.common.util.Utils;
  * and fire off any consequent property changes.
  */
 public class UnitWas extends ObjectWas implements Comparable<UnitWas> {
-
-    private static final Logger logger = Logger.getLogger(UnitWas.class.getName());
 
     private final Unit unit;
     private final UnitType type;

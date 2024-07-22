@@ -2505,7 +2505,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         
         getPlayer().modifyGold(-purchasePrice);
-        final List<Unit> createdUnit = ((ServerPlayer) getPlayer()).createUnits(List.of(au), getPlayer().getEurope(), getAIRandom());
+        final ServerPlayer serverPlayer = (ServerPlayer) getPlayer();
+        serverPlayer.createUnits(List.of(au), getPlayer().getEurope(), getAIRandom());
+        
         return true;
     }
 

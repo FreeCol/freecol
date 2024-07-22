@@ -23,7 +23,6 @@ import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
 import static net.sf.freecol.common.util.CollectionUtils.max;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;

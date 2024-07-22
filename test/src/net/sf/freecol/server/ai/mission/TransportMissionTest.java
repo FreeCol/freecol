@@ -124,7 +124,6 @@ public class TransportMissionTest extends FreeColTestCase {
     public void testGetNextStopAlreadyAtDestination() {
         Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
         Map map = game.getMap();
-        InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
@@ -133,7 +132,7 @@ public class TransportMissionTest extends FreeColTestCase {
         
         // create a ship carrying a colonist
         Tile colonyTile = map.getTile(9, 9);
-        getStandardColony(1, colonyTile.getX(), colonyTile.getY());
+        createStandardColony(1, colonyTile.getX(), colonyTile.getY());
 
         Unit galleon = new ServerUnit(game, colonyTile, dutch, galleonType);
         AIUnit aiUnit = aiMain.getAIUnit(galleon);
@@ -157,7 +156,6 @@ public class TransportMissionTest extends FreeColTestCase {
     public void testGetNextStopIsEurope() {
         Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
         Map map = game.getMap();
-        InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
@@ -168,7 +166,7 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // create a ship carrying a colonist in a colony
         Tile colonyTile = map.getTile(9, 9);
-        getStandardColony(1, colonyTile.getX(), colonyTile.getY());
+        createStandardColony(1, colonyTile.getX(), colonyTile.getY());
 
         Unit galleon = new ServerUnit(game, colonyTile, dutch, galleonType);
         AIUnit aiUnit = aiMain.getAIUnit(galleon);
@@ -195,7 +193,6 @@ public class TransportMissionTest extends FreeColTestCase {
     public void testGetNextStopIsColony() {
         Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
         Map map = game.getMap();
-        InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
@@ -205,7 +202,7 @@ public class TransportMissionTest extends FreeColTestCase {
 
         Tile colonyTile = map.getTile(9, 9);
         assertTrue(colonyTile.isLand());
-        getStandardColony(1, colonyTile.getX(), colonyTile.getY());
+        createStandardColony(1, colonyTile.getX(), colonyTile.getY());
 
         // create a ship
         Tile galleonTile = map.getTile(10, 9);
@@ -234,7 +231,6 @@ public class TransportMissionTest extends FreeColTestCase {
     public void testGetDefaultDestination() {
         Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
         Map map = game.getMap();
-        InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
@@ -282,9 +278,9 @@ public class TransportMissionTest extends FreeColTestCase {
 
     public void testWagonTrain() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-        Colony one = getStandardColony(3, 3, 3);
+        Colony one = createStandardColony(3, 3, 3);
         one.setName("one");
-        Colony two = getStandardColony(3, 8, 8);
+        Colony two = createStandardColony(3, 8, 8);
         two.setName("two");
         assertEquals(one.getOwner(), two.getOwner());
 

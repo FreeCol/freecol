@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.dialog;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
@@ -36,11 +35,12 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
@@ -200,7 +200,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         final Specification spec = freeColClient.getGame().getSpecification();
         final GUI gui = getGUI();
         IndianSettlement ret = null;
-        Set<Tile> tiles = is.getOwnedTiles();
         Object value = getValue();
         if (options.get(0).equals(value)) { // OK
             is.setName(this.name.getText());

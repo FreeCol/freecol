@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
@@ -38,11 +36,7 @@ import net.sf.freecol.server.FreeColServer;
 /**
  * Message handler for new client connections.
  */
-public final class UserConnectionHandler extends FreeColServerHolder
-    implements MessageHandler {
-
-    private static final Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
-
+public final class UserConnectionHandler extends FreeColServerHolder implements MessageHandler {
 
     /**
      * Build a new user connection handler.

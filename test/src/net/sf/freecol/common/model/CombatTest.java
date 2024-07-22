@@ -238,7 +238,7 @@ public class CombatTest extends FreeColTestCase {
         Map map = getTestMap(true);
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player inca = game.getPlayerByNationId("model.nation.inca");
 
@@ -267,7 +267,7 @@ public class CombatTest extends FreeColTestCase {
         final SimpleCombatModel combatModel = new SimpleCombatModel();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Player inca = game.getPlayerByNationId("model.nation.inca");
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
         Unit colonist = first(colony.getUnitList());

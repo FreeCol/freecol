@@ -87,7 +87,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * Creates a colony with a university and n elder statesmen
      */
     private Colony getSchoolColony(int n, SchoolLevel slevel) {
-        Colony colony = getStandardColony(n);
+        Colony colony = createStandardColony(n);
         for (Unit u : colony.getUnitList()) u.setType(elderStatesmanType);
         BuildingType type = null;
         switch (slevel) {
@@ -831,7 +831,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         boolean selection = FreeColTestUtils.setStudentSelection(false);
         ServerTestHelper.startServerGame(getTestMap(true));
 
-        Colony otherColony = getStandardColony(1, 10, 10);
+        Colony otherColony = createStandardColony(1, 10, 10);
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         // prevent starvation
         colony.addGoods(foodType, 100);

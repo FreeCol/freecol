@@ -24,7 +24,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -58,8 +57,6 @@ import net.sf.freecol.common.option.GameOptions;
  * A dialog to display a colony warehouse.
  */
 public final class WarehouseDialog extends FreeColPanel {
-
-    private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 
 
     /**
@@ -175,7 +172,6 @@ public final class WarehouseDialog extends FreeColPanel {
             add(goodsLabel, "span 1 2");
 
             // low level settings
-            String str;
             SpinnerNumberModel lowLevelModel
                 = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);

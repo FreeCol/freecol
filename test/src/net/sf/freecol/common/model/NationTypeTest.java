@@ -139,7 +139,7 @@ public class NationTypeTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.getOwner().changeNationType(spec().getNationType("model.nationType.building"));
 
         List<Modifier> modifiers = toList(colony.getOwner().getModifiers("model.goods.hammers"));

@@ -119,7 +119,7 @@ public class ServerColonyTest extends FreeColTestCase {
         ServerTestHelper.startServerGame(getTestMap(marsh));
 
         int consumption, production, unitsBeforeNewTurn = 3;
-        Colony colony = getStandardColony(unitsBeforeNewTurn);
+        Colony colony = createStandardColony(unitsBeforeNewTurn);
 
         final Building townHall = colony.getBuilding(townHallType);
         for (Unit u : colony.getUnitList()) {
@@ -155,7 +155,7 @@ public class ServerColonyTest extends FreeColTestCase {
         ServerTestHelper.startServerGame(getTestMap(marsh));
 
         int unitsBeforeNewTurn = 3;
-        Colony colony = getStandardColony(unitsBeforeNewTurn);
+        Colony colony = createStandardColony(unitsBeforeNewTurn);
         assertEquals("Wrong number of units in colony", unitsBeforeNewTurn,
             colony.getUnitCount());
 
@@ -193,7 +193,7 @@ public class ServerColonyTest extends FreeColTestCase {
     public void testBuildingCompletion() {
         ServerTestHelper.startServerGame(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         ServerBuilding initialWarehouse
             = new ServerBuilding(getGame(), colony, depotType);
         colony.addBuilding(initialWarehouse);
@@ -218,7 +218,7 @@ public class ServerColonyTest extends FreeColTestCase {
     public void testInvalidCompletion() {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
-        Colony colony = getStandardColony(2);
+        Colony colony = createStandardColony(2);
         Building carpenterHouse = colony.getBuilding(carpenterHouseType);
         assertEquals("Colony should not have lumber mill", carpenterHouse,
                      colony.getBuilding(lumberMillType));
@@ -252,7 +252,7 @@ public class ServerColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Building carpenterHouse = colony.getBuilding(carpenterHouseType);
         Unit unit = colony.getFirstUnit();
         // necessary for work production
@@ -283,7 +283,7 @@ public class ServerColonyTest extends FreeColTestCase {
         ServerTestHelper.startServerGame(getTestMap(true));
 
         final int population = 3;
-        Colony colony = getStandardColony(population);
+        Colony colony = createStandardColony(population);
 
         ServerBuilding townHall
             = (ServerBuilding)colony.getBuilding(townHallType);

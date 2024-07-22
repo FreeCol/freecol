@@ -68,7 +68,6 @@ public class ServerPlayerTest extends FreeColTestCase {
      */
     public void testMarketRecovery() {
         ServerGame game = ServerTestHelper.startServerGame(getTestMap());
-        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer french = getServerPlayer(game, "model.nation.french");
         ServerPlayer english = getServerPlayer(game, "model.nation.english");
@@ -81,6 +80,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // is now considered "traded".
         Random random = new Random();
         int m = english.sellInEurope(random, null, silverType, 1);
+        assertEquals(1, m);
         assertTrue(englishMarket.hasBeenTraded(silverType));
         int englishAmount = englishMarket.getAmountInMarket(silverType);
 
@@ -164,7 +164,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.addGoods(cottonType, 200);
         ServerPlayer dutch
             = getServerPlayer(game, "model.nation.dutch");
@@ -404,7 +404,7 @@ public class ServerPlayerTest extends FreeColTestCase {
      */
     public int buyUntilPriceRise(Game game, ServerPlayer player,
                                  GoodsType type) {
-        Game g = ServerTestHelper.startServerGame(getTestMap());
+        ServerTestHelper.startServerGame(getTestMap());
         Random random = new Random();
         int result = 0;
         Market market = player.getMarket();

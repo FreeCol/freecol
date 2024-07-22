@@ -1235,9 +1235,7 @@ public class Colony extends Settlement implements TradeLocation {
      * @param amount The number of liberty to add.
      */
     public void addLiberty(int amount) {
-        List<GoodsType> libertyTypeList = getSpecification()
-                .getLibertyGoodsTypeList();
-        final int uc = getUnitCount();
+        List<GoodsType> libertyTypeList = getSpecification().getLibertyGoodsTypeList();
         if (amount > 0 && !libertyTypeList.isEmpty()) {
             addGoods(libertyTypeList.get(0), amount);
         }

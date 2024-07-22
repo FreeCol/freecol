@@ -94,7 +94,6 @@ public class ChatMessage extends AttributeMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final Color color = getColor();
         final String sender = getSender();
         final String text = getMessage();

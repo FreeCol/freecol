@@ -898,7 +898,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
      * @param summaries A list of {@code ColonySummary}s to update from.
      */
     private void updateCombinedColonies(List<ColonySummary> summaries) {
-        JLabel l;
         Color c;
         StringTemplate t;
 

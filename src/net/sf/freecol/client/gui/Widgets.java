@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -150,8 +149,6 @@ import net.sf.freecol.common.util.Utils;
  * Moved here so that Canvas is more manageable.
  */
 public final class Widgets {
-
-    private static final Logger logger = Logger.getLogger(Widgets.class.getName());
 
     /** The game client. */
     private final FreeColClient freeColClient;

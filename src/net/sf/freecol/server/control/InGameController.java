@@ -646,7 +646,6 @@ public final class InGameController extends Controller {
         if (!valid) return;
         String messageId = action.getTextKey();
         StringTemplate template;
-        MonarchActionMessage message;
         String monarchKey = serverPlayer.getNationId();
 
         switch (action) {
@@ -3898,11 +3897,10 @@ public final class InGameController extends Controller {
     public ChangeSet updateTradeRoute(ServerPlayer serverPlayer,
                                       TradeRoute tradeRoute) {
         final Game game = getGame();
-        String name;
         StringTemplate fail;
         TradeRoute tr;
         if (tradeRoute == null || tradeRoute.getId() == null
-            || (name = tradeRoute.getName()) == null) {
+            || tradeRoute.getName() == null) {
             return serverPlayer.clientError("Bogus route");
         } else if ((fail = tradeRoute.verify()) != null) {
             return serverPlayer.clientError(Messages.message(fail));

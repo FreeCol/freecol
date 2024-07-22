@@ -645,7 +645,7 @@ public class MapTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile();
 
         Map otherMap = map.copy(game);

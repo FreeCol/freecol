@@ -582,11 +582,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         if (hasSettlements()) return false;
 
         int naval = 0;
-        int land = 0, landOnMap = 0;
+        int land = 0;
         for (Unit u : getUnitSet()) {
             if (u.isNaval()) naval++; else {
                 land++;
-                if (u.isOnTile()) landOnMap++;
             }
         }
 

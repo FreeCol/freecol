@@ -754,7 +754,6 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String SKILL_TAUGHT_TAG = "skill-taught";
     private static final String SPACE_TAG = "space";
     private static final String SPACE_TAKEN_TAG = "space-taken";
-    private static final String UNIT_TAG = "unit";
     // @compat 0.11.0
     private static final String OLD_DEFAULT_EQUIPMENT_TAG = "default-equipment";
     // end @compat 0.11.0

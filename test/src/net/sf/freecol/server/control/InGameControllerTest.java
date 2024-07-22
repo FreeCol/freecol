@@ -54,7 +54,6 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
 import net.sf.freecol.common.model.Tile;
@@ -295,7 +294,7 @@ public class InGameControllerTest extends FreeColTestCase {
         // Fail from a port while galleon exists, then succeed
         treasure = new ServerUnit(game, tile, dutch, treasureTrainType);
         treasure.setTreasureAmount(100);
-        Colony port = getStandardColony(1, 9, 4);
+        Colony port = createStandardColony(1, 9, 4);
         assertFalse("Standard colony is not landlocked",
                     port.isLandLocked());
         assertTrue("Standard colony is connected to Europe",
@@ -308,7 +307,7 @@ public class InGameControllerTest extends FreeColTestCase {
                    treasure.canCashInTreasureTrain());
 
         // Fail from a landlocked colony
-        Colony inland = getStandardColony(1, 7, 7);
+        Colony inland = createStandardColony(1, 7, 7);
         assertTrue("Inland colony is landlocked",
                    inland.isLandLocked());
         assertFalse("Inland colony is not connected to Europe",
@@ -319,7 +318,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Fail from a colony with a port but no connection to Europe
         map.getTile(5, 5).setType(spec().getTileType("model.tile.lake"));
-        Colony lake = getStandardColony(1, 4, 5);
+        Colony lake = createStandardColony(1, 4, 5);
         assertFalse("Lake colony is not landlocked",
                     lake.isLandLocked());
         assertFalse("Lake colony is not connected to Europe",
@@ -387,7 +386,7 @@ public class InGameControllerTest extends FreeColTestCase {
                     unit.getType() != hardyPioneerType);
 
         // Can not clear speciality while teaching
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Building school = new ServerBuilding(game, colony, schoolHouseType);
         colony.addBuilding(school);
 
@@ -539,7 +538,7 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         ServerPlayer french = getServerPlayer(game, "model.nation.french");
         igc.changeStance(french, Stance.WAR, dutch, true);
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
@@ -656,7 +655,7 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         ServerPlayer inca = getServerPlayer(game, "model.nation.inca");
         igc.changeStance(dutch, Stance.WAR, inca, true);
-        Colony colony = getStandardColony(1, 5, 8);
+        Colony colony = createStandardColony(1, 5, 8);
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
@@ -871,7 +870,7 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         ServerPlayer inca = getServerPlayer(game, "model.nation.inca");
         igc.changeStance(dutch, Stance.WAR, inca, true);
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
 
         dutch.setStance(inca, Stance.WAR);
         inca.setStance(dutch, Stance.WAR);
@@ -1570,8 +1569,6 @@ public class InGameControllerTest extends FreeColTestCase {
 
         int dutchInitialTension = dutch.getTension(french).getValue();
         int frenchInitialTension = french.getTension(dutch).getValue();
-        StanceTradeItem peaceTreaty
-            = new StanceTradeItem(game, dutch, french, newStance);
 
         // Execute peace treaty
         igc.changeStance(dutch, newStance, french, true);
@@ -1654,12 +1651,10 @@ public class InGameControllerTest extends FreeColTestCase {
 
     public void testEquipIndian() {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
-        final InGameController igc = ServerTestHelper.getInGameController();
 
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
-        ServerPlayer indian = (ServerPlayer)camp.getOwner();
         List<AbstractGoods> required = nativeDragoonRole.getRequiredGoodsList();
         int horsesReqPerUnit = AbstractGoods.getCount(horsesType, required);
         int musketsReqPerUnit = AbstractGoods.getCount(musketsType, required);
@@ -1705,7 +1700,6 @@ public class InGameControllerTest extends FreeColTestCase {
 
     public void testEquipIndianNotEnoughReqGoods() {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
-        final InGameController igc = ServerTestHelper.getInGameController();
 
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -1772,11 +1766,11 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testAddFatherBuildingEvent() {
-        final Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
         BuildingType press = spec().getBuildingType("model.building.printingPress");
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         assertEquals(null, colony.getBuilding(press));
 
         FoundingFather father = new FoundingFather("father", spec());
@@ -1796,7 +1790,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game)
@@ -1819,10 +1813,10 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testLaSalle() {
-        final Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        Colony colony = getStandardColony(2);
+        Colony colony = createStandardColony(2);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         assertEquals(2, colony.getUnitCount());
 
@@ -1871,7 +1865,7 @@ public class InGameControllerTest extends FreeColTestCase {
         father.addModifier(priceBonus);
         igc.addFoundingFather(dutch, father);
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         ServerTestHelper.newTurn();
         assertTrue(colony.getBuilding(press) != null);
     }
@@ -1882,7 +1876,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
         colonist.changeWorkType(grainType);
@@ -2010,7 +2004,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
 
         UnitType gardenerType = new UnitType("gardener", spec());
         gardenerType.setSkill(0);
@@ -2035,7 +2029,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap(true));
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerColony colony = (ServerColony)getStandardColony(2);
+        ServerColony colony = (ServerColony)createStandardColony(2);
         colony.addGoods(lumberType, 100);
         Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(carpenterHouse);
@@ -2066,9 +2060,8 @@ public class InGameControllerTest extends FreeColTestCase {
 
     public void testAttrition() {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
-        final InGameController igc = ServerTestHelper.getInGameController();
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Unit unit = new ServerUnit(game, colony.getTile(), player,
                                    indianConvertType);

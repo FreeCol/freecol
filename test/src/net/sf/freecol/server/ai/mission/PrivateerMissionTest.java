@@ -27,7 +27,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -66,7 +65,7 @@ public class PrivateerMissionTest extends FreeColTestCase {
         assertFalse("Dutch galleon tile should be ocean",dutchGalleonTile.isLand());
 
         // setup colony and units
-        getStandardColony(1, colonyTile.getX(), colonyTile.getY());
+        createStandardColony(1, colonyTile.getX(), colonyTile.getY());
         new ServerUnit(game, privateerTile, dutch, privateerType);
         new ServerUnit(game, frenchGalleonTile, french, galleonType);
         new ServerUnit(game, dutchGalleonTile, dutch, galleonType);
@@ -94,7 +93,6 @@ public class PrivateerMissionTest extends FreeColTestCase {
         Unit dutchGalleon = dutchGalleonTile.getFirstUnit();
         assertNotNull("Setup error, could not get galleon", dutchGalleon);
 
-        AIPlayer aiPlayer = aiMain.getAIPlayer(privateer.getOwner());
         AIUnit privateerAI = aiMain.getAIUnit(privateer);
         assertNotNull("Setup error, could not get privateerAI", privateerAI);
 

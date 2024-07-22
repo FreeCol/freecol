@@ -47,7 +47,6 @@ public class UnitChangeTypeTest extends FreeColTestCase {
     public void testAbilityScope() {
         Game game = getStandardGame();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
-        Player inca = game.getPlayerByNationId("model.nation.inca");
 
         UnitType gardenerType = new UnitType("gardener", spec());
         gardenerType.setSkill(0);

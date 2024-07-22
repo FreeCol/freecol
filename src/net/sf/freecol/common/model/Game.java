@@ -992,7 +992,6 @@ public class Game extends FreeColGameObject {
      * @param players The list of {@code players} to add.
      */
     public void addPlayers(List<Player> players) {
-        List<Player> valid = new ArrayList<>();
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {

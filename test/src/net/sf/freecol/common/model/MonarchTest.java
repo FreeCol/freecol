@@ -57,7 +57,7 @@ public class MonarchTest extends FreeColTestCase {
             = dutch.getMonarch().getActionChoices();
         assertTrue(choices.isEmpty());
 
-        Colony colony = getStandardColony();
+        createStandardColony();
         game.setTurn(new Turn(100));
         dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
         choices = dutch.getMonarch().getActionChoices();

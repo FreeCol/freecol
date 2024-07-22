@@ -150,7 +150,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // Get a minimal colony so that the units-that-use-no-bells
         // parameter will not be relevant.
-        final Colony colony = getStandardColony(1);
+        final Colony colony = createStandardColony(1);
         final Player player = colony.getOwner();
         final int noBellUnits = colony.getSpecification()
             .getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
@@ -227,7 +227,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap());
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         Building pasture = colony.getBuilding(countryType);
         Unit unit = colony.getFirstUnit();
         unit.setLocation(colony.getWorkLocationFor(unit, foodType));
@@ -271,7 +271,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap());
 
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
         int units = colony.getUnitCount();
         int buildings = colony.getBuildings().size();
 
@@ -357,7 +357,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap());
 
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
         ColonyTile tile = colony.getColonyTile(colony.getTile());
 
         assertEquals(0, colony.getGoodsCount(foodType));
@@ -477,7 +477,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap());
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         ColonyTile colonyTile = colony.getColonyTile(colony.getTile());
         assertNotNull(colonyTile);
         assertEquals(plainsType, colony.getTile().getType());

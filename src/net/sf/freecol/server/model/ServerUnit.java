@@ -815,7 +815,6 @@ public class ServerUnit extends Unit implements TurnTaker {
 
         if (newTile.isLand()) {
             Settlement settlement;
-            Unit unit = null;
             int d;
             // Claim land for tribe?
             if ((newTile.getOwner() == null

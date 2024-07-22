@@ -35,9 +35,9 @@ public class TradeRouteTest extends FreeColTestCase {
         game.changeMap(getTestMap(mixedForestType, true));
 
         // Set up three colonies
-        Colony colony1 = getStandardColony(4, 1, 1);
-        Colony colony2 = getStandardColony(4, 3, 1);
-        Colony colony3 = getStandardColony(4, 5, 1);
+        Colony colony1 = createStandardColony(4, 1, 1);
+        Colony colony2 = createStandardColony(4, 3, 1);
+        Colony colony3 = createStandardColony(4, 5, 1);
         Tile tile1 = colony1.getTile();
         Tile tile2 = colony2.getTile();
         Tile tile3 = colony3.getTile();

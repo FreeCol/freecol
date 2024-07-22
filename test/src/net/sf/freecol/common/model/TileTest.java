@@ -201,7 +201,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile();
         ColonyTile center = colony.getColonyTile(tile);
 
@@ -369,7 +369,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
         ColonyTile colonyTile1 = null;
         ColonyTile colonyTile2 = null;
@@ -555,7 +555,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(map);
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         final Tile tile = colony.getTile();
         tile.addRiver(1, "1111"); // allow rivers to join
         final Iterable<Tile> tiles = tile.getSurroundingTiles(1);
@@ -630,7 +630,7 @@ public class TileTest extends FreeColTestCase {
         Map map = getTestMap(tundra);
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         ColonyTile colonyTile = colony.getColonyTile(tile);
         tile.addResource(new Resource(game, tile, mineralsResource));
@@ -708,7 +708,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         game.changeMap(getTestMap(plains));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile();
 
         Tile otherTile = tile.copy(game);

@@ -308,7 +308,6 @@ public class Introspector {
      * @return The class found, or null if none available.
      */
     public static Class<?> getClassByName(String name) {
-        Class<?> messageClass;
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException ex) {

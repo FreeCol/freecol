@@ -3672,7 +3672,6 @@ public class Player extends FreeColGameObject implements Nameable {
         // Applied once
         final double MOD_HAS_RESOURCE           = 0.75;
         final double MOD_FOOD_LOW               = 0.75;
-        final double MOD_INITIAL_FOOD           = 2.0;
         final double MOD_STEAL                  = 0.5;
         final double MOD_INLAND                 = 0.5;
 
@@ -3866,7 +3865,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            for (Unit u : transform(t.getUnits(),
+            for (@SuppressWarnings("unused") Unit u : transform(t.getUnits(),
                                     u -> !owns(u) && u.isOffensiveUnit()
                                         && atWarWith(u.getOwner()))) {
                 values.set(ColonyValueCategory.A_ADJACENT.ordinal(),
@@ -3893,9 +3892,6 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         // Apply modifiers for other settlements and units at distance.
-        final Predicate<Unit> hostileUnitPred
-            = u -> !this.owns(u) && u.isOffensiveUnit()
-                && this.atWarWith(u.getOwner());
         for (int radius = 1; radius < distanceMax; radius++) {
             for (Tile t : getGame().getMap().getCircleTiles(tile, false,
                                                             radius)) {

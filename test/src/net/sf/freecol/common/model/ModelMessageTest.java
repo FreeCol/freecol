@@ -32,7 +32,7 @@ public class ModelMessageTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(MessageType.MISSING_GOODS,
@@ -58,7 +58,7 @@ public class ModelMessageTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,

@@ -106,7 +106,6 @@ public class ServerColony extends Colony implements TurnTaker {
             colonyTiles.add(new ServerColonyTile(game, this, t));
         }
 
-        Building building;
         List<BuildingType> buildingTypes = spec.getBuildingTypeList();
         for (BuildingType buildingType : transform(buildingTypes, bt ->
                 bt.isAutomaticBuild() || isAutomaticBuild(bt))) {

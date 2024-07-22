@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.List;
 import java.util.Random;
 
 import net.sf.freecol.common.model.AbstractUnit;
@@ -54,7 +53,6 @@ public class REFTest extends FreeColTestCase {
         final Force exf = player1.getMonarch().getExpeditionaryForce();
         // Update to have full naval capacity
         exf.prepareToBoard(null);
-        List<AbstractUnit> refBeforeIndependence = exf.getUnitList();
         
         ServerPlayer refPlayer = igc.createREFPlayer(player1);
 
@@ -75,7 +73,6 @@ public class REFTest extends FreeColTestCase {
     public void testAddToREF() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         final Specification spec = game.getSpecification();
-        InGameController igc = ServerTestHelper.getInGameController();
         Random random = ServerTestHelper.getServer().getServerRandom();
 
         // Create player
@@ -88,7 +85,6 @@ public class REFTest extends FreeColTestCase {
         // If the REF has too many land units, it should add more naval,
         // if it has enough naval it should add more land.
         // If this does not happen, this test will fail by looping forever.
-        final Force exf = monarch.getExpeditionaryForce();
         int done = 0;
         while (done != 3) {
             boolean naval = monarch.shouldAddNavalUnit();

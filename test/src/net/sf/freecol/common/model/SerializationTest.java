@@ -119,8 +119,7 @@ public class SerializationTest extends FreeColTestCase {
             .addAmount("%amount%", 50)
             .addStringTemplate("%goods%", t1);
 
-        Game game = getGame();
-        Player player = game.getPlayerByNationId("model.nation.dutch");
+        getGame();
 
         try {
             Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");

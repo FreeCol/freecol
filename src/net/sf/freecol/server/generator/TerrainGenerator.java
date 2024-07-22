@@ -401,7 +401,6 @@ public class TerrainGenerator {
 
         // Create ServerRegions for all land regions
         ServerRegion[] landregions = new ServerRegion[continents+1];
-        int landIndex = 1;
         for (int c = 1; c <= continents; c++) {
             // c starting at 1, c=0 is all water tiles
             landregions[c] = new ServerRegion(game, RegionType.LAND);
@@ -650,7 +649,6 @@ public class TerrainGenerator {
             .getTileType("model.tile.lake");
         List<Tile> todo = new ArrayList<>(lakes.size()/10);
         List<ServerRegion> result = new ArrayList<>(lakes.size()/10);
-        int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = first(lakes);
             if (tile.getRegion() != null) continue;

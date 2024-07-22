@@ -1418,7 +1418,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 nonExperts.add(u);
             }
         }
-        int expert = 0;
+
         Iterator<Unit> expertIterator = experts.iterator();
         while (expertIterator.hasNext()) {
             Unit u1 = expertIterator.next();

@@ -834,9 +834,6 @@ public final class ColonyPanel extends PortPanel
         final Dimension tilesScrollDimension = getTilesPanelGuiScaledDimension();
         add(buildingsScroll, "span 1 4, grow");
         
-        // TODO: Display the name:
-        //add(this.nameBox, "grow, span");
-        
         upperRightPanel = new JPanel(new MigLayout("wrap 1, ins 7 7 7 7, gap 0 0", "[center]")) {
             {
                 /*
@@ -854,13 +851,7 @@ public final class ColonyPanel extends PortPanel
         };
         upperRightPanel.setOpaque(false);
         upperRightPanel.add(tilesPanel, "width " + tilesScrollDimension.width + "px!, height " + tilesScrollDimension.height +"px!, top, center");
-
-        final FreeColImageBorder border = FreeColImageBorder.innerColonyPanelBorder;
-        final Insets borderInsets = border.getBorderInsets(this);
         upperRightPanel.add(netProductionPanel, "grow, wmax 384, height 68!");
-        
-        // TODO: Display the numbers in new components:
-        //add(populationPanel, "grow");
         
         upperRightPanel.add(constructionPanel, "grow, top, wmax 367, height 90");
         add(upperRightPanel, "span 1 3, growy, gapbefore 53, width 400!, wmax 400");
@@ -1069,7 +1060,6 @@ public final class ColonyPanel extends PortPanel
         final QuickActionMenu unitMenu
             = new QuickActionMenu(freeColClient, this);
         Tile colonyTile = colony.getTile();
-        int unitNumber = 0;
         JMenuItem subMenu = null;
 
         for (final Unit unit : colony.getUnitList()) {
@@ -1108,7 +1098,6 @@ public final class ColonyPanel extends PortPanel
                     unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                     getGUI().showPopupMenu(unitMenu, 0, 0);
                 });
-            unitNumber++;
             colonyUnitsMenu.add(subMenu);
         }
         colonyUnitsMenu.addSeparator();
@@ -1122,7 +1111,6 @@ public final class ColonyPanel extends PortPanel
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         getGUI().showPopupMenu(unitMenu, 0, 0);
                     });
-                unitNumber++;
                 colonyUnitsMenu.add(subMenu);
                 for (final Unit innerUnit : unit.getUnitList()) {
                     unitIcon = new ImageIcon(lib.getSmallerUnitImage(innerUnit));
@@ -1134,7 +1122,6 @@ public final class ColonyPanel extends PortPanel
                             unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
                             getGUI().showPopupMenu(unitMenu, 0, 0);
                         });
-                    unitNumber++;
                     colonyUnitsMenu.add(subMenu);
                 }
             } else if (!unit.isOnCarrier()) {
@@ -1146,7 +1133,6 @@ public final class ColonyPanel extends PortPanel
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         getGUI().showPopupMenu(unitMenu, 0, 0);
                     });
-                unitNumber++;
                 colonyUnitsMenu.add(subMenu);
             }
         }

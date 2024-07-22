@@ -206,8 +206,6 @@ public final class InfoPanel extends FreeColPanel
             panel.setLocation(lib.scaleInt(pl.getInt("panel.x")), lib.scaleInt(pl.getInt("panel.y")));
             panel.setSize(lib.scaleInt(pl.getInt("panel.width")), lib.scaleInt(pl.getInt("panel.height")));
         } else {
-            final int y = (this.getHeight() - panel.getHeight()) / 2;
-            final int x = (this.getWidth() - panel.getWidth()) / 2;
             panel.setSize(lib.scale(PREFERRED_SIZE));
             panel.setLocation(0, 0);
         }

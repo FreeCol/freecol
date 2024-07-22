@@ -29,7 +29,7 @@ public class SoLTest extends FreeColTestCase {
         game.changeMap(getTestMap(true));
 
         final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-        Colony colony = getStandardColony(7);
+        Colony colony = createStandardColony(7);
         for (int i = 1; i <= 100; i++) {
             int requiredBells = (Colony.LIBERTY_PER_REBEL
                 * (colony.getSonsOfLiberty() + 1) * colony.getUnitCount()) / 100;

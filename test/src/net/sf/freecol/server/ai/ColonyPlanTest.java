@@ -125,7 +125,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     public void testReqLumberAndHammersForBuild() {
         ServerTestHelper.startServerGame(buildMap(true));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         ColonyPlan plan = new ColonyPlan(aiMain,colony);
         plan.update();
@@ -141,7 +141,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     public void testReqOreAndToolsWithEnoughHammersForBuild() {
         ServerTestHelper.startServerGame(buildMap(true));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         // Set colony to have enough hammers.  Should still require tools.
         ColonyPlan plan = new ColonyPlan(aiMain, colony);
@@ -166,7 +166,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     public void testNoBuildRawMatTiles() {
         ServerTestHelper.startServerGame(buildMap(false));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         // Add enough raw materials for build
         colony.addGoods(lumberType, GoodsContainer.CARGO_SIZE);
@@ -200,7 +200,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     public void testGetBestWorker() {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         game.setCurrentPlayer(colony.getOwner());
         Player dutch = getGame().getPlayerByNationId("model.nation.dutch");
         List<Unit> units = new ArrayList<>();

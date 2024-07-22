@@ -72,7 +72,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
             = getServerPlayer(game, "model.nation.dutch");
         final EuropeanAIPlayer aiPlayer
             = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
-        final Colony colony = getStandardColony();
+        final Colony colony = createStandardColony();
         final AIColony aiColony = aiMain.getAIColony(colony);
         final Unit colonist = new ServerUnit(game, colony.getTile(), player,
                                              colonistType);

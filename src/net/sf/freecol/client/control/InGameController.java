@@ -5348,7 +5348,6 @@ public final class InGameController extends FreeColClientHolder {
             || workLocation == null
             || !requireOurTurn()) return false;
 
-        StringTemplate template;
         if (unit.getStudent() != null
             && !getGUI().confirmAbandonEducation(unit, false)) return false;
 

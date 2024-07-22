@@ -106,7 +106,6 @@ class EuropeanStartingPositionsGenerator {
     }
 
     private java.util.Map<Player, Tile> determineStartingTiles(Map map, List<Player> europeanPlayers, java.util.Map<Player, StartingUnits> playerStartingUnits) {
-        final Specification spec = map.getSpecification();
         final Game game = map.getGame();
         
         final boolean mapDefinedStartingPositionsAvailable = isMapDefinedStartingPositionsAvailableFor(europeanPlayers, game);

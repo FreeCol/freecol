@@ -73,7 +73,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Colony should be building a warehouse",
                      warehouseType, colony.getCurrentlyBuilding());
@@ -87,7 +87,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
 
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Building queue should have 1 entry",
@@ -110,7 +110,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.setCurrentlyBuilding(wagonTrainType);
         // default item will be added to new colony's build queue
         assertEquals("Building queue should have 2 entry",
@@ -126,7 +126,7 @@ public class ColonyTest extends FreeColTestCase {
         game.changeMap(getTestMap(true));
 
         int population = 1;
-        Colony colony = getStandardColony(population);
+        Colony colony = createStandardColony(population);
 
         assertTrue("colony should produce enough food",
                    colony.getFoodProduction() > colony.getFoodConsumption()
@@ -176,7 +176,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(5);
+        Colony colony = createStandardColony(5);
         Player player = colony.getOwner();
 
         assertEquals(0, countParties(colony));
@@ -193,7 +193,7 @@ public class ColonyTest extends FreeColTestCase {
         game.changeMap(getTestMap(arcticTileType, true));
 
         int population = 1;
-        Colony colony = getStandardColony(population);
+        Colony colony = createStandardColony(population);
         assertTrue("colony should produce less food than it consumes",
             colony.getFoodProduction() < colony.getFoodConsumption()
             + freeColonistType.getConsumptionOf(foodGoodsType));
@@ -290,7 +290,7 @@ public class ColonyTest extends FreeColTestCase {
         Map map = getCoastTestMap(plainsTileType);
         game.changeMap(map);
 
-        Colony colony = getStandardColony(3, 1, 8);
+        Colony colony = createStandardColony(3, 1, 8);
         Player dutch = colony.getOwner();
         Tile colonyTile = colony.getTile();
         assertEquals(colonyTile.getType(), plainsTileType);
@@ -327,7 +327,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(nativeTile.getOwner(), indianPlayer);
 
         Player french = game.getPlayerByNationId("model.nation.french");
-        Colony frenchColony = getStandardColony(3, 9, 8);
+        Colony frenchColony = createStandardColony(3, 9, 8);
         frenchColony.changeOwner(french);
         assertEquals(frenchColony.getTile().getType(), plainsTileType);
         Tile frenchTile = null;
@@ -423,7 +423,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(5);
+        Colony colony = createStandardColony(5);
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
 
@@ -463,7 +463,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(5);
+        Colony colony = createStandardColony(5);
 
         assertEquals("New colonies should not require upkeep.",
                      0, colony.getUpkeep());
@@ -481,7 +481,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(2);
+        Colony colony = createStandardColony(2);
         Player player = colony.getOwner();
 
         Colony copied = colony.copyColony();

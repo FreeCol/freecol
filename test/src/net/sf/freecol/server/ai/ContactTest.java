@@ -263,7 +263,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(apache));
         assertFalse(apache.hasContacted(dutch));
 
-        Colony colony = getStandardColony(1, 5, 8);
+        Colony colony = createStandardColony(1, 5, 8);
         assertNotNull(colony);
         ServerUnit brave = new ServerUnit(game, tile3, apache, braveType);
         igc.move(apache, brave, tile2);

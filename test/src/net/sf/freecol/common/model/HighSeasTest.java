@@ -31,7 +31,7 @@ public class HighSeasTest extends FreeColTestCase {
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         HighSeas highSeas = dutch.getHighSeas();
         UnitType caravel = spec().getUnitType("model.unit.caravel");
-        Unit unit = new ServerUnit(game, highSeas, dutch, caravel);
+        new ServerUnit(game, highSeas, dutch, caravel);
 
         dutch.dumpObject();
     }

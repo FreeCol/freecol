@@ -21,12 +21,11 @@ package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -37,10 +36,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 
-    private static final UnitType veteranType
-        = spec().getUnitType("model.unit.veteranSoldier");
-
-    private LogBuilder lb = new LogBuilder(0);
+    private static final UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
 
 
     @Override
@@ -74,8 +70,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
 
-        UnitSeekAndDestroyMission mission
-            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender);
+        new UnitSeekAndDestroyMission(aiMain, aiUnit, defender);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
             aiUnit.hasMission(UnitSeekAndDestroyMission.class));
 
@@ -111,15 +106,14 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
 
-        UnitSeekAndDestroyMission mission
-            = new UnitSeekAndDestroyMission(aiMain, aiUnit, defender);
+        new UnitSeekAndDestroyMission(aiMain, aiUnit, defender);
         assertTrue("Attacker should have a UnitSeekAndDestroyMission",
                    aiUnit.hasMission(UnitSeekAndDestroyMission.class));
         assertTrue("UnitSeekAndDestroyMission should be valid",
                    aiUnit.getMission().isValid());
 
         // add colony to the defender tile, to simulate the unit entering it
-        getStandardColony(1, defenderTile.getX(),defenderTile.getY());
+        createStandardColony(1, defenderTile.getX(),defenderTile.getY());
         assertFalse("UnitSeekAndDestroyMission should NOT be valid anymore, defender in colony",
                     aiUnit.getMission().isValid());
     }

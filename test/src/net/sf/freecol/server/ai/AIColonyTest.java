@@ -102,7 +102,7 @@ public class AIColonyTest extends FreeColTestCase {
         }
 
         // Needs a decent sized colony.
-        Colony colony = getStandardColony(6);
+        Colony colony = createStandardColony(6);
         game.setCurrentPlayer(colony.getOwner());
         return colony;
     }
@@ -355,7 +355,7 @@ public class AIColonyTest extends FreeColTestCase {
 
     public void testBestDefender() {
         ServerTestHelper.startServerGame(getTestMap(savannahType));
-        final Colony colony = getStandardColony();
+        final Colony colony = createStandardColony();
         assertEquals(artilleryType, colony.getBestDefenderType());
     }
 }
