@@ -19,55 +19,34 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+
 import net.sf.freecol.common.model.Player.NoClaimReason;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class ColonyTest extends FreeColTestCase {
 
-    private static final BuildingType carpenterHouseType
-        = spec().getBuildingType("model.building.carpenterHouse");
-    private static final BuildingType churchType
-        = spec().getBuildingType("model.building.church");
-    private static final BuildingType depotType
-        = spec().getBuildingType("model.building.depot");
-    private static final BuildingType lumberMillType
-        = spec().getBuildingType("model.building.lumberMill");
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
-    private static final BuildingType warehouseType
-        = spec().getBuildingType("model.building.warehouse");
-    private static final BuildingType warehouseExpansionType
-        = spec().getBuildingType("model.building.warehouseExpansion");
-    private static final BuildingType weaversHouseType
-        = spec().getBuildingType("model.building.weaverHouse");
+    private static final BuildingType carpenterHouseType = spec().getBuildingType("model.building.carpenterHouse");
+    private static final BuildingType churchType = spec().getBuildingType("model.building.church");
+    private static final BuildingType lumberMillType = spec().getBuildingType("model.building.lumberMill");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType warehouseType = spec().getBuildingType("model.building.warehouse");
+    private static final BuildingType weaversHouseType = spec().getBuildingType("model.building.weaverHouse");
 
-    private static final GoodsType bellsGoodsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType clothGoodsType
-        = spec().getGoodsType("model.goods.cloth");
-    private static final GoodsType cottonGoodsType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType foodGoodsType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType grainGoodsType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType hammerGoodsType
-        = spec().getGoodsType("model.goods.hammers");
-    private static final GoodsType lumberGoodsType
-        = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType bellsGoodsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType clothGoodsType = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType cottonGoodsType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodGoodsType = spec().getPrimaryFoodType();
+    private static final GoodsType grainGoodsType = spec().getGoodsType("model.goods.grain");
     
-    private static final ResourceType cottonResourceType
-        = spec().getResourceType("model.resource.cotton");
+    private static final ResourceType cottonResourceType = spec().getResourceType("model.resource.cotton");
     
     private static final TileImprovementType plowTileImprovementType
         = spec().getTileImprovementType("model.improvement.plow");
-    
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
 
     private static final TileType arcticTileType
         = spec().getTileType("model.tile.arctic");
@@ -450,7 +429,7 @@ public class ColonyTest extends FreeColTestCase {
 
         assertFalse("No enemy units present.", colony.isUnderSiege());
 
-        Unit brave = new ServerUnit(game, tile, iroquois, braveType);
+        new ServerUnit(game, tile, iroquois, braveType);
         assertFalse("Not at war with the Iroquois.", colony.isUnderSiege());
 
         // declare war
@@ -460,12 +439,12 @@ public class ColonyTest extends FreeColTestCase {
         assertTrue("At war with the Iroquois.", colony.isUnderSiege());
 
         Role soldierRole = spec().getRole("model.role.soldier");
-        Unit soldier = new ServerUnit(game, colony.getTile(), colony.getOwner(),
+        new ServerUnit(game, colony.getTile(), colony.getOwner(),
                                       freeColonistType, soldierRole);
         assertFalse("Equal number of friendly and enemy combat units.",
                     colony.isUnderSiege());
 
-        Unit brave2 = new ServerUnit(game, tile, iroquois, braveType);
+        new ServerUnit(game, tile, iroquois, braveType);
         assertTrue("Enemy combat units outnumber friendly combat units.",
                    colony.isUnderSiege());
 

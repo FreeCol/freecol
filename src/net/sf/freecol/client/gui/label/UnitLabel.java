@@ -31,7 +31,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -63,10 +62,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
  * This label holds Unit data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.
  */
-public final class UnitLabel extends FreeColLabel
-        implements ActionListener, CargoLabel, Draggable {
-
-    private static final Logger logger = Logger.getLogger(UnitLabel.class.getName());
+public final class UnitLabel extends FreeColLabel implements ActionListener, CargoLabel, Draggable {
 
     /** The different actions a {@code Unit} is allowed to take. */
     public enum UnitAction {

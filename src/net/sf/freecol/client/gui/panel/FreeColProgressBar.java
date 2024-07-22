@@ -58,12 +58,6 @@ public class FreeColProgressBar extends JPanel {
     /** The expected increase next turn. */
     private int step = 0;
 
-    /**
-     * The type of goods this progress bar is for.  The default value
-     * of null indicates no goods type.
-     */
-    private final GoodsType goodsType;
-
     /** An image for the goods type. */
     private final Image image;
 
@@ -116,7 +110,6 @@ public class FreeColProgressBar extends JPanel {
         this.max = max;
         this.value = value;
         this.step = step;
-        this.goodsType = goodsType;
         this.image = (goodsType == null) ? null
             : (lib.getGoodsTypeImage(goodsType,
                     new Dimension(-1, iconHeight)));

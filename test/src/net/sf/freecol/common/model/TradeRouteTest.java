@@ -25,16 +25,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TradeRouteTest extends FreeColTestCase {
 
-    private static final GoodsType fursGoodsType
-        = spec().getGoodsType("model.goods.furs");
-
-    private static final TileType mixedForestType
-        = spec().getTileType("model.tile.mixedForest");
-
-    private static final UnitType caravel
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType wagonTrainType
-        = spec().getUnitType("model.unit.wagonTrain");
+    private static final GoodsType fursGoodsType = spec().getGoodsType("model.goods.furs");
+    private static final TileType mixedForestType = spec().getTileType("model.tile.mixedForest");
+    private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
 
 
     public void testTradeRoute() {

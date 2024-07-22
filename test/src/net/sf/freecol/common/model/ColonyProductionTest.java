@@ -31,40 +31,23 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyProductionTest extends FreeColTestCase {
 
-    private static final BuildingType countryType
-        = spec().getBuildingType("model.building.country");
-    private static final BuildingType depotType
-        = spec().getBuildingType("model.building.depot");
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType countryType = spec().getBuildingType("model.building.country");
+    private static final BuildingType depotType = spec().getBuildingType("model.building.depot");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
 
-    private static final GoodsType bellsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType clothType
-        = spec().getGoodsType("model.goods.cloth");
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType crossesType
-        = spec().getGoodsType("model.goods.crosses");
-    private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType horsesType
-        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType = spec().getGoodsType("model.goods.food");
+    private static final GoodsType grainType = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
-    private static final ResourceType grainResource
-        = spec().getResourceType("model.resource.grain");
+    private static final ResourceType grainResource = spec().getResourceType("model.resource.grain");
 
-    private static final TileType plainsType
-        = spec().getTileType("model.tile.plains");
+    private static final TileType plainsType = spec().getTileType("model.tile.plains");
 
-    private static final UnitType freeColonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType pioneerType
-        = spec().getUnitType("model.unit.hardyPioneer");
-    private static final UnitType veteranSoldierType
-        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
+    private static final UnitType veteranSoldierType = spec().getUnitType("model.unit.veteranSoldier");
 
 
     public void testProductionSoldier() {

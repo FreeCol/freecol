@@ -1031,16 +1031,6 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
         }
 
         /**
-         * Gets the current radius of the circle.
-         *
-         * @return The distance from the center tile this
-         *     {@code CircleIterator} was initialized with.
-         */
-        public int getCurrentRadius() {
-            return currentRadius;
-        }
-
-        /**
          * Finds the next position.
          */
         private void nextTile() {

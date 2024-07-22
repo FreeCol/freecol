@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
@@ -35,10 +33,7 @@ import net.sf.freecol.server.control.FreeColServerHolder;
 /**
  * Handles the network messages that arrives while in the game.
  */
-public final class AIInGameInputHandler extends FreeColServerHolder
-    implements MessageHandler {
-
-    private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
+public final class AIInGameInputHandler extends FreeColServerHolder implements MessageHandler {
 
     /** The player for whom I work. */
     private final Player player;

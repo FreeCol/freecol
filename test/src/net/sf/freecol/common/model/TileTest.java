@@ -23,117 +23,63 @@ import static net.sf.freecol.common.util.CollectionUtils.any;
 import static net.sf.freecol.common.util.CollectionUtils.count;
 import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.sf.freecol.common.model.production.TileProductionCalculator;
-import net.sf.freecol.common.model.production.WorkerAssignment;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class TileTest extends FreeColTestCase {
 
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
 
-    private static final GoodsType cotton
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType fish
-        = spec().getGoodsType("model.goods.fish");
-    private static final GoodsType food
-        = spec().getPrimaryFoodType();
-    private static final GoodsType furs
-        = spec().getGoodsType("model.goods.furs");
-    private static final GoodsType grain
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType lumber
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType ore
-        = spec().getGoodsType("model.goods.ore");
-    private static final GoodsType silver
-        = spec().getGoodsType("model.goods.silver");
-    private static final GoodsType sugar
-        = spec().getGoodsType("model.goods.sugar");
-    private static final GoodsType tobacco
-        = spec().getGoodsType("model.goods.tobacco");
+    private static final GoodsType cotton = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType food = spec().getPrimaryFoodType();
+    private static final GoodsType furs = spec().getGoodsType("model.goods.furs");
+    private static final GoodsType grain = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType ore = spec().getGoodsType("model.goods.ore");
+    private static final GoodsType silver = spec().getGoodsType("model.goods.silver");
+    private static final GoodsType sugar = spec().getGoodsType("model.goods.sugar");
 
-    private static final ResourceType grainResource
-        = spec().getResourceType("model.resource.grain");
-    private static final ResourceType lumberResource
-        = spec().getResourceType("model.resource.lumber");
-    private static final ResourceType mineralsResource
-        = spec().getResourceType("model.resource.minerals");
-    private static final ResourceType silverResource
-        = spec().getResourceType("model.resource.silver");
-    private static final ResourceType sugarResource
-        = spec().getResourceType("model.resource.sugar");
+    private static final ResourceType grainResource = spec().getResourceType("model.resource.grain");
+    private static final ResourceType lumberResource = spec().getResourceType("model.resource.lumber");
+    private static final ResourceType mineralsResource = spec().getResourceType("model.resource.minerals");
+    private static final ResourceType silverResource = spec().getResourceType("model.resource.silver");
+    private static final ResourceType sugarResource = spec().getResourceType("model.resource.sugar");
 
-    private static final TileImprovementType clearForest
-        = spec().getTileImprovementType("model.improvement.clearForest");
-    private static final TileImprovementType fishBonusLand
-        = spec().getTileImprovementType("model.improvement.fishBonusLand");
-    private static final TileImprovementType fishBonusRiver
-        = spec().getTileImprovementType("model.improvement.fishBonusRiver");
-    private static final TileImprovementType plow
-        = spec().getTileImprovementType("model.improvement.plow");
-    private static final TileImprovementType river
-        = spec().getTileImprovementType("model.improvement.river");
-    private static final TileImprovementType road
-        = spec().getTileImprovementType("model.improvement.road");
+    private static final TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.clearForest");
+    private static final TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
+    private static final TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
+    private static final TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
+    private static final TileImprovementType river = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
 
-    private static final TileType arctic
-        = spec().getTileType("model.tile.arctic");
-    private static final TileType coniferForest
-        = spec().getTileType("model.tile.coniferForest");
-    private static final TileType desert
-        = spec().getTileType("model.tile.desert");
-    private static final TileType desertForest
-        = spec().getTileType("model.tile.scrubForest");
-    private static final TileType grassland
-        = spec().getTileType("model.tile.grassland");
-    private static final TileType highSeas
-        = spec().getTileType("model.tile.highSeas");
-    private static final TileType hills
-        = spec().getTileType("model.tile.hills");
-    private static final TileType marsh
-        = spec().getTileType("model.tile.marsh");
-    private static final TileType marshForest
-        = spec().getTileType("model.tile.wetlandForest");
-    private static final TileType mountains
-        = spec().getTileType("model.tile.mountains");
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
-    private static final TileType plainsForest
-        = spec().getTileType("model.tile.mixedForest");
-    private static final TileType prairie
-        = spec().getTileType("model.tile.prairie");
-    private static final TileType prairieForest
-        = spec().getTileType("model.tile.broadleafForest");
-    private static final TileType savannah
-        = spec().getTileType("model.tile.savannah");
-    private static final TileType savannahForest
-        = spec().getTileType("model.tile.tropicalForest");
-    private static final TileType swamp
-        = spec().getTileType("model.tile.swamp");
-    private static final TileType swampForest
-        = spec().getTileType("model.tile.rainForest");
-    private static final TileType tundra
-        = spec().getTileType("model.tile.tundra");
-    private static final TileType tundraForest
-        = spec().getTileType("model.tile.borealForest");
+    private static final TileType arctic = spec().getTileType("model.tile.arctic");
+    private static final TileType coniferForest = spec().getTileType("model.tile.coniferForest");
+    private static final TileType desert = spec().getTileType("model.tile.desert");
+    private static final TileType desertForest = spec().getTileType("model.tile.scrubForest");
+    private static final TileType grassland = spec().getTileType("model.tile.grassland");
+    private static final TileType highSeas = spec().getTileType("model.tile.highSeas");
+    private static final TileType hills = spec().getTileType("model.tile.hills");
+    private static final TileType marsh = spec().getTileType("model.tile.marsh");
+    private static final TileType marshForest = spec().getTileType("model.tile.wetlandForest");
+    private static final TileType mountains = spec().getTileType("model.tile.mountains");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
+    private static final TileType plainsForest = spec().getTileType("model.tile.mixedForest");
+    private static final TileType prairie = spec().getTileType("model.tile.prairie");
+    private static final TileType prairieForest = spec().getTileType("model.tile.broadleafForest");
+    private static final TileType savannah = spec().getTileType("model.tile.savannah");
+    private static final TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
+    private static final TileType swamp = spec().getTileType("model.tile.swamp");
+    private static final TileType swampForest = spec().getTileType("model.tile.rainForest");
+    private static final TileType tundra = spec().getTileType("model.tile.tundra");
+    private static final TileType tundraForest = spec().getTileType("model.tile.borealForest");
 
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType expertFarmerType
-        = spec().getUnitType("model.unit.expertFarmer");
-    private static final UnitType expertLumberJack
-        = spec().getUnitType("model.unit.expertLumberJack");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType expertLumberJack = spec().getUnitType("model.unit.expertLumberJack");
     
     private static final UnitType expertSilverMiner = spec().getUnitType("model.unit.expertSilverMiner");
 
@@ -406,7 +352,7 @@ public class TileTest extends FreeColTestCase {
         TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
         assertTrue(road2.isComplete());
-        TileImprovement river2 = tile2.addRiver(1, "0101");
+        tile2.addRiver(1, "0101");
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
@@ -453,7 +399,7 @@ public class TileTest extends FreeColTestCase {
         TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
         assertTrue(road2.isComplete());
-        TileImprovement river2 = tile2.addRiver(1, "0101");
+        tile2.addRiver(1, "0101");
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 

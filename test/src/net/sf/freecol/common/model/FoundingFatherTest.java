@@ -39,17 +39,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
  */
 public class FoundingFatherTest extends FreeColTestCase {
 
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
-
-    private static final UnitType servantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType statesmanType
-        = spec().getUnitType("model.unit.elderStatesman");
-
-
     public void testFeatures() {
         Game game = getStandardGame();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");

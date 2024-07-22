@@ -230,9 +230,6 @@ public class FoundingFather extends FreeColSpecObjectType {
 
 
     // Serialization
-
-    private static final String FROM_ID_TAG = "from-id";
-    private static final String TO_ID_TAG = "to-id";
     private static final String TYPE_TAG = "type";
     private static final String UNIT_TAG = "unit";
     private static final String WEIGHT_TAG = "weight";

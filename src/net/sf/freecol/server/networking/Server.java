@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.networking;
 
-import static net.sf.freecol.common.util.CollectionUtils.transform;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;

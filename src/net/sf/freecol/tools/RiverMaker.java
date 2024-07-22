@@ -40,8 +40,6 @@ public class RiverMaker {
     private static final int HALF_WIDTH = BASE_WIDTH / 2;
     private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
 
-    private static final float EDGE_LENGTH = (float) Math.sqrt(HALF_WIDTH * HALF_WIDTH + HALF_HEIGHT * HALF_HEIGHT);
-
     private static final int DY = 4;
     private static final int DX = 2 * DY;
 

@@ -297,7 +297,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private static Nation nativeNation;
 
     private final JPanel listPanel;
-    private JToggleButton settlementButton;
     private final ButtonGroup group;
     
     private final ChooseAreaModificationPanel chooseAreaModificationPanel;

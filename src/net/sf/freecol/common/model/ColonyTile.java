@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,8 +34,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.production.TileProductionCalculator;
 import net.sf.freecol.common.model.production.WorkerAssignment;
-import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**

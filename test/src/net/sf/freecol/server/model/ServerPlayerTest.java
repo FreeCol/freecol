@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -45,28 +44,15 @@ import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class ServerPlayerTest extends FreeColTestCase {	
 
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType foodType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
-    private static final GoodsType silverType
-        = spec().getGoodsType("model.goods.silver");
-
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType = spec().getPrimaryFoodType();
+    private static final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType silverType = spec().getGoodsType("model.goods.silver");
     
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType wagonTrainType
-        = spec().getUnitType("model.unit.wagonTrain");
-    private static final UnitType caravelType
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType = spec().getUnitType("model.unit.privateer");
 
 
     @Override

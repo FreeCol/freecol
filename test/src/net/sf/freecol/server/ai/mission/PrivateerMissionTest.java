@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -37,16 +36,10 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PrivateerMissionTest extends FreeColTestCase {
 
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
 
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
-
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType = spec().getUnitType("model.unit.privateer");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
 
 
     @Override

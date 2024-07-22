@@ -289,7 +289,6 @@ public abstract class Mission extends AIObject {
         final Unit carrier = (l.getLocation() instanceof Unit)
             ? (Unit)(l.getLocation()) : null;
         final AIUnit transport = t.getTransport();
-        Player owner;
         Location loc;
         boolean checkSrc = transport == null;
 
@@ -541,7 +540,6 @@ public abstract class Mission extends AIObject {
     public static Location resolveBlockage(AIUnit aiUnit, Location target) {
         final Unit unit = aiUnit.getUnit();
         PathNode path = unit.findPath(target);
-        Direction d = null;
         if (path != null && path.next != null) {
             Tile tile = path.next.getTile();
             Settlement settlement = tile.getSettlement();

@@ -19,16 +19,15 @@
 
 package net.sf.freecol.client.gui.action;
 
+import static net.sf.freecol.common.util.StringUtils.getEnumKey;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**

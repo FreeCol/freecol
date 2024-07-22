@@ -782,18 +782,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Set the players in the game.
-     *
-     * @param players The new {@code Player}s to add.
-     */
-    private void setPlayers(List<Player> players) {
-        synchronized (this.players) {
-            this.players.clear();
-            if (players != null) this.players.addAll(players);
-        }
-    }
-
-    /**
      * Gets the live player after the given player.
      *
      * @param beforePlayer The {@code Player} before the

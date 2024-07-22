@@ -23,9 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Random;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.model.ServerGame;

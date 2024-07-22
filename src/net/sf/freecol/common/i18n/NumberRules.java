@@ -22,7 +22,6 @@ package net.sf.freecol.common.i18n;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,8 +35,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
  * Common Locale Data Repository</a>.
  */
 public class NumberRules {
-
-    private static final Logger logger = Logger.getLogger(NumberRules.class.getName());
 
     /**
      * A rule that always returns category "other".

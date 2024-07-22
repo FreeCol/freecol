@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -50,10 +49,7 @@ import net.sf.freecol.common.util.LogBuilder;
  * The super class of all settlements on the map (that is colonies and
  * indian settlements).
  */
-public abstract class Settlement extends GoodsLocation
-    implements Nameable, Ownable {
-
-    private static final Logger logger = Logger.getLogger(Settlement.class.getName());
+public abstract class Settlement extends GoodsLocation implements Nameable, Ownable {
 
     public static final int FOOD_PER_COLONIST = 200;
 

@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.tooltip;
 import static net.sf.freecol.common.util.CollectionUtils.forEach;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.List;
 
 import javax.swing.JLabel;

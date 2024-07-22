@@ -25,7 +25,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -47,29 +46,8 @@ import net.sf.freecol.common.metaserver.ServerInfo;
  */
 public final class ServerListPanel extends FreeColPanel {
 
-    private static final Logger logger = Logger.getLogger(ServerListPanel.class.getName());
-
-    private static class ServerListTableCellRenderer
-        extends DefaultTableCellRenderer {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Component getTableCellRendererComponent(JTable t, Object o,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-            setOpaque(isSelected);
-            return super.getTableCellRendererComponent(t, o, isSelected,
-                                                       hasFocus, row, column);
-        }
-    };
-        
-    private final ConnectController connectController;
-
     private final JTable table;
-
     private final ServerListTableModel tableModel;
-
     private final JButton connect;
 
     
@@ -80,11 +58,8 @@ public final class ServerListPanel extends FreeColPanel {
      * @param connectController The controller responsible for creating new
      *     connections.
      */
-    public ServerListPanel(FreeColClient freeColClient,
-                           ConnectController connectController) {
+    public ServerListPanel(FreeColClient freeColClient, ConnectController connectController) {
         super(freeColClient, null, new MigLayout("", "", ""));
-
-        this.connectController = connectController;
 
         JButton cancel = Utility.localizedButton("cancel");
         JScrollPane tableScroll;
@@ -186,4 +161,18 @@ public final class ServerListPanel extends FreeColPanel {
     public void refreshTable() {
         tableModel.fireTableDataChanged();
     }
+    
+    private static class ServerListTableCellRenderer extends DefaultTableCellRenderer {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component getTableCellRendererComponent(JTable t, Object o,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+            setOpaque(isSelected);
+            return super.getTableCellRendererComponent(t, o, isSelected,
+                                                       hasFocus, row, column);
+        }
+    };
 }

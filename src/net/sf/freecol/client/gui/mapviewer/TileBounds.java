@@ -20,9 +20,6 @@
 package net.sf.freecol.client.gui.mapviewer;
 
 import java.awt.Dimension;
-import java.awt.Point;
-
-import javax.swing.JLabel;
 
 /**
  * Bounds of the tiles to be rendered. These bounds are scaled according to the
@@ -41,14 +38,11 @@ public final class TileBounds {
     /** Tile width and height, and half values thereof. */
     private int tileHeight, tileWidth, halfHeight, halfWidth;
     
-    private float scaleFactor;
-    
     TileBounds(Dimension tileSize, float scaleFactor) {
         this.tileHeight = tileSize.height;
         this.tileWidth = tileSize.width;
         this.halfHeight = tileSize.height / 2;
         this.halfWidth = tileSize.width / 2;
-        this.scaleFactor = scaleFactor;
     }
     
     public int getWidth() {

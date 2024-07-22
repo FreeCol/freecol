@@ -1571,6 +1571,7 @@ public final class MapViewer extends FreeColClientHolder {
      *      translated so that position (0, 0) is the upper left corner of the
      *      tile image (that is, outside of the tile diamond itself).
      */
+    @SuppressWarnings("unused")
     private void paintSingleTile(Graphics2D g2d, TileClippingBounds tcb,
                                  Tile tile, TileRenderingCallback c) {
         paintEachTile(g2d, tcb.getTopLeftDirtyTile(), List.of(tile), c);

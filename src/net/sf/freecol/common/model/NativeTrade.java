@@ -41,10 +41,6 @@ public class NativeTrade extends FreeColGameObject {
 
     public static final String TAG = "nativeTrade";
 
-    /** A template to use as a magic cookie for aborted trades. */
-    private static final StringTemplate abortTrade
-        = StringTemplate.template("");
-
     /** The type of native trade command. */
     public static enum NativeTradeAction {
         // Requests from European trader

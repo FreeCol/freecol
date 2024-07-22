@@ -34,38 +34,18 @@ public class SchoolTest extends FreeColTestCase {
 
     private enum SchoolLevel { SCHOOLHOUSE, COLLEGE, UNIVERSITY };
 
-    private static final BuildingType schoolType
-        = spec().getBuildingType("model.building.schoolhouse");
-    private static final BuildingType collegeType
-        = spec().getBuildingType("model.building.college");
-    private static final BuildingType universityType
-        = spec().getBuildingType("model.building.university");
+    private static final BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
+    private static final BuildingType collegeType = spec().getBuildingType("model.building.college");
+    private static final BuildingType universityType = spec().getBuildingType("model.building.university");
 
-    private static final GoodsType lumber
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType cotton
-        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType cotton = spec().getGoodsType("model.goods.cotton");
 
-    private static final UnitType colonialRegularType
-        = spec().getUnitType("model.unit.colonialRegular");
-    private static final UnitType elderStatesmanType
-        = spec().getUnitType("model.unit.elderStatesman");
-    private static final UnitType expertLumberJackType
-        = spec().getUnitType("model.unit.expertLumberJack");
-    private static final UnitType expertOreMinerType
-        = spec().getUnitType("model.unit.expertOreMiner");
-    private static final UnitType freeColonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType indenturedServantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType pettyCriminalType
-        = spec().getUnitType("model.unit.pettyCriminal");
-    private static final UnitType masterBlacksmithType
-        = spec().getUnitType("model.unit.masterBlacksmith");
-    private static final UnitType masterCarpenterType
-        = spec().getUnitType("model.unit.masterCarpenter");
-    private static final UnitType veteranSoldierType
-        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType expertLumberJackType = spec().getUnitType("model.unit.expertLumberJack");
+    private static final UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
+    private static final UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
+    private static final UnitType masterCarpenterType = spec().getUnitType("model.unit.masterCarpenter");
 
 
     private Building addSchoolToColony(Game game, Colony colony,

@@ -21,9 +21,6 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractButton;
-
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
 

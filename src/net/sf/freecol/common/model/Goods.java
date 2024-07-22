@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -36,8 +34,6 @@ import net.sf.freecol.common.util.Utils;
  * @see AbstractGoods
  */
 public class Goods extends AbstractGoods implements Locatable, Ownable {
-
-    private static final Logger logger = Logger.getLogger(Goods.class.getName());
 
     public static final String TAG = "goods";
 

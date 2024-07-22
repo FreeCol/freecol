@@ -176,17 +176,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 this.indexedBuildables = indexedBuildables;
             }
 
-
-            /**
-             * Get the build queue from the {@code Transferable}.
-             *
-             * @return The build queue.
-             */
-            public List<IndexedBuildable> getBuildables() {
-                return this.indexedBuildables;
-            }
-
-
             // Interface Transferable
 
             /**

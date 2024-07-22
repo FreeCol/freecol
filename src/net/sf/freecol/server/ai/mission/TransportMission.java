@@ -27,10 +27,7 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -90,8 +87,6 @@ public final class TransportMission extends Mission {
      * on the distinct destination locations to visit.
      */
     private static final int DESTINATION_UPPER_BOUND = 4;
-
-    private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
     /** A list of {@code Cargo}s to work on. */
     private final List<Cargo> cargoes = new ArrayList<>();

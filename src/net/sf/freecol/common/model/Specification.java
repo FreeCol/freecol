@@ -1111,27 +1111,6 @@ public final class Specification implements OptionContainer {
     }
 
     /**
-     * Merge an option group into the spec.
-     *
-     * @param group The {@code OptionGroup} to merge.
-     * @return The merged {@code OptionGroup} from this
-     *     {@code Specification}.
-     */
-    private OptionGroup mergeGroup(OptionGroup group) {
-        OptionGroup realGroup = allOptionGroups.get(group.getId());
-        if (realGroup == null || !realGroup.isEditable()) return realGroup;
-
-        for (Option o : group.getOptions()) {
-            if (o instanceof OptionGroup) {
-                mergeGroup((OptionGroup)o);
-            } else {
-                realGroup.add(o);
-            }
-        }
-        return realGroup;
-    }
-
-    /**
      * Gets the difficulty levels in this specification.
      *
      * @return A list of difficulty levels in this specification.
@@ -2534,7 +2513,6 @@ public final class Specification implements OptionContainer {
     private boolean fixDifficultyOptions() {
         boolean ret = false;
         String id;
-        AbstractOption op;
         OptionGroup og;
         UnitListOption ulo;
 

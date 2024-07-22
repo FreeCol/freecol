@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.StringUtils.getBreakingPoint;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -35,7 +37,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -44,9 +45,6 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Turn;
-
-import static net.sf.freecol.common.util.StringUtils.getBreakingPoint;
 
 
 /**

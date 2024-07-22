@@ -115,7 +115,8 @@ public class LogoutMessage extends AttributeMessage {
         LogoutReason reason = getReason();
         ChangeSet cs = null;
         switch (freeColServer.getServerState()) {
-        case PRE_GAME: case LOAD_GAME:
+        case PRE_GAME:
+        case LOAD_GAME:
             break;
         case IN_GAME:
             boolean endTurn = false;
@@ -124,6 +125,7 @@ public class LogoutMessage extends AttributeMessage {
                 endTurn = true;
                 break;
             case LOGIN: // FIXME: should go away
+            case LOGOUT:
                 break;
             case MAIN_TITLE: case NEW_GAME: case QUIT:
                 if (freeColServer.getSinglePlayer() || serverPlayer.isAdmin()) {

@@ -46,8 +46,6 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectAmountDialog.class.getName());
 
-    private static final int SELECT_CANCEL = -1;
-
     /** The default amounts to try. */
     private static final int[] amounts = { 20, 40, 50, 60, 80, 100 };
 

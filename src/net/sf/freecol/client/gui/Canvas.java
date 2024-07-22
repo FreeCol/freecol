@@ -84,7 +84,6 @@ import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
 

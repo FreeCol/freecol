@@ -40,23 +40,14 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class MapTest extends FreeColTestCase {
 
-    private final TileType highSeasType
-        = spec().getTileType("model.tile.highSeas");
-    private final TileType lakeType
-        = spec().getTileType("model.tile.lake");
-    private final TileType oceanType
-        = spec().getTileType("model.tile.ocean");
-    private final TileType plainsType
-        = spec().getTileType("model.tile.plains");
+    private final TileType lakeType = spec().getTileType("model.tile.lake");
+    private final TileType oceanType = spec().getTileType("model.tile.ocean");
+    private final TileType plainsType = spec().getTileType("model.tile.plains");
 
-    private final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private final UnitType pioneerType
-        = spec().getUnitType("model.unit.hardyPioneer");
+    private final UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+    private final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private final UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
 
 
     private Map getSingleLandPathMap(Game game) {

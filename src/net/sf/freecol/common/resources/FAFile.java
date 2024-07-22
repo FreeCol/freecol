@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.mapviewer.MapViewer;
-
 
 /**
  * Represents the data within a Font Animation File.

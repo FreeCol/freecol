@@ -162,10 +162,6 @@ public final class InGameController extends FreeColClientHolder {
 
     private static final short UNIT_LAST_MOVE_DELAY = 300;
 
-    /** A template to use as a magic cookie for aborted trades. */
-    private static final StringTemplate abortTrade
-        = StringTemplate.template("");
-
     /** A comparator for ordering trade route units. */
     private static final Comparator<Unit> tradeRouteUnitComparator
         = Comparator.comparing((Unit u) -> u.getTradeRoute().getName())
@@ -808,7 +804,6 @@ public final class InGameController extends FreeColClientHolder {
     private boolean askUnloadGoods(GoodsType type, int amount, Unit carrier) {
         // Do not check for trade location, unloading can include dumping
         // which can happen anywhere
-        final Player player = getMyPlayer();
 
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askServer().unloadGoods(type, amount, carrier)
@@ -3015,7 +3010,6 @@ public final class InGameController extends FreeColClientHolder {
             || !unit.canCashInTreasureTrain()
             || !requireOurTurn()) return false;
 
-        final Tile tile = unit.getTile();
         final Europe europe = unit.getOwner().getEurope();
         if (europe == null || unit.isInEurope()) {
             ;// No need to check for transport.

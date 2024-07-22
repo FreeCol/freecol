@@ -19,9 +19,13 @@
 
 package net.sf.freecol.server.ai;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.toListNoNulls;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -34,11 +38,12 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
@@ -52,7 +57,6 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -71,13 +75,6 @@ public abstract class AIPlayer extends AIObject {
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
     public static final String TAG = "aiPlayer";
-
-    /** Do nothing! */
-    private static final Runnable nullRunnable = () -> {};
-    
-    /** A comparator to sort AI units by location. */
-    private static final Comparator<AIUnit> aiUnitLocationComparator
-        = Comparator.comparing(AIUnit::getUnit, Unit.locComparator);
 
     /** The FreeColGameObject this AIObject contains AI-information for. */
     private Player player;

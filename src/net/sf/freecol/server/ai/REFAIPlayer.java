@@ -198,9 +198,6 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
     /** Map of target to count. */
     private final Map<Location, Integer> targetMap = new HashMap<>();
 
-    /** Has the army been landed? */
-    private boolean landed = false;
-
 
     /**
      * Creates a new {@code REFAIPlayer}.
@@ -912,12 +909,8 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
                 if (aiu.hasMission(TransportMission.class)) {
                     transport.add(aiu.getMission(TransportMission.class));
                 }
-            } else {
-                if (u.isInEurope()) {
-                    land.add(aiu);
-                } else if (u.isOnTile()) {
-                    this.landed = true;
-                }
+            } else if (u.isInEurope()) {
+                land.add(aiu);
             }
         }
         if (!land.isEmpty() && !transport.isEmpty()) {

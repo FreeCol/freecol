@@ -52,9 +52,6 @@ public class LostCityRumour extends TileItem {
     // The bogus end of the world year.
     private static final int MAYAN_PROPHESY_YEAR = 2012;
 
-    // How many `nothing' rumours are there.
-    private static int rumourNothing = -1;
-
     /** Constants describing types of Lost City Rumours. */
     public static enum RumourType {
         NO_SUCH_RUMOUR,

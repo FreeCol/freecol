@@ -39,12 +39,6 @@ import net.sf.freecol.common.model.TileImprovement;
  */
 public class RiverSection {
 
-//    private static final Logger logger = Logger.getLogger(RiverImprovementBuilder.class.getName());
-
-    private static final char[] template = {
-        '0', '1', '2', '3'
-    };
-
     /**
      * River magnitude (size) for each direction toward the edges of the tile
      */

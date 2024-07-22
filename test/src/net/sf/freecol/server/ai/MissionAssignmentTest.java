@@ -19,12 +19,11 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tension;
@@ -46,22 +45,13 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class MissionAssignmentTest extends FreeColTestCase {
 
-    private static final BuildingType stockadeType
-        = spec().getBuildingType("model.building.stockade");
+    private static final TileType plainsType = spec().getTileType("model.tile.plains");
 
-    private static final TileType plainsType
-        = spec().getTileType("model.tile.plains");
-
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType veteranType
-        = spec().getUnitType("model.unit.veteranSoldier");
-    private static final UnitType braveType
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType braveType = spec().getUnitType("model.unit.brave");
+    private static final UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
 
     final int MISSION_IMPOSSIBLE = Integer.MIN_VALUE;
 

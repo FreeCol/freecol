@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel.mapeditor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -44,11 +43,6 @@ import net.sf.freecol.common.model.Area;
  */
 public final class ChooseAreaModificationPanel extends FreeColPanel {
 
-    private static final Logger logger = Logger.getLogger(ChooseAreaModificationPanel.class.getName());
-
-    
-    private final DialogHandler<Area> dialogHandler;
-    
     /**
      * Creates a new game panel.
      *
@@ -56,8 +50,6 @@ public final class ChooseAreaModificationPanel extends FreeColPanel {
      */
     public ChooseAreaModificationPanel(FreeColClient freeColClient, DialogHandler<Area> dialogHandler) {
         super(freeColClient, null, new MigLayout("fill, wrap 1", "[fill, growprio 150]", "[fill, growprio 150]"));
-        
-        this.dialogHandler = dialogHandler;
         
         final JPanel areasPanel = new JPanel(new WrapLayout()
                 .withHorizontalAlignment(HorizontalAlignment.CENTER)

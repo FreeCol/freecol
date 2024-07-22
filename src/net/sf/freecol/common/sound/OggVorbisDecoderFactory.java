@@ -313,7 +313,6 @@ public class OggVorbisDecoderFactory {
          */
         public int getBody(InputStream is) {
             String err;
-            int packet = 3;
 
             pcmi = new int[orbisInfo.channels];
             pcmData = new float[1][][];
@@ -329,7 +328,6 @@ public class OggVorbisDecoderFactory {
                         orbisDspState.synthesis_read(n);
                         return 2 * orbisInfo.channels * decodePacket(n);
                     }
-                    packet++;
                     break;
                 case 0:
                     if ((err = getPage()) != null) {
@@ -414,10 +412,6 @@ public class OggVorbisDecoderFactory {
         @Override
         public int read(byte[] buf) throws IOException {
             return os.read(buf);
-        }
-
-        public int read(byte[] buf, int n) throws IOException {
-            return os.read(buf, n);
         }
 
         @Override

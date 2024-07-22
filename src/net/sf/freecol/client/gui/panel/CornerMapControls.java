@@ -28,7 +28,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
@@ -55,8 +54,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class CornerMapControls extends MapControls {
 
-    private static final Logger logger = Logger.getLogger(CornerMapControls.class.getName());
-    
     private class MiniMapPanelSkin extends JPanel {
         
         MiniMapPanelSkin() {

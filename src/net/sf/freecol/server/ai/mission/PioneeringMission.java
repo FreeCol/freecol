@@ -19,8 +19,9 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import static net.sf.freecol.common.util.CollectionUtils.maximize;
+
 import java.util.Comparator;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -31,9 +32,9 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
@@ -44,7 +45,6 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -59,19 +59,10 @@ import net.sf.freecol.server.ai.TileImprovementPlan;
  */
 public final class PioneeringMission extends Mission {
 
-    private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
-
     public static final String TAG = "pioneeringMission";
 
     /** The tag for this mission. */
     private static final String tag = "AI pioneer";
-
-
-    // FIXME: This is unused, delete?
-    /**
-     * Default distance in turns to a threatening unit.
-     */
-    private static final int DEFAULT_THREAT_TURNS = 3;
 
     /** The improvement this pioneer is to work on. */
     private TileImprovementPlan tileImprovementPlan;

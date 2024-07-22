@@ -19,19 +19,14 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.BorderLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -41,7 +36,6 @@ import net.sf.freecol.common.option.FullscreenDisplayModeOption.FullscreenDispla
 
 public final class FullscreenDisplayModeOptionUI extends OptionUI<FullscreenDisplayModeOption> {
 
-    private final GUI gui;
     private final JComboBox<FullscreenDisplayModeWrapper> cbox;
 
 
@@ -55,8 +49,6 @@ public final class FullscreenDisplayModeOptionUI extends OptionUI<FullscreenDisp
      */
     public FullscreenDisplayModeOptionUI(GUI gui, FullscreenDisplayModeOption option, boolean editable) {
         super(option, editable);
-
-        this.gui = gui;
 
         cbox = new JComboBox<>();
         //panel.add(cbox, BorderLayout.LINE_START);

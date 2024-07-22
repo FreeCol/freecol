@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -77,9 +76,6 @@ public final class InfoPanel extends FreeColPanel
     private static enum InfoPanelMode {
         NONE, END, MAP, TILE, UNIT;
     }
-
-    /** Pixel width of text area beside icon. */
-    private static final int TEXT_WIDTH = 150;
 
     /** A small pixel gap. */
     private static final int SLACK = 5;

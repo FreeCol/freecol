@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 
@@ -31,9 +30,7 @@ import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
  * change, and fire off any consequent property changes.
  */
 public class ColonyWas extends ObjectWas {
-
-    private static final Logger logger = Logger.getLogger(ColonyWas.class.getName());
-
+    
     private final Colony colony;
     private final int population;
     private final int productionBonus;

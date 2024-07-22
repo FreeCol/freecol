@@ -29,7 +29,6 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -40,14 +39,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ScoutingMissionTest extends FreeColTestCase {
 
-    private static final Role scoutRole
-        = spec().getRole("model.role.scout");
+    private static final Role scoutRole = spec().getRole("model.role.scout");
 
-    private static final UnitType scoutType
-        = spec().getUnitType("model.unit.seasonedScout");
-
-    private static final LogBuilder lb = new LogBuilder(0);
-
+    private static final UnitType scoutType = spec().getUnitType("model.unit.seasonedScout");
 
     @Override
     public void tearDown() throws Exception {

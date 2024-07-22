@@ -19,9 +19,11 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import static net.sf.freecol.common.util.CollectionUtils.cachingIntComparator;
+import static net.sf.freecol.common.util.CollectionUtils.minimize;
+
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -37,7 +39,6 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -50,8 +51,6 @@ import net.sf.freecol.server.ai.AIUnit;
  * FIXME: Better avoidance of enemy units
  */
 public final class CashInTreasureTrainMission extends Mission {
-
-    private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
     public static final String TAG = "cashInTreasureTrainMission";
 

@@ -91,17 +91,6 @@ public class FontLibrary {
     public static float getMainFontSize() {
         return mainFontSize;
     }
-
-    /**
-     * Convert a font size and scale factor to float.
-     *
-     * @param fontSize The font size expressed as a {@code Size}.
-     * @param scaleFactor A secondary scaling.
-     * @return The conversion result.
-     */
-    private static float getScaledSize(Size fontSize, float scaleFactor) {
-        return fontSize.forFont() * scaleFactor;
-    }
     
     /**
      * Create a default {@code Font} set on initialization of the GUI.

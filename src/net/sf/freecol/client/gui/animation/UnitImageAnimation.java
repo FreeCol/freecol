@@ -19,18 +19,20 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.ImageUtils.createMirroredImage;
+import static net.sf.freecol.common.util.StringUtils.downCase;
+
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.io.sza.AnimationEvent;
@@ -39,9 +41,6 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.ImageUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -50,8 +49,6 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class UnitImageAnimation extends Animation {
     
-    private static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
-
     /**
        Alternate directions to check when a directional animation is
        not found.

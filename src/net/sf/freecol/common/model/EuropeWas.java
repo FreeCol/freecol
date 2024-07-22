@@ -19,9 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.logging.Logger;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.CollectionUtils.cachingIntComparator;
+import static net.sf.freecol.common.util.CollectionUtils.maximize;
 
 
 /**
@@ -29,8 +28,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * change, and fire off any consequent property changes.
  */
 public class EuropeWas extends ObjectWas {
-
-    private static final Logger logger = Logger.getLogger(EuropeWas.class.getName());
 
     /** The Europe to remember. */
     private final Europe europe;

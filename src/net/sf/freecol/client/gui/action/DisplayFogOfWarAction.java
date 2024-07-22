@@ -19,10 +19,6 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.option.GameOptions;

@@ -54,23 +54,13 @@ public class Animations {
      * @param scale The scale factor for the unit image.
      * @return A list of {@code Animation}s.
      */
-    public static List<Animation> unitMove(FreeColClient freeColClient,
-                                           Unit unit,
-                                           Tile source, Tile destination,
-                                           float scale) {
-        List<Animation> ret = new ArrayList<>();
-        int speed = freeColClient.getAnimationSpeed(unit.getOwner());
-        if (speed > 0) {
-            UnitMoveAnimation a
-                = new UnitMoveAnimation(unit,
-                    source, destination, speed, scale);
-            if (a == null) {
-                logger.warning("No move animation for: " + unit);
-            } else {
-                ret.add(a);
-            }
+    public static List<Animation> unitMove(FreeColClient freeColClient, Unit unit, Tile source, Tile destination, float scale) {
+        final int speed = freeColClient.getAnimationSpeed(unit.getOwner());
+        if (speed <= 0) {
+            return List.of();
         }
-        return ret;
+        final UnitMoveAnimation a = new UnitMoveAnimation(unit, source, destination, speed, scale);
+        return List.of(a);
     }
     
     /**

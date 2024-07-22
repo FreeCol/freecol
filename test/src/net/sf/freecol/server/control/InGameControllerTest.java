@@ -19,6 +19,11 @@
 
 package net.sf.freecol.server.control;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +36,8 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatEffectType;
 import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
@@ -45,11 +50,10 @@ import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Scope;
-import net.sf.freecol.common.model.SimpleCombatModel;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tension.Level;
@@ -60,7 +64,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
@@ -73,145 +76,68 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class InGameControllerTest extends FreeColTestCase {
 
-    private static BuildingType carpenterHouse
-        = spec().getBuildingType("model.building.carpenterHouse");
-    private static BuildingType press
-        = spec().getBuildingType("model.building.printingPress");
-    private static final BuildingType schoolHouseType
-        = spec().getBuildingType("model.building.schoolhouse");
-    private static final BuildingType stockadeType
-        = spec().getBuildingType("model.building.stockade");
+    private static BuildingType carpenterHouse = spec().getBuildingType("model.building.carpenterHouse");
+    private static BuildingType press = spec().getBuildingType("model.building.printingPress");
+    private static final BuildingType schoolHouseType = spec().getBuildingType("model.building.schoolhouse");
+    private static final BuildingType stockadeType = spec().getBuildingType("model.building.stockade");
 
-    private static final GoodsType bellsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType foodType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType hammersType
-        = spec().getGoodsType("model.goods.hammers");
-    private static final GoodsType horsesType
-        = spec().getGoodsType("model.goods.horses");
-    private static final GoodsType lumberType
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
-    private static final GoodsType toolsType
-        = spec().getGoodsType("model.goods.tools");
+    private static final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType grainType = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
+    private static final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
 
-    private static final Role scoutRole
-        = spec().getRole("model.role.scout");
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
-    private static final Role dragoonRole
-        = spec().getRole("model.role.dragoon");
-    private static final Role pioneerRole
-        = spec().getRole("model.role.pioneer");
-    private static final Role missionaryRole
-        = spec().getRole("model.role.missionary");
-    private static final Role infantryRole
-        = spec().getRole("model.role.infantry");
-    private static final Role cavalryRole
-        = spec().getRole("model.role.cavalry");
-    private static final Role armedBraveRole
-        = spec().getRole("model.role.armedBrave");
-    private static final Role mountedBraveRole
-        = spec().getRole("model.role.mountedBrave");
-    private static final Role nativeDragoonRole
-        = spec().getRole("model.role.nativeDragoon");
+    private static final Role scoutRole = spec().getRole("model.role.scout");
+    private static final Role soldierRole = spec().getRole("model.role.soldier");
+    private static final Role dragoonRole = spec().getRole("model.role.dragoon");
+    private static final Role pioneerRole = spec().getRole("model.role.pioneer");
+    private static final Role armedBraveRole = spec().getRole("model.role.armedBrave");
+    private static final Role mountedBraveRole = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoonRole = spec().getRole("model.role.nativeDragoon");
 
-    private static final TileImprovementType clear
-        = spec().getTileImprovementType("model.improvement.clearForest");
-    private static final TileImprovementType plow
-        = spec().getTileImprovementType("model.improvement.plow");
-    private static final TileImprovementType road
-        = spec().getTileImprovementType("model.improvement.road");
+    private static final TileImprovementType clear = spec().getTileImprovementType("model.improvement.clearForest");
+    private static final TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
+    private static final TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
 
-    private static final TileType arctic
-        = spec().getTileType("model.tile.arctic");
-    private static final TileType desert
-        = spec().getTileType("model.tile.desert");
-    private static final TileType desertForest
-        = spec().getTileType("model.tile.scrubForest");
-    private static final TileType grassland
-        = spec().getTileType("model.tile.grassland");
-    private static final TileType grasslandForest
-        = spec().getTileType("model.tile.coniferForest");
-    private static final TileType hills
-        = spec().getTileType("model.tile.hills");
-    private static final TileType marsh
-        = spec().getTileType("model.tile.marsh");
-    private static final TileType marshForest
-        = spec().getTileType("model.tile.wetlandForest");
-    private static final TileType mountains
-        = spec().getTileType("model.tile.mountains");
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
-    private static final TileType plainsForest
-        = spec().getTileType("model.tile.mixedForest");
-    private static final TileType prairie
-        = spec().getTileType("model.tile.prairie");
-    private static final TileType prairieForest
-        = spec().getTileType("model.tile.broadleafForest");
-    private static final TileType savannah
-        = spec().getTileType("model.tile.savannah");
-    private static final TileType savannahForest
-        = spec().getTileType("model.tile.tropicalForest");
-    private static final TileType swamp
-        = spec().getTileType("model.tile.swamp");
-    private static final TileType swampForest
-        = spec().getTileType("model.tile.rainForest");
-    private static final TileType tundra
-        = spec().getTileType("model.tile.tundra");
-    private static final TileType tundraForest
-        = spec().getTileType("model.tile.borealForest");
+    private static final TileType desert = spec().getTileType("model.tile.desert");
+    private static final TileType desertForest = spec().getTileType("model.tile.scrubForest");
+    private static final TileType hills = spec().getTileType("model.tile.hills");
+    private static final TileType marsh = spec().getTileType("model.tile.marsh");
+    private static final TileType marshForest = spec().getTileType("model.tile.wetlandForest");
+    private static final TileType mountains = spec().getTileType("model.tile.mountains");
+    private static final TileType ocean = spec().getTileType("model.tile.ocean");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
+    private static final TileType plainsForest = spec().getTileType("model.tile.mixedForest");
+    private static final TileType savannah = spec().getTileType("model.tile.savannah");
+    private static final TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
+    private static final TileType swamp = spec().getTileType("model.tile.swamp");
+    private static final TileType swampForest = spec().getTileType("model.tile.rainForest");
+    private static final TileType tundra = spec().getTileType("model.tile.tundra");
+    private static final TileType tundraForest = spec().getTileType("model.tile.borealForest");
 
-    private static final UnitType braveType
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType farmerType
-        = spec().getUnitType("model.unit.expertFarmer");
-    private static final UnitType colonialType
-        = spec().getUnitType("model.unit.colonialRegular");
-    private static final UnitType veteranType
-        = spec().getUnitType("model.unit.veteranSoldier");
-    private static final UnitType pettyCriminalType
-        = spec().getUnitType("model.unit.pettyCriminal");
-    private static final UnitType indenturedServantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType kingsRegularType
-        = spec().getUnitType("model.unit.kingsRegular");
-    private static final UnitType indianConvertType
-        = spec().getUnitType("model.unit.indianConvert");
-    private static final UnitType hardyPioneerType
-        = spec().getUnitType("model.unit.hardyPioneer");
-    private static final UnitType statesmanType
-        = spec().getUnitType("model.unit.elderStatesman");
-    private static final UnitType wagonTrainType
-        = spec().getUnitType("model.unit.wagonTrain");
-    private static final UnitType caravelType
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
-    private static final UnitType missionaryType
-        = spec().getUnitType("model.unit.jesuitMissionary");
-    private static final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private static final UnitType damagedArtilleryType
-        = spec().getUnitType("model.unit.damagedArtillery");
-    private static final UnitType treasureTrainType
-        = spec().getUnitType("model.unit.treasureTrain");
+    private static final UnitType braveType = spec().getUnitType("model.unit.brave");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType colonialType = spec().getUnitType("model.unit.colonialRegular");
+    private static final UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
+    private static final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
+    private static final UnitType kingsRegularType = spec().getUnitType("model.unit.kingsRegular");
+    private static final UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
+    private static final UnitType statesmanType = spec().getUnitType("model.unit.elderStatesman");
+    private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType caravelType = spec().getUnitType("model.unit.caravel");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType = spec().getUnitType("model.unit.privateer");
+    private static final UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
+    private static final UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+    private static final UnitType damagedArtilleryType = spec().getUnitType("model.unit.damagedArtillery");
+    private static final UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
 
-    private SimpleCombatModel combatModel = new SimpleCombatModel();
-
-
+    
     @Override
     public void tearDown() throws Exception {
         ServerTestHelper.stopServerGame();
@@ -734,7 +660,6 @@ public class InGameControllerTest extends FreeColTestCase {
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-        Unit colonist = first(colony.getUnits());
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
                                        veteranType, dragoonRole);
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,

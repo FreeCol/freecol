@@ -53,14 +53,6 @@ public class ForestMaker {
     private static final int HALF_WIDTH = BASE_WIDTH / 2;
     private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
 
-    private static final int[] LIMIT = {
-            HALF_WIDTH, HALF_WIDTH, -HALF_WIDTH, -HALF_WIDTH
-    };
-
-    private static final double[] SLOPE = {
-            -0.5, 0.5, -0.5, 0.5
-    };
-
     private static final int[] POWERS_OF_TWO
             = { 1, 2, 4, 8 };
 

@@ -28,7 +28,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -40,52 +39,26 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class ServerColonyTest extends FreeColTestCase {
 
-    private static final BuildingType chapelType
-        = spec().getBuildingType("model.building.chapel");
-    private static final BuildingType carpenterHouseType
-        = spec().getBuildingType("model.building.carpenterHouse");
-    private static final BuildingType depotType
-        = spec().getBuildingType("model.building.depot");
-    private static final BuildingType lumberMillType
-        = spec().getBuildingType("model.building.lumberMill");
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
-    private static final BuildingType warehouseType
-        = spec().getBuildingType("model.building.warehouse");
+    private static final BuildingType chapelType = spec().getBuildingType("model.building.chapel");
+    private static final BuildingType carpenterHouseType = spec().getBuildingType("model.building.carpenterHouse");
+    private static final BuildingType depotType = spec().getBuildingType("model.building.depot");
+    private static final BuildingType lumberMillType = spec().getBuildingType("model.building.lumberMill");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType warehouseType = spec().getBuildingType("model.building.warehouse");
 
-    private static final GoodsType bellsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType crossesType
-        = spec().getGoodsType("model.goods.crosses");
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType hammerGoodsType
-        = spec().getGoodsType("model.goods.hammers");
-    private static final GoodsType lumberGoodsType
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType foodType
-        = spec().getGoodsType("model.goods.food");
-    private static final GoodsType foodGoodsType
-        = spec().getPrimaryFoodType();
+    private static final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType crossesType = spec().getGoodsType("model.goods.crosses");
+    private static final GoodsType grainType = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
+    private static final GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType foodType = spec().getGoodsType("model.goods.food");
+    private static final GoodsType foodGoodsType = spec().getPrimaryFoodType();
 
-    private static final ResourceType lumberResource
-        = spec().getResourceType("model.resource.lumber");
-
-    private static final TileType coniferForest
-        = spec().getTileType("model.tile.coniferForest");
-    private static final TileType desert
-        = spec().getTileType("model.tile.desert");
-    private static final TileType marsh
-        = spec().getTileType("model.tile.marsh");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final TileType coniferForest = spec().getTileType("model.tile.coniferForest");
+    private static final TileType marsh = spec().getTileType("model.tile.marsh");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
     
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType expertLumberJack
-        = spec().getUnitType("model.unit.expertLumberJack");
-    private static final UnitType pioneerType
-        = spec().getUnitType("model.unit.hardyPioneer");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 
 
     public void testFoodConsumption() {
@@ -143,11 +116,10 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testDeathByStarvation() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(marsh));
+        ServerTestHelper.startServerGame(getTestMap(marsh));
 
         int consumption, production, unitsBeforeNewTurn = 3;
         Colony colony = getStandardColony(unitsBeforeNewTurn);
-        ServerPlayer player = (ServerPlayer) colony.getOwner();
 
         final Building townHall = colony.getBuilding(townHallType);
         for (Unit u : colony.getUnitList()) {
@@ -180,11 +152,10 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testAvoidStarvation() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(marsh));
+        ServerTestHelper.startServerGame(getTestMap(marsh));
 
         int unitsBeforeNewTurn = 3;
         Colony colony = getStandardColony(unitsBeforeNewTurn);
-        ServerPlayer player = (ServerPlayer) colony.getOwner();
         assertEquals("Wrong number of units in colony", unitsBeforeNewTurn,
             colony.getUnitCount());
 
@@ -220,7 +191,7 @@ public class ServerColonyTest extends FreeColTestCase {
      * Tests completion of buildable
      */
     public void testBuildingCompletion() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getStandardColony();
         ServerBuilding initialWarehouse
@@ -309,7 +280,7 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testLibertyAndImmigration() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        ServerTestHelper.startServerGame(getTestMap(true));
 
         final int population = 3;
         Colony colony = getStandardColony(population);

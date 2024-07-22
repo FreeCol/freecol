@@ -381,8 +381,9 @@ public final class EuropePanel extends PortPanel {
             case ACTIVE: case FORTIFIED: case FORTIFYING:
             case SENTRY: case SKIPPED:
                 return true;
+            default:
+                return false;
             }
-            return false;
         }
     }
 

@@ -78,21 +78,8 @@ public class SerializationTest extends FreeColTestCase {
         }
     }
 
-    private void logParseFailure(SAXParseException e, String serialized) {
-        int col = e.getColumnNumber();
-        String errMsg = e.getMessage()
-            + "\nAt line=" + e.getLineNumber()
-            + ", column=" + col + ":\n"
-            + serialized.substring(Math.max(0, col - 100),
-                                   Math.min(col + 100, serialized.length()));
-        fail(errMsg);
-    }
-
     public void testValidation() throws Exception {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
-
-        Colony colony = getStandardColony(6);
-        Player player = game.getPlayerByNationId("model.nation.dutch");
 
         ServerTestHelper.newTurn();
         ServerTestHelper.newTurn();

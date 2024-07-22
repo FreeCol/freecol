@@ -23,7 +23,6 @@ import static net.sf.freecol.common.util.CollectionUtils.first;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.List;

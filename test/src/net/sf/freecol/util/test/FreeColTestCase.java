@@ -603,11 +603,7 @@ public class FreeColTestCase extends TestCase {
 
             // Add braves
             for (int i = 0; i < initialBravesInCamp; i++) {
-                Unit brave = new ServerUnit(game, camp, indianPlayer,
-                                            indianBraveType);
-                if (brave == null) {
-                    throw new RuntimeException("Null brave");
-                }
+                Unit brave = new ServerUnit(game, camp, indianPlayer, indianBraveType);
                 camp.addOwnedUnit(brave);
             }
             camp.placeSettlement(true);

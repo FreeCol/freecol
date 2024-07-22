@@ -213,10 +213,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             this.stops = stops;
         }
 
-        public List<TradeRouteStop> getStops() {
-            return stops;
-        }
-
         // Interface Transferable
 
         /**

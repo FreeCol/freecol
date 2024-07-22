@@ -19,20 +19,22 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.UUID;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,8 +43,6 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -101,10 +101,6 @@ public class HighScore extends FreeColObject {
             return minimumScore;
         }
     }
-
-    /** The format to use for dates.  Almost ISO8601. */
-    private final SimpleDateFormat dateFormat
-        = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
     /** The turn in which independence was granted. */
     private int independenceTurn = -1;

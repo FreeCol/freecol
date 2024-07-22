@@ -25,7 +25,6 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -173,9 +172,6 @@ public final class NegotiationDialog extends FreeColPanel {
         final Player player = getMyPlayer();
         final Unit ourUnit = (our instanceof Unit) ? (Unit)our : null;
         final Colony ourColony = (our instanceof Colony) ? (Colony)our : null;
-        final Unit otherUnit = (other instanceof Unit) ? (Unit)other : null;
-        final Colony otherColony = (other instanceof Colony) ? (Colony)other
-                : null;
 
         this.otherPlayer = ((Ownable)other).getOwner();
         this.agreement = agreement;

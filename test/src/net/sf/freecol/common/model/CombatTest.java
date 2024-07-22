@@ -19,6 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.forEach;
+import static net.sf.freecol.common.util.CollectionUtils.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,65 +32,37 @@ import net.sf.freecol.common.model.CombatModel.CombatEffectType;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.util.test.MockPseudoRandom;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.MockPseudoRandom;
 
 
 public class CombatTest extends FreeColTestCase {
 
-    private static final Role armedBraveRole
-        = spec().getRole("model.role.armedBrave");
-    private static final Role cavalryRole
-        = spec().getRole("model.role.cavalry");
-    private static final Role dragoonRole
-        = spec().getRole("model.role.dragoon");
-    private static final Role infantryRole
-        = spec().getRole("model.role.infantry");
-    private static final Role missionaryRole
-        = spec().getRole("model.role.missionary");
-    private static final Role nativeDragoonRole
-        = spec().getRole("model.role.nativeDragoon");
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
+    private static final Role armedBraveRole = spec().getRole("model.role.armedBrave");
+    private static final Role cavalryRole = spec().getRole("model.role.cavalry");
+    private static final Role dragoonRole = spec().getRole("model.role.dragoon");
+    private static final Role infantryRole = spec().getRole("model.role.infantry");
+    private static final Role missionaryRole = spec().getRole("model.role.missionary");
+    private static final Role nativeDragoonRole = spec().getRole("model.role.nativeDragoon");
+    private static final Role soldierRole = spec().getRole("model.role.soldier");
 
-    private static final TileType hills
-        = spec().getTileType("model.tile.hills");
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final TileType hills = spec().getTileType("model.tile.hills");
+    private static final TileType ocean = spec().getTileType("model.tile.ocean");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
 
-    private static final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private static final UnitType braveType
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType colonialRegularType
-        = spec().getUnitType("model.unit.colonialRegular");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType damagedArtilleryType
-        = spec().getUnitType("model.unit.damagedArtillery");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private static final UnitType indenturedServantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType indianConvertType
-        = spec().getUnitType("model.unit.indianConvert");
-    private static final UnitType jesuitMissionaryType
-        = spec().getUnitType("model.unit.jesuitMissionary");
-    private static final UnitType kingsRegularType
-        = spec().getUnitType("model.unit.kingsRegular");
-    private static final UnitType pettyCriminalType
-        = spec().getUnitType("model.unit.pettyCriminal");
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
-    private static final UnitType veteranType
-        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType braveType = spec().getUnitType("model.unit.brave");
+    private static final UnitType colonialRegularType = spec().getUnitType("model.unit.colonialRegular");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private static final UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType jesuitMissionaryType = spec().getUnitType("model.unit.jesuitMissionary");
+    private static final UnitType kingsRegularType = spec().getUnitType("model.unit.kingsRegular");
+    private static final UnitType privateerType = spec().getUnitType("model.unit.privateer");
+    private static final UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
 
 
     public void testColonistAttackedByVeteran() throws Exception {
@@ -443,7 +419,7 @@ public class CombatTest extends FreeColTestCase {
 
         Player spanish = game.getPlayerByNationId("model.nation.spanish");
         Player tupi = game.getPlayerByNationId("model.nation.tupi");
-        SimpleCombatModel combatModel = new SimpleCombatModel();
+
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
@@ -547,7 +523,6 @@ public class CombatTest extends FreeColTestCase {
         Map map = getTestMap(plains, true);
         Game game = ServerTestHelper.startServerGame(map);
         CombatModel combatModel = game.getCombatModel();
-        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         ServerPlayer inca = getServerPlayer(game, "model.nation.inca");

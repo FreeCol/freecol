@@ -657,8 +657,8 @@ public final class FreeColServer {
     public void addNewUserConnection(Socket socket)
         throws FreeColException, IOException, XMLStreamException {
         final String name = socket.getInetAddress() + ":" + socket.getPort();
-        Connection c = new Connection(socket, FreeCol.SERVER_THREAD + name)
-            .setMessageHandler(this.userConnectionHandler);
+        @SuppressWarnings("resource")
+        final Connection c = new Connection(socket, FreeCol.SERVER_THREAD + name).setMessageHandler(this.userConnectionHandler);
         getServer().addConnection(c);
         // Short delay here improves reliability
         c.startReceiving();

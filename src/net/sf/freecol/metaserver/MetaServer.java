@@ -148,9 +148,8 @@ public final class MetaServer extends Thread {
                 clientSocket = serverSocket.accept();
                 logger.info("Client connection from: "
                     + clientSocket.getInetAddress().toString());
-                Connection connection = new Connection(clientSocket,
-                    FreeCol.METASERVER_THREAD)
-                    .setMessageHandler(getMetaServerHandler());
+                @SuppressWarnings("resource")
+                final Connection connection = new Connection(clientSocket, FreeCol.METASERVER_THREAD).setMessageHandler(getMetaServerHandler());
                 this.connections.put(clientSocket, connection);
                 connection.startReceiving();
             } catch (IOException e) {

@@ -21,7 +21,6 @@ package net.sf.freecol.common.option;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -30,7 +29,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
 
 
 /**
@@ -38,11 +36,7 @@ import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
  */
 public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
-    private static final Logger logger = Logger.getLogger(AbstractUnitOption.class.getName());
-
     public static final String TAG = "unitOption";
-
-    private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;
     
     /** The value of this option. */
     private AbstractUnit value = null;

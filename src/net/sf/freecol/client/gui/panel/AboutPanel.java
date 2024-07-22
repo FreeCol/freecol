@@ -21,16 +21,12 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
@@ -69,8 +65,6 @@ import net.sf.freecol.common.util.OSUtils;
  *
  */
 public final class AboutPanel extends FreeColPanel {
-
-    private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
     /** The main FreeCol website */
     private static final String SITE_URL

@@ -19,9 +19,12 @@
 
 package net.sf.freecol.common.io.sza;
 
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.max;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -46,8 +49,6 @@ import javax.imageio.ImageIO;
 
 import net.sf.freecol.common.util.ImageUtils;
 
-import static net.sf.freecol.common.util.CollectionUtils.*;
-
 
 /**
  * An animation made from images stored in a zip-file.
@@ -56,8 +57,6 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
 
     private static final class ImageAnimationEventImpl
         implements ImageAnimationEvent {
-
-        private static final Component _c = new Component() {};
         
         private final BufferedImage image;
         private final int durationInMs;

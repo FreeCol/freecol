@@ -75,12 +75,6 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.fort");
     private static final BuildingType fortressType
         = spec().getBuildingType("model.building.fortress");
-    private static final BuildingType furTraderHouseType
-        = spec().getBuildingType("model.building.furTraderHouse");
-    private static final BuildingType furTradingPostType
-        = spec().getBuildingType("model.building.furTradingPost");
-    private static final BuildingType furFactoryType
-        = spec().getBuildingType("model.building.furFactory");
     private static final BuildingType ironWorksType
         = spec().getBuildingType("model.building.ironWorks");
     private static final BuildingType lumberMillType
@@ -128,12 +122,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType hammersType
-        = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
-    private static final GoodsType lumberType
-        = spec().getGoodsType("model.goods.lumber");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
     private static final GoodsType oreType
@@ -159,8 +149,6 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.indenturedServant");
     private static final UnitType indianConvertType
         = spec().getUnitType("model.unit.indianConvert");
-    private static final UnitType masterBlacksmithType
-        = spec().getUnitType("model.unit.masterBlacksmith");
     private static final UnitType masterCarpenterType
         = spec().getUnitType("model.unit.masterCarpenter");
     private static final UnitType masterDistillerType
@@ -205,7 +193,6 @@ public class BuildingTest extends FreeColTestCase {
         UnitType[] unitTypes = new UnitType[] {
             indianConvertType, pettyCriminalType, indenturedServantType,
             freeColonistType, building.getExpertUnitType() };
-        Tile tile = colony.getTile();
         for (UnitType ut : unitTypes) {
             if (none(colony.getUnits(), matchKey(ut, Unit::getType))) {
                 Unit u = find(colony.getUnits(),
@@ -1090,8 +1077,6 @@ public class BuildingTest extends FreeColTestCase {
     };
     private static final BuildingType[] clothBuildings = new BuildingType[] {
         weaverHouseType, weaverShopType, textileMillType };
-    private static final BuildingType[] furBuildings = new BuildingType[] {
-        furTraderHouseType, furTradingPostType, furFactoryType };
     private static final BuildingType[] sugarBuildings = new BuildingType[] {
         distillerHouseType, rumDistilleryType, rumFactoryType };
     private static final BuildingType[] tobaccoBuildings = new BuildingType[] {

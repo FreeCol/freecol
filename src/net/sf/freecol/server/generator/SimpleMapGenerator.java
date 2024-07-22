@@ -88,13 +88,6 @@ public class SimpleMapGenerator implements MapGenerator {
 
     private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
 
-    /**
-     * To avoid starting positions too close to the poles, this
-     * percentage indicating how much of the half map close to the
-     * pole cannot be spawned on.
-     */
-    private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
-
     /** The random number source. */
     private final Random random;
 

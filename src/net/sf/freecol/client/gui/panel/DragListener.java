@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu.Separator;
@@ -32,9 +31,9 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
+import net.sf.freecol.client.gui.label.AbstractGoodsLabel.AmountType;
 import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.label.AbstractGoodsLabel.AmountType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.OSUtils;
 
@@ -46,9 +45,7 @@ import net.sf.freecol.common.util.OSUtils;
  * be precise).
  */
 public final class DragListener extends MouseAdapter {
-
-    private static final Logger logger = Logger.getLogger(DragListener.class.getName());
-
+    
     /**
      * The maximum numbers of pixels of the user's screen height
      * before triggering the small flag.

@@ -23,13 +23,11 @@ public class UnitAnimator {
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels
         = new HashMap<>();
     
-    private final FreeColClient freeColClient;
     private final MapViewer mapViewer;
     private final ImageLibrary lib;
     
     
     UnitAnimator(FreeColClient freeColClient, MapViewer mapViewer, ImageLibrary lib) {
-        this.freeColClient = freeColClient;
         this.mapViewer = mapViewer;
         this.lib = lib;
     }

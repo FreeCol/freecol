@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.dialog;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -37,9 +36,6 @@ import net.sf.freecol.common.model.StringTemplate;
  * A FreeColDialog with input field/s.
  */
 public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
-
-    private static final Logger logger = Logger.getLogger(FreeColInputDialog.class.getName());
-
 
     /**
      * Internal constructor.

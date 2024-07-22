@@ -39,7 +39,6 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.ColopediaAction;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.action.SelectableOptionAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.Utility;

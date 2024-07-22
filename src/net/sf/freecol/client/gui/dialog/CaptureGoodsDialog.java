@@ -25,7 +25,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -67,9 +66,6 @@ import net.sf.freecol.common.model.Unit;
  *      needed.
  */
 public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
-
-    private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
-
 
     private static class GoodsItem extends JCheckBox {
 
@@ -115,11 +111,6 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         implements ListCellRenderer<GoodsItem> {
 
         private Market market;
-
-        public CheckBoxRenderer() {
-            //setBackground(UIManager.getColor("List.textBackground"));
-            //setForeground(UIManager.getColor("List.textForeground"));
-        }
 
         /**
          * Overload constructor for market lookups on good pricing for display

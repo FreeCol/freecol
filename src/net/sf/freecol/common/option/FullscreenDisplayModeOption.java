@@ -20,7 +20,6 @@
 package net.sf.freecol.common.option;
 
 import java.awt.DisplayMode;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -34,9 +33,7 @@ import net.sf.freecol.common.model.Specification;
  * Option for selecting a fullscreen display mode.
  */
 public class FullscreenDisplayModeOption extends AbstractOption<FullscreenDisplayModeOption.FullscreenDisplayModeWrapper> {
-
-    private static Logger logger = Logger.getLogger(FullscreenDisplayModeOption.class.getName());
-
+    
     public static final String TAG = "fullscreenDisplayModeOption";
 
     /** The value of this option. */

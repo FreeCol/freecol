@@ -21,7 +21,6 @@ package net.sf.freecol.server.model;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.ChangeSet;
 
@@ -30,8 +29,6 @@ import net.sf.freecol.common.networking.ChangeSet;
  * Root class for timed sessions.
  */
 public abstract class TimedSession extends Session {
-
-    private static final Logger logger = Logger.getLogger(TimedSession.class.getName());
 
     /** The timer that controls the session duration. */
     private Timer timer;

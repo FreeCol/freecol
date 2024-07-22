@@ -134,6 +134,7 @@ public class Connection implements Closeable {
      * @param name The connection name.
      * @exception IOException if streams can not be derived from the socket.
      */
+    @SuppressWarnings("resource")
     public Connection(Socket socket, String name) throws IOException {
         this(name);
 

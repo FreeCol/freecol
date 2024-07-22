@@ -578,7 +578,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private static final String DISASTER_TAG = "disaster";
     private static final String EXPENDED_AMOUNT_TAG = "expended-amount";
     private static final String EXPOSE_RESOURCE_PERCENT_TAG = "expose-resource-percent";
-    private static final String FROM_TAG = "from";
     private static final String MAGNITUDE_TAG = "magnitude";
     private static final String MOVEMENT_COST_TAG = "movement-cost";
     private static final String NATURAL_TAG = "natural";
@@ -586,7 +585,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private static final String REQUIRED_IMPROVEMENT_TAG = "required-improvement";
     private static final String REQUIRED_ROLE_TAG = "required-role";
     private static final String TILE_TYPE_CHANGE_TAG = "tile-type-change";
-    private static final String TO_TAG = "to";
     private static final String WORKER_TAG = "worker";
     private static final String ZINDEX_TAG = "zIndex";
     // @compat 0.11.0
