@@ -183,18 +183,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testImportMap() {
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         Map importMap = null;
-        List<File> mapFiles = new ArrayList<>();
-        if (true) {
-            // We now have too many maps to test comprehensively, so
-            // we will just test the standard (old) maps for now
-            for (String name : FreeColTestCase.STANDARD_MAPS) {
-                mapFiles.add(new File(name));
-            }
-        } else {
-            // This test all the maps
-            mapFiles.addAll(FreeColDirectories.getMapFileList());
-        }
-        for (File importFile : mapFiles) {
+        for (File importFile : FreeColDirectories.getMapFileList()) {
             Game game = getStandardGame();
             Specification spec = game.getSpecification();
             spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
