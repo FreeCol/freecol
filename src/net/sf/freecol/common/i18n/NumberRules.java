@@ -64,19 +64,6 @@ public class NumberRules {
 
 
     /**
-     * Creates a new {@code NumberRules} instance from the given
-     * input stream, which must contain an XML representation of the
-     * CLDR plural rules.
-     *
-     * @param in an {@code InputStream} value
-     * @exception XMLStreamException if there is a problem reading the stream.
-     */
-    public NumberRules(InputStream in) throws XMLStreamException {
-        load(in);
-    }
-
-
-    /**
      * Returns a rule appropriate for the given language, or the
      * OTHER_NUMBER_RULE if none has been defined.
      *

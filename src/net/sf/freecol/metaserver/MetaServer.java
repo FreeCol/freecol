@@ -94,23 +94,6 @@ public final class MetaServer extends Thread {
     }
 
     /**
-     * Shuts down the server thread.
-     */
-    public void shutdown() {
-        this.running = false;
-
-        try {
-            this.serverSocket.close();
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not close the server socket!", e);
-        }
-
-        Connection c;
-        while ((c = this.connections.remove(0)) != null) c.disconnect();
-        logger.info("Metaserver shutdown.");
-    }
-
-    /**
      * Gets a {@code Connection} identified by a {@code Socket}.
      * 
      * @param socket The {@code Socket} that identifies the

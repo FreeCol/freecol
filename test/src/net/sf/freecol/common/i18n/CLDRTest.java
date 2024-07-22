@@ -19,13 +19,6 @@
 
 package net.sf.freecol.common.i18n;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.common.i18n.Number.Category;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -60,15 +53,6 @@ public class CLDRTest extends FreeColTestCase {
     }
 
     public void testPlurals() {
-        NumberRules numberRules;
-        File inputFile = new File("data/strings/plurals.xml");
-        assertTrue(inputFile.exists());
-        try (InputStream in = Files.newInputStream(inputFile.toPath())) {
-            numberRules = new NumberRules(in);
-        } catch (IOException|XMLStreamException ex) {
-            fail(ex.toString());
-        }
-
         assertNotNull(NumberRules.getNumberForLanguage("az"));
         assertTrue(NumberRules.getNumberForLanguage("az") instanceof OtherNumberRule);
 

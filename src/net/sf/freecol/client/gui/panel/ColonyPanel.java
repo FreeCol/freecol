@@ -1219,7 +1219,6 @@ public final class ColonyPanel extends PortPanel
         if (selectedUnitLabel != unitLabel) {
             inPortPanel.removePropertyChangeListeners();
             if (selectedUnitLabel != null) {
-                selectedUnitLabel.setSelected(false);
                 selectedUnitLabel.getUnit().removePropertyChangeListener(this);
             }
             super.setSelectedUnitLabel(unitLabel);
@@ -1227,7 +1226,6 @@ public final class ColonyPanel extends PortPanel
                 cargoPanel.setCarrier(null);
             } else {
                 cargoPanel.setCarrier(unitLabel.getUnit());
-                unitLabel.setSelected(true);
                 unitLabel.getUnit().addPropertyChangeListener(this);
             }
             inPortPanel.addPropertyChangeListeners();

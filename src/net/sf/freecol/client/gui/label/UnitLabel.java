@@ -87,9 +87,6 @@ public final class UnitLabel extends FreeColLabel implements ActionListener, Car
     /** The unit this is a label for. */
     private final Unit unit;
 
-    /** Is this a currently selected unit? */
-    private boolean selected;
-
     /** Is this a small label? */
     private boolean isSmall;
 
@@ -139,7 +136,6 @@ public final class UnitLabel extends FreeColLabel implements ActionListener, Car
                      boolean isSmall, boolean ignoreLocation) {
         this.freeColClient = freeColClient;
         this.unit = unit;
-        this.selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
         this.tinyFont = freeColClient.getGUI().getFixedImageLibrary().getScaledFont("normal-plain-tiny", null);
@@ -175,15 +171,6 @@ public final class UnitLabel extends FreeColLabel implements ActionListener, Car
      */
     public Unit getUnit() {
         return this.unit;
-    }
-
-    /**
-     * Sets whether or not this unit should be selected.
-     *
-     * @param b Whether or not this unit should be selected.
-     */
-    public void setSelected(boolean b) {
-        this.selected = b;
     }
 
     /**

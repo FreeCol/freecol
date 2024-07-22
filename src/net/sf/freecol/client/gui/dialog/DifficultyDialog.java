@@ -26,10 +26,6 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -44,10 +40,7 @@ import net.sf.freecol.common.option.OptionGroup;
  *
  * @see OptionGroup
  */
-public final class DifficultyDialog extends OptionsDialog implements TreeSelectionListener {
-
-    /** The currently selected subgroup. */
-    private OptionGroup selected;
+public final class DifficultyDialog extends OptionsDialog {
 
     /**
      * We need our own copy of the specification, as the dialog is
@@ -75,9 +68,6 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
               "model.difficulty.custom", editable);
 
         this.specification = specification;
-        this.selected = level;
-        
-        getOptionUI().getTree().addTreeSelectionListener(this);
         
         final List<JButton> extraButtons = new ArrayList<>();
         if (isEditable()) {
@@ -162,16 +152,6 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
 
 
     // Implement TreeSelectionListener
-
-    @Override
-    public void valueChanged(TreeSelectionEvent event) {
-        TreePath path = event.getPath();
-        if (path.getPathCount() >= 2) {
-            DefaultMutableTreeNode node
-                = (DefaultMutableTreeNode)path.getPathComponent(1);
-            this.selected = (OptionGroup)node.getUserObject();
-        }
-    }
 
     @Override
     protected boolean saveDefaultOptions() {
