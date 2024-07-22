@@ -823,9 +823,9 @@ public final class FreeColServer {
         this.setAIMain(null);
         // Mask out spec while saving map.
         Specification spec = getSpecification();
-        //getGame().setSpecification(null);
+        getGame().setSpecification(null);
         saveGame(file, MAP_EDITOR_NAME, null, null, image);
-        //getGame().setSpecification(spec);
+        getGame().setSpecification(spec);
     }
 
     /**
