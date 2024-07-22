@@ -3722,52 +3722,24 @@ public final class InGameController extends FreeColClientHolder {
      * @param type The {@code GoodsType} demanded (null means gold).
      * @param amount The amount of goods/gold demanded.
      */
-    public void indianDemandHandler(Unit unit, Colony colony,
-                                    GoodsType type, int amount) {
-        final Player player = getMyPlayer();
-
-        boolean accepted;
-        int opt = getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
-        switch (opt) {
-        case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
+    public void indianDemandHandler(Unit unit, Colony colony, GoodsType type, int amount) {
+        final int indianDemandPreference = getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
+        if (indianDemandPreference == ClientOptions.INDIAN_DEMAND_RESPONSE_ASK) {
             invokeLater(() ->
-                getGUI().showNativeDemandDialog(unit, colony, type, amount,
-                    (Boolean accept) ->
-                        askServer().indianDemand(unit, colony, type, amount,
-                            ((accept) ? IndianDemandAction.INDIAN_DEMAND_ACCEPT
-                                : IndianDemandAction.INDIAN_DEMAND_REJECT))));
+            getGUI().showNativeDemandDialog(unit, colony, type, amount, (Boolean accept) ->
+                    askServer().indianDemand(unit, colony, type, amount,
+                        ((accept) ? IndianDemandAction.INDIAN_DEMAND_ACCEPT
+                            : IndianDemandAction.INDIAN_DEMAND_REJECT))));
             return;
-        case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-            accepted = true;
-            break;
-        case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-            accepted = false;
-            break;
-        default:
-            throw new RuntimeException("Impossible option value: " + opt);
         }
 
-        final String nation = Messages.message(unit.getOwner().getNationLabel());
-        ModelMessage m = (type == null)
-            ? new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                               "indianDemand.gold.text", colony, unit)
-                .addName("%nation%", nation)
-                .addName("%colony%", colony.getName())
-                .addAmount("%amount%", amount)
-            : (type.isFoodType())
-            ? new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                               "indianDemand.food.text", colony, unit)
-                .addName("%nation%", nation)
-                .addName("%colony%", colony.getName())
-                .addAmount("%amount%", amount)
-            : new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                               "indianDemand.other.text", colony, unit)
-                .addName("%nation%", nation)
-                .addName("%colony%", colony.getName())
-                .addAmount("%amount%", amount)
-                .addNamed("%goods%", type);
-        player.addModelMessage(m);
-        invokeLater(() -> nextModelMessage());
+        invokeLater(() -> {
+            if (indianDemandPreference == ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT) {
+                askServer().indianDemand(unit, colony, type, amount, IndianDemandAction.INDIAN_DEMAND_ACCEPT);
+            } else {
+                askServer().indianDemand(unit, colony, type, amount, IndianDemandAction.INDIAN_DEMAND_REJECT);
+            }
+        });
     }
 
     /**
