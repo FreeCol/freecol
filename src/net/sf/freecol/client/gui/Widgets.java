@@ -284,6 +284,13 @@ public final class Widgets {
             return null;
         }
 
+        final FreeColDialog<T> dialog = createChoiceDialog(tmpl, icon, cancelKey, choices);
+        return canvas.displayModalDialog(dialog);
+    }
+
+
+    private <T> FreeColDialog<T> createChoiceDialog(StringTemplate tmpl, ImageIcon icon, String cancelKey,
+            List<ChoiceItem<T>> choices) {
         final List<ChoiceItem<T>> allChoices = new ArrayList<>(choices);
         if (cancelKey != null) {
             ChoiceItem<T> cancelOption = new ChoiceItem<>(Messages.message(cancelKey), (T) null).cancelOption();
@@ -327,8 +334,7 @@ public final class Widgets {
 
             return content;
         });
-        
-        return canvas.displayModalDialog(dialog);
+        return dialog;
     }
 
     private <T> JButton createButtonFromChoiceItem(DialogApi<T> api, ChoiceItem<T> ci) {
@@ -626,13 +632,9 @@ public final class Widgets {
      *     fountain of youth.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
-    public void showEmigrationDialog(Player player, boolean fountainOfYouth,
-                                     DialogHandler<Integer> handler) {
-        new DialogCallback<>(new EmigrationDialog(this.freeColClient,
-                                                  getFrame(),
-                                                  player.getEurope(),
-                                                  fountainOfYouth),
-                             null, handler);
+    public void showEmigrationDialog(Player player, boolean fountainOfYouth, DialogHandler<Integer> handler) {
+        final FreeColPanel panel = new EmigrationDialog(this.freeColClient, player.getEurope(), fountainOfYouth, handler);
+        this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
     }
 
     /**
