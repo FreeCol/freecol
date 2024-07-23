@@ -147,7 +147,7 @@ public class DebugUtils {
             new ChoiceItem<BuildingType>(Messages.getName(bt), bt);
 
         StringTemplate tmpl = StringTemplate.name(title);
-        BuildingType buildingType = gui.getChoice(tmpl, "cancel",
+        BuildingType buildingType = gui.modalChoiceDialog(tmpl, "cancel",
             transform(spec.getBuildingTypeList(), alwaysTrue(), mapper,
                       Comparator.naturalOrder()));
         if (buildingType == null) return;
@@ -208,7 +208,7 @@ public class DebugUtils {
             = f -> new ChoiceItem<FoundingFather>(Messages.getName(f), f);
 
         StringTemplate tmpl = StringTemplate.name(fatherTitle);
-        FoundingFather father = gui.getChoice(tmpl, "cancel",
+        FoundingFather father = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sSpec.getFoundingFathers(), noFatherPred, mapper,
                       Comparator.naturalOrder()));
         if (father != null) {
@@ -231,7 +231,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectGold"),
             Integer.toString(1000), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -279,7 +279,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectImmigration"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -307,7 +307,7 @@ public class DebugUtils {
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectLiberty"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -369,7 +369,7 @@ public class DebugUtils {
             new ChoiceItem<UnitType>(Messages.getName(ut), ut);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectUnitType");
-        UnitType unitChoice = gui.getChoice(tmpl, "cancel",
+        UnitType unitChoice = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sSpec.getUnitTypeList(), alwaysTrue(), mapper,
                       Comparator.naturalOrder()));
         if (unitChoice == null) return;
@@ -415,12 +415,12 @@ public class DebugUtils {
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
             
         StringTemplate tmpl = StringTemplate.template("prompt.selectGoodsType");
-        GoodsType goodsType = gui.getChoice(tmpl, "cancel",
+        GoodsType goodsType = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sSpec.getGoodsTypeList(), goodsPred, mapper,
                       Comparator.naturalOrder()));
         if (goodsType == null) return;
 
-        String amount = gui.getInput(null,
+        String amount = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectGoodsAmount"),
             "20", "ok", "cancel");
         if (amount == null) return;
@@ -465,7 +465,7 @@ public class DebugUtils {
             return;
         }
         StringTemplate tmpl = StringTemplate.template("prompt.selectDisaster");
-        Disaster disaster = gui.getChoice(tmpl, "cancel", disasters);
+        Disaster disaster = gui.modalChoiceDialog(tmpl, "cancel", disasters);
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -504,7 +504,7 @@ public class DebugUtils {
             new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectOwner");
-        Player player = gui.getChoice(tmpl, "cancel",
+        Player player = gui.modalChoiceDialog(tmpl, "cancel",
             transform(game.getLiveEuropeanPlayers(colony.getOwner()),
                       alwaysTrue(), mapper, Comparator.naturalOrder()));
         if (player == null) return;
@@ -537,7 +537,7 @@ public class DebugUtils {
             new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectOwner");
-        Player player = gui.getChoice(tmpl, "cancel",
+        Player player = gui.modalChoiceDialog(tmpl, "cancel",
             transform(game.getLivePlayers(),
                       p -> unit.getType().isAvailableTo(p), mapper,
                       Comparator.naturalOrder()));
@@ -572,7 +572,7 @@ public class DebugUtils {
             new ChoiceItem<Role>(r.getId(), r);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectRole");
-        Role roleChoice = gui.getChoice(tmpl, "cancel",
+        Role roleChoice = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sGame.getSpecification().getRoles(), alwaysTrue(),
                       roleMapper, Comparator.naturalOrder()));
         if (roleChoice == null) return;
@@ -978,12 +978,12 @@ public class DebugUtils {
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectGoodsType");
-        GoodsType goodsType = gui.getChoice(tmpl, "cancel",
+        GoodsType goodsType = gui.modalChoiceDialog(tmpl, "cancel",
             transform(spec.getGoodsTypeList(), goodsPred, mapper,
                       Comparator.naturalOrder()));
         if (goodsType == null) return;
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
                 StringTemplate.template("prompt.selectGoodsAmount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel");
@@ -1038,7 +1038,7 @@ public class DebugUtils {
             new ChoiceItem<MonarchAction>(a);
 
         StringTemplate tmpl = StringTemplate.name(monarchTitle);
-        MonarchAction action = gui.getChoice(tmpl, "cancel",
+        MonarchAction action = gui.modalChoiceDialog(tmpl, "cancel",
             transform(MonarchAction.values(), alwaysTrue(), mapper,
                       Comparator.naturalOrder()));
         if (action == null) return;
@@ -1067,7 +1067,7 @@ public class DebugUtils {
             
         StringTemplate tmpl = StringTemplate.template("prompt.selectLostCityRumour");
         RumourType rumourChoice = freeColClient.getGUI()
-            .getChoice(tmpl, "cancel",
+            .modalChoiceDialog(tmpl, "cancel",
                        transform(RumourType.values(), realRumourPred, mapper,
                                  Comparator.naturalOrder()));
         if (rumourChoice == null) return;
@@ -1112,7 +1112,7 @@ public class DebugUtils {
 
         freeColClient.skipTurns(0); // Clear existing skipping
 
-        String response = freeColClient.getGUI().getInput(null,
+        String response = freeColClient.getGUI().modalInputDialog(null,
             StringTemplate.key("prompt.selectTurnsToSkip"),
             Integer.toString(10), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -1159,7 +1159,7 @@ public class DebugUtils {
         boolean more = true;
         while (more) {
             int val = server.getInGameController().stepRandom();
-            more = gui.confirm(StringTemplate.template("prompt.stepRNG")
+            more = gui.modalConfirmDialog(StringTemplate.template("prompt.stepRNG")
                 .addAmount("%value%", val),
                 "more", "cancel");
         }

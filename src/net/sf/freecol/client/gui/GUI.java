@@ -141,8 +141,8 @@ public class GUI extends FreeColClientHolder {
      *      it's the cancel button that gets focused.
      * @return True if the "ok" button was selected.
      */
-    public final boolean confirm(String textKey, String okKey, String cancelKey, boolean defaultOk) {
-        return confirm(null, StringTemplate.key(textKey), (ImageIcon)null,
+    public final boolean modalConfirmDialog(String textKey, String okKey, String cancelKey, boolean defaultOk) {
+        return modalConfirmDialog(null, StringTemplate.key(textKey), (ImageIcon)null,
                        okKey, cancelKey, defaultOk);
     }
 
@@ -154,9 +154,9 @@ public class GUI extends FreeColClientHolder {
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public final boolean confirm(StringTemplate template,
+    public final boolean modalConfirmDialog(StringTemplate template,
                                  String okKey, String cancelKey) {
-        return confirm(null, template, (ImageIcon)null,
+        return modalConfirmDialog(null, template, (ImageIcon)null,
                        okKey, cancelKey, true);
     }
 
@@ -170,12 +170,12 @@ public class GUI extends FreeColClientHolder {
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public final boolean confirm(Tile tile, StringTemplate template,
+    public final boolean modalConfirmDialog(Tile tile, StringTemplate template,
                                  GoodsType goodsType,
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
-        return confirm(tile, template, icon, okKey, cancelKey, true);
+        return modalConfirmDialog(tile, template, icon, okKey, cancelKey, true);
     }
 
     /**
@@ -188,12 +188,12 @@ public class GUI extends FreeColClientHolder {
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public final boolean confirm(Tile tile, StringTemplate template,
+    public final boolean modalConfirmDialog(Tile tile, StringTemplate template,
                                  Settlement settlement,
                                  String okKey, String cancelKey) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
-        return confirm(tile, template, icon, okKey, cancelKey, true);
+        return modalConfirmDialog(tile, template, icon, okKey, cancelKey, true);
     }
 
     /**
@@ -208,11 +208,11 @@ public class GUI extends FreeColClientHolder {
      *      it's the cancel button that gets focused.
      * @return True if the "ok" button was selected.
      */
-    public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
+    public final boolean modalConfirmDialog(Tile tile, StringTemplate template, Unit unit,
                                  String okKey, String cancelKey, boolean defaultOk) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
-        return confirm(tile, template, icon, okKey, cancelKey, defaultOk);
+        return modalConfirmDialog(tile, template, icon, okKey, cancelKey, defaultOk);
     }
 
     /**
@@ -248,7 +248,7 @@ public class GUI extends FreeColClientHolder {
                 .addNamed("%building%", school)
             : null;
         return template == null
-            || confirm(unit.getTile(), template, unit,
+            || modalConfirmDialog(unit.getTile(), template, unit,
                        "abandonEducation.yes", "abandonEducation.no", true);
     }
 
@@ -267,7 +267,7 @@ public class GUI extends FreeColClientHolder {
             .addStringTemplate("%unit%",
                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
             .addName("%route%", tr.getName());
-        return confirm(unit.getTile(), template, unit, "yes", "no", true);
+        return modalConfirmDialog(unit.getTile(), template, unit, "yes", "no", true);
     }
 
     /**
@@ -359,7 +359,7 @@ public class GUI extends FreeColClientHolder {
         }
         StringTemplate t = StringTemplate.template(messageId)
             .addStringTemplate("%nation%", enemy.getNationLabel());
-        return confirm(attacker.getTile(), t, attacker,
+        return modalConfirmDialog(attacker.getTile(), t, attacker,
                        "confirmHostile.yes", "cancel", false);
     }
 
@@ -404,7 +404,7 @@ public class GUI extends FreeColClientHolder {
         StringTemplate t = StringTemplate.template(messageId)
             .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
             .addStringTemplate("%nation%", other.getNationLabel());
-        return (confirm(is.getTile(), t, attacker,
+        return (modalConfirmDialog(is.getTile(), t, attacker,
                         "confirmTribute.yes", "confirmTribute.no", true)) ? 1 : -1;
     }
 
@@ -433,7 +433,7 @@ public class GUI extends FreeColClientHolder {
      * @return True if confirmation was given.
      */
     public boolean confirmStopGame() {
-        return confirm("stopCurrentGame.text",
+        return modalConfirmDialog("stopCurrentGame.text",
                        "stopCurrentGame.yes", "stopCurrentGame.no", false);
     }
 
@@ -456,7 +456,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(msg,
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
-        return getChoice(settlement.getTile(),
+        return modalChoiceDialog(settlement.getTile(),
                          settlement.getAlarmLevelLabel(player),
                          settlement, "cancel", choices);
     }
@@ -483,7 +483,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                                      BoycottAction.BOYCOTT_DUMP_CARGO));
 
-        return getChoice(null, template,
+        return modalChoiceDialog(null, template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -515,7 +515,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
                                      TradeBuyAction.HAGGLE));
 
-        return getChoice(unit.getTile(), template,
+        return modalChoiceDialog(unit.getTile(), template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -529,11 +529,11 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(StringTemplate explain, String cancelKey,
+    public final <T> T modalChoiceDialog(StringTemplate explain, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getPlaceholderImage());
-        return getChoice(null, explain, icon, cancelKey, choices);
+        return modalChoiceDialog(null, explain, icon, cancelKey, choices);
     }
 
     /**
@@ -548,12 +548,12 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    private final <T> T getChoice(Tile tile, StringTemplate template,
+    private final <T> T modalChoiceDialog(Tile tile, StringTemplate template,
                                   GoodsType goodsType, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledGoodsTypeImage(goodsType));
-        return getChoice(tile, template, icon, cancelKey, choices);
+        return modalChoiceDialog(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -568,12 +568,12 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    private final <T> T getChoice(Tile tile, StringTemplate template,
+    private final <T> T modalChoiceDialog(Tile tile, StringTemplate template,
                                   Nation nation, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledNationImage(nation));
-        return getChoice(tile, template, icon, cancelKey, choices);
+        return modalChoiceDialog(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -588,12 +588,12 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, StringTemplate template,
+    public final <T> T modalChoiceDialog(Tile tile, StringTemplate template,
                                  Settlement settlement, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledSettlementImage(settlement));
-        return getChoice(tile, template, icon, cancelKey, choices);
+        return modalChoiceDialog(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -608,12 +608,12 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, StringTemplate template,
+    public final <T> T modalChoiceDialog(Tile tile, StringTemplate template,
                                  Unit unit, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
         ImageIcon icon = new ImageIcon(getFixedImageLibrary()
             .getScaledUnitImage(unit));
-        return getChoice(tile, template, icon, cancelKey, choices);
+        return modalChoiceDialog(tile, template, icon, cancelKey, choices);
     }
 
     /**
@@ -643,7 +643,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
                                      ClaimAction.CLAIM_STEAL));
 
-        return getChoice(tile, template, owner.getNation(),
+        return modalChoiceDialog(tile, template, owner.getNation(),
                          "indianLand.cancel", choices);
     }
 
@@ -679,7 +679,7 @@ public class GUI extends FreeColClientHolder {
         }
         if (choices.isEmpty()) return null;
 
-        return getChoice(settlement.getTile(), template,
+        return modalChoiceDialog(settlement.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -729,7 +729,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(msg,
                 MissionaryAction.MISSIONARY_INCITE_INDIANS));
 
-        return getChoice(unit.getTile(), template,
+        return modalChoiceDialog(unit.getTile(), template,
                          is, "cancel", choices);
     }
 
@@ -743,7 +743,7 @@ public class GUI extends FreeColClientHolder {
     public String getNewColonyName(Player player, Tile tile) {
         String suggested = player.getSettlementName(null);
         StringTemplate t = StringTemplate.template("nameColony.text");
-        String name = getInput(tile, t, suggested, "accept", "cancel");
+        String name = modalInputDialog(tile, t, suggested, "accept", "cancel");
         if (name == null) {
             // Cancelled
         } else if (name.isEmpty()) {
@@ -785,7 +785,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
                                      ScoutColonyAction.SCOUT_COLONY_ATTACK));
 
-        return getChoice(unit.getTile(), template,
+        return modalChoiceDialog(unit.getTile(), template,
                          colony, "cancel", choices);
     }
 
@@ -845,7 +845,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.SCOUT_SETTLEMENT_ATTACK));
 
-        return getChoice(is.getTile(), template, is, "cancel", choices);
+        return modalChoiceDialog(is.getTile(), template, is, "cancel", choices);
     }
 
     /**
@@ -880,7 +880,7 @@ public class GUI extends FreeColClientHolder {
                     .addStringTemplate("%goods%", goodsTemplate)),
                 TradeSellAction.GIFT));
 
-        return getChoice(unit.getTile(), template,
+        return modalChoiceDialog(unit.getTile(), template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -1230,7 +1230,7 @@ public class GUI extends FreeColClientHolder {
      *      it's the cancel button that gets focused.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(Tile tile, StringTemplate template, ImageIcon icon,
+    public boolean modalConfirmDialog(Tile tile, StringTemplate template, ImageIcon icon,
             String okKey, String cancelKey, boolean defaultOk) {
         return false;
     }
@@ -1247,7 +1247,7 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    protected <T> T getChoice(Tile tile, StringTemplate template,
+    protected <T> T modalChoiceDialog(Tile tile, StringTemplate template,
                               ImageIcon icon, String cancelKey,
                               List<ChoiceItem<T>> choices) {
         return null;
@@ -1263,7 +1263,7 @@ public class GUI extends FreeColClientHolder {
      * @param cancelKey A key for the message on the "cancel" button.
      * @return The chosen value.
      */
-    public String getInput(Tile tile, StringTemplate template,
+    public String modalInputDialog(Tile tile, StringTemplate template,
                            String defaultValue,
                            String okKey, String cancelKey) {
         return null;

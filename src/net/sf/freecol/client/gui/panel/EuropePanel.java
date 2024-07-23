@@ -201,7 +201,7 @@ public final class EuropePanel extends PortPanel {
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
                         .getLocationLabelFor(unit.getOwner());
-                    if (!getGUI().confirm(null, StringTemplate
+                    if (!getGUI().modalConfirmDialog(null, StringTemplate
                             .template("europePanel.leaveColonists")
                             .addStringTemplate("%newWorld%", locName),
                             unit, "ok", "cancel", true)) return null;

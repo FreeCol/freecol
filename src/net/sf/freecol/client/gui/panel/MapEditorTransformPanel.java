@@ -495,7 +495,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             = rt -> new ChoiceItem<ResourceType>(Messages.getName(rt), rt);
         StringTemplate tmpl = StringTemplate
             .template("mapEditorTransformPanel.chooseResource");
-        return getGUI().getChoice(tmpl, "cancel",
+        return getGUI().modalChoiceDialog(tmpl, "cancel",
                                   transform(resources, alwaysTrue(), mapper));
     }
 }

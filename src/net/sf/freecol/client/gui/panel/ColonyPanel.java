@@ -1312,13 +1312,13 @@ public final class ColonyPanel extends PortPanel
                     && colony.isConnectedPort())
                     ? "abandonColony.lastPort.text"
                     : "abandonColony.text";
-                if (!getGUI().confirm(null, StringTemplate.key(key), colony,
+                if (!getGUI().modalConfirmDialog(null, StringTemplate.key(key), colony,
                         "abandonColony.yes", "abandonColony.no")) return;
                 abandon = true;
             } else if ((buildable = colony.getCurrentlyBuilding()) != null) {
                 int required = buildable.getRequiredPopulation();
                 if (required > colony.getUnitCount()
-                    && !getGUI().confirm(null, StringTemplate
+                    && !getGUI().modalConfirmDialog(null, StringTemplate
                         .template("colonyPanel.reducePopulation")
                             .addName("%colony%", colony.getName())
                             .addAmount("%number%", required)

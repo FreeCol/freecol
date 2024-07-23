@@ -252,7 +252,7 @@ public final class EditSettlementDialog extends DeprecatedFreeColDialog<IndianSe
             ret = is;
 
         } else if (options.get(1).equals(value)) {
-            if (!gui.confirm("editSettlementDialog.removeSettlement.text", 
+            if (!gui.modalConfirmDialog("editSettlementDialog.removeSettlement.text", 
                              "ok", "cancel", true)) {
                 return is;
             }

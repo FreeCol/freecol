@@ -1002,7 +1002,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
+    public boolean modalConfirmDialog(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey, boolean defaultOk) {
         return this.widgets.modalConfirmDialog(tmpl, icon, okKey, cancelKey,getPopupPosition(tile), defaultOk);
     }
@@ -1011,7 +1011,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
+    protected <T> T modalChoiceDialog(Tile tile, StringTemplate tmpl, ImageIcon icon,
                               String cancelKey, List<ChoiceItem<T>> choices) {
         return this.widgets.modalChoiceDialog(tmpl, icon, cancelKey, choices,
                                       getPopupPosition(tile));
@@ -1021,7 +1021,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
+    public String modalInputDialog(Tile tile, StringTemplate tmpl, String defaultValue,
                            String okKey, String cancelKey) {
         return this.widgets.modalInputDialog(tmpl, defaultValue, okKey, cancelKey,
                                      getPopupPosition(tile));
