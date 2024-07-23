@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.dialog.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.dialog.ConfirmDeclarationDialog;
+import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.DialogPanel;
 import net.sf.freecol.client.gui.dialog.DifficultyDialog;
 import net.sf.freecol.client.gui.dialog.DumpCargoDialog;
@@ -48,7 +49,6 @@ import net.sf.freecol.client.gui.dialog.EditSettlementDialog;
 import net.sf.freecol.client.gui.dialog.EmigrationDialog;
 import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
-import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
@@ -65,9 +65,8 @@ import net.sf.freecol.client.gui.dialog.PreCombatDialog;
 import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.client.gui.dialog.SaveDialog;
 import net.sf.freecol.client.gui.dialog.ScaleMapSizeDialog;
-import net.sf.freecol.client.gui.dialog.SelectGoodsAmountDialog;
 import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
-import net.sf.freecol.client.gui.dialog.SelectTributeAmountDialog;
+import net.sf.freecol.client.gui.dialog.SelectGoodsAmountDialog;
 import net.sf.freecol.client.gui.dialog.VictoryDialog;
 import net.sf.freecol.client.gui.dialog.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.AboutPanel;
@@ -1110,13 +1109,14 @@ public final class Widgets {
      * @param maximum The maximum amount available.
      * @return The amount selected.
      */
-    public int showSelectTributeAmountDialog(StringTemplate question,
-                                             int maximum) {
-        DeprecatedFreeColDialog<Integer> dialog
-            = new SelectTributeAmountDialog(this.freeColClient, getFrame(),
-                                            question, maximum);
-        Integer result = this.canvas.showFreeColDialog(dialog, null);
-        return (result == null) ? -1 : result;
+    public int showSelectTributeAmountDialog(StringTemplate question, int maximum) {
+        final String resultString = modalInputDialog(question, "" + maximum, "ok", "cancel", null);
+        int result = -1;
+        try {
+            result = Integer.parseInt(resultString);
+        } catch (NumberFormatException nfe) {}
+        
+        return (result <= 0 || result > maximum) ? null : result;
     }
 
     /**
