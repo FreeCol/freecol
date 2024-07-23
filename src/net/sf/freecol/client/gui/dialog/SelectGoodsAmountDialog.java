@@ -25,10 +25,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -80,6 +82,11 @@ public final class SelectGoodsAmountDialog {
 
             final JTextArea question = Utility.localizedTextArea("selectAmountDialog.text");
             content.add(question);
+            
+            if (goodsType != null) {
+                final ImageIcon icon = new ImageIcon(freeColClient.getGUI().getFixedImageLibrary().getScaledGoodsTypeImage(goodsType));
+                content.add(new JLabel(icon), "split 2");
+            }
 
             List<Integer> values = new ArrayList<>();
             int defaultIndex = -1;
@@ -120,7 +127,7 @@ public final class SelectGoodsAmountDialog {
                     api.setValue(determineValue(comboBox));
                 }
             });
-            content.add(comboBox, "wrap 20, growx");
+            content.add(comboBox, "wrap, growx");
 
             final JButton okButton = new FreeColButton(Messages.message("ok")).withButtonStyle(ButtonStyle.IMPORTANT);
             okButton.addActionListener(ae -> {
