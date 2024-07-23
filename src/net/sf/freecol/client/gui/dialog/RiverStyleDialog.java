@@ -59,7 +59,7 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
                                           Utility.FONTSPEC_TITLE),
                   "span, align center");
 
-        List<ChoiceItem<String>> c = FreeColDialog.choices();
+        List<ChoiceItem<String>> c = DeprecatedFreeColDialog.choices();
         for (String style : styles) {
             c.add(new ChoiceItem<>(null, style)
                 .setIcon(new ImageIcon(getImageLibrary().getSmallerRiverImage(style))));

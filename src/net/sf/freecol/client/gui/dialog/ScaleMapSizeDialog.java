@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.Map;
 /**
  * A dialog to allow resizing of the map.
  */
-public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
+public class ScaleMapSizeDialog extends DeprecatedFreeColDialog<Dimension> {
 
     private static final int COLUMNS = 5;
 

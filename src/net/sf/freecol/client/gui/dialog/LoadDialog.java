@@ -35,7 +35,7 @@ import net.sf.freecol.common.i18n.Messages;
 /**
  * A dialog for choosing a file to load.
  */
-public final class LoadDialog extends FreeColDialog<File> {
+public final class LoadDialog extends DeprecatedFreeColDialog<File> {
 
     /** Fake file for the cancel selection. */
     private static final File cancelFile = new File("");

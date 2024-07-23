@@ -63,7 +63,7 @@ import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special dialogs and panels
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.mapviewer.GUIMessage;
 import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
@@ -1808,7 +1808,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void removeDialog(FreeColDialog<?> fcd) {
+    public void removeDialog(DeprecatedFreeColDialog<?> fcd) {
         this.canvas.dialogRemove(fcd);
     }
 

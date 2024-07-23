@@ -48,7 +48,7 @@ import net.sf.freecol.client.gui.dialog.EditSettlementDialog;
 import net.sf.freecol.client.gui.dialog.EmigrationDialog;
 import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
 import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
@@ -161,7 +161,7 @@ public final class Widgets {
     private class DialogCallback<T> implements Runnable {
         
         /** The dialog to show. */
-        private final FreeColDialog<T> fcd;
+        private final DeprecatedFreeColDialog<T> fcd;
 
         /** A rough position for the dialog. */
         private final PopupPosition pos;
@@ -177,7 +177,7 @@ public final class Widgets {
          * @param pos A {@code PopupPosition} for the dialog.
          * @param handler The {@code DialogHandler} to call when run.
          */
-        public DialogCallback(FreeColDialog<T> fcd, PopupPosition pos,
+        public DialogCallback(DeprecatedFreeColDialog<T> fcd, PopupPosition pos,
                               DialogHandler<T> handler) {
             this.fcd = fcd;
             this.pos = pos;
@@ -1071,7 +1071,7 @@ public final class Widgets {
      */
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
-        FreeColDialog<Integer> dialog
+        DeprecatedFreeColDialog<Integer> dialog
             = new SelectAmountDialog(this.freeColClient, getFrame(),
                                      goodsType, available,
                                      defaultAmount, needToPay);
@@ -1120,7 +1120,7 @@ public final class Widgets {
      */
     public int showSelectTributeAmountDialog(StringTemplate question,
                                              int maximum) {
-        FreeColDialog<Integer> dialog
+        DeprecatedFreeColDialog<Integer> dialog
             = new SelectTributeAmountDialog(this.freeColClient, getFrame(),
                                             question, maximum);
         Integer result = this.canvas.showFreeColDialog(dialog, null);

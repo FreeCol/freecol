@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * A simple modal choice dialog.
  */
-public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
+public class FreeColChoiceDialog<T> extends DeprecatedFreeColDialog<T> {
 
     /**
      * Internal constructor.

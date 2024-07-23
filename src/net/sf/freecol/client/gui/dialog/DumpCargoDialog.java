@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * This panel is used to handle dumping cargo.
  */
-public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
+public final class DumpCargoDialog extends DeprecatedFreeColDialog<List<Goods>> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());

@@ -40,7 +40,7 @@ import net.sf.freecol.common.i18n.Messages;
 /**
  * A dialog for editing parameters.
  */
-public class ParametersDialog extends FreeColDialog<Parameters> {
+public class ParametersDialog extends DeprecatedFreeColDialog<Parameters> {
     
     private static final int COLUMNS = 5;
 

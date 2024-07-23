@@ -63,7 +63,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
 import net.sf.freecol.client.gui.mapviewer.CanvasMapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
@@ -143,7 +143,7 @@ public final class Canvas extends JDesktopPane {
     private GrayLayer greyLayer;
 
     /** The dialogs in view. */
-    private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
+    private final List<DeprecatedFreeColDialog<?>> dialogs = new ArrayList<>();
 
     /**
      * The main panel.  Remember this because getExistingFreeColPanel
@@ -1118,7 +1118,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else if (panel.endsWith("Dialog")) {
-            for (FreeColDialog<?> fcd : new ArrayList<>(dialogs)) {
+            for (DeprecatedFreeColDialog<?> fcd : new ArrayList<>(dialogs)) {
                 if (panel.equals(fcd.getClass().getName())) {
                     dialogs.remove(fcd);
                     fcd.dispose();
@@ -1133,7 +1133,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param fcd The dialog to add.
      */
-    private void dialogAdd(FreeColDialog<?> fcd) {
+    private void dialogAdd(DeprecatedFreeColDialog<?> fcd) {
         if (fcd.isModal()) {
             this.mapViewer.getMapViewerState().setCursorBlinking(false);
         }
@@ -1161,9 +1161,9 @@ public final class Canvas extends JDesktopPane {
      *
      * @param fcd The dialog to remove.
      */
-    public void dialogRemove(FreeColDialog<?> fcd) {
+    public void dialogRemove(DeprecatedFreeColDialog<?> fcd) {
         dialogs.remove(fcd);
-        if (fcd.isModal() && none(dialogs, FreeColDialog::isModal)) {
+        if (fcd.isModal() && none(dialogs, DeprecatedFreeColDialog::isModal)) {
             this.mapViewer.getMapViewerState().setCursorBlinking(true);
         }
         if (nothingShowing()) updateMenuBar();
@@ -1215,8 +1215,8 @@ public final class Canvas extends JDesktopPane {
      * @param type The class of dialog to look for.
      * @return The {@code FreeColDialog} found, or null if none present.
      */
-    public FreeColDialog<?> getExistingFreeColDialog(Class<?> type) {
-        for (FreeColDialog<?> d : dialogs) {
+    public DeprecatedFreeColDialog<?> getExistingFreeColDialog(Class<?> type) {
+        for (DeprecatedFreeColDialog<?> d : dialogs) {
             if (d.getClass() == type) return d;
         }
         return null;
@@ -1370,10 +1370,10 @@ public final class Canvas extends JDesktopPane {
      * @param <T> The type to be returned from the dialog.
      * @param dialog The {@code FreeColDialog} to be displayed
      * @param pos A {@code PopupPosition} for the dialog.
-     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     * @return The {@link DeprecatedFreeColDialog#getResponse reponse} returned by
      *     the dialog.
      */
-    public <T> T showFreeColDialog(FreeColDialog<T> dialog, PopupPosition pos) {
+    public <T> T showFreeColDialog(DeprecatedFreeColDialog<T> dialog, PopupPosition pos) {
         viewFreeColDialog(dialog, pos);
         T response = dialog.getResponse();
         remove(dialog);
@@ -1426,7 +1426,7 @@ public final class Canvas extends JDesktopPane {
      * @param freeColDialog The dialog to be displayed
      * @param pos A {@code PopupPosition} for the dialog.
      */
-    public <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
+    public <T> void viewFreeColDialog(final DeprecatedFreeColDialog<T> freeColDialog,
                                       PopupPosition pos) {
         // TODO: Remove compatibility code when all non-modal dialogs
         //       have been converted into panels.
@@ -1559,7 +1559,7 @@ public final class Canvas extends JDesktopPane {
             jif.dispose();
         }
         while (!dialogs.isEmpty()) {
-            FreeColDialog<?> dialog = dialogs.remove(0);
+            DeprecatedFreeColDialog<?> dialog = dialogs.remove(0);
             dialog.dispose();
         }
     }

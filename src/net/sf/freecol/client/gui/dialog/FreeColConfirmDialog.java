@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * A simple modal ok/cancel dialog.
  */
-public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
+public class FreeColConfirmDialog extends DeprecatedFreeColDialog<Boolean> {
 
     /**
      * Internal constructor.

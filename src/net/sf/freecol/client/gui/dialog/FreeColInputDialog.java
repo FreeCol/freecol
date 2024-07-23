@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * A FreeColDialog with input field/s.
  */
-public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
+public abstract class FreeColInputDialog<T> extends DeprecatedFreeColDialog<T> {
 
     /**
      * Internal constructor.

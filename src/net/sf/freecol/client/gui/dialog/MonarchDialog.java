@@ -49,7 +49,7 @@ import net.sf.freecol.common.model.StringTemplate;
  * there may not be a meaningful accept option in some cases.  This
  * prevents just extending FreeColConfirmDialog. 
  */
-public final class MonarchDialog extends FreeColDialog<Boolean> {
+public final class MonarchDialog extends DeprecatedFreeColDialog<Boolean> {
 
     /**
      * Creates a dialog to handle monarch interactions.

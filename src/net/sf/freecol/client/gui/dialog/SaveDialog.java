@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.ChoiceItem;
 /**
  * A dialog for choosing a file to save.
  */
-public final class SaveDialog extends FreeColDialog<File> {
+public final class SaveDialog extends DeprecatedFreeColDialog<File> {
 
     /**
      * We need a magic cookie to use for the cancel response, as

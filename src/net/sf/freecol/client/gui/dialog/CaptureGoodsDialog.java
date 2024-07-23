@@ -65,7 +65,7 @@ import net.sf.freecol.common.model.Unit;
  *      checkbox and text combination, repeated as
  *      needed.
  */
-public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
+public final class CaptureGoodsDialog extends DeprecatedFreeColDialog<List<Goods>> {
 
     private static class GoodsItem extends JCheckBox {
 

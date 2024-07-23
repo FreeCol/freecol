@@ -59,7 +59,7 @@ import net.sf.freecol.server.model.ServerUnit;
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
  */
-public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
+public final class EditSettlementDialog extends DeprecatedFreeColDialog<IndianSettlement>
     implements ItemListener {
 
     @SuppressWarnings("unused")

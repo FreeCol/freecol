@@ -42,7 +42,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
@@ -1867,7 +1867,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param fcd The {@code FreeColDialog} to remove.
      */
-    public void removeDialog(FreeColDialog<?> fcd) {}
+    public void removeDialog(DeprecatedFreeColDialog<?> fcd) {}
 
     /**
      * Remove a trade route panel and associated input on an associated

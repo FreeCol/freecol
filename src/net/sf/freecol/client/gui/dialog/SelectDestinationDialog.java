@@ -91,7 +91,7 @@ import net.sf.freecol.common.util.LogBuilder;
 /**
  * Select a location as the destination for a given unit.
  */
-public final class SelectDestinationDialog extends FreeColDialog<Location>
+public final class SelectDestinationDialog extends DeprecatedFreeColDialog<Location>
     implements ListSelectionListener {
 
     @SuppressWarnings("unused")

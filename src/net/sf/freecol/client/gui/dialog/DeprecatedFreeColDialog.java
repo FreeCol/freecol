@@ -63,11 +63,11 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * Superclass for all dialogs in FreeCol.
+ * Deprecated dialogs that should be migrated to {@link FreeColModalDialog}.
  */
-public class FreeColDialog<T> extends JDialog implements PropertyChangeListener {
+public class DeprecatedFreeColDialog<T> extends JDialog implements PropertyChangeListener {
 
-    private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(DeprecatedFreeColDialog.class.getName());
 
     public static enum DialogType {
         PLAIN,
@@ -93,7 +93,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
-    protected FreeColDialog(FreeColClient freeColClient, JFrame frame) {
+    protected DeprecatedFreeColDialog(FreeColClient freeColClient, JFrame frame) {
         super(frame);
 
         this.freeColClient = freeColClient;
@@ -114,7 +114,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param icon An optional icon to display.
      * @param options A list of options to choose from.
      */
-    public FreeColDialog(FreeColClient freeColClient, JFrame frame,
+    public DeprecatedFreeColDialog(FreeColClient freeColClient, JFrame frame,
                          DialogType type, boolean modal, StringTemplate tmpl,
                          ImageIcon icon, List<ChoiceItem<T>> options) {
         this(freeColClient, frame);
@@ -206,14 +206,14 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
 
                 @Override
                 public void windowClosing(WindowEvent we) {
-                    if (!FreeColDialog.this.responded()) {
-                        FreeColDialog.this.setValue(null);
+                    if (!DeprecatedFreeColDialog.this.responded()) {
+                        DeprecatedFreeColDialog.this.setValue(null);
                     }
                 }
                 @Override
                 public void windowGainedFocus(WindowEvent we) {
                     if (!gotFocus) { // Once window gets focus, initialize.
-                        FreeColDialog.this.pane.selectInitialValue();
+                        DeprecatedFreeColDialog.this.pane.selectInitialValue();
                         gotFocus = true;
                     }
                 }
@@ -225,7 +225,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
                 @Override
                 public void componentShown(ComponentEvent ce) {
                     // Reset value to ensure closing works properly.
-                    FreeColDialog.this.pane
+                    DeprecatedFreeColDialog.this.pane
                         .setValue(JOptionPane.UNINITIALIZED_VALUE);
                 }
             });
@@ -254,8 +254,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
                             e.getX(), e.getY(), null);
                     int dx = now.x - loc.x;
                     int dy = now.y - loc.y;
-                    Point p = FreeColDialog.this.getLocation();
-                    FreeColDialog.this.setLocation(p.x + dx, p.y + dy);
+                    Point p = DeprecatedFreeColDialog.this.getLocation();
+                    DeprecatedFreeColDialog.this.setLocation(p.x + dx, p.y + dy);
                     loc = null;
                 }
             });
@@ -476,7 +476,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     public void removeNotify() {
         super.removeNotify();
 
-        getGUI().removeDialog(FreeColDialog.this);
+        getGUI().removeDialog(DeprecatedFreeColDialog.this);
 
         removeAll();
         if (this.pane != null) {
