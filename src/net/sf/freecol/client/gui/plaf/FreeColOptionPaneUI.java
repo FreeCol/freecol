@@ -42,8 +42,8 @@ import javax.swing.plaf.basic.BasicOptionPaneUI;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
-import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.util.ImageUtils;
@@ -66,18 +66,18 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     
     @Override
     protected void installComponents() {
-        if (!(optionPane.getMessage() instanceof FreeColModalDialog )) {
+        if (!(optionPane.getMessage() instanceof FreeColDialog )) {
             super.installComponents();
             return;
         }
         
         /*
-         * FreeColModalDialog overrides the normal UI and behaviour of the JOptionPane:
+         * FreeColDialog overrides the normal UI and behaviour of the JOptionPane:
          */
         
         @SuppressWarnings("unchecked")
-        final FreeColModalDialog<Object> dialog = (FreeColModalDialog<Object>) optionPane.getMessage();
-        final JPanel content = dialog.createContent(new ModalApi<Object>() {
+        final FreeColDialog<Object> dialog = (FreeColDialog<Object>) optionPane.getMessage();
+        final JPanel content = dialog.createContent(new DialogApi<Object>() {
             @Override
             public void setValue(Object value) {
                 optionPane.setInputValue(value);
@@ -95,7 +95,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
              * Workaround for bug JDK-5018574 (Unable to set focus to another component in JOptionPane).
              * https://bugs.java.com/bugdatabase/view_bug?bug_id=5018574
              * 
-             * This workaround only handles JInternalFrame as there's no need to use FreeColModalDialog
+             * This workaround only handles JInternalFrame as there's no need to use FreeColDialog
              * for non-internal frames.
              */
             content.setFocusable(true);

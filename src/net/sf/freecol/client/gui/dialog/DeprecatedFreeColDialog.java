@@ -63,7 +63,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * Deprecated dialogs that should be migrated to {@link FreeColModalDialog}.
+ * Deprecated dialogs that should be migrated to {@link FreeColDialog}.
  */
 public class DeprecatedFreeColDialog<T> extends JDialog implements PropertyChangeListener {
 

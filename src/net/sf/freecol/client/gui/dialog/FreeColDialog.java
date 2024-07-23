@@ -24,62 +24,69 @@ import java.awt.Component;
 import javax.swing.JPanel;
 
 /**
- * A modal dialog returning a value when it's closed.
+ * A dialog returning a value when it's closed. The dialog can be displayed
+ * both in a modal and a non-modal state.
  * 
  * @param <T> The return type of the modal dialog.
  */
-public class FreeColModalDialog<T> {
+public final class FreeColDialog<T> {
     /*
      * This is really a workaround to get a nice interface for making custom
-     * modal dialogs. The dialog is displayed using the JOptionPane, while
+     * modal dialogs. The modal dialog is displayed using the JOptionPane with
      * the custom rendering and handling is implemented by FreeColOptionPaneUI.
+     * 
+     * For non-modal dialog the implementation is straight forward, but we use the
+     * same interface so that we can easily convert between modal and non-modal
+     * behavior.
      */
 
-    private final ModalContentCreator<T> modalContentCreator;
+    private final DialogContentCreator<T> dialogContentCreator;
     
 
     /**
-     * Creates a {@code FreeColModalDialog} using the given creator.
-     * @param modalContentCreator The code responsible for generating the content.
+     * Creates a {@code FreeColDialog} using the given creator.
+     * @param dialogContentCreator The code responsible for generating the content.
      */
-    public FreeColModalDialog(ModalContentCreator<T> modalContentCreator) {
-        this.modalContentCreator = modalContentCreator;
+    public FreeColDialog(DialogContentCreator<T> dialogContentCreator) {
+        this.dialogContentCreator = dialogContentCreator;
     }
     
     
     /**
      * This method is called by {@link FreeColOptionPaneUI} in order to
-     * render the custom panel.
+     * render the custom panel for modal dialogs.
      * 
-     * @param api The API provided by {@link FreeColOptionPaneUI} to acces
+     * @param api The API provided by {@link FreeColOptionPaneUI} to access
      *      functionality provided by JOptionPane.
      * @return The panel to be rendered.
      */
-    public JPanel createContent(ModalApi<T> api) {
-        return modalContentCreator.createContent(api);
+    public JPanel createContent(DialogApi<T> api) {
+        return dialogContentCreator.createContent(api);
     }
     
     
     /**
-     * A content creator for the modal dialog.
-     * @param <T> The return type of the modal dialog.
+     * A content creator for the dialog.
+     * @param <T> The return type of the dialog.
      */
-    public interface ModalContentCreator<T> {
+    public interface DialogContentCreator<T> {
         
         /**
          * Creates the content to be displayed for this dialog.
          * 
-         * @param modalApi An API for setting the result.
+         * @param dialogApi An API for setting the result.
          * @return The panel that will be displayed for this dialog.
          */
-        JPanel createContent(ModalApi<T> modalApi);
+        JPanel createContent(DialogApi<T> dialogApi);
     }
     
     /**
-     * Access to modal operations.
-     * @param <T> The return type of the modal dialog.
+     * Access to to behavior that for modal dialogs are handled in
+     * {@code FreeColOptionPaneUI}.
+     * 
+     * @param <T> The return type of the dialog.
      */
-    public interface ModalApi<T> {
+    public interface DialogApi<T> {
         
         /**
          * Sets the value returned by this dialog. Setting a value
@@ -91,6 +98,10 @@ public class FreeColModalDialog<T> {
          */
         void setValue(T value);
         
+        /**
+         * Sets the component that should have the initial focus when displaying the dialog.
+         * @param component The component that will have its {@link Component#requestFocus()} called.
+         */
         void setInitialFocusComponent(Component component);
     }
 }

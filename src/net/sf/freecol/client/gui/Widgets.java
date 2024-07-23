@@ -49,8 +49,8 @@ import net.sf.freecol.client.gui.dialog.EmigrationDialog;
 import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
-import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
-import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
 import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
@@ -237,10 +237,10 @@ public final class Widgets {
      *      it's the cancel button that gets focused.
      * @return True if the user clicked the "ok"-button.
      */
-    public boolean confirm(StringTemplate tmpl, ImageIcon icon,
+    public boolean modalConfirmDialog(StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey, PopupPosition pos,
                            boolean defaultOk) {
-        final FreeColModalDialog<Boolean> dialog = new FreeColModalDialog<Boolean>(api -> {
+        final FreeColDialog<Boolean> dialog = new FreeColDialog<Boolean>(api -> {
             final JPanel content = new JPanel(new MigLayout("fill"));
             if (icon != null) {
                 content.add(new JLabel(icon), "split 2, gap 0 20 0 unrel");
@@ -280,7 +280,7 @@ public final class Widgets {
      * @return The corresponding member of the values array to the selected
      *     option, or null if no choices available.
      */
-    public <T> T getChoice(StringTemplate tmpl, ImageIcon icon, String cancelKey, List<ChoiceItem<T>> choices, PopupPosition pos) {
+    public <T> T modalChoiceDialog(StringTemplate tmpl, ImageIcon icon, String cancelKey, List<ChoiceItem<T>> choices, PopupPosition pos) {
         if (choices.isEmpty()) {
             return null;
         }
@@ -295,7 +295,7 @@ public final class Widgets {
             allChoices.add(cancelOption);
         }
         
-        final FreeColModalDialog<T> dialog = new FreeColModalDialog<T>(api -> {
+        final FreeColDialog<T> dialog = new FreeColDialog<T>(api -> {
             final JPanel content = new JPanel(new MigLayout("fill, wrap 4"));
             if (icon != null) {
                 content.add(new JLabel(icon), "split 2, gap 0 20 0 unrel");
@@ -332,7 +332,7 @@ public final class Widgets {
         return canvas.displayModalDialog(dialog);
     }
 
-    private <T> JButton createButtonFromChoiceItem(ModalApi<T> api, ChoiceItem<T> ci) {
+    private <T> JButton createButtonFromChoiceItem(DialogApi<T> api, ChoiceItem<T> ci) {
         final ButtonStyle style = (ci.isOK()) ? ButtonStyle.IMPORTANT : ButtonStyle.SIMPLE;
         final JButton button = new FreeColButton(ci.toString(), ci.getIcon()).withButtonStyle(style);
         button.addActionListener(ae -> {
@@ -348,44 +348,41 @@ public final class Widgets {
     /**
      * Show a modal dialog with a text field and a ok/cancel option.
      *
-     * @param tmpl A {@code StringTemplate} that explains the
-     *     action to the user.
+     * @param tmpl A {@code StringTemplate} that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
-     * @param cancelKey A key displayed on the optional "cancel"-button.
+     * @param cancelKey A key displayed on the optional "cancel"-button. Use {@code null} to
+     *      avoid displaying a cancel button.
      * @param pos A {@code PopupPosition} for the dialog.
      * @return The text the user entered, or null if cancelled.
+     * @see #inputDialog(StringTemplate, String, String, String, PopupPosition, DialogHandler)
      */
-    public String getInput(StringTemplate tmpl, String defaultValue,
-                           String okKey, String cancelKey,
-                           PopupPosition pos) {
-        
-        final FreeColModalDialog<String> dialog = createInputDialog(tmpl, defaultValue, okKey, cancelKey);
+    public String modalInputDialog(StringTemplate tmpl, String defaultValue, String okKey, String cancelKey, PopupPosition pos) {
+        final FreeColDialog<String> dialog = createInputDialog(tmpl, defaultValue, okKey, cancelKey);
         return canvas.displayModalDialog(dialog);
     }
     
     /**
-     * Show a modal dialog with a text field and a ok/cancel option.
+     * Show a non-modal dialog with a text field and a ok/cancel option.
      *
-     * @param tmpl A {@code StringTemplate} that explains the
-     *     action to the user.
+     * @param tmpl A {@code StringTemplate} that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
-     * @param cancelKey A key displayed on the optional "cancel"-button.
+     * @param cancelKey A key displayed on the optional "cancel"-button. Use {@code null} to
+     *      avoid displaying a cancel button.
      * @param pos A {@code PopupPosition} for the dialog.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
-    public void getInput(StringTemplate tmpl, String defaultValue,
+    public void inputDialog(StringTemplate tmpl, String defaultValue,
             String okKey, String cancelKey, PopupPosition pos, DialogHandler<String> handler) {
         
-        final FreeColModalDialog<String> dialog = createInputDialog(tmpl, defaultValue, okKey, cancelKey);
+        final FreeColDialog<String> dialog = createInputDialog(tmpl, defaultValue, okKey, cancelKey);
         final DialogPanel<String> panel = new DialogPanel<String>(freeColClient, dialog, handler);
         this.canvas.showFreeColPanel(panel, pos, true);
     }
 
-    private FreeColModalDialog<String> createInputDialog(StringTemplate tmpl, String defaultValue, String okKey,
-            String cancelKey) {
-        final FreeColModalDialog<String> dialog = new FreeColModalDialog<String>(api -> {
+    private FreeColDialog<String> createInputDialog(StringTemplate tmpl, String defaultValue, String okKey, String cancelKey) {
+        final FreeColDialog<String> dialog = new FreeColDialog<String>(api -> {
             final JPanel content = new JPanel(new MigLayout("fill"));
             content.add(Utility.localizedTextArea(tmpl));
             final JTextField input = new JTextField(defaultValue != null ? defaultValue : "");
@@ -889,7 +886,7 @@ public final class Widgets {
      */
     public void showNamingDialog(StringTemplate tmpl, String defaultName,
             PopupPosition pos, DialogHandler<String> handler) {
-        getInput(tmpl, defaultName, "ok", "cancel", pos, handler);
+        inputDialog(tmpl, defaultName, "ok", "cancel", pos, handler);
     }
 
     /**

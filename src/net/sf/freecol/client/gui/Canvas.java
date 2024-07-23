@@ -64,7 +64,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
-import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.mapviewer.CanvasMapViewer;
 import net.sf.freecol.client.gui.mapviewer.MapViewer;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -1190,7 +1190,7 @@ public final class Canvas extends JDesktopPane {
      * @return The return from the dialog.
      */
     @SuppressWarnings("unchecked")
-    public <T> T displayModalDialog(FreeColModalDialog<T> dialog) {
+    public <T> T displayModalDialog(FreeColDialog<T> dialog) {
         try {
             modalDialogAdd();
             return (T) JOptionPane.showInternalInputDialog(this,

@@ -24,7 +24,7 @@ import java.awt.Component;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.DialogHandler;
-import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
+import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 
 /**
@@ -42,10 +42,10 @@ public class DialogPanel<T> extends FreeColPanel {
      * @param dialog The dialog to be display.
      * @param handler The handler that will get the result from the dialog.
      */
-    public DialogPanel(FreeColClient freeColClient, FreeColModalDialog<T> dialog, DialogHandler<T> handler) {
+    public DialogPanel(FreeColClient freeColClient, FreeColDialog<T> dialog, DialogHandler<T> handler) {
         super(freeColClient, null, new BorderLayout());
         
-        final ModalApi<T> api = new ModalApi<>() {
+        final DialogApi<T> api = new DialogApi<>() {
             public void setValue(T value) {
                 getGUI().removeComponent(DialogPanel.this);
                 handler.handle(value);
