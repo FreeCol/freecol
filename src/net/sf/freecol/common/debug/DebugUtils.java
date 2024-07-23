@@ -243,6 +243,7 @@ public class DebugUtils {
         }
         player.modifyGold(gold);
         sPlayer.modifyGold(gold);
+        freeColClient.getGUI().updateMenuBar();
     }
 
     /**
