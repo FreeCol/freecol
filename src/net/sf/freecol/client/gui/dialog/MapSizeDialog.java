@@ -20,64 +20,73 @@
 package net.sf.freecol.client.gui.dialog;
 
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.FreeColButton;
+import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.i18n.Messages;
 
 
 /**
  * A dialog for choosing a map size.
  */
-public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
+public final class MapSizeDialog {
 
     private static final int COLUMNS = 5;
-    private static final int DEFAULT_HEIGHT = 100;
     private static final int DEFAULT_WIDTH = 40;
+    private static final int DEFAULT_HEIGHT = 100;
 
-    private final JTextField inputWidth
-        = new JTextField(Integer.toString(DEFAULT_WIDTH), COLUMNS);
-    private final JTextField inputHeight
-        = new JTextField(Integer.toString(DEFAULT_HEIGHT), COLUMNS);
+    
+    public static FreeColDialog<Dimension> create() {
+        final FreeColDialog<Dimension> dialog = new FreeColDialog<Dimension>(api -> {
+            final JPanel content = new JPanel(new MigLayout("fill"));
+            content.add(Utility.localizedHeaderLabel("mapSizeDialog.mapSize", SwingConstants.CENTER, Utility.FONTSPEC_SUBTITLE), "span");
+            
+            final JTextField inputWidth = new JTextField(Integer.toString(DEFAULT_WIDTH), COLUMNS);
+            final JTextField inputHeight = new JTextField(Integer.toString(DEFAULT_HEIGHT), COLUMNS);
+            
+            final JLabel widthLabel = Utility.localizedLabel("width");
+            widthLabel.setLabelFor(inputWidth);
+            final JLabel heightLabel = Utility.localizedLabel("height");
+            heightLabel.setLabelFor(inputHeight);
+            
+            content.add(widthLabel, "newline unrel");
+            content.add(inputWidth);
+            content.add(heightLabel, "newline");
+            content.add(inputHeight);
 
-
-    /**
-     * Creates a dialog to choose the map size.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     * @param frame The owner frame.
-     */
-    public MapSizeDialog(FreeColClient freeColClient, JFrame frame) {
-        super(freeColClient, frame);
-
-        JLabel widthLabel = Utility.localizedLabel("width");
-        widthLabel.setLabelFor(inputWidth);
-        JLabel heightLabel = Utility.localizedLabel("height");
-        heightLabel.setLabelFor(inputHeight);
-
-        JPanel panel = new MigPanel(new MigLayout("wrap 2"));
-        panel.add(Utility.localizedHeader("mapSizeDialog.mapSize",
-                                          Utility.FONTSPEC_SUBTITLE),
-                  "span, align center");
-        panel.add(widthLabel, "newline 20");
-        panel.add(inputWidth);
-        panel.add(heightLabel);
-        panel.add(inputHeight);
-
-        initializeInputDialog(frame, true, panel, null, "ok", "cancel");
+            final ActionListener al = ae -> {
+                api.setValue(determineResult(inputWidth, inputHeight));
+            };
+            inputWidth.addActionListener(al);
+            inputHeight.addActionListener(al);
+            
+            final JButton okButton = new FreeColButton(Messages.message("ok")).withButtonStyle(ButtonStyle.IMPORTANT);
+            okButton.addActionListener(al);
+            content.add(okButton, "newline unrel, span, split 2, tag ok");
+            
+            final JButton cancelButton = new FreeColButton(Messages.message("cancel"));
+            cancelButton.addActionListener(ae -> {
+                api.setValue(null);
+            });
+            content.add(cancelButton, "tag cancel");
+            
+            api.setInitialFocusComponent(okButton);
+            
+            return content;
+        });
+        return dialog;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Dimension getInputValue() {
+    private static Dimension determineResult(JTextField inputWidth, JTextField inputHeight) {
         int width, height;
         try {
             width = Integer.parseInt(inputWidth.getText());
@@ -85,18 +94,6 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         } catch (NumberFormatException nfe) {
             return null;
         }
-        return (width <= 0 || height <= 0) ? null
-            : new Dimension(width, height);
-    }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void requestFocus() {
-        this.inputWidth.requestFocus();
+        return (width <= 0 || height <= 0) ? null : new Dimension(width, height);
     }
 }

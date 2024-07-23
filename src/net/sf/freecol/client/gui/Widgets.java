@@ -852,9 +852,8 @@ public final class Widgets {
      * @return The response returned by the dialog.
      */
     public Dimension showMapSizeDialog() {
-        MapSizeDialog dialog
-            = new MapSizeDialog(this.freeColClient, getFrame());
-        return this.canvas.showFreeColDialog(dialog, null);
+        final FreeColDialog<Dimension> dialog = MapSizeDialog.create();
+        return this.canvas.displayModalDialog(dialog);
     }
 
     /**

@@ -21,6 +21,9 @@ package net.sf.freecol.client.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.DialogHandler;
@@ -56,6 +59,14 @@ public class DialogPanel<T> extends FreeColPanel {
                 initialFocusComponent = component;
             }
         };
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                getGUI().removeComponent(DialogPanel.this);
+                handler.handle(null);
+            }
+        });
         
         add(dialog.createContent(api), BorderLayout.CENTER);
     }
