@@ -109,7 +109,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         // Default to ESCAPE removing the panel
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false),
                      ESCAPE);
     }
 
