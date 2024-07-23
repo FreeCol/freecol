@@ -65,7 +65,7 @@ import net.sf.freecol.client.gui.dialog.PreCombatDialog;
 import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.client.gui.dialog.SaveDialog;
 import net.sf.freecol.client.gui.dialog.ScaleMapSizeDialog;
-import net.sf.freecol.client.gui.dialog.SelectAmountDialog;
+import net.sf.freecol.client.gui.dialog.SelectGoodsAmountDialog;
 import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
 import net.sf.freecol.client.gui.dialog.SelectTributeAmountDialog;
 import net.sf.freecol.client.gui.dialog.VictoryDialog;
@@ -1065,13 +1065,9 @@ public final class Widgets {
      * @param needToPay If true, check the player has sufficient funds.
      * @return The amount selected.
      */
-    public int showSelectAmountDialog(GoodsType goodsType, int available,
-                                      int defaultAmount, boolean needToPay) {
-        DeprecatedFreeColDialog<Integer> dialog
-            = new SelectAmountDialog(this.freeColClient, getFrame(),
-                                     goodsType, available,
-                                     defaultAmount, needToPay);
-        Integer result = this.canvas.showFreeColDialog(dialog, null);
+    public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
+        final FreeColDialog<Integer> dialog = SelectGoodsAmountDialog.create(freeColClient, goodsType, available, defaultAmount, needToPay);
+        final Integer result = this.canvas.displayModalDialog(dialog);
         return (result == null) ? -1 : result;
     }
 
