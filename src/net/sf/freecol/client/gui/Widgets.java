@@ -62,7 +62,6 @@ import net.sf.freecol.client.gui.dialog.NegotiationDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.dialog.ParametersDialog;
 import net.sf.freecol.client.gui.dialog.PreCombatDialog;
-import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.client.gui.dialog.SaveDialog;
 import net.sf.freecol.client.gui.dialog.ScaleMapSizeDialog;
 import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
@@ -301,12 +300,21 @@ public final class Widgets {
             allChoices.add(cancelOption);
         }
         
+        final int choiceWrap;
+        if (choices.size() > 16) {
+            choiceWrap = (int) Math.sqrt(choices.size()) + 1;  
+        } else {
+            choiceWrap = 4;
+        }
+        
         final FreeColDialog<T> dialog = new FreeColDialog<T>(api -> {
-            final JPanel content = new JPanel(new MigLayout("fill, wrap 4"));
+            final JPanel content = new JPanel(new MigLayout("fill"));
             if (icon != null) {
-                content.add(new JLabel(icon), "split 2, gap 0 20 0 unrel");
+                content.add(new JLabel(icon), "span, split 2, gap 0 20 0 unrel");
+                content.add(Utility.localizedTextArea(tmpl), "gap 0 0 0 unrel, wrap");
+            } else {
+                content.add(Utility.localizedTextArea(tmpl), "span, gap 0 0 0 unrel, wrap");
             }
-            content.add(Utility.localizedTextArea(tmpl), "gap 0 0 0 unrel, wrap");
             
             int i = 0;
             boolean sameSize = allChoices.size() > 4;
@@ -314,8 +322,8 @@ public final class Widgets {
                 final JButton button = createButtonFromChoiceItem(api, ci);
                 
                 List<String> layout = new ArrayList<>();
-                if (i % 4 == 0) {
-                    layout.add("newline, split 4");
+                if (i % choiceWrap == 0) {
+                    layout.add("newline, split " + choiceWrap);
                 }
                 if (sameSize) {
                     layout.add("sg");
@@ -1024,9 +1032,13 @@ public final class Widgets {
      * @return The response returned by the dialog.
      */
     public String showRiverStyleDialog(List<String> styles) {
-        RiverStyleDialog dialog
-            = new RiverStyleDialog(this.freeColClient, getFrame(), styles);
-        return this.canvas.showFreeColDialog(dialog, null);
+        final List<ChoiceItem<String>> c = new ArrayList<>();
+        for (String style : styles) {
+            c.add(new ChoiceItem<>(null, style)
+                .setIcon(new ImageIcon(freeColClient.getGUI().getFixedImageLibrary().getSmallerRiverImage(style))));
+        }
+        
+        return modalChoiceDialog(StringTemplate.template("riverStyleDialog.text"), null, "cancel", c, null);
     }
 
     /**
