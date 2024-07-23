@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.dialog.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.dialog.ConfirmDeclarationDialog;
+import net.sf.freecol.client.gui.dialog.DialogPanel;
 import net.sf.freecol.client.gui.dialog.DifficultyDialog;
 import net.sf.freecol.client.gui.dialog.DumpCargoDialog;
 import net.sf.freecol.client.gui.dialog.EditOptionDialog;
@@ -50,7 +51,6 @@ import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColModalDialog;
 import net.sf.freecol.client.gui.dialog.FreeColModalDialog.ModalApi;
-import net.sf.freecol.client.gui.dialog.FreeColStringInputDialog;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
 import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
@@ -360,6 +360,31 @@ public final class Widgets {
                            String okKey, String cancelKey,
                            PopupPosition pos) {
         
+        final FreeColModalDialog<String> dialog = createInputDialog(tmpl, defaultValue, okKey, cancelKey);
+        return canvas.displayModalDialog(dialog);
+    }
+    
+    /**
+     * Show a modal dialog with a text field and a ok/cancel option.
+     *
+     * @param tmpl A {@code StringTemplate} that explains the
+     *     action to the user.
+     * @param defaultValue The default value appearing in the text field.
+     * @param okKey A key displayed on the "ok"-button.
+     * @param cancelKey A key displayed on the optional "cancel"-button.
+     * @param pos A {@code PopupPosition} for the dialog.
+     * @param handler A {@code DialogHandler} for the dialog response.
+     */
+    public void getInput(StringTemplate tmpl, String defaultValue,
+            String okKey, String cancelKey, PopupPosition pos, DialogHandler<String> handler) {
+        
+        final FreeColModalDialog<String> dialog = createInputDialog(tmpl, defaultValue, okKey, cancelKey);
+        final DialogPanel<String> panel = new DialogPanel<String>(freeColClient, dialog, handler);
+        this.canvas.showFreeColPanel(panel, pos, true);
+    }
+
+    private FreeColModalDialog<String> createInputDialog(StringTemplate tmpl, String defaultValue, String okKey,
+            String cancelKey) {
         final FreeColModalDialog<String> dialog = new FreeColModalDialog<String>(api -> {
             final JPanel content = new JPanel(new MigLayout("fill"));
             content.add(Utility.localizedTextArea(tmpl));
@@ -370,22 +395,24 @@ public final class Widgets {
             });
             
             final JButton okButton = new FreeColButton(Messages.message(okKey)).withButtonStyle(ButtonStyle.IMPORTANT);
-            final JButton cancelButton = new FreeColButton(Messages.message(cancelKey));
             okButton.addActionListener(ae -> {
                 api.setValue(input.getText());
             });
-            cancelButton.addActionListener(ae -> {
-                api.setValue(null);
-            });
             content.add(okButton, "newline, split 2, tag ok");
-            content.add(cancelButton, "tag cancel");
+            
+            if (cancelKey != null) {
+                final JButton cancelButton = new FreeColButton(Messages.message(cancelKey));
+                cancelButton.addActionListener(ae -> {
+                    api.setValue(null);
+                });
+                content.add(cancelButton, "tag cancel");
+            }
             
             api.setInitialFocusComponent(input);
             
             return content;
         });
-        
-        return canvas.displayModalDialog(dialog);
+        return dialog;
     }
 
 
@@ -861,13 +888,8 @@ public final class Widgets {
      * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showNamingDialog(StringTemplate tmpl, String defaultName,
-                                 PopupPosition pos,
-                                 DialogHandler<String> handler) {
-        new DialogCallback<>(new FreeColStringInputDialog(this.freeColClient,
-                                                          getFrame(), false,
-                                                          tmpl, defaultName,
-                                                          "ok", null),
-                             pos, handler);
+            PopupPosition pos, DialogHandler<String> handler) {
+        getInput(tmpl, defaultName, "ok", "cancel", pos, handler);
     }
 
     /**
