@@ -1151,7 +1151,7 @@ public final class Canvas extends JDesktopPane {
             freeColClient.getActionManager().update();
             repaint();
         }
-        if  (displayedModalDialogs > 1) {
+        if (displayedModalDialogs > 1) {
             logger.warning("Displaying more than one modal dialog at the same time.");
         }
     }
@@ -1180,6 +1180,10 @@ public final class Canvas extends JDesktopPane {
         if (displayedModalDialogs == 0) {
             freeColClient.getActionManager().update();
             repaint();
+            
+            if (nothingShowing()) {
+                requestFocusInWindow();
+            }
         }
     }
     
