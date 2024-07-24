@@ -8,14 +8,19 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * The end turn panel can now be resized.
 * 10 in now the minimum font size. This mitigates the effect from low reported DPI on macos when a non-native resolution is used.
 * Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
+* The resolution of the screen in fullscreen mode can now be configured in the Preferences.
 * Bugfix: Attack animations are now played in the correct position.
 * Bugfix: Fixes an issue where goods that has been sold is still displayed in the unit info panel.
+* Bugfix: Fixes a bug where the escape key closed multiple panels.
 
 ### Performance ###
 * Unit movements are now faster (area redrawn when moving is reduced).
 
 ### Rule Changes ###
 * Disabling "Experts have connections" for the classic ruleset.
+
+### AI/computer players ###
+* Bugfix: Fixed an issue that prevented diplomacy initiated during the AI players' turns.
 
 ### Mod development ###
 * Allow mods to add modifiers ("model.modifier.education.teaching.turns") for the education teaching time. Scope checks are applied to the teacher.
