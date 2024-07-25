@@ -1191,6 +1191,12 @@ public final class InGameController extends FreeColClientHolder {
             ret = false;
         } else if (!movePath(unit, path)) {
             ret = false; // ask the player to resolve the movePath problem
+        } else if (unit.isDisposed() || !player.owns(unit)) {
+            /*
+             * Disposed in combat or cashed in treasure train. Do NOT display
+             * to the player (or we get an error message).
+             */
+            return true;
         } else if (unit.isAtLocation(destination)) {
             final Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
                 : null;
