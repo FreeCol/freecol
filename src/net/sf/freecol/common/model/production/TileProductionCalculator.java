@@ -139,6 +139,9 @@ public class TileProductionCalculator {
                 .collect(Collectors.toList());
         
         for (TileImprovementType tit : getNormalImprovements(spec, originalTileType)) {
+            if (!tile.isImprovementTypeAllowed(tit)) {
+                continue;
+            }
             final ProductionInfo newResult = getBasicProductionInfo(tile, turn, new WorkerAssignment(unitType, originalProductionType), colonyCenterTile, List.of(tit));
             final int amount = productionOfGoodsType(goodsType, newResult);
             if (amount > currentMaximumPotentialProduction) {
