@@ -973,6 +973,9 @@ public final class TransportMission extends Mission {
      */
     private void doTransport(LogBuilder lb) {
         final Unit unit = getUnit();
+        if (tSize() == 0) {
+            queueMoreCargo(lb, unit);
+        }
         if (tSize() > 0) {
             // Arrived at a target.  Deliver what can be delivered.
             // Check other deliveries, we might be in port so this is
@@ -1064,15 +1067,21 @@ public final class TransportMission extends Mission {
         }
 
         queueEasilyTransportedCargo(unit);
-        
+        queueMoreCargo(lb, unit);
+    }
+
+    private void queueMoreCargo(LogBuilder lb, final Unit unit) {
         // Replenish cargoes up to available destination capacity
         // and 50% above maximum cargoes (FIXME: longer?)
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
-        while (destinationCapacity() > 0
-            && tSize() < unit.getCargoCapacity() * 3 / 2) {
-            Cargo cargo = getBestCargo(unit);
-            if (cargo == null) break;
-            if (!queueCargo(cargo, false, lb)) break;
+        while (destinationCapacity() > 0 && tSize() < unit.getCargoCapacity() * 3 / 2) {
+            final Cargo cargo = getBestCargo(unit);
+            if (cargo == null) {
+                break;
+            }
+            if (!queueCargo(cargo, false, lb)) {
+                break;
+            }
             euaip.claimTransportable(cargo.getTransportable());
         }
         

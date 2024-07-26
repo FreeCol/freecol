@@ -35,6 +35,7 @@ public class AllTests {
         suite.addTestSuite(REFTest.class);
         suite.addTestSuite(StandardAIPlayerTest.class);
         suite.addTestSuite(TensionTest.class);
+        suite.addTestSuite(EuropeanAIPlayerTest.class);
         //$JUnit-END$
         suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());
         return suite;
