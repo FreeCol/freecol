@@ -297,7 +297,7 @@ public final class NegotiationDialog extends FreeColPanel {
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
         centerPanel.add(scroll, "top, width 100%, wmin 200, grow");
-        add(centerPanel, "spany 3, top, growx"); // Center pane
+        add(centerPanel, "spany, top, growx"); // Center pane
         add(this.goldOfferPanel, "sg item"); // Right pane
 
         if (this.colonyDemandPanel != null) {
