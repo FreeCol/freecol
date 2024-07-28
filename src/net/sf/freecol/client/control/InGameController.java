@@ -3040,6 +3040,10 @@ public final class InGameController extends FreeColClientHolder {
         if (ret) {
             sound("sound.event.cashInTreasureTrain");
             fireChanges(unitWas);
+            final Unit activeUnit = getGUI().getActiveUnit();
+            if (activeUnit != null && activeUnit == unit) {
+                getGUI().changeView(null, false);
+            }
         }
         return ret;
     }
