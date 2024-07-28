@@ -758,8 +758,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
-                             int value) {
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class<?> type, int value) {
         if (type == DefendSettlementMission.class) {
             // Reduce value in proportion to the number of active defenders.
             Settlement settlement = (Settlement)DefendSettlementMission

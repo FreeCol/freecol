@@ -231,7 +231,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof ChoiceItem) {
-            ChoiceItem other = (ChoiceItem)o;
+            ChoiceItem<?> other = (ChoiceItem<?>) o;
             return Utils.equals(this.text, other.toString())
                 && Utils.equals(this.getObject(), other.getObject());
         }

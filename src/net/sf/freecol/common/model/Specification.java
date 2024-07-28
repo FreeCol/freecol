@@ -86,7 +86,7 @@ public final class Specification implements OptionContainer {
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     /** Fixed class array argument used in newType(). */
-    private static final Class[] newTypeClasses
+    private static final Class<?>[] newTypeClasses
         = new Class[] { String.class, Specification.class };
     
     // Special reader classes for spec objects
@@ -430,7 +430,7 @@ public final class Specification implements OptionContainer {
     private final List<Modifier> specialModifiers = new ArrayList<>();
 
     // readerMap("options")
-    private final Map<String, AbstractOption> allOptions = new HashMap<>();
+    private final Map<String, AbstractOption<?>> allOptions = new HashMap<>();
     private final Map<String, OptionGroup> allOptionGroups = new HashMap<>();
 
     /* Containers derived from readerMap containers */
@@ -1038,10 +1038,10 @@ public final class Specification implements OptionContainer {
     /**
      * {@inheritDoc}
      */
-    public <T extends Option> boolean hasOption(String id,
+    public <T extends Option<?>> boolean hasOption(String id,
                                                 Class<T> returnClass) {
         if (id == null) return false;
-        AbstractOption val = this.allOptions.get(id);
+        AbstractOption<?> val = this.allOptions.get(id);
         return (val == null) ? false
             : returnClass.isAssignableFrom(val.getClass());
     }
@@ -1049,7 +1049,7 @@ public final class Specification implements OptionContainer {
     /**
      * {@inheritDoc}
      */
-    public <T extends Option> T getOption(String id,
+    public <T extends Option<?>> T getOption(String id,
                                           Class<T> returnClass) {
         if (id == null) {
             throw new RuntimeException("Null identifier for "
@@ -1057,7 +1057,7 @@ public final class Specification implements OptionContainer {
         } else if (!this.allOptions.containsKey(id)) {
             throw new RuntimeException("Missing option: " + id);
         } else {
-            AbstractOption op = this.allOptions.get(id);
+            AbstractOption<?> op = this.allOptions.get(id);
             try {
                 return returnClass.cast(op);
             } catch (ClassCastException cce) {
@@ -1088,14 +1088,14 @@ public final class Specification implements OptionContainer {
      */
     private void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
         // Add the options of the group
-        for (Option option : optionGroup.getOptions()) {
+        for (Option<?> option : optionGroup.getOptions()) {
             if (option instanceof OptionGroup) {
                 allOptionGroups.put(option.getId(), (OptionGroup)option);
                 if (recursive) {
                     addOptionGroup((OptionGroup)option, true);
                 }
             } else {
-                addAbstractOption((AbstractOption)option);
+                addAbstractOption((AbstractOption<?>) option);
             }
         }
     }
@@ -1105,7 +1105,7 @@ public final class Specification implements OptionContainer {
      *
      * @param abstractOption The {@code AbstractOption} to add.
      */
-    private void addAbstractOption(AbstractOption abstractOption) {
+    private void addAbstractOption(AbstractOption<?> abstractOption) {
         // Add the option
         allOptions.put(abstractOption.getId(), abstractOption);
     }
@@ -1117,9 +1117,9 @@ public final class Specification implements OptionContainer {
      */
     public List<OptionGroup> getDifficultyLevels() {
         OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
-        Stream<Option> stream = (group == null) ? Stream.<Option>empty()
+        Stream<Option<?>> stream = (group == null) ? Stream.<Option<?>>empty()
             : group.getOptions().stream();
-        return transform(stream, (Option o) -> o instanceof OptionGroup,
+        return transform(stream, (Option<?> o) -> o instanceof OptionGroup,
                          o -> (OptionGroup)o);
     }
 
@@ -2158,19 +2158,19 @@ public final class Specification implements OptionContainer {
      * @return True if a fix was made.
      */
     private boolean fixOrphanOptions() {
-        Collection<AbstractOption> allO = new HashSet<>(allOptions.values());
-        Collection<AbstractOption> allG = new HashSet<>(allOptionGroups.values());
+        Collection<AbstractOption<?>> allO = new HashSet<>(allOptions.values());
+        Collection<AbstractOption<?>> allG = new HashSet<>(allOptionGroups.values());
         for (String id : coreOptionGroups) {
             dropOptions(allOptionGroups.get(id), allO);
             dropOptions(allOptionGroups.get(id), allG);
         }
-        for (AbstractOption ao : allO) {
+        for (AbstractOption<?> ao : allO) {
             // Drop from actual allOptions map
             dropOptions(ao, allOptions.values());
             if (ao instanceof OptionGroup) allOptionGroups.remove(ao.getId());
             logger.warning("Dropping orphan option: " + ao);
         }
-        for (AbstractOption ao : allG) {
+        for (AbstractOption<?> ao : allG) {
             allOptionGroups.remove(ao.getId());
             logger.warning("Dropping orphan option group: " + ao);
         }
@@ -2183,13 +2183,13 @@ public final class Specification implements OptionContainer {
      * @param o The {@code AbstractOption} to drop.
      * @param all The collection of options to drop from.
      */
-    private void dropOptions(AbstractOption o, Collection<AbstractOption> all) {
+    private void dropOptions(AbstractOption<?> o, Collection<AbstractOption<?>> all) {
         all.remove(o);
         if (o instanceof OptionGroup) {
             OptionGroup og = (OptionGroup)o;
-            for (Option op : og.getOptions()) {
-                if (op instanceof AbstractOption) {
-                    dropOptions((AbstractOption)op, all);
+            for (Option<?> op : og.getOptions()) {
+                if (op instanceof AbstractOption<?>) {
+                    dropOptions((AbstractOption<?>) op, all);
                 }
             }
         }
@@ -2299,8 +2299,8 @@ public final class Specification implements OptionContainer {
         // Older specs (<= 0.10.5 ?) had refSize directly under difficulty
         // level, later moved it under the monarch group.
         for (OptionGroup level : getDifficultyLevels()) {
-            Option monarch = level.getOption(GameOptions.DIFFICULTY_MONARCH);
-            Option refSize = ((OptionGroup)((monarch instanceof OptionGroup)
+            Option<?> monarch = level.getOption(GameOptions.DIFFICULTY_MONARCH);
+            Option<?> refSize = ((OptionGroup)((monarch instanceof OptionGroup)
                     ? monarch : level)).getOption(GameOptions.REF_FORCE);
             if (!(refSize instanceof UnitListOption)) continue;
             boolean changed;
@@ -2323,11 +2323,11 @@ public final class Specification implements OptionContainer {
         }
 
         // Fix all other UnitListOptions
-        List<Option> todo = new ArrayList<>(getDifficultyLevels());
+        List<Option<?>> todo = new ArrayList<>(getDifficultyLevels());
         while (!todo.isEmpty()) {
-            Option o = todo.remove(0);
+            Option<?> o = todo.remove(0);
             if (o instanceof OptionGroup) {
-                List<Option> next = ((OptionGroup)o).getOptions();
+                List<Option<?>> next = ((OptionGroup) o).getOptions();
                 todo.addAll(new ArrayList<>(next));
             } else if (o instanceof UnitListOption) {
                 boolean changed;
@@ -2739,10 +2739,10 @@ public final class Specification implements OptionContainer {
 
         // Ensure 2 levels of groups, and one level of leaves
         for (OptionGroup level : getDifficultyLevels()) {
-            for (Option o : level.getOptions()) {
+            for (Option<?> o : level.getOptions()) {
                 if (o instanceof OptionGroup) {
                     og = (OptionGroup)o;
-                    for (Option o2 : og.getOptions()) {
+                    for (Option<?> o2 : og.getOptions()) {
                         if (o2 instanceof OptionGroup) {
                             lb.add("?-group ", level.getId() + "/" + og.getId()
                                 + "/" + o2.getId());
@@ -2767,7 +2767,7 @@ public final class Specification implements OptionContainer {
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
             OptionGroup og = null;
-            for (Option o : level.getOptions()) {
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(gr) && o instanceof OptionGroup) {
                     og = (OptionGroup)o;
                     break;
@@ -2782,8 +2782,8 @@ public final class Specification implements OptionContainer {
                 ret = true;
             }
             for (String id : ids) {
-                Option op = null;
-                for (Option o : level.getOptions()) {
+                Option<?> op = null;
+                for (Option<?> o : level.getOptions()) {
                     if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
                         op = o;
                         break;
@@ -2791,8 +2791,8 @@ public final class Specification implements OptionContainer {
                 }
                 if (op != null) {
                     level.remove(op.getId());
-                    if (op instanceof AbstractOption) {
-                        ((AbstractOption)op).setGroup(og.getId());
+                    if (op instanceof AbstractOption<?>) {
+                        ((AbstractOption<?>) op).setGroup(og.getId());
                     }
                     og.add(op);
                     lb.add("\n  ~", level.getId(), "/", id, " -> ",
@@ -2810,15 +2810,15 @@ public final class Specification implements OptionContainer {
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
             OptionGroup og = null;
-            for (Option o : level.getOptions()) {
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(gr) && o instanceof OptionGroup) {
                     og = (OptionGroup)o;
                     break;
                 }
             }
             if (og == null) continue;
-            Option op = null;
-            for (Option o : level.getOptions()) {
+            Option<?> op = null;
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
                     op = o;
                     break;
@@ -2837,7 +2837,7 @@ public final class Specification implements OptionContainer {
                     level.getId(), "/" + og.getId());
             } else {
                 op = null;
-                for (Option o : og.getOptions()) {
+                for (Option<?> o : og.getOptions()) {
                     if (o.getId().equals(id)) {
                         op = o;
                         break;
@@ -2863,15 +2863,15 @@ public final class Specification implements OptionContainer {
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
             OptionGroup og = null;
-            for (Option o : level.getOptions()) {
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(gr) && o instanceof OptionGroup) {
                     og = (OptionGroup)o;
                     break;
                 }
             }
             if (og == null) continue;
-            Option op = null;
-            for (Option o : level.getOptions()) {
+            Option<?> op = null;
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
                     op = o;
                     break;
@@ -2890,7 +2890,7 @@ public final class Specification implements OptionContainer {
                     level.getId(), "/" + og.getId());
             } else {
                 op = null;
-                for (Option o : og.getOptions()) {
+                for (Option<?> o : og.getOptions()) {
                     if (o.getId().equals(id)) {
                         op = o;
                         break;
@@ -2915,15 +2915,15 @@ public final class Specification implements OptionContainer {
         UnitListOption ulo = null;
         for (OptionGroup level : getDifficultyLevels()) {
             OptionGroup og = null;
-            for (Option o : level.getOptions()) {
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(gr) && o instanceof OptionGroup) {
                     og = (OptionGroup)o;
                     break;
                 }
             }
             if (og == null) continue;
-            Option op = null;
-            for (Option o : level.getOptions()) {
+            Option<?> op = null;
+            for (Option<?> o : level.getOptions()) {
                 if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
                     op = o;
                     break;
@@ -2931,15 +2931,15 @@ public final class Specification implements OptionContainer {
             }
             if (op != null) {
                 level.remove(op.getId());
-                if (op instanceof AbstractOption) {
-                    ((AbstractOption)op).setGroup(og.getId());
+                if (op instanceof AbstractOption<?>) {
+                    ((AbstractOption<?>) op).setGroup(og.getId());
                 }
                 og.add(op);
                 lb.add("\n  ~", level.getId(), "/", id, " -> ",
                     level.getId(), "/" + og.getId());
             } else {
                 op = null;
-                for (Option o : og.getOptions()) {
+                for (Option<?> o : og.getOptions()) {
                     if (o.getId().equals(id)) {
                         op = o;
                         break;
@@ -3130,7 +3130,7 @@ public final class Specification implements OptionContainer {
         op.setGroup(gr);
         op.setValue(defaultValue);
         getOptionGroup(gr).add(op);
-        addAbstractOption((AbstractOption)op);
+        addAbstractOption((AbstractOption<?>) op);
         return true;
     }
         

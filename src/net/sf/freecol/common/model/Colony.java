@@ -2128,7 +2128,7 @@ public class Colony extends Settlement implements TradeLocation {
      * @return an {@code int} value
      */
     public int getAdjustedNetProductionOf(final GoodsType goodsType) {
-        final ToIntFunction<BuildQueue> consumes = q -> {
+        final ToIntFunction<BuildQueue<?>> consumes = q -> {
             ProductionInfo pi = productionCache.getProductionInfo(q);
             return (pi == null) ? 0
                     : AbstractGoods.getCount(goodsType, pi.getConsumption());

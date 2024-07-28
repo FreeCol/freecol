@@ -924,8 +924,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
-                             int value) {
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class<?> type, int value) {
         if (value > 0) {
             if (type == DefendSettlementMission.class) {
                 // REF garrisons thinly.

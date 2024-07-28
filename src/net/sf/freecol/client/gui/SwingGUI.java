@@ -2201,7 +2201,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean showEditOptionDialog(Option option) {
+    public boolean showEditOptionDialog(Option<?> option) {
         return this.widgets.showEditOptionDialog(option);
     }
 

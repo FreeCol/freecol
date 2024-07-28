@@ -244,7 +244,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
             xw.writeEndElement();
         }
 
-        for (AbstractOption option : value) {
+        for (AbstractOption<?> option : value) {
             option.toXML(xw);
         }
     }

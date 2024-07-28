@@ -1208,7 +1208,7 @@ public abstract class FreeColObject
      */
     public final void toXMLPartial(FreeColXMLWriter xw,
                                    String[] fields) throws XMLStreamException {
-        final Class theClass = getClass();
+        final Class<?> theClass = getClass();
 
         xw.writeStartElement(getXMLTagName());
 
@@ -1240,7 +1240,7 @@ public abstract class FreeColObject
      */
     public final void toXMLPartial(FreeColXMLWriter xw,
                                    List<String> fields) throws XMLStreamException {
-        final Class theClass = getClass();
+        final Class<?> theClass = getClass();
 
         try {
             xw.writeStartElement(getXMLTagName());
@@ -1356,7 +1356,7 @@ public abstract class FreeColObject
      *      during parsing.
      */
     public final void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
-        final Class theClass = getClass();
+        final Class<?> theClass = getClass();
         final String tag = xr.getLocalName();
         int n = xr.getAttributeCount();
 

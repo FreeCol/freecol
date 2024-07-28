@@ -108,9 +108,10 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @SuppressWarnings("unchecked")
         @Override
         public Object getCellEditorValue() {
-            return ((JComboBox)getComponent()).getSelectedItem();
+            return ((JComboBox<EuropeanNationType>) getComponent()).getSelectedItem();
         }
     }
 

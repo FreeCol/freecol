@@ -494,11 +494,10 @@ public final class FreeCol {
      * @return The {@code JarURLConnection}.
      * @exception IOException if the connection fails to open.
      */
-    private static JarURLConnection getJarURLConnection(Class c)
-        throws IOException {
+    private static JarURLConnection getJarURLConnection(Class<?> c) throws IOException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
-        return (JarURLConnection)url.openConnection();
+        return (JarURLConnection) url.openConnection();
     }
         
     /**

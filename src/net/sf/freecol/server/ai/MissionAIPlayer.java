@@ -379,7 +379,6 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @param type The mission type.
      * @return A score representing the desirability of this mission.
      */
-    public abstract int adjustMission(AIUnit aiUnit, PathNode path, Class type,
-                                      int value);
+    public abstract int adjustMission(AIUnit aiUnit, PathNode path, Class<?> type, int value);
 
 }

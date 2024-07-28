@@ -130,7 +130,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      *
      * @return A suitable ListCellRenderer.
      */
-    public ListCellRenderer getListCellRenderer() {
+    public ListCellRenderer<T> getListCellRenderer() {
         return null;
     }
 
@@ -164,7 +164,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      * @param editable Should the result be editable.
      * @return A suitable {@code OptionUI}, or null if none found.
      */
-    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
+    public static OptionUI<?> getOptionUI(GUI gui, Option<?> option, boolean editable) {
         if (option instanceof BooleanOption) {
             return new BooleanOptionUI((BooleanOption)option, editable);
         } else if (option instanceof FileOption) {

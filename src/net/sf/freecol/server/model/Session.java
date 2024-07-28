@@ -142,8 +142,7 @@ public abstract class Session {
      * @param o2 Another string to uniquely identify the transaction.
      * @return A transaction session key.
      */
-    protected static String makeSessionKey(Class type,
-                                           String o1, String o2) {
+    protected static String makeSessionKey(Class<?> type, String o1, String o2) {
         return (o1.compareTo(o2) < 0)
             ? type + "-" + o1 + "-" + o2
             : type + "-" + o2 + "-" + o1;
@@ -157,9 +156,7 @@ public abstract class Session {
      * @param o2 Another {@code FreeColGameObject} involved in the session.
      * @return A transaction session key.
      */
-    protected static String makeSessionKey(Class type,
-                                           FreeColGameObject o1,
-                                           FreeColGameObject o2) {
+    protected static String makeSessionKey(Class<?> type, FreeColGameObject o1, FreeColGameObject o2) {
         return makeSessionKey(type, o1.getId(), o2.getId());
     }
 

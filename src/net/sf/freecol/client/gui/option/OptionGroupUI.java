@@ -81,14 +81,14 @@ public final class OptionGroupUI extends MigPanel
                                          boolean expanded, boolean leaf,
                                          int row, boolean hasFocus) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-            Option option = (Option)node.getUserObject();
+            Option<?> option = (Option<?>) node.getUserObject();
             return Messages.getName(option.getId());
         }
     };
             
     private final List<OptionUpdater> optionUpdaters = new ArrayList<>();
 
-    private final HashMap<String, OptionUI> optionUIs = new HashMap<>();
+    private final HashMap<String, OptionUI<?>> optionUIs = new HashMap<>();
     private final Map<String, TreeNode[]> optionGroupSelectionPath = new HashMap<>(); 
 
     private final JPanel detailPanel;
@@ -168,7 +168,7 @@ public final class OptionGroupUI extends MigPanel
      * @param parent The tree to build onto.
      */
     private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
-        for (Option option : group.getOptions()) {
+        for (Option<?> option : group.getOptions()) {
             if (option instanceof OptionGroup) {
                 if (!((OptionGroup)option).isVisible()) continue;
                 DefaultMutableTreeNode branch
@@ -195,7 +195,7 @@ public final class OptionGroupUI extends MigPanel
         if (node != null) {
             if (node.isLeaf()) {
                 OptionGroup group = (OptionGroup) node.getUserObject();
-                for (Option option : group.getOptions()) {
+                for (Option<?> option : group.getOptions()) {
                     addOptionUI(option, editable && group.isEditable());
                 }
             } else {
@@ -220,16 +220,16 @@ public final class OptionGroupUI extends MigPanel
         }
     }
     
-    public OptionUI getOptionUI(String key) {
+    public OptionUI<?> getOptionUI(String key) {
         return optionUIs.get(key);
     }
     
-    public <T extends OptionUI> T getOptionUI(String key, Class<T> clazz) {
+    public <T extends OptionUI<?>> T getOptionUI(String key, Class<T> clazz) {
         return clazz.cast(optionUIs.get(key));
     }
 
-    private void addOptionUI(Option option, boolean editable) {
-        OptionUI ui = optionUIs.get(option.getId());
+    private void addOptionUI(Option<?> option, boolean editable) {
+        OptionUI<?> ui = optionUIs.get(option.getId());
         if (ui == null) {
             ui = OptionUI.getOptionUI(gui, option, editable);
             if (ui == null) {
@@ -238,7 +238,7 @@ public final class OptionGroupUI extends MigPanel
             }
             if (option.getEnabledBy() != null) {
                 BooleanOptionUI enabler = (BooleanOptionUI) optionUIs.get(option.getEnabledBy());
-                final OptionUI theUI = ui;
+                final OptionUI<?> theUI = ui;
                 enabler.addActionListener((e) -> {
                     theUI.initialize();
                 });

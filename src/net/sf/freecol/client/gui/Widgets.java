@@ -612,7 +612,7 @@ public final class Widgets {
      * @param op The {@code Option} to edit.
      * @return The response returned by the dialog.
      */
-    public boolean showEditOptionDialog(Option op) {
+    public boolean showEditOptionDialog(Option<?> op) {
         if (op == null) return false;
         EditOptionDialog dialog
             = new EditOptionDialog(this.freeColClient, getFrame(), op);

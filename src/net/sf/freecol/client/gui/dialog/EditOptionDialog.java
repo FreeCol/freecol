@@ -35,7 +35,7 @@ import net.sf.freecol.common.option.Option;
  */
 public class EditOptionDialog extends FreeColConfirmDialog {
 
-    private final OptionUI ui;
+    private final OptionUI<?> ui;
 
 
     /**
@@ -45,7 +45,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
      * @param frame The owner frame.
      * @param option The {@code Option} to operate on.
      */
-    public EditOptionDialog(FreeColClient freeColClient, JFrame frame, Option option) {
+    public EditOptionDialog(FreeColClient freeColClient, JFrame frame, Option<?> option) {
         super(freeColClient, frame);
 
         this.ui = OptionUI.getOptionUI(getGUI(), option, true);

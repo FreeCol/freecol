@@ -101,7 +101,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             });
         this.tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
                 @Override
-                public Component getListCellRendererComponent(JList list,
+                public Component getListCellRendererComponent(JList<?> list,
                     Object value, int index, boolean selected, boolean focus) {
                     Component ret = super.getListCellRendererComponent(list,
                         value, index, selected, focus);
