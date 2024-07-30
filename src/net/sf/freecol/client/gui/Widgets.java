@@ -22,20 +22,27 @@ package net.sf.freecol.client.gui;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
@@ -51,10 +58,8 @@ import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
-import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
-import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.dialog.MapSizeDialog;
 import net.sf.freecol.client.gui.dialog.MonarchDialog;
@@ -69,6 +74,7 @@ import net.sf.freecol.client.gui.dialog.SelectDestinationDialog;
 import net.sf.freecol.client.gui.dialog.SelectGoodsAmountDialog;
 import net.sf.freecol.client.gui.dialog.VictoryDialog;
 import net.sf.freecol.client.gui.dialog.WarehouseDialog;
+import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ChatPanel;
@@ -853,12 +859,83 @@ public final class Widgets {
      * @return The {@code LoadingSavegameInfo} if the dialog was accepted,
      *     or null otherwise.
      */
-    public LoadingSavegameInfo showLoadingSavegameDialog(boolean pubSer,
-                                                         boolean single) {
-        LoadingSavegameDialog dialog
-            = new LoadingSavegameDialog(this.freeColClient, getFrame());
-        return (this.canvas.showFreeColDialog(dialog, null)) ? dialog.getInfo()
-            : null;
+    public LoadingSavegameInfo showLoadingSavegameDialog(boolean pubSer, boolean single) {
+        final FreeColDialog<LoadingSavegameInfo> dialog = new FreeColDialog<LoadingSavegameInfo>(api -> {
+            final JPanel content = new JPanel(new MigLayout("fill, wrap 1"));
+            
+            final JLabel header = Utility.localizedHeaderLabel("loadingSavegameDialog.name", JLabel.CENTER, Utility.FONTSPEC_SUBTITLE);
+            content.add(header, "growx");
+            
+            
+            final JLabel serverNameLabel = Utility.localizedLabel("loadingSavegameDialog.serverName");
+            content.add(serverNameLabel, "newline unrel, growx");
+            
+            final JTextField serverNameField = new JTextField();
+            serverNameLabel.setLabelFor(serverNameField);
+            content.add(serverNameField, "growx");
+            
+            final JLabel ipLabel = Utility.localizedLabel("loadingSavegameDialog.ip");
+            content.add(ipLabel, "growx");
+            
+            final JComboBox<InetAddress> serverAddressBox = Utility.createServerInetAddressBox();
+            ipLabel.setLabelFor(serverAddressBox);
+            content.add(serverAddressBox, "growx");
+            
+            final JLabel portLabel = Utility.localizedLabel("loadingSavegameDialog.port");
+            content.add(portLabel);
+            final JSpinner portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(), 1, 65536, 1));
+            portLabel.setLabelFor(portField);
+            portField.setEditor(new JSpinner.NumberEditor(portField, "#"));
+            content.add(portField);
+            
+            final ButtonGroup bg = new ButtonGroup();
+            final JRadioButton singlePlayer = new JRadioButton(Messages.message("loadingSavegameDialog.singlePlayer"));
+            bg.add(singlePlayer);
+            content.add(singlePlayer, "newline unrel");
+            final JRadioButton privateMultiplayer = new JRadioButton(Messages.message("loadingSavegameDialog.privateMultiplayer"));
+            bg.add(privateMultiplayer);
+            content.add(privateMultiplayer);
+            final JRadioButton publicMultiplayer = new JRadioButton(Messages.message("loadingSavegameDialog.publicMultiplayer"));
+            bg.add(publicMultiplayer);
+            content.add(publicMultiplayer);
+            
+            serverAddressBox.addActionListener(event -> {
+                final InetAddress address = (InetAddress) serverAddressBox.getSelectedItem();
+                publicMultiplayer.setEnabled(!address.isLoopbackAddress());
+            });
+            
+            final InetAddress address = (InetAddress) serverAddressBox.getSelectedItem();
+            publicMultiplayer.setEnabled(!address.isLoopbackAddress());
+            if (single) {
+                singlePlayer.setSelected(true);
+            } else if (pubSer && publicMultiplayer.isEnabled()) {
+                publicMultiplayer.setSelected(true);
+            } else {
+                privateMultiplayer.setSelected(true);
+            }
+            
+            final JButton okButton = new FreeColButton(Messages.message("ok")).withButtonStyle(ButtonStyle.IMPORTANT);
+            final JButton cancelButton = new FreeColButton(Messages.message("cancel"));
+            okButton.addActionListener(ae -> {
+                final InetAddress inetAddress = singlePlayer.isSelected() ? null : (InetAddress) serverAddressBox.getSelectedItem();
+                final int port = singlePlayer.isSelected() ? -1 : ((Integer) portField.getValue());
+                final LoadingSavegameInfo result = new LoadingSavegameInfo(singlePlayer.isSelected(), inetAddress, port, serverNameField.getName(), publicMultiplayer.isSelected());
+                
+                api.setValue(result);
+            });
+            cancelButton.addActionListener(ae -> {
+                api.setValue(null);
+            });
+
+            content.add(okButton, "newline unrel, split 2, tag ok");
+            content.add(cancelButton, "tag cancel");
+            
+            api.setInitialFocusComponent(serverNameField);
+            
+            return content;
+        });
+        
+        return canvas.displayModalDialog(dialog);
     }
 
     /**
