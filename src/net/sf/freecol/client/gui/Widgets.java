@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -44,13 +45,13 @@ import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.DialogPanel;
 import net.sf.freecol.client.gui.dialog.DifficultyDialog;
 import net.sf.freecol.client.gui.dialog.DumpCargoDialog;
-import net.sf.freecol.client.gui.dialog.EditOptionDialog;
 import net.sf.freecol.client.gui.dialog.EditSettlementDialog;
 import net.sf.freecol.client.gui.dialog.EmigrationDialog;
 import net.sf.freecol.client.gui.dialog.EndTurnDialog;
 import net.sf.freecol.client.gui.dialog.FirstContactDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
+import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.client.gui.dialog.GameOptionsDialog;
 import net.sf.freecol.client.gui.dialog.LoadDialog;
 import net.sf.freecol.client.gui.dialog.LoadingSavegameDialog;
@@ -609,14 +610,42 @@ public final class Widgets {
     /**
      * Show the EditOptionDialog.
      *
-     * @param op The {@code Option} to edit.
+     * @param option The {@code Option} to edit.
      * @return The response returned by the dialog.
      */
-    public boolean showEditOptionDialog(Option<?> op) {
-        if (op == null) return false;
-        EditOptionDialog dialog
-            = new EditOptionDialog(this.freeColClient, getFrame(), op);
-        return this.canvas.showFreeColDialog(dialog, null);
+    public boolean showEditOptionDialog(Option<?> option) {
+        if (option == null) {
+            return false;
+        }
+        
+        final OptionUI<?> optionUi = OptionUI.getOptionUI(freeColClient.getGUI(), option, true);
+        final FreeColDialog<Boolean> dialog = new FreeColDialog<Boolean>(api -> {
+            final JPanel content = new JPanel(new MigLayout("fill"));
+            final JComponent editOptionComponent = optionUi.getComponent();
+            content.add(editOptionComponent, "grow");
+            
+            final JButton okButton = new FreeColButton(Messages.message("ok")).withButtonStyle(ButtonStyle.IMPORTANT);
+            final JButton cancelButton = new FreeColButton(Messages.message("cancel"));
+            okButton.addActionListener(ae -> {
+                api.setValue(Boolean.TRUE);
+            });
+            cancelButton.addActionListener(ae -> {
+                api.setValue(null);
+            });
+
+            content.add(okButton, "newline, split 2, tag ok");
+            content.add(cancelButton, "tag cancel");
+            
+            api.setInitialFocusComponent(editOptionComponent);
+            
+            return content;
+        });
+        
+        final boolean result = (canvas.displayModalDialog(dialog) != null);
+        if (result) {
+            optionUi.updateOption();
+        }
+        return result;
     }
 
     /**
