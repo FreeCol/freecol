@@ -65,7 +65,7 @@ public abstract class Message {
             Constructor<? extends Message>>());
 
     /** Classes used by Message.read() */
-    private static final Class[] readClasses = {
+    private static final Class<?>[] readClasses = {
         Game.class, FreeColXMLReader.class };
 
     // Convenient way to specify the relative priorities of the messages

@@ -258,8 +258,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         protected Transferable createTransferable(JComponent c) {
-            final JList list = (JList) c;
-            final DefaultListModel model = (DefaultListModel)list.getModel();
+            final JList<?> list = (JList<?>) c;
+            final DefaultListModel<?> model = (DefaultListModel<?>) list.getModel();
             final int[] indicies = list.getSelectedIndices();
             final List<TradeRouteStop> stops = new ArrayList<>(indicies.length);
             for (int i : indicies) {

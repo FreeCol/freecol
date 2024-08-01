@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui;
 
 import javax.swing.ImageIcon;
 
-import net.sf.freecol.client.gui.dialog.*;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -231,7 +230,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof ChoiceItem) {
-            ChoiceItem other = (ChoiceItem)o;
+            ChoiceItem<?> other = (ChoiceItem<?>) o;
             return Utils.equals(this.text, other.toString())
                 && Utils.equals(this.getObject(), other.getObject());
         }

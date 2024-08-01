@@ -261,8 +261,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 if (target != bql) {
                     // Dragging out of build queue => just remove the item.
                     // updateAllLists takes care of the rest.
-                    DefaultListModel sourceModel
-                        = (DefaultListModel)source.getModel();
+                    DefaultListModel<?> sourceModel = (DefaultListModel<?>) source.getModel();
                     for (Object obj : queue) {
                         sourceModel.removeElement(obj);
                     }

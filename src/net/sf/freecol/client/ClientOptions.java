@@ -978,8 +978,10 @@ public class ClientOptions extends OptionGroup {
      * @param gr The identifier for the option group to move to.
      */
     private void regroup(String id, String gr) {
-        Option op = getOption(id);
-        if (op != null) op.setGroup(gr);
+        final Option<?> op = getOption(id);
+        if (op != null) {
+            op.setGroup(gr);
+        }
     }
 
     /**

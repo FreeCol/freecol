@@ -81,7 +81,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      * {@inheritDoc}
      */
     @Override
-    public JComboBox getComponent() {
+    public JComboBox<UnitType> getComponent() {
         return this.box;
     }
 

@@ -303,8 +303,8 @@
     </target>
 
     <target name="prepareManual" depends="initDist,print-manuals">
-        <mkdir dir="${freecol.release.dir}/manual/${freecol.name}"/>
-        <copy todir="${freecol.release.dir}/manual/${freecol.name}">
+        <mkdir dir="${freecol.release.dir}/manual/${freecol.release.name}"/>
+        <copy todir="${freecol.release.dir}/manual/${freecol.release.name}">
             <fileset dir="${freecol.doc.dir}" includes="FreeCol.pdf"/>
             <fileset dir="${freecol.doc.dir}" includes="developer.pdf"/>
         </copy>
@@ -313,8 +313,8 @@
     <target name="prepareBaseFiles" depends="initDist,desktop-entry">
         <antcall target="cleanMain"/>
         <antcall target="package"/>
-        <mkdir dir="${freecol.release.dir}/base/${freecol.name}"/>
-        <copy todir="${freecol.release.dir}/base/${freecol.name}">
+        <mkdir dir="${freecol.release.dir}/base/${freecol.release.name}"/>
+        <copy todir="${freecol.release.dir}/base/${freecol.release.name}">
             <fileset dir="${basedir}" includes="FreeCol.jar"/>
             <fileset dir="${basedir}" includes="splash.jpg"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="COPYING"/>
@@ -327,13 +327,13 @@
             <fileset dir="${basedir}" includes="jars/**"/>
         </copy>
         <copy file="${freecol.packaging.dir}/common/freecol.sh"
-              tofile="${freecol.release.dir}/base/${freecol.name}/freecol"/>
+              tofile="${freecol.release.dir}/base/${freecol.release.name}/freecol"/>
     </target>
 
     <target name="prepareSourceFiles" depends="initDist">
         <antcall target="cleanMain"/>
-        <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
-        <copy todir="${freecol.release.dir}/source/${freecol.name}">
+        <mkdir dir="${freecol.release.dir}/source/${freecol.release.name}"/>
+        <copy todir="${freecol.release.dir}/source/${freecol.release.name}">
             <fileset dir="${basedir}"
                      excludes="splash.jpg,dist/**,data/**,jars/**,www.freecol.org/**,nbproject/**,srcdata/**,unused/**"/>
         </copy>
@@ -342,13 +342,13 @@
     <target name="prepareWinFiles" depends="initDist,define-jsmoothgen">
         <jsmoothgen project="${freecol.build.dir}/startup.jsmooth"
                     skeletonroot="${freecol.build.dir}/skeletons"/>
-        <move todir="${freecol.release.dir}/win/${freecol.name}">
+        <move todir="${freecol.release.dir}/win/${freecol.release.name}">
             <fileset dir="${freecol.build.dir}" includes="freecol.exe"/>
         </move>
-        <mkdir dir="${freecol.release.dir}/win/${freecol.name}/Uninstaller"/>
+        <mkdir dir="${freecol.release.dir}/win/${freecol.release.name}/Uninstaller"/>
         <jsmoothgen project="${freecol.build.dir}/uninstaller.jsmooth"
                     skeletonroot="${freecol.build.dir}/skeletons"/>
-        <move todir="${freecol.release.dir}/win/${freecol.name}/Uninstaller">
+        <move todir="${freecol.release.dir}/win/${freecol.release.name}/Uninstaller">
             <fileset dir="${freecol.build.dir}" includes="uninstaller.exe"/>
         </move>
     </target>
@@ -357,9 +357,9 @@
             depends="initDist,prepareManual,prepareBaseFiles">
         <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
             <fileset dir="${freecol.release.dir}/base"
-                     includes="${freecol.name}/**"/>
+                     includes="${freecol.release.name}/**"/>
             <fileset dir="${freecol.release.dir}/manual"
-                     includes="${freecol.name}/**"/>
+                     includes="${freecol.release.name}/**"/>
         </zip>
     </target>
 
@@ -367,10 +367,10 @@
             depends="initDist,prepareBaseFiles,prepareSourceFiles">
         <zip destfile="${freecol.release.dir}/${freecol.release.name}-src.zip">
             <fileset dir="${freecol.release.dir}/base"
-                     includes="${freecol.name}/**"
-                     excludes="${freecol.name}/FreeCol.jar,${freecol.name}/freecol.*,${freecol.name}/freecol"/>
+                     includes="${freecol.release.name}/**"
+                     excludes="${freecol.release.name}/FreeCol.jar,${freecol.release.name}/freecol.*,${freecol.release.name}/freecol"/>
             <fileset dir="${freecol.release.dir}/source"
-                     includes="${freecol.name}/**"/>
+                     includes="${freecol.release.name}/**"/>
         </zip>
     </target>
 
@@ -426,7 +426,7 @@
                         <langpack iso3="ukr"/>
                     </locale>
                     <resources>
-                        <res id="LicencePanel.licence" src="base/@{freecol.name}/COPYING"/>
+                        <res id="LicencePanel.licence" src="base/@{freecol.release.name}/COPYING"/>
                         <res id="shortcutSpec.xml" src="@{freecol.build.dir}/winShortcutSpec.xml"/>
                         <res id="Unix_shortcutSpec.xml" src="@{freecol.build.dir}/unixShortcutSpec.xml"/>
                         <res id="installer.langsel.img" src="@{freecol.build.dir}/install.png"/>
@@ -471,15 +471,15 @@
                     <packs>
                         <pack id="FreeCol" name="FreeCol" required="yes">
                             <description>The FreeCol application and data files. This pack includes all files required to play the game.</description>
-                            <fileset dir="base/@{freecol.name}" targetdir="$INSTALL_PATH"/>
+                            <fileset dir="base/@{freecol.release.name}" targetdir="$INSTALL_PATH"/>
                             <fileset dir="@{freecol.packaging.dir}/common/" includes="Uninstaller/**" targetdir="$INSTALL_PATH"/>
-                            <fileset dir="win/@{freecol.name}" targetdir="$INSTALL_PATH" os="windows"/>
+                            <fileset dir="win/@{freecol.release.name}" targetdir="$INSTALL_PATH" os="windows"/>
                             <executable targetfile="$INSTALL_PATH/freecol" stage="never" keep="true" />
                             <executable targetfile="$INSTALL_PATH/Uninstaller/uninstaller" stage="never" keep="true" />
                         </pack>
                         <pack id="GameManual" name="Game Manual" required="no" preselected="yes">
                             <description>This pack includes the game manual.</description>
-                            <fileset dir="manual/@{freecol.name}" targetdir="$INSTALL_PATH"/>
+                            <fileset dir="manual/@{freecol.release.name}" targetdir="$INSTALL_PATH"/>
                         </pack>
                     </packs>
                 </installation>

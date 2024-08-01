@@ -158,7 +158,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
      * {@inheritDoc}
      */
     @Override
-    public ListCellRenderer getListCellRenderer() {
+    public ListCellRenderer<AbstractUnitOption> getListCellRenderer() {
         return new AbstractUnitRenderer();
     }
 

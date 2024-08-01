@@ -232,11 +232,11 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      * @return An option.
      * @exception XMLStreamException on stream errors.
      */
-    protected AbstractOption readOption(FreeColXMLReader xr)
+    protected AbstractOption<?> readOption(FreeColXMLReader xr)
         throws XMLStreamException {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
-        AbstractOption option = null;
+        AbstractOption<?> option = null;
 
         if (ACTION_TAG.equals(tag)) {
             // FIXME: load FreeColActions from client options?

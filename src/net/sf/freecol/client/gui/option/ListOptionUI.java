@@ -66,7 +66,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private final JButton upButton = Utility.localizedButton("list.up");
     private final JButton downButton = Utility.localizedButton("list.down");
     
-    private final Function<AbstractOption, Boolean> choiceModifiableCheck;
+    private final Function<AbstractOption<?>, Boolean> choiceModifiableCheck;
 
 
     /**
@@ -80,7 +80,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      *      be added/modified in the list.
      */
     public ListOptionUI(final GUI gui, final ListOption<T> option,
-                        boolean editable, Function<AbstractOption, Boolean> choiceModifiableCheck) {
+                        boolean editable, Function<AbstractOption<?>, Boolean> choiceModifiableCheck) {
         super(option, editable);
 
         this.choiceModifiableCheck = choiceModifiableCheck;
@@ -202,7 +202,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     @SuppressWarnings("unchecked")
     private void setCellRenderer(GUI gui, AbstractOption<T> o,
                                  boolean editable) {
-        OptionUI ui = OptionUI.getOptionUI(gui, o, editable);
+        OptionUI<AbstractOption<T>> ui = (OptionUI<AbstractOption<T>>) OptionUI.getOptionUI(gui, o, editable);
         if (ui != null && ui.getListCellRenderer() != null) {
             this.list.setCellRenderer(ui.getListCellRenderer());
         }

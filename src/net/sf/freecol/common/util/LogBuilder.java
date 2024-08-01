@@ -59,7 +59,7 @@ public class LogBuilder {
      */
     private static String o2s(Object o) {
         return (o == null) ? "null"
-            : (o instanceof Class) ? ((Class)o).getName()
+            : (o instanceof Class<?>) ? ((Class<?>) o).getName()
             : (o instanceof String) ? (String)o
             : (o instanceof Location) ? ((Location)o).toShortString()
             : o.toString();

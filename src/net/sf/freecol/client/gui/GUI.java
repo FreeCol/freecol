@@ -2066,7 +2066,7 @@ public class GUI extends FreeColClientHolder {
      * @param option The {@code Option} to edit.
      * @return True if the option edit was accepted.
      */
-    public boolean showEditOptionDialog(Option option) { return false; }
+    public boolean showEditOptionDialog(Option<?> option) { return false; }
 
     /**
      * Show a dialog for editing a settlmeent.
