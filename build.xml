@@ -605,11 +605,11 @@
                     stubfile="${freecol.build.dir}/skeletons/universalJavaApplicationStub"
                     useJavaXKey="true"
                     icon="${freecol.packaging.dir}/icons/FreeCol.icns">
-            <jarfileset dir="${freecol.release.dir}/base/freecol/">
+            <jarfileset dir="${freecol.release.dir}/base/${freecol.release.name}/">
                 <include name="**/*" />
                 <exclude name="data/**" />
             </jarfileset>
-            <resourcefileset dir="${freecol.release.dir}/base/freecol/data" />
+            <resourcefileset dir="${freecol.release.dir}/base/${freecol.release.name}/data" />
         </jarbundler>
     </target>
 
