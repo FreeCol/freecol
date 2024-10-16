@@ -878,6 +878,7 @@ public final class ColonyPanel extends PortPanel
          */
         add(unloadButton, "wmax 0, height 0, gap 0 0 0 0");
         add(fillButton, "wmax 0, height 0, gap 0 0 0 0");
+        add(nameBox, "wmax 0, height 0, gap 0 0 0 0");
         
         add(okButton, "gapbefore push, height 48!"); // tag ok
         
