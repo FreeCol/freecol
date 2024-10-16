@@ -3898,8 +3898,9 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if looting occurs.
      */
     private boolean lootCargo(Unit unit, List<Goods> goods, String defenderId) {
-        if (unit == null || goods == null || goods.isEmpty()
-            || defenderId == null) return false;
+        if (unit == null || goods == null || defenderId == null) {
+            return false;
+        }
 
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askServer().loot(unit, defenderId, goods);
