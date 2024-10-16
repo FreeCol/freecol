@@ -2,6 +2,9 @@
 
 All savegames (without mods) from 0.12.0 and up should continue working with 1.2.1.
 
+### Graphics ###
+* Adding new graphics for the lost city rumours.
+
 ### User Interface ###
 * Changes the default for most confirm dialogs to OK instead of Cancel.
 * Lots of dialogs, that where previously popups outside the game window, have now moved into the main game window.
@@ -9,9 +12,12 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * 10 in now the minimum font size. This mitigates the effect from low reported DPI on macos when a non-native resolution is used.
 * Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
 * The resolution of the screen in fullscreen mode can now be configured in the Preferences.
+* Left and right arrows can now again be used for switching the currently displayed colony
 * Bugfix: Attack animations are now played in the correct position.
 * Bugfix: Fixes an issue where goods that has been sold is still displayed in the unit info panel.
 * Bugfix: Fixes a bug where the escape key closed multiple panels.
+* Bugfix: An error message is no longer displayed when a goto order cashes in a treasure train.
+* Bugfix: A warning message is no longer displayed if cashing in a treasure train using the context menu while the treasure train is the active unit.
 
 ### Performance ###
 * Unit movements are now faster (area redrawn when moving is reduced).
@@ -21,10 +27,14 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 
 ### AI/computer players ###
 * Bugfix: Fixed an issue that prevented diplomacy initiated during the AI players' turns.
+* Bugfix: Ships the AI builds in its colonies no longer wait one turn before being utilized.
 
 ### Mod development ###
 * Allow mods to add modifiers ("model.modifier.education.teaching.turns") for the education teaching time. Scope checks are applied to the teacher.
 
+### Other ###
+* Fixes an issue where not capturing goods from a ship prevents ending the turn.
+* Includes the version number in the freecol application directory when making ZIP-files and other packages. This prevents having the application directory collide with the settings directory if the user extracts the ZIP file (or other installation file) to the Documents directory in Windows.
 
 ## FreeCol 1.2.0 (4th of July, 2024) ##
 
