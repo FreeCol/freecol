@@ -814,7 +814,15 @@ public final class QuickActionMenu extends JPopupMenu {
                 if (parentPanel instanceof CargoPanel) {
                     CargoPanel cargoPanel = (CargoPanel) parentPanel;
                     cargoPanel.initialize();
+
                 }
+
+                 if (parentPanel instanceof EuropePanel) {
+
+                    EuropePanel europePanel = ((EuropePanel) parentPanel);
+                    europePanel.refreshMarketPanel();
+                }
+
                 parentPanel.revalidate();
             });
         this.add(menuItem);
