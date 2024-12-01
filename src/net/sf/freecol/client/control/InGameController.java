@@ -3330,7 +3330,13 @@ public final class InGameController extends FreeColClientHolder {
                             ourAgreement = agreement;
                             ourAgreement.setStatus(TradeStatus.REJECT_TRADE);
                         }
-                        askServer().diplomacy(our, other, ourAgreement);                        
+                        askServer().diplomacy(our, other, ourAgreement);
+
+                        if (other instanceof Colony) {
+                            // invalidate nation summaries in case that accept a second trade proposal (Send button) and gains gold in any way
+                            player.clearNationSummary(player);
+                            player.clearNationSummary(otherPlayer);
+                        }
                     });
                 });
             break;
