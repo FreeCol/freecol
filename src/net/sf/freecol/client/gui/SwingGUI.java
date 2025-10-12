@@ -1722,7 +1722,9 @@ public class SwingGUI extends GUI {
             setFocus((Tile)fco);
         } else if (fco instanceof Unit) {
             Location loc = ((Unit)fco).up();
-            if (loc instanceof Colony) {
+            if (loc.getRank() == Location.LOCATION_RANK_HIGHSEAS) {
+                // do nothing. Unit at LOCATION_RANK_HIGHSEAS can't be displayed
+            }else if (loc instanceof Colony) {
                 showColonyPanel((Colony)loc, (Unit)fco);
             } else {
                 displayObject((FreeColObject)loc);
