@@ -101,7 +101,11 @@ public final class ReportLabourDetailPanel extends ReportPanel {
                 detailPanel.add(countLabel);
             }
         }
-        forEachMapEntry(unitLocations, e -> !(e.getKey() instanceof Colony),
+
+
+        forEachMapEntry(unitLocations, e -> (!(e.getKey() instanceof Colony)
+                && !(e.getKey().getRank() == Location.LOCATION_RANK_HIGHSEAS)
+                ),
             e -> {
                 String locationName
                     = Messages.message(e.getKey().getLocationLabel());
@@ -113,6 +117,19 @@ public final class ReportLabourDetailPanel extends ReportPanel {
                 countLabel.setForeground(Utility.getLinkColor());
                 detailPanel.add(countLabel);
             });
+        
+        forEachMapEntry(unitLocations, e -> (!(e.getKey() instanceof Colony)
+                && (e.getKey().getRank() == Location.LOCATION_RANK_HIGHSEAS)
+                ),
+            e -> {
+                String locationName
+                    = Messages.message(e.getKey().getLocationLabel());
+                JLabel linkButton = new JLabel(locationName);
+                detailPanel.add(linkButton);
+                JLabel countLabel = new JLabel(e.getValue().toString());
+                detailPanel.add(countLabel);
+        });
+
         if (canTrain) {
             detailPanel.add(Utility.localizedLabel("report.labour.canTrain"),
                             "newline 20, span");
