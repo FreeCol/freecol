@@ -18,6 +18,9 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * Bugfix: Fixes a bug where the escape key closed multiple panels.
 * Bugfix: An error message is no longer displayed when a goto order cashes in a treasure train.
 * Bugfix: A warning message is no longer displayed if cashing in a treasure train using the context menu while the treasure train is the active unit.
+* Bugfix: Fixes rendering issues in the diplomacy dialog.
+* Buxfix: In the labor report, clicking on a unit carried by a ship no longer forces a reconnect.
+* Bugfix: Paying arrears in Europe now immediately refreshes the display so that goods are no longer greyed out.
 
 ### Performance ###
 * Unit movements are now faster (area redrawn when moving is reduced).
