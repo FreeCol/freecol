@@ -280,7 +280,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         });
 
         this.joinNameLabel = Utility.localizedLabel("host");
-        this.joinNameField = new JTextField(FreeCol.getServerHost());
+        this.joinNameField = new JTextField(FreeCol.getDefaultServerHost());
         this.joinPortLabel = Utility.localizedLabel("port");
         this.joinPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
