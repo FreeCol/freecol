@@ -910,4 +910,11 @@ public final class EuropePanel extends PortPanel {
         exitButton = trainButton = purchaseButton = recruitButton
             = unloadButton = sailButton = null;
     }
+
+    /**
+     * Refresh marketPanel, called after pay arrears
+     */
+    public void refreshMarketPanel() {
+        marketPanel.initialize();
+    }
 }
