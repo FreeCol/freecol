@@ -1421,11 +1421,14 @@ public class Colony extends Settlement implements TradeLocation {
         final int uc = getUnitCount();
         int liberty = getLiberty();
         int soLPercent = calculateSoLPercentage(uc, liberty);
-        int bonus0 = calculateProductionBonus(soLPercent);
+        int bonus = calculateProductionBonus(soLPercent);
+        int projectedProduction = libertyProduction;
+        int rc = calculateRebelCount(uc, soLPercent);
 
-        int n = 0, bonus = bonus0;
+        int n = 0;
         for (;;) {
-            if (bonus != bonus0 && ret.get(0) < 0) {
+            int next = calculateRebelCount(uc, soLPercent);
+            if (next != rc && ret.get(0) < 0) {
                 ret.set(0, n);
             }
             if (bonus == GOVERNMENT_GOOD && ret.get(1) < 0) {
@@ -1435,14 +1438,53 @@ public class Colony extends Settlement implements TradeLocation {
                 ret.set(2, n);
                 break;
             }
-            liberty += libertyProduction;
+
+            liberty += projectedProduction;
             soLPercent = calculateSoLPercentage(uc, liberty);
-            bonus = calculateProductionBonus(soLPercent);
+            int newBonus = calculateProductionBonus(soLPercent);
+            if (newBonus != bonus) {
+                projectedProduction = projectLibertyProduction(newBonus);
+            }
+            bonus = newBonus;
             n++;
         }
         return ret;
     }
-            
+
+    /**
+     * Calculate the projected liberty production when a different government
+     * bonus applies.
+     *
+     * @param projectedBonus The bonus level to evaluate.
+     * @return The liberty production per turn including liberty modifiers.
+     */
+    private int projectLibertyProduction(int projectedBonus) {
+        final Specification spec = getSpecification();
+        final List<GoodsType> libertyGoods = spec.getLibertyGoodsTypeList();
+        final Turn turn = getGame().getTurn();
+        final Player owner = getOwner();
+
+        final int originalBonus = getProductionBonus();
+        final boolean changed = projectedBonus != originalBonus;
+        int production;
+        if (changed) {
+            // Apply temporal bonus
+            setProductionBonus(projectedBonus);
+            invalidateCache();
+        }
+        try {
+            production = sum(libertyGoods, gt -> getNetProductionOf(gt));
+        } finally {
+            if (changed) {
+                // Restore original cache
+                setProductionBonus(originalBonus);
+                invalidateCache();
+            }
+        }
+
+        return (int) FeatureContainer.applyModifiers((float) production, turn,
+                owner.getModifiers(Modifier.LIBERTY));
+    }
 
     // Unit manipulation and population
 
