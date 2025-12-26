@@ -275,7 +275,9 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     private void updateImageIcon(String key) {
-        final ImageLibrary lib = getGUI().getFixedImageLibrary();
+        final GUI gui = getGUI();
+        if (gui == null) return;
+        final ImageLibrary lib = gui.getFixedImageLibrary();
         List<BufferedImage> images = lib.getButtonImages(key);
         orderButtonImageCount = images.size();
         if (hasOrderButtons()) {
