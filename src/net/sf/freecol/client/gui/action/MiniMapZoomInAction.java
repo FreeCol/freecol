@@ -40,6 +40,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     public MiniMapZoomInAction(FreeColClient freeColClient) {
         super(freeColClient, id);
 
+        setCanvasKeyBinding(true);
         addImageIcons("zoom_in");
     }
 
@@ -53,6 +54,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     public MiniMapZoomInAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");
  
+        setCanvasKeyBinding(true);
         addImageIcons("zoom_in");
     }
 

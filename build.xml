@@ -106,8 +106,7 @@
                debug="on"
                optimize="on"
                deprecation="off"
-               source="${java.target.version}"
-               target="${java.target.version}"
+               release="${java.target.version}"
                includeantruntime="false">
             <compilerarg value="-Xlint:unchecked"/>
             <compilerarg value="-Xlint:deprecation"/>
@@ -125,8 +124,7 @@
                debug="on"
                optimize="on"
                deprecation="off"
-               source="${java.target.version}"
-               target="${java.target.version}"
+               release="${java.target.version}"
                includeantruntime="false">
             <compilerarg value="-Xlint:unchecked"/>
             <compilerarg value="-Xlint:deprecation"/>
@@ -820,8 +818,7 @@
                debug="on"
                optimize="on"
                deprecation="off"
-               source="${java.target.version}"
-               target="${java.target.version}"
+               release="${java.target.version}"
                includeantruntime="false">
             <compilerarg value="-Xlint:unchecked"/>
             <compilerarg value="-Xlint:deprecation"/>

@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.IllformedLocaleException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -306,7 +307,6 @@ public class Messages {
      * @param languageID An underscore separated language/country/variant tuple.
      * @return The {@code Locale} for the specified language.
      */
-    @SuppressWarnings("deprecation")
     public static Locale getLocale(String languageID) {
         String language, country = "", variant = "";
         StringTokenizer st = new StringTokenizer(languageID, "_", true);
@@ -330,7 +330,15 @@ public class Messages {
                 }
             }
         }
-        return new Locale(language, country, variant);
+        try {
+            Locale.Builder builder = new Locale.Builder();
+            if (!language.isEmpty()) builder.setLanguage(language);
+            if (!country.isEmpty()) builder.setRegion(country);
+            if (!variant.isEmpty()) builder.setVariant(variant);
+            return builder.build();
+        } catch (IllformedLocaleException e) {
+            return Locale.ROOT;
+        }
     }
 
 
