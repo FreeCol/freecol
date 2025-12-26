@@ -701,6 +701,7 @@
                  private="true"
                  classpathref="freecol.build.classpath"
                  Author="true"
+                 additionalparam="-Xdoclint:all,-missing"
                  Windowtitle="FreeCol Code Documentation"/>
         <echo message="" />
         <echo message="-------------------------------------------------"/>

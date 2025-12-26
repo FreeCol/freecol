@@ -1092,7 +1092,6 @@ public class ColonyPlan {
      * Equips a unit for a role, trying all possibilities if a military role
      * was called for.
      *
-     * @param spec The {@code Specification} defining the roles.
      * @param unit The {@code Unit} to equip if possible.
      * @param role The {@code Role} for the unit to take.
      * @param colony The {@code Colony} storing the equipment.

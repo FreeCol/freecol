@@ -16,6 +16,7 @@ nbproject
 FreeCol.log
 FreeCol*.jar
 src/*.MF
+build/
 build/installer/
 build/net/
 doc/specification_*.html

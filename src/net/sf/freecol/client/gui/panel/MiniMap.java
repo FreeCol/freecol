@@ -253,7 +253,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      *
      * FIXME: Public for MapEditorController.createMiniMapThumbnail.
      *
-     * @param graphics The {@code Graphics} context within which to draw.
+     * @param g2d The {@code Graphics2D} context within which to draw.
      */
     public void paintMap(Graphics2D g2d) {
         if (getMap() == null) {

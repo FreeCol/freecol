@@ -110,7 +110,7 @@ public class WrapLayout implements LayoutManager {
      * 
      * @see #withHorizontalAlignment(HorizontalAlignment)
      * @see #withLayoutStyle(LayoutStyle)
-     * @see #withHorizontalGap(HorizontalGap, int)
+     * @see #withHorizontalGap(HorizontalGap, int, int)
      */
     public WrapLayout() {
         

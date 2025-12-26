@@ -216,7 +216,10 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     // Override BasicOptionPaneUI
 
     /**
-     * {@inheritDoc}
+     * Creates a new UI delegate for a {@code JOptionPane}.
+     *
+     * @param c The component to create a UI for.
+     * @return The new UI delegate.
      */
     public static ComponentUI createUI(@SuppressWarnings("unused")JComponent c) {
         return new FreeColOptionPaneUI();

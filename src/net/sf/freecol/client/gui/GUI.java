@@ -2044,7 +2044,7 @@ public class GUI extends FreeColClientHolder {
      * @param spec The enclosing {@code Specification}.
      * @param group The {@code OptionGroup} to show.
      * @param editable If true, the option group can be edited.
-     * @return The (possibly modified) {@code OptionGroup}.
+     * @param dialogHandler Callback executed when the dialog gets closed.
      */
     public void showDifficultyDialog(Specification spec,
                                             OptionGroup group,

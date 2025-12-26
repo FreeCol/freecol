@@ -69,7 +69,6 @@ public abstract class MapControls extends FreeColClientHolder {
      * The basic constructor.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param useSkin Use a skin or not in the info panel.
      */
     protected MapControls(final FreeColClient freeColClient) {
         super(freeColClient);

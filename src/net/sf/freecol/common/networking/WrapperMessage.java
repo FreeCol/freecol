@@ -132,7 +132,9 @@ public abstract class WrapperMessage extends AttributeMessage {
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the subtype of the wrapped message.
+     *
+     * @return The wrapped message type, or {@code null} if missing.
      */
     public String getSubType() {
         return (this.message == null) ? null : this.message.getType();

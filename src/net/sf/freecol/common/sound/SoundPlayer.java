@@ -302,7 +302,7 @@ public final class SoundPlayer {
     /**
      * Defines the default playlist.
      *
-     * @param file The {@code File}s to be played when
+     * @param files The {@code File}s to be played when
      *      nothing else is being played.
      */
     public void setDefaultPlaylist(File... files) {

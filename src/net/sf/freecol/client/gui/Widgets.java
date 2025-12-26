@@ -600,7 +600,6 @@ public final class Widgets {
      * @param group The {@code OptionGroup} containing the difficulty.
      * @param editable If the options should be editable.
      * @param dialogHandler Callback executed when the dialog gets closed.
-     * @return The resulting {@code OptionGroup}.
      */
     public void showDifficultyDialog(Specification spec,
                                             OptionGroup group,
@@ -696,7 +695,6 @@ public final class Widgets {
      * Show the EndTurnDialog with given units that could still move.
      *
      * @param units A list of {@code Unit}s that could still move.
-     * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showEndTurnDialog(List<Unit> units) {
         final EndTurnDialog endTurnPanel = new EndTurnDialog(this.freeColClient, units);
@@ -864,7 +862,7 @@ public final class Widgets {
      * Show a dialog for setting options when loading a savegame.
      *
      * The settings can be retrieved directly from
-     * {@link LoadingSavegameDialog} after calling this method.
+     * {@link LoadingSavegameInfo} after calling this method.
      *
      * @param pubSer Default value.
      * @param single Default value.
@@ -1341,7 +1339,7 @@ public final class Widgets {
      * Run out of ColonyPanel, so the tile is already displayed.
      *
      * @param colony The {@code Colony} to display.
-     * @return The response returned by the dialog.
+     * @param handler A {@code DialogHandler} for the dialog response.
      */
     public void showWarehouseDialog(Colony colony, DialogHandler<Boolean> handler) {
         final WarehouseDialog dialog = new WarehouseDialog(this.freeColClient, colony, handler);

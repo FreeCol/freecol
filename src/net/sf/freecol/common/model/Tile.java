@@ -1280,7 +1280,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * Used by the terrain generator.
      *
-     * @param mountains The mountain tile type.
      * @return True if this is a good potential elevated tile.
      */
     public boolean isGoodMountainTile() {

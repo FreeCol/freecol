@@ -163,13 +163,13 @@ public final class NegotiationDialog extends FreeColPanel {
      * Creates a new {@code NegotiationDialog} instance.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param frame The owner frame.
      * @param our Our {@code FreeColGameObject} that is negotiating.
      * @param other The other {@code FreeColGameObject}.
      * @param agreement The {@code DiplomaticTrade} agreement that
      *     is being negotiated.
      * @param comment An optional {@code StringTemplate}
      *     commentary message.
+     * @param handler Callback executed when the dialog closes.
      */
     public NegotiationDialog(FreeColClient freeColClient,
                              FreeColGameObject our, FreeColGameObject other,

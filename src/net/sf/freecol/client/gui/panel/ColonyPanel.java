@@ -131,7 +131,6 @@ import net.sf.freecol.common.util.ImageUtils;
  * Beware that in debug mode, this might be a server-side version of
  * the colony which is why we need to call getColony().getSpecification()
  * to get the spec that corresponds to the good types in this colony.
- * <p>
  */
 public final class ColonyPanel extends PortPanel
     implements PropertyChangeListener {

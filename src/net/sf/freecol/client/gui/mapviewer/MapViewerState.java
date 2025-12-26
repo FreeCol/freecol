@@ -30,7 +30,8 @@ import net.sf.freecol.common.model.Unit;
 /**
  * Internal state for the {@link MapViewer}.
  * 
- * Methods in this class should only be used by {@link SwingGUI},
+ * Methods in this class should only be used by
+ * {@link net.sf.freecol.client.gui.SwingGUI},
  * {@link net.sf.freecol.client.gui.Canvas} or {@link MapViewer}.
  */
 public final class MapViewerState {

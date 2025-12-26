@@ -65,8 +65,6 @@ public final class DeltaAnimationImageCreator {
      * 
      * @param pebblesImage The pebbles image. That is, the graphics the water is drawn upon.
      * @param waterImage The water to be drawn.
-     * @param waterImageVariationNumber The variation number of the
-     *      water image given above.
      * @param riverWaterMaskImage A mask to be applied to the water image in
      *      order to make the pebbles visible below the water.
      * @param riverPebblesMaskImage A mask to be applied to the pebbles image in

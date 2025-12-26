@@ -630,7 +630,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * Cancel import of goods at the selected stops.
      *
-     * @param gt The {@code GoodsType} to stop importing.
+     * @param gtl The {@code GoodsTypeLabel} to stop importing.
      */
     private void cancelImport(GoodsTypeLabel gtl) {
         this.stopGoodsTypesPanel.remove(gtl);

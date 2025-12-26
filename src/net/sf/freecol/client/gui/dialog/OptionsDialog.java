@@ -157,7 +157,7 @@ public abstract class OptionsDialog extends FreeColPanel {
      * Initialize this dialog.
      * 
      * @param frame The owner frame.
-     * @param c Extra choices to add beyond the default ok and cancel.
+     * @param extraButtons Extra choices to add beyond the default ok and cancel.
      */
     protected void initialize(JFrame frame, List<JButton> extraButtons) {
         this.panel.add(this.optionPanel, "width 100%, height 100%, gap 0 0, pad 0");
