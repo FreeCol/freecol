@@ -3,7 +3,7 @@
 <!-- This file includes targets for building FreeCol,
      the metaserver, distribution packages, running tests
      and creating documentation. -->
-<project name="FreeCol" default="package">
+<project name="FreeCol" default="package" xmlns:jacoco="antlib:org.jacoco.ant">
     <description>
         This file includes targets for building FreeCol,
         the metaserver, distribution packages, running tests
@@ -33,6 +33,10 @@
               value="jars/miglayout-core-5.3.jar"/>
     <property name="cli.jar" value="jars/commons-cli-1.4.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
+    <property name="jacoco.ant.jar" value="${basedir}/test/lib/jacocoant.jar"/>
+    <property name="jacoco.agent.jar" value="${basedir}/test/lib/jacoco-agent.jar"/>
+    <property name="jacoco.exec.file" value="${freecol.build.dir}/jacoco.exec"/>
+    <property name="jacoco.report.dir" value="${freecol.build.dir}/jacoco"/>
 
 
     <path id="libraries.classpath">
@@ -65,6 +69,16 @@
         <path refid="junit.classpath"/>
         <path refid="libraries.classpath" />
     </path>
+    <path id="jacoco.ant.classpath">
+        <pathelement location="${jacoco.ant.jar}"/>
+        <pathelement location="${basedir}/test/lib/jacoco-core.jar"/>
+        <pathelement location="${basedir}/test/lib/jacoco-report.jar"/>
+        <pathelement location="${jacoco.agent.jar}"/>
+        <pathelement location="${basedir}/test/lib/asm.jar"/>
+        <pathelement location="${basedir}/test/lib/asm-commons.jar"/>
+        <pathelement location="${basedir}/test/lib/asm-tree.jar"/>
+        <pathelement location="${basedir}/test/lib/asm-analysis.jar"/>
+    </path>
 
     <condition property="isOsUnixLike">
         <os family="unix" />
@@ -91,6 +105,12 @@
         <taskdef name="jsmoothgen"
                  classname="net.charabia.jsmoothgen.ant.JSmoothGen"
                  classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"/>
+    </target>
+    
+    <target name="define-jacoco">
+        <taskdef uri="antlib:org.jacoco.ant"
+                 resource="org/jacoco/ant/antlib.xml"
+                 classpathref="jacoco.ant.classpath"/>
     </target>
 
     <target name="init" unless="TSTAMP">
@@ -786,6 +806,58 @@
 
         <echo message="For detailed results of the test run see: ${freecol.build.dir}/report/index.html"/>
 
+        <fail if="error.junit" message="Automated Unit Tests failed."/>
+    </target>
+    
+    <target name="coverage" depends="build-unit-tests,define-jacoco"
+            description="Runs all unit tests with JaCoCo coverage">
+        <delete file="${jacoco.exec.file}" />
+        <delete dir="${jacoco.report.dir}" />
+        <mkdir dir="${jacoco.report.dir}"/>
+        <mkdir dir="${freecol.build.dir}/report"/>
+        <mkdir dir="${freecol.build.dir}/report/xml"/>
+
+        <jacoco:coverage destfile="${jacoco.exec.file}"
+                         includes="net.sf.freecol.*"
+                         excludes="net.sf.freecol.tools.*">
+            <junit printsummary="on" errorProperty="error.junit"
+                   failureProperty="error.junit" fork="yes" maxmemory="256M">
+                <classpath refid="test.run.classpath"/>
+                <formatter type="xml" />
+                <test todir="${freecol.build.dir}/report/xml"
+                      name="net.sf.freecol.AllTests" fork="yes"/>
+                <sysproperty key="java.awt.headless" value="true" />
+            </junit>
+        </jacoco:coverage>
+
+        <junitreport>
+            <fileset dir="${freecol.build.dir}/report/xml">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report todir="${freecol.build.dir}/report" />
+        </junitreport>
+
+        <jacoco:report>
+            <executiondata>
+                <file file="${jacoco.exec.file}"/>
+            </executiondata>
+            <structure name="FreeCol">
+                <classfiles>
+                    <fileset dir="${freecol.build.dir}">
+                        <include name="**/*.class"/>
+                    </fileset>
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${freecol.src.dir}">
+                        <include name="**/*.java"/>
+                    </fileset>
+                </sourcefiles>
+            </structure>
+            <html destdir="${jacoco.report.dir}"/>
+            <xml destfile="${jacoco.report.dir}/jacoco.xml"/>
+        </jacoco:report>
+
+        <echo message="Coverage report: ${jacoco.report.dir}/index.html"/>
         <fail if="error.junit" message="Automated Unit Tests failed."/>
     </target>
 
