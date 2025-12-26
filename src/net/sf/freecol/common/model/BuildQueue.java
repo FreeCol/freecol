@@ -65,10 +65,10 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     private final List<T> queue = new ArrayList<>();
 
     /** What to do when an item has been completed. */
-    private CompletionAction completionAction = CompletionAction.REMOVE;
+    private CompletionAction completionAction;
 
     /** The build priority. */
-    private int priority = COLONY_PRIORITY;
+    private int priority;
 
     /** The colony to queue buildables for. */
     private final Colony colony;

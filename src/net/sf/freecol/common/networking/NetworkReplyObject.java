@@ -20,6 +20,8 @@
 package net.sf.freecol.common.networking;
 
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class for storing a network response.  If the response has not been
@@ -27,6 +29,8 @@ import java.util.concurrent.TimeoutException;
  * block until {@link #setResponse} is called.
  */
 public class NetworkReplyObject {
+
+    private static final Logger logger = Logger.getLogger(NetworkReplyObject.class.getName());
 
     private static int ONE_SECOND = 1000; // 1000ms
 
@@ -83,7 +87,10 @@ public class NetworkReplyObject {
             }
             try {
                 wait(ONE_SECOND);
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                logger.log(Level.FINE, "Interrupted while waiting for response.", ie);
+            }
         }
         return this.response;
     }

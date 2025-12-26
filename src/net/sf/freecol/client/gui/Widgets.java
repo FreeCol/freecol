@@ -26,6 +26,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -154,6 +156,8 @@ import net.sf.freecol.common.util.Utils;
  * Moved here so that Canvas is more manageable.
  */
 public final class Widgets {
+
+    private static final Logger logger = Logger.getLogger(Widgets.class.getName());
 
     /** The game client. */
     private final FreeColClient freeColClient;
@@ -325,25 +329,33 @@ public final class Widgets {
             
             int i = 0;
             boolean sameSize = allChoices.size() > 4;
+            StringBuilder layoutBuilder = new StringBuilder(32);
             for (ChoiceItem<T> ci : allChoices) {
                 final JButton button = createButtonFromChoiceItem(api, ci);
                 
-                List<String> layout = new ArrayList<>();
+                layoutBuilder.setLength(0);
+                boolean hasLayout = false;
                 if (i % choiceWrap == 0) {
-                    layout.add("newline, split " + choiceWrap);
+                    layoutBuilder.append("newline, split ").append(choiceWrap);
+                    hasLayout = true;
                 }
                 if (sameSize) {
-                    layout.add("sg");
+                    if (hasLayout) layoutBuilder.append(", ");
+                    layoutBuilder.append("sg");
+                    hasLayout = true;
                 } else {
                     if (ci.isOK()) {
-                        layout.add("tag ok");
+                        if (hasLayout) layoutBuilder.append(", ");
+                        layoutBuilder.append("tag ok");
+                        hasLayout = true;
                     }
                     if (ci.isCancel()) {
-                        layout.add("tag cancel");
+                        if (hasLayout) layoutBuilder.append(", ");
+                        layoutBuilder.append("tag cancel");
+                        hasLayout = true;
                     }
                 }
-                final String layoutStr = layout.stream().reduce((a, b) -> a + ", " + b).orElse(null);
-                content.add(button, layoutStr);
+                content.add(button, hasLayout ? layoutBuilder.toString() : null);
                 i++;
             }
 
@@ -841,7 +853,7 @@ public final class Widgets {
      * @param filters {@code FileFilter}s for suitable files.
      * @return The selected {@code File}.
      */
-    public File showLoadDialog(File directory, FileFilter[] filters) {
+    public File showLoadDialog(File directory, FileFilter... filters) {
         LoadDialog dialog
             = new LoadDialog(this.freeColClient, getFrame(), directory,
                              filters);
@@ -1234,7 +1246,9 @@ public final class Widgets {
         int result = -1;
         try {
             result = Integer.parseInt(resultString);
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+            if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid tribute amount: " + resultString, nfe);
+        }
         
         return (result <= 0 || result > maximum) ? null : result;
     }

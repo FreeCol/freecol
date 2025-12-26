@@ -35,6 +35,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
@@ -164,7 +165,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
         private final FAFile faFile;
 
-        private final ArrayList<ActionListener> actionListeners
+        private final List<ActionListener> actionListeners
             = new ArrayList<>();
 
         private Point[] points = null;
@@ -209,7 +210,8 @@ public final class DeclarationPanel extends FreeColPanel {
                 partNames = newPartNames;
             }
 
-            String first = partNames[0], second = partNames[1];
+            String first = partNames[0];
+            String second = partNames[1];
             String s = join(" ", partNames);
             if (!isTooLarge(s)) return s;
             s = first.charAt(0) + ". " + second;
@@ -240,13 +242,13 @@ public final class DeclarationPanel extends FreeColPanel {
          * @param name The name to be used when making the signature.
          */
         public void initialize(String name) {
-            name = faFile.onlyValidCharacters(name);
-            name = getAbbreviatedName(name);
+            String sanitizedName = faFile.onlyValidCharacters(name);
+            sanitizedName = getAbbreviatedName(sanitizedName);
 
-            points = faFile.getPoints(name);
+            points = faFile.getPoints(sanitizedName);
             counter = 0;
             
-            final Dimension originalSize = faFile.getDimension(name);
+            final Dimension originalSize = faFile.getDimension(sanitizedName);
             final Dimension size = getImageLibrary().scale(originalSize);
             imageBuffer = ImageUtils.createBufferedImage(size.width, size.height);
             setSize(size);

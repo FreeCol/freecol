@@ -245,20 +245,20 @@ public final class CornerMapControls extends MapControls {
                 
                 final int totalWidth = buttonsDimension.width + this.miniMapPanel.getWidth() + this.infoPanel.getWidth();
                 if (totalWidth < newSize.width) {
-                    final Point firstButtonPoint = calculateFirstPosition(newSize, unitButtons, spaceBetweenButtons, buttonsDimension);
-                    layoutUnitButtons(unitButtons, buttonsDimension, firstButtonPoint, spaceBetweenButtons);
+                    final Point firstButtonPoint = calculateFirstPosition(newSize, spaceBetweenButtons, buttonsDimension);
+                    layoutUnitButtons(unitButtons, firstButtonPoint, spaceBetweenButtons);
                 } else {
                     final int numberInTopRow = this.unitButtons.size() / 2;
                     
                     final List<UnitButton> bottomRowButtons = unitButtons.subList(numberInTopRow, unitButtons.size());
                     final Dimension buttonsBottomRowDimension = calculateTotalDimension(bottomRowButtons, spaceBetweenButtons);
-                    final Point firstButtonBottomRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsBottomRowDimension);
-                    layoutUnitButtons(bottomRowButtons,buttonsDimension, firstButtonBottomRowPoint, spaceBetweenButtons);
+                    final Point firstButtonBottomRowPoint = calculateFirstPosition(newSize, spaceBetweenButtons, buttonsBottomRowDimension);
+                    layoutUnitButtons(bottomRowButtons, firstButtonBottomRowPoint, spaceBetweenButtons);
     
                     final List<UnitButton> topRowButtons = unitButtons.subList(0, numberInTopRow);
                     final Dimension buttonsTopRowDimension = calculateTotalDimension(topRowButtons, spaceBetweenButtons);
-                    final Point firstButtonTopRowPoint = calculateFirstPosition(newSize, bottomRowButtons, spaceBetweenButtons, buttonsTopRowDimension);
-                    layoutUnitButtons(topRowButtons, buttonsDimension, new Point(firstButtonTopRowPoint.x, firstButtonBottomRowPoint.y - buttonsTopRowDimension.height - spaceBetweenButtons), spaceBetweenButtons);
+                    final Point firstButtonTopRowPoint = calculateFirstPosition(newSize, spaceBetweenButtons, buttonsTopRowDimension);
+                    layoutUnitButtons(topRowButtons, new Point(firstButtonTopRowPoint.x, firstButtonBottomRowPoint.y - buttonsTopRowDimension.height - spaceBetweenButtons), spaceBetweenButtons);
                 }
             }
         }
@@ -266,7 +266,8 @@ public final class CornerMapControls extends MapControls {
     }
     
     private static Dimension calculateTotalDimension(List<UnitButton> unitButtons, int spaceBetweenButtons) {
-        int width = -spaceBetweenButtons, height = 0;
+        int width = -spaceBetweenButtons;
+        int height = 0;
         for (UnitButton ub : unitButtons) {
             if (ub.isShowing()) continue;
             height = Math.max(height, ub.getHeight());
@@ -275,14 +276,14 @@ public final class CornerMapControls extends MapControls {
         return new Dimension(width, height);
     }
     
-    private Point calculateFirstPosition(Dimension newSize, List<UnitButton> unitButtons, int spaceBetweenButtons, Dimension buttonsDimension) {
+    private Point calculateFirstPosition(Dimension newSize, int spaceBetweenButtons, Dimension buttonsDimension) {
         final int x = this.miniMapPanel.getWidth() + 1
                 + (this.infoPanel.getX() - this.miniMapPanel.getWidth() - buttonsDimension.width) / 2;
         final int y = newSize.height - buttonsDimension.height - spaceBetweenButtons;
         return new Point(x, y);
     }
 
-    private void layoutUnitButtons(List<UnitButton> unitButtons, final Dimension buttonsDimension, Point firstButtonPoint, final int spaceBetweenButtons) {
+    private void layoutUnitButtons(List<UnitButton> unitButtons, Point firstButtonPoint, final int spaceBetweenButtons) {
         int x = firstButtonPoint.x;
         final int y = firstButtonPoint.y;
         

@@ -145,8 +145,8 @@ public class Messages {
     /**
      * Load the message bundle for the given locale
      *
-     * Error messages have to go to System.err as this routine is called
-     * before logging is enabled.
+     * Error messages go to the logger as this routine can run before
+     * logging is configured.
      *
      * @param locale The {@code Locale} to set resources for.
      */
@@ -160,12 +160,16 @@ public class Messages {
                 try (InputStream in = Files.newInputStream(cldr.toPath())) {
                     NumberRules.load(in);
                 } catch (IOException|XMLStreamException e) {
-                    System.err.println("Failed to read CLDR rules: "
-                        + e.getMessage());
+                    if (logger.isLoggable(Level.WARNING)) {
+                        logger.warning("Failed to read CLDR rules: "
+                            + e.getMessage());
+                    }
                 }
             } else {
-                System.err.println("Could not find CLDR rules: "
-                    + cldr.getPath());
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.warning("Could not find CLDR rules: "
+                        + cldr.getPath());
+                }
             }
         }
 
@@ -178,8 +182,10 @@ public class Messages {
             try {
                 loadMessages(Files.newInputStream(f.toPath()));
             } catch (IOException ioe) {
-                System.err.println("Failed to load messages from "
-                    + f.getPath() + ": " + ioe.getMessage());
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.warning("Failed to load messages from "
+                        + f.getPath() + ": " + ioe.getMessage());
+                }
             }
         }
 
@@ -187,19 +193,17 @@ public class Messages {
             = FreeColDirectories.getMessageFileNameList(locale);
         for (FreeColModFile fctf : FreeColRules.getRulesList()) {
             for (String fn : filenames) {
-                InputStream is = null;
-                try {
-                    is = fctf.getInputStream(fn);
+                try (InputStream is = fctf.getInputStream(fn)) {
+                    try {
+                        loadMessages(is);
+                    } catch (IOException ioe) {
+                        if (logger.isLoggable(Level.WARNING)) {
+                            logger.warning("Failed to load rules messages from "
+                                + fn + ": " + ioe.getMessage());
+                        }
+                    }
                 } catch (IOException ioe) {
                     continue; // Expecting failure
-                }
-                try {
-                    loadMessages(is);
-                } catch (IOException ioe) {
-                    System.err.println("Failed to load rules messages from "
-                        + fn + ": " + ioe.getMessage());
-                } finally {
-                    try { is.close(); } catch (IOException x) {}
                 }
             }
         }
@@ -217,7 +221,7 @@ public class Messages {
      */
     public static void loadMessages(InputStream is) throws IOException {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-            String line = null;
+            String line;
             while((line = in.readLine()) != null) {
                 line = line.trim();
                 int index = line.indexOf('#');
@@ -302,6 +306,7 @@ public class Messages {
      * @param languageID An underscore separated language/country/variant tuple.
      * @return The {@code Locale} for the specified language.
      */
+    @SuppressWarnings("deprecation")
     public static Locale getLocale(String languageID) {
         String language, country = "", variant = "";
         StringTokenizer st = new StringTokenizer(languageID, "_", true);
@@ -737,7 +742,7 @@ public class Messages {
                 if (sb.length() >= template.getId().length()) {
                     result = sb.toString().substring(template.getId().length());
                 } else {
-                    logger.warning("incorrect use of template " + template);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("incorrect use of template " + template);
                 }
             }
             break;
@@ -786,8 +791,8 @@ public class Messages {
      * @return a {@code String} value
      */
     private static String replaceChoices(String input, StringTemplate template) {
-        int openChoice = 0;
-        int closeChoice = 0;
+        int openChoice;
+        int closeChoice;
         int highWaterMark = 0;
         StringBuilder result = new StringBuilder();
         while ((openChoice = input.indexOf("{{", highWaterMark)) >= 0) {
@@ -795,19 +800,19 @@ public class Messages {
             closeChoice = findMatchingBracket(input, openChoice + 2);
             if (closeChoice < 0) {
                 // no closing brackets found
-                logger.warning("Mismatched brackets: " + input);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Mismatched brackets: " + input);
                 return result.toString();
             }
             highWaterMark = closeChoice + 2;
             int colonIndex = input.indexOf(':', openChoice + 2);
             if (colonIndex < 0 || colonIndex > closeChoice) {
-                logger.warning("No tag found: " + input);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No tag found: " + input);
                 continue;
             }
             String tag = input.substring(openChoice + 2, colonIndex);
             int pipeIndex = input.indexOf('|', colonIndex + 1);
             if (pipeIndex < 0 || pipeIndex > closeChoice) {
-                logger.warning("No choices found: " + input);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No choices found: " + input);
                 continue;
             }
             String selector = input.substring(colonIndex + 1, pipeIndex);
@@ -820,7 +825,7 @@ public class Messages {
                     StringTemplate replacement
                         = template.getReplacement(selector);
                     if (replacement == null) {
-                        logger.warning("Failed to find replacement for "
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to find replacement for "
                             + selector);
                         continue;
                     } else {
@@ -846,7 +851,7 @@ public class Messages {
                     StringTemplate replacement
                         = template.getReplacement(otherKey);
                     if (replacement == null) {
-                        logger.warning("Failed to find replacement for "
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to find replacement for "
                             + selector + "/" + otherKey);
                         continue;
                     } else if (replacement.getTemplateType() == TemplateType.KEY) {
@@ -858,7 +863,7 @@ public class Messages {
                         } else {
                             keyIndex = otherKey.indexOf(selector, keyIndex);
                             if (keyIndex < 0) {
-                                logger.warning("Failed to find key "
+                                if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to find key "
                                     + selector + "/" + otherKey
                                     + " in replacement " + replacement);
                                 continue;
@@ -867,7 +872,7 @@ public class Messages {
                             }
                         }
                     } else {
-                        logger.warning("Choice substitution for "
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Choice substitution for "
                             + selector + "/" + otherKey
                             + " attempted, but template was " + replacement
                             + " for input " + input);
@@ -877,7 +882,7 @@ public class Messages {
                     otherKey = getChoice(messageBundle.get(otherKey), selector);
                     result.append(otherKey);
                 } else {
-                    logger.warning("Unknown key or untagged choice: '"
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Unknown key or untagged choice: '"
                         + otherKey
                         + "', selector was '" + selector
                         + "', trying 'default' instead");
@@ -938,7 +943,7 @@ public class Messages {
             if (end < 0) {
                 end = input.indexOf("}}", start);
                 if (end < 0) {
-                    logger.warning("Failed to find end of choice for key " + key
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to find end of choice for key " + key
                                    + " in input " + input);
                     return null;
                 }

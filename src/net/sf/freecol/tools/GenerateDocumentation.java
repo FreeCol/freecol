@@ -27,6 +27,8 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -46,6 +48,8 @@ import net.sf.freecol.common.util.Utils;
  * Generate some documentation.
  */
 public class GenerateDocumentation {
+
+    private static final Logger logger = Logger.getLogger(GenerateDocumentation.class.getName());
 
     private static final File STRING_DIRECTORY = new File("data/strings");
     private static final File RESOURCE_DIRECTORY = new File("data/default");
@@ -79,7 +83,7 @@ public class GenerateDocumentation {
     }
 
     private static void readResources() {
-        System.out.println("Processing source file: resources.properties");
+        logger.info("Processing source file: resources.properties");
         File sourceFile = new File(RESOURCE_DIRECTORY, "resources.properties");
         try (
              Reader reader = Utils.getFileUTF8Reader(sourceFile);
@@ -96,7 +100,7 @@ public class GenerateDocumentation {
                 line = bufferedReader.readLine();
             }
         } catch (IOException ioe) {
-            System.err.println("Error reading resources: " + ioe);
+            logger.log(Level.SEVERE, "Error reading resources", ioe);
         }
     }
 
@@ -107,7 +111,7 @@ public class GenerateDocumentation {
 
         for (String name : sourceFiles) {
 
-            System.out.println("Processing source file: " + name);
+            logger.info("Processing source file: " + name);
 
             String languageCode = name.substring(15, name.length() - 11);
             if (languageCode.isEmpty()) {
@@ -171,7 +175,7 @@ public class GenerateDocumentation {
     }
     */
     
-    private static void generateDocumentation(String[] languages) {
+    private static void generateDocumentation(String... languages) {
         for (String name : sourceFiles) {
 
             String languageCode = name.substring(15, name.length() - 11);
@@ -180,7 +184,7 @@ public class GenerateDocumentation {
             } else if ('_' == languageCode.charAt(0)) {
                 languageCode = languageCode.substring(1);
                 if ("qqq".equals(languageCode)) {
-                    System.out.println("Skipping language code 'qqq'");
+                    logger.info("Skipping language code 'qqq'");
                     continue;
                 }
             } else {
@@ -189,7 +193,7 @@ public class GenerateDocumentation {
             }
             if (languages.length == 0
                     || Arrays.binarySearch(languages, languageCode) >= 0) {
-                System.out.println("Generating localized documentation for language code "
+                if (logger.isLoggable(Level.INFO)) logger.info("Generating localized documentation for language code "
                                            + languageCode);
 
                 Messages.loadMessageBundle(Messages.getLocale(languageCode));
@@ -202,8 +206,8 @@ public class GenerateDocumentation {
                     try {
                         stylesheet = factory.newTransformer(xsl);
                     } catch (TransformerException tce) {
-                        System.err.println("Problem with " + XSL + " at: "
-                            + tce.getLocationAsString() + '\n' + tce);
+                        if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Problem with " + XSL + " at: "
+                            + tce.getLocationAsString(), tce);
                         continue;
                     }
 
@@ -213,7 +217,7 @@ public class GenerateDocumentation {
                     stylesheet.transform(request, response);
                 }
                 catch (TransformerException e) {
-                    System.err.println("Transformation error: " + e);
+                    logger.log(Level.SEVERE, "Transformation error", e);
                 }
             }
         }

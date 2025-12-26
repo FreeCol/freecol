@@ -97,7 +97,7 @@ public class DemandTributeMessage extends AttributeMessage {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (unit.isArmed()
@@ -111,7 +111,7 @@ public class DemandTributeMessage extends AttributeMessage {
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

@@ -325,7 +325,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             } catch (UnsupportedFlavorException e) {
                 logger.log(Level.WARNING, "Drag&drop failed.", e);
                 return false;
-            } catch (RuntimeException e) {
+            } catch (IllegalStateException e) {
                 logger.log(Level.WARNING, "Drag&drop failed.", e);
                 throw e;
             }
@@ -657,8 +657,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * Add any stops selected in the destination selector.
      */
     private void addSelectedStops() {
-        int startIndex = -1;
-        int endIndex = -1;
+        int startIndex;
+        int endIndex;
         int sel = this.destinationSelector.getSelectedIndex();
         if (sel == 0) { // All colonies + Europe
             startIndex = 1;

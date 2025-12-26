@@ -156,7 +156,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             return;
         }
         
-        final int x = e.getX(), y = e.getY();
+        final int x = e.getX();
+        final int y = e.getY();
 
         final Dimension size = getSize();
         final Point focusPoint = getGUI().getFocusMapPoint();
@@ -315,7 +316,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                            RenderingHints.VALUE_RENDER_QUALITY);
 
         /* Fill the rectangle with background color */
-        final int minimapWidth = size.width, minimapHeight = size.height;
+        final int minimapWidth = size.width;
+        final int minimapHeight = size.height;
         g.setColor(ImageLibrary.getMinimapBackgroundColor());
         g.fillRect(0, 0, minimapWidth, minimapHeight);
 
@@ -415,7 +417,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         final int halfWidth = tileSize / 2;
         final int halfHeight = tileSize / 4;
         
-        int xt0 = 0, yt0 = 0;
+        int xt0 = 0;
+        int yt0 = 0;
         for (Tile t : tiles) {
             final int x = t.getX();
             final int y = t.getY();
@@ -423,7 +426,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 + (y&1) * halfWidth;
             final int yt = (y-y0) * halfHeight;
             g2d.translate(xt - xt0, yt - yt0);
-            xt0 = xt; yt0 = yt;
+            xt0 = xt;
+            yt0 = yt;
 
             c.render(g2d, t);
         }
@@ -490,6 +494,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     /**
      * A callback for rendering a single tile.
      */
+    @FunctionalInterface
     private interface TileRenderingCallback {
         
         /**

@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -342,7 +343,8 @@ public class ColonyPlan {
                 int n = 0, idx = produce.indexOf(g);
                 for (GoodsType type = g.getInputType(); type != null;
                      type = type.getInputType()) {
-                    if ((wls = suppressed.get(type)) == null) break;
+                    wls = suppressed.get(type);
+                    if (wls == null) break;
                     if (colony.getGoodsCount(type)
                         >= GoodsContainer.CARGO_SIZE/2) break;
                     n += wls.size();
@@ -472,7 +474,7 @@ public class ColonyPlan {
             } else if (g.isFarmed()) {
                 otherRawGoodsTypes.add(g);
             } else { // Not interested in this goods type.  Should not happen.
-                logger.warning("Ignoring goods type " + g
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Ignoring goods type " + g
                     + " at " + colony.getName());
                 production.remove(g);
             }
@@ -612,12 +614,10 @@ public class ColonyPlan {
             buildPlans.add(new BuildPlan(type, weight, support));
             return true;
         }
-        if (bp.weight * bp.support < weight * support) {
-            bp.weight = weight;
-            bp.support = support;
-            return true;
-        }
-        return false;
+        if (bp.weight * bp.support >= weight * support) return false;
+        bp.weight = weight;
+        bp.support = support;
+        return true;
     }
 
     /**
@@ -778,7 +778,7 @@ public class ColonyPlan {
             }
 
             if (!expectFail && findBuildPlan(type) == null) {
-                logger.warning("No building priority found for: " + type);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No building priority found for: " + type);
             }
         }
 
@@ -1098,7 +1098,7 @@ public class ColonyPlan {
      * @param colony The {@code Colony} storing the equipment.
      * @return True if the unit was equipped.
      */
-    private static boolean fullEquipUnit(Specification spec, Unit unit, Role role, Colony colony) {
+    private static boolean fullEquipUnit(Unit unit, Role role, Colony colony) {
         return colony.equipForRole(unit, role, role.getMaximumCount());
     }
 
@@ -1155,14 +1155,14 @@ public class ColonyPlan {
                 Role role = outdoorRole;
                 if (role == null) {
                     for (Role r : u.getSortedMilitaryRoles()) {
-                        if (u.getType() == r.getExpertUnit() && fullEquipUnit(spec(), u, r, col)) {
+                        if (u.getType() == r.getExpertUnit() && fullEquipUnit(u, r, col)) {
                             workers.remove(u);
                             lb.add(u.getId(), "(", u.getType().getSuffix(),
                                 ") -> ", r.getSuffix(), "\n");
                             break;
                         }
                     }
-                } else if (u.getType() == role.getExpertUnit() && fullEquipUnit(spec(), u, role, col)) {
+                } else if (u.getType() == role.getExpertUnit() && fullEquipUnit(u, role, col)) {
                     workers.remove(u);
                     lb.add(u.getId(), "(", u.getType().getSuffix(),
                         ") -> ", role.getSuffix(), "\n");
@@ -1194,7 +1194,7 @@ public class ColonyPlan {
                 continue;
             }
             for (Role role : u.getSortedMilitaryRoles()) {
-                if (role != null && fullEquipUnit(spec(), u, role, col)) { 
+                if (role != null && fullEquipUnit(u, role, col)) { 
                     workers.remove(u);
                     lb.add(u.getId(), "(", u.getType().getSuffix(), ") -> ",
                             u.getRoleSuffix(), "\n");
@@ -1221,9 +1221,8 @@ public class ColonyPlan {
                 // Try to produce something.
                 wlps = workPlans;
                 while (!produce.isEmpty()) {
-                    if ((wlp = findPlan(produce.get(0), workPlans)) != null) {
-                        break; // Found a plan to try.
-                    }
+                    wlp = findPlan(produce.get(0), workPlans);
+                    if (wlp != null) break; // Found a plan to try.
                     produce.remove(0); // Can not produce this goods type
                 }
             }
@@ -1246,7 +1245,6 @@ public class ColonyPlan {
                 String err = null;
                 goodsType = wlp.getGoodsType();
                 wl = col.getCorresponding(wlp.getWorkLocation());
-                best = null;
                 lb.add("    ", LogBuilder.wide(2, col.getUnitCount()),
                        ": ", LogBuilder.wide(-15, goodsType.getSuffix()),
                        "@", LogBuilder.wide(25, locationDescription(wl)),
@@ -1256,8 +1254,9 @@ public class ColonyPlan {
                     err = "can not be worked";
                 } else if (wl.isFull()) {
                     err = "full";
-                } else if ((best = ColonyPlan.getBestWorker(wl, goodsType,
-                                                            workers)) == null) {
+                }
+                best = ColonyPlan.getBestWorker(wl, goodsType, workers);
+                if (best == null) {
                     err = "no worker found";
                 }
                 if (err != null) {
@@ -1427,7 +1426,9 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
                 expertIterator.remove();
-            } else if ((other = u1.trySwapExpert(nonExperts)) != null) {
+            } else {
+                other = u1.trySwapExpert(nonExperts);
+                if (other == null) continue;
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
                 expertIterator.remove();
@@ -1450,7 +1451,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         for (Unit u : sort(workers, soldierComparator)) {
             if (u.getSkillLevel() > 0) continue;
             for (Role role : u.getSortedMilitaryRoles()) {
-                if (fullEquipUnit(spec(), u, role, col)) {
+                if (fullEquipUnit(u, role, col)) {
                     lb.add("    ", u.getId(), "(", u.getType().getSuffix(),
                            ") -> ", u.getRoleSuffix(), "\n");
                     workers.remove(u);
@@ -1459,7 +1460,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             }
         }
         for (Unit u : transform(col.getUnits(), u -> !u.hasDefaultRole())) {
-            logger.warning("assignWorkers bogus role for " + u);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("assignWorkers bogus role for " + u);
             u.changeRole(spec().getDefaultRole(), 0);
         }
 

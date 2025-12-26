@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Tile;
  * 
  * Assumes perfect conditions like all bonus effect (SoL 100%, Henry Hudson etc)
  */
+@FunctionalInterface
 public interface ColonyPlanner {
 
     /**

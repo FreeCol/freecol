@@ -49,6 +49,7 @@ public class MiniMapZoomOutAction extends MapboardAction {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param b A boolean.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public MiniMapZoomOutAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");
 

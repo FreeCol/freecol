@@ -121,16 +121,17 @@ public final class Cargo {
             // Get the path to the destination, possibly allowing fallback
             // to a destination that at least improves matters.
             PathNode deliver = t.getDeliveryPath(carrier, tdst);
-            fallback = false;
+            boolean isFallback = false;
             if (deliver == null && allowFallback) {
                 deliver = t.getIntermediatePath(carrier, tdst);
-                fallback = true;
+                isFallback = deliver != null;
             }
             if (deliver == null) {
                 return "no-deliver " + t
                     + "/" + carrier.toShortString()
                     + " -> " + tdst.toShortString();
             }
+            fallback = isFallback;
 
             // Where is the transportable collected?  At the first
             // path node where it is on the carrier.
@@ -153,11 +154,13 @@ public final class Cargo {
             // Can the carrier reach the pickup point?  If already
             // carrying this is obviously moot.
             PathNode collect = null;
-            if (!carrying
-                && (collect = carrier.findPath(this.cwait)) == null) {
-                return "no-collect " + t
-                    + "/" + carrier.toShortString()
-                    + " at " + this.cwait.toShortString();
+            if (!carrying) {
+                collect = carrier.findPath(this.cwait);
+                if (collect == null) {
+                    return "no-collect " + t
+                        + "/" + carrier.toShortString()
+                        + " at " + this.cwait.toShortString();
+                }
             }
                 
             // Where is the transportable dropped?  At the drop node,

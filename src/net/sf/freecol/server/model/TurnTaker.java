@@ -28,6 +28,7 @@ import net.sf.freecol.common.networking.ChangeSet;
 /**
  * Interface for server-side objects which need to update every turn.
  */
+@FunctionalInterface
 public interface TurnTaker {
 
     /**

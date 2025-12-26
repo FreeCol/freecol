@@ -55,8 +55,10 @@ public abstract class MapControls extends FreeColClientHolder {
     protected final MiniMap miniMap;
 
     /** Special purpose buttons for the mini map. */
-    protected final UnitButton miniMapToggleBorders,
-        miniMapToggleFogOfWarButton, miniMapZoomOutButton, miniMapZoomInButton;
+    protected final UnitButton miniMapToggleBorders;
+    protected final UnitButton miniMapToggleFogOfWarButton;
+    protected final UnitButton miniMapZoomOutButton;
+    protected final UnitButton miniMapZoomInButton;
 
     /** The buttons to control unit actions. */
     protected final List<UnitButton> unitButtons = new ArrayList<>();

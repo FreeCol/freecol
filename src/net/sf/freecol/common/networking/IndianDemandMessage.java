@@ -162,7 +162,7 @@ public class IndianDemandMessage extends AttributeMessage {
                         + serverPlayer.getId());
                 }
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

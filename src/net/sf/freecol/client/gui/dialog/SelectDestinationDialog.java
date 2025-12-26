@@ -86,6 +86,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -94,7 +95,6 @@ import net.sf.freecol.common.util.LogBuilder;
 public final class SelectDestinationDialog extends DeprecatedFreeColDialog<Location>
     implements ListSelectionListener {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectDestinationDialog.class.getName());
 
 
@@ -107,6 +107,7 @@ public final class SelectDestinationDialog extends DeprecatedFreeColDialog<Locat
         /** Basic destination comparator, that just uses the name field. */
         private static Comparator<Destination> nameComparator
             = new Comparator<Destination>() {
+                    @Override
                     public int compare(Destination d1, Destination d2) {
                         if (!(d1.location instanceof Settlement)) return -1;
                         if (!(d2.location instanceof Settlement)) return 1;
@@ -495,7 +496,7 @@ public final class SelectDestinationDialog extends DeprecatedFreeColDialog<Locat
             Settlement s = e.getKey().getTile().getSettlement();
             PathNode p = e.getValue();
             if (s == null) {
-                logger.warning("BR#3149 null settlement: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("BR#3149 null settlement: "
                     + Messages.message(e.getKey().getLocationLabel())
                     + " path=" + p.fullPathToString());
                 return null;

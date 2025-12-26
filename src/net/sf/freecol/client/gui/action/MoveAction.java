@@ -58,6 +58,7 @@ public class MoveAction extends MapboardAction {
      * @param direction The {@code Direction} to move in.
      * @param secondary a {@code boolean} value
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public MoveAction(FreeColClient freeColClient, Direction direction,
                       boolean secondary) {
         super(freeColClient, id + direction + ".secondary");

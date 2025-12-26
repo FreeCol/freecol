@@ -90,6 +90,7 @@ public final class Specification implements OptionContainer {
         = new Class[] { String.class, Specification.class };
     
     // Special reader classes for spec objects
+    @FunctionalInterface
     private interface ChildReader {
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
     }
@@ -166,7 +167,7 @@ public final class Specification implements OptionContainer {
                 Specification.this.addOptionGroup(group, recursive);
 
             } else {
-                logger.warning(OptionGroup.TAG + " expected in OptionReader"
+                if (logger.isLoggable(Level.WARNING)) logger.warning(OptionGroup.TAG + " expected in OptionReader"
                     + ", not: " + tag);
                 xr.nextTag();
             }
@@ -210,14 +211,14 @@ public final class Specification implements OptionContainer {
                 final String tag = xr.getLocalName();
                 String id = xr.readId();
                 if (id == null) {
-                    logger.warning("Null identifier, tag: " + tag);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Null identifier, tag: " + tag);
 
                 } else if (FreeColSpecObjectType.DELETE_TAG.equals(tag)) {
                     FreeColSpecObjectType object = removeType(id);
                     if (object != null) {
                         result.remove(object);
                     } else {
-                        logger.warning("Delete " + id + " failed");
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Delete " + id + " failed");
                     }
 
                 } else {
@@ -603,24 +604,25 @@ public final class Specification implements OptionContainer {
         initialized = false;
         boolean loadedMod = false;
         for (FreeColModFile mod : mods) {
-            InputStream sis = null;
+            InputStream sis;
             try {
-                if ((sis = mod.getSpecificationInputStream()) != null) {
+                sis = mod.getSpecificationInputStream();
+                if (sis != null) {
                     // Some mods are resource only
                     load(sis);
                 }
                 loadedMod = true;
-                logger.info("Loaded mod " + mod.getId());
+                if (logger.isLoggable(Level.INFO)) logger.info("Loaded mod " + mod.getId());
             } catch (FreeColUserMessageException e) {
                 throw e;
             } catch (IOException|XMLStreamException ex) {
-                logger.log(Level.WARNING, "Read error in mod " + mod.getId(), ex);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Read error in mod " + mod.getId(), ex);
                 throw new FreeColUserMessageException(
                     StringTemplate.template("error.mod").add("%id%", mod.getId()).add("%name%", Messages.getName("mod." + mod.getId())),
                     ex
                 );
-            } catch (RuntimeException rte) {
-                logger.log(Level.WARNING, "Parse error in mod " + mod.getId(), rte);
+            } catch (IllegalArgumentException rte) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Parse error in mod " + mod.getId(), rte);
                 throw new FreeColUserMessageException(
                     StringTemplate.template("error.mod").add("%id%", mod.getId()).add("%name%", Messages.getName("mod." + mod.getId())),
                     rte
@@ -676,7 +678,7 @@ public final class Specification implements OptionContainer {
      *     be cleaned.
      */
     public void clean(String why) {
-        logger.finest("Cleaning up specification following " + why + ".");
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Cleaning up specification following " + why + ".");
 
         // Fix up the GoodsType derived attributes.  Several GoodsType
         // predicates are likely to fail until this is done.
@@ -814,7 +816,7 @@ public final class Specification implements OptionContainer {
             }
         }
         if (badAges) {
-            logger.warning("Bad ages: " + agesValue);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bad ages: " + agesValue);
             ages[0] = 1;   // First turn
             ages[1] = Turn.yearToTurn(1600);
             ages[2] = Turn.yearToTurn(1700);
@@ -856,7 +858,7 @@ public final class Specification implements OptionContainer {
             .append(", ").append(unitChangeTypeList.size()).append(" UnitChangeTypes")
             .append(", ").append(unitTypeList.size()).append(" UnitTypes")
             .append(" read.");
-        logger.info(sb.toString());
+        if (logger.isLoggable(Level.INFO)) logger.info(sb.toString());
     }
 
 
@@ -1026,7 +1028,9 @@ public final class Specification implements OptionContainer {
                 if (cmp != 0) return cmp;
                 return Integer.compare(Integer.parseInt(sv[1]),
                                        Integer.parseInt(so[1]));
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+                if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid version: " + version + " vs " + other, nfe);
+            }
         }
         throw new RuntimeException("Bad version: " + other);
     }
@@ -2065,7 +2069,7 @@ public final class Specification implements OptionContainer {
             return Introspector.instantiate(returnClass, newTypeClasses,
                                             new Object[] { id, this });
         } catch (Introspector.IntrospectorException ie) {
-            logger.log(Level.WARNING, "newType(" + id
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "newType(" + id
                 + "," + returnClass.getName() + ") failed", ie);
         }
         return null;
@@ -2168,11 +2172,11 @@ public final class Specification implements OptionContainer {
             // Drop from actual allOptions map
             dropOptions(ao, allOptions.values());
             if (ao instanceof OptionGroup) allOptionGroups.remove(ao.getId());
-            logger.warning("Dropping orphan option: " + ao);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Dropping orphan option: " + ao);
         }
         for (AbstractOption<?> ao : allG) {
             allOptionGroups.remove(ao.getId());
-            logger.warning("Dropping orphan option group: " + ao);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Dropping orphan option group: " + ao);
         }
         return !allO.isEmpty() || !allG.isEmpty();
     }
@@ -2217,7 +2221,7 @@ public final class Specification implements OptionContainer {
             return false;
         }
 
-        logger.info("Loading role backward compatibility fragment: "
+        if (logger.isLoggable(Level.INFO)) logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: "
             + transform(getRoles(), alwaysTrue(), Role::getId,
                         Collectors.joining(" ")));
@@ -2245,7 +2249,7 @@ public final class Specification implements OptionContainer {
             unitChangeTypeList.add(enter);
         }
 
-        logger.info("Loading unit-changes backward compatibility fragment: "
+        if (logger.isLoggable(Level.INFO)) logger.info("Loading unit-changes backward compatibility fragment: "
             + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
             + transform(getUnitChangeTypeList(), alwaysTrue(),
                 UnitChangeType::getId, Collectors.joining(" ")));
@@ -3123,7 +3127,7 @@ public final class Specification implements OptionContainer {
                 new Class[] { String.class, Specification.class },
                 new Object[] { id, this });
         } catch (Introspector.IntrospectorException ie) {
-            logger.warning("Failed to make " + returnClass.getName()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to make " + returnClass.getName()
                 + ": " + id);
             return false;
         }
@@ -3252,7 +3256,7 @@ public final class Specification implements OptionContainer {
             version = xr.getAttribute(VERSION_TAG, (String)null);
         }
 
-        logger.fine("Reading specification " + newId
+        if (logger.isLoggable(Level.FINE)) logger.fine("Reading specification " + newId
             + " difficulty=" + difficultyLevel
             + " version=" + version);
 
@@ -3263,7 +3267,7 @@ public final class Specification implements OptionContainer {
                 FreeColModFile parent = FreeColRules.getFreeColRulesFile(parentId);
                 try {
                     load(parent.getSpecificationInputStream());
-                } catch (RuntimeException|XMLStreamException e) {
+                } catch (IllegalArgumentException | XMLStreamException e) {
                     throw new FreeColUserMessageException(
                         StringTemplate.template("error.mod").add("%id%", parent.getId()).add("%name%", Messages.getName("mod." + parent.getId())),
                         e
@@ -3285,7 +3289,7 @@ public final class Specification implements OptionContainer {
             // end @compat 0.11.0
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
-                logger.warning("No reader found for: " + childName);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No reader found for: " + childName);
             } else {
                 reader.readChildren(xr);
             }

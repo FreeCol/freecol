@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.OptionGroup;
+import java.util.logging.Level;
 
 
 /**
@@ -302,7 +303,7 @@ public abstract class OptionsDialog extends FreeColPanel {
         } else if (CANCEL.equals(command)) {
             cancelOptionsDialog();
         } else {
-            logger.warning("Bad event: " + command);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bad event: " + command);
         }
     }
 }

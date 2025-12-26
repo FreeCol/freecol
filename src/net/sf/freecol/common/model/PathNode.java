@@ -52,13 +52,13 @@ public class PathNode {
     private int turns;
 
     /** Whether the unit traversing this path is on a carrier at this node. */
-    private boolean onCarrier = false;
+    private boolean onCarrier;
 
     /** The next node in the path. */
-    public PathNode next = null;
+    public PathNode next;
 
     /** The previous node in the path. */
-    public PathNode previous = null;
+    public PathNode previous;
 
 
     /**
@@ -320,11 +320,15 @@ public class PathNode {
      * @return True if there was a non-carrier move in the last turn.
      */
     public boolean embarkedThisTurn(int turns) {
+        boolean found = false;
         for (PathNode p = this; p != null; p = p.previous) {
-            if (p.getTurns() < turns) return false;
-            if (!p.isOnCarrier()) return true;
+            if (p.getTurns() < turns) break;
+            if (!p.isOnCarrier()) {
+                found = true;
+                break;
+            }
         }
-        return false;
+        return found;
     }
 
     /**

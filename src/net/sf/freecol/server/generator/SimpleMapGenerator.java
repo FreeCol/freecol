@@ -76,6 +76,7 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
+import java.util.logging.Level;
 
 
 /**
@@ -344,7 +345,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         .filter(t -> settlementTiles.contains(t))
                         .collect(Collectors.toCollection(LinkedHashSet::new));
                 if (settlementTilesForNation.isEmpty()) {
-                    logger.warning("No settlements for nationType=" + player.getNationId());
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("No settlements for nationType=" + player.getNationId());
                 }
                 designatedArea.put(player, settlementTilesForNation);
             }
@@ -361,7 +362,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     .collect(Collectors.toList());
                         
             if (otherRegions.isEmpty()) {
-                logger.warning("No area or regions found for nationType=" + player.getNationId());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No area or regions found for nationType=" + player.getNationId());
                 continue;
             }
             
@@ -370,7 +371,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             
             if (settlementTilesForNation.isEmpty()) {
-                logger.warning("No settlements in region for nationType=" + player.getNationId());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No settlements in region for nationType=" + player.getNationId());
             }
             designatedArea.put(player, settlementTilesForNation);
         }

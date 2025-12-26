@@ -53,7 +53,7 @@ public final class DisplayTileTextAction extends SelectableOptionAction {
         KeyEvent.VK_R
     };
 
-    private DisplayText display = null;
+    private DisplayText display;
 
 
     /**

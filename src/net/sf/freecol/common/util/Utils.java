@@ -154,7 +154,7 @@ public class Utils {
             InputStream fis = Files.newInputStream(file.toPath());
             return new InputStreamReader(fis, StandardCharsets.UTF_8);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "No input stream for " + file.getPath(),
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "No input stream for " + file.getPath(),
                        ioe);
         }
         return null;
@@ -174,7 +174,7 @@ public class Utils {
             try {
                 reader.read(cb);
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Read failed for " + file.getPath(),
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Read failed for " + file.getPath(),
                            ioe);
             }
             cb.flip();
@@ -212,7 +212,7 @@ public class Utils {
                 : Files.newOutputStream(file.toPath());
             return getUTF8Writer(fos);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "No output stream for " + file.getName(),
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "No output stream for " + file.getName(),
                        ioe);
         }
         return null;
@@ -277,10 +277,10 @@ public class Utils {
     public static void deleteFile(File file) {
         try {
             if (!file.delete()) {
-                logger.warning("Failed to delete: " + file.getPath());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to delete: " + file.getPath());
             }
         } catch (SecurityException ex) {
-            logger.log(Level.WARNING, "Exception deleting: "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Exception deleting: "
                 + file.getPath(), ex);
         }
     }
@@ -380,13 +380,17 @@ public class Utils {
     public static GraphicsDevice getGoodGraphicsDevice() {
         try {
             return MouseInfo.getPointerInfo().getDevice();
-        } catch (HeadlessException he) {}
+        } catch (HeadlessException he) {
+            logger.log(Level.FINE, "Headless environment, no pointer device.", he);
+        }
 
         try {
             final GraphicsEnvironment lge
                 = GraphicsEnvironment.getLocalGraphicsEnvironment();
             return lge.getDefaultScreenDevice();
-        } catch (HeadlessException he) {}
+        } catch (HeadlessException he) {
+            logger.log(Level.FINE, "Headless environment, no screen device.", he);
+        }
         return null;
     }
     

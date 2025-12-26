@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.label;
 
 
+@FunctionalInterface
 public interface Draggable {
 
     /**

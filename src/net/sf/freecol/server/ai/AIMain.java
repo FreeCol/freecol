@@ -240,7 +240,9 @@ public class AIMain extends FreeColObject
         synchronized (aiObjects) {
             result = aiObjects.remove(id) != null;
         }
-        if (result) logger.finest("Removed AI object: " + id);
+        if (result) {
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Removed AI object: " + id);
+        }
         return result;
     }
 
@@ -425,7 +427,7 @@ public class AIMain extends FreeColObject
                 // No point doing anything with the object yet, as we
                 // need the player type before we can create the
                 // right class of AI player.
-                logger.info("Temporarily ignoring incomplete AI player: "
+                if (logger.isLoggable(Level.INFO)) logger.info("Temporarily ignoring incomplete AI player: "
                     + fcgo.getId());
             } else if (player.isIndian()) {
                 aio = new NativeAIPlayer(this, player);
@@ -469,7 +471,7 @@ public class AIMain extends FreeColObject
                              Player newOwner) {
         AIObject ao = getAIObject(source);
         if (ao == null) return;
-        logger.finest("Owner changed for " + source.getId()
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Owner changed for " + source.getId()
             + " with AI object: " + ao);
 
         AIPlayer oldAIOwner = getAIPlayer(oldOwner);
@@ -546,13 +548,13 @@ public class AIMain extends FreeColObject
 
             try {
                 if (aio.getId() == null) {
-                    logger.warning("Null AI identifier for: "
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Null AI identifier for: "
                         + aio.getClass().getName());
                 } else {
                     aio.toXML(xw);
                 }
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to write AI object: " + aio,
+            } catch (XMLStreamException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to write AI object: " + aio,
                     e);
             }
         }
@@ -592,11 +594,16 @@ public class AIMain extends FreeColObject
             // with the call to setInitialized().
             AIObject aio = null;
             boolean indirect = false;
-            if (oid != null && (aio = getAIObject(oid)) != null) {
-                aio.readFromXML(xr);
-                aio.setInitialized();
+            if (oid != null) {
+                aio = getAIObject(oid);
+                if (aio != null) {
+                    aio.readFromXML(xr);
+                    aio.setInitialized();
+                    return;
+                }
+            }
 
-            } else if (AIColony.TAG.equals(tag)) {
+            if (AIColony.TAG.equals(tag)) {
                 aio = new AIColony(this, xr);
 
             } else if (AIGoods.TAG.equals(tag)) {
@@ -637,7 +644,9 @@ public class AIMain extends FreeColObject
                 aio = new WorkerWish(this, xr);
             
             } else {
-                System.err.println("AT " + tag + " with " + oid);
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.warning("AT " + tag + " with " + oid);
+                }
                 indirect = true;
                 super.readChild(xr);
             }
@@ -647,12 +656,12 @@ public class AIMain extends FreeColObject
             }
         } catch (XMLStreamException xse) { // Expected
             throw xse;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             // Nothing above apparently tries to throw an exception
             // that can end up here, but that keeps changing and
             // this is a great place to resynchronize the reader
             // so keep this in place.
-            logger.log(Level.WARNING, "Exception reading AIObject: "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Exception reading AIObject: "
                        + tag + ", id=" + oid, e);
             final String mainTag = TAG;
             while (xr.moreTags() || !(xr.atTag(tag) || xr.atTag(mainTag)));

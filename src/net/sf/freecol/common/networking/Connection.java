@@ -401,7 +401,7 @@ public class Connection implements Closeable {
         if (line == null) return DisconnectMessage.TAG;
         try {
             this.xr = new FreeColXMLReader(new StringReader(line));
-        } catch (Exception ex) {
+        } catch (XMLStreamException ex) {
             return DisconnectMessage.TAG;
         }
         this.xr.nextTag();
@@ -506,7 +506,9 @@ public class Connection implements Closeable {
                                         END_OF_STREAM_ARRAY.length);
                 this.lw.flush();
             }
-        } catch (Exception ex) {}
+        } catch (XMLStreamException | RuntimeException ex) {
+            logger.log(Level.FINE, "Failed to log message.", ex);
+        }
     }
     
 
@@ -588,6 +590,7 @@ public class Connection implements Closeable {
     /**
      * Close this connection.
      */
+    @Override
     public void close() {
         synchronized (receivingThreadLock) {
             if (this.receivingThread != null) {
@@ -603,7 +606,7 @@ public class Connection implements Closeable {
         closeInputStream();
         closeOutputStream();
         
-        logger.fine("Connection closed for " + this.name);
+        if (logger.isLoggable(Level.FINE)) logger.fine("Connection closed for " + this.name);
     }
 
 

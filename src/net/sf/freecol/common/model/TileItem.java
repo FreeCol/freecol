@@ -57,6 +57,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
      * @param game The enclosing {@code Game}.
      * @param xr The input stream containing the XML.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public TileItem(Game game, FreeColXMLReader xr) {
         super(game, null);
     }

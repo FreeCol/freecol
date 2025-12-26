@@ -100,10 +100,12 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
              */
             content.setFocusable(true);
             initialFocusComponent.addHierarchyListener(new HierarchyListener() {
+                @Override
                 public void hierarchyChanged(HierarchyEvent e) {
                     final Component c = e.getComponent();
                     if (c.isShowing() && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                         SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 content.setFocusable(false);
                                 c.requestFocus();
@@ -155,6 +157,8 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         final String cancelLabel = Messages.message("cancel");
         Object[] buttons = getButtons();
         List<JButton> newButtons = new ArrayList<>(buttons.length);
+        int okIndex = -1;
+        int cancelIndex = -1;
 
         int maxWidth = 0, maxHeight = 0;
         for (int i = 0; i < buttons.length; i++) {
@@ -166,8 +170,8 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 b = (label == null || label.isEmpty()) ? new JButton(icon)
                     : new JButton(label, icon);
                 b.setName("OptionPane.button." + label);
-                if (ci.isOK()) this.okIndex = i;
-                else if (ci.isCancel()) this.cancelIndex = i;
+                if (ci.isOK()) okIndex = i;
+                else if (ci.isCancel()) cancelIndex = i;
             } else if (buttons[i] instanceof Icon) {
                 b = new JButton((Icon)buttons[i]);
                 b.setName("OptionPane.button.withIcon");
@@ -175,8 +179,8 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 String label = buttons[i].toString();
                 b = new JButton(label);
                 b.setName("OptionPane.button." + label);
-                if (okLabel.equals(label)) this.okIndex = i;
-                else if (cancelLabel.equals(label)) this.cancelIndex = i;
+                if (okLabel.equals(label)) okIndex = i;
+                else if (cancelLabel.equals(label)) cancelIndex = i;
             }
             maxWidth = Math.max(maxWidth, b.getMinimumSize().width);
             maxHeight = Math.max(maxHeight, b.getMinimumSize().height);
@@ -184,6 +188,8 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
             b.addActionListener(buttonListener);
             newButtons.add(b);
         }
+        this.okIndex = okIndex;
+        this.cancelIndex = cancelIndex;
         if (maxWidth > 0) {
             Dimension dimension = new Dimension(maxWidth, maxHeight);
             for (int i = 0; i < buttons.length; i++) {

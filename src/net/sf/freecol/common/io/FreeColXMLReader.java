@@ -131,7 +131,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         try {
             xsr = xif.createXMLStreamReader(bis, "UTF-8");
             setParent(xsr);
-        } catch (Exception ex) {
+        } catch (XMLStreamException | IllegalArgumentException ex) {
             throw new XMLStreamException("Stream reader fail", ex);
         }
         this.inputStream = bis;
@@ -361,17 +361,19 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public int nextTag() throws XMLStreamException {
         int tag = super.nextTag();
         if (tracing) {
-            switch (tag) {
-            case XMLStreamConstants.START_ELEMENT:
-                System.err.println("[" + getLocalName());
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                System.err.println(getLocalName() + "]");
-                break;
-            default:
-                String val = tagStrings.get(tag);
-                System.err.println((val == null) ? "Weird tag: " + tag : val);
-                break;
+            if (logger.isLoggable(Level.FINE)) {
+                switch (tag) {
+                case XMLStreamConstants.START_ELEMENT:
+                    logger.fine("[" + getLocalName());
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    logger.fine(getLocalName() + "]");
+                    break;
+                default:
+                    String val = tagStrings.get(tag);
+                    logger.fine((val == null) ? "Weird tag: " + tag : val);
+                    break;
+                }
             }
         }
         return tag;
@@ -524,7 +526,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Float.parseFloat(attrib);
             } catch (NumberFormatException e) {
-                logger.warning(attributeName + " is not a float: " + attrib);
+                if (logger.isLoggable(Level.WARNING)) logger.warning(attributeName + " is not a float: " + attrib);
             }
         }
         return result;
@@ -545,7 +547,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Integer.decode(attrib);
             } catch (NumberFormatException e) {
-                logger.warning(attributeName + " is not an integer: " + attrib);
+                if (logger.isLoggable(Level.WARNING)) logger.warning(attributeName + " is not an integer: " + attrib);
             }
         }
         return result;
@@ -566,7 +568,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Long.decode(attrib);
             } catch (NumberFormatException e) {
-                logger.warning(attributeName + " is not a long: " + attrib);
+                if (logger.isLoggable(Level.WARNING)) logger.warning(attributeName + " is not a long: " + attrib);
             }
         }
         return result;
@@ -604,8 +606,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
         if (attrib != null) {
             try {
                 result = Enum.valueOf(returnClass, upCase(attrib));
-            } catch (Exception e) {
-                logger.warning(attributeName + " is not a "
+            } catch (IllegalArgumentException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.warning(attributeName + " is not a "
                     + returnClass.getName() + ": " + attrib);
             }
         }
@@ -693,7 +695,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             }
         }
         if (fco instanceof Location) return (Location)fco;
-        logger.warning("Not a location: " + attrib);
+        if (logger.isLoggable(Level.WARNING)) logger.warning("Not a location: " + attrib);
         return null;
     }
 
@@ -768,7 +770,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         List<T> list = new ArrayList<>(length);
         for (int x = 0; x < length; x++) {
             T value = getType(spec, FreeColObject.arrayKey(x), type, (T)null); 
-            if (value == null) logger.warning("Null list value(" + x + ")");
+            if (value == null) {
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Null list value(" + x + ")");
+            }
             list.add(value);
         }
 
@@ -840,22 +844,25 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 throw new XMLStreamException("Missing " + attributeName
                     + " for " + returnClass.getName() + ": " + currentTag());
             }
-        } else if ((ret = lookup(game, id, returnClass)) == null) {
-            ret = Game.newInstance(game, returnClass,
-                                   getReadScope() == ReadScope.SERVER);
+        } else {
+            ret = lookup(game, id, returnClass);
             if (ret == null) {
-                String err = "Failed to create " + returnClass.getName()
-                    + " with id: " + id;
-                if (required) throw new XMLStreamException(err);
-                logger.warning(err);
-            } else if (ret instanceof FreeColGameObject) {
-                // Do not set the id earlier or interning will happen
-                // by default in the constructor called from newInstance
-                ret.setId(id);
-                if (shouldIntern()) {
-                    ((FreeColGameObject)ret).internId(id);
-                } else {
-                    uninterned.put(id, ret);
+                ret = Game.newInstance(game, returnClass,
+                                       getReadScope() == ReadScope.SERVER);
+                if (ret == null) {
+                    String err = "Failed to create " + returnClass.getName()
+                        + " with id: " + id;
+                    if (required) throw new XMLStreamException(err);
+                    logger.warning(err);
+                } else if (ret instanceof FreeColGameObject) {
+                    // Do not set the id earlier or interning will happen
+                    // by default in the constructor called from newInstance
+                    ret.setId(id);
+                    if (shouldIntern()) {
+                        ((FreeColGameObject)ret).internId(id);
+                    } else {
+                        uninterned.put(id, ret);
+                    }
                 }
             }
         }
@@ -1038,7 +1045,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                     if (required) {
                         throw new XMLStreamException(e);
                     } else {
-                        logger.log(Level.WARNING, "Failed to create AIObject: "
+                        if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to create AIObject: "
                                    + id, e);
                     }
                 }

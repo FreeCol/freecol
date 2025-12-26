@@ -78,6 +78,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.StringResource;
 import net.sf.freecol.common.resources.Video;
 import net.sf.freecol.common.util.ImageUtils;
+import java.util.logging.Level;
 
 
 /**
@@ -186,7 +187,9 @@ public final class ImageLibrary {
     private float scaleFactor;
 
     /** Fixed tile dimensions. */
-    private Dimension tileSize, tileOverlaySize, tileForestSize;
+    private Dimension tileSize;
+    private Dimension tileOverlaySize;
+    private Dimension tileForestSize;
 
     /** Cache for images. */
     private final ImageCache imageCache;
@@ -691,7 +694,7 @@ public final class ImageLibrary {
             ? getUnitTypeImage((UnitType)derived, size)
             : null;
         if (image == null) {
-            logger.warning("Could not find image for " + display);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Could not find image for " + display);
             return null;
         }
         return image;
@@ -755,14 +758,15 @@ public final class ImageLibrary {
      *      superclass.
      */
     public static BufferedImage getPanelBackground(Class<?> clazz) {
-        while (clazz != null) {
-            final ImageResource ir = ResourceManager.getImageResource("image.background." + clazz.getSimpleName(), false);
+        Class<?> current = clazz;
+        while (current != null) {
+            final ImageResource ir = ResourceManager.getImageResource("image.background." + current.getSimpleName(), false);
             if (ir != null) {
                 return ir.getImage();
             }
-            clazz = clazz.getSuperclass();
-            if (!clazz.getName().startsWith("net.sf.freecol")) {
-                clazz = null;
+            current = current.getSuperclass();
+            if (current == null || !current.getName().startsWith("net.sf.freecol")) {
+                current = null;
             }
         }
         return getPanelBackground();
@@ -885,19 +889,20 @@ public final class ImageLibrary {
     public Dimension determineMaxSizeUsingSizeFromAllLevels(BuildingType buildingType, Player player) {        
         int maxWidth = 0;
         int maxHeight = 0;
-        while (buildingType.getUpgradesFrom() != null) {
-            buildingType = buildingType.getUpgradesFrom();
+        BuildingType current = buildingType;
+        while (current.getUpgradesFrom() != null) {
+            current = current.getUpgradesFrom();
         }
         do {
-            final Image buildingImage = getScaledBuildingTypeImage(buildingType, player, getScaleFactor());
+            final Image buildingImage = getScaledBuildingTypeImage(current, player, getScaleFactor());
             if (buildingImage.getWidth(null) > maxWidth) {
                 maxWidth = buildingImage.getWidth(null);
             }
             if (buildingImage.getHeight(null) > maxHeight) {
                 maxHeight = buildingImage.getHeight(null);
             }
-            buildingType = buildingType.getUpgradesTo();
-        } while (buildingType != null);
+            current = current.getUpgradesTo();
+        } while (current != null);
         
         return new Dimension(maxWidth, maxHeight);
     }
@@ -1045,7 +1050,6 @@ public final class ImageLibrary {
                 if (poles && poleRight != null) {
                     resultG2D.drawImage(poleRight, x, 0, null);
                 }
-                x += eastImage.getWidth();
             }
             x = (imageWidth - textWidth) / 2;
             final int textY = y + (centerImage.getHeight() - textHeight) / 2 + fm.getAscent();
@@ -1119,7 +1123,7 @@ public final class ImageLibrary {
         try {
             int n = Integer.parseInt(monarchKey);
             key = getMercenaryLeaderKey(n);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             key = getMonarchKey(monarchKey);
         }
         return getUnscaledImage(key);
@@ -1744,17 +1748,18 @@ public final class ImageLibrary {
     private static String getUnitTypeImageKey(UnitType unitType, Player owner,
                                               String roleId,
                                               boolean nativeEthnicity) {
+        boolean isNativeEthnicity = nativeEthnicity;
         // Units that can only be native don't need the .native key part
-        if (nativeEthnicity
+        if (isNativeEthnicity
             && unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)) {
-            nativeEthnicity = false;
+            isNativeEthnicity = false;
         }
         // Try to get an image matching the key
         String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
             : "." + Role.getRoleIdSuffix(roleId);
         String key = "image.unit." + unitType.getId() + roleQual
-            + ((nativeEthnicity) ? ".native" : "");
-        if (nativeEthnicity
+            + ((isNativeEthnicity) ? ".native" : "");
+        if (isNativeEthnicity
             && ResourceManager.getImageResource(key, false) == null) {
             key = "image.unit." + unitType.getId() + roleQual;
         }
@@ -2031,20 +2036,21 @@ public final class ImageLibrary {
      */
     public BufferedImage getStringImage(Graphics g, String text, Color color,
                                         Font font) {
-        if (color == null) {
-            logger.warning("getStringImage(" + text + ") called with color null");
-            color = Color.WHITE;
+        Color textColor = color;
+        if (textColor == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getStringImage(" + text + ") called with color null");
+            textColor = Color.WHITE;
         }
 
         // Check the cache
         final String key = text
             + "." + font.getFontName().replace(' ', '-')
             + "." + Integer.toString(font.getSize())
-            + "." + Integer.toHexString(color.getRGB());
+            + "." + Integer.toHexString(textColor.getRGB());
         BufferedImage img = this.stringImageCache.get(key);
         if (img != null) return img;
 
-        img = createStringImage(text, color, font, g.getFontMetrics(font));
+        img = createStringImage(text, textColor, font, g.getFontMetrics(font));
         this.stringImageCache.put(key, img);
         return img;
     }
@@ -2075,7 +2081,9 @@ public final class ImageLibrary {
         // draw the border around letters
         int borderWidth = 1;
         int borderColor = makeStringBorderColor(color).getRGB();
-        int srcRGB, dstRGB, srcA;
+        int srcRGB;
+        int dstRGB;
+        int srcA;
         for (int biY = 0; biY < height; biY++) {
             for (int biX = borderWidth; biX < width - borderWidth; biX++) {
                 int biXI = width - biX - 1;

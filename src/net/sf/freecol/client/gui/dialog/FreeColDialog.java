@@ -69,6 +69,7 @@ public final class FreeColDialog<T> {
      * A content creator for the dialog.
      * @param <T> The return type of the dialog.
      */
+    @FunctionalInterface
     public interface DialogContentCreator<T> {
         
         /**

@@ -285,14 +285,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();

@@ -48,6 +48,7 @@ import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import java.util.logging.Level;
 
 /**
  * Handles the starting placement of European units. 
@@ -240,7 +241,7 @@ class EuropeanStartingPositionsGenerator {
             for (Player player : europeanPlayers) {
                 final Area area = game.getNationStartingArea(player.getNation());
                 if (area == null || area.getTiles().isEmpty()) {
-                    logger.info("No map defined starting area for: " + player.getNationId());
+                    if (logger.isLoggable(Level.INFO)) logger.info("No map defined starting area for: " + player.getNationId());
                     if (positionType == GameOptions.STARTING_POSITIONS_CLASSIC
                             || positionType == GameOptions.STARTING_POSITIONS_HISTORICAL) {
                         break;

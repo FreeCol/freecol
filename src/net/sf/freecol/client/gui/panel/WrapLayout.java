@@ -241,7 +241,7 @@ public class WrapLayout implements LayoutManager {
     }
     
     private Layout determineLayout(Container target, boolean preferred) {
-        int targetWidth = target.getSize().width;
+        int targetWidth;
         Container container = target;
         while (container.getSize().width == 0 && container.getParent() != null) {
             container = container.getParent();
@@ -395,7 +395,7 @@ public class WrapLayout implements LayoutManager {
             if (layout.dimension.width > size.width || layout.dimension.height > size.height) {
                 layout = determineLayout(parent, size.width, false);
             }
-            applyLayout(parent, size, layout);
+            applyLayout(size, layout);
         }
     }
     
@@ -407,11 +407,11 @@ public class WrapLayout implements LayoutManager {
         synchronized (parent.getTreeLock()) {
             final Dimension size = parent.getSize();
             final Layout layout = determineLayout(parent, size.width, preferred);
-            applyLayout(parent, size, layout);
+            applyLayout(size, layout);
         }
     }
     
-    private void applyLayout(Container parent, Dimension size, Layout layout) {
+    private void applyLayout(Dimension size, Layout layout) {
         final Point offsetAll = determineOffsetForCentering(size, layout.dimension);
         
         final int rowsSize = layout.rows.size();

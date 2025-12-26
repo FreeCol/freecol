@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -232,7 +233,7 @@ public class SwingGUI extends GUI {
         
         configureMigLayout(scaleFactor);
         
-        logger.info("GUI constructed using scale factor " + scaleFactor);
+        if (logger.isLoggable(Level.INFO)) logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
 
@@ -503,11 +504,11 @@ public class SwingGUI extends GUI {
     private boolean changeSelectedTile(Tile newTile, boolean refocus) {
         final Tile oldTile = getSelectedTile();
         final Tile oldFocus = getFocus();
-        refocus = newTile != null
+        boolean shouldRefocus = newTile != null
             && newTile != oldFocus
             && (oldFocus == null || refocus
                 || !this.mapViewer.getMapViewerBounds().onScreen(newTile));
-        if (refocus) setFocus(newTile);
+        if (shouldRefocus) setFocus(newTile);
         if (newTile == oldTile) return false;
         this.mapViewer.getMapViewerState().setSelectedTile(newTile);
         if (oldTile != null) refreshTile(oldTile);
@@ -579,7 +580,7 @@ public class SwingGUI extends GUI {
             && !active.isAtLocation(destination)) {
             try {
                 path = active.findPath(destination);
-            } catch (Exception e) {
+            } catch (IllegalStateException e) {
                 logger.log(Level.WARNING, "Path fail", e);
                 active.setDestination(null);
             }
@@ -756,7 +757,7 @@ public class SwingGUI extends GUI {
         } else {
             try {
                 SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 logger.log(Level.WARNING, "Client GUI interaction", ex);
             }
         }
@@ -820,20 +821,21 @@ public class SwingGUI extends GUI {
         resetMapZoom(); // This should refresh the map
         // Update the view, somehow.  Try really hard to find a tile
         // to focus on
+        Tile focusTile = tile;
         if (active != null) {
             changeView(active, false);
             if (active.hasTile()) {
-                tile = active.getTile();
+                focusTile = active.getTile();
             } else if (active.getOwner().getFallbackTile() != null) {
-                tile = active.getOwner().getFallbackTile();
-                changeView(tile);
+                focusTile = active.getOwner().getFallbackTile();
+                changeView(focusTile);
             }
-        } else if (tile != null) {
-            changeView(tile);
+        } else if (focusTile != null) {
+            changeView(focusTile);
         } else {
             changeView((Unit)null, false);
         }
-        this.mapViewer.getMapViewerBounds().setFocus(tile);
+        this.mapViewer.getMapViewerBounds().setFocus(focusTile);
 
         enableMapControls(false);
         enableMapControls(getGame() != null && getGame().getMap() != null && getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
@@ -891,7 +893,7 @@ public class SwingGUI extends GUI {
         opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)
             .addPropertyChangeListener((PropertyChangeEvent e) -> {
                 Language language = (Language)e.getNewValue();
-                logger.info("Set language to: " + language);
+                if (logger.isLoggable(Level.INFO)) logger.info("Set language to: " + language);
                 if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {
                     showInformationPanel("info.autodetectLanguageSelected");
                 } else {
@@ -1541,10 +1543,10 @@ public class SwingGUI extends GUI {
     }
 
     private void changeMapScale(float newScale) {
-        newScale = constrainToMaxMapScale(newScale);
+        float adjustedScale = constrainToMaxMapScale(newScale);
         imageCache.clear();
         if (this.mapViewer != null) {
-            this.mapViewer.changeScale(newScale);
+            this.mapViewer.changeScale(adjustedScale);
         }
         if (this.mapControls != null) {
             this.mapControls.updateMinimap();
@@ -1555,10 +1557,11 @@ public class SwingGUI extends GUI {
     }
     
     private float constrainToMaxMapScale(float newScale) {
-        if (newScale > getMaxScale()) {
-            newScale = getMaxScale();
+        float adjustedScale = newScale;
+        if (adjustedScale > getMaxScale()) {
+            adjustedScale = getMaxScale();
         }
-        return newScale;
+        return adjustedScale;
     }
     
     /**
@@ -1617,7 +1620,7 @@ public class SwingGUI extends GUI {
 
         final Tile tile = tileAt(x, y);
         if (tile == null) return;
-        Unit other = null;
+        Unit other;
 
         if (!tile.isExplored()) { // Select unexplored tiles
             setFocus(tile);
@@ -1633,36 +1636,39 @@ public class SwingGUI extends GUI {
             } else if (settlement instanceof IndianSettlement) {
                 showIndianSettlementPanel((IndianSettlement)settlement);
             }
-        } else if ((other = this.mapViewer.getMapViewerState().findUnitInFront(tile)) != null) {
-            if (getMyPlayer().owns(other)) {
-                // If there is one of the player units present, select it,
-                // unless we are on the same tile as the active unit,
-                // in which case select the active unit if not in units mode
-                // otherwise the unit *after* the active.
-                final Unit active = getActiveUnit();
-                if (active != null && active.getTile() == tile) {
-                    if (getViewMode() != ViewMode.MOVE_UNITS) {
-                        other = active;
-                    } else {
-                        List<Unit> units = tile.getUnitList();
-                        while (!units.isEmpty()) {
-                            Unit u = units.remove(0);
-                            if (u == active) {
-                                if (!units.isEmpty()) other = units.remove(0);
-                                break;
+        } else {
+            other = this.mapViewer.getMapViewerState().findUnitInFront(tile);
+            if (other != null) {
+                if (getMyPlayer().owns(other)) {
+                    // If there is one of the player units present, select it,
+                    // unless we are on the same tile as the active unit,
+                    // in which case select the active unit if not in units mode
+                    // otherwise the unit *after* the active.
+                    final Unit active = getActiveUnit();
+                    if (active != null && active.getTile() == tile) {
+                        if (getViewMode() != ViewMode.MOVE_UNITS) {
+                            other = active;
+                        } else {
+                            List<Unit> units = tile.getUnitList();
+                            while (!units.isEmpty()) {
+                                Unit u = units.remove(0);
+                                if (u == active) {
+                                    if (!units.isEmpty()) other = units.remove(0);
+                                    break;
+                                }
                             }
                         }
                     }
+                    changeView(other, false);
+                } else { // Select the tile under the unit if it is not ours
+                    setFocus(tile);
                 }
-                changeView(other, false);
-            } else { // Select the tile under the unit if it is not ours
-                setFocus(tile);
-            }
-        } else { // Otherwise select the tile in terrain mode on multiclick
-            if (count > 1) {
-                changeView(tile);
-            } else {
-                setFocus(tile);
+            } else { // Otherwise select the tile in terrain mode on multiclick
+                if (count > 1) {
+                    changeView(tile);
+                } else {
+                    setFocus(tile);
+                }
             }
         }
     }    
@@ -1867,7 +1873,9 @@ public class SwingGUI extends GUI {
                 // introspection
                 try {
                     Introspector.invokeVoidMethod(p, "update");
-                } catch (Exception e) {
+                } catch (IllegalAccessException
+                         | InvocationTargetException
+                         | NoSuchMethodException e) {
                     ; // "can not happen"
                 }
             }
@@ -2008,7 +2016,7 @@ public class SwingGUI extends GUI {
         
         if (getClientOptions().getBoolean(ClientOptions.MANUAL_MAIN_FONT_SIZE)) {
             final int fontSize = getClientOptions().getInteger(ClientOptions.MAIN_FONT_SIZE);
-            logger.info("Manual font size: " + fontSize + " (reported DPI: " + dpi + ")");
+            if (logger.isLoggable(Level.INFO)) logger.info("Manual font size: " + fontSize + " (reported DPI: " + dpi + ")");
             return fontSize;
         }
         
@@ -2017,7 +2025,7 @@ public class SwingGUI extends GUI {
         final int fontSizeUsingScaling = (int) (FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * scaleFactor);
         
         if (displayScaling != 0) {
-            logger.info("Font size based on manual display scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ")");
+            if (logger.isLoggable(Level.INFO)) logger.info("Font size based on manual display scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ")");
             return fontSizeUsingScaling;
         }
         
@@ -2030,11 +2038,11 @@ public class SwingGUI extends GUI {
         }
         
         if (fontSizeUsingDpi >= fontSizeUsingScaling * 0.25f) {
-            logger.info("Using font size from scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
+            if (logger.isLoggable(Level.INFO)) logger.info("Using font size from scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
             return fontSizeUsingScaling;
         }
                 
-        logger.info("Automatic font size: " + fontSizeUsingDpi + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
+        if (logger.isLoggable(Level.INFO)) logger.info("Automatic font size: " + fontSizeUsingDpi + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
         return Math.max(10, fontSizeUsingDpi);        
     }
 
@@ -2073,10 +2081,10 @@ public class SwingGUI extends GUI {
                 scaleFactor = Math.min(1.75F, scaleFactor);
             }
             
-            logger.info("Automatic scale factor: " + scaleFactor + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
+            if (logger.isLoggable(Level.INFO)) logger.info("Automatic scale factor: " + scaleFactor + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
         } else {
             scaleFactor = displayScaling / 100f;
-            logger.info("Manual scale factor: " + scaleFactor + " (reported DPI: " + dpi + ")");
+            if (logger.isLoggable(Level.INFO)) logger.info("Manual scale factor: " + scaleFactor + " (reported DPI: " + dpi + ")");
         }
         return scaleFactor;
     }
@@ -2094,8 +2102,8 @@ public class SwingGUI extends GUI {
         if (panel == null) {
             try {
                 panel = new ColonyPanel(getFreeColClient(), colony);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception in ColonyPanel for "
+            } catch (IllegalStateException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Exception in ColonyPanel for "
                     + colony.getId(), e);
                 return null;
             }
@@ -2172,7 +2180,7 @@ public class SwingGUI extends GUI {
                 refresh();
                 afterClosing.run();
             });
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
             throw e;
         }
@@ -2489,7 +2497,7 @@ public class SwingGUI extends GUI {
     public FreeColPanel showNewPanel(Specification spec) {
         try {
             return this.widgets.showNewPanel(spec);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             logger.log(Level.WARNING, "Exception while showing new game panel", e);
             showErrorPanel(e, StringTemplate.key("error.unspecified"));
             return null;
@@ -2548,7 +2556,7 @@ public class SwingGUI extends GUI {
             compact = getFreeColClient().getClientOptions()
                 .getInteger(ClientOptions.COLONY_REPORT)
                 == ClientOptions.COLONY_REPORT_COMPACT;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             compact = false;
         }
         return this.widgets.showReportColonyPanel(compact);

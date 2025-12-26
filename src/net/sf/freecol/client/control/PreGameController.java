@@ -46,6 +46,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.AudioResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
+import java.util.logging.Level;
 
 
 /**
@@ -340,10 +341,10 @@ public final class PreGameController extends FreeColClientHolder {
                     final FreeColClient fcc = getFreeColClient();
                     fcc.addSpecificationActions(((Game)fco).getSpecification());
                 } else {
-                    logger.warning("Pre-game copy-in failed: " + fco.getId());
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Pre-game copy-in failed: " + fco.getId());
                 }
             } else {
-                logger.warning("Game node expected: " + fco.getId());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Game node expected: " + fco.getId());
             }
         }
     }

@@ -49,7 +49,7 @@ public final class DeltaAnimationImageCreator {
             final BufferedImage riverPebblesMaskImage = this.imageCache.getSizedImage(riverPebblesMaskKey, lib.getTileSize(), false);
             final BufferedImage baseTileMask = lib.getTerrainMask(null);
             
-            return generateImage(riverPebblesImage, waterImage, waterVariationNumber, riverWaterMaskImage, riverPebblesMaskImage, baseTileMask);
+            return generateImage(riverPebblesImage, waterImage, riverWaterMaskImage, riverPebblesMaskImage, baseTileMask);
         });
         
         return result;
@@ -77,7 +77,6 @@ public final class DeltaAnimationImageCreator {
      */
     private static BufferedImage generateImage(BufferedImage pebblesImage,
             BufferedImage waterImage,
-            int waterImageVariationNumber,
             BufferedImage riverWaterMaskImage,
             BufferedImage riverPebblesMaskImage,
             BufferedImage tileMask) {

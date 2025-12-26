@@ -39,6 +39,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
+import java.util.logging.Level;
 
 
 /**
@@ -125,7 +126,7 @@ public class ResourceManager {
                 Thread.sleep(10);
             }
         } catch (InterruptedException e) {
-            logger.warning(e.getMessage());
+            if (logger.isLoggable(Level.WARNING)) logger.warning(e.getMessage());
         }
     }
 
@@ -150,7 +151,7 @@ public class ResourceManager {
                 public void run() {
                     logger.info("Preload thread started");
                     final int n = mergedContainer.preload(() -> !preloadDone);
-                    logger.info("Preload done, " + n + " resources.");
+                    if (logger.isLoggable(Level.INFO)) logger.info("Preload done, " + n + " resources.");
                     preloadThread = null;
                     SwingUtilities.invokeLater(() -> {
                         afterPreloadHasCompleted.run();
@@ -183,7 +184,9 @@ public class ResourceManager {
      */
     public static AudioResource getAudioResource(String key, boolean warn) {
         final AudioResource r = mergedContainer.getAudioResource(key);
-        if (warn && r == null) logger.warning("getAudioResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getAudioResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -197,7 +200,9 @@ public class ResourceManager {
      */
     public static ColorResource getColorResource(String key, boolean warn) {
         final ColorResource r = mergedContainer.getColorResource(key);
-        if (warn && r == null) logger.warning("getColorResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getColorResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -211,7 +216,9 @@ public class ResourceManager {
      */
     public static FAFileResource getFAFileResource(String key, boolean warn) {
         final FAFileResource r = mergedContainer.getFAFileResource(key);
-        if (warn && r == null) logger.warning("getFAFileResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getFAFileResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -225,7 +232,9 @@ public class ResourceManager {
      */
     public static FontResource getFontResource(String key, boolean warn) {
         final FontResource r = mergedContainer.getFontResource(key);
-        if (warn && r == null) logger.warning("getFontResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getFontResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -240,7 +249,9 @@ public class ResourceManager {
     public static ImageResource getImageResource(String key, boolean warn) {
         // Public for ImageCache
         final ImageResource r = mergedContainer.getImageResource(key);
-        if (warn && r == null) logger.warning("getImageResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getImageResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -254,7 +265,9 @@ public class ResourceManager {
      */
     public static StringResource getStringResource(String key, boolean warn) {
         final StringResource r = mergedContainer.getStringResource(key);
-        if (warn && r == null) logger.warning("getStringResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getStringResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -268,7 +281,9 @@ public class ResourceManager {
      */
     public static SZAResource getSZAResource(String key, boolean warn) {
         final SZAResource r = mergedContainer.getSZAResource(key);
-        if (warn && r == null) logger.warning("getSZAResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getSZAResource(" + key + ") failed");
+        }
         return r;
     }
 
@@ -282,7 +297,9 @@ public class ResourceManager {
      */
     public static VideoResource getVideoResource(String key, boolean warn) {
         final VideoResource r = mergedContainer.getVideoResource(key);
-        if (warn && r == null) logger.warning("getVideoResource(" + key + ") failed");
+        if (warn && r == null) {
+            if (logger.isLoggable(Level.WARNING)) logger.warning("getVideoResource(" + key + ") failed");
+        }
         return r;
     }
 

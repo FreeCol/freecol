@@ -59,6 +59,7 @@ import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.MissionAIPlayer;
 import net.sf.freecol.server.ai.TransportableAIObject;
+import java.util.logging.Level;
 
 
 /**
@@ -299,7 +300,8 @@ public abstract class Mission extends AIObject {
 
         if (checkSrc) {
             Settlement s;
-            if ((loc = t.getTransportSource()) == null) {
+            loc = t.getTransportSource();
+            if (loc == null) {
                 return "transportable-source-missing-" + t;
             } else if (((FreeColGameObject)loc).isDisposed()) {
                 return "transportable-source-disposed";
@@ -741,70 +743,76 @@ public abstract class Mission extends AIObject {
                 PathNode ownPath;
                 int pathTurns, ownTurns;
 
-                if ((tm = aiCarrier.getMission(TransportMission.class)) == null) {
+                tm = aiCarrier.getMission(TransportMission.class);
+                if (tm == null) {
                     // Carrier has no transport mission?!?  Bogus.
                     lb.add(", had bogus carrier ", aiCarrier.getUnit());
-                    logger.warning(unit + " has transport " + aiCarrier
+                    if (logger.isLoggable(Level.WARNING)) logger.warning(unit + " has transport " + aiCarrier
                         + " without transport mission");
                     aiUnit.dropTransport();
                     aiCarrier = null;
 
-                } else if ((pick = tm.getTransportTarget(aiUnit)) == null) {
-                    // No collection point for this unit?  Bogus.
-                    lb.add(", had bogus transport on ", aiCarrier.getUnit());
-                    logger.warning(unit + " has transport " + aiCarrier
-                        + " with transport mission but null transport target\n"
-                        + tm.toFullString());
-                    aiUnit.dropTransport();
-                    aiCarrier = null;
-
-                } else if (Map.isSameLocation(pick, unit.getLocation())) {
-                    // Waiting for the carrier at the collection point.
-                    waiting = true;
-
-                } else if ((path = unit.findPath(unit.getLocation(), pick,
-                            null, costDecider, null)) == null) {
-                    // No path to the collection point.
-                    lbAt(lb);
-                    lb.add(", no path to meet ", aiCarrier.getUnit(),
-                           " at ", pick);
-                    path = unit.findPath(unit.getLocation(), target,
-                        null, costDecider, null);
-                    if (path == null) {
-                        // Unable to fall back to going direct.
-                        // Return failure in the hope that it is a
-                        // transient blockage.
-                        return MoveType.MOVE_NO_TILE;
-                    }
-                    // Fall back to going direct to the target.
-                    lb.add(", dropped carrier");
-                    aiUnit.dropTransport();
-                    aiCarrier = null;
-                    useTransport = false;
-
-                } else if ((ownPath = unit.findPath(unit.getLocation(), 
-                            target, null, costDecider, null)) == null
-                    || (ownTurns = ownPath.getTotalTurns())
-                    > (pathTurns = path.getTotalTurns())) {
-                    // Either there is no direct path to the target or
-                    // a path exists but takes longer than using the
-                    // carrier.  This confirms that it is not only
-                    // possible to travel to the collection point, it
-                    // is also the best plan.
-                    MoveType ret = followMapPath(path.next, lb);
-                    if (ret != MoveType.MOVE) return ret;
-                    waiting = true; // Arrived for collection.
-
                 } else {
-                    // It is quicker to cancel the transport and go to
-                    // the target directly.
-                    lb.add(", dropping carrier", aiCarrier.getUnit(),
-                        " as it is faster (", ownTurns, "<", pathTurns,
-                        " without it");
-                    aiUnit.dropTransport();
-                    aiCarrier = null;
-                    path = ownPath;
-                    useTransport = false;
+                    pick = tm.getTransportTarget(aiUnit);
+                    if (pick == null) {
+                        // No collection point for this unit?  Bogus.
+                        lb.add(", had bogus transport on ", aiCarrier.getUnit());
+                        if (logger.isLoggable(Level.WARNING)) logger.warning(unit + " has transport " + aiCarrier
+                            + " with transport mission but null transport target\n"
+                            + tm.toFullString());
+                        aiUnit.dropTransport();
+                        aiCarrier = null;
+                    } else if (Map.isSameLocation(pick, unit.getLocation())) {
+                        // Waiting for the carrier at the collection point.
+                        waiting = true;
+                    } else {
+                        path = unit.findPath(unit.getLocation(), pick,
+                                             null, costDecider, null);
+                        if (path == null) {
+                            // No path to the collection point.
+                            lbAt(lb);
+                            lb.add(", no path to meet ", aiCarrier.getUnit(),
+                                   " at ", pick);
+                            path = unit.findPath(unit.getLocation(), target,
+                                null, costDecider, null);
+                            if (path == null) {
+                                // Unable to fall back to going direct.
+                                // Return failure in the hope that it is a
+                                // transient blockage.
+                                return MoveType.MOVE_NO_TILE;
+                            }
+                            // Fall back to going direct to the target.
+                            lb.add(", dropped carrier");
+                            aiUnit.dropTransport();
+                            aiCarrier = null;
+                            useTransport = false;
+                        } else {
+                            ownPath = unit.findPath(unit.getLocation(),
+                                                    target, null, costDecider, null);
+                            if (ownPath == null
+                                || (ownTurns = ownPath.getTotalTurns())
+                                > (pathTurns = path.getTotalTurns())) {
+                                // Either there is no direct path to the target or
+                                // a path exists but takes longer than using the
+                                // carrier.  This confirms that it is not only
+                                // possible to travel to the collection point, it
+                                // is also the best plan.
+                                MoveType ret = followMapPath(path.next, lb);
+                                if (ret != MoveType.MOVE) return ret;
+                                waiting = true; // Arrived for collection.
+                            } else {
+                                // It is quicker to cancel the transport and go to
+                                // the target directly.
+                                lb.add(", dropping carrier", aiCarrier.getUnit(),
+                                    " as it is faster (", ownTurns, "<", pathTurns,
+                                    " without it");
+                                aiUnit.dropTransport();
+                                aiCarrier = null;
+                                path = ownPath;
+                                useTransport = false;
+                            }
+                        }
+                    }
                 }
 
                 if (waiting) {

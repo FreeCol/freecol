@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.option.Option;
+import java.util.logging.Level;
 
 
 /**
@@ -283,7 +284,7 @@ public abstract class FreeColAction extends AbstractAction
             putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
             putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
         } else {
-            logger.warning("Found only " + orderButtonImageCount
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Found only " + orderButtonImageCount
                 + " order button images for " + getId() + "/" + key);
         }
     }

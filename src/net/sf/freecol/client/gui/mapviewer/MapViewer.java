@@ -46,7 +46,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.awt.image.VolatileImage;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,7 +148,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Bounds of the tiles to be rendered. These bounds are scaled according to the
      * zoom level of the map.
      */
-    private TileBounds tileBounds = new TileBounds(new Dimension(0, 0), 1f);
+    private TileBounds tileBounds = new TileBounds(new Dimension(0, 0));
     
     private List<Rectangle> fullyRepaintedAreas = new ArrayList<>();
     
@@ -204,7 +203,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     private void updateScaledVariables() {
         // ATTENTION: we assume that all base tiles have the same size
-        this.tileBounds = new TileBounds(lib.getTileSize(), lib.getScaleFactor());
+        this.tileBounds = new TileBounds(lib.getTileSize());
         
         mapViewerBounds.updateSizeVariables(tileBounds);
         mapViewerScaledUtils.updateScaledVariables(lib);
@@ -216,7 +215,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param size The new map size.
      */
     public void changeSize(Dimension size) {
-        this.tileBounds = new TileBounds(this.lib.getTileSize(), this.lib.getScaleFactor());
+        this.tileBounds = new TileBounds(this.lib.getTileSize());
         mapViewerBounds.changeSize(size, this.tileBounds);
         rpm.markAsDirty();
     }
@@ -891,7 +890,7 @@ public final class MapViewer extends FreeColClientHolder {
                                          Player player, int colonyLabels,
                                          RescaleOp rop) {
         if (settlement.isDisposed()) {
-            logger.warning("Settlement display race detected: "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Settlement display race detected: "
                            + settlement.getName());
             return;
         }
@@ -1410,8 +1409,8 @@ public final class MapViewer extends FreeColClientHolder {
                                  (opaque) ? 255 : 100);
             g2d.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            final EnumMap<Direction, Float> borderPoints = mapViewerScaledUtils.getBorderPoints();
-            EnumMap<Direction, Float> controlPoints = mapViewerScaledUtils.getControlPoints();
+            final java.util.Map<Direction, Float> borderPoints = mapViewerScaledUtils.getBorderPoints();
+            java.util.Map<Direction, Float> controlPoints = mapViewerScaledUtils.getControlPoints();
             
             path.moveTo(borderPoints.get(Direction.longSides.get(0)).x,
                     borderPoints.get(Direction.longSides.get(0)).y);
@@ -1435,7 +1434,8 @@ public final class MapViewer extends FreeColClientHolder {
                                 borderPoints.get(next2).x,
                                 borderPoints.get(next2).y);
                     } else {
-                        int dx = 0, dy = 0;
+                        int dx = 0;
+                        int dy = 0;
                         switch(d) {
                         case NW: dx = tileBounds.getHalfWidth(); dy = -tileBounds.getHalfHeight(); break;
                         case NE: dx = tileBounds.getHalfWidth(); dy = tileBounds.getHalfHeight(); break;
@@ -1452,7 +1452,8 @@ public final class MapViewer extends FreeColClientHolder {
                             // big corner
                             Direction previous = d.getPreviousDirection();
                             Direction previous2 = previous.getPreviousDirection();
-                            int ddx = 0, ddy = 0;
+                            int ddx = 0;
+                            int ddy = 0;
                             switch(d) {
                             case NW: ddy = -tileBounds.getHeight(); break;
                             case NE: ddx = tileBounds.getWidth(); break;
@@ -1488,7 +1489,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (relevantDirtyClipBounds.isEmpty() || clipBounds.contains(relevantDirtyClipBounds)) {
             rpm.markAsClean();
         } else {
-            logger.info("Repaint has been called for a smaller area than what is dirty. "
+            if (logger.isLoggable(Level.INFO)) logger.info("Repaint has been called for a smaller area than what is dirty. "
                     + "Have you forgotten to call repaint() after marking stuff as dirty? "
                     + "The only known OK instance of this happening is when the GUI is "
                     + "starting up. Bounds: "
@@ -1635,7 +1636,8 @@ public final class MapViewer extends FreeColClientHolder {
         final int x0 = firstTile.getX();
         final int y0 = firstTile.getY();
         
-        int xt0 = 0, yt0 = 0;
+        int xt0 = 0;
+        int yt0 = 0;
         for (Tile t : tiles) {
             final int x = t.getX();
             final int y = t.getY();
@@ -1643,7 +1645,8 @@ public final class MapViewer extends FreeColClientHolder {
                 + (y&1) * tileBounds.getHalfWidth();
             final int yt = (y-y0) * tileBounds.getHalfHeight();
             g2d.translate(xt - xt0, yt - yt0);
-            xt0 = xt; yt0 = yt;
+            xt0 = xt;
+            yt0 = yt;
 
             c.render(g2d, t);
         }
@@ -1781,6 +1784,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * A callback for rendering a single tile.
      */
+    @FunctionalInterface
     private interface TileRenderingCallback {
         
         /**

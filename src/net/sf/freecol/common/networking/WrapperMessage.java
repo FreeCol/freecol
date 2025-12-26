@@ -39,7 +39,7 @@ public abstract class WrapperMessage extends AttributeMessage {
     public static final String REPLY_ID_TAG = "networkReplyId";
 
     /** The encapsulated message. */
-    private Message message = null;
+    private Message message;
 
 
     /**

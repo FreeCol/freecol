@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -41,6 +43,8 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
  * Validate a saved game.
  */
 public class SaveGameValidator {
+
+    private static final Logger logger = Logger.getLogger(SaveGameValidator.class.getName());
 
     public static void main(String[] args) throws Exception {
 
@@ -64,20 +68,20 @@ public class SaveGameValidator {
 
         int ret = 0;
         for (File file : allFiles) {
-            //System.out.println("Processing file " + file.getPath());
+            //logger.info("Processing file " + file.getPath());
             try {
                 FreeColSavegameFile mapFile = new FreeColSavegameFile(file);
                 try (InputStream in = mapFile.getSavegameInputStream()) {
                     saveGameValidator.validate(new StreamSource(in));
                 }
-                System.out.println("Successfully validated " + file.getName());
+                if (logger.isLoggable(Level.INFO)) logger.info("Successfully validated " + file.getName());
             } catch (SAXParseException e) {
-                System.out.println(e.getMessage() 
-                                   + " at line=" + e.getLineNumber() 
-                                   + " column=" + e.getColumnNumber());
+                if (logger.isLoggable(Level.WARNING)) logger.warning(e.getMessage()
+                    + " at line=" + e.getLineNumber()
+                    + " column=" + e.getColumnNumber());
                 ret = Math.max(ret, 1);
             } catch (IOException | SAXException e) {
-                System.out.println("Failed to read " + file.getName());
+                if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Failed to read " + file.getName(), e);
                 ret = 2;
             }
         }
@@ -85,4 +89,3 @@ public class SaveGameValidator {
     }
 
 }
-

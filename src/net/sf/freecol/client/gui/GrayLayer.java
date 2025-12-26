@@ -98,8 +98,8 @@ public class GrayLayer extends JComponent {
         }
 
         ImageIcon coatOfArmsIcon = null;
-        String message = null;
-        Color colour = null;
+        String message;
+        Color colour;
 
         if (player == null) {
             message = Messages.message(freeColClient.getGame().getTurn()

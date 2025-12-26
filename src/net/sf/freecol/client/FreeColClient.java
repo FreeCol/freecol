@@ -49,6 +49,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
@@ -246,7 +247,7 @@ public final class FreeColClient {
         if (!FreeCol.getHeadless()) {
             try {
                 gui.installLookAndFeel(fontName);
-            } catch (Exception e) {
+            } catch (FreeColException e) {
                 FreeCol.fatal(logger,
                         Messages.message("client.laf") + "\n" + e.getMessage());
             }
@@ -375,18 +376,18 @@ public final class FreeColClient {
             try {
                 FreeColSavegameFile fcsf
                     = new FreeColSavegameFile(savedGameFile);
-                logger.info("Merge client options from saved game: "
+                if (logger.isLoggable(Level.INFO)) logger.info("Merge client options from saved game: "
                     + savedGameFile.getPath());
                 clop.merge(fcsf);
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Could not open saved game "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Could not open saved game "
                     + savedGameFile.getPath(), ioe);
             }
         }
 
         final File userOptions = FreeColDirectories.getClientOptionsFile();
         if (userOptions != null && userOptions.exists()) {
-            logger.info("Merge client options from user options file: "
+            if (logger.isLoggable(Level.INFO)) logger.info("Merge client options from user options file: "
                 + userOptions.getPath());
             clop.load(userOptions);
         }
@@ -900,7 +901,7 @@ public final class FreeColClient {
             }
         } catch (XMLStreamException xse) {
             return failToMain(xse, FreeCol.badFile("error.couldNotLoad", saveFile));
-        } catch (Exception ex) {
+        } catch (FreeColException | IOException ex) {
             return failToMain(ex, "server.initialize");
         }
 
@@ -1023,7 +1024,7 @@ public final class FreeColClient {
         // Exit
         try {
             gui.quitGUI();
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             FreeCol.fatal(logger, "Failed to shutdown gui: " + e);
         }
         FreeCol.quit(0);
@@ -1040,16 +1041,18 @@ public final class FreeColClient {
             
             final boolean seriousError = (e instanceof Error);
             try {
-                logger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
                 
                 if (seriousError) {
                     gui.showErrorPanel(Messages.message("error.seriousError"), () -> {
                         System.exit(1);
                     });
                 }
-            } catch (Throwable t) {
+            } catch (IllegalStateException | SecurityException t) {
                 if (seriousError) {
-                    t.printStackTrace();
+                    if (logger.isLoggable(Level.SEVERE)) {
+                        logger.log(Level.SEVERE, "Fatal error while showing error panel", t);
+                    }
                     System.exit(1);
                 }
             }

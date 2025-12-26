@@ -64,7 +64,7 @@ public final class RiverAnimationImageCreator {
             final BufferedImage maskImage = createRiverMaskImageWithTransitions(baseMaskImage, minorToMajorTransitions);
             final BufferedImage baseTileMask = lib.getTerrainMask(null);
             
-            return generateImage(riverPebblesImage, riverWaterImage, riverVariationNumber, maskImage, baseTileMask);
+            return generateImage(riverPebblesImage, riverWaterImage, maskImage, baseTileMask);
         });
         
         return result;
@@ -145,7 +145,6 @@ public final class RiverAnimationImageCreator {
      */
     private static BufferedImage generateImage(BufferedImage pebblesImage,
             BufferedImage waterImage,
-            int riverImageVariationNumber,
             BufferedImage riverMaskImage,
             BufferedImage tileMask) {
         final int width = waterImage.getWidth();

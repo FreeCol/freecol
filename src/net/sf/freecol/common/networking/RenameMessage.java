@@ -90,7 +90,7 @@ public class RenameMessage extends AttributeMessage {
         FreeColGameObject fcgo;
         try {
             fcgo = serverPlayer.getOurFreeColGameObject(nameableId, FreeColGameObject.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (!(fcgo instanceof Nameable)) {

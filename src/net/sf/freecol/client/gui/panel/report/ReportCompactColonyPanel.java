@@ -306,7 +306,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             } else if (p == 0) {
                 status = ProductionStatus.ZERO;
                 extra = 0;
-                deficit = null;
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
                     if (pi == null) continue;
@@ -332,7 +331,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             } else {
                 status = ProductionStatus.GOOD;
                 extra = 0;
-                deficit = null;
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
                     if (pi == null) continue;
@@ -436,8 +434,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
     }
 
     private static StringTemplate stpld(String messageId) {
-        messageId = Messages.descriptionKey(messageId);
-        return stpl(messageId);
+        String descriptionKey = Messages.descriptionKey(messageId);
+        return stpl(descriptionKey);
     }
 
     private JLabel newLabel(String h, ImageIcon i, Color c) {
@@ -501,7 +499,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             : cGood;
         String annotations = "", key;
         t = StringTemplate.label(",");
-        if ((building = s.colony.getStockade()) == null) {
+        building = s.colony.getStockade();
+        if (building == null) {
             key = "annotation.unfortified";
             t.add(Messages.message("report.colony.annotation.unfortified"));
         } else {
@@ -514,12 +513,15 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         if (!s.colony.getTile().isCoastland()) {
             key = "annotation.inland";
             t.add(Messages.message("report.colony.annotation.inland"));
-        } else if ((building = s.colony.getWorkLocationWithAbility(Ability.PRODUCE_IN_WATER, Building.class)) == null) {
+        } else {
+            building = s.colony.getWorkLocationWithAbility(Ability.PRODUCE_IN_WATER, Building.class);
+            if (building == null) {
             key = "annotation.coastal";
             t.add(Messages.message("report.colony.annotation.coastal"));
-        } else {
-            key = "annotation." + building.getType().getSuffix();
-            t.add(Messages.message(building.getLabel()));
+            } else {
+                key = "annotation." + building.getType().getSuffix();
+                t.add(Messages.message(building.getLabel()));
+            }
         }
         if (ResourceManager.getStringResource(key, false) != null) {
             annotations += ResourceManager.getString(key);
@@ -548,7 +550,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
            t.add(Messages.message(building.getLabel()));
            if (ResourceManager.hasResource(key)) annotations += ResourceManager.getString(key);
            }*/
-        if ((building = s.colony.getWorkLocationWithAbility(Ability.EXPORT, Building.class)) != null) {
+        building = s.colony.getWorkLocationWithAbility(Ability.EXPORT, Building.class);
+        if (building != null) {
             annotations += "*";
             t.add(Messages.message(building.getLabel()));
         }
@@ -1129,7 +1132,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         // Define the layout, with a column for each goods type.
         StringBuilder sb = new StringBuilder(64);
         sb.append("[l][c][c][c]");
-        for (int i = 0; i < this.goodsTypes.size(); i++) sb.append("[c]");
+        for (GoodsType ignored : this.goodsTypes) sb.append("[c]");
         sb.append("[c][c][l][l][l]");
         reportPanel.setLayout(new MigLayout("fillx, insets 0, gap 0 0",
                 sb.toString(), ""));

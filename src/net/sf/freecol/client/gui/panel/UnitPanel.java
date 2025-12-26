@@ -33,6 +33,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIUnit;
+import java.util.logging.Level;
 
 
 /**
@@ -203,7 +204,7 @@ public abstract class UnitPanel extends MigPanel
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        logger.finest(getName() + " change " + event.getPropertyName()
+        if (logger.isLoggable(Level.FINEST)) logger.finest(getName() + " change " + event.getPropertyName()
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();
