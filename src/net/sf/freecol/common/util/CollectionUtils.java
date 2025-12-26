@@ -302,7 +302,7 @@ public class CollectionUtils {
             }
         } else {
             for (; n < 0; n++) {
-                T t = list.remove(n-1);
+                T t = list.remove(list.size() - 1);
                 list.add(0, t);
             }
         }
