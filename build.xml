@@ -51,6 +51,7 @@
     </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />
+        <pathelement location="${basedir}/test/lib/hamcrest-core.jar" />
     </path>
     <path id="freecol.build.classpath">
         <path refid="libraries.classpath" />

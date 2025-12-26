@@ -8,12 +8,15 @@ addons:
     packages:
       - ant-optional
 before_install:
+  - .travis/install-sbom-tools.sh
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "cron" ]]; then .travis/merge-sourceforge.sh; fi
   - if [[ "$TRAVIS_BRANCH" == "slim" && "$TRAVIS_EVENT_TYPE" == "cron" ]]; then .travis/merge-slim.sh; fi
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "cron" ]]; then .travis/deploy-sourceforge-merge.sh; fi
   - if [[ "$TRAVIS_BRANCH" == "slim" && "$TRAVIS_EVENT_TYPE" == "cron" ]]; then .travis/deploy-slim-merge.sh; fi
 script:
   - ant testci
+  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" ]]; then ./scripts/generate-sbom.sh; fi
+  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" ]]; then ./scripts/scan-sbom.sh; fi
 before_deploy:
   - ant nightly-release
   - ls -l dist/releases
