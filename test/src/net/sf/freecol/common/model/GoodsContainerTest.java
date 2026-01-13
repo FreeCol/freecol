@@ -19,86 +19,153 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class GoodsContainerTest extends FreeColTestCase {
 
-    GoodsType sugar = spec().getGoodsType("model.goods.sugar");
-    GoodsType food = spec().getPrimaryFoodType();
-    GoodsType fish = spec().getGoodsType("model.goods.fish");
-    GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+    private GoodsType sugar() { return spec().getGoodsType("model.goods.sugar"); }
+    private GoodsType food() { return spec().getPrimaryFoodType(); }
+    private GoodsType fish() { return spec().getGoodsType("model.goods.fish"); }
+    private GoodsType lumber() { return spec().getGoodsType("model.goods.lumber"); }
 
-    public void testContainer() {
+    private GoodsContainer getPreparedContainer() {
         Game game = getGame();
-        game.changeMap(getTestMap(true));
-
+        game.changeMap(getTestMap(true)); 
         Colony colony = createStandardColony();
-        GoodsContainer container = new GoodsContainer(game, colony);
+        return new GoodsContainer(game, colony);
+    }
+
+    /**
+     * Verifies that different goods types respond correctly to removeAbove().
+     * Lumber should be capped, but Fish and Food should ignore the limit.
+     */
+    public void testLimitIgnoringGoods() {
+        GoodsContainer container = getPreparedContainer();
+        GoodsType lumber = lumber();
+        GoodsType fish = fish();
+        GoodsType food = food();
+
+        // Add 200 of each
+        container.addGoods(lumber, 200);
+        container.addGoods(fish, 200);
+        container.addGoods(food, 200);
+
+        // Try to cap everything at 100
+        container.removeAbove(100);
+
+        assertEquals("Lumber should be capped at 100", 100, container.getGoodsCount(lumber));
+        assertEquals("Fish should ignore the cap and stay at 200", 200, container.getGoodsCount(fish));
+        assertEquals("Food should ignore the cap and stay at 200", 200, container.getGoodsCount(food));
+    }
+
+    public void testGetSpaceTakenWithMultipleTypes() {
+        GoodsContainer container = getPreparedContainer();
+        
+        // 150 Sugar = 2 slots
+        container.addGoods(sugar(), 150);
+        // 50 Lumber = 1 slot
+        container.addGoods(lumber(), 50);
+
+        assertEquals("Should occupy 3 slots total (2 for sugar, 1 for lumber)", 3, container.getSpaceTaken());
+    }
+
+    public void testContainerBasicOps() {
+        GoodsContainer container = getPreparedContainer();
+        GoodsType sugar = sugar();
 
         assertEquals(0, container.getGoodsCount(sugar));
-        assertEquals(0, container.getGoodsCount(food));
-        assertEquals(0, container.getGoodsCount(fish));
-        assertEquals(0, container.getGoodsCount(lumber));
+        container.addGoods(sugar, 50);
+        assertEquals(50, container.getGoodsCount(sugar));
+        
+        container.removeGoods(sugar, 20);
+        assertEquals(30, container.getGoodsCount(sugar));
+    }
 
-        container.addGoods(sugar, 36);
-        assertEquals(36, container.getGoodsCount(sugar));
-        container.addGoods(lumber, 37);
-        assertEquals(37, container.getGoodsCount(lumber));
-        container.addGoods(food, 38);
-        assertEquals(38, container.getGoodsCount(food));
-        container.addGoods(fish, 39);
-        assertEquals(39, container.getGoodsCount(fish));
+    public void testStateManagement() {
+        GoodsContainer container = getPreparedContainer();
+        GoodsType sugar = sugar();
 
-        int difference = 20;
-        int totalDifference = difference;
-        container.addGoods(sugar, difference);
-        assertEquals(36 + totalDifference, container.getGoodsCount(sugar));
-        container.addGoods(lumber, difference);
-        assertEquals(37 + totalDifference, container.getGoodsCount(lumber));
-        container.addGoods(food, difference);
-        assertEquals(38 + totalDifference, container.getGoodsCount(food));
-        container.addGoods(fish, difference);
-        assertEquals(39 + totalDifference, container.getGoodsCount(fish));
+        container.addGoods(sugar, 50);
+        container.saveState(); 
 
-        difference = 10;
-        totalDifference -= difference;
-        container.removeGoods(sugar, difference);
-        assertEquals(36 + totalDifference, container.getGoodsCount(sugar));
-        container.removeGoods(lumber, difference);
-        assertEquals(37 + totalDifference, container.getGoodsCount(lumber));
-        container.removeGoods(food, difference);
-        assertEquals(38 + totalDifference, container.getGoodsCount(food));
-        container.removeGoods(fish, difference);
-        assertEquals(39 + totalDifference, container.getGoodsCount(fish));
+        container.addGoods(sugar, 20); 
+        assertTrue("Container should report change", container.hasChanged());
+        
+        container.restoreState();
+        assertEquals("Should restore to 50", 50, container.getGoodsCount(sugar));
+    }
 
-        difference = -20;
-        totalDifference += difference;
-        container.addGoods(sugar, difference);
-        assertEquals(36 + totalDifference, container.getGoodsCount(sugar));
-        container.addGoods(lumber, difference);
-        assertEquals(37 + totalDifference, container.getGoodsCount(lumber));
-        container.addGoods(food, difference);
-        assertEquals(38 + totalDifference, container.getGoodsCount(food));
-        container.addGoods(fish, difference);
-        assertEquals(39 + totalDifference, container.getGoodsCount(fish));
+    public void testGetGoodsListChunking() {
+        GoodsContainer container = getPreparedContainer();
+        container.addGoods(sugar(), 250);
 
-        container.removeAbove(10);
-        assertEquals(10, container.getGoodsCount(sugar));
-        assertEquals(10, container.getGoodsCount(lumber));
-        // food and fish ignore limit
-        assertEquals(38 + totalDifference, container.getGoodsCount(food));
-        assertEquals(39 + totalDifference, container.getGoodsCount(fish));
+        List<Goods> goodsList = container.getGoodsList();
+        assertEquals("Should be split into 3 stacks", 3, goodsList.size());
 
-        difference = 20;
-        totalDifference -= difference;
-        container.removeGoods(sugar, difference);
+        int total = goodsList.stream().mapToInt(AbstractGoods::getAmount).sum();
+        assertEquals(250, total);
+    }
+
+    public void testNegativeGoodsException() {
+        GoodsContainer container = getPreparedContainer();
+        try {
+            container.addGoods(sugar(), -10);
+            fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            // Success
+        }
+    }
+
+    public void testEdgeCases() {
+        GoodsContainer container = getPreparedContainer();
+        GoodsType sugar = sugar();
+
+        // Removing more than exists should clamp to zero
+        container.addGoods(sugar, 30);
+        container.removeGoods(sugar, 999);
+        assertEquals("Removing too much should clamp to zero", 0, container.getGoodsCount(sugar));
+
+        // Adding zero should not change state
+        container.addGoods(sugar, 0);
         assertEquals(0, container.getGoodsCount(sugar));
-        container.removeGoods(lumber, difference);
-        assertEquals(0, container.getGoodsCount(lumber));
-        container.removeGoods(food, difference);
-        assertEquals(38 + totalDifference, container.getGoodsCount(food));
-        container.removeGoods(fish, difference);
-        assertEquals(39 + totalDifference, container.getGoodsCount(fish));
+
+        // Removing zero should not change state
+        container.removeGoods(sugar, 0);
+        assertEquals(0, container.getGoodsCount(sugar));
+
+        // Adding extremely large amounts should not overflow
+        container.addGoods(sugar, Integer.MAX_VALUE / 2);
+        assertTrue("Should store large values safely", container.getGoodsCount(sugar) > 0);
+
+        // Removing goods of a type not present should not crash
+        container.removeGoods(food(), 10);
+        assertEquals(0, container.getGoodsCount(food()));
+    }
+
+    public void testMoveGoods() {
+        GoodsContainer src = getPreparedContainer();
+        GoodsContainer dst = new GoodsContainer(getGame(), src.getParent());
+        
+        GoodsType sugar = sugar();
+        src.addGoods(sugar, 100);
+        GoodsContainer.moveGoods(src, sugar, 40, dst);
+
+        assertEquals("Source should have 60 left", 60, src.getGoodsCount(sugar));
+        assertEquals("Destination should have 40", 40, dst.getGoodsCount(sugar));
+        assertEquals("Source old state should be 100", 100, src.getOldGoodsCount(sugar));
+        assertTrue("Source should report changes", src.hasChanged());
+    }
+
+    public void testRemoveAll() {
+        GoodsContainer container = getPreparedContainer();
+        container.addGoods(sugar(), 50);
+        container.addGoods(lumber(), 50);
+        container.removeAll();
+        
+        assertEquals(0, container.getGoodsCount(sugar()));
+        assertEquals(0, container.getGoodsCount(lumber()));
+        assertEquals(0, container.getSpaceTaken());
     }
 }
