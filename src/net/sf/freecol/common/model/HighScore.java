@@ -351,7 +351,7 @@ public class HighScore extends FreeColObject {
      */
     private static void tidyScores(List<HighScore> scores) {
         if (scores.size() > NUMBER_OF_HIGH_SCORES) {
-            scores = scores.subList(0, NUMBER_OF_HIGH_SCORES - 1);
+            scores.subList(NUMBER_OF_HIGH_SCORES, scores.size()).clear();
         }
         scores.sort(descendingScoreComparator);
     }
@@ -365,30 +365,30 @@ public class HighScore extends FreeColObject {
      */
     public static int checkHighScore(HighScore highScore,
                                      List<HighScore> scores) {
-        final int nScores = scores.size();
-        final int score = highScore.getScore();
-        final UUID uuid = highScore.getGameUUID();
-        if (uuid.compareTo(nullUUID) != 0) {
-            // UUID is valid, check for duplicate games
-            for (int i = nScores-1; i >= 0; i--) {
-                HighScore hs = scores.get(i);
-                if (uuid.compareTo(hs.getGameUUID()) == 0
-                    && score > hs.getScore()) return i; // Replace score i
+        int score = hs.getScore();
+        UUID uuid = hs.getGameUUID();
+
+        // Reject negative scores
+        if (score < 0) return -1;
+
+        // Duplicate game logic
+        if (uuid != null && !uuid.equals(nullUUID)) {
+            for (int i = 0; i < scores.size(); i++) {
+                HighScore existing = scores.get(i);
+                if (uuid.equals(existing.getGameUUID())) {
+                    return score > existing.getScore() ? i : -1;
+                }
             }
         }
-        if (score < 0) {
-            return -1;
+
+        if (scores.isEmpty()) return 0;
+    
+        if (scores.size() >= NUMBER_OF_HIGH_SCORES) {
+            int lastIndex = scores.size() - 1;
+            return score > scores.get(lastIndex).getScore() ? lastIndex : -1;
         }
-        if (nScores == 0) {
-            return 0;
-        }
-        if (nScores >= NUMBER_OF_HIGH_SCORES) {
-            if (score > scores.get(nScores-1).getScore()) {
-                return nScores - 1;
-            }
-            return -1;
-        }
-        return nScores;
+
+        return scores.size();
     }
 
     /**
