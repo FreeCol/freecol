@@ -288,15 +288,6 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Has there been trading in this {@code MarketData}?
-     *
-     * @return True if trading has occurred.
-     **/
-    public final boolean getTraded() {
-        return traded;
-    }
-
-    /**
      * Set the trading status of this {@code MarketData}.
      *
      * @param traded The trade status to set.
@@ -305,6 +296,205 @@ public class MarketData extends FreeColGameObject {
         this.traded = traded;
     }
 
+    /**
+     * Has the price of this goods type changed?
+     *
+     * @return True if the price has changed.
+     */
+    public boolean hasPriceChanged() {
+        return oldPrice != 0 && oldPrice != costToBuy;
+    }
+
+    /**
+     * Has this goods type been traded in the market?
+     *
+     * @return True if the goods type has been traded.
+     */
+    public boolean hasBeenTraded() {
+        return traded;
+    }
+
+    /**
+     * Checks if the price has increased since the last flush.
+     *
+     * @return True if the current cost to buy is greater than the old price.
+     */
+    public boolean isPriceIncrease() {
+        return costToBuy > oldPrice;
+    }
+
+    /**
+     * Clear any price changes for this goods type by 
+     * updating the old price to the current price.
+     */
+    public void flushPriceChange() {
+        oldPrice = costToBuy;
+    }
+
+    /**
+     * Gets the price of a given amount of these goods when the player buys.
+     *
+     * @param amount The amount of goods.
+     * @return The bid price.
+     */
+    public int getBidPrice(int amount) {
+        return amount * costToBuy;
+    }
+
+    /**
+     * Gets the price of a given amount of these goods when the player sells.
+     *
+     * @param amount The amount of goods.
+     * @return The sale price.
+     */
+    public int getSalePrice(int amount) {
+        return amount * paidForSale;
+    }
+
+    /**
+     * Records a sale of these goods.
+     *
+     * @param amount The quantity sold.
+     */
+    public void addSales(int amount) {
+        this.sales += amount;
+        this.traded = true;
+    }
+
+    /**
+     * Adds to the accumulated income before taxes.
+     *
+     * @param amount The income amount to add.
+     */
+    public void addIncomeBeforeTaxes(int amount) {
+        this.incomeBeforeTaxes += amount;
+    }
+
+    /**
+     * Adds to the accumulated income after taxes.
+     *
+     * @param amount The income amount to add.
+     */
+    public void addIncomeAfterTaxes(int amount) {
+        this.incomeAfterTaxes += amount;
+    }
+
+    /**
+     * Adds an amount of goods to this market data, ensuring the 
+     * market amount does not drop below a specified threshold.
+     *
+     * @param amount The amount of goods to add (can be negative).
+     * @param minimumAmount The floor for the goods amount in market.
+     * @return True if the price changed as a result.
+     */
+    public boolean addGoods(int amount, int minimumAmount) {
+        // Markets are bottomless, amount can not go below the threshold
+        this.amountInMarket = Math.max(minimumAmount, this.amountInMarket + amount);
+        this.traded = true;
+        return price(); // Recalculate and return if price changed
+    }
+
+    /**
+     * Utility to keep a price within the allowed market bounds.
+     * * @param price The calculated price.
+     * @return The price clamped between MINIMUM_PRICE and MAXIMUM_PRICE.
+     */
+    private int clampPrice(int price) {
+        return Math.max(MINIMUM_PRICE, Math.min(MAXIMUM_PRICE, price));
+    }
+
+    /**
+     * Limits price fluctuations to prevent market exploitation.
+     * If the new price exceeds the 'diff' threshold from the current cost,
+     * the market supply is adjusted to maintain economic balance.
+     *
+     * @param newPrice The newly calculated price.
+     * @param diff The allowed price difference.
+     * @return The stabilized price.
+     */
+    private int applyStabilityLimit(int newPrice, int diff) {
+        if (costToBuy <= 0) return newPrice;
+
+        float amountPrice = initialPrice * (goodsType.getInitialAmount() / (float) amountInMarket);
+
+        // Price rising too fast
+        if (newPrice > costToBuy + diff) {
+            float adjustedAmountPrice =
+                amountPrice - (newPrice - (costToBuy + diff));
+
+            adjustMarketAmountForPrice(adjustedAmountPrice);
+
+            int stabilizedPrice = costToBuy + diff;
+            logger.info("Clamped price rise for " + getId()
+                + " from " + newPrice
+                + " to " + stabilizedPrice);
+            return stabilizedPrice;
+        }
+
+        // Price falling too fast
+        if (newPrice < costToBuy - diff) {
+            float adjustedAmountPrice =
+                amountPrice + ((costToBuy - diff) - newPrice);
+
+            adjustMarketAmountForPrice(adjustedAmountPrice);
+
+            int stabilizedPrice = costToBuy - diff;
+            logger.info("Clamped price fall for " + getId()
+                + " from " + newPrice
+                + " to " + stabilizedPrice);
+            return stabilizedPrice;
+        }
+
+        return newPrice;
+    }
+
+    /**
+     * Recalculates amountInMarket to match the adjusted amountPrice
+     * used in the original stability clamp logic.
+     *
+     * This method preserves the original behavior exactly:
+     *
+     *     amountInMarket = round(initialAmount * (initialPrice / amountPrice))
+     *
+     * @param adjustedAmountPrice The modified amountPrice value
+     *                            after applying the stability correction.
+     */
+    private void adjustMarketAmountForPrice(float adjustedAmountPrice) {
+        this.amountInMarket = Math.round(
+            goodsType.getInitialAmount() * (initialPrice / adjustedAmountPrice)
+        );
+    }
+
+    /**
+     * Updates the internal price state and notifies listeners if a change occurred.
+     *
+     * @param newPrice The final calculated purchase price.
+     * @param newSalePrice The final calculated sale price.
+     * @return True if either price changed.
+     */
+    private boolean updatePriceState(int newPrice, int newSalePrice) {
+        int oldCostToBuy = costToBuy;
+        int oldPaidForSale = paidForSale;
+
+        this.costToBuy = newPrice;
+        this.paidForSale = newSalePrice;
+
+        if (costToBuy != oldCostToBuy) {
+            firePropertyChange(goodsType.getId(), oldCostToBuy, costToBuy);
+            return true;
+        } else if (paidForSale != oldPaidForSale) {
+            firePropertyChange(goodsType.getId(), oldPaidForSale, paidForSale);
+            return true;
+        }
+        
+        return false;
+    }
+
+    private boolean isNewWorldPriceCapped(int newSalePrice) {
+        return newSalePrice > initialPrice + 2
+            && (goodsType.isNewWorldGoodsType() 
+                || (goodsType.getInputType() != null && goodsType.getInputType().isNewWorldGoodsType()));
+    }
 
     /**
      * Adjust the prices.
@@ -318,68 +508,35 @@ public class MarketData extends FreeColGameObject {
      */
     public boolean price() {
         if (!goodsType.isStorable()) return false;
+        
         int diff = goodsType.getPriceDifference();
-        float amountPrice = initialPrice * (goodsType.getInitialAmount()
-            / (float) amountInMarket);
+        
+        // Calculate base price from market supply
+        float amountPrice = initialPrice * (goodsType.getInitialAmount() / (float) amountInMarket);
         int newSalePrice = Math.round(amountPrice);
         int newPrice = newSalePrice + diff;
 
-        // Work-around to limit prices of new world goods
-        // and related manufactured goods.
-        if (newSalePrice > initialPrice + 2
-            && ((goodsType.getInputType() != null
-                    && goodsType.getInputType().isNewWorldGoodsType())
-                || goodsType.isNewWorldGoodsType())) {
+        // Apply New World goods ceiling
+        if (isNewWorldPriceCapped(newSalePrice)) {
             newSalePrice = initialPrice + 2;
             newPrice = newSalePrice + diff;
         }
 
-        // Another hack to prevent price changing too fast in one hit.
-        // Push the amount in market back as well to keep this stable.
-        //
-        // Prices that change by more than the buy/sell difference
-        // allow big traders to exploit the market and extract free
-        // money... not sure I want to be fighting economic reality
-        // but game balance demands it here.
-        if (costToBuy > 0) {
-            if (newPrice > costToBuy + diff) {
-                amountPrice -= newPrice - (costToBuy + diff);
-                amountInMarket = Math.round(goodsType.getInitialAmount()
-                    * (initialPrice / amountPrice));
-                logger.info("Clamped price rise for " + getId()
-                    + " from " + newPrice
-                    + " to " + (costToBuy + diff));
-                newPrice = costToBuy + diff;
-            } else if (newPrice < costToBuy - diff) {
-                amountPrice += (costToBuy - diff) - newPrice;
-                amountInMarket = Math.round(goodsType.getInitialAmount()
-                    * (initialPrice / amountPrice));
-                logger.info("Clamped price fall for " + getId()
-                    + " from " + newPrice
-                    + " to " + (costToBuy - diff));
-                newPrice = costToBuy - diff;
-            }
-            newSalePrice = newPrice - diff;
-        }
+        // Apply stability hack (prevents rapid exploitation)
+        newPrice = applyStabilityLimit(newPrice, diff);
 
-        // Clamp extremes.
-        if (newPrice > MAXIMUM_PRICE) {
-            newPrice = MAXIMUM_PRICE;
-            newSalePrice = newPrice - diff;
-        } else if (newSalePrice < MINIMUM_PRICE) {
+        // Absolute clamping (MIN/MAX)
+        newPrice = clampPrice(newPrice);
+        newSalePrice = newPrice - diff;
+
+        // Floor protection (ensure sale price >= 1)
+        if (newSalePrice < MINIMUM_PRICE) {
             newSalePrice = MINIMUM_PRICE;
             newPrice = newSalePrice + diff;
         }
 
-        int oldCostToBuy = costToBuy, oldPaidForSale = paidForSale;
-        costToBuy = newPrice;
-        paidForSale = newSalePrice;
-        if (costToBuy != oldCostToBuy) {
-            firePropertyChange(goodsType.getId(), oldCostToBuy, costToBuy);
-        } else if (paidForSale != oldPaidForSale) {
-            firePropertyChange(goodsType.getId(), oldPaidForSale, paidForSale);
-        }            
-        return costToBuy != oldCostToBuy || paidForSale != oldPaidForSale;
+        // Commit changes and return result
+        return updatePriceState(newPrice, newSalePrice);
     }
 
     /**
@@ -410,7 +567,7 @@ public class MarketData extends FreeColGameObject {
         this.incomeBeforeTaxes = o.getIncomeBeforeTaxes();
         this.incomeAfterTaxes = o.getIncomeAfterTaxes();
         this.oldPrice = o.getOldPrice();
-        this.traded = o.getTraded();
+        this.traded = o.hasBeenTraded();
         return true;
     }
 

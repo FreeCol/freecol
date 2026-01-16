@@ -177,7 +177,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public boolean hasBeenTraded(GoodsType type) {
         MarketData data = getMarketData(type);
-        return data != null && data.getTraded();
+        return data != null && data.hasBeenTraded();
     }
 
     /**
@@ -213,34 +213,23 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public boolean addGoodsToMarket(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);
-
-        // Markets are bottomless, amount can not go below the threshold
-        data.setAmountInMarket(Math.max(MINIMUM_AMOUNT,
-                                        data.getAmountInMarket() + amount));
-        data.setTraded(true);
-        return data.price();
+        return data.addGoods(amount, MINIMUM_AMOUNT);
     }
 
     /**
-     * Gets the initial price of a given goods type.
+     * Sets a new initial price for a goods type and forces a price update.
+     * This is primarily used during game randomization/initialization.
      *
-     * @param goodsType The {@code GoodsType} to get the initial price of.
-     * @return The initial price.
+     * @param type The GoodsType to modify.
+     * @param price The new initial price.
      */
-    public int getInitialPrice(GoodsType goodsType) {
-        MarketData data = requireMarketData(goodsType);
-        return data.getInitialPrice();
-    }
-
-    /**
-     * Sets the initial price of a given goods type.
-     *
-     * @param goodsType The {@code GoodsType} to set the initial price of.
-     * @param amount The new initial price.
-     */
-    public void setInitialPrice(GoodsType goodsType, int amount) {
-        MarketData data = requireMarketData(goodsType);
-        data.setInitialPrice(amount);
+    public void resetInitialPrice(GoodsType type, int price) {
+        MarketData data = getMarketData(type);
+        if (data != null) {
+            data.setInitialPrice(price);
+            data.update();           // Calculate costToBuy/paidForSale based on new initial
+            data.flushPriceChange();  // Ensure Turn 1 doesn't show a "price change" alert
+        }
     }
 
     /**
@@ -252,7 +241,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public int getBidPrice(GoodsType type, int amount) {
         MarketData data = getMarketData(type);
-        return (data == null) ? 0 : amount * data.getCostToBuy();
+        return (data == null) ? 0 : data.getBidPrice(amount);
     }
 
     /**
@@ -264,7 +253,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public int getSalePrice(GoodsType type, int amount) {
         MarketData data = getMarketData(type);
-        return (data == null) ? 0 : amount * data.getPaidForSale();
+        return (data == null) ? 0 : data.getSalePrice(amount);
     }
 
     /**
@@ -320,8 +309,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public void modifySales(GoodsType goodsType, int amount) {
         if (amount != 0) {
             MarketData data = requireMarketData(goodsType);
-            data.setSales(data.getSales() + amount);
-            data.setTraded(true);
+            data.addSales(amount);
         }
     }
 
@@ -344,7 +332,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);
-        data.setIncomeBeforeTaxes(data.getIncomeBeforeTaxes() + amount);
+        data.addIncomeBeforeTaxes(amount);
     }
 
     /**
@@ -366,7 +354,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
         MarketData data = requireMarketData(goodsType);
-        data.setIncomeAfterTaxes(data.getIncomeAfterTaxes() + amount);
+        data.addIncomeAfterTaxes(amount);
     }
 
     /**
@@ -383,24 +371,23 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Has the price of a type of goods changed in this market?
      *
-     * @param goodsType The type of goods to consider.
+     * @param goodsType The {@code GoodsType} to consider.
      * @return True if the price has changed.
      */
     public boolean hasPriceChanged(GoodsType goodsType) {
         MarketData data = getMarketData(goodsType);
-        return data != null && data.getOldPrice() != 0
-            && data.getOldPrice() != data.getCostToBuy();
+        return data != null && data.hasPriceChanged();
     }
 
     /**
      * Clear any price changes for a type of goods.
      *
-     * @param goodsType The type of goods to consider.
+     * @param goodsType The {@code GoodsType} to consider.
      */
     public void flushPriceChange(GoodsType goodsType) {
         MarketData data = getMarketData(goodsType);
         if (data != null) {
-            data.setOldPrice(data.getCostToBuy());
+            data.flushPriceChange();
         }
     }
 
@@ -413,17 +400,17 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public ModelMessage makePriceChangeMessage(GoodsType goodsType) {
         MarketData data = getMarketData(goodsType);
-        int oldPrice = data.getOldPrice();
-        int newPrice = data.getCostToBuy();
-        return (oldPrice == newPrice) ? null
-            : new ModelMessage(ModelMessage.MessageType.MARKET_PRICES,
-                               ((newPrice > oldPrice)
-                                   ? "model.market.priceIncrease"
-                                   : "model.market.priceDecrease"),
-                               this, goodsType)
+        if (data == null || !data.hasPriceChanged()) return null;
+
+        String messageId = data.isPriceIncrease()
+            ? "model.market.priceIncrease"
+            : "model.market.priceDecrease";
+
+        return new ModelMessage(ModelMessage.MessageType.MARKET_PRICES,
+                                messageId, this, goodsType)
                 .addStringTemplate("%market%", owner.getMarketName())
                 .addNamed("%goods%", goodsType)
-                .addAmount("%buy%", newPrice)
+                .addAmount("%buy%", data.getCostToBuy())
                 .addAmount("%sell%", data.getPaidForSale());
     }
 

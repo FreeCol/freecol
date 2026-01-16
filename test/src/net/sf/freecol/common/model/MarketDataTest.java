@@ -45,7 +45,7 @@ public class MarketDataTest extends FreeColTestCase {
                      rum.getInitialBuyPrice(), data.getCostToBuy());
         assertEquals("Initial sell price mismatch", 
                      rum.getInitialSellPrice(), data.getPaidForSale());
-        assertFalse("Traded status should be false by default", data.getTraded());
+        assertFalse("Traded status should be false by default", data.hasBeenTraded());
     }
 
     public void testPriceIncrease() {
@@ -140,7 +140,7 @@ public class MarketDataTest extends FreeColTestCase {
         assertEquals("Market amount mismatch after copyIn", 
                      original.getAmountInMarket(), copy.getAmountInMarket());
         assertEquals("Traded status mismatch after copyIn", 
-                     original.getTraded(), copy.getTraded());
+                     original.hasBeenTraded(), copy.hasBeenTraded());
     }
 
     public void testXMLRoundTrip() throws Exception {
@@ -170,6 +170,6 @@ public class MarketDataTest extends FreeColTestCase {
         assertEquals("Arrears lost in XML", 42, loaded.getArrears());
         assertEquals("Sales lost in XML", 100, loaded.getSales());
         assertEquals("Income lost in XML", 500, loaded.getIncomeBeforeTaxes());
-        assertTrue("Traded status lost in XML", loaded.getTraded());
+        assertTrue("Traded status lost in XML", loaded.hasBeenTraded());
     }
 }
