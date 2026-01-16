@@ -185,11 +185,9 @@ public class Tension implements Named {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof Tension) {
-            Tension other = (Tension)o;
-            return this.value == other.value;
-        }
-        return false;
+        if (!(o instanceof Tension)) return false;
+        Tension other = (Tension) o;
+        return this.value == other.value;
     }
 
     /**
@@ -197,9 +195,7 @@ public class Tension implements Named {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + this.value;
-        return hash;
+        return java.util.Objects.hash(this.value);
     }
 
     /**
