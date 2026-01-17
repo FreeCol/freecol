@@ -19,11 +19,11 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -293,10 +293,13 @@ public abstract class TradeItem extends FreeColGameObject {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TradeItem)) return false;
-        TradeItem other = (TradeItem)o;
-        return Utils.equals(this.source, other.source)
-            && Utils.equals(this.destination, other.destination)
+        if (this == o) return true;
+        
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        TradeItem other = (TradeItem) o;
+        return Objects.equals(this.source, other.source)
+            && Objects.equals(this.destination, other.destination)
             && super.equals(other);
     }
 
@@ -305,8 +308,6 @@ public abstract class TradeItem extends FreeColGameObject {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.source);
-        return 37 * hash + Utils.hashCode(this.destination);
+        return Objects.hash(super.hashCode(), this.source, this.destination);
     }
 }

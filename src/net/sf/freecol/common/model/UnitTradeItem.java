@@ -19,12 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -33,6 +34,8 @@ import net.sf.freecol.common.util.Utils;
 public class UnitTradeItem extends TradeItem {
     
     public static final String TAG = "unitTradeItem";
+
+    private static final int MIN_AI_UNITS_TO_TRADE = 10;
 
     /** The unit to change hands. */
     private Unit unit;
@@ -113,13 +116,18 @@ public class UnitTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public int evaluateFor(Player player) {
-        final Unit unit = getUnit();
-        return (!isValid()) ? INVALID_TRADE_ITEM
-            : (getSource() == player)
-            ? ((player.isAI() && player.getUnitCount() < 10)
-                ? TradeItem.INVALID_TRADE_ITEM
-                : -unit.evaluateFor(player))
-            : unit.evaluateFor(player);
+        if (!isValid()) {
+            return INVALID_TRADE_ITEM;
+        }
+        Unit u = getUnit();
+        if (getSource() == player) {
+            // AI players with too few units refuse to trade
+            if (player.isAI() && player.getUnitCount() < MIN_AI_UNITS_TO_TRADE) {
+                return INVALID_TRADE_ITEM;
+            }
+            return -u.evaluateFor(player);
+        }
+        return u.evaluateFor(player);
     }
 
 
@@ -174,12 +182,14 @@ public class UnitTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof UnitTradeItem) {
-            return Utils.equals(this.unit, ((UnitTradeItem)other).unit)
-                && super.equals(other);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UnitTradeItem other = (UnitTradeItem) o;
+        return Objects.equals(this.unit, other.unit)
+            && super.equals(other);
     }
 
     /**
@@ -187,8 +197,7 @@ public class UnitTradeItem extends TradeItem {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + Utils.hashCode(this.unit);
+        return Objects.hash(super.hashCode(), this.unit);
     }
 
     /**
@@ -196,9 +205,7 @@ public class UnitTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(unit.getId()).append(']');
-        return sb.toString();
+        return getClass().getSimpleName() + "[id=" + getId() + 
+               ", unit=" + (unit != null ? unit.getId() : "null") + "]";
     }
 }
