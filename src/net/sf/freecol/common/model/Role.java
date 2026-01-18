@@ -205,13 +205,7 @@ public class Role extends BuildableType {
      * @return A list of required goods.
      */
     public List<AbstractGoods> getRequiredGoodsList(int roleCount) {
-        List<AbstractGoods> result = getRequiredGoodsList();
-        if (roleCount > 1 && !result.isEmpty()) {
-            for (AbstractGoods ag : result) {
-                ag.setAmount(roleCount * ag.getAmount());
-            }
-        }
-        return result;
+        return getRequiredGoodsForCount(roleCount);
     }
 
     /**
@@ -222,7 +216,7 @@ public class Role extends BuildableType {
      * @return A stream of required goods.
      */
     public Stream<AbstractGoods> getRequiredGoods(int roleCount) {
-        return getRequiredGoodsList(roleCount).stream();
+        return getRequiredGoodsForCount(roleCount).stream();
     }
 
     /**
@@ -434,10 +428,11 @@ public class Role extends BuildableType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Role o = copyInCast(other, Role.class);
-        if (o == null || !super.copyIn(o)) return false;
-        this.downgrade = o.getDowngrade();
-        this.maximumCount = o.getMaximumCount();
-        this.expertUnit = o.getExpertUnit();
+        if (o == null) return false;
+        super.copyIn(o);
+        this.downgrade = o.downgrade;
+        this.maximumCount = o.maximumCount;
+        this.expertUnit = o.expertUnit;
         this.setRoleChanges(o.getRoleChanges());
         return true;
     }

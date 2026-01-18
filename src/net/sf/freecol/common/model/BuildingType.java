@@ -412,6 +412,11 @@ public final class BuildingType extends BuildableType
     }
 
     @Override
+    public boolean isUniqueInQueue() {
+        return true;
+    }
+
+    @Override
     public int getMinimumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         ListModel<BuildableType> buildQueue = buildQueueList.getModel();
         BuildingType upgradesFrom = this.getUpgradesFrom();
@@ -529,19 +534,20 @@ public final class BuildingType extends BuildableType
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         BuildingType o = copyInCast(other, BuildingType.class);
-        if (o == null || !super.copyIn(o)) return false;
-        this.level = o.getLevel();
-        this.workPlaces = o.getWorkPlaces();
-        this.minSkill = o.getMinimumSkill();
-        this.maxSkill = o.getMaximumSkill();
-        this.upkeep = o.getUpkeep();
-        this.priority = o.getPriority();
-        this.expertConnectionProduction = o.getExpertConnectionProduction();
-        this.competenceFactor = o.getCompetenceFactor();
-        this.rebelFactor = o.getRebelFactor();
-        this.upgradesFrom = o.getUpgradesFrom();
-        this.upgradesTo = o.getUpgradesTo();
-        this.setProductionTypes(o.getProductionTypes());        
+        if (o == null) return false;
+        super.copyIn(o);
+        this.level = o.level;
+        this.workPlaces = o.workPlaces;
+        this.minSkill = o.minSkill;
+        this.maxSkill = o.maxSkill;
+        this.upkeep = o.upkeep;
+        this.priority = o.priority;
+        this.expertConnectionProduction = o.expertConnectionProduction;
+        this.competenceFactor = o.competenceFactor;
+        this.rebelFactor = o.rebelFactor;
+        this.upgradesFrom = o.upgradesFrom;
+        this.upgradesTo = o.upgradesTo;
+        this.setProductionTypes(o.getProductionTypes());
         return true;
     }
 

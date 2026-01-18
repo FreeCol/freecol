@@ -650,6 +650,41 @@ public class ServerColony extends Colony implements TurnTaker {
         }
     }
 
+    /**
+     * Updates the build queue based on its completion action.
+     *
+     * @param queue The {@code BuildQueue} that completed an item.
+     * @param random The {@code Random} source for shuffling.
+     * @param cs The {@code ChangeSet} to update.
+     */
+    private void applyCompletionAction(BuildQueue<? extends BuildableType> queue,
+                                       Random random, ChangeSet cs) {
+    
+        switch (queue.getCompletionAction()) {
+    
+        case SHUFFLE:
+            if (queue.size() > 1) {
+                randomShuffle(logger, "Build queue",
+                              queue.getValues(), random);
+            }
+            break;
+    
+        case REMOVE_EXCEPT_LAST:
+            if (queue.size() == 1
+                && queue.getCurrentlyBuilding() instanceof UnitType) {
+                // Repeat last unit
+                break;
+            }
+            // fall through
+    
+        case REMOVE:
+        default:
+            queue.remove(0);
+            break;
+        }
+    
+        csNextBuildable(queue, cs);
+    }
 
     // Implement TurnTaker
 
@@ -809,26 +844,7 @@ public class ServerColony extends Colony implements TurnTaker {
         // built item from its build queue.
         if (!built.isEmpty()) {
             for (BuildQueue<? extends BuildableType> queue : built) {
-                switch (queue.getCompletionAction()) {
-                case SHUFFLE:
-                    if (queue.size() > 1) {
-                        randomShuffle(logger, "Build queue",
-                                      queue.getValues(), random);
-                    }
-                    break;
-                case REMOVE_EXCEPT_LAST:
-                    if (queue.size() == 1
-                        && queue.getCurrentlyBuilding() instanceof UnitType) {
-                        // Repeat last unit
-                        break;
-                    }
-                    // Fall through
-                case REMOVE:
-                default:
-                    queue.remove(0);
-                    break;
-                }
-                csNextBuildable(queue, cs);
+                applyCompletionAction(queue, random, cs);
             }
             tileDirty = true;
         }

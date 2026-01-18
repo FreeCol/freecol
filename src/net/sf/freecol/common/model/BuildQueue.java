@@ -19,9 +19,12 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.sf.freecol.common.option.GameOptions;
@@ -62,7 +65,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
     /** A list of Buildable items. */
-    private final List<T> queue = new ArrayList<>();
+    private final Deque<T> queue = new ArrayDeque<>();
 
     /** What to do when an item has been completed. */
     private CompletionAction completionAction = CompletionAction.REMOVE;
@@ -89,40 +92,43 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
     public void clear() {
-        this.queue.clear();
+        queue.clear();
     }
 
     public void add(T buildable) {
-        this.queue.add(buildable);
+        queue.addLast(buildable);
     }
 
     public List<T> getValues() {
-        return this.queue;
+        return Collections.unmodifiableList(new ArrayList<>(queue));
     }
 
     public void setValues(List<T> values) {
         clear();
-        this.queue.addAll(values);
+        values.forEach(queue::addLast);
     }
 
     public void remove(int index) {
-        this.queue.remove(index);
+        List<T> list = new ArrayList<>(queue);
+        list.remove(index);
+        queue.clear();
+        queue.addAll(list);
     }
 
     public int size() {
-        return this.queue.size();
+        return queue.size();
     }
 
     public boolean isEmpty() {
-        return this.queue.isEmpty();
+        return queue.isEmpty();
     }
 
     public final CompletionAction getCompletionAction() {
-        return this.completionAction;
+        return completionAction;
     }
 
     public final void setCompletionAction(final CompletionAction newCompletionAction) {
-        this.completionAction = newCompletionAction;
+        completionAction = newCompletionAction;
     }
 
 
@@ -132,7 +138,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * @return The type of building currently being built.
      */
     public T getCurrentlyBuilding() {
-        return (this.queue.isEmpty()) ? null : this.queue.get(0);
+        return queue.peekFirst();
     }
 
     /**
@@ -144,13 +150,14 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     public void setCurrentlyBuilding(T buildable) {
         if (buildable == null) {
             clear();
-        } else {
-            if (buildable instanceof BuildingType // FIXME: OO
-                && this.queue.contains(buildable)) {
-                this.queue.remove(buildable);
-            }
-            this.queue.add(0, buildable);
+            return;
         }
+
+        if (buildable.isUniqueInQueue() && queue.contains(buildable)) {
+            queue.remove(buildable);
+        }
+
+        queue.addFirst(buildable);
     }
 
     /**
@@ -162,27 +169,43 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
         T current = getCurrentlyBuilding();
-        if (current != null) {
-            // ATTENTION: this code presupposes that we will consume
-            // all required goods at once
-            final boolean overflow = this.colony.getSpecification()
-                .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
-            List<AbstractGoods> consumption = new ArrayList<>();
-            for (AbstractGoods ag : current.getRequiredGoodsList()) {
-                AbstractGoods available = find(input, AbstractGoods.matches(ag.getType()));
-                if (available != null
-                    && ag.getAmount() <= available.getAmount()) {
-                    int amount = (overflow || ag.getType().isStorable())
-                        ? ag.getAmount()
-                        : available.getAmount();
-                    consumption.add(new AbstractGoods(ag.getType(), amount));
-                } else { // don't build anything
-                    return result;
-                }
-            }
-            result.setConsumption(consumption);
+
+        if (current == null) {
+            return result;
         }
+
+        final boolean overflow = colony.getSpecification()
+                                       .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
+
+        List<AbstractGoods> consumption = new ArrayList<>();
+
+        for (AbstractGoods required : current.getRequiredGoodsList()) {
+
+            AbstractGoods available = find(input, AbstractGoods.matches(required.getType()));
+
+            if (available == null || available.getAmount() < required.getAmount()) {
+                return result; // Not enough goods → no production
+            }
+
+            int amount = computeConsumptionAmount(required, available, overflow);
+            consumption.add(new AbstractGoods(required.getType(), amount));
+        }
+
+        result.setConsumption(consumption);
         return result;
+    }
+
+    /**
+     * Determines how many goods to consume for production,
+     * using overflow rules and storable‑goods behavior.
+     *
+     * @return the amount of goods to consume
+     */
+    private int computeConsumptionAmount(AbstractGoods required, AbstractGoods available, boolean overflow) {
+        if (overflow || required.getType().isStorable()) {
+            return required.getAmount();
+        }
+        return available.getAmount();
     }
 
 
@@ -203,7 +226,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      */
     @Override
     public int getPriority() {
-        return this.priority;
+        return priority;
     }
 
     /**
@@ -222,12 +245,9 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append("[BuildQueue (").append(this.colony.getName()).append(')');
-        for (BuildableType item : this.queue) {
-            sb.append(' ').append(item.getId());
-        }
-        sb.append(']');
-        return sb.toString();
+        String items = queue.stream()
+                            .map(BuildableType::getId)
+                            .collect(Collectors.joining(" "));
+        return "[BuildQueue (" + colony.getName() + ") " + items + "]";
     }
 }

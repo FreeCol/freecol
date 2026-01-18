@@ -59,7 +59,6 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /** Limits on the production of this type. */
     private List<Limit> limits = null;
 
-
     /**
      * Creates a new buildable type.
      *
@@ -68,6 +67,14 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public BuildableType(String id, Specification specification) {
         super(id, specification);
+    }
+
+    /**
+     * Whether this buildable type must appear at most once in a colony's
+     * build queue. Buildings override this to return true.
+     */
+    public boolean isUniqueInQueue() {
+        return false;
     }
 
 
@@ -156,6 +163,21 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     }
 
     /**
+     * Creates a defensive copy of this buildable's required goods.
+     * Each AbstractGoods entry is duplicated to prevent external mutation.
+     */
+    private List<AbstractGoods> copyRequiredGoods() {
+        if (requiredGoods == null || requiredGoods.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<AbstractGoods> copy = new ArrayList<>(requiredGoods.size());
+        for (AbstractGoods ag : requiredGoods) {
+            copy.add(new AbstractGoods(ag.getType(), ag.getAmount()));
+        }
+        return copy;
+    }
+
+    /**
      * Get the goods required to build an instance of this buildable.
      *
      * Note we must take care to return a deep copy, as these lists
@@ -164,10 +186,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return A deep copy of the list of required goods.
      */
     public List<AbstractGoods> getRequiredGoodsList() {
-        return (this.requiredGoods == null)
-                ? Collections.<AbstractGoods>emptyList()
-                : transform(this.requiredGoods, alwaysTrue(),
-                ag -> new AbstractGoods(ag.getType(), ag.getAmount()));
+        return copyRequiredGoods();
     }
 
     /**
@@ -177,8 +196,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return A stream of the required goods.
      */
     public Stream<AbstractGoods> getRequiredGoods() {
-        return (this.requiredGoods == null) ? Stream.<AbstractGoods>empty()
-                : getRequiredGoodsList().stream();
+        return copyRequiredGoods().stream();
     }
 
     /**
@@ -187,8 +205,11 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @param goods The new required goods.
      */
     public void setRequiredGoods(List<AbstractGoods> goods) {
-        this.requiredGoods.clear();
-        this.requiredGoods.addAll(goods);
+        if (goods == null || goods.isEmpty()) {
+            this.requiredGoods = null;
+        } else {
+            this.requiredGoods = new ArrayList<>(goods);
+        }
     }
 
     /**
@@ -208,7 +229,10 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @param ag The required {@code AbstractGoods} to add.
      */
     private void addRequiredGoods(AbstractGoods ag) {
-        if (this.requiredGoods == null) this.requiredGoods = new ArrayList<>();
+        if (ag == null) return;
+        if (this.requiredGoods == null) {
+            this.requiredGoods = new ArrayList<>();
+        }
         this.requiredGoods.add(ag);
     }
 
@@ -218,7 +242,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return True if goods are required to build this buildable.
      */
     public boolean needsGoodsToBuild() {
-        return this.requiredGoods != null && !this.requiredGoods.isEmpty();
+        return !getRequiredGoodsList().isEmpty();
     }
 
     /**
@@ -260,6 +284,20 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     }
 
     /**
+     * Returns the goods required to build this type multiplied by the given count.
+     * Useful for estimating total costs when producing multiple items.
+     */
+    public List<AbstractGoods> getRequiredGoodsForCount(int count) {
+        if (count <= 1) return getRequiredGoodsList();
+        List<AbstractGoods> base = getRequiredGoodsList();
+        List<AbstractGoods> scaled = new ArrayList<>(base.size());
+        for (AbstractGoods ag : base) {
+            scaled.add(new AbstractGoods(ag.getType(), ag.getAmount() * count));
+        }
+        return scaled;
+    }
+
+    /**
      * Check to see if this buildable type can be built in a colony
      * based on the buildings or units available.
      *
@@ -287,11 +325,16 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         BuildableType o = copyInCast(other, BuildableType.class);
-        if (o == null || !super.copyIn(o)) return false;
-        this.setRequiredPopulation(o.getRequiredPopulation());
-        this.setRequiredAbilities(o.getRequiredAbilities());
-        this.setRequiredGoods(o.getRequiredGoodsList());
-        this.setLimits(o.getLimits());
+        if (o == null) return false;
+
+        this.requiredPopulation = o.requiredPopulation;
+        this.requiredAbilities = (o.requiredAbilities == null)
+                ? null : new HashMap<>(o.requiredAbilities);
+        this.requiredGoods = (o.requiredGoods == null)
+                ? null : new ArrayList<>(o.requiredGoods);
+        this.limits = (o.limits == null)
+                ? null : new ArrayList<>(o.limits);
+
         return true;
     }
 
