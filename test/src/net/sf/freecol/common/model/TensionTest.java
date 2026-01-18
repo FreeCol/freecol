@@ -1,3 +1,22 @@
+/**
+ * Copyright (C) 2002-2024  The FreeCol Team
+ *
+ * This file is part of FreeCol.
+ *
+ * FreeCol is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * FreeCol is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -70,9 +89,9 @@ public class TensionTest extends FreeColTestCase {
     }
 
     public void testToStringMatchesLevel() {
-        assertEquals("HAPPY", new Tension(50).toString());
-        assertEquals("CONTENT", new Tension(500).toString());
-        assertEquals("HATEFUL", new Tension(2000).toString());
+        assertEquals("HAPPY(50)", new Tension(50).toString());
+        assertEquals("CONTENT(500)", new Tension(500).toString());
+        assertEquals("HATEFUL(1100)", new Tension(2000).toString()); 
     }
 
     public void testKeyFormatting() {
@@ -84,5 +103,52 @@ public class TensionTest extends FreeColTestCase {
         Tension t = new Tension(50);
         String expected = "model.tension." + Tension.Level.HAPPY.getKey() + ".name";
         assertEquals(expected, t.getNameKey());
+    }
+
+    public void testLevelClassificationMethods() {
+        assertTrue(Tension.Level.HAPPY.isFriendly());
+        assertTrue(Tension.Level.HAPPY.isVeryFriendly());
+        assertFalse(Tension.Level.HAPPY.isNeutral());
+        assertFalse(Tension.Level.HAPPY.isHostile());
+        assertTrue(Tension.Level.CONTENT.isFriendly());
+        assertFalse(Tension.Level.CONTENT.isVeryFriendly());
+        assertTrue(Tension.Level.CONTENT.isNeutral());
+        assertTrue(Tension.Level.DISPLEASED.isNeutral());
+        assertFalse(Tension.Level.DISPLEASED.isFriendly());
+        assertTrue(Tension.Level.ANGRY.isHostile());
+        assertFalse(Tension.Level.ANGRY.isVeryHostile());
+        assertTrue(Tension.Level.HATEFUL.isHostile());
+        assertTrue(Tension.Level.HATEFUL.isVeryHostile());
+    }
+
+    public void testLevelComparison() {
+        assertTrue(Tension.Level.HATEFUL.isWorseThan(Tension.Level.HAPPY));
+        assertTrue(Tension.Level.HAPPY.isBetterThan(Tension.Level.ANGRY));
+        assertFalse(Tension.Level.CONTENT.isWorseThan(Tension.Level.CONTENT));
+    }
+
+    public void testPointsToNextLevel() {
+        assertEquals(50, new Tension(50).pointsToNextLevel());
+        assertEquals(50, new Tension(650).pointsToNextLevel());
+        assertEquals(0, new Tension(Tension.Level.HATEFUL.getLimit()).pointsToNextLevel());
+        assertEquals(0, new Tension(Tension.TENSION_MAX).pointsToNextLevel());
+    }
+
+    public void testLevelChangedAfterModify() {
+        Tension tension = new Tension(95);
+
+        assertFalse("Small change should not trigger level change", 
+            tension.levelChangedAfterModify(2));
+
+        assertTrue("Pushing over 100 should trigger level change", 
+            tension.levelChangedAfterModify(10));
+   
+        assertEquals(Tension.Level.CONTENT, tension.getLevel());
+    }
+
+    public void testSurrenderValue() {
+        Tension tension = new Tension(Tension.SURRENDERED);
+        assertEquals(350, tension.getValue());
+        assertEquals(Tension.Level.CONTENT, tension.getLevel());
     }
 }

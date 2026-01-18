@@ -394,18 +394,22 @@ public class GUI extends FreeColClientHolder {
         Player player = attacker.getOwner();
         Player other = is.getOwner();
         int strength = player.calculateStrength(false);
+
         String messageId = (other.getSettlementCount() >= strength)
             ? "confirmTribute.unwise"
             : (other.getStance(player) == Stance.CEASE_FIRE)
             ? "confirmTribute.warLikely"
-            : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
+            : (is.getAlarm(player).getLevel().isVeryFriendly())
             ? "confirmTribute.happy"
             : "confirmTribute.normal";
+
         StringTemplate t = StringTemplate.template(messageId)
             .addStringTemplate("%settlement%", is.getLocationLabelFor(player))
             .addStringTemplate("%nation%", other.getNationLabel());
-        return (modalConfirmDialog(is.getTile(), t, attacker,
-                        "confirmTribute.yes", "confirmTribute.no", true)) ? 1 : -1;
+
+        return modalConfirmDialog(is.getTile(), t, attacker,
+                "confirmTribute.yes", "confirmTribute.no", true)
+            ? 1 : -1;
     }
 
     /**

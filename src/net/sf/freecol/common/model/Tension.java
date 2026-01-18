@@ -19,8 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
+
 import net.sf.freecol.common.i18n.Messages;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -93,6 +94,71 @@ public class Tension implements Named {
         public String getKey() {
             return getEnumKey(this);
         }
+
+        /**
+         * Is this a friendly tension level.
+         *
+         * @return True if the level is HAPPY or CONTENT.
+         */
+        public boolean isFriendly() {
+            return this == HAPPY || this == CONTENT;
+        }
+
+        /**
+         * Is this a very friendly tension level.
+         *
+         * @return True if the level is HAPPY.
+         */
+        public boolean isVeryFriendly() {
+            return this == HAPPY;
+        }
+
+        /**
+         * Is this a neutral tension level.
+         *
+         * @return True if the level is CONTENT or DISPLEASED.
+         */
+        public boolean isNeutral() {
+            return this == CONTENT || this == DISPLEASED;
+        }
+
+        /**
+         * Is this a hostile tension level.
+         *
+         * @return True if the level is ANGRY or HATEFUL.
+         */
+        public boolean isHostile() {
+            return this == ANGRY || this == HATEFUL;
+        }
+
+        /**
+         * Is this an extremely hostile tension level.
+         *
+         * @return True if the level is HATEFUL.
+         */
+        public boolean isVeryHostile() {
+            return this == HATEFUL;
+        }
+
+        /**
+         * Is this level worse than another.
+         *
+         * @param other The other {@code Level}.
+         * @return True if this level represents greater hostility.
+         */
+        public boolean isWorseThan(Level other) {
+            return this.limit > other.limit;
+        }
+
+        /**
+         * Is this level better than another.
+         *
+         * @param other The other {@code Level}.
+         * @return True if this level represents less hostility.
+         */
+        public boolean isBetterThan(Level other) {
+            return this.limit < other.limit;
+        }
     }
     
     private int value;
@@ -144,9 +210,38 @@ public class Tension implements Named {
      *
      * @return The current level.
      */
-    public final Level getLevel() {
-        return find(Level.values(), level -> value <= level.getLimit(),
-                    Level.HATEFUL);
+    public Level getLevel() {
+        for (Level level : Level.values()) {
+            if (value <= level.limit) return level;
+        }
+        return Level.HATEFUL;
+    }
+
+    /**
+     * Get the number of tension points required to reach the next
+     * higher tension level.
+     *
+     * @return The points needed to reach the next level, or zero if
+     *     already at the maximum level.
+     */
+    public int pointsToNextLevel() {
+        for (Level level : Level.values()) {
+            if (value < level.limit) return level.limit - value;
+        }
+        return 0;
+    }
+
+    /**
+     * Check whether modifying the tension by the given amount results
+     * in a change of tension level.
+     *
+     * @param delta The amount to modify the tension by.
+     * @return True if the tension level changed, false otherwise.
+     */
+    public boolean levelChangedAfterModify(int delta) {
+        Level old = getLevel();
+        modify(delta);
+        return old != getLevel();
     }
 
     /**
@@ -185,7 +280,9 @@ public class Tension implements Named {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Tension)) return false;
+        
+        if (o == null || getClass() != o.getClass()) return false;
+        
         Tension other = (Tension) o;
         return this.value == other.value;
     }
@@ -195,7 +292,7 @@ public class Tension implements Named {
      */
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(this.value);
+        return Objects.hash(this.value);
     }
 
     /**
@@ -203,6 +300,6 @@ public class Tension implements Named {
      */
     @Override
     public String toString() {
-        return getLevel().toString();
-    }    
+        return getLevel() + "(" + value + ")";
+    }  
 }
