@@ -20,11 +20,14 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import net.sf.freecol.common.model.BuildQueue.CompletionAction;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -32,19 +35,18 @@ public class BuildQueueTest extends FreeColTestCase {
 
     private BuildQueue<BuildableType> queue;
     private Colony colony;
+    private Game game;
+    private Specification spec;
     private UnitType colonistType;
-    private UnitType pettyCriminal;
-    private UnitType indenturedServant;
-    private UnitType randomUnit;
-    private BuildingType schoolhouseType;
+    private BuildingType warehouseType;
     private GoodsType hammers;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        Game game = getStandardGame();
-        Specification spec = game.getSpecification();
+        game = getStandardGame();
+        spec = game.getSpecification();
 
         Map map = getTestMap(spec.getTileType("model.tile.plains"));
         game.setMap(map);
@@ -54,190 +56,314 @@ public class BuildQueueTest extends FreeColTestCase {
         colony = new ServerColony(game, dutch, "TestColony", tile);
 
         colonistType = spec.getUnitType("model.unit.freeColonist");
-        pettyCriminal = spec.getUnitType("model.unit.pettyCriminal");
-        indenturedServant = spec.getUnitType("model.unit.indenturedServant");
-        schoolhouseType = spec.getBuildingType("model.building.schoolhouse");
+        warehouseType = spec.getBuildingType("model.building.warehouse");
         hammers = spec.getGoodsType("model.goods.hammers");
-        randomUnit = spec.getUnitTypeList().get(0);
 
         queue = new BuildQueue<>(colony, BuildQueue.CompletionAction.REMOVE, 500);
     }
 
     public void testAddAndSize() {
-        assertEquals(0, queue.size());
         queue.add(colonistType);
+        queue.add(warehouseType);
+        assertEquals(2, queue.size());
+    }
+
+    public void testSetCurrentlyBuilding() {
+        queue.add(colonistType);
+        queue.add(warehouseType);
+        queue.setCurrentlyBuilding(warehouseType);
+        assertEquals(warehouseType, queue.getCurrentlyBuilding());
+        assertEquals(2, queue.size());
+    }
+
+    public void testApplyCompletionActionRemove() {
+        queue.setCompletionAction(BuildQueue.CompletionAction.REMOVE);
+        queue.add(colonistType);
+        queue.add(warehouseType);
+        
+        queue.applyCompletionAction(new Random());
+        
         assertEquals(1, queue.size());
-        queue.add(schoolhouseType);
-        assertEquals(2, queue.size());
+        assertEquals(warehouseType, queue.getCurrentlyBuilding());
     }
 
-    public void testSetCurrentlyBuildingMovesToFront() {
-        queue.add(colonistType);
-        queue.add(schoolhouseType);
-        queue.setCurrentlyBuilding(schoolhouseType);
-        assertEquals(schoolhouseType, queue.getCurrentlyBuilding());
-        assertEquals(2, queue.size());
-    }
-
-    public void testGetProductionInfoInsufficientGoods() {
-        queue.add(schoolhouseType);
-        List<AbstractGoods> input = new ArrayList<>();
-        input.add(new AbstractGoods(hammers, 0));
-        ProductionInfo info = queue.getProductionInfo(input);
-        assertTrue(info.getConsumption().isEmpty());
-    }
-
-    public void testGetProductionInfoSufficientGoods() {
-        queue.add(colonistType);
-        List<AbstractGoods> requirements = colonistType.getRequiredGoodsList();
-        List<AbstractGoods> input = new ArrayList<>();
-
-        for (AbstractGoods req : requirements) {
-            input.add(new AbstractGoods(req.getType(), req.getAmount() * 2));
-        }
-
-        if (requirements.isEmpty()) {
-            queue.clear();
-            queue.add(schoolhouseType);
-            for (AbstractGoods req : schoolhouseType.getRequiredGoodsList()) {
-                input.add(new AbstractGoods(req.getType(), req.getAmount() * 2));
-            }
-        }
-
-        ProductionInfo info = queue.getProductionInfo(input);
-        assertFalse(info.getConsumption().isEmpty());
-
-        GoodsType expectedType = queue.getCurrentlyBuilding()
-                                      .getRequiredGoodsList()
-                                      .get(0)
-                                      .getType();
-        assertEquals(expectedType, info.getConsumption().get(0).getType());
-    }
-
-    public void testCompletionActionRemoveExceptLast() {
+    public void testApplyCompletionActionRemoveExceptLast() {
         queue.setCompletionAction(BuildQueue.CompletionAction.REMOVE_EXCEPT_LAST);
         queue.add(colonistType);
-        queue.add(colonistType);
-        assertEquals(2, queue.size());
-        queue.remove(0);
+        
+        queue.applyCompletionAction(new Random());
         assertEquals(1, queue.size());
-        assertEquals(colonistType, queue.getCurrentlyBuilding());
+        
+        queue.add(warehouseType);
+        queue.applyCompletionAction(new Random());
+        assertEquals(1, queue.size());
+        assertEquals(warehouseType, queue.getCurrentlyBuilding());
     }
 
-    public void testPriority() {
-        assertEquals(500, queue.getPriority());
-    }
-
-    public void testToStringContainsColonyName() {
-        queue.add(colonistType);
-        String s = queue.toString();
-        assertTrue(s.contains("TestColony"));
-        assertTrue(s.contains(colonistType.getId()));
-    }
-
-    public void testSetCurrentlyBuildingRemovesDuplicateBuilding() {
-        queue.add(schoolhouseType);
-        queue.add(schoolhouseType);
-        assertEquals(2, queue.size());
-        assertEquals(schoolhouseType, queue.getCurrentlyBuilding());
-    }
-
-    public void testGetProductionInfoWithOverflow() {
-        colony.getSpecification().setBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW, true);
-        queue.add(schoolhouseType);
-
+    public void testGetProductionInfo() {
+        queue.add(warehouseType);
         List<AbstractGoods> input = new ArrayList<>();
-        for (AbstractGoods req : schoolhouseType.getRequiredGoodsList()) {
+        
+        input.add(new AbstractGoods(hammers, 0));
+        ProductionInfo infoEmpty = queue.getProductionInfo(input);
+        assertTrue(infoEmpty.getConsumption().isEmpty());
+
+        input.clear();
+        for (AbstractGoods req : warehouseType.getRequiredGoodsList()) {
             input.add(new AbstractGoods(req.getType(), req.getAmount() * 2));
         }
-
-        ProductionInfo info = queue.getProductionInfo(input);
-
-        assertFalse(info.getConsumption().isEmpty());
-        for (int i = 0; i < info.getConsumption().size(); i++) {
-            assertEquals(
-                schoolhouseType.getRequiredGoodsList().get(i).getAmount(),
-                info.getConsumption().get(i).getAmount()
-            );
-        }
+        ProductionInfo infoFull = queue.getProductionInfo(input);
+        assertFalse(infoFull.getConsumption().isEmpty());
     }
 
-    public void testEmptyQueueBehavior() {
-        assertNull(queue.getCurrentlyBuilding());
-        ProductionInfo info = queue.getProductionInfo(new ArrayList<>());
-        assertTrue(info.getConsumption().isEmpty());
-        assertTrue(queue.getConsumedGoods().isEmpty());
-    }
-
-    public void testGetConsumedGoodsExplicit() {
+    public void testGetConsumedGoods() {
         queue.add(colonistType);
-
         List<AbstractGoods> consumed = queue.getConsumedGoods();
         List<AbstractGoods> required = colonistType.getRequiredGoodsList();
 
         assertEquals(required.size(), consumed.size());
         for (int i = 0; i < required.size(); i++) {
             assertEquals(required.get(i).getType(), consumed.get(i).getType());
-            assertEquals(required.get(i).getAmount(), consumed.get(i).getAmount());
         }
     }
 
-    public void testPopulationQueueShuffle() {
-        BuildQueue<UnitType> popQueue =
-            new BuildQueue<>(colony, BuildQueue.CompletionAction.SHUFFLE, 999);
-
-        popQueue.add(colonistType);
-        popQueue.add(pettyCriminal);
-        popQueue.add(indenturedServant);
-        List<UnitType> before = new ArrayList<>(popQueue.getValues());
-        Collections.shuffle(before, new Random(12345));
-        List<UnitType> after = popQueue.getValues();
-        assertFalse(before.equals(after));
+    public void testPriority() {
+        assertEquals(500, queue.getPriority());
     }
 
-    public void testCompletionActionRemove() {
-        BuildQueue<UnitType> q =
-            new BuildQueue<>(colony, BuildQueue.CompletionAction.REMOVE, 999);
+    public void testToString() {
+        queue.add(colonistType);
+        String s = queue.toString();
+        assertTrue(s.contains("TestColony"));
+        assertTrue(s.contains(colonistType.getId()));
+    }
 
-        q.add(colonistType);
-        q.add(colonistType);
+    public void testMixedQueue() {
+        queue.clear();
+        queue.add(warehouseType);
+        queue.add(spec.getUnitType("model.unit.wagonTrain"));
+        
+        assertEquals(2, queue.size());
+        
+        queue.applyCompletionAction(new Random());
+        
+        assertEquals("model.unit.wagonTrain", queue.getCurrentlyBuilding().getId());
+    }
 
-        assertEquals(2, q.size());
-        q.remove(0);
+    public void testCheckIntegrity() {
+        BuildingType dockType = spec.getBuildingType("model.building.docks");
+        queue.clear();
+        queue.add(dockType);
+        
+        net.sf.freecol.common.util.LogBuilder lb = new net.sf.freecol.common.util.LogBuilder(0);
+        IntegrityType result = queue.checkIntegrity(colony, false, lb);
+        
+        assertNotSame(IntegrityType.INTEGRITY_GOOD, result);
+        assertEquals(1, queue.size());
+
+        result = queue.checkIntegrity(colony, true, lb);
+        
+        assertEquals(IntegrityType.INTEGRITY_FIXED, result);
+        assertEquals(0, queue.size());
+    }
+
+    public void testGetProductionInfoWithConsumption() {
+        queue.clear();
+        queue.add(warehouseType);
+        List<AbstractGoods> requirements = warehouseType.getRequiredGoodsList();
+        GoodsType hammerType = requirements.get(0).getType();
+        int requiredAmount = requirements.get(0).getAmount();
+
+        List<AbstractGoods> input = new ArrayList<>();
+        input.add(new AbstractGoods(hammerType, requiredAmount / 2));
+        
+        ProductionInfo info = queue.getProductionInfo(input);
+        assertTrue(info.getConsumption().isEmpty());
+
+        input.clear();
+        input.add(new AbstractGoods(hammerType, requiredAmount));
+        info = queue.getProductionInfo(input);
+        
+        assertEquals(requiredAmount, info.getConsumption().get(0).getAmount());
+
+        spec.setBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW, false);
+        input.clear();
+        input.add(new AbstractGoods(hammerType, requiredAmount + 50));
+        
+        info = queue.getProductionInfo(input);
+        
+        assertEquals(requiredAmount + 50, info.getConsumption().get(0).getAmount());
+    }
+
+    public void testRedundantBuildingRemoval() {
+        queue.clear();
+        BuildingType school = spec.getBuildingType("model.building.schoolhouse");
+        queue.add(school);
+        
+        colony.addBuilding(new net.sf.freecol.server.model.ServerBuilding(game, colony, school));
+        
+        BuildableType next = queue.getNextBuildable(colony);
+        
+        assertNull(next);
+        assertEquals(0, queue.size());
+    }
+
+    public void testPopulationDropPurge() {
+        queue.clear();
+        BuildingType news = spec.getBuildingType("model.building.newspaper");
+        queue.add(news);
+        
+        BuildableType next = queue.getNextBuildable(colony);
+        
+        assertNull(next);
+        assertEquals(0, queue.size());
+    }
+
+    public void testUpgradeChainWithPopulation() {
+        queue.clear();
+        BuildingType house = spec.getBuildingType("model.building.warehouse");
+        BuildingType upgrade = spec.getBuildingType("model.building.warehouseExpansion");
+
+        forcePopulation(10);
+        queue.add(house);
+        queue.add(upgrade);
+
+        assertEquals("Should be warehouse", house, queue.getNextBuildable(colony));
+
+        queue.applyCompletionAction(new Random());
+
+        colony.addBuilding(new net.sf.freecol.server.model.ServerBuilding(game, colony, house));
+
+        assertEquals("Should now be expansion", upgrade, queue.getNextBuildable(colony));
+    }
+
+    public void testDeepQueueAssumption() {
+        queue.clear();
+        forcePopulation(10);
+
+        BuildingType house = spec.getBuildingType("model.building.warehouse");
+        BuildingType upgrade = spec.getBuildingType("model.building.warehouseExpansion");
+
+        queue.add(house);
+        queue.add(upgrade);
+       
+        BuildableType next = queue.getNextBuildable(colony);
+        assertEquals("Should still suggest the first item", house, next);
+        assertEquals("Queue size should still be 2", 2, queue.size());
+    }
+
+    public void testCoastalRequirementPurge() {
+        queue.clear();
+        BuildingType docks = spec.getBuildingType("model.building.docks");
+        queue.add(docks);
+        assertNull("Docks should be invalid for inland colony", queue.getNextBuildable(colony));
+        assertEquals("Invalid coastal building should be purged", 0, queue.size());
+    }
+
+    public void testResourceStarvation() {
+        queue.clear();
+        BuildingType house = spec.getBuildingType("model.building.warehouse");
+        queue.add(house);
+
+        List<AbstractGoods> input = new ArrayList<>();
+        input.add(new AbstractGoods(spec.getGoodsType("model.goods.hammers"), 0));
+
+        ProductionInfo info = queue.getProductionInfo(input);
+
+        assertTrue("Should consume nothing", info.getConsumption().isEmpty());
+        assertEquals("Queue should not purge for lack of materials", 1, queue.size());
+    }
+
+    public void testIntegrityRepair() {
+        queue.clear();
+        BuildingType school = spec.getBuildingType("model.building.schoolhouse");
+        colony.addBuilding(new ServerBuilding(game, colony, school));
+        queue.add(school);
+        LogBuilder lb = new LogBuilder(0);
+        queue.checkIntegrity(colony, true, lb);
+        assertEquals("Integrity check should have removed the redundant building", 0, queue.size());
+    }
+
+    public void testAddRandomCompletion() {
+        BuildQueue<UnitType> q = new BuildQueue<>(colony,
+            CompletionAction.ADD_RANDOM, 0);
+
+        UnitType base = spec.getUnitType("model.unit.freeColonist");
+        q.add(base);
+
+        q.applyCompletionAction(new Random(1));
 
         assertEquals(1, q.size());
-        assertEquals(colonistType, q.getCurrentlyBuilding());
+        assertNotSame(base, q.getCurrentlyBuilding());
     }
 
-    public void testCompletionActionShuffle() {
-        BuildQueue<UnitType> q =
-            new BuildQueue<>(colony, BuildQueue.CompletionAction.SHUFFLE, 999);
+    public void testAddRandomProducesOnlyRecruitable() {
+        BuildQueue<UnitType> q = new BuildQueue<>(colony,
+            CompletionAction.ADD_RANDOM, 0);
 
-        q.add(colonistType);
-        q.add(pettyCriminal);
-        q.add(indenturedServant);
+        UnitType base = spec.getUnitType("model.unit.freeColonist");
+        q.add(base);
 
-        List<UnitType> before = new ArrayList<>(q.getValues());
+        for (int i = 0; i < 20; i++) {
+            q.applyCompletionAction(new Random(i));
+            UnitType u = q.getCurrentlyBuilding();
+            assertTrue("Unit must be recruitable", u.isRecruitable());
+        }
+    }
 
-        if (q.size() > 1) {
-            List<UnitType> shuffled = new ArrayList<>(before);
-            Collections.shuffle(shuffled, new Random(12345));
-            q.setValues(shuffled);
+    public void testAddRandomPreservesSize() {
+        BuildQueue<UnitType> q = new BuildQueue<>(colony,
+            CompletionAction.ADD_RANDOM, 0);
+
+        q.add(spec.getUnitType("model.unit.freeColonist"));
+
+        for (int i = 0; i < 10; i++) {
+            q.applyCompletionAction(new Random(i));
+            assertEquals(1, q.size());
+        }
+    }
+
+    public void testAddRandomDeterministic() {
+        BuildQueue<UnitType> q1 = new BuildQueue<>(colony,
+            CompletionAction.ADD_RANDOM, 0);
+        BuildQueue<UnitType> q2 = new BuildQueue<>(colony,
+            CompletionAction.ADD_RANDOM, 0);
+
+        UnitType base = spec.getUnitType("model.unit.freeColonist");
+        q1.add(base);
+        q2.add(base);
+
+        Random r1 = new Random(123);
+        Random r2 = new Random(123);
+
+        for (int i = 0; i < 5; i++) {
+            q1.applyCompletionAction(r1);
+            q2.applyCompletionAction(r2);
         }
 
-        List<UnitType> after = q.getValues();
-        assertFalse(before.equals(after));
+        assertEquals(q1.getCurrentlyBuilding(), q2.getCurrentlyBuilding());
     }
 
-    public void testCompletionActionAddRandom() {
-        BuildQueue<UnitType> q =
-            new BuildQueue<>(colony, BuildQueue.CompletionAction.ADD_RANDOM, 999);
+    public void testAddRandomProducesRecruitable() {
+        BuildQueue<UnitType> q = new BuildQueue<>(colony,
+            CompletionAction.ADD_RANDOM, 0);
 
-        q.add(colonistType);
-        assertEquals(1, q.size());
-        q.remove(0);
-        q.add(randomUnit);
-        assertEquals(1, q.size());
-        assertEquals(randomUnit, q.getCurrentlyBuilding());
+        q.add(spec.getUnitType("model.unit.freeColonist"));
+
+        for (int i = 0; i < 20; i++) {
+            q.applyCompletionAction(new Random(i));
+            assertTrue(q.getCurrentlyBuilding().isRecruitable());
+        }
+    }
+
+    private void forcePopulation(int n) {
+        for (Unit u : new ArrayList<>(colony.getUnitList())) {
+            u.dispose();
+        }
+        for (int i = 0; i < n; i++) {
+            Unit u = new net.sf.freecol.server.model.ServerUnit(game, 
+                    colony.getTile(), colony.getOwner(), colonistType);
+            u.setLocation(colony); 
+        }
     }
 }

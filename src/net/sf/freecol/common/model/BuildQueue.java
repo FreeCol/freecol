@@ -24,11 +24,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.sf.freecol.common.model.Colony.NoBuildReason;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.LogBuilder;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -63,6 +70,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         ADD_RANDOM
     };
 
+    private static final Logger logger = Logger.getLogger(BuildQueue.class.getName());
 
     /** A list of Buildable items. */
     private final Deque<T> queue = new ArrayDeque<>();
@@ -208,6 +216,139 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return available.getAmount();
     }
 
+    /**
+     * Apply the completion action to this queue.
+     * Only mutates the queue; no colony side effects.
+     */
+    public void applyCompletionAction(Random random) {
+        switch (completionAction) {
+
+        case SHUFFLE:
+            // Shuffle queue items (except the one just completed)
+            if (queue.size() > 1) {
+                List<T> list = new ArrayList<>(queue);
+                Collections.shuffle(list, random);
+                queue.clear();
+                queue.addAll(list);
+            }
+            break;
+
+        case REMOVE_EXCEPT_LAST:
+            // Keep last unit if repeating; otherwise remove first
+            if (!(queue.size() == 1
+                  && queue.peekFirst() instanceof UnitType)) {
+                queue.removeFirst();
+            }
+            break;
+
+        case ADD_RANDOM:
+            queue.removeFirst();
+            T randomItem = pickRandomBuildable(random);
+            if (randomItem != null) {
+                queue.addLast(randomItem);
+            }
+            break;
+
+        case REMOVE:
+
+        default:
+            // Default: remove completed item
+            queue.removeFirst();
+            break;
+        }
+    }
+
+    /**
+     * Selects a random valid buildable for ADD_RANDOM queues.
+     * Used mainly by population queues to pick a recruitable UnitType.
+     * Returns null if no candidates exist.
+     */
+    @SuppressWarnings("unchecked")
+    private T pickRandomBuildable(Random random) {
+        // Only meaningful for UnitType queues
+        if (!(colony instanceof Colony)) return null;
+
+        List<UnitType> candidates = colony.getSpecification()
+            .getUnitTypeList().stream()
+            .filter(UnitType::isRecruitable)
+            .collect(Collectors.toList());
+
+        if (candidates.isEmpty()) return null;
+
+        return (T) getRandomMember(
+                logger,
+                "ADD_RANDOM",
+                candidates,
+                random
+            );
+    }
+
+    /**
+     * Return the next buildable item, removing invalid ones.
+     * No messages or side effects; pure queue logic.
+     */
+    public T getNextBuildable(Colony colony) {
+
+        List<BuildableType> assumeBuilt = new ArrayList<>();
+
+        for (T bt : new ArrayList<>(queue)) {
+
+            NoBuildReason reason = colony.getNoBuildReason(bt, assumeBuilt);
+
+            switch (reason) {
+
+            case NONE:
+            case LIMIT_EXCEEDED:
+                // Valid or semi-valid → return it
+                return bt;
+
+            case NOT_BUILDABLE:
+                // Redundant building (e.g. schoolhouse already built)
+                assumeBuilt.add(bt);
+                queue.remove(bt);
+                break;
+
+            default:
+                // Invalid → remove but do NOT add to assumeBuilt
+                queue.remove(bt);
+                break;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Check queue integrity in order.
+     * If fix=true, remove invalid items.
+     */
+    public IntegrityType checkIntegrity(Colony colony,
+                                        boolean fix,
+                                        LogBuilder lb) {
+
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
+        List<BuildableType> assumeBuilt = new ArrayList<>();
+
+        List<T> items = new ArrayList<>(queue);
+
+        for (int i = 0; i < items.size(); i++) {
+            T bt = items.get(i);
+            NoBuildReason reason = colony.getNoBuildReason(bt, assumeBuilt);
+
+            if (reason == NoBuildReason.NONE) {
+                assumeBuilt.add(bt);
+            } else if (fix) {
+                if (lb != null) lb.add("\n  Invalid queue item removed: ", bt.getId());
+                queue.remove(bt);
+                result = result.fix();
+            } else {
+                if (lb != null) lb.add("\n  Invalid queue item: ", bt.getId());
+                result = result.fail();
+            }
+        }
+
+        return result;
+    }
 
     // Interface Consumer
 

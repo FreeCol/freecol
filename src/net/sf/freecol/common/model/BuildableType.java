@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import javax.swing.JList;
@@ -32,8 +33,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -108,9 +107,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     }
 
     public boolean requiresAbility(String key) {
-        return (requiredAbilities == null) ? false
-                : (!requiredAbilities.containsKey(key)) ? false
-                : requiredAbilities.get(key);
+        return requiredAbilities != null && Boolean.TRUE.equals(requiredAbilities.get(key));
     }
 
     /**
@@ -119,7 +116,11 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @param abilities The new required abilities.
      */
     public void setRequiredAbilities(Map<String, Boolean> abilities) {
-        requiredAbilities = abilities;
+        if (abilities == null) {
+            this.requiredAbilities = null;
+        } else {
+            this.requiredAbilities = new HashMap<>(abilities);
+        }
     }
 
     /**
@@ -156,10 +157,15 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return True if the buildable is available.
      */
     public boolean isAvailableTo(FreeColObject... fco) {
-        return (requiredAbilities == null) ? true
-            : all(requiredAbilities.entrySet(),
-                e -> e.getValue() == any(fco,
-                    o -> o != null && o.hasAbility(e.getKey())));
+        if (requiredAbilities == null) return true;
+
+        for (Map.Entry<String, Boolean> req : requiredAbilities.entrySet()) {
+            boolean present = Stream.of(fco)
+                .filter(Objects::nonNull)
+                .anyMatch(o -> o.hasAbility(req.getKey()));
+            if (present != req.getValue()) return false;
+        }
+        return true;
     }
 
     /**
@@ -196,7 +202,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return A stream of the required goods.
      */
     public Stream<AbstractGoods> getRequiredGoods() {
-        return copyRequiredGoods().stream();
+        return getRequiredGoodsList().stream();
     }
 
     /**
@@ -208,7 +214,10 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         if (goods == null || goods.isEmpty()) {
             this.requiredGoods = null;
         } else {
-            this.requiredGoods = new ArrayList<>(goods);
+            this.requiredGoods = new ArrayList<>(goods.size());
+            for (AbstractGoods ag : goods) {
+                this.requiredGoods.add(new AbstractGoods(ag.getType(), ag.getAmount()));
+            }
         }
     }
 
@@ -242,7 +251,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return True if goods are required to build this buildable.
      */
     public boolean needsGoodsToBuild() {
-        return !getRequiredGoodsList().isEmpty();
+        return requiredGoods != null && !requiredGoods.isEmpty();
     }
 
     /**
@@ -289,11 +298,16 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public List<AbstractGoods> getRequiredGoodsForCount(int count) {
         if (count <= 1) return getRequiredGoodsList();
+
         List<AbstractGoods> base = getRequiredGoodsList();
         List<AbstractGoods> scaled = new ArrayList<>(base.size());
+
         for (AbstractGoods ag : base) {
-            scaled.add(new AbstractGoods(ag.getType(), ag.getAmount() * count));
+            long raw = (long) ag.getAmount() * count;
+            int scaledAmount = Math.toIntExact(raw);
+            scaled.add(new AbstractGoods(ag.getType(), scaledAmount));
         }
+
         return scaled;
     }
 
@@ -328,12 +342,23 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         if (o == null) return false;
 
         this.requiredPopulation = o.requiredPopulation;
+
         this.requiredAbilities = (o.requiredAbilities == null)
-                ? null : new HashMap<>(o.requiredAbilities);
-        this.requiredGoods = (o.requiredGoods == null)
-                ? null : new ArrayList<>(o.requiredGoods);
+                ? null
+                : new HashMap<>(o.requiredAbilities);
+
+        if (o.requiredGoods == null) {
+            this.requiredGoods = null;
+        } else {
+            this.requiredGoods = new ArrayList<>(o.requiredGoods.size());
+            for (AbstractGoods ag : o.requiredGoods) {
+                this.requiredGoods.add(new AbstractGoods(ag.getType(), ag.getAmount()));
+            }
+        }
+
         this.limits = (o.limits == null)
-                ? null : new ArrayList<>(o.limits);
+                ? null
+                : new ArrayList<>(o.limits);
 
         return true;
     }

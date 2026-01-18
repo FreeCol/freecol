@@ -22,7 +22,6 @@ package net.sf.freecol.server.model;
 import static net.sf.freecol.common.util.CollectionUtils.any;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 import static net.sf.freecol.common.util.RandomUtils.getRandomMember;
-import static net.sf.freecol.common.util.RandomUtils.randomShuffle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -256,53 +255,54 @@ public class ServerColony extends Colony implements TurnTaker {
      */
     private BuildableType csNextBuildable(BuildQueue<? extends BuildableType> queue,
                                           ChangeSet cs) {
+    
         Specification spec = getSpecification();
         Player owner = getOwner();
-        BuildableType buildable;
-        boolean invalidate = false;
-        final Predicate<GoodsType> notBuildingPred
-            = gt -> gt.isBuildingMaterial() && !gt.isStorable()
-                && getTotalProductionOf(gt) > 0;
-
-        while ((buildable = queue.getCurrentlyBuilding()) != null) {
-            switch (getNoBuildReason(buildable, null)) {
-            case LIMIT_EXCEEDED:
-                // Expected when a player builds its last available wagon
-                // and there is nothing else in the build queue.
-                break;
-            case NONE:
-                return buildable;
-            case NOT_BUILDING:
-                if (any(spec.getGoodsTypeList(), notBuildingPred)) {
-                    cs.addMessage(owner,
-                        new ModelMessage(MessageType.WARNING,
-                                         "model.colony.cannotBuild", this)
-                            .addName("%colony%", getName()));
-                }
-                return null;
-
-            case POPULATION_TOO_SMALL:
+    
+        // Ask the queue to give us the next legal buildable
+        BuildableType buildable = queue.getNextBuildable(getColony());
+    
+        if (buildable == null) {
+            // Special NOT_BUILDING warning
+            final Predicate<GoodsType> notBuildingPred
+                = gt -> gt.isBuildingMaterial() && !gt.isStorable()
+                    && getTotalProductionOf(gt) > 0;
+    
+            if (any(spec.getGoodsTypeList(), notBuildingPred)) {
                 cs.addMessage(owner,
                     new ModelMessage(MessageType.WARNING,
-                                     "model.colony.buildNeedPop",
-                                     this)
-                        .addName("%colony%", getName())
-                        .addNamed("%building%", buildable));
-                break;
-            default: // Are there other warnings to send?
-                logger.warning("Unexpected build failure at " + getName()
-                    + " for " + buildable
-                    + ": " + getNoBuildReason(buildable, null));
-                cs.addMessage(owner,
-                              getUnbuildableMessage(buildable));
-                break;
+                                     "model.colony.cannotBuild", this)
+                        .addName("%colony%", getName()));
             }
-            queue.remove(0);
-            invalidate = true;
+            return null;
         }
-        if (invalidate) invalidateCache();
-        return null;
+    
+        // Check again for colony warnings
+        NoBuildReason reason = getNoBuildReason(buildable, null);
+    
+        if (reason == NoBuildReason.POPULATION_TOO_SMALL) {
+            cs.addMessage(owner,
+                new ModelMessage(MessageType.WARNING,
+                                 "model.colony.buildNeedPop",
+                                 this)
+                    .addName("%colony%", getName())
+                    .addNamed("%building%", buildable));
+            return null;
+        }
+    
+        if (reason != NoBuildReason.NONE
+            && reason != NoBuildReason.LIMIT_EXCEEDED) {
+    
+            logger.warning("Unexpected build failure at " + getName()
+                + " for " + buildable + ": " + reason);
+    
+            cs.addMessage(owner, getUnbuildableMessage(buildable));
+            return null;
+        }
+    
+        return buildable;
     }
+
 
     /**
      * Evict the users from a tile used by this colony, due to military
@@ -650,41 +650,6 @@ public class ServerColony extends Colony implements TurnTaker {
         }
     }
 
-    /**
-     * Updates the build queue based on its completion action.
-     *
-     * @param queue The {@code BuildQueue} that completed an item.
-     * @param random The {@code Random} source for shuffling.
-     * @param cs The {@code ChangeSet} to update.
-     */
-    private void applyCompletionAction(BuildQueue<? extends BuildableType> queue,
-                                       Random random, ChangeSet cs) {
-    
-        switch (queue.getCompletionAction()) {
-    
-        case SHUFFLE:
-            if (queue.size() > 1) {
-                randomShuffle(logger, "Build queue",
-                              queue.getValues(), random);
-            }
-            break;
-    
-        case REMOVE_EXCEPT_LAST:
-            if (queue.size() == 1
-                && queue.getCurrentlyBuilding() instanceof UnitType) {
-                // Repeat last unit
-                break;
-            }
-            // fall through
-    
-        case REMOVE:
-        default:
-            queue.remove(0);
-            break;
-        }
-    
-        csNextBuildable(queue, cs);
-    }
 
     // Implement TurnTaker
 
@@ -763,7 +728,6 @@ public class ServerColony extends Colony implements TurnTaker {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
             if (!info.getConsumption().isEmpty()) {
-                // Ready to build something.  FIXME: OO!
                 BuildableType buildable = csNextBuildable(queue, cs);
                 if (buildable == null) {
                     ; // It was invalid, ignore.
@@ -844,7 +808,8 @@ public class ServerColony extends Colony implements TurnTaker {
         // built item from its build queue.
         if (!built.isEmpty()) {
             for (BuildQueue<? extends BuildableType> queue : built) {
-                applyCompletionAction(queue, random, cs);
+                queue.applyCompletionAction(random);
+                csNextBuildable(queue, cs);
             }
             tileDirty = true;
         }

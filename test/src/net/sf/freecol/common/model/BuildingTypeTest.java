@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
