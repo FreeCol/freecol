@@ -541,7 +541,9 @@ public class GameOptions {
     // Serialization
 
     /**
-     * {@inheritDoc}
+     * Gets the XML tag name for serialization.
+     *
+     * @return The XML tag name.
      */
     public String getXMLTagName() { return TAG; }
 }

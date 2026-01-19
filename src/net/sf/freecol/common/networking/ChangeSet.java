@@ -360,6 +360,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public AnimateAttackMessage toMessage(Player player) {
             if (!isNotifiable(player)) return null;
             Unit a = (player.owns(attacker)) ? attacker
@@ -417,6 +418,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public AttributeMessage toMessage(Player player) {
             return new AttributeMessage(AttributeMessage.TAG,
                                         key, value).setMergeable(true);
@@ -1451,13 +1453,14 @@ public class ChangeSet {
         // splitting out trivial mergeable attribute changes.
         List<Message> messages = new ArrayList<>();
         List<Message> diverted = new ArrayList<>();
-        for (Change<?> c : this.changes) {
-            if (!c.isNotifiable(player)) continue;
-            Message m = c.toMessage(player);
+        for (Change<?> change : this.changes) {
+            if (!change.isNotifiable(player)) continue;
+            Message m = change.toMessage(player);
             List<Message> onto = (m.canMerge()) ? diverted : messages;
             onto.add(m);
-            if ((c = c.consequence(player)) != null) {
-                m = c.toMessage(player);
+            Change<?> consequence = change.consequence(player);
+            if (consequence != null) {
+                m = consequence.toMessage(player);
                 onto = (m.canMerge()) ? diverted : messages;
                 onto.add(m);
             }

@@ -168,9 +168,9 @@ public final class MilitaryCoordinator {
         keepUnitsInColonies(defensiveMap.getColoniesExposedLand(), artilleryUnits, maxArtilleries(2));
         placeUnitsInColonies(defensiveMap.getColoniesExposedLand(), dragoonUnits, maxDragoons(2));
         
-        assignDefendClosestColony(unusedUnits);
+        assignDefendClosestColony();
         if (!ourColonies.isEmpty()) {
-            transportMilitaryUnitsFromEurope(ourColonies.get(0), unusedUnits);
+            transportMilitaryUnitsFromEurope(ourColonies.get(0));
         }
         assignWanderHostile();
     }
@@ -316,7 +316,7 @@ public final class MilitaryCoordinator {
         }
     }
     
-    private void assignDefendClosestColony(Set<AIUnit> militaryUnits) {
+    private void assignDefendClosestColony() {
         for (AIUnit unit : new HashSet<>(unusedUnits)) {
             final Mission mission = player.getDefendSettlementMission(unit, true, true);
             if (mission != null) {
@@ -326,7 +326,7 @@ public final class MilitaryCoordinator {
         }
     }
     
-    private void transportMilitaryUnitsFromEurope(AIColony destination, Set<AIUnit> militaryUnits) {
+    private void transportMilitaryUnitsFromEurope(AIColony destination) {
         // TODO: Better method for transporting military units from Europe.
         for (AIUnit unit : new HashSet<>(unusedUnits)) {
             if (unit.getUnit().getTile() != null) {

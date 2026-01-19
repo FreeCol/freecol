@@ -33,6 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
+import java.util.logging.Level;
 
 
 /**
@@ -482,7 +483,7 @@ public class ProductionType extends FreeColSpecObject {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
             if (type == null) {
-                logger.warning("Skipping input with null type: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Skipping input with null type: "
                     + xr.getAttribute(GOODS_TYPE_TAG, (String)null));
             } else {
                 addInput(type, xr.getAttribute(VALUE_TAG, -1));
@@ -493,7 +494,7 @@ public class ProductionType extends FreeColSpecObject {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
             if (type == null) {
-                logger.warning("Skipping output with null type: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Skipping output with null type: "
                     + xr.getAttribute(GOODS_TYPE_TAG, (String)null));
             } else {
                 addOutput(type, xr.getAttribute(VALUE_TAG, -1));

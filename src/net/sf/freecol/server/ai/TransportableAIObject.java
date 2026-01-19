@@ -211,9 +211,11 @@ public abstract class TransportableAIObject extends ValuedAIObject {
         // Get off any current carrier unless it is the new one.
         Location now;
         Locatable l = getTransportLocatable();
-        if (l != null && (now = l.getLocation()) instanceof Unit
-            && !(aiCarrier != null && aiCarrier.getUnit() == now)) {
-            if (!leaveTransport()) return false;
+        if (l != null) {
+            now = l.getLocation();
+            if (now instanceof Unit
+                && !(aiCarrier != null && aiCarrier.getUnit() == now)
+                && !leaveTransport()) return false;
         }
 
         AIUnit old = getTransport();

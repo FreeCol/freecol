@@ -19,8 +19,14 @@
 
 package net.sf.freecol.common.logging;
 
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -37,11 +43,16 @@ import net.sf.freecol.common.util.OSUtils;
  */
 public final class DefaultHandler extends Handler {
 
+    private static final PrintWriter STDERR = new PrintWriter(
+        new OutputStreamWriter(new FileOutputStream(FileDescriptor.err),
+            StandardCharsets.UTF_8),
+        true);
+
     /** Lock for the writer. */
     private final Object writerLock = new Object();
 
     /** A writer to write log records with. */
-    private Writer writer = null;
+    private Writer writer;
 
     /** Flag to enable console logging. */
     private final boolean consoleLogging;
@@ -88,7 +99,7 @@ public final class DefaultHandler extends Handler {
                 this.writer.write(sb.toString());
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace(System.err);
+            reportError("Failed to write log header", ioe, ErrorManager.WRITE_FAILURE);
         }
     }
 
@@ -103,7 +114,7 @@ public final class DefaultHandler extends Handler {
                     this.writer.close();
                     this.writer = null;
                 } catch (IOException ioe) {
-                    ioe.printStackTrace(System.err);
+                    reportError("Failed to close log writer", ioe, ErrorManager.CLOSE_FAILURE);
                 }
             }
         }
@@ -119,7 +130,7 @@ public final class DefaultHandler extends Handler {
                 try {
                     this.writer.flush();
                 } catch (IOException ioe) {
-                    ioe.printStackTrace(System.err);
+                    reportError("Failed to flush log writer", ioe, ErrorManager.FLUSH_FAILURE);
                 }
             }
         }
@@ -141,7 +152,7 @@ public final class DefaultHandler extends Handler {
         String str = getFormatter().format(record);
         if (consoleLogging
             && record.getLevel().intValue() >= Level.WARNING.intValue()) {
-            System.err.println(str);
+            STDERR.println(str);
         }
 
         synchronized (this.writerLock) {
@@ -151,8 +162,7 @@ public final class DefaultHandler extends Handler {
                     // Because FreeCol is still in a very early stage.
                     flush();
                 } catch (IOException ioe) {
-                    System.err.println("Failed to write log record: " + str);
-                    ioe.printStackTrace(System.err);
+                    reportError("Failed to write log record: " + str, ioe, ErrorManager.WRITE_FAILURE);
                 }
             }
         }

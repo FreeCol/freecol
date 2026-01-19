@@ -80,7 +80,7 @@ final class ReceivingThread extends Thread {
             try {
                 reply = this.conn.handle(this.query);
             } catch (FreeColException fce) {
-                logger.log(Level.WARNING, getName() + ": handler fail", fce);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + ": handler fail", fce);
                 return;
             }
 
@@ -88,9 +88,9 @@ final class ReceivingThread extends Thread {
                 : reply.getType();
             try {
                 this.conn.sendMessage(new ReplyMessage(this.replyId, reply));
-                logger.log(Level.FINEST, getName() + " -> " + replyTag);
+                if (logger.isLoggable(Level.FINEST)) logger.log(Level.FINEST, getName() + " -> " + replyTag);
             } catch (FreeColException|IOException|XMLStreamException ex) {
-                logger.log(Level.WARNING, getName() + " -> " + replyTag
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + " -> " + replyTag
                     + " failed", ex);
             }                
         }
@@ -128,16 +128,16 @@ final class ReceivingThread extends Thread {
             try {
                 reply = this.conn.handle(this.message);
             } catch (FreeColException fce) {
-                logger.log(Level.WARNING, getName() + ": handler fail", fce);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + ": handler fail", fce);
                 return;
             }
 
             final String outTag = (reply == null) ? "null" : reply.getType();
             try {
                 this.conn.sendMessage(reply);
-                logger.log(Level.FINEST, getName() + " -> " + outTag);
+                if (logger.isLoggable(Level.FINEST)) logger.log(Level.FINEST, getName() + " -> " + outTag);
             } catch (FreeColException|IOException|XMLStreamException ex) {
-                logger.log(Level.WARNING, getName() + " -> " + outTag
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + " -> " + outTag
                     + " failed", ex);
             }                
         }
@@ -243,7 +243,7 @@ final class ReceivingThread extends Thread {
      */
     public void askToStop(String reason) {
         if (stopThread()) {
-            logger.info(getName() + ": stopped receiving thread: " + reason);
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + ": stopped receiving thread: " + reason);
         }
     }
 
@@ -295,12 +295,12 @@ final class ReceivingThread extends Thread {
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
         String tag;
-        int replyId = -1;
+        int replyId;
         try {
             tag = this.connection.startListen();
         } catch (XMLStreamException xse) {
             if (!shouldRun()) return; // Connection shutdown, fail expected
-            logger.log(Level.WARNING, getName() + ": listen fail", xse);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + ": listen fail", xse);
             tag = DisconnectMessage.TAG;
         }
 
@@ -322,13 +322,13 @@ final class ReceivingThread extends Thread {
             Message rm;
             try {
                 rm = this.connection.reader();
-            } catch (Exception ex) {
+            } catch (FreeColException | XMLStreamException ex) {
                 rm = null;
-                logger.log(Level.WARNING, getName() + ": reply fail", ex);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + ": reply fail", ex);
             }
             NetworkReplyObject nro = this.waitingThreads.remove(replyId);
             if (nro == null) {
-                logger.warning(getName() + ": did not find reply " + replyId);
+                if (logger.isLoggable(Level.WARNING)) logger.warning(getName() + ": did not find reply " + replyId);
             } else {
                 nro.setResponse(rm);
             }
@@ -338,13 +338,13 @@ final class ReceivingThread extends Thread {
             // A question.  Build a thread to handle it and send a reply.
 
             replyId = this.connection.getReplyId();
-            Message m = null;
+            Message m;
             try {
                 m = this.connection.reader();
                 assert m instanceof QuestionMessage;
                 t = messageQuestion((QuestionMessage)m, replyId);
             } catch (FreeColException fce) {
-                logger.log(Level.WARNING, "No reader for " + replyId, fce);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "No reader for " + replyId, fce);
                 t = null;
             }                
             break;
@@ -355,8 +355,8 @@ final class ReceivingThread extends Thread {
 
             try {
                 t = messageUpdate(this.connection.reader());
-            } catch (Exception ex) {
-                logger.log(Level.FINEST, getName() + ": fail", ex);
+            } catch (FreeColException | XMLStreamException ex) {
+                if (logger.isLoggable(Level.FINEST)) logger.log(Level.FINEST, getName() + ": fail", ex);
                 askToStop("listen-update-fail");
             }
             break;
@@ -387,13 +387,13 @@ final class ReceivingThread extends Thread {
                     timesFailed = 0;
                 } catch (SAXException|XMLStreamException ex) {
                     if (!shouldRun()) break;
-                    logger.log(Level.WARNING, getName() + ": XML fail", ex);
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + ": XML fail", ex);
                     if (++timesFailed > MAXIMUM_RETRIES) {
                         disconnect();
                     }
                 } catch (IOException ioe) {
                     if (!shouldRun()) break;
-                    logger.log(Level.WARNING, getName() + ": IO fail", ioe);
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, getName() + ": IO fail", ioe);
                     disconnect();
                 }
             }

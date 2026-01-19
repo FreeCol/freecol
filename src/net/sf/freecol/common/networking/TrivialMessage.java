@@ -88,7 +88,8 @@ public abstract class TrivialMessage extends Message {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
-    protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    protected TrivialMessage(String tag, Game game,
                              FreeColXMLReader xr) throws XMLStreamException {
         this(tag);
 
@@ -130,11 +131,8 @@ public abstract class TrivialMessage extends Message {
      * {@inheritDoc}
      */
     protected void setStringAttribute(String key, String value) {
-        if (key == null || value == null) {
-            ; // Always OK to set nothing
-        } else { // Nope
-            throw new RuntimeException(getType() + ".setStringAttribute NYI");
-        }
+        if (key == null || value == null) return; // Always OK to set nothing
+        throw new RuntimeException(getType() + ".setStringAttribute NYI");
     }
     
     /**
@@ -162,33 +160,24 @@ public abstract class TrivialMessage extends Message {
      * {@inheritDoc}
      */
     protected void setChildren(List<? extends FreeColObject> fcos) {
-        if (fcos == null || fcos.isEmpty()) {
-            ; // Always OK to set nothing
-        } else { // Nope
-            throw new RuntimeException(getType() + ".setChildren NYI");
-        }
+        if (fcos == null || fcos.isEmpty()) return; // Always OK to set nothing
+        throw new RuntimeException(getType() + ".setChildren NYI");
     }
     
     /**
      * {@inheritDoc}
      */
     protected <T extends FreeColObject> void appendChild(T fco) {
-        if (fco == null) {
-            ; // Always OK to add nothing
-        } else {
-            throw new RuntimeException(getType() + ".append NYI");
-        }
+        if (fco == null) return; // Always OK to add nothing
+        throw new RuntimeException(getType() + ".append NYI");
     }
 
     /**
      * {@inheritDoc}
      */
     protected <T extends FreeColObject> void appendChildren(Collection<T> fcos) {
-        if (fcos == null) {
-            ; // Always OK to add nothing
-        } else {
-            throw new RuntimeException(getType() + ".append NYI");
-        }
+        if (fcos == null) return; // Always OK to add nothing
+        throw new RuntimeException(getType() + ".append NYI");
     }
 
     /**

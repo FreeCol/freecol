@@ -23,9 +23,14 @@ import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 
 public class ColonizationSaveGameReader {
+
+    private static final Logger logger
+        = Logger.getLogger(ColonizationSaveGameReader.class.getName());
 
     private final static int PLAYER_DATA = 0x9e;
     private final static int COLONY_DATA = 0x186;
@@ -48,9 +53,9 @@ public class ColonizationSaveGameReader {
         }
 
         public void print() {
-            System.out.println("Map size is " + mapWidth + " x " + mapHeight);
-            System.out.println("Difficulty is " + difficulty);
-            System.out.println(numberOfColonies + " colonies found");
+            if (logger.isLoggable(Level.INFO)) logger.info("Map size is " + mapWidth + " x " + mapHeight);
+            if (logger.isLoggable(Level.INFO)) logger.info("Difficulty is " + difficulty);
+            if (logger.isLoggable(Level.INFO)) logger.info(numberOfColonies + " colonies found");
         }
 
         public int getNumberOfColonies() {
@@ -73,9 +78,9 @@ public class ColonizationSaveGameReader {
         }
 
         public void print() {
-            System.out.println("Player name is " + playerName
-                               + (humanPlayer ? " [human]" : " [AI]"));
-            System.out.println("New land name is " + newLandName);
+            if (logger.isLoggable(Level.INFO)) logger.info("Player name is " + playerName
+                        + (humanPlayer ? " [human]" : " [AI]"));
+            if (logger.isLoggable(Level.INFO)) logger.info("New land name is " + newLandName);
         }
 
     }
@@ -116,8 +121,8 @@ public class ColonizationSaveGameReader {
         }
 
         public void print() {
-            System.out.println(name + " [" + x + ", " + y + "], "
-                               + numberOfColonists + " colonists");
+            if (logger.isLoggable(Level.INFO)) logger.info(name + " [" + x + ", " + y + "], "
+                        + numberOfColonists + " colonists");
             for (Colonist colonist : colonists) {
                 colonist.print();
             }
@@ -177,8 +182,8 @@ public class ColonizationSaveGameReader {
         public void print() {
             String tileString = (tile >= 0)
                 ? " [tile " + TILES[tile] + "]" : "";
-            System.out.println(OCCUPATION[speciality] + " working as "
-                               + OCCUPATION[occupation] + tileString);
+            if (logger.isLoggable(Level.INFO)) logger.info(OCCUPATION[speciality] + " working as "
+                        + OCCUPATION[occupation] + tileString);
         }
 
     }
@@ -198,7 +203,7 @@ public class ColonizationSaveGameReader {
             reader.readFully(data);
             new ColonizationSaveGameReader(data).run();
         } catch (EOFException ee) {
-            System.err.println("Could not read from " + args[0] + ": " + ee);
+            if (logger.isLoggable(Level.SEVERE)) logger.severe("Could not read from " + args[0] + ": " + ee);
             System.exit(1);
         }
     }
@@ -209,7 +214,7 @@ public class ColonizationSaveGameReader {
         GameData gameData = new GameData(data);
         gameData.print();
         for (int index = 0; index < 4; index++) {
-            System.out.println("Nation is " + NATIONS[index]);
+            if (logger.isLoggable(Level.INFO)) logger.info("Nation is " + NATIONS[index]);
             PlayerData playerData = new PlayerData(data, PLAYER_DATA +
                     index * PlayerData.LENGTH);
             playerData.print();

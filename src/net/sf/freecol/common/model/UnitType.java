@@ -118,7 +118,7 @@ public final class UnitType extends BuildableType implements Consumer {
     private UnitType skillTaught = null;
 
     /** The default role for a unit of this type. */
-    private Role defaultRole = null;
+    private Role defaultRole;
 
     /** The goods consumed per turn when in a settlement. */
     private TypeCountMap<GoodsType> consumption = null;

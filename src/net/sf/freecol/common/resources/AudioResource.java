@@ -54,13 +54,15 @@ public class AudioResource extends Resource {
         
         final File file = new File(resourceLocator);
         if (!file.isDirectory()) {
-            try (final AudioInputStream ais =SoundPlayer.getAudioInputStream(file)) {
+            try (final AudioInputStream stream = SoundPlayer.getAudioInputStream(file)) {
+                stream.getFormat();
                 this.files.add(file);
             }
         } else {
             final File[] candidateFiles = file.listFiles((dir, name) -> name.endsWith(".ogg") || name.endsWith(".wav"));
             for (File f : candidateFiles) {
-                try (final AudioInputStream ais = SoundPlayer.getAudioInputStream(f)) {
+                try (final AudioInputStream stream = SoundPlayer.getAudioInputStream(f)) {
+                    stream.getFormat();
                     this.files.add(f);
                 }
             }

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.i18n;
 
+@FunctionalInterface
 public interface Selector {
 
     /**

@@ -51,6 +51,7 @@ public class ConnectionVerificationMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public ConnectionVerificationMessage(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(TAG, xr, CONNECTABLE_TAG);
     }

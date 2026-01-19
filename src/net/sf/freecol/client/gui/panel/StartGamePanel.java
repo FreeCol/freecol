@@ -62,7 +62,10 @@ public final class StartGamePanel extends FreeColPanel {
 
     private JTextArea chatArea;
 
-    private JButton start, cancel, gameOptions, mapGeneratorOptions;
+    private JButton start;
+    private JButton cancel;
+    private JButton gameOptions;
+    private JButton mapGeneratorOptions;
 
     private PlayersTable table;
 
@@ -144,7 +147,8 @@ public final class StartGamePanel extends FreeColPanel {
 
         NationOptions nationOptions = getGame().getNationOptions();
         cancel = Utility.localizedButton("cancel");
-        JScrollPane chatScroll = null, tableScroll;
+        JScrollPane chatScroll = null;
+        JScrollPane tableScroll;
         table = new PlayersTable(getFreeColClient(), nationOptions,
                                  getMyPlayer());
 

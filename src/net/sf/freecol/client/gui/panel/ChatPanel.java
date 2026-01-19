@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
+import java.util.logging.Level;
 
 
 /**
@@ -106,7 +107,7 @@ public final class ChatPanel extends FreeColPanel {
             switch (Integer.parseInt(command)) {
             case CHAT:
                 String message = getChatText();
-                if (!message.trim().equals("")) {
+                if (!message.trim().isEmpty()) {
                     igc().chat(message);
                 }
                 getGUI().removeComponent(this);
@@ -115,7 +116,7 @@ public final class ChatPanel extends FreeColPanel {
                 super.actionPerformed(ae);
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid ActionEvent, not a number: " + command);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid ActionEvent, not a number: " + command);
         }
     }
 }

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +52,8 @@ import static net.sf.freecol.common.util.Utils.*;
  * Simple container for the freecol file and directory structure model.
  */
 public class FreeColDirectories {
+
+    private static final Logger logger = Logger.getLogger(FreeColDirectories.class.getName());
 
     // No logger!  Many of these routines are called before logging is
     // initialized.
@@ -300,8 +304,10 @@ public class FreeColDirectories {
                     Files.setPosixFilePermissions(dir.toPath(), mode0700);
                 } catch (IOException|UnsupportedOperationException ex) {
                     // Just log, error is not fatal
-                    System.err.println("Failed to change permissions of "
-                        + dir.getPath());
+                    if (logger.isLoggable(Level.WARNING)) {
+                        logger.warning("Failed to change permissions of "
+                            + dir.getPath());
+                    }
                 }
                 return dir;
             }
@@ -349,7 +355,7 @@ public class FreeColDirectories {
      *     XDG directory if it is present or created.
      * @return Null on success, an error message on error.
      */
-    private static StringTemplate getXDGDirs(File[] dirs) {
+    private static StringTemplate getXDGDirs(File... dirs) {
         File home = getUserDefaultDirectory();
         if (home == null) return badHome();
 
@@ -357,25 +363,31 @@ public class FreeColDirectories {
         File d = (env != null) ? new File(env)
             : new File(home, XDG_CONFIG_HOME_DEFAULT);
         File xd;
-        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        xd = requireDirectory(d);
+        if (xd == null) return badDir(d);
         File f = new File(xd, FREECOL_DIRECTORY);
-        if ((d = requireDirectory(f)) == null) return badConfig(f);
+        d = requireDirectory(f);
+        if (d == null) return badConfig(f);
         dirs[0] = d;
 
         env = System.getenv(XDG_DATA_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_DATA_HOME_DEFAULT);
-        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        xd = requireDirectory(d);
+        if (xd == null) return badDir(d);
         f = new File(xd, FREECOL_DIRECTORY);
-        if ((d = requireDirectory(f)) == null) return badData(f);
+        d = requireDirectory(f);
+        if (d == null) return badData(f);
         dirs[1] = d;
 
         env = System.getenv(XDG_CACHE_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_CACHE_HOME_DEFAULT);
-        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        xd = requireDirectory(d);
+        if (xd == null) return badDir(d);
         f = new File(xd, FREECOL_DIRECTORY);
-        if ((d = requireDirectory(f)) == null) return badCache(f);
+        d = requireDirectory(f);
+        if (d == null) return badCache(f);
         dirs[2] = d;
 
         return null;
@@ -390,7 +402,7 @@ public class FreeColDirectories {
      *     MacOSX freecol directories.
      * @return Null on success, an error message on failure.
      */
-    private static StringTemplate getMacOSXDirs(File[] dirs) {
+    private static StringTemplate getMacOSXDirs(File... dirs) {
         File home = getUserDefaultDirectory();
         if (home == null) return badHome();
         File libDir = new File(home, "Library");
@@ -428,7 +440,7 @@ public class FreeColDirectories {
      *     Windows freecol directories.
      * @return Null on success, an error message on failure.
      */
-    private static StringTemplate getWindowsDirs(File[] dirs) {
+    private static StringTemplate getWindowsDirs(File... dirs) {
         File home = getUserDefaultDirectory();
         if (home == null) return badHome();
 
@@ -448,17 +460,22 @@ public class FreeColDirectories {
     private static boolean insistDirectory(File file) {
         boolean ret;
         if (file.exists()) {
-            if (!(ret = file.isDirectory())) {
-                System.err.println("Could not create directory "
-                    + file.getPath() + " because a non-directory with that name is already there.");
+            ret = file.isDirectory();
+            if (!ret) {
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.warning("Could not create directory "
+                        + file.getPath() + " because a non-directory with that name is already there.");
+                }
             }
         } else {
             try {
                 ret = file.mkdir();
-            } catch (Exception e) {
+            } catch (SecurityException e) {
                 ret = false;
-                System.err.println("Could not make directory " + file.getPath()
-                    + ": " + e.getMessage());
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.warning("Could not make directory " + file.getPath()
+                        + ": " + e.getMessage());
+                }
             }
         }
         return ret;
@@ -754,11 +771,9 @@ public class FreeColDirectories {
      */
     public static boolean setClientOptionsFile(String path) {
         File file = new File(path);
-        if (file.exists() && file.isFile() && file.canRead()) {
-            clientOptionsFile = file;
-            return true;
-        }
-        return false;
+        if (!file.exists() || !file.isFile() || !file.canRead()) return false;
+        clientOptionsFile = file;
+        return true;
     }
 
     /**

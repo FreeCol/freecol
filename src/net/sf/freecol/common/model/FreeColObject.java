@@ -22,15 +22,19 @@ package net.sf.freecol.common.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -65,6 +69,7 @@ public abstract class FreeColObject
     /** Comparator by FCO identifier. */
     public static final Comparator<? super FreeColObject> fcoComparator
         = new Comparator<FreeColObject>() {
+                @Override
                 public int compare(FreeColObject fco1, FreeColObject fco2) {
                     return FreeColObject.compareIds(fco1, fco2);
                 }
@@ -100,7 +105,7 @@ public abstract class FreeColObject
             + capitalize(name);
         final Class<T> c = (Class<T>)Introspector.getClassByName(type);
         if (c != null) return c;
-        logger.warning("getFreeColObjectClass could not find: " + type);
+        if (logger.isLoggable(Level.WARNING)) logger.warning("getFreeColObjectClass could not find: " + type);
         return null;
     }
 
@@ -212,7 +217,9 @@ public abstract class FreeColObject
                 // end @compat 0.11.6
                 try {
                     return Integer.parseInt(s);
-                } catch (NumberFormatException nfe) {}
+                } catch (NumberFormatException nfe) {
+                    if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid id number: " + s, nfe);
+                }
             }
         }
         return -1;
@@ -824,8 +831,9 @@ public abstract class FreeColObject
         if (methodName != null && returnClass != null) {
             try {
                 return Introspector.invokeMethod(this, methodName, returnClass);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
+            } catch (IllegalAccessException | InvocationTargetException
+                    | NoSuchMethodException ex) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
             }
         }
         return defaultValue;
@@ -863,7 +871,13 @@ public abstract class FreeColObject
      * Debugging tool, dump object XML to System.err.
      */
     public void dumpObject() {
-        save(System.err, WriteScope.toSave(), false);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (PrintStream ps = new PrintStream(bos, true, StandardCharsets.UTF_8)) {
+            save(ps, WriteScope.toSave(), false);
+        }
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(new String(bos.toByteArray(), StandardCharsets.UTF_8));
+        }
     }
 
     /**
@@ -1051,7 +1065,7 @@ public abstract class FreeColObject
             = new FreeColXMLReader(new StringReader(this.serialize()))) {
             ret = xr.copy(game, returnClass);
         } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Copy of " + getId()
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Copy of " + getId()
                 + " to " + returnClass.getName() + "failed", xse);
         }
         return ret;
@@ -1073,7 +1087,7 @@ public abstract class FreeColObject
             = new FreeColXMLReader(new StringReader(this.serialize(player)))) {
             ret = xr.copy(game, returnClass);
         } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Copy of " + getId()
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Copy of " + getId()
                 + " to " + returnClass.getName()
                 + " for " + player.getId() + "failed", xse);
         }
@@ -1111,12 +1125,14 @@ public abstract class FreeColObject
         copyInCast(T other, Class<R> returnClass) {
         if (other == null) return (R)null;
         if (!idEquals(other)) {
-            logger.warning("copyInCast " + other.getId() + " onto " + getId());
+            if (logger.isLoggable(Level.WARNING)) logger.warning("copyInCast " + other.getId() + " onto " + getId());
             return (R)null;
         }
         try {
             return returnClass.cast(other);
-        } catch (ClassCastException cce) {}
+        } catch (ClassCastException cce) {
+            logger.log(Level.FINE, "Failed to cast copy target.", cce);
+        }
         return (R)null;
     }
 
@@ -1172,7 +1188,7 @@ public abstract class FreeColObject
      */
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         if (getId() == null) {
-            logger.warning("FreeColObject with null identifier: " + this);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("FreeColObject with null identifier: " + this);
         } else {
             xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         }
@@ -1207,7 +1223,7 @@ public abstract class FreeColObject
      *      to the stream.
      */
     public final void toXMLPartial(FreeColXMLWriter xw,
-                                   String[] fields) throws XMLStreamException {
+                                   String... fields) throws XMLStreamException {
         final Class<?> theClass = getClass();
 
         xw.writeStartElement(getXMLTagName());
@@ -1222,7 +1238,7 @@ public abstract class FreeColObject
                 String value = intro.getter(this);
                 xw.writeAttribute(field, value);
             } catch (Introspector.IntrospectorException ie) {
-                logger.log(Level.WARNING, "Failed to write field: " + field, ie);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to write field: " + field, ie);
             }
         }
 
@@ -1256,8 +1272,8 @@ public abstract class FreeColObject
 
             xw.writeEndElement();
 
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Partial write failed for "
+        } catch (XMLStreamException e) {
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Partial write failed for "
                        + theClass.getName(), e);
         }
     }
@@ -1323,7 +1339,7 @@ public abstract class FreeColObject
                 readChild(xr);
             }
         } catch (XMLStreamException xse) {
-            logger.log(Level.SEVERE, "nextTag failed at " + tag, xse);
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "nextTag failed at " + tag, xse);
         }
         xr.expectTag(tag);
     }
@@ -1372,8 +1388,8 @@ public abstract class FreeColObject
                 Introspector intro = new Introspector(theClass, name);
                 intro.setter(this, xr.getAttributeValue(i));
 
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not set field " + name, e);
+            } catch (Introspector.IntrospectorException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Could not set field " + name, e);
             }
         }
 

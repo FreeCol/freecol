@@ -86,7 +86,7 @@ public class RandomUtils {
     public static int randomInt(Logger logger, String logMe, Random random,
                                 int range) {
         int ret = random.nextInt(range);
-        if (logger != null) {
+        if (logger != null && logger.isLoggable(Level.FINEST)) {
             logger.finest(logMe + " random(" + range + ") = " + ret);
         }
         return ret;
@@ -99,11 +99,11 @@ public class RandomUtils {
      * @param logMe A string to log with the result.
      * @param arr The array of ints to log.
      */
-    public static void logArray(Logger logger, String logMe, int[] arr) {
+    public static void logArray(Logger logger, String logMe, int... arr) {
         if (logger != null && logger.isLoggable(Level.FINEST)) {
             StringBuilder sb = new StringBuilder(64);
             sb.append(logMe).append(" random").append(" = [");
-            for (int i = 0; i < arr.length; i++) sb.append(' ').append(arr[i]);
+            for (int value : arr) sb.append(' ').append(value);
             sb.append(" ]");
             logger.finest(sb.toString());
         }

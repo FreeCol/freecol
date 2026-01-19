@@ -129,7 +129,7 @@ public class NewRegionNameMessage extends AttributeMessage {
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

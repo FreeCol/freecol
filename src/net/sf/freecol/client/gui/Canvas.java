@@ -256,7 +256,7 @@ public final class Canvas extends JDesktopPane {
         updateRepaintTimer(false);
         this.animationTimer.start();
         
-        logger.info("Canvas created with bounds: " + windowBounds);
+        if (logger.isLoggable(Level.INFO)) logger.info("Canvas created with bounds: " + windowBounds);
     }
 
     
@@ -285,7 +285,7 @@ public final class Canvas extends JDesktopPane {
         
         Dimension size = getSize();
         if (oldSize.width != size.width || oldSize.height != size.height) {
-            logger.info("Canvas resize from " + oldSize + " to " + size);
+            if (logger.isLoggable(Level.INFO)) logger.info("Canvas resize from " + oldSize + " to " + size);
             oldSize = size;
             canvasMapViewer.changeSize(size);
             if (removeMapControls()) {
@@ -353,7 +353,7 @@ public final class Canvas extends JDesktopPane {
             final Point loc = f.getLocation();
             final int newX = (loc.x + newSize.width > canvasSize.width) ? canvasSize.width - newSize.width : loc.x;
             final int newY = (loc.y + newSize.height > canvasSize.height) ? canvasSize.height - newSize.height : loc.y;
-            f.setLocation(new Point(Math.max(0, newX), Math.max(0, newY)));
+            f.setLocation(Math.max(0, newX), Math.max(0, newY));
            
             /*
              * Maintains logical positions (like centered) after resize.
@@ -442,7 +442,7 @@ public final class Canvas extends JDesktopPane {
                 ret = false;
             } else {
                 logger.warning("Full screen mode not supported.");
-                System.err.println(Messages.message("client.fullScreen"));
+                if (logger.isLoggable(Level.WARNING)) logger.warning(Messages.message("client.fullScreen"));
                 ret = true;
             }
         } else {
@@ -466,6 +466,8 @@ public final class Canvas extends JDesktopPane {
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox,
                                       PopupPosition popupPosition,
                                       boolean resizable) {
+        PopupPosition framePosition = popupPosition;
+        boolean frameResizable = resizable;
         @SuppressWarnings("serial")
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame() {
             @Override
@@ -481,15 +483,15 @@ public final class Canvas extends JDesktopPane {
         if (comp instanceof FreeColPanel) {
             final FreeColPanel freeColPanel = (FreeColPanel) comp;
             fullscreenPanel = freeColPanel.isFullscreen();
-            if (popupPosition == null) {
-                popupPosition = freeColPanel.getFramePopupPosition();
+            if (framePosition == null) {
+                framePosition = freeColPanel.getFramePopupPosition();
             }
         } else {
             fullscreenPanel = false;
         }
         
         if (fullscreenPanel) {
-            resizable = false;
+            frameResizable = false;
         }
         
         Container con = f.getContentPane();
@@ -556,13 +558,13 @@ public final class Canvas extends JDesktopPane {
         if (fullscreenPanel) {
             f.setLocation(0, 0);
         } else {
-            final Point p = chooseLocation(comp, size.width, size.height, popupPosition);
+            final Point p = chooseLocation(comp, size.width, size.height, framePosition);
             final Point adjustedP = adjustLocationForClearSpace(p, size.width, size.height);
             
-            if (popupPosition == PopupPosition.CENTERED_FORCED || p.equals(adjustedP)) {
+            if (framePosition == PopupPosition.CENTERED_FORCED || p.equals(adjustedP)) {
                 f.setLocation(p);
-                f.putClientProperty(PROPERTY_POPUP_POSITION, popupPosition);
-                f.putClientProperty(PROPERTY_RESIZABLE, resizable);
+                f.putClientProperty(PROPERTY_POPUP_POSITION, framePosition);
+                f.putClientProperty(PROPERTY_RESIZABLE, frameResizable);
             } else {
                 f.setLocation(adjustedP);
             }
@@ -574,10 +576,12 @@ public final class Canvas extends JDesktopPane {
 
         f.setFrameIcon(null);
         f.setVisible(true);
-        f.setResizable(resizable);
+        f.setResizable(frameResizable);
         try {
             f.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException e) {
+            logger.log(Level.FINE, "Frame selection vetoed.", e);
+        }
         return f;
     }
 
@@ -615,8 +619,8 @@ public final class Canvas extends JDesktopPane {
         	// To avoid illegal component position exception - remove the component first
             remove(comp);
             add(comp, layer);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "addToCanvas("
+        } catch (IllegalArgumentException e) {
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "addToCanvas("
                 + comp.getClass().getSimpleName()
                 + " at " + comp.getX() + "," + comp.getY()
                 + " on layer " + layer + ") failed.", e);
@@ -664,8 +668,10 @@ public final class Canvas extends JDesktopPane {
     private Point chooseLocation(Component comp, int width, int height, 
                                  PopupPosition popupPosition) {
         Point p = null;
-        if ((comp instanceof FreeColPanel)
-            && (p = getSavedPosition(comp)) != null) {
+        if (comp instanceof FreeColPanel) {
+            p = getSavedPosition(comp);
+        }
+        if (p != null) {
             // Sanity check stuff coming out of client options.
             if (p.getX() < 0
                 || p.getX() >= getWidth() - width
@@ -674,7 +680,8 @@ public final class Canvas extends JDesktopPane {
                 p = null;
             }
         }
-        int x = 0, y = 0;
+        int x = 0;
+        int y = 0;
         if (p != null) {
             x = (int)p.getX();
             y = (int)p.getY();
@@ -715,7 +722,10 @@ public final class Canvas extends JDesktopPane {
                 break;
             case UPPER_LEFT:
             case ORIGIN:
-                x = y = 0;
+                x = 0;
+                y = 0;
+                break;
+            default:
                 break;
             }
         }
@@ -724,11 +734,10 @@ public final class Canvas extends JDesktopPane {
     }
 
     private Point adjustLocationForClearSpace(Point location, int width, int height) {
-        Point p;
         int x = location.x;
         int y = location.y;
-        if ((p = getClearSpace(x, y, width, height, MAXTRY)) != null
-            && p.x >= 0 && p.x < getWidth()
+        Point p = getClearSpace(x, y, width, height, MAXTRY);
+        if (p != null && p.x >= 0 && p.x < getWidth()
             && p.y >= 0 && p.y < getHeight()) {
             x = p.x;
             y = p.y;
@@ -753,7 +762,7 @@ public final class Canvas extends JDesktopPane {
         final Rectangle bounds = this.getBounds();
         if (!bounds.contains(x, y)) return null;
 
-        tries = 3 * tries + 1; // 3 new candidates per level
+        int remaining = 3 * tries + 1; // 3 new candidates per level
         List<Point> todo = new ArrayList<>();
         Point p = new Point(x, y);
         todo.add(p);
@@ -766,9 +775,10 @@ public final class Canvas extends JDesktopPane {
         // Find the position with the least overlap
         int bestScore = Integer.MAX_VALUE;
         Point best = p;
+        Rectangle r = new Rectangle();
         while (!todo.isEmpty()) {
             p = todo.remove(0);
-            Rectangle r = new Rectangle(p.x, p.y, w, h);
+            r.setBounds(p.x, p.y, w, h);
             if (!bounds.contains(r)) {
                 continue;
             }
@@ -796,7 +806,8 @@ public final class Canvas extends JDesktopPane {
                 best = p;
             }
             // Guarantee eventual completion
-            if (--tries <= 0) break;
+            remaining -= 1;
+            if (remaining <= 0) break;
 
             int n = todo.size(),
                 // Some alternative new positions
@@ -835,7 +846,10 @@ public final class Canvas extends JDesktopPane {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
                 return null;
             }
-        } catch (Exception e) {}
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.FINE, "Failed to read position option.", e);
+            return null;
+        }
         return co.getPanelPosition(comp.getClass().getName());
     }
 
@@ -853,7 +867,10 @@ public final class Canvas extends JDesktopPane {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) {
                 return null;
             }
-        } catch (Exception e) {}
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.FINE, "Failed to read size option.", e);
+            return null;
+        }
         return co.getPanelSize(comp.getClass().getName());
     }
 
@@ -893,7 +910,10 @@ public final class Canvas extends JDesktopPane {
         try {
             if (!this.freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) return;
-        } catch (Exception e) {}
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.FINE, "Failed to read position option.", e);
+            return;
+        }
 
         String className = comp.getClass().getName();
         saveInteger(className, ".x", position.x);
@@ -910,7 +930,10 @@ public final class Canvas extends JDesktopPane {
         try {
             if (!this.freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) return;
-        } catch (Exception e) {}
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.FINE, "Failed to read size option.", e);
+            return;
+        }
 
         String className = comp.getClass().getName();
         saveInteger(className, ".w", size.width);
@@ -922,9 +945,8 @@ public final class Canvas extends JDesktopPane {
      * to be saved.
      *
      * @param c The closing {@code Component}.
-     * @param jif The enclosing {@code JInternalFrame}.
      */
-    private void notifyClose(Component c, JInternalFrame jif) {
+    private void notifyClose(Component c) {
         if (c instanceof FreeColPanel) {
             FreeColPanel fcp = (FreeColPanel) c;
             fcp.firePropertyChange("closing", false, true);
@@ -1111,7 +1133,7 @@ public final class Canvas extends JDesktopPane {
                     for (Component c2 : jif.getContentPane().getComponents()) {
                         if (panel.equals(c2.getClass().getName())) {
                             savePositionAndSize(c2, jif);
-                            notifyClose(c2, jif);
+                            notifyClose(c2);
                             return;
                         }
                     }
@@ -1256,7 +1278,9 @@ public final class Canvas extends JDesktopPane {
                                 });
                             return ret;
                         }
-                    } catch (ClassCastException cce) {}
+                    } catch (ClassCastException cce) {
+                        logger.log(Level.FINE, "Panel cast failed.", cce);
+                    }
                 }
             }
         }
@@ -1357,12 +1381,12 @@ public final class Canvas extends JDesktopPane {
             // crashes here deep in the java libraries.
             try {
                 super.remove(comp);
-            } catch (Exception e) {
+            } catch (IllegalArgumentException | IllegalStateException e) {
                 logger.log(Level.WARNING, "Java crash", e);
             }
         }
         if (jif != null) { // Notify close after removing from Canvas
-            notifyClose(comp, jif);
+            notifyClose(comp);
         }
         repaint(updateBounds.x, updateBounds.y,
                 updateBounds.width, updateBounds.height);
@@ -1558,7 +1582,7 @@ public final class Canvas extends JDesktopPane {
         for (JInternalFrame jif : getAllFrames()) {
             for (Component c : jif.getContentPane().getComponents()) {
                 savePositionAndSize(c, jif);
-                notifyClose(c, jif);
+                notifyClose(c);
             }
             jif.dispose();
         }

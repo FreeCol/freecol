@@ -144,7 +144,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         try {
             savegame = new FreeColSavegameFile(file);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to make save game for: "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to make save game for: "
                 + mapName, ioe);
             return null;
         }
@@ -153,7 +153,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         try {
             thumbnail = ImageIO.read(savegame.getThumbnailInputStream());
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to read thumbnail for: "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to read thumbnail for: "
                 + mapName, ioe);
             thumbnail = null;
         }
@@ -169,7 +169,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                     + "\u00D7"
                     + properties.getProperty("map.height"));
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to read properties for: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to read properties for: "
                     + mapName, ioe);
             }
         }
@@ -199,7 +199,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 getGroup().setInteger(EDGE, getGroup().getIntegerMinimum(EDGE));
                 return false;
             }
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             logger.log(Level.WARNING, "Options in disarray", ex);
         }           
         if (!ok) {

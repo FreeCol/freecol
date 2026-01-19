@@ -122,6 +122,8 @@ public final class UnitImageAnimation extends Animation {
                     a.add(d.rotate(1)); a.add(d.rotate(-1));
                     a.add(d.rotate(2)); a.add(d.rotate(-2));
                     break;
+                default:
+                    break;
                 }
                 alternatives.put(d, a);
             }

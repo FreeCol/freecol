@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -655,9 +659,8 @@ public class DebugUtils {
                     su.getDescription(Unit.UnitLabelType.NATIONAL),
                     "(", su.getId(), ") from: ", 
                     su.getLocation().getId(), ".\n");
-                try {
-                    lb.add("  Client: ", cTile.getFirstUnit(), "\n");
-                } catch (NullPointerException npe) {}
+                Unit firstUnit = (cTile == null) ? null : cTile.getFirstUnit();
+                lb.add("  Client: ", firstUnit, "\n");
             } else {
                 if (cu.hasTile()
                     && !cu.getTile().getId().equals(su.getTile().getId())) {
@@ -893,15 +896,21 @@ public class DebugUtils {
         final Game sGame = server.getGame();
         final Player player = freeColClient.getMyPlayer();
 
-        System.err.println("\nClient (" + game.getClientUserName()
-            + "/" + player.getId() + "):");
-        tile.save(System.err, WriteScope.toClient(player), true);
-        System.err.println("\n\nServer:");
-        Tile sTile = sGame.getFreeColGameObject(tile.getId(), Tile.class);
-        sTile.save(System.err, WriteScope.toServer(), true);
-        System.err.println("\n\nSave:");
-        sTile.save(System.err, WriteScope.toSave(), true);
-        System.err.println('\n');
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (PrintStream ps = new PrintStream(bos, true, StandardCharsets.UTF_8)) {
+            ps.println("\nClient (" + game.getClientUserName()
+                + "/" + player.getId() + "):");
+            tile.save(ps, WriteScope.toClient(player), true);
+            ps.println("\n\nServer:");
+            Tile sTile = sGame.getFreeColGameObject(tile.getId(), Tile.class);
+            sTile.save(ps, WriteScope.toServer(), true);
+            ps.println("\n\nSave:");
+            sTile.save(ps, WriteScope.toSave(), true);
+            ps.println('\n');
+        }
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info(new String(bos.toByteArray(), StandardCharsets.UTF_8));
+        }
     }
 
     /**

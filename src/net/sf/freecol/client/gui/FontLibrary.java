@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.resources.ResourceManager;
+import java.util.logging.Level;
 
 
 /**
@@ -173,7 +174,7 @@ public class FontLibrary {
             if (displayTest(ret, text)) return ret;
             // Failed the display test.  Try to fix these by changing the
             // spec at the call site.
-            logger.warning("Fontlibrary cached font for " + spec
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Fontlibrary cached font for " + spec
                 + " failed to display: " + text);
         }
 
@@ -205,13 +206,13 @@ public class FontLibrary {
                 // Fall back to the main font, we are out of options.
                 // This is bad, because every time we try *text* we
                 // will end up here again.  Fix this warning if it happens!
-                logger.warning("FontLibrary found no font for: " + text);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("FontLibrary found no font for: " + text);
             }
             ret = mainFont;
         }
         ret = ret.deriveFont(style, size.forFont());
         if (ret == null) {
-            logger.warning("FontLibrary could not derive font for: " + spec);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("FontLibrary could not derive font for: " + spec);
         } else {
             FontLibrary.fontCache.put(spec, ret);
         }
