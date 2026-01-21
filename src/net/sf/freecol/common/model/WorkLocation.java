@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -187,8 +188,10 @@ public abstract class WorkLocation extends UnitLocation
      * work type of units present.
      */
     public void updateProductionType() {
-        setProductionType(getBestProductionType(isEmpty(),
-                getCurrentWorkType()));
+        final boolean unattended = isEmpty();
+        final GoodsType workType = getCurrentWorkType();
+        
+        setProductionType(getBestProductionType(unattended, workType));
     }
 
     /**
@@ -197,12 +200,17 @@ public abstract class WorkLocation extends UnitLocation
      * @param unattended Whether to require unattended production.
      * @param workType An optional work type to require.
      * @return The best available {@code ProductionType} given the
-     *     argument constraints.
+     * argument constraints.
      */
     public ProductionType getBestProductionType(boolean unattended,
                                                 GoodsType workType) {
-        return ProductionType.getBestProductionType(workType,
-            getAvailableProductionTypes(unattended));
+        final List<ProductionType> available = getAvailableProductionTypes(unattended);
+        
+        if (available == null || available.isEmpty()) {
+            return null;
+        }
+        
+        return ProductionType.getBestProductionType(workType, available);
     }
 
     /**
@@ -250,20 +258,25 @@ public abstract class WorkLocation extends UnitLocation
             unitType = spec.getDefaultUnitType(getOwner().getNationType());
         }
         
-        LogBuilder lb = new LogBuilder((getColony().getOccupationTrace()) ? 64 : 0);
+        final boolean trace = getColony().getOccupationTrace();
+        LogBuilder lb = new LogBuilder(trace ? 64 : 0);
         lb.add(getColony().getName(), "/", this, ".getOccupation(",
                unitType.getSuffix(), ")");
 
-        Collection<GoodsType> types = spec.getGoodsTypeList();
+        final Collection<GoodsType> types = spec.getGoodsTypeList();
         Occupation best = new Occupation(null, null, null);
+        
         lb.add("\n  ");
         logFreeColObjects(types, lb);
+        
         int bestAmount = best.improve(unitType, this, 0, types, lb);
+        
         if (best.workType != null) {
             lb.add("\n  => ", best, "/", bestAmount);
         } else {
             lb.add("\n  FAILED");
         }
+        
         lb.log(logger, Level.WARNING);
         return (best.workType == null) ? null : best;
     }
@@ -310,19 +323,21 @@ public abstract class WorkLocation extends UnitLocation
             || goodsType == null
             || ((unit == null || !contains(unit)) && isFull())) return null;
 
-        final Specification spec = getSpecification();
-        final Player owner = getOwner();
-        final UnitType expert = spec.getExpertForProducing(goodsType);
+        final var spec = getSpecification();
+        final var owner = getOwner();
+        final var expert = spec.getExpertForProducing(goodsType);
         
         // Require there be a better unit to do this work, and that it
         // would actually improve production.
-        final UnitType better = (expert != null) ? expert
+        final var better = (expert != null) ? expert
             : spec.getDefaultUnitType(owner);
         if (unit != null && better == unit.getType()) return null;
+        
         int delta = getPotentialProduction(goodsType, better);
         if (unit != null) {
             delta -= getPotentialProduction(goodsType, unit.getType());
         }
+        
         // Do we have a chance of satisfying the inputs?
         final ToIntFunction<AbstractGoods> prod = ag ->
             getColony().getNetProductionOf(ag.getType());
@@ -336,12 +351,12 @@ public abstract class WorkLocation extends UnitLocation
                 || goodsType.isImmigrationType())) 
             return null;
         
-        final Boolean ok = goodSuggestionCheck(better,unit, goodsType);
+        // Use primitive boolean for "ok" to avoid unnecessary boxing/unboxing
+        final boolean ok = goodSuggestionCheck(better, unit, goodsType);
         return (!ok) ? null
             : new Suggestion(this, (unit == null) ? null : unit.getType(),
                              better, goodsType, delta);
     }
-
 
     /**
      * Determines whether a {@code WorkLocation} is a good suggestion
@@ -380,26 +395,33 @@ public abstract class WorkLocation extends UnitLocation
      *     adding a unit) to a {@code Suggestion}.
      */
     public java.util.Map<Unit, Suggestion> getSuggestions() {
-        java.util.Map<Unit, Suggestion> result = new HashMap<>();
+        var result = new HashMap<Unit, Suggestion>();
         if (!canBeWorked() || canTeach()) return result;
         
-        Occupation occ = getOccupation(null);
-        GoodsType work;
-        Suggestion sug;
-        // Check if the existing non-student units can be improved.
-        for (Unit u : transform(getUnits(), isNull(Unit::getTeacher))) {
-            if ((work = u.getWorkType()) == null) {
-                if (occ != null) work = occ.workType;
+        var occ = getOccupation(null);
+        var currentProductionType = getProductionType();
+        
+        // Check if existing units (that aren't currently being taught) can be improved
+        getUnitList().stream()
+            .filter(u -> u.getTeacher() == null)
+            .forEach(u -> {
+                var work = u.getWorkType();
+                if (work == null && occ != null) {
+                    work = occ.workType;
+                }
+                
+                var sug = getSuggestion(u, currentProductionType, work);
+                if (sug != null) {
+                    result.put(u, sug);
+                }
+            });
+
+        // Check for an extra worker suggestion if space is available
+        if (occ != null && occ.workType != null && !isFull()) {
+            var sug = getSuggestion(null, occ.productionType, occ.workType);
+            if (sug != null) {
+                result.put(null, sug);
             }
-            if ((sug = getSuggestion(u, getProductionType(), work)) != null) {
-                result.put(u, sug);
-            }
-        }
-        // Check for a suggestion for an extra worker if there is space.
-        if (occ != null && (work = occ.workType) != null
-            && !isFull()
-            && (sug = getSuggestion(null, occ.productionType, work)) != null) {
-            result.put(null, sug);
         }
         return result;
     }
@@ -441,7 +463,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return True if there are any inputs.
      */
     public boolean hasInputs() {
-        return any(getInputs());
+        return getInputs().anyMatch(Objects::nonNull);
     }
 
     /**
@@ -450,8 +472,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return True if there are any outputs.
      */
     public boolean hasOutputs() {
-        return this.productionType != null
-            && any(this.productionType.getOutputs());
+        return getOutputs().anyMatch(Objects::nonNull);
     }
 
     /**
@@ -534,10 +555,14 @@ public abstract class WorkLocation extends UnitLocation
     public UnitType getExpertUnitType() {
         final Specification spec = getSpecification();
         ProductionType pt = getBestProductionType(false, null);
-        return (pt == null) ? null
-            : find(map(pt.getOutputs(),
-                       ag -> spec.getExpertForProducing(ag.getType())),
-                   isNotNull());
+        
+        if (pt == null) return null;
+
+        return pt.getOutputs()
+                 .map(ag -> spec.getExpertForProducing(ag.getType()))
+                 .filter(Objects::nonNull)
+                 .findFirst()
+                 .orElse(null);
     }
 
     /**
@@ -564,13 +589,20 @@ public abstract class WorkLocation extends UnitLocation
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
-        if (unit == null || unit.getWorkType() != goodsType) return 0;
+        // Defensive check: if unit is null or doing different work, productivity is zero.
+        if (unit == null || goodsType == null || unit.getWorkType() != goodsType) {
+            return 0;
+        }
+
         final UnitType unitType = unit.getType();
         final Turn turn = getGame().getTurn();
-        return Math.max(0,
-                        (int)applyModifiers(getBaseProduction(getProductionType(), goodsType, unitType),
-                                            turn,
-                                            getProductionModifiers(goodsType, unitType)));
+        final ProductionType pt = getProductionType();
+
+        int base = getBaseProduction(pt, goodsType, unitType);
+        var modifiers = getProductionModifiers(goodsType, unitType);
+        double result = applyModifiers(base, turn, modifiers);
+
+        return Math.max(0, (int) result);
     }
 
     /**
@@ -597,8 +629,8 @@ public abstract class WorkLocation extends UnitLocation
      * this routine is intended to be used for planning purposes, so
      * some exceptions are allowed --- the calculation proceeds:
      *
-     *   - for unclaimed tiles
-     *   - when the location is currently full of units
+     * - for unclaimed tiles
+     * - when the location is currently full of units
      *
      * which are conditions that an AI might plausibly be able and
      * willing to change (a case could be made for including the
@@ -607,34 +639,53 @@ public abstract class WorkLocation extends UnitLocation
      * @param goodsType The {@code GoodsType} to produce.
      * @param unitType The optional {@code UnitType} to do the work.
      * @return The potential production with the given goods type and
-     *     unit type.
+     * unit type.
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
+        // Fail-fast check for production capability.
         if (!canProduce(goodsType, unitType)) return 0;
 
         if (unitType != null) {
-            switch (getNoWorkReason()) {
-            case NONE: case ALREADY_PRESENT: case CLAIM_REQUIRED:
-                break;
+            // Check why a unit might not be able to work here.
+            final NoAddReason reason = getNoWorkReason();
+            switch (reason) {
+            case NONE: 
+            case ALREADY_PRESENT: 
+            case CLAIM_REQUIRED:
+                break; // These are "planning" exceptions; allow calculation.
+
             case CAPACITY_EXCEEDED:
-                if (getUnitCapacity() > 0) break; // Could work after reorg!
-                // Fall through
-            case WRONG_TYPE: case OWNED_BY_ENEMY: case ANOTHER_COLONY:
-            case COLONY_CENTER: case MISSING_ABILITY: case MISSING_SKILL:
-            case MINIMUM_SKILL: case MAXIMUM_SKILL:
-            case OCCUPIED_BY_ENEMY: // Arguable!
+                // If the building has capacity but is just full, the AI can 
+                // move units around. Only fail if total capacity is zero.
+                if (getUnitCapacity() > 0) break; 
+                return 0;
+
+            // All other reasons are non-transient or fundamental blocks.
+            case WRONG_TYPE: 
+            case OWNED_BY_ENEMY: 
+            case ANOTHER_COLONY:
+            case COLONY_CENTER: 
+            case MISSING_ABILITY: 
+            case MISSING_SKILL:
+            case MINIMUM_SKILL: 
+            case MAXIMUM_SKILL:
+            case OCCUPIED_BY_ENEMY: 
             default:
-                // Non-transient or inapplicable conditions.  Production
-                // is impossible.
                 return 0;
             }
         }
 
-        int amount = getBaseProduction(null, goodsType, unitType);
-        amount = (int)applyModifiers(amount, getGame().getTurn(),
-                                     getProductionModifiers(goodsType, unitType));
-        return (amount < 0) ? 0 : amount;
+        // Capture turn once to ensure consistency.
+        final Turn turn = getGame().getTurn();
+        
+        // Calculate base and apply modifiers.
+        int base = getBaseProduction(null, goodsType, unitType);
+        double total = applyModifiers(base, turn, 
+                                      getProductionModifiers(goodsType, unitType));
+        
+        // Ensure result is not negative.
+        return Math.max(0, (int) total);
     }
 
     /**

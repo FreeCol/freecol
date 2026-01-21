@@ -21,10 +21,11 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
@@ -32,7 +33,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -41,10 +41,6 @@ import net.sf.freecol.common.util.Utils;
 public class ProductionType extends FreeColSpecObject {
 
     public static final String TAG = "production";
-    
-    public static final List<AbstractGoods> EMPTY_LIST
-        = Collections.<AbstractGoods>emptyList();
-
 
     /** Whether this production type applies only to colony center tiles. */
     private boolean unattended;
@@ -56,10 +52,10 @@ public class ProductionType extends FreeColSpecObject {
     private String productionLevel;
 
     /** The goods that are produced by this production type. */
-    private List<AbstractGoods> outputs = null;
+    private List<AbstractGoods> outputs = new ArrayList<>();
 
     /** The goods that are consumed by this production type. */
-    private List<AbstractGoods> inputs = null;
+    private List<AbstractGoods> inputs = new ArrayList<>();
 
 
     /**
@@ -80,7 +76,7 @@ public class ProductionType extends FreeColSpecObject {
     private ProductionType(List<AbstractGoods> outputs) {
         this((Specification)null);
 
-        this.outputs = outputs;
+        this.outputs = (outputs == null) ? new ArrayList<>() : outputs;
     }
 
     /**
@@ -94,7 +90,7 @@ public class ProductionType extends FreeColSpecObject {
                           List<AbstractGoods> outputs) {
         this(outputs);
 
-        this.inputs = inputs;
+        this.inputs = (inputs == null) ? new ArrayList<>() : inputs;
     }
 
     /**
@@ -123,14 +119,12 @@ public class ProductionType extends FreeColSpecObject {
      */
     public ProductionType(GoodsType input, GoodsType output, int amount) {
         this((Specification)null);
-        
+            
         if (input != null) {
-            this.inputs = new ArrayList<>();
-            this.inputs.add(new AbstractGoods(input, amount));
+            inputs.add(new AbstractGoods(input, amount));
         }
         if (output != null) {
-            this.outputs = new ArrayList<>();
-            this.outputs.add(new AbstractGoods(output, amount));
+            outputs.add(new AbstractGoods(output, amount));
         }
     }
 
@@ -204,18 +198,17 @@ public class ProductionType extends FreeColSpecObject {
      *
      * @return A list of the input {@code AbstractGoods}.
      */
-    public final List<AbstractGoods> getInputList() {
-        return (this.inputs == null) ? EMPTY_LIST : this.inputs;
+    public List<AbstractGoods> getInputList() {
+        return inputs;
     }
-        
+
     /**
      * Get the input goods as a stream.
      *
      * @return A stream of the input {@code AbstractGoods}.
      */
-    public final Stream<AbstractGoods> getInputs() {
-        return (this.inputs == null) ? Stream.<AbstractGoods>empty()
-            : this.inputs.stream();
+    public Stream<AbstractGoods> getInputs() {
+        return inputs.stream();
     }
 
     /**
@@ -234,8 +227,7 @@ public class ProductionType extends FreeColSpecObject {
      * @param amount The amount of goods.
      */
     private void addInput(GoodsType type, int amount) {
-        if (this.inputs == null) this.inputs = new ArrayList<>(1);
-        this.inputs.add(new AbstractGoods(type, amount));
+        inputs.add(new AbstractGoods(type, amount));
     }
 
     /**
@@ -243,8 +235,8 @@ public class ProductionType extends FreeColSpecObject {
      *
      * @return A list of the output {@code AbstractGoods}.
      */
-    public final List<AbstractGoods> getOutputList() {
-        return (this.outputs == null) ? EMPTY_LIST : this.outputs;
+    public List<AbstractGoods> getOutputList() {
+        return outputs;
     }
         
     /**
@@ -252,9 +244,8 @@ public class ProductionType extends FreeColSpecObject {
      *
      * @return A stream of the output {@code AbstractGoods}.
      */
-    public final Stream<AbstractGoods> getOutputs() {
-        return (this.outputs == null) ? Stream.<AbstractGoods>empty()
-            : this.outputs.stream();
+    public Stream<AbstractGoods> getOutputs() {
+        return outputs.stream();
     }
 
     /**
@@ -273,8 +264,7 @@ public class ProductionType extends FreeColSpecObject {
      * @param amount The amount of goods.
      */
     private void addOutput(GoodsType type, int amount) {
-        if (this.outputs == null) this.outputs = new ArrayList<>(1);
-        this.outputs.add(new AbstractGoods(type, amount));
+        outputs.add(new AbstractGoods(type, amount));
     }
 
     /**
@@ -283,8 +273,7 @@ public class ProductionType extends FreeColSpecObject {
      * @param ag The {@code AbstractGoods} to add.
      */
     public void addOutput(AbstractGoods ag) {
-        if (this.outputs == null) this.outputs = new ArrayList<>(1);
-        this.outputs.add(ag);
+        outputs.add(ag);
     }
 
     /**
@@ -295,8 +284,7 @@ public class ProductionType extends FreeColSpecObject {
      *     null.
      */
     public AbstractGoods getOutput(GoodsType goodsType) {
-        return (this.outputs == null) ? null
-            : find(this.outputs, AbstractGoods.matches(goodsType));
+        return find(outputs, AbstractGoods.matches(goodsType));
     }
 
     /**
@@ -305,12 +293,8 @@ public class ProductionType extends FreeColSpecObject {
      * @return The {@code GoodsType} of the most productive output.
      */
     public GoodsType getBestOutputType() {
-        AbstractGoods goods;
-        return (this.outputs == null
-            || (goods = maximize(this.outputs,
-                    AbstractGoods.ascendingAmountComparator)) == null)
-            ? null
-            : goods.getType();
+        AbstractGoods goods = maximize(outputs, AbstractGoods.ascendingAmountComparator);
+        return (goods == null) ? null : goods.getType();
     }
 
     /**
@@ -371,8 +355,8 @@ public class ProductionType extends FreeColSpecObject {
         if (o == null || !super.copyIn(o)) return false;
         this.unattended = o.getUnattended();
         this.productionLevel = o.getProductionLevel();
-        this.setOutputs(o.getOutputList());
-        this.setInputs(o.getInputList());
+        this.outputs = new ArrayList<>(o.getOutputList());
+        this.inputs = new ArrayList<>(o.getInputList());
         return true;
     }
 
@@ -413,28 +397,18 @@ public class ProductionType extends FreeColSpecObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (inputs != null) {
-            for (AbstractGoods input : inputs) {
-                xw.writeStartElement(INPUT_TAG);
-
-                xw.writeAttribute(GOODS_TYPE_TAG, input.getType());
-
-                xw.writeAttribute(VALUE_TAG, input.getAmount());
-
-                xw.writeEndElement();
-            }
+        for (AbstractGoods input : inputs) {
+            xw.writeStartElement(INPUT_TAG);
+            xw.writeAttribute(GOODS_TYPE_TAG, input.getType());
+            xw.writeAttribute(VALUE_TAG, input.getAmount());
+            xw.writeEndElement();
         }
 
-        if (outputs != null) {
-            for (AbstractGoods output : outputs) {
-                xw.writeStartElement(OUTPUT_TAG);
-
-                xw.writeAttribute(GOODS_TYPE_TAG, output.getType());
-
-                xw.writeAttribute(VALUE_TAG, output.getAmount());
-
-                xw.writeEndElement();
-            }
+        for (AbstractGoods output : outputs) {
+            xw.writeStartElement(OUTPUT_TAG);
+            xw.writeAttribute(GOODS_TYPE_TAG, output.getType());
+            xw.writeAttribute(VALUE_TAG, output.getAmount());
+            xw.writeEndElement();
         }
     }
 
@@ -463,9 +437,8 @@ public class ProductionType extends FreeColSpecObject {
      */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (inputs != null) inputs.clear();
-        if (outputs != null) outputs.clear();
+        inputs.clear();
+        outputs.clear();
 
         super.readChildren(xr);
     }
@@ -519,15 +492,15 @@ public class ProductionType extends FreeColSpecObject {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof ProductionType) {
-            ProductionType other = (ProductionType)o;
-            return this.unattended == other.unattended
-                && listEquals(this.outputs, other.outputs)
-                && listEquals(this.inputs, other.inputs)
-                && Utils.equals(this.productionLevel, other.productionLevel)
-                && super.equals(other);
-        }
-        return false;
+        if (!(o instanceof ProductionType)) return false;
+        if (!super.equals(o)) return false;
+
+        ProductionType other = (ProductionType) o;
+
+        return this.unattended == other.unattended
+            && Objects.equals(this.productionLevel, other.productionLevel)
+            && Objects.equals(this.inputs, other.inputs)
+            && Objects.equals(this.outputs, other.outputs);
     }
 
     /**
@@ -535,20 +508,13 @@ public class ProductionType extends FreeColSpecObject {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + ((this.unattended) ? 1 : 0);
-        hash = 31 * hash + Utils.hashCode(this.productionLevel);
-        if (this.outputs != null) {
-            for (AbstractGoods ag : this.outputs) {
-                hash = 31 * hash + Utils.hashCode(ag);
-            }
-        }
-        if (this.inputs != null) {
-            for (AbstractGoods ag : this.inputs) {
-                hash = 31 * hash + Utils.hashCode(ag);
-            }
-        }
-        return hash;
+        return Objects.hash(
+            super.hashCode(),
+            unattended,
+            productionLevel,
+            inputs,
+            outputs
+        );
     }
 
     /**
@@ -556,31 +522,33 @@ public class ProductionType extends FreeColSpecObject {
      */
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(64);
-        result.append('[').append(getId()).append(':');
+        StringBuilder sb = new StringBuilder(64);
+        sb.append('[').append(getId()).append(':');
+
         if (productionLevel != null) {
-            result.append(' ').append(productionLevel);
+            sb.append(' ').append(productionLevel);
         }
         if (unattended) {
-            result.append(" unattended");
+            sb.append(" unattended");
         }
-        if (!(inputs == null || inputs.isEmpty())) {
-            result.append(" [inputs: ");
-            for (AbstractGoods input : inputs) {
-                result.append(input).append(", ");
-            }
-            int length = result.length();
-            result.replace(length - 2, length, "]");
+
+        if (!inputs.isEmpty()) {
+            sb.append(" [inputs: ");
+            sb.append(inputs.stream()
+                            .map(Object::toString)
+                            .collect(Collectors.joining(", ")));
+            sb.append(']');
         }
-        if (!(outputs == null || outputs.isEmpty())) {
-            result.append(" [outputs: ");
-            for (AbstractGoods output : outputs) {
-                result.append(output).append(", ");
-            }
-            int length = result.length();
-            result.replace(length - 2, length, "]");
+
+        if (!outputs.isEmpty()) {
+            sb.append(" [outputs: ");
+            sb.append(outputs.stream()
+                             .map(Object::toString)
+                             .collect(Collectors.joining(", ")));
+            sb.append(']');
         }
-        result.append(']');
-        return result.toString();
+
+        sb.append(']');
+        return sb.toString();
     }
 }
