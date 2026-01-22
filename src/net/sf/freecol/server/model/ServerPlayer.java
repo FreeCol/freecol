@@ -1964,6 +1964,194 @@ outer:  for (Effect effect : effects) {
         }
     }
 
+    private boolean handleUnitCreation(FoundingFather father, ServerEurope europe,
+                                       Random random) {
+        List<AbstractUnit> units = father.getUnitList();
+        if (europe != null && units != null && !units.isEmpty()) {
+            createUnits(units, europe, random); // -vis: safe, Europe
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleUnitTypeChanges(Specification spec, ChangeSet cs) {
+        boolean visibilityChange = false;
+
+        visibilityChange |= spec
+                .getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+                .apply(this, cs);
+
+        return visibilityChange;
+    }
+
+    private boolean handleSpecialModifiers(FoundingFather father, ChangeSet cs) {
+        boolean visibilityChange = false;
+    
+        for (Modifier m : iterable(father.getModifiers())) {
+            if (Modifier.LINE_OF_SIGHT_BONUS.equals(m.getId())) {
+                // Check for tiles that are now visible.  They need to be
+                // explored, and always updated so that units are visible.
+                // *Requires that canSee[] has **not** been updated yet!*
+                Set<Tile> tiles = collectNewTiles(getVisibleTileSet());
+                cs.add(See.only(this), tiles);
+                visibilityChange |= !tiles.isEmpty();
+    
+            } else if (Modifier.SOL.equals(m.getId())) {
+                for (Colony c : getColonyList()) {
+                    c.refreshGovernanceEffects();
+                    cs.add(See.only(this), c);
+                }
+            }
+        }
+    
+        return visibilityChange;
+    }
+
+    private boolean handleSpecialEvents(FoundingFather father, Random random,
+                                        Turn turn, ChangeSet cs) {
+        boolean visibilityChange = false;
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final ServerEurope europe = (ServerEurope)getEurope();
+    
+        for (Event event : father.getEvents()) {
+            String eventId = event.getId();
+    
+            switch (eventId) {
+    
+            case "model.event.resetBannedMissions":
+                handleResetBannedMissions(cs);
+                break;
+    
+            case "model.event.resetNativeAlarm":
+                handleResetNativeAlarm(cs);
+                break;
+    
+            case "model.event.boycottsLifted":
+                handleBoycottsLifted(spec, cs);
+                break;
+    
+            case "model.event.freeBuilding":
+                handleFreeBuilding(event, cs);
+                break;
+    
+            case "model.event.seeAllColonies":
+                visibilityChange |= handleSeeAllColonies(father, turn, cs);
+                break;
+    
+            case "model.event.newRecruits":
+                if (europe != null) {
+                    europe.replaceRecruits(random);
+                    cs.add(See.only(this), europe);
+                }
+                break;
+    
+            case "model.event.movementChange":
+                handleMovementChange(cs);
+                break;
+    
+            default:
+                break;
+            }
+        }
+    
+        return visibilityChange;
+    }
+
+    private void handleResetBannedMissions(ChangeSet cs) {
+        for (Player p : getGame().getLiveNativePlayerList()) {
+            if (p.missionsBanned(this)) {
+                p.removeMissionBan(this);
+                cs.add(See.only(this), p);
+            }
+        }
+    }
+
+    private void handleResetNativeAlarm(ChangeSet cs) {
+        Game game = getGame();
+    
+        for (Player p : transform(game.getLiveNativePlayers(),
+                                  p -> p.hasContacted(this))) {
+            p.setTension(this, new Tension(Tension.TENSION_MIN));
+    
+            for (IndianSettlement is : transform(p.getIndianSettlements(),
+                                                 is -> is.hasContacted(this))) {
+                is.getTile().cacheUnseen(); // +til
+                is.setAlarm(this, new Tension(Tension.TENSION_MIN)); // -til
+                cs.add(See.only(this), is);
+            }
+    
+            csChangeStance(Stance.PEACE, p, true, cs);
+        }
+    }
+
+    private void handleBoycottsLifted(Specification spec, ChangeSet cs) {
+        Market market = getMarket();
+    
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+            if (market.getArrears(goodsType) > 0) {
+                market.setArrears(goodsType, 0);
+                cs.add(See.only(this), market.getMarketData(goodsType));
+            }
+        }
+    
+        for (Colony c : getColonyList()) {
+            c.invalidateCache();
+            cs.add(See.only(this), c);
+        }
+    }
+
+    private void handleFreeBuilding(Event event, ChangeSet cs) {
+        BuildingType type = getGame().getSpecification()
+                                     .getBuildingType(event.getValue());
+    
+        for (Colony c : getColonyList()) {
+            ((ServerColony)c).csFreeBuilding(type, cs);
+        }
+    }
+
+    private boolean handleSeeAllColonies(FoundingFather father, Turn turn,
+                                         ChangeSet cs) {
+        boolean visibilityChange = true; // -vis(this)
+        Game game = getGame();
+    
+        for (Colony colony : game.getAllColoniesList(null)) {
+            final Tile t = colony.getTile();
+            Set<Tile> tiles = new HashSet<>();
+    
+            if (exploreTile(t)) {
+                if (!hasAbility(Ability.SEE_ALL_COLONIES)) {
+                    Tile c = t.copy(game);
+                    c.getColony().setDisplayUnitCount(1);
+                    t.setCachedTile(this, c);
+                }
+                tiles.add(t);
+            }
+    
+            final int fullRadius = (int) father.apply(
+                (float) colony.getLineOfSight(),
+                turn,
+                Modifier.EXPOSED_TILES_RADIUS
+            );
+    
+            tiles.addAll(exploreTiles(t.getSurroundingTiles(1, fullRadius)));
+            cs.add(See.only(this), tiles);
+        }
+    
+        invalidateCanSeeTiles();
+        cs.add(See.only(this), game.getMap());
+    
+        return visibilityChange;
+    }
+
+    private void handleMovementChange(ChangeSet cs) {
+        for (Unit u : transform(getUnits(), u -> u.getMovesLeft() > 0)) {
+            u.setMovesLeft(u.getInitialMovesLeft());
+            cs.addPartial(See.only(this), u,
+                "movesLeft", String.valueOf(u.getMovesLeft()));
+        }
+    }
+
     /**
      * Adds a founding father to a players continental congress.
      *
@@ -1979,14 +2167,17 @@ outer:  for (Effect effect : effects) {
         final Turn turn = game.getTurn();
         boolean europeDirty = false, visibilityChange = false;
 
+        // --- Core mechanics ---
         addFather(father);
         addHistory(new HistoryEvent(turn,
                 HistoryEvent.HistoryEventType.FOUNDING_FATHER, this)
                     .addNamed("%father%", father));
+
         // FIXME: We do not want to have to update the whole player
         // just to get the FF into the client, but for now if there
         // are modifiers that is the only way to do it.
         cs.add(See.only(this), this);
+
         cs.addMessage(this,
             new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
                              "model.player.foundingFatherJoinedCongress",
@@ -1994,131 +2185,17 @@ outer:  for (Effect effect : effects) {
                       .addNamed("%foundingFather%", father)
                       .add("%description%", father.getDescriptionKey()));
 
-        List<AbstractUnit> units = father.getUnitList();
-        if (europe != null && units != null && !units.isEmpty()) {
-            createUnits(units, europe, random);//-vis: safe, Europe
-            europeDirty = true;
-        }
+        // --- Units granted by the father ---
+        europeDirty |= handleUnitCreation(father, europe, random);
 
-        UnitChangeType uct
-            = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
-        if (uct != null && uct.appliesTo(this)) {
-            for (Unit u : getUnitSet()) {
-                for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
-                    if (!uc.appliesTo(u)) continue;
-                    u.changeType(uc.to);//-vis(this)
-                    visibilityChange = true;
-                    cs.add(See.perhaps(), u);
-                    break;
-                }
-            }
-        }
+        // --- Unit type changes ---
+        visibilityChange |= handleUnitTypeChanges(spec, cs);
 
-        // Some modifiers are special
-        for (Modifier m : iterable(father.getModifiers())) {
-            if (Modifier.LINE_OF_SIGHT_BONUS.equals(m.getId())) {
-                // Check for tiles that are now visible.  They need to be
-                // explored, and always updated so that units are visible.
-                // *Requires that canSee[] has **not** been updated yet!*
-                Set<Tile> tiles = collectNewTiles(getVisibleTileSet());
-                cs.add(See.only(this), tiles);
-                visibilityChange = !tiles.isEmpty();
-            } else if (Modifier.SOL.equals(m.getId())) {
-                for (Colony c : getColonyList()) {
-                    c.addLiberty(0); // Kick the SoL and production bonus
-                    c.invalidateCache();
-                }
-            }
-        }
+        // --- Special modifiers ---
+        visibilityChange |= handleSpecialModifiers(father, cs);
 
-        // Some events are special
-        for (Event event : father.getEvents()) {
-            String eventId = event.getId();
-            switch (eventId) {
-            case "model.event.resetBannedMissions":
-                for (Player p : game.getLiveNativePlayerList()) {
-                    if (p.missionsBanned(this)) {
-                        p.removeMissionBan(this);
-                        cs.add(See.only(this), p);
-                    }
-                }
-                break;
-
-            case "model.event.resetNativeAlarm":
-                for (Player p : transform(game.getLiveNativePlayers(),
-                                          p -> p.hasContacted(this))) {
-                    p.setTension(this, new Tension(Tension.TENSION_MIN));
-                    for (IndianSettlement is : transform(p.getIndianSettlements(),
-                                                         is -> is.hasContacted(this))) {
-                        is.getTile().cacheUnseen();//+til
-                        is.setAlarm(this, new Tension(Tension.TENSION_MIN));//-til
-                        cs.add(See.only(this), is);
-                    }
-                    csChangeStance(Stance.PEACE, p, true, cs);
-                }
-                break;
-
-            case "model.event.boycottsLifted":
-                Market market = getMarket();
-                for (GoodsType goodsType : spec.getGoodsTypeList()) {
-                    if (market.getArrears(goodsType) > 0) {
-                        market.setArrears(goodsType, 0);
-                        cs.add(See.only(this), market.getMarketData(goodsType));
-                    }
-                }
-                break;
-
-            case "model.event.freeBuilding":
-                BuildingType type = spec.getBuildingType(event.getValue());
-                for (Colony c : getColonyList()) {
-                    ((ServerColony)c).csFreeBuilding(type, cs);
-                }
-                break;
-
-            case "model.event.seeAllColonies":
-                visibilityChange = true;//-vis(this), can now see other colonies
-                for (Colony colony : game.getAllColoniesList(null)) {
-                    final Tile t = colony.getTile();
-                    Set<Tile> tiles = new HashSet<>();
-                    if (exploreTile(t)) {
-                        if (!hasAbility(Ability.SEE_ALL_COLONIES)) {
-                            // FreeCol ruleset adds this ability
-                            // allowing full visibility of colony,
-                            // whereas Col1 showed colonies as size 1.
-                            Tile c = t.copy(game);
-                            c.getColony().setDisplayUnitCount(1);
-                            t.setCachedTile(this, c);
-                        }
-                        tiles.add(t);
-                    }
-                    // Revealed tiles in 11x11 block in Col1
-                    final int fullRadius = (int)father
-                        .apply((float)colony.getLineOfSight(),
-                            turn, Modifier.EXPOSED_TILES_RADIUS);
-                    tiles.addAll(exploreTiles(t.getSurroundingTiles(1,
-                                fullRadius)));
-                    cs.add(See.only(this), tiles);
-                }
-                break;
-                
-            case "model.event.newRecruits":
-                if (europe != null) {
-                    europeDirty = europe.replaceRecruits(random);
-                }
-                break;
-
-            case "model.event.movementChange":
-                for (Unit u : transform(getUnits(), u -> u.getMovesLeft() > 0)) {
-                    u.setMovesLeft(u.getInitialMovesLeft());
-                    cs.addPartial(See.only(this), u,
-                        "movesLeft", String.valueOf(u.getMovesLeft()));
-                }
-                break;
-
-            default:
-                break;
-            }
-        }
+        // --- Special events ---
+        visibilityChange |= handleSpecialEvents(father, random, turn, cs);
 
         if (europeDirty) cs.add(See.only(this), europe);
         if (visibilityChange) invalidateCanSeeTiles(); //+vis(this)

@@ -28,6 +28,9 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.See;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -155,6 +158,39 @@ public class UnitChangeType extends FreeColSpecObjectType {
      */
     public void addUnitTypeChange(UnitTypeChange uc) {
         appendToMapList(this.changes, uc.from, uc);
+    }
+
+    /**
+     * Applies this {@code UnitChangeType} to all units owned by the given player.
+     *
+     * <p>This method checks whether the change type applies to the player and,
+     * if so, iterates over all of the player's units. For each unit, the first
+     * applicable {@code UnitTypeChange} is applied, causing the unit to change
+     * type. Any affected unit is added to the {@code ChangeSet} using
+     * {@code See.perhaps()}, as the change may alter unit visibility.</p>
+     *
+     * @param player The {@code Player} whose units should be checked and updated.
+     * @param cs The {@code ChangeSet} to record any resulting unit updates.
+     * @return {@code true} if any unit type was changed and visibility may be
+     *         affected; {@code false} otherwise.
+     */
+    public boolean apply(Player player, ChangeSet cs) {
+        boolean visibilityChange = false;
+
+        if (!this.appliesTo(player)) return false;
+
+        for (Unit u : player.getUnitSet()) {
+            for (UnitTypeChange uc : this.getUnitChanges(u.getType())) {
+                if (!uc.appliesTo(u)) continue;
+
+                u.changeType(uc.to);
+                cs.add(See.perhaps(), u);
+                visibilityChange = true;
+                break;
+            }
+        }
+
+        return visibilityChange;
     }
 
     /**

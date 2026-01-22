@@ -1281,6 +1281,17 @@ public class Colony extends Settlement implements TradeLocation {
     }
 
     /**
+     * Recalculates all governance‑related colony effects, including
+     * Sons of Liberty and production bonuses, and clears cached
+     * production values to ensure the colony state is fully updated.
+     */
+    public void refreshGovernanceEffects() {
+        updateSoL();
+        updateProductionBonus();
+        invalidateCache();
+    }
+
+    /**
      * Calculate the SoL membership percentage of this colony based on
      * a given number of colonists and liberty.
      *

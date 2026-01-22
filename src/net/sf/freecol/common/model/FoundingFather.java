@@ -139,9 +139,8 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * @return A list of {@code Event}s.
      */
-    public final List<Event> getEvents() {
-        return (events == null) ? Collections.<Event>emptyList()
-            : events;
+    public List<Event> getEvents() {
+        return (events == null) ? List.of() : Collections.unmodifiableList(events);
     }
 
     /**
@@ -151,8 +150,8 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * @param newEvents The new events.
      */
-    public final void setEvents(final List<Event> newEvents) {
-        this.events = newEvents;
+    public void setEvents(final List<Event> newEvents) {
+        this.events = (newEvents == null) ? null : new ArrayList<>(newEvents);
     }
 
     /**
@@ -161,7 +160,9 @@ public class FoundingFather extends FreeColSpecObjectType {
      * @param event The {@code Event} to add.
      */
     private void addEvent(Event event) {
-        if (events == null) events = new ArrayList<>();
+        if (events == null) {
+            events = new ArrayList<>();
+        }
         events.add(event);
     }
 
@@ -170,9 +171,8 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * @return A list of {@code AbstractUnit}s.
      */
-    public final List<AbstractUnit> getUnitList() {
-        return (units == null) ? Collections.<AbstractUnit>emptyList()
-            : units;
+    public List<AbstractUnit> getUnitList() {
+        return (units == null) ? List.of() : Collections.unmodifiableList(units);
     }
 
     /**
@@ -182,8 +182,8 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * @param newUnits The new units.
      */
-    public final void setUnits(final List<AbstractUnit> newUnits) {
-        this.units = newUnits;
+    public void setUnits(final List<AbstractUnit> newUnits) {
+        this.units = (newUnits == null) ? null : new ArrayList<>(newUnits);
     }
 
     /**
@@ -192,7 +192,9 @@ public class FoundingFather extends FreeColSpecObjectType {
      * @param unit The {@code AbstractUnit} to add.
      */
     private void addUnit(AbstractUnit unit) {
-        if (units == null) units = new ArrayList<>();
+        if (units == null) {
+            units = new ArrayList<>();
+        }
         units.add(unit);
     }
 
@@ -220,13 +222,15 @@ public class FoundingFather extends FreeColSpecObjectType {
         FoundingFather o = copyInCast(other, FoundingFather.class);
         if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
+
         for (int i = 0; i < weight.length; i++) {
             this.weight[i] = o.getWeight(i);
         }
-        this.setEvents(o.getEvents());
-        this.setUnits(o.getUnitList());
+        setEvents(o.getEvents());
+        setUnits(o.getUnitList());
         return true;
     }
+
 
 
     // Serialization

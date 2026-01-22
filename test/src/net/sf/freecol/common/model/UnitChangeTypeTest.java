@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
 import static net.sf.freecol.common.util.CollectionUtils.count;
 
+import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -98,6 +99,117 @@ public class UnitChangeTypeTest extends FreeColTestCase {
         assertEquals(farmer, gardenerUnit.getType());
 
         spec().getUnitChangeType(UnitChangeType.CREATION)
+            .deleteUnitChanges(gardenerType);
+    }
+
+    public void testApply() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+
+        UnitType gardenerType = new UnitType("gardener", spec());
+        gardenerType.setSkill(0);
+
+        UnitChangeType uct = spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
+        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardenerType);
+
+        ChangeSet cs = new ChangeSet();
+        assertFalse("No rules → no changes", uct.apply(dutch, cs));
+        assertEquals("Unit type unchanged", gardenerType, gardenerUnit.getType());
+
+        addUnitTypeChange(UnitChangeType.FOUNDING_FATHER, gardenerType, farmer,
+                          100, -1);
+
+        cs = new ChangeSet();
+        assertTrue("Rule applies → change expected", uct.apply(dutch, cs));
+        assertEquals("Unit type changed", farmer, gardenerUnit.getType());
+
+        uct.deleteUnitChanges(gardenerType);
+    }
+
+    public void testApplyRespectsAbilityScope() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+
+        UnitType gardenerType = new UnitType("gardener", spec());
+        gardenerType.setSkill(0);
+
+        addUnitTypeChange(UnitChangeType.FOUNDING_FATHER, gardenerType, farmer,
+                          100, -1);
+
+        Scope scope = new Scope();
+        scope.setAbilityId(Ability.NATIVE);
+        spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER).addScope(scope);
+
+        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardenerType);
+
+        ChangeSet cs = new ChangeSet();
+        assertFalse("Unit without NATIVE ability should not change",
+                    spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+                        .apply(dutch, cs));
+        assertEquals("Unit type unchanged", gardenerType, gardenerUnit.getType());
+
+        scope.setMatchNegated(true);
+
+        cs = new ChangeSet();
+        assertTrue("Negated scope should apply to non-native units",
+                   spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+                       .apply(dutch, cs));
+        assertEquals("Unit type changed", farmer, gardenerUnit.getType());
+
+        // Cleanup
+        spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+            .removeScope(scope);
+        spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+            .deleteUnitChanges(gardenerType);
+    }
+
+    public void testApplyUsesFirstMatchingRule() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+
+        UnitType gardenerType = new UnitType("gardener", spec());
+        gardenerType.setSkill(0);
+
+        addUnitTypeChange(UnitChangeType.FOUNDING_FATHER, gardenerType, farmer,
+                          100, -1);
+        UnitType soldier = spec().getUnitType("model.unit.veteranSoldier");
+        addUnitTypeChange(UnitChangeType.FOUNDING_FATHER, gardenerType, soldier,
+                          100, -1);
+
+        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardenerType);
+
+        ChangeSet cs = new ChangeSet();
+        assertTrue(spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+                   .apply(dutch, cs));
+
+        assertEquals("First matching rule should be applied",
+                     farmer, gardenerUnit.getType());
+
+        spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+            .deleteUnitChanges(gardenerType);
+    }
+
+    public void testApplyAffectsMultipleUnits() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+
+        UnitType gardenerType = new UnitType("gardener", spec());
+        gardenerType.setSkill(0);
+
+        addUnitTypeChange(UnitChangeType.FOUNDING_FATHER, gardenerType, farmer,
+                          100, -1);
+
+        Unit u1 = new ServerUnit(game, null, dutch, gardenerType);
+        Unit u2 = new ServerUnit(game, null, dutch, gardenerType);
+
+        ChangeSet cs = new ChangeSet();
+        assertTrue(spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
+                   .apply(dutch, cs));
+
+        assertEquals(farmer, u1.getType());
+        assertEquals(farmer, u2.getType());
+
+        spec().getUnitChangeType(UnitChangeType.FOUNDING_FATHER)
             .deleteUnitChanges(gardenerType);
     }
 }
