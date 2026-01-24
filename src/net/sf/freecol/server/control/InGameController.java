@@ -2869,17 +2869,7 @@ public final class InGameController extends Controller {
             } else {
                 invalid = true;
             }
-            boolean hasMap = false;
-            for (Location dest : destinations) {
-                if (dest instanceof Map) {
-                    hasMap = true;
-                    break;
-                }
-            }
-            if (!hasMap) {
-                Map map = getGame().getMap();
-                destinations.add(map);
-            }
+            highSeas.ensureMapDestination();
         } else if (destination instanceof Map) {
             if (!destinations.contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "

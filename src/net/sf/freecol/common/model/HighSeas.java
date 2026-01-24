@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -70,7 +71,7 @@ public class HighSeas extends UnitLocation {
      * @return A list of {@code Location}s.
      */
     public final List<Location> getDestinations() {
-        return this.destinations;
+        return Collections.unmodifiableList(destinations);
     }
 
     /**
@@ -115,6 +116,77 @@ public class HighSeas extends UnitLocation {
      */
     public void removeDestination(Location destination) {
         this.destinations.remove(destination);
+    }
+
+    /**
+     * Validate that this HighSeas instance has the expected destinations.
+     * This is diagnostic only and does not change behavior.
+     */
+    void validateDestinations() {
+        boolean hasEurope = false;
+        boolean hasMap = false;
+
+        for (Location loc : destinations) {
+            if (loc instanceof Europe) hasEurope = true;
+            if (loc instanceof Map) hasMap = true;
+        }
+
+        if (!hasEurope) {
+            logger.warning("HighSeas " + getId()
+                + " has no Europe destination: " + destinationsToString());
+        }
+        if (!hasMap) {
+            logger.warning("HighSeas " + getId()
+                + " has no Map destination: " + destinationsToString());
+        }
+    }
+
+    /**
+     * Ensure that the current game map is present as a destination.
+     * This is a safe, non-breaking repair used when older saves or
+     * legacy code leave the HighSeas without a Map destination.
+     */
+    public void ensureMapDestination() {
+        Map map = getGame().getMap();
+        if (map != null && !destinations.contains(map)) {
+            destinations.add(map);
+            logger.warning("HighSeas " + getId()
+                + " was missing Map destination; added " + map.getId());
+        }
+    }
+
+    /**
+     * Check whether this HighSeas has a Map destination.
+     */
+    public boolean hasMapDestination() {
+        for (Location loc : destinations) {
+            if (loc instanceof Map) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get the Map destination, if present.
+     */
+    public Map getMapDestination() {
+        for (Location loc : destinations) {
+            if (loc instanceof Map) return (Map) loc;
+        }
+        return null;
+    }
+
+    public Europe getEuropeDestination() {
+        for (Location loc : destinations) {
+            if (loc instanceof Europe) return (Europe) loc;
+        }
+        return null;
+    }
+
+    public boolean hasEuropeDestination() {
+        for (Location loc : destinations) {
+            if (loc instanceof Europe) return true;
+        }
+        return false;
     }
 
 
@@ -208,6 +280,7 @@ public class HighSeas extends UnitLocation {
         for (Location loc : o.getDestinations()) {
             this.destinations.add(game.updateLocationRef(loc));
         }
+        validateDestinations();
         return true;
     }
 

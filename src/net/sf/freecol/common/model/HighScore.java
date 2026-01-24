@@ -55,7 +55,7 @@ public class HighScore extends FreeColObject {
     public static final String TAG = "highScore";
 
     /** Trivial UUID to used when it is not present in the high score file. */
-    private static final UUID nullUUID = new UUID(0L, 0L);
+    private static final UUID NULL_UUID = new UUID(0L, 0L);
     
     /** A comparator by ascending AI object value. */
     public static final Comparator<? super HighScore> descendingScoreComparator
@@ -323,7 +323,7 @@ public class HighScore extends FreeColObject {
      */
     public final Date getDate() {
         // findbugs says not to expose this.date directly
-        return new Date(this.date.getTime());
+        return Date.from(this.date.toInstant());
     }
 
     /**
@@ -350,10 +350,10 @@ public class HighScore extends FreeColObject {
      * @param scores The list of {@code HighScore}s to operate on.
      */
     private static void tidyScores(List<HighScore> scores) {
+        scores.sort(descendingScoreComparator);
         if (scores.size() > NUMBER_OF_HIGH_SCORES) {
             scores.subList(NUMBER_OF_HIGH_SCORES, scores.size()).clear();
         }
-        scores.sort(descendingScoreComparator);
     }
 
     /**
@@ -364,15 +364,18 @@ public class HighScore extends FreeColObject {
      * @return The index of a score to replace, or negative if no replacement.
      */
     public static int checkHighScore(HighScore highScore,
-                                     List<HighScore> scores) {
-        int score = hs.getScore();
-        UUID uuid = hs.getGameUUID();
+                                    List<HighScore> scores) {
+
+        if (scores == null) return -1;   // Defensive guard
+
+        int score = highScore.getScore();
+        UUID uuid = highScore.getGameUUID();
 
         // Reject negative scores
         if (score < 0) return -1;
 
         // Duplicate game logic
-        if (uuid != null && !uuid.equals(nullUUID)) {
+        if (uuid != null && !uuid.equals(NULL_UUID)) {
             for (int i = 0; i < scores.size(); i++) {
                 HighScore existing = scores.get(i);
                 if (uuid.equals(existing.getGameUUID())) {
@@ -382,7 +385,8 @@ public class HighScore extends FreeColObject {
         }
 
         if (scores.isEmpty()) return 0;
-    
+
+        // scores is expected to be sorted descending (tidyScores enforces this)
         if (scores.size() >= NUMBER_OF_HIGH_SCORES) {
             int lastIndex = scores.size() - 1;
             return score > scores.get(lastIndex).getScore() ? lastIndex : -1;
@@ -620,7 +624,7 @@ public class HighScore extends FreeColObject {
         try {
             gameUUID = UUID.fromString(str);
         } catch (Exception e) {
-            gameUUID = nullUUID;
+            gameUUID = NULL_UUID;
         }
         
         score = xr.getAttribute(SCORE_TAG, 0);
