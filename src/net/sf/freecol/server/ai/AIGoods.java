@@ -365,7 +365,7 @@ public final class AIGoods extends TransportableAIObject {
             : (goods == null) ? "null-goods"
             : (goods.getType() == null) ? "null-goods-type"
             : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
-            : (goods.getLocation() == null) ? "null-location"
+            : (goods.isLoot()) ? "null-location"
             : (((FreeColGameObject)goods.getLocation()).isDisposed()) ? "disposed-location"
             : null;
         if (destination != null

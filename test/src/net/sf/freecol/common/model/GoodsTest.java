@@ -19,13 +19,14 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.StringReader;
 import java.util.List;
 import java.util.Locale;
 
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-
 
 public class GoodsTest extends FreeColTestCase {
 
@@ -45,16 +46,11 @@ public class GoodsTest extends FreeColTestCase {
     private static final GoodsType tradeGoodsType = spec().getGoodsType("model.goods.tradeGoods");
 
     private static final TileType plainsType = spec().getTileType("model.tile.plains");
-
     private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
 
-
     public void testGoodsGameLocationIntInt() {
-
         Map map = getTestMap(plainsType);
-
-        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(),
-                                    wagonTrainType);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
 
@@ -64,15 +60,11 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testSetOwner() {
-
         try {
             Map map = getTestMap(plainsType);
-
-            Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(),
-                                        wagonTrainType);
+            Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
 
             Goods g = new Goods(getGame(), wagon, cottonType, 75);
-
             g.setOwner(getGame().getCurrentPlayer());
 
             fail("Should not allow setOwner");
@@ -82,11 +74,8 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testToString() {
-
         Messages.loadMessageBundle(Locale.ENGLISH);
-
         Map map = getTestMap(plainsType);
-
         Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
@@ -95,28 +84,20 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testGetName() {
-
         Locale.setDefault(Locale.ENGLISH);
-
         Goods g = new Goods(getGame(), null, cottonType, 75);
 
         assertEquals("75 Cotton", Messages.message(g.getLabel(true)));
         assertEquals("75 Cotton (boycotted)", Messages.message(g.getLabel(false)));
-
-        // Same as getName(int, boolean)
-        //assertEquals(g.getName(), Goods.getName(cottonType));
-        //assertEquals(g.getName(false), Goods.getName(cottonType, false));
-        //assertEquals(g.getName(true), Goods.getName(cottonType, true));
-
     }
 
     public void testGetInputType() {
-        assertEquals(null, cottonType.getInputType());
+        assertNull(cottonType.getInputType());
         assertEquals(cottonType, clothType.getInputType());
     }
 
     public void testGetOutputType() {
-        assertEquals(null, clothType.getOutputType());
+        assertNull(clothType.getOutputType());
         assertEquals(clothType, cottonType.getOutputType());
     }
 
@@ -139,6 +120,7 @@ public class GoodsTest extends FreeColTestCase {
         // for dragoon role
         assertTrue(horsesType.isBuildingMaterial());
         assertTrue(musketsType.isBuildingMaterial());
+        
         // for buildings and units
         assertTrue(hammersType.isBuildingMaterial());
         assertTrue(toolsType.isBuildingMaterial());
@@ -149,7 +131,6 @@ public class GoodsTest extends FreeColTestCase {
         assertFalse(clothType.isBuildingMaterial());
         assertFalse(cottonType.isBuildingMaterial());
         assertFalse(fishType.isBuildingMaterial());
-        //assertFalse(foodType.isBuildingMaterial());
         assertFalse(oreType.isBuildingMaterial());
         assertFalse(lumberType.isBuildingMaterial());
 
@@ -157,8 +138,8 @@ public class GoodsTest extends FreeColTestCase {
         assertTrue(oreType.isRawBuildingMaterial());
         assertTrue(lumberType.isRawBuildingMaterial());
         assertFalse(toolsType.isRawBuildingMaterial());
-        assertFalse(foodType.isRawBuildingMaterial());// freecol-ruleset!
-        assertTrue(grainType.isRawBuildingMaterial());// freecol-ruleset!
+        assertFalse(foodType.isRawBuildingMaterial()); // freecol-ruleset!
+        assertTrue(grainType.isRawBuildingMaterial()); // freecol-ruleset!
         assertFalse(fishType.isRawBuildingMaterial());
         assertFalse(horsesType.isRawBuildingMaterial());
         assertFalse(musketsType.isRawBuildingMaterial());
@@ -175,8 +156,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testGetTakeSpace() {
         Map map = getTestMap(plainsType, true);
-        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(),
-                                    wagonTrainType);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
 
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
         assertEquals(1, cotton.getSpaceTaken());
@@ -184,47 +164,35 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testSetGetAmount() {
         Map map = getTestMap(plainsType, true);
-
         Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
 
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
-
         assertEquals(75, cotton.getAmount());
 
         cotton.setAmount(-10);
-
         assertEquals(-10, cotton.getAmount());
 
         cotton.setAmount(100000);
-
         assertEquals(100000, cotton.getAmount());
-
     }
 
-    public Player dutch(){
+    public Player dutch() {
         return getGame().getPlayerByNationId("model.nation.dutch");
     }
 
     public void testAdjustAmount() {
-
         Map map = getTestMap(plainsType, true);
-
         Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
-
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
 
         assertEquals(75, cotton.getAmount());
 
         cotton.adjustAmount();
-
         cotton.setAmount(-10);
-
         assertEquals(-10, cotton.getAmount());
 
         cotton.setAmount(100000);
-
         assertEquals(100000, cotton.getAmount());
-
     }
 
     public void testProductionChain() {
@@ -236,5 +204,56 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(oreType, chain.get(0));
         assertEquals(toolsType, chain.get(1));
         assertEquals(musketsType, chain.get(2));
+    }
+
+    public void testNullLocationBecomesLootLocation() {
+        Goods g = new Goods(getGame(), null, cottonType, 10);
+        assertTrue(g.isLoot());
+        assertEquals(LootLocation.INSTANCE, g.getLocation());
+    }
+
+    public void testReadAttributesNullLocation() throws Exception {
+        String xml = "<goods type=\"model.goods.cotton\" amount=\"10\"/>";
+        FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+        xr.nextTag();
+
+        Goods g = new Goods(getGame(), xr);
+
+        assertTrue(g.isLoot());
+        assertEquals(LootLocation.INSTANCE, g.getLocation());
+    }
+
+    public void testSetLocationNull() {
+        Goods g = new Goods(getGame(), null, cottonType, 5);
+        g.setLocation(null);
+        assertTrue(g.isLoot());
+    }
+
+    public void testCopyInNullLocation() {
+        Goods g1 = new Goods(getGame(), null, cottonType, 10);
+        Goods g2 = new Goods(getGame(), null, cottonType, 10);
+
+        g1.copyIn(g2);
+
+        assertTrue(g1.isLoot());
+        assertEquals(LootLocation.INSTANCE, g1.getLocation());
+    }
+
+    public void testEqualsAndHashCode() {
+        Goods g1 = new Goods(getGame(), null, cottonType, 10);
+        Goods g2 = new Goods(getGame(), null, cottonType, 10);
+
+        assertEquals(g1, g2);
+        assertEquals(g1.hashCode(), g2.hashCode());
+    }
+
+    public void testEqualsDifferentLocation() {
+        Map map = getTestMap(plainsType);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
+
+        Goods g1 = new Goods(getGame(), wagon, cottonType, 10);
+        Goods g2 = new Goods(getGame(), null, cottonType, 10);
+
+        assertFalse(g1.equals(g2));
     }
 }

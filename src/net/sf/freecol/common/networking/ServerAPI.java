@@ -671,15 +671,14 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for looting.  Handles both an initial query and
-     * the actual looting.
+     * Sends a looting request to the server. Handles both the initial query
+     * (when {@code goods} is null) and the actual looting request.
      *
-     * @param winner The {@code Unit} that is looting.
-     * @param defenderId The identifier of the defender unit (it may have sunk).
-     * @param goods A list of {@code Goods}, if empty this is a query
-     *     as to what is to be looted which is filled into the list,
-     *     if non-empty, then the list of goods to loot.
-     * @return True if the server interaction succeeded.
+     * @param winner The unit performing the looting.
+     * @param defenderId The identifier of the defeated unit (may already be sunk).
+     * @param goods If null, this is a query asking what can be looted.
+     *              If non-null, this is the list of goods the player wants to take.
+     * @return True if the server accepted the request.
      */
     public boolean loot(Unit winner, String defenderId, List<Goods> goods) {
         return ask(new LootCargoMessage(winner, defenderId, goods));

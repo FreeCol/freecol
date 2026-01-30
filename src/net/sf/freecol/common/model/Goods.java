@@ -45,10 +45,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     private final Game game;
 
     /**
-     * Where the goods are.  This should always be non-null except for the
-     * really special case of goods that are in the process of being looted
-     * from a ship --- we can not use the ship as it is removed/disposed
-     * at once while the looting is still being resolved.
+     * The location of these goods. Never null.
+     * If goods are temporarily unassigned (e.g. during looting),
+     * this is {@link LootLocation#INSTANCE}.
      */
     private Location location;
 
@@ -101,7 +100,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         setId(type.getId());
         setType(type);
         setAmount(amount);
-        this.location = location;
+        this.location = (location == null) ? LootLocation.INSTANCE : location;
     }
 
     /**
@@ -123,12 +122,20 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * then this method adjusts the amount to the maximum amount possible.
      */
     public void adjustAmount() {
-        if (this.location == null) return;
-        GoodsContainer gc = this.location.getGoodsContainer();
+        final GoodsContainer gc = this.location.getGoodsContainer();
         if (gc != null) {
             int maxAmount = gc.getGoodsCount(getType());
             if (getAmount() > maxAmount) setAmount(maxAmount);
         }
+    }
+
+    /**
+     * Returns whether these goods are in a temporary looting state.
+     *
+     * @return true if the location is a {@link LootLocation}.
+     */
+    public boolean isLoot() {
+        return this.location instanceof LootLocation;
     }
 
 
@@ -147,7 +154,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public boolean setLocation(Location location) {
-        this.location = location;
+        this.location = (location == null) ? LootLocation.INSTANCE : location;
         return true;
     }
 
@@ -166,7 +173,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public Tile getTile() {
-        return (this.location == null) ? null : this.location.getTile();
+        return this.location.getTile();
     }
 
     /**
@@ -185,9 +192,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public Player getOwner() {
-        return (this.location instanceof Ownable)
-            ? ((Ownable)this.location).getOwner()
-            : null;
+        Location loc = this.location;
+        return (loc instanceof Ownable) ? ((Ownable) loc).getOwner() : null;
     }
 
     /**
@@ -252,7 +258,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         Goods o = copyInCast(other, Goods.class);
         if (o == null || !super.copyIn(o)) return false;
         //Game can not change.  No: this.game = o.getGame();
-        this.location = getGame().updateLocationRef(o.getLocation());
+        Location newLoc = getGame().updateLocationRef(o.getLocation());
+        this.location = (newLoc == null) ? LootLocation.INSTANCE : newLoc;
         return true;
     }
 
@@ -275,9 +282,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
         xw.writeAttribute(AMOUNT_TAG, this.amount);
 
-        if (this.location != null) {
-            xw.writeLocationAttribute(LOCATION_TAG, this.location);
-        }
+        xw.writeLocationAttribute(LOCATION_TAG, this.location);
     }
 
     /**
@@ -298,7 +303,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
         this.amount = xr.getAttribute(AMOUNT_TAG, 0);
 
-        this.location = xr.getLocationAttribute(game, LOCATION_TAG, true);
+        Location loc = xr.getLocationAttribute(game, LOCATION_TAG, true);
+        this.location = (loc == null) ? LootLocation.INSTANCE : loc;
     }
 
     /**
@@ -314,12 +320,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Goods) {
-            Goods other = (Goods)o;
-            return this.location == other.location
-                && super.equals(other);
-        }
-        return false;
+        if (this == o) return true;
+        if (!(o instanceof Goods)) return false;
+        Goods other = (Goods) o;
+        return super.equals(other)
+            && Utils.equals(this.location, other.location);
     }
 
     /**

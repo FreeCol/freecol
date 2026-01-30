@@ -53,7 +53,6 @@ public class LootCargoMessage extends ObjectMessage {
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
         super(TAG, WINNER_TAG, winner.getId(), LOSER_TAG, loserId);
-
         appendChildren(goods);
     }
 
@@ -65,14 +64,14 @@ public class LootCargoMessage extends ObjectMessage {
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public LootCargoMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+            throws XMLStreamException {
         super(TAG, xr, WINNER_TAG, LOSER_TAG);
 
-        List<Goods> goods = new ArrayList<>();
+        final List<Goods> goods = new ArrayList<>();
         while (xr.moreTags()) {
-            String tag = xr.getLocalName();
+            final String tag = xr.getLocalName();
             if (Goods.TAG.equals(tag)) {
-                Goods g = xr.readFreeColObject(game, Goods.class);
+                final Goods g = xr.readFreeColObject(game, Goods.class);
                 if (g != null) goods.add(g);
             } else {
                 expected(Goods.TAG, tag);
@@ -80,6 +79,7 @@ public class LootCargoMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+
         appendChildren(goods);
     }
 
@@ -118,7 +118,7 @@ public class LootCargoMessage extends ObjectMessage {
      */
     @Override
     public MessagePriority getPriority() {
-        return Message.MessagePriority.LATE;
+        return MessagePriority.LATE;
     }
 
     /**
@@ -127,11 +127,11 @@ public class LootCargoMessage extends ObjectMessage {
     @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         final Game game = freeColServer.getGame();
-        final Unit winner = getWinner(game);
-        final List<Goods> initialGoods = getGoods();
-        final String loserId = getLoserId();
-
-        aiPlayer.lootCargoHandler(winner, initialGoods, loserId);
+        aiPlayer.lootCargoHandler(
+                getWinner(game),
+                getGoods(),
+                getLoserId()
+        );
     }
 
     /**
@@ -141,12 +141,10 @@ public class LootCargoMessage extends ObjectMessage {
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Unit unit = getWinner(game);
-        final String loserId = getLoserId();
-        final List<Goods> goods = getGoods();
 
         if (unit == null) return;
 
-        igc(freeColClient).lootCargoHandler(unit, goods, loserId);
+        igc(freeColClient).lootCargoHandler(unit, getGoods(), getLoserId());
         clientGeneric(freeColClient);
     }
 
@@ -158,7 +156,7 @@ public class LootCargoMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
 
-        Unit winner;
+        final Unit winner;
         try {
             winner = getWinner(game);
         } catch (Exception e) {
@@ -170,6 +168,6 @@ public class LootCargoMessage extends ObjectMessage {
 
         // Try to loot.
         return igc(freeColServer)
-            .lootCargo(serverPlayer, winner, getLoserId(), getGoods());
+                .lootCargo(serverPlayer, winner, getLoserId(), getGoods());
     }
 }

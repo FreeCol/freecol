@@ -2750,33 +2750,34 @@ public final class InGameController extends Controller {
         if (session == null) {
             return serverPlayer.clientError("Bogus looting!");
         }
+
         if (!winner.hasSpaceLeft()) {
-            return serverPlayer.clientError("No space to loot to: "
-                + winner.getId());
+            return serverPlayer.clientError("No space to loot to: " + winner.getId());
         }
 
         ChangeSet cs = new ChangeSet();
         List<Goods> available = session.getCapture();
-        if (loot == null) { // Initial inquiry
+
+        if (loot == null) {
             cs.add(See.only(serverPlayer),
                    new LootCargoMessage(winner, loserId, available));
-        } else {
-            for (Goods g : loot) {
-                if (!available.contains(g)) {
-                    return serverPlayer.clientError("Invalid loot: " + g);
-                }
-                available.remove(g);
-                if (!winner.canAdd(g)) {
-                    return serverPlayer.clientError("Loot failed: " + g);
-                }
-                winner.add(g);
-            }
-
-            // Others can see cargo capacity change.
-            session.complete(cs);
-            cs.add(See.perhaps(), winner);
-            getGame().sendToOthers(serverPlayer, cs);
+            return cs;
         }
+
+        for (Goods g : loot) {
+            if (!session.isAvailable(g)) {
+                return serverPlayer.clientError("Invalid loot: " + g);
+            }
+            if (!session.canTake(g)) {
+                return serverPlayer.clientError("Loot failed: " + g);
+            }
+            session.take(g);
+            winner.loadLoot(g);
+        }
+
+        session.complete(cs);
+        cs.add(See.perhaps(), winner);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }
 

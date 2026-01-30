@@ -4014,7 +4014,20 @@ public class Unit extends GoodsLocation
         changeRole(tmpRole, tmpRoleCount);
     }
 
-        
+    /**
+     * Loads looted goods onto this unit.
+     *
+     * <p>This is a convenience wrapper used during the looting process.
+     * It applies the standard goods-loading logic by delegating to
+     * {@link #add(Goods)}, which updates the unit's {@code GoodsContainer}
+     * accordingly.</p>
+     *
+     * @param g The {@code Goods} to load onto this unit. Must not be null.
+     */
+    public void loadLoot(Goods g) {
+        add(g);
+    }
+
     // Message unpacking support.
 
     /**

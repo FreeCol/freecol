@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.List;
 
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.LootLocation;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 
@@ -31,21 +32,61 @@ import net.sf.freecol.common.networking.ChangeSet;
  */
 public class LootSession extends Session {
 
+    private enum State { ACTIVE, COMPLETE }
+    private State state = State.ACTIVE;
+
+    /** The unit that won the battle and is looting. */
+    private final Unit winner;
+
+    /** The unit that lost the battle and whose cargo is being looted. */
+    private final Unit loser;
+
     /** The goods that are available to be captured. */
     private final List<Goods> capture;
 
 
     public LootSession(Unit winner, Unit loser, List<Goods> capture) {
         super(makeSessionKey(LootSession.class, winner, loser));
+        this.winner = winner;
+        this.loser = loser;
         this.capture = capture;
+
+        // Move goods into loot state immediately
+        for (Goods g : capture) {
+            g.setLocation(LootLocation.INSTANCE);
+        }
     }
 
+    public boolean canTake(Goods g) {
+        return winner.getLoadableAmount(g.getType()) >= g.getAmount();
+    }
+
+    public boolean isAvailable(Goods g) {
+        return capture.contains(g);
+    }
+
+    public void take(Goods g) {
+        capture.remove(g);
+    }
+
+    public boolean isLoser(Unit u) {
+        return this.loser == u;
+    }
+
+    public boolean isWinner(Unit u) {
+        return this.winner == u;
+    }
 
     @Override
     public boolean complete(ChangeSet cs) {
+        this.state = State.COMPLETE;
         return super.complete(cs);
     }
 
+    public boolean isComplete() {
+        return state == State.COMPLETE;
+    }
+    
     public List<Goods> getCapture() {
         return capture;
     }

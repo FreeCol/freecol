@@ -3813,7 +3813,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean loadCargo(Goods goods, Unit carrier) {
         if (goods == null || goods.getAmount() <= 0
-            || goods.getLocation() == null
+            || goods.isLoot()
             || carrier == null || !carrier.isCarrier()
             || !requireOurTurn()) return false;
 
