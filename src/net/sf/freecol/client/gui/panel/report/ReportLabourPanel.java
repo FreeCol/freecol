@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import java.util.logging.Level;
 
 
 /**
@@ -152,7 +153,7 @@ public final class ReportLabourPanel extends ReportPanel {
 
             Location location = unit.getLocation();
             if (location == null) {
-                logger.warning("Unit has null location: " + unit);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Unit has null location: " + unit);
             } else if (location.getSettlement() != null) {
                 location = location.getSettlement();
             } else if (unit.isInEurope()) {

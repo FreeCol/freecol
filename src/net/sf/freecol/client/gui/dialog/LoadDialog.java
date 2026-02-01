@@ -50,7 +50,7 @@ public final class LoadDialog extends DeprecatedFreeColDialog<File> {
      * @param fileFilters The available file filters in the dialog.
      */
     public LoadDialog(FreeColClient freeColClient, JFrame frame,
-            File directory, FileFilter[] fileFilters) {
+            File directory, FileFilter... fileFilters) {
         super(freeColClient, frame);
 
         final JFileChooser fileChooser = new JFileChooser(directory);

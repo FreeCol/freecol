@@ -49,14 +49,17 @@ import net.sf.freecol.common.model.TileImprovement;
 final class RoadPainter {
 
     /** Helper variables for displaying the map. */
-    private int tileHeight, tileWidth, halfHeight, halfWidth;
+    private int tileHeight;
+    private int tileWidth;
+    private int halfHeight;
+    private int halfWidth;
 
-    private final EnumMap<Direction, Point2D.Float> corners
+    private final java.util.Map<Direction, Point2D.Float> corners
         = new EnumMap<>(Direction.class);
-    private final EnumMap<Direction, List<Direction>> prohibitedRoads
+    private final java.util.Map<Direction, List<Direction>> prohibitedRoads
         = new EnumMap<>(Direction.class);
 
-    private Stroke roadStroke = new BasicStroke(2);
+    private Stroke roadStroke;
 
 
     /**

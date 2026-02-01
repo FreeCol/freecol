@@ -353,11 +353,12 @@ public final class QuickActionMenu extends JPopupMenu {
         JMenuItem expertOwned = null;
         JMenuItem expertUnowned = null;
         for (GoodsType type : spec.getGoodsTypeList()) {
-            int bestOwnedProd = bonus + bonusChange,
-                bestUnownedProd = bonus + bonusChange;
-            WorkLocation bestOwned = null, bestUnowned = null;
+            int bestOwnedProd = bonus + bonusChange;
+            int bestUnownedProd = bonus + bonusChange;
+            WorkLocation bestOwned = null;
+            WorkLocation bestUnowned = null;
             for (WorkLocation wl : colony.getAllWorkLocationsList()) {
-                int prod = 0;
+                int prod;
                 switch (wl.getNoAddReason(unit)) {
                 case NONE:
                     prod = wl.getPotentialProduction(type, unitType);
@@ -437,7 +438,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (spec.getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : transform(unit.getColony().getTeachers(), u ->
                     unit.canBeStudent(u) && u.isInColony())) {
-                JMenuItem menuItem = null;
+                JMenuItem menuItem;
                 ImageIcon teacherIcon
                     = new ImageIcon(lib.getSmallerUnitImage(teacher));
                 if (teacher.getStudent() != unit) {
@@ -902,11 +903,9 @@ public final class QuickActionMenu extends JPopupMenu {
     private boolean addTileItem(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
         final Tile tile = (unit == null) ? null : unit.getWorkTile();
-        if (tile != null) {
-            addTileItem(tile);
-            return true;
-        }
-        return false;
+        if (tile == null) return false;
+        addTileItem(tile);
+        return true;
     }
 
     /**

@@ -44,6 +44,8 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
 
@@ -51,6 +53,8 @@ import java.util.stream.StreamSupport;
  * Collection of small static helper methods using Collections.
  */
 public class CollectionUtils {
+
+    private static final Logger logger = Logger.getLogger(CollectionUtils.class.getName());
 
     private static final int MAX_DEFAULT = Integer.MIN_VALUE;
     private static final int MIN_DEFAULT = Integer.MAX_VALUE;
@@ -120,7 +124,7 @@ public class CollectionUtils {
      * @param values The array of values.
      * @return An unmodifiable map containing the specified members.
      */
-    public static <K,V> Map<K,V> makeUnmodifiableMap(K[] keys, V[] values) {
+    public static <K,V> Map<K,V> makeUnmodifiableMap(K[] keys, V... values) {
         if (keys.length != values.length) {
             throw new RuntimeException("Length mismatch: " + keys.length
                 + " != " + values.length);
@@ -298,7 +302,7 @@ public class CollectionUtils {
             }
         } else {
             for (; n < 0; n++) {
-                T t = list.remove(n-1);
+                T t = list.remove(list.size() - 1);
                 list.add(0, t);
             }
         }
@@ -313,10 +317,14 @@ public class CollectionUtils {
     public static <T> void reverse(final List<T> list) {
         final int len = list.size();
         if (len <= 0) return;
-        for (int i = 0, j = len-1; i < j; i++, j--) {
+        int i = 0;
+        int j = len - 1;
+        while (i < j) {
             T t = list.get(i);
             list.set(i, list.get(j));
             list.set(j, t);
+            i++;
+            j--;
         }
     }
 
@@ -476,7 +484,7 @@ public class CollectionUtils {
      * @param array The array to test.
      * @return True if the array is non-empty.
      */
-    public static <T> boolean any(T[] array) {
+    public static <T> boolean any(T... array) {
         return array != null && array.length > 0;
     }
 
@@ -609,8 +617,8 @@ public class CollectionUtils {
     public static <T> Stream<T> concat(Stream<T> s0, Stream<T>... streams) {
         Stream<T>[] sts = streams;
         Stream<T> ret = (s0 == null) ? Stream.empty() : s0;
-        for (int i = 0; i < sts.length; i++) {
-            if (sts[i] != null) ret = Stream.concat(ret, sts[i]);
+        for (Stream<T> stream : sts) {
+            if (stream != null) ret = Stream.concat(ret, stream);
         }
         return ret;
     }
@@ -622,7 +630,7 @@ public class CollectionUtils {
      * @param array The array to check.
      * @return The number of items that matched.
      */
-    public static <T> int count(T[] array) {
+    public static <T> int count(T... array) {
         return (array == null) ? 0 : array.length;
     }
         
@@ -707,7 +715,7 @@ public class CollectionUtils {
      * @param header Optional informational string to print first.
      * @param array The array to dump.
      */
-    public static <T> void dump(String header, T[] array) {
+    public static <T> void dump(String header, T... array) {
         dump_internal(header, Arrays.stream(array));
     }
 
@@ -738,13 +746,12 @@ public class CollectionUtils {
      * @param stream The {@code Stream} to print.
      */
     private static void dump_internal(String header, Stream<?> stream) {
-        if (header != null) System.err.print(header);
-        System.err.print("[ ");                       
-        forEach(stream, (v) -> {
-                System.err.print(v);
-                System.err.print(' ');
-            });
-        System.err.println(']');
+        StringBuilder sb = new StringBuilder(128);
+        if (header != null) sb.append(header);
+        sb.append("[ ");
+        forEach(stream, (v) -> sb.append(v).append(' '));
+        sb.append(']');
+        if (logger.isLoggable(Level.FINE)) logger.fine(sb.toString());
     }
 
     /**
@@ -754,15 +761,17 @@ public class CollectionUtils {
      * @param map The {@code Map} to print.
      */
     public static void dump(String header, Map<?,?> map) {
-        if (header != null) System.err.print(header);
-        System.err.print("[ ");
+        StringBuilder sb = new StringBuilder(128);
+        if (header != null) sb.append(header);
+        sb.append("[ ");
         forEachMapEntry(map, (e) -> {
-                System.err.print(e.getKey());
-                System.err.print(',');
-                System.err.print(e.getValue());
-                System.err.print(' ');
+                sb.append(e.getKey());
+                sb.append(',');
+                sb.append(e.getValue());
+                sb.append(' ');
             });
-        System.err.println(']');
+        sb.append(']');
+        if (logger.isLoggable(Level.FINE)) logger.fine(sb.toString());
     }
     
     /**
@@ -892,7 +901,7 @@ public class CollectionUtils {
      * @param array The {@code Collection} to search.
      * @return The first item, or null on failure.
      */
-    public static <T> T first(T[] array) {
+    public static <T> T first(T... array) {
         return (array == null || array.length == 0) ? null
             : first_internal(Arrays.stream(array), null);
     }
@@ -1235,6 +1244,7 @@ public class CollectionUtils {
      */
     public static <T> Iterable<T> iterable(final Stream<T> stream) {
         return new Iterable<T>() {
+            @Override
             public Iterator<T> iterator() { return stream.iterator(); }
         };
     }
@@ -1764,7 +1774,7 @@ public class CollectionUtils {
      * @param array The array to test.
      * @return True if an array is null or empty.
      */
-    public static <T> boolean none(T[] array) {
+    public static <T> boolean none(T... array) {
         return array == null || array.length == 0;
     }
 
@@ -1992,7 +2002,7 @@ public class CollectionUtils {
      * @param array The array to convert.
      * @return A list of the stream contents.
      */
-    public static <T extends Comparable<? super T>> List<T> sort(T[] array) {
+    public static <T extends Comparable<? super T>> List<T> sort(T... array) {
         final Comparator<T> comparator = Comparator.naturalOrder();
         return sort_internal(Arrays.stream(array), comparator);
     }
@@ -2293,7 +2303,7 @@ public class CollectionUtils {
      * @param array The array to convert.
      * @return A map of the stream contents.
      */
-    public static <T> List<T> toList(T[] array) {
+    public static <T> List<T> toList(T... array) {
         return toList_internal(Arrays.stream(array));
     }
 

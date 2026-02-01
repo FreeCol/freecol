@@ -53,11 +53,13 @@ public final class FreeColDialog<T> {
     
     
     /**
-     * This method is called by {@link FreeColOptionPaneUI} in order to
+     * This method is called by
+     * {@link net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI} in order to
      * render the custom panel for modal dialogs.
      * 
-     * @param api The API provided by {@link FreeColOptionPaneUI} to access
-     *      functionality provided by JOptionPane.
+     * @param api The API provided by
+     *      {@link net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI} to access
+     *      functionality provided by {@code JOptionPane}.
      * @return The panel to be rendered.
      */
     public JPanel createContent(DialogApi<T> api) {
@@ -69,6 +71,7 @@ public final class FreeColDialog<T> {
      * A content creator for the dialog.
      * @param <T> The return type of the dialog.
      */
+    @FunctionalInterface
     public interface DialogContentCreator<T> {
         
         /**
@@ -82,7 +85,7 @@ public final class FreeColDialog<T> {
     
     /**
      * Access to to behavior that for modal dialogs are handled in
-     * {@code FreeColOptionPaneUI}.
+     * {@link net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI}.
      * 
      * @param <T> The return type of the dialog.
      */

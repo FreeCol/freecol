@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import net.sf.freecol.FreeCol;
@@ -39,6 +40,8 @@ import net.sf.freecol.FreeCol;
  * @since 0.5.2
  */
 public class FSGConverter {
+
+    private static final Logger logger = Logger.getLogger(FSGConverter.class.getName());
 
     /**
      * A singleton object of this class.
@@ -114,7 +117,7 @@ public class FSGConverter {
             in.mark(10);
             byte[] buf = new byte[5];
             if (in.read(buf, 0, buf.length) < buf.length) {
-                System.err.println("Unable to read header");
+                logger.severe("Unable to read header");
                 return;
             }
             in.reset();
@@ -168,13 +171,13 @@ public class FSGConverter {
      * Prints the usage of this program to standard out.
      */
     private static void printUsage() {
-        System.out.println("A program for converting FreeCol Savegames.");
-        System.out.println();
-        System.out.println("Usage: java -cp FreeCol.jar net.sf.freecol.tools.FSGConverter [-][-]output:xml FSG_FILE [OUTPUT_FILE]");
-        System.out.println();
-        System.out.println("output:xml \tThe output will be indented XML.");
-        System.out.println();
-        System.out.println("The output file will get the same name as FSG_FILE if not specified (with \".fsg\" replaced with \".xml\").");
+        logger.info("A program for converting FreeCol Savegames.");
+        logger.info("");
+        logger.info("Usage: java -cp FreeCol.jar net.sf.freecol.tools.FSGConverter [-][-]output:xml FSG_FILE [OUTPUT_FILE]");
+        logger.info("");
+        logger.info("output:xml \tThe output will be indented XML.");
+        logger.info("");
+        logger.info("The output file will get the same name as FSG_FILE if not specified (with \".fsg\" replaced with \".xml\").");
     }
     
     /**

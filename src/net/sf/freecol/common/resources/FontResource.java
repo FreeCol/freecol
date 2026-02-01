@@ -59,7 +59,6 @@ public class FontResource extends Resource {
      */
     public FontResource(String cachingKey, URI resourceLocator) throws IOException {
         super(cachingKey, resourceLocator);
-        font = null;
         try {
             if (resourceLocator.getPath() != null
                 && resourceLocator.getPath().endsWith(".ttf")) {
@@ -72,10 +71,10 @@ public class FontResource extends Resource {
             GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .registerFont(font);
 
-            logger.info("Loaded font: " + font.getFontName()
+            if (logger.isLoggable(Level.INFO)) logger.info("Loaded font: " + font.getFontName()
                 + " from: " + resourceLocator);
         } catch (FontFormatException|IOException ex) {
-            logger.log(Level.WARNING,
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING,
                 "Failed loading font from: " + resourceLocator, ex);
             throw new IOException("Font load failed from: " + resourceLocator,
                 ex);

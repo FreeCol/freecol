@@ -137,7 +137,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             StyleConstants.setComponent(doc.getStyle("button"),
                 createColonyButton(colony, true));
             doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-        } catch (Exception e) {
+        } catch (BadLocationException e) {
             logger.log(Level.WARNING, "Colony check fail", e);
         }
 
@@ -217,7 +217,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 doc.insertString(doc.getLength(), "\n\n"
                     + Messages.message("report.requirements.met"),
                     doc.getStyle("regular"));
-            } catch (Exception e) {
+            } catch (BadLocationException e) {
                 logger.log(Level.WARNING, "Colony check fail", e);
             }
         }
@@ -232,7 +232,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         try {
             doc.insertString(doc.getLength(), "\n\n" + Messages.message(t),
                              doc.getStyle("regular"));
-        } catch (Exception e) {
+        } catch (BadLocationException e) {
             logger.log(Level.WARNING, "Tile warning fail", e);
         }
     }
@@ -256,7 +256,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage,
                              doc.getStyle("regular"));
-        } catch (Exception e) {
+        } catch (BadLocationException e) {
             logger.log(Level.WARNING, "Bad assignment fail", e);
         }
     }
@@ -323,13 +323,14 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 insertColonyButtons(doc, canTrainExperts);
             }
 
-        } catch(Exception e) {
+        } catch (BadLocationException e) {
             logger.log(Level.WARNING, "Assign experts fail", e);
         }
 
     }
 
-    private void insertColonyButtons(StyledDocument doc, List<Colony> colonies) throws Exception {
+    private void insertColonyButtons(StyledDocument doc, List<Colony> colonies)
+        throws BadLocationException {
         for (Colony colony : colonies) {
             StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
             doc.insertString(doc.getLength(), " ", doc.getStyle("button"));

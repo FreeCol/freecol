@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 
 /**
@@ -69,7 +70,7 @@ public class FAFile {
             final char c = text.charAt(i);
             FALetter fl = getLetter(c);
             if (fl == null) {
-                logger.warning("Missing character in FAF: " + c);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Missing character in FAF: " + c);
                 continue;
             }
             sb.append(c);
@@ -98,8 +99,7 @@ public class FAFile {
 
         int firstMinX = Integer.MAX_VALUE;
         FALetter letter = getLetter(text.charAt(0));
-        for (int i=0; i<letter.points.length; i++) {
-            Point p = letter.points[i];
+        for (Point p : letter.points) {
             if (p.x < firstMinX) {
                 firstMinX = p.x;
             }
@@ -109,8 +109,7 @@ public class FAFile {
         int lastMaxX = 0;
         letter = getLetter(text.charAt(text.length()-1));
 
-        for (int i=0; i<letter.points.length; i++) {
-            Point p = letter.points[i];
+        for (Point p : letter.points) {
             if (p.x > lastMaxX) {
                 lastMaxX = p.x;
             }
@@ -138,8 +137,7 @@ public class FAFile {
         int x = 0;
         for (int i=0; i<text.length(); i++) {
             FALetter fl = getLetter(text.charAt(i));
-            for (int j=0; j<fl.points.length; j++) {
-                Point p = fl.points[j];
+            for (Point p : fl.points) {
                 points.add(new Point(p.x + x, p.y));
             }
 
@@ -168,7 +166,8 @@ public class FAFile {
         line = in.readLine();
         while (line != null && !line.startsWith("[Chars]")) {
             String name = line;
-            if ((line = in.readLine()) == null) break;
+            line = in.readLine();
+            if (line == null) break;
             st = new StringTokenizer(line);
             int width = Integer.parseInt(st.nextToken());
             int height = Integer.parseInt(st.nextToken());
@@ -176,13 +175,15 @@ public class FAFile {
             int[] xs = new int[numberOfPoints];
             int[] ys = new int[numberOfPoints];
 
-            if ((line = in.readLine()) == null) break;
+            line = in.readLine();
+            if (line == null) break;
             st = new StringTokenizer(line);
             for (int i=0; i<numberOfPoints; i++) {
                 xs[i] = Integer.parseInt(st.nextToken());               
             }
 
-            if ((line = in.readLine()) == null) break;
+            line = in.readLine();
+            if (line == null) break;
             st = new StringTokenizer(line);         
             for (int i=0; i<numberOfPoints; i++) {
                 ys[i] = Integer.parseInt(st.nextToken());               
@@ -208,13 +209,15 @@ public class FAFile {
             int[] xs = new int[numberOfPoints];
             int[] ys = new int[numberOfPoints];
 
-            if ((line = in.readLine()) == null) break;
+            line = in.readLine();
+            if (line == null) break;
             st = new StringTokenizer(line);
             for (int i = 0; i < numberOfPoints; i++) {
                 xs[i] = Integer.parseInt(st.nextToken());               
             }
 
-            if ((line = in.readLine()) == null) break;
+            line = in.readLine();
+            if (line == null) break;
             st = new StringTokenizer(line);         
             for (int i = 0; i < numberOfPoints; i++) {
                 ys[i] = Integer.parseInt(st.nextToken());               
@@ -284,4 +287,3 @@ public class FAFile {
         private final InputStream in;
     }
 }
-

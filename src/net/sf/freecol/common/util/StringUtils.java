@@ -120,7 +120,8 @@ public class StringUtils {
         StringBuilder sb = new StringBuilder(len);
         int idx, from = 0;
         for (;;) {
-            if ((idx = base.indexOf('_', from)) < 0) {
+            idx = base.indexOf('_', from);
+            if (idx < 0) {
                 sb.append(base.substring(from));
                 break;
             }

@@ -53,6 +53,7 @@ public class CloseMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public CloseMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, PANEL_TAG);

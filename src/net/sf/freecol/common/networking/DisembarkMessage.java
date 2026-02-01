@@ -88,7 +88,7 @@ public class DisembarkMessage extends AttributeMessage {
         ServerUnit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

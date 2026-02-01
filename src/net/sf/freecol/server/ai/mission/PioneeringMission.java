@@ -266,12 +266,10 @@ public final class PioneeringMission extends Mission {
                 @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path);
-                    if (bestValue < value) {
-                        bestValue = value;
-                        bestPath = path;
-                        return true;
-                    }
-                    return false;
+                    if (bestValue >= value) return false;
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
                 }
             };
         return (deferOK) ? GoalDeciders.getComposedGoalDecider(false, gd,
@@ -722,7 +720,8 @@ public final class PioneeringMission extends Mission {
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
                 lb.add(", land claim failed at ", tile);
-                if ((newTarget = findMissionTarget(aiUnit, 10, false)) == null) {
+                newTarget = findMissionTarget(aiUnit, 10, false);
+                if (newTarget == null) {
                     return lbFail(lb, false, "no alternate target");
                 }
                 setTarget(newTarget);

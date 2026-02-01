@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.util.logging.Level;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -110,7 +111,7 @@ public class ScrollThread extends Thread {
                         return;
                     }
                 });
-            } catch (Exception ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 logger.log(Level.WARNING, "Exception while scrolling", ex);
                 abort();
                 break;

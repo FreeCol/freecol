@@ -288,7 +288,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
                 AbstractOption<T> op = readChildOption(xr);
                 if (op != null) addMember(op);
             } catch (XMLStreamException xse) {
-                logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
                 xr.closeTag(tag);
             }
             break;

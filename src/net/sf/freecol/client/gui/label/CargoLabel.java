@@ -28,6 +28,7 @@ import java.awt.Component;
  * An interface used for updating a {@code CargoPanel} to add or
  * remove a {@code Component}
  */
+@FunctionalInterface
 public interface CargoLabel {
 
     /**

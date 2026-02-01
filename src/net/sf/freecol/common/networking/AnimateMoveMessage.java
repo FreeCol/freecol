@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -107,18 +108,19 @@ public class AnimateMoveMessage extends ObjectMessage {
     private Unit getUnit(Game game) {
         final String uid = getStringAttribute(UNIT_TAG);
         Unit unit = game.getFreeColGameObject(uid, Unit.class);
+        if (unit != null) return unit;
+
+        unit = getChild(0, Unit.class);
         if (unit == null) {
-            if ((unit = getChild(0, Unit.class)) == null) {
-                logger.warning("Move animation missing unit: " + uid);
-            } else {
-                unit.intern();
-                if (!unit.getId().equals(uid)) { // actually on carrier
-                    unit = unit.getCarriedUnitById(uid);
-                    if (unit == null) {
-                        logger.warning("Move animation missing carried unit: "
-                            + uid);
-                    }
-                }
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Move animation missing unit: " + uid);
+            return null;
+        }
+
+        unit.intern();
+        if (!unit.getId().equals(uid)) { // actually on carrier
+            unit = unit.getCarriedUnitById(uid);
+            if (unit == null && logger.isLoggable(Level.WARNING)) {
+                logger.warning("Move animation missing carried unit: " + uid);
             }
         }
         return unit;
@@ -175,12 +177,12 @@ public class AnimateMoveMessage extends ObjectMessage {
 
         if (unit == null) return;
         if (oldTile == null) {
-            logger.warning("Animation for: " + player.getId()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Animation for: " + player.getId()
                 + " missing old Tile.");
             return;
         }
         if (newTile == null) {
-            logger.warning("Animation for: " + player.getId()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Animation for: " + player.getId()
                 + " missing new Tile.");
             return;
         }

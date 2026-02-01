@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -39,6 +41,8 @@ import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
  * Represents a FreeCol savegame.
  */
 public class FreeColSavegameFile extends FreeColDataFile {
+
+    private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
 
     /** The tag for the version string in the saved game. */
     public static final String VERSION_TAG = "version";
@@ -130,7 +134,9 @@ public class FreeColSavegameFile extends FreeColDataFile {
         if (v != null && v.size() == 1) {
             try {
                 ret = Integer.parseInt(v.get(0));
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+                if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid savegame version: " + v.get(0), nfe);
+            }
         }
         return ret;
     }

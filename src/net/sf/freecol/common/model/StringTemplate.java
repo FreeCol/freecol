@@ -195,7 +195,7 @@ public class StringTemplate extends FreeColObject {
         try {
             return returnClass.cast(this);
         } catch (ClassCastException cce) {
-            logger.log(Level.WARNING, "Invalid class "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Invalid class "
                 + this.getClass() + " referenced.", cce);
         }
         return null;            

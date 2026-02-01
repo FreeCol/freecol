@@ -109,9 +109,7 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
     public void clientHandler(FreeColClient freeColClient) {
         final OptionGroup gameOptions = getGameOptions();
 
-        if (freeColClient.isInGame()) {
-            ; // Ignored
-        } else {
+        if (!freeColClient.isInGame()) {
             pgc(freeColClient).updateGameOptionsHandler(gameOptions);
         }
         clientGeneric(freeColClient);

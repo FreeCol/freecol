@@ -20,6 +20,7 @@
 package net.sf.freecol.common.i18n;
 
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 
 /**
@@ -52,7 +53,7 @@ public abstract class Number implements Selector {
         try {
             return getKey(Double.parseDouble(selector));
         } catch(NumberFormatException e) {
-            logger.warning("Syntax error in string template '" + template + "'");
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Syntax error in string template '" + template + "'");
             return Category.other.toString();
         }
     }

@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -142,8 +143,10 @@ public final class RecruitPanel extends FreeColPanel {
                     if (!shouldEnable) getGUI().removeComponent(this);
                     return;
                 }
-            } catch (NumberFormatException e) {}
-            logger.warning("Invalid action command: " + command);
+            } catch (NumberFormatException e) {
+                if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid recruit command: " + command, e);
+            }
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid action command: " + command);
         }
     }
 

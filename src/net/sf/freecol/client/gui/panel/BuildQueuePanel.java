@@ -222,7 +222,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // What actual panel component was chosen?
             JList<? extends BuildableType> target = BuildQueuePanel.this.convertJComp(comp);
             if (target == null) {
-                logger.warning("Build queue import failed to: " + comp);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Build queue import failed to: " + comp);
                 return false;
             }
 
@@ -388,7 +388,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     private class BuildQueueMouseAdapter extends MouseAdapter {
 
-        private boolean add = true;
+        private boolean add;
         
         private boolean enabled = false;
 
@@ -941,13 +941,14 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * @return boolean
      */
     private boolean hasBuildingType(BuildingType buildingType) {
+        BuildingType current = buildingType;
         while (true) {
-            if (this.colony.getBuilding(buildingType) == null) {
+            if (this.colony.getBuilding(current) == null) {
                 return false;
-            } else if (colony.getBuilding(buildingType).getType() == buildingType) {
+            } else if (colony.getBuilding(current).getType() == current) {
                 return true;
-            } else if (buildingType.getUpgradesTo() != null) {
-                buildingType = buildingType.getUpgradesTo();
+            } else if (current.getUpgradesTo() != null) {
+                current = current.getUpgradesTo();
             } else {
                 return false;
             }

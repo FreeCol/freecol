@@ -227,7 +227,7 @@ public final class AIUnit extends TransportableAIObject {
         AIUnit transport = getTransport();
         if (transport != aiCarrier) {
             if (transport != null) {
-                logger.warning("Taking different transport: " + aiCarrier);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Taking different transport: " + aiCarrier);
                 dropTransport();
             }
             setTransport(aiCarrier);
@@ -693,8 +693,8 @@ public final class AIUnit extends TransportableAIObject {
                 && (direction = tile.getDirection(path.next.getTile())) != null) {
                 try {
                     return leaveTransport(direction);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Leave transport crash for "
+                } catch (IllegalStateException e) {
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Leave transport crash for "
                         + this + "/" + unit.getMovesLeft(), e);
                 }
             }

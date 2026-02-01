@@ -213,7 +213,8 @@ public final class ReportIndianPanel extends ReportPanel {
                     JLabel goodsLabel;
                     GoodsType gt;
                     List<StringTemplate> gl = is.getWantedGoodsLabel(i, player);
-                    if (visited && (gt = is.getWantedGoods(i)) != null) {
+                    gt = is.getWantedGoods(i);
+                    if (visited && gt != null) {
                         goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(lib
                                 .getSmallGoodsTypeImage(gt)));

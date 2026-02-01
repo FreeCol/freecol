@@ -90,7 +90,7 @@ public final class RandomRange {
      *
      * @return The probability.
      */
-    public final int getProbability() {
+    public int getProbability() {
         return probability;
     }
 
@@ -99,7 +99,7 @@ public final class RandomRange {
      *
      * @return The lower bound.
      */
-    public final int getMinimum() {
+    public int getMinimum() {
         return minimum;
     }
 
@@ -108,7 +108,7 @@ public final class RandomRange {
      *
      * @return The upper bound.
      */
-    public final int getMaximum() {
+    public int getMaximum() {
         return maximum;
     }
 
@@ -117,7 +117,7 @@ public final class RandomRange {
      *
      * @return The factor.
      */
-    public final int getFactor() {
+    public int getFactor() {
         return factor;
     }
 

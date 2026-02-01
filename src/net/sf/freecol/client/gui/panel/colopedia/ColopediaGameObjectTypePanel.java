@@ -212,7 +212,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 .getGoodsType(modifier.getId());
             String bonus = ModifierFormat.getModifierAsString(modifier);
             return getGoodsButton(goodsType, bonus);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             // not a production bonus
             JLabel label = new JLabel(ModifierFormat.getFeatureAsString(modifier) + ": "
                 + ModifierFormat.getModifierAsString(modifier));

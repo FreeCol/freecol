@@ -29,6 +29,7 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -105,7 +106,7 @@ public class LandMap {
         int minNumberOfTiles = mgo.getInteger(MapGeneratorOptions.LAND_MASS)
             * getWidth() * getHeight() / 100;
         int gen = mgo.getSelection(MapGeneratorOptions.LAND_GENERATOR_TYPE);
-        logger.info("Using land generator "
+        if (logger.isLoggable(Level.INFO)) logger.info("Using land generator "
             + mgo.getSelectionName(MapGeneratorOptions.LAND_GENERATOR_TYPE)
             + " to make " + width + "x" + height + " map"
             + " with distance-to-edge=" + distanceToEdge
@@ -275,7 +276,6 @@ public class LandMap {
                 // find a free tile.  Decrease necessary minimum over
                 // time, so that this process will eventually succeed.
                 if (failCounter > 100) {
-                    failCounter = 0;
                     minNumberOfTiles--;
                     break;
                 }

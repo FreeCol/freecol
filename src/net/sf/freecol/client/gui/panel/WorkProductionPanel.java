@@ -74,9 +74,9 @@ public class WorkProductionPanel extends FreeColPanel {
         final WorkLocation wl = (WorkLocation)unit.getLocation();
         final GoodsType workType = unit.getWorkType();
 
-        String shortName = "";
-        String longName = "";
-        Image image = null;
+        String shortName;
+        String longName;
+        Image image;
         float result = wl.getBaseProduction(wl.getProductionType(), 
                                             workType, unitType);
 

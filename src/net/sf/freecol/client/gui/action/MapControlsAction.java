@@ -51,14 +51,6 @@ public class MapControlsAction extends SelectableOptionAction {
      * {@inheritDoc}
      */
     @Override
-    public void update() {
-        super.update();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected boolean shouldBeEnabled() { 
         return super.shouldBeEnabled() && getGame() != null && getGame().getMap() != null;
     }

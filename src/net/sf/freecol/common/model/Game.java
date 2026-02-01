@@ -323,7 +323,7 @@ public class Game extends FreeColGameObject {
                     new Class[] { Specification.class },
                     new Object[] { game.getSpecification() });
             } catch (Introspector.IntrospectorException ex) {
-                logger.log(Level.WARNING, "newInstance(spec) fail for: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "newInstance(spec) fail for: "
                     + returnClass.getName(), ex);
             }
         } else { // Or just use the trivial constructor
@@ -331,7 +331,7 @@ public class Game extends FreeColGameObject {
                 return Introspector.instantiate(returnClass,
                     new Class[] {}, new Object[] {});
             } catch (Introspector.IntrospectorException ex) {
-                logger.log(Level.WARNING, "newInstance(trivial) fail for: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "newInstance(trivial) fail for: "
                     + returnClass.getName(), ex);
             }
         }
@@ -490,7 +490,7 @@ public class Game extends FreeColGameObject {
             throw new RuntimeException("Null/empty identifier: " + this);
         }
 
-        logger.finest("removeFCGO/" + reason + ": " + id);
+        if (logger.isLoggable(Level.FINEST)) logger.finest("removeFCGO/" + reason + ": " + id);
         notifyRemoveFreeColGameObject(id);
         synchronized (this.freeColGameObjects) {
             this.freeColGameObjects.remove(id);
@@ -541,7 +541,7 @@ public class Game extends FreeColGameObject {
                 fcgo.setId(id);
             } else {
                 // Otherwise this is an error
-                logger.warning("Update of missing object: " + id
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Update of missing object: " + id
                     + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
                 return null;
             }
@@ -715,7 +715,7 @@ public class Game extends FreeColGameObject {
                 final String key = this.readAhead.getKey();
                 this.fcgoState = FcgoState.INVALID;
                 this.it.remove();
-                logger.finest("removeFCGO/expire: " + key);
+                if (logger.isLoggable(Level.FINEST)) logger.finest("removeFCGO/expire: " + key);
                 notifyRemoveFreeColGameObject(key);
             }
         };
@@ -995,20 +995,21 @@ public class Game extends FreeColGameObject {
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {
-                if ((fcgo = update(p, Player.class, true)) != null) {
+                fcgo = update(p, Player.class, true);
+                if (fcgo != null) {
                     addPlayer((Player)fcgo);
-                    logger.finest("addPlayers added new: " + fcgo);
+                    if (logger.isLoggable(Level.FINEST)) logger.finest("addPlayers added new: " + fcgo);
                 } else {
-                    logger.warning("addPlayers create new fail: " + p);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("addPlayers create new fail: " + p);
                 }                
             } else if (fcgo instanceof Player) {
                 if (fcgo.copyIn(p)) {
-                    logger.finest("addPlayers copied in: " + fcgo);
+                    if (logger.isLoggable(Level.FINEST)) logger.finest("addPlayers copied in: " + fcgo);
                 } else {
-                    logger.warning("addPlayers copyIn existing fail: " + p);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("addPlayers copyIn existing fail: " + p);
                 }
             } else {
-                logger.warning("addPlayers onto non-player: " + fcgo);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("addPlayers onto non-player: " + fcgo);
             }
         }
     }
@@ -1408,7 +1409,7 @@ public class Game extends FreeColGameObject {
         if (o == null) {
             try {
                 o = getSpecification().getType(id);
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 o = null; // Ignore
             }
         }
@@ -1483,7 +1484,9 @@ public class Game extends FreeColGameObject {
             ret.readFromXML(xr);
             return ret;
 
-        } catch (Exception ex) {
+        } catch (XMLStreamException ex) {
+            throw ex;
+        } catch (IllegalArgumentException ex) {
             throw new XMLStreamException(ex);
         }
     }
@@ -1837,7 +1840,7 @@ public class Game extends FreeColGameObject {
                     areas.put(area.getId(), area);
                 }
             } catch (XMLStreamException xse) {
-                logger.log(Level.SEVERE, "nextTag failed at " + tag, xse);
+                if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "nextTag failed at " + tag, xse);
             }
         } else {
             super.readChild(xr);

@@ -6,6 +6,7 @@ import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.EnumMap;
+import java.util.Map;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -23,13 +24,16 @@ final class MapViewerScaledUtils {
     private final GeneralPath fog = new GeneralPath();
 
     /** Fonts (scaled). */
-    private Font fontNormal, fontItalic, fontProduction, fontTiny;
+    private Font fontNormal;
+    private Font fontItalic;
+    private Font fontProduction;
+    private Font fontTiny;
         
     /** Points to use to draw the borders. */
-    private final EnumMap<Direction, Point2D.Float> borderPoints
+    private final Map<Direction, Point2D.Float> borderPoints
         = new EnumMap<>(Direction.class);
     /** Support points for quadTo calls when drawing borders. */
-    private final EnumMap<Direction, Point2D.Float> controlPoints
+    private final Map<Direction, Point2D.Float> controlPoints
         = new EnumMap<>(Direction.class);
 
     /** Stroke to draw the borders with. */
@@ -44,7 +48,7 @@ final class MapViewerScaledUtils {
     
     
     void updateScaledVariables(ImageLibrary lib) {
-        final TileBounds tileBounds = new TileBounds(lib.getTileSize(), lib.getScaleFactor());
+        final TileBounds tileBounds = new TileBounds(lib.getTileSize());
         // ATTENTION: we assume that all base tiles have the same size
         this.fog.reset();
         this.fog.moveTo(tileBounds.getHalfWidth(), 0);
@@ -127,11 +131,11 @@ final class MapViewerScaledUtils {
         return borderStroke;
     }
     
-    EnumMap<Direction, Point2D.Float> getBorderPoints() {
+    Map<Direction, Point2D.Float> getBorderPoints() {
         return borderPoints;
     }
     
-    EnumMap<Direction, Point2D.Float> getControlPoints() {
+    Map<Direction, Point2D.Float> getControlPoints() {
         return controlPoints;
     }
     
