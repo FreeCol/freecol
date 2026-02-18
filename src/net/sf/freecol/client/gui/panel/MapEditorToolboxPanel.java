@@ -112,7 +112,6 @@ public final class MapEditorToolboxPanel extends FreeColPanel {
 
     private JToggleButton buildButton(MapEditorTool mapEditorTool, boolean defaultTool) {
         final String text = Messages.getName(mapEditorTool.getId());
-        final MapEditorController ctlr = getFreeColClient().getMapEditorController();
         /* TODO: Update description panel?
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)),
@@ -122,7 +121,6 @@ public final class MapEditorToolboxPanel extends FreeColPanel {
         descriptionPanel.setBackground(Color.RED);
         mt.setDescriptionPanel(descriptionPanel);
         */
-        final Dimension riverSize = ImageLibrary.scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_SIZE), ImageLibrary.SMALLER_SCALE);
         ImageIcon icon = new ImageIcon(getImageLibrary().getScaledImage("image.ui.includesSpecification")); // TODO: Add icon
         final JToggleButton button = new JToggleButton(icon);
         button.setToolTipText(text);

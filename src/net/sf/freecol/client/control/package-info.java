@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Client Control package</h1>
+ * <h2>FreeCol Client Control package</h2>
  *
  * <p>Contains the classes responsible for the control of the game.</p>
  *

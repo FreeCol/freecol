@@ -126,10 +126,10 @@ public final class MetaServer extends Thread {
         // new client connects to the server a new {@link Connection}
         // is made, with {@link MetaServerHandler} as the input handler.
         while (this.running) {
-            Socket clientSocket = null;
+            Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
-                logger.info("Client connection from: "
+                if (logger.isLoggable(Level.INFO)) logger.info("Client connection from: "
                     + clientSocket.getInetAddress().toString());
                 @SuppressWarnings("resource")
                 final Connection connection = new Connection(clientSocket, FreeCol.METASERVER_THREAD).setMessageHandler(getMetaServerHandler());
@@ -153,8 +153,10 @@ public final class MetaServer extends Thread {
         try {
             port = Integer.parseInt(args[0]);
         } catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
-            System.out.println("Usage: " + MetaServer.class.getName()
-                + " PORT_NUMBER");
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info("Usage: " + MetaServer.class.getName()
+                    + " PORT_NUMBER");
+            }
             System.exit(1);
         }
 

@@ -74,7 +74,7 @@ public class ResourceFactory {
                 } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
                     resource = new FontResource(cachingKey, uri);
                 } else {
-                    logger.log(Level.WARNING, "Unknown urn part: " + uri.getSchemeSpecificPart());
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unknown urn part: " + uri.getSchemeSpecificPart());
                     return null;
                 }
             } else if (pathPart.endsWith("\"") && pathPart.lastIndexOf('"', pathPart.length()-1) >= 0) {
@@ -101,7 +101,7 @@ public class ResourceFactory {
             resources.put(uri, resource);
             return resource;
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to create " + uri, ioe);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to create " + uri, ioe);
             return null;
         }
     }

@@ -161,7 +161,7 @@ public abstract class WorkLocation extends UnitLocation
         if (!Utils.equals(newProductionType, this.productionType)) {
             this.productionType = newProductionType;
             getColony().invalidateCache();
-            logger.fine("Production type at " + this
+            if (logger.isLoggable(Level.FINE)) logger.fine("Production type at " + this
                 + " is now: " + newProductionType);
         }
     }
@@ -388,18 +388,24 @@ public abstract class WorkLocation extends UnitLocation
         Suggestion sug;
         // Check if the existing non-student units can be improved.
         for (Unit u : transform(getUnits(), isNull(Unit::getTeacher))) {
-            if ((work = u.getWorkType()) == null) {
-                if (occ != null) work = occ.workType;
+            work = u.getWorkType();
+            if (work == null && occ != null) {
+                work = occ.workType;
             }
-            if ((sug = getSuggestion(u, getProductionType(), work)) != null) {
+            sug = getSuggestion(u, getProductionType(), work);
+            if (sug != null) {
                 result.put(u, sug);
             }
         }
         // Check for a suggestion for an extra worker if there is space.
-        if (occ != null && (work = occ.workType) != null
-            && !isFull()
-            && (sug = getSuggestion(null, occ.productionType, work)) != null) {
-            result.put(null, sug);
+        if (occ != null) {
+            work = occ.workType;
+            if (work != null && !isFull()) {
+                sug = getSuggestion(null, occ.productionType, work);
+                if (sug != null) {
+                    result.put(null, sug);
+                }
+            }
         }
         return result;
     }

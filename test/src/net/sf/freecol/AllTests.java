@@ -20,6 +20,9 @@
 package net.sf.freecol;
 
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -32,6 +35,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
+        configureTestLogging();
         TestSuite suite = new TestSuite("Test for net.sf.freecol");
         // $JUnit-BEGIN$
 
@@ -46,10 +50,16 @@ public class AllTests {
         TestSetup wrapper = new TestSetup(suite) {
             public void setUp() {
                 Locale.setDefault(Locale.US);
+                configureTestLogging();
             }
         };
         return wrapper;
 
     }
 
+    private static void configureTestLogging() {
+        LogManager.getLogManager().reset();
+        Logger rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.SEVERE);
+    }
 }

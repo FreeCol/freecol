@@ -72,7 +72,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @param game The enclosing {@code Game}.
      * @param id The identifier (ignored, type gives identifier here).
      */
-    public Goods(Game game, @SuppressWarnings("unused") String id) {
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    public Goods(Game game, String id) {
         this(game);
     }
     

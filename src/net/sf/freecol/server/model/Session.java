@@ -30,12 +30,13 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.networking.ChangeSet;
+import java.util.logging.Level;
 
 
 /**
  * Root class for sessions.
  */
-public abstract class Session {
+public class Session {
 
     private static final Logger logger = Logger.getLogger(Session.class.getName());
 
@@ -46,7 +47,7 @@ public abstract class Session {
     private String key;
 
     /** Has this session been completed? */
-    private boolean completed = false;
+    private boolean completed;
 
 
     /**
@@ -63,7 +64,7 @@ public abstract class Session {
         }
         this.key = key;
         this.completed = false;
-        logger.finest("Created session: " + key);
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Created session: " + key);
     }
 
 
@@ -248,4 +249,3 @@ public abstract class Session {
         return (ts == null) ? null : type.cast(ts);
     }
 }
-

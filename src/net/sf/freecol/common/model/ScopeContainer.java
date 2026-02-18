@@ -44,6 +44,7 @@ public class ScopeContainer {
     /** Cached standard scope comparator. */
     private static final Comparator<Scope> scopeComparator
         = new Comparator<Scope>() {
+                @Override
                 public int compare(Scope s1, Scope s2) {
                     return Long.compare(s1.hashCode(), s2.hashCode());
                 }

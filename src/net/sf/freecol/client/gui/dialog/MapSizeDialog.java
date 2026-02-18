@@ -87,7 +87,8 @@ public final class MapSizeDialog {
     }
 
     private static Dimension determineResult(JTextField inputWidth, JTextField inputHeight) {
-        int width, height;
+        int width;
+        int height;
         try {
             width = Integer.parseInt(inputWidth.getText());
             height = Integer.parseInt(inputHeight.getText());

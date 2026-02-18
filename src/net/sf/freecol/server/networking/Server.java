@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -202,11 +205,11 @@ public final class Server extends Thread {
             if (conn.isAlive()) {
                 try {
                     conn.sendMessage(message);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Unable to send to: " + conn, ex);
+                } catch (FreeColException | IOException | XMLStreamException ex) {
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unable to send to: " + conn, ex);
                 }
             } else {
-                logger.log(Level.INFO, "Reap dead connection: " + conn);
+                if (logger.isLoggable(Level.INFO)) logger.log(Level.INFO, "Reap dead connection: " + conn);
                 removeConnection(conn);
             }
         }
@@ -262,10 +265,8 @@ public final class Server extends Thread {
                         // Undocumented null return has been seen
                         this.freeColServer.addNewUserConnection(sock);
                     }
-                } catch (Exception ex) {
-                    // Catch all exceptions.  There have been
-                    // sightings of spurious NPEs and other fail in
-                    // the Java libraries.
+                } catch (FreeColException | IOException | XMLStreamException
+                         | SecurityException ex) {
                     if (this.running) {
                         logger.log(Level.WARNING, "Connection failed: ", ex);
                     }

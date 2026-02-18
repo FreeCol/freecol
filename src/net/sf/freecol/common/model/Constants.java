@@ -25,7 +25,9 @@ package net.sf.freecol.common.model;
  * Contains the constants.  These constants are used by the
  * controllers and input handlers when they are communicating.
  */
-public interface Constants {
+public final class Constants {
+
+    private Constants() {}
 
     /** Generic "huge" value. */
     public static final int INFINITY = Integer.MAX_VALUE;
@@ -34,7 +36,7 @@ public interface Constants {
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
     /** The result of checkIntegrity. */
-    public static enum IntegrityType {
+    public enum IntegrityType {
         INTEGRITY_FAIL(-1),
         INTEGRITY_FIXED(0),
         INTEGRITY_GOOD(1);

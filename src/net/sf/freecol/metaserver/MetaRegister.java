@@ -102,11 +102,7 @@ public final class MetaRegister {
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    removeDeadServers();
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Could not remove servers.", ex);
-                }
+                removeDeadServers();
             }
         }, REMOVE_DEAD_SERVERS_INTERVAL, REMOVE_DEAD_SERVERS_INTERVAL);
     }
@@ -129,12 +125,12 @@ public final class MetaRegister {
         
         final String identity = newSi.getName() + " (" + newSi.getAddress() + ":" + newSi.getPort() + ")";
         if (!canConnectToServer(newSi)) {
-            logger.log(Level.INFO, "Cannot connect to server: " + identity);
+            if (logger.isLoggable(Level.INFO)) logger.log(Level.INFO, "Cannot connect to server: " + identity);
             return false;
         }
         
         items.add(newSi);
-        logger.info("Server added:" + identity);
+        if (logger.isLoggable(Level.INFO)) logger.info("Server added:" + identity);
         
         return true;
     }
@@ -167,7 +163,7 @@ public final class MetaRegister {
         long time = now() - REMOVE_OLDER_THAN;
         for (int i=0; i<items.size(); i++) {
             if (items.get(i).getLastUpdated() < time) {
-                logger.info("Removing: " + items.get(i));
+                if (logger.isLoggable(Level.INFO)) logger.info("Removing: " + items.get(i));
                 items.remove(i);
             }
         }
@@ -183,9 +179,9 @@ public final class MetaRegister {
         int index = indexOf(address, port);
         if (index >= 0) {
             items.remove(index);
-            logger.info("Removing server:" + address + ":" + port);
+            if (logger.isLoggable(Level.INFO)) logger.info("Removing server:" + address + ":" + port);
         } else {
-            logger.warning("Trying to remove non-existing server:"
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Trying to remove non-existing server:"
                 + address + ":" + port);
         }
     }

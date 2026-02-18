@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
+import java.util.logging.Level;
 
 
 /**
@@ -238,7 +239,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getPropertyName();
-        logger.finest(building.getId() + " change " + property
+        if (logger.isLoggable(Level.FINEST)) logger.finest(building.getId() + " change " + property
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();

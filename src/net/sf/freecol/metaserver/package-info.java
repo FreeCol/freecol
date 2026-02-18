@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Meta server</h1>
+ * <h2>FreeCol Meta server</h2>
  *
  * <p>This package contains an implementation of a meta server.</p>
  *

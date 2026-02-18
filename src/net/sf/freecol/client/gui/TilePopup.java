@@ -130,7 +130,7 @@ public final class TilePopup extends JPopupMenu {
                     }
 
                     // Add state changes if present
-                    JMenuItem ji = null;
+                    JMenuItem ji;
                     if (activeUnit.checkSetState(UnitState.ACTIVE)) {
                         ji = Utility.localizedMenuItem("activateUnit");
                         ji.addActionListener((ActionEvent ae) -> {

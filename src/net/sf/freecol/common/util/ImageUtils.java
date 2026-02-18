@@ -319,7 +319,7 @@ public class ImageUtils {
     public static BufferedImage fadeImage(Image img, float fade, float target) {
         int w = img.getWidth(null);
         int h = img.getHeight(null);
-        final BufferedImage bi = createBufferedImage(w, h);;
+        final BufferedImage bi = createBufferedImage(w, h);
         final Graphics2D g = bi.createGraphics();
         g.drawImage(img, 0, 0, null);
 

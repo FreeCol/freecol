@@ -103,7 +103,7 @@ public final class CanvasMapEditorMouseListener extends FreeColClientHolder
             //} else { Disabled:  TODO, is this necessary?
                 //canvas.requestFocus();
             }
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException | IllegalStateException ex) {
             logger.log(Level.WARNING, "Error in mouseClicked!", ex);
         }
     }
@@ -136,7 +136,7 @@ public final class CanvasMapEditorMouseListener extends FreeColClientHolder
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException | IllegalStateException ex) {
             logger.log(Level.WARNING, "Error in mousePressed!", ex);
         }
     }
@@ -165,7 +165,10 @@ public final class CanvasMapEditorMouseListener extends FreeColClientHolder
         }
 
         // find the area to transform
-        int min_x, max_x, min_y, max_y;
+        int min_x;
+        int max_x;
+        int min_y;
+        int max_y;
         if (start.getX() < end.getX()) {
             min_x = start.getX();
             max_x = end.getX();
@@ -182,7 +185,7 @@ public final class CanvasMapEditorMouseListener extends FreeColClientHolder
         }
 
         // apply transformation to all tiles in the area
-        Tile t = null;
+        Tile t;
         for (int x = min_x; x <= max_x; x++) {
             for (int y = min_y; y <= max_y; y++) {
                 t = getMap().getTile(x, y);
