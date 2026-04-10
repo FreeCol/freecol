@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -308,7 +308,6 @@ public class Introspector {
      * @return The class found, or null if none available.
      */
     public static Class<?> getClassByName(String name) {
-        Class<?> messageClass;
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException ex) {
@@ -324,7 +323,7 @@ public class Introspector {
      * @param types The types of the constructor arguments.
      * @return The constructor found, or null on error.
      */
-    public static <T> Constructor<T> getConstructor(Class<T> cl, Class[] types) {
+    public static <T> Constructor<T> getConstructor(Class<T> cl, Class<?>[] types) {
         Constructor<T> constructor;
         try {
             constructor = cl.getDeclaredConstructor(types);
@@ -366,8 +365,7 @@ public class Introspector {
      * @return The new object instance.
      * @exception IntrospectorException wraps all exceptional conditions.
      */
-    public static Object instantiate(String tag, Class[] types,
-                                     Object[] params)
+    public static Object instantiate(String tag, Class<?>[] types, Object[] params)
         throws IntrospectorException {
         Class<?> messageClass;
         try {
@@ -389,8 +387,7 @@ public class Introspector {
      * @return The new instance.
      * @exception IntrospectorException wraps all exceptional conditions.
      */
-    public static <T> T instantiate(Class<T> messageClass, Class[] types,
-                                    Object[] params)
+    public static <T> T instantiate(Class<T> messageClass, Class<?>[] types, Object[] params)
         throws IntrospectorException {
         final String tag = messageClass.getName();
         Constructor<T> constructor;

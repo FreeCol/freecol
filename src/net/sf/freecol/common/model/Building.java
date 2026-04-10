@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -49,8 +49,6 @@ public class Building extends WorkLocation
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
-
-    private final static double EPSILON = 0.0001;
 
     public static final String TAG = "building";
     

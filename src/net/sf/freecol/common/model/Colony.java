@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -1235,9 +1235,7 @@ public class Colony extends Settlement implements TradeLocation {
      * @param amount The number of liberty to add.
      */
     public void addLiberty(int amount) {
-        List<GoodsType> libertyTypeList = getSpecification()
-                .getLibertyGoodsTypeList();
-        final int uc = getUnitCount();
+        List<GoodsType> libertyTypeList = getSpecification().getLibertyGoodsTypeList();
         if (amount > 0 && !libertyTypeList.isEmpty()) {
             addGoods(libertyTypeList.get(0), amount);
         }
@@ -2130,7 +2128,7 @@ public class Colony extends Settlement implements TradeLocation {
      * @return an {@code int} value
      */
     public int getAdjustedNetProductionOf(final GoodsType goodsType) {
-        final ToIntFunction<BuildQueue> consumes = q -> {
+        final ToIntFunction<BuildQueue<?>> consumes = q -> {
             ProductionInfo pi = productionCache.getProductionInfo(q);
             return (pi == null) ? 0
                     : AbstractGoods.getCount(goodsType, pi.getConsumption());
@@ -2933,8 +2931,15 @@ public class Colony extends Settlement implements TradeLocation {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
         final int present = returnPresent(goodsType, turns);
-        final ExportData ed = getExportData(goodsType);
-        int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
+        final int capacity;
+        if (getSpecification().getBoolean(GameOptions.ENHANCED_TRADE_ROUTES)) {
+            final ExportData ed = getExportData(goodsType);
+            capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
+        } else if (goodsType.limitIgnored()) {
+            return Integer.MAX_VALUE;
+        } else {
+            capacity = getWarehouseCapacity();
+        }
         return Math.max(0, capacity - present);
     }
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,22 +19,21 @@
 
 package net.sf.freecol.client.gui.action;
 
+import static net.sf.freecol.common.util.StringUtils.getEnumKey;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
-import static net.sf.freecol.common.util.StringUtils.*;
-
 
 /**
  * Display text over tiles.
  */
-public final class DisplayTileTextAction extends SelectableAction {
+public final class DisplayTileTextAction extends SelectableOptionAction {
 
     public static final String id = "displayTileTextAction.";
 
@@ -96,10 +95,7 @@ public final class DisplayTileTextAction extends SelectableAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (((JRadioButtonMenuItem)ae.getSource()).isSelected()) {
-            freeColClient.getClientOptions()
-                .setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
-            getGUI().refresh();
-        }
+        freeColClient.getClientOptions().setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
+        getGUI().refresh();
     }
 }

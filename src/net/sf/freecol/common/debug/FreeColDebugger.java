@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -113,6 +113,16 @@ public class FreeColDebugger {
      */
     public static boolean isInDebugMode() {
         return FreeColDebugger.debugMode != 0;
+    }
+    
+    /**
+     * Checks if automatic changing of the scaleFactor on window resize
+     * has been enabled.
+     * 
+     * @return {@code true} if any debug mode is enabled.
+     */
+    public static boolean isAutomaticRescalingOnWindowResize() {
+        return FreeColDebugger.debugMode != 0;    
     }
 
     /**

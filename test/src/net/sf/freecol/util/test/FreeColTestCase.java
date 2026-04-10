@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -303,8 +303,8 @@ public class FreeColTestCase extends TestCase {
      *
      * @return The {@code Colony} as specified.
      */
-    public Colony getStandardColony() {
-        return getStandardColony(1, 5, 8);
+    public Colony createStandardColony() {
+        return createStandardColony(1, 5, 8);
     }
 
     /**
@@ -314,8 +314,8 @@ public class FreeColTestCase extends TestCase {
      *     colony.  Must be >= 1.
      * @return The {@code Colony} as specified.
      */
-    public Colony getStandardColony(int numberOfSettlers) {
-        return getStandardColony(numberOfSettlers, 5, 8);
+    public Colony createStandardColony(int numberOfSettlers) {
+        return createStandardColony(numberOfSettlers, 5, 8);
     }
 
     /**
@@ -328,7 +328,7 @@ public class FreeColTestCase extends TestCase {
      * @param tileY Coordinate of tile for the colony.
      * @return The {@code Colony} as specified.
      */
-    public Colony getStandardColony(int numberOfSettlers,
+    public Colony createStandardColony(int numberOfSettlers,
                                     int tileX, int tileY) {
         Game game = getGame();
         Map map = game.getMap();
@@ -603,11 +603,7 @@ public class FreeColTestCase extends TestCase {
 
             // Add braves
             for (int i = 0; i < initialBravesInCamp; i++) {
-                Unit brave = new ServerUnit(game, camp, indianPlayer,
-                                            indianBraveType);
-                if (brave == null) {
-                    throw new RuntimeException("Null brave");
-                }
+                Unit brave = new ServerUnit(game, camp, indianPlayer, indianBraveType);
                 camp.addOwnedUnit(brave);
             }
             camp.placeSettlement(true);

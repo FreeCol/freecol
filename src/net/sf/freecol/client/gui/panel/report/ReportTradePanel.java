@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -168,7 +168,7 @@ public final class ReportTradePanel extends ReportPanel {
                 goodsLabel.setBorder((first) ? Utility.getTopCellBorder()
                     : Utility.getCellBorder());
                 goodsLabel.setForeground(ImageLibrary.getGoodsColor(goodsType, amount,
-                                                             colony));
+                                                             colony, false));
                 ExportData ed = colony.getExportData(goodsType);
                 if (ed.getExported()) {
                     goodsLabel.setToolTipText(Messages.message(StringTemplate
@@ -181,7 +181,7 @@ public final class ReportTradePanel extends ReportPanel {
                 int production = colony.getNetProductionOf(goodsType);
                 JLabel productionLabel = createNumberLabel(production, true);
                 productionLabel.setForeground(ImageLibrary.getGoodsColor(goodsType,
-                        production, colony));
+                        production, colony, false));
                 Collection<StringTemplate> warnings
                     = colony.getProductionWarnings(goodsType);
                 if (!warnings.isEmpty()) {

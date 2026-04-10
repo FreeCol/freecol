@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -63,7 +63,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
      * {@inheritDoc}
      */
     @Override
-    public JComboBox getComponent() {
+    public JComboBox<Language> getComponent() {
         return box;
     }
 
@@ -72,7 +72,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
      */
     @Override
     public void updateOption() {
-        getOption().setValue((Language)box.getSelectedItem());
+        getOption().setValue((Language) box.getSelectedItem());
     }
 
     /**

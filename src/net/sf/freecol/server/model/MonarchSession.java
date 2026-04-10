@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,7 +20,6 @@
 package net.sf.freecol.server.model;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Goods;
@@ -32,8 +31,6 @@ import net.sf.freecol.common.networking.ChangeSet;
  * A type of session to handle monarch actions that require response.
  */
 public class MonarchSession extends Session {
-
-    private static final Logger logger = Logger.getLogger(MonarchSession.class.getName());
 
     /** The player whose monarch is active. */
     private final ServerPlayer serverPlayer;

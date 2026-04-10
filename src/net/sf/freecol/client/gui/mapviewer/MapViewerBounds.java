@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -305,6 +305,19 @@ public final class MapViewerBounds {
         }
         return new Point(p.x + tileBounds.getWidth(), p.y);
     }
+    
+    /**
+     * Gets the center position of the given {@code Tile} on the visible map.
+     *
+     * @param tile The {@code Tile} to check.
+     * @return The centerposition of the given {@code Tile}.
+     */
+    public Point calculateCenterTilePosition(Tile tile) {
+        if (!isTileVisible(tile)) return null;
+
+        final Point p = tileToPoint(tile);
+        return new Point(p.x + tileBounds.getHalfWidth(), p.y + tileBounds.getHalfHeight());
+    }
 
     /**
      * Sets the focus tile.
@@ -452,7 +465,7 @@ public final class MapViewerBounds {
      */
     public Rectangle calculateDrawnTileBounds(Tile tile) {
         if (!isTileVisible(tile)) {
-            return new Rectangle(0, 0, 0, 0);
+            return new Rectangle(0, 0, -1, -1);
         }
             
         final Point p = tileToPoint(tile);

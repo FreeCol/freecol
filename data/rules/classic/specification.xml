@@ -3042,6 +3042,47 @@
         <scope method-name="isIndian" method-value="true"/>
       </modifier>
     </european-nation-type>
+    <european-nation-type id="model.nationType.naval"
+                          extends="model.nationType.default">
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="3">
+        <scope ability-id="model.ability.navalUnit"/>
+      </modifier>
+      <unit id="ship" type="model.unit.merchantman"/>
+    </european-nation-type>
+    <european-nation-type id="model.nationType.building"
+                          extends="model.nationType.default">
+      <unit id="pioneer" type="model.unit.masterCarpenter"
+            role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.expertLumberJack"
+            role="model.role.soldier"/>
+      <modifier id="model.goods.lumber" index="80"
+                type="additive" value="2"/>
+      <modifier id="model.goods.hammers" index="80"
+                type="additive" value="2">
+        <scope ability-id="model.ability.person" />
+      </modifier>
+    </european-nation-type>
+    <european-nation-type id="model.nationType.agriculture"
+                          extends="model.nationType.default">
+      <unit id="pioneer" type="model.unit.expertFarmer"
+            role="model.role.pioneer"/>
+      <modifier id="model.goods.grain" index="80"
+                type="additive" value="2"/>
+    </european-nation-type>
+    <european-nation-type id="model.nationType.furTrapping"
+                          extends="model.nationType.default">
+      <unit id="pioneer" type="model.unit.expertFurTrapper"
+            role="model.role.pioneer"/>
+      <unit id="soldier" type="model.unit.masterFurTrader"
+            role="model.role.soldier"/>
+      <modifier id="model.goods.furs" index="80"
+                type="additive" value="2"/>
+      <modifier id="model.goods.coats" index="80"
+                type="additive" value="2">
+        <scope ability-id="model.ability.person" />
+      </modifier>
+    </european-nation-type>
   </european-nation-types>
 
   <indian-nation-types>
@@ -3143,7 +3184,7 @@
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
-      <region id="model.region.west" />
+      <region id="model.region.center" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" extends="camp"
                         number-of-settlements="average" aggression="average">
@@ -3154,16 +3195,17 @@
       <region id="model.region.northWest" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" extends="camp"
-                        number-of-settlements="low" aggression="high">
+                        number-of-settlements="high" aggression="low">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.seasonedScout" probability="10"/>
       <skill id="model.unit.masterCottonPlanter" probability="10"/>
       <skill id="model.unit.expertFurTrapper" probability="3"/>
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <region id="model.region.southEast" />
+      <region id="model.region.south" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" extends="village"
-                        number-of-settlements="low" aggression="low">
+                        number-of-settlements="low" aggression="high">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
@@ -3178,7 +3220,7 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFarmer" probability="3"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
-      <region id="model.region.northEast" />
+      <region id="model.region.north" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" extends="village"
                         number-of-settlements="average" aggression="average">
@@ -3190,10 +3232,10 @@
       <skill id="model.unit.expertFisherman" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
       <skill id="model.unit.masterFurTrader" probability="3"/>
-      <region id="model.region.north" />
+      <region id="model.region.northEast" />
     </indian-nation-type>
     <indian-nation-type id="city" abstract="true" extends="default"
-                        number-of-settlements="high">
+                        number-of-settlements="low">
       <skill id="model.unit.expertSilverMiner" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
@@ -3203,7 +3245,6 @@
                         aggression="low">
       <skill id="model.unit.expertOreMiner" probability="10"/>
       <region id="model.region.southWest" />
-      <region id="model.region.south" />
       <settlement id="model.settlement.inca" capital="false"
                   claimable-radius="2" extra-claimable-radius="2"
                   minimum-size="8" maximum-size="12"
@@ -3247,8 +3288,7 @@
                         aggression="high">
       <skill id="model.unit.masterSugarPlanter" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
-      <region id="model.region.center" />
-      <region id="model.region.east" />
+      <region id="model.region.west" />
       <settlement id="model.settlement.aztec" capital="false"
                   claimable-radius="2" extra-claimable-radius="2"
                   minimum-size="8" maximum-size="12"
@@ -3322,13 +3362,35 @@
             nation-type="model.nationType.apache"/>
     <nation id="model.nation.tupi" color="0x045c04"
             nation-type="model.nationType.tupi"/>
-    <nation id="model.nation.dutchREF" color="0xcc5500"
+    <nation id="model.nation.dutchREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.frenchREF" color="0x6050dc"
+    <nation id="model.nation.frenchREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.englishREF" color="0xde3163"
+    <nation id="model.nation.englishREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.spanishREF" color="0xffdf00"
+    <nation id="model.nation.spanishREF" color="0xffffff"
+            nation-type="model.nationType.ref"/>
+            
+    <nation id="model.nation.portuguese" color="0x00ff00"
+            nation-type="model.nationType.naval" selectable="true"
+            preferred-latitude="-16" ref="model.nation.portugueseREF"/>
+    <nation id="model.nation.swedish" color="0x00bfff"
+            nation-type="model.nationType.building" selectable="true"
+            preferred-latitude="-39" ref="model.nation.swedishREF"/>
+    <nation id="model.nation.danish" color="0xff00bf"
+            nation-type="model.nationType.agriculture" selectable="true"
+            preferred-latitude="-64" ref="model.nation.danishREF"/>
+    <nation id="model.nation.russian" color="0xaaaaaa"
+            nation-type="model.nationType.furTrapping" selectable="true"
+            preferred-latitude="-55" starts-on-east-coast="false"
+            ref="model.nation.russianREF"/>
+    <nation id="model.nation.portugueseREF" color="0xffffff"
+            nation-type="model.nationType.ref"/>
+    <nation id="model.nation.swedishREF" color="0xffffff"
+            nation-type="model.nationType.ref"/>
+    <nation id="model.nation.danishREF" color="0xffffff"
+            nation-type="model.nationType.ref"/>
+    <nation id="model.nation.russianREF" color="0xffffff"
             nation-type="model.nationType.ref"/>
   </nations>
 
@@ -4625,6 +4687,10 @@
              sail in? -->
         <booleanOption id="model.option.teleportREF"
                        defaultValue="true"/>
+                       
+        <!-- Use map defined starting positions (if available). -->
+        <booleanOption id="model.option.mapDefinedStartingPositions" defaultValue="true" />
+        
         <!-- Types of starting positions -->
         <selectOption id="model.option.startingPositions"
                       defaultValue="0" localizedLabels="true">
@@ -4675,7 +4741,7 @@
         <!-- Whether experts have connections, producing without raw
              materials in factories -->
         <booleanOption id="model.option.expertsHaveConnections"
-                       defaultValue="true"/>
+                       defaultValue="false"/>
         <!-- Can colonies be founded during the war of independence? -->
         <booleanOption id="model.option.foundColonyDuringRebellion"
                        defaultValue="false"/>

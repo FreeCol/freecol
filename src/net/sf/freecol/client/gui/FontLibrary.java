@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -90,17 +90,6 @@ public class FontLibrary {
     
     public static float getMainFontSize() {
         return mainFontSize;
-    }
-
-    /**
-     * Convert a font size and scale factor to float.
-     *
-     * @param fontSize The font size expressed as a {@code Size}.
-     * @param scaleFactor A secondary scaling.
-     * @return The conversion result.
-     */
-    private static float getScaledSize(Size fontSize, float scaleFactor) {
-        return fontSize.forFont() * scaleFactor;
     }
     
     /**

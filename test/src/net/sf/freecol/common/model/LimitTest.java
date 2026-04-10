@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -50,7 +50,7 @@ public class LimitTest extends FreeColTestCase {
         game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
         Building armory = new ServerBuilding(getGame(), colony, spec().getBuildingType("model.building.armory"));
         colony.addBuilding(armory);
 
@@ -80,7 +80,7 @@ public class LimitTest extends FreeColTestCase {
         game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
 
         Event event = spec().getEvent("model.event.declareIndependence");
         assertNotNull(event);
@@ -161,7 +161,7 @@ public class LimitTest extends FreeColTestCase {
         game.changeMap(map);
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
 
         Event event = spec().getEvent("model.event.spanishSuccession");
         assertNotNull(event);

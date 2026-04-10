@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,7 +42,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -64,7 +63,7 @@ import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.Animations;
 // Special dialogs and panels
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;
-import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.DeprecatedFreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.client.gui.mapviewer.GUIMessage;
 import net.sf.freecol.client.gui.mapviewer.MapAsyncPainter;
@@ -77,6 +76,8 @@ import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.InformationPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MapEditorToolboxPanel;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.PurchasePanel;
 import net.sf.freecol.client.gui.panel.RecruitPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
@@ -90,6 +91,7 @@ import net.sf.freecol.client.gui.plaf.FreeColToolTipUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.MemoryManager;
 import net.sf.freecol.common.debug.DebugUtils;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.metaserver.ServerInfo;
@@ -141,6 +143,12 @@ public class SwingGUI extends GUI {
         CENTERED,
         CENTERED_LEFT,
         CENTERED_RIGHT,
+        LOWER_LEFT,
+        LOWER_RIGHT,
+        UPPER_LEFT,
+        UPPER_RIGHT,
+        LEFT,
+        RIGHT,
         
         /**
          * Places centered even this means overlapping components.
@@ -559,7 +567,10 @@ public class SwingGUI extends GUI {
      */
     private void updateUnitPath() {
         final Unit active = getActiveUnit();
-        if (active == null) return;
+        if (active == null) {
+            setUnitPath(null);
+            return;
+        }
 
         Location destination = active.getDestination();
         PathNode path = null;
@@ -760,6 +771,7 @@ public class SwingGUI extends GUI {
     @Override
     public void changeWindowedMode() {
         this.canvas.toggleFrame();
+        refreshGuiUsingClientOptions();
     }
 
     /** 
@@ -780,6 +792,7 @@ public class SwingGUI extends GUI {
             throw new FreeColException("Unable to create main font: "
                 + fontName);
         }
+        FreeColLookAndFeel.setScaleFactor(fixedImageLibrary.getScaleFactor());
         FreeColLookAndFeel.installFont(font);
         Utility.initStyleContext(font);
     }
@@ -823,7 +836,7 @@ public class SwingGUI extends GUI {
         this.mapViewer.getMapViewerBounds().setFocus(tile);
 
         enableMapControls(false);
-        enableMapControls(getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        enableMapControls(getGame() != null && getGame().getMap() != null && getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
 
         refresh();
     }
@@ -871,6 +884,8 @@ public class SwingGUI extends GUI {
                                  desiredWindowSize, this.mapViewer,
                                  this.mapControls);
         this.widgets = new Widgets(fcc, this.canvas);
+        
+        refreshGuiUsingClientOptions();
 
         // Now that there is a canvas, prepare for language changes.
         opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)
@@ -908,7 +923,52 @@ public class SwingGUI extends GUI {
         resetMapZoom(); // Reset zoom to the default
         mapViewer.getMapViewerState().setActiveUnit(null);
         this.canvas.startMapEditorGUI();
-        this.canvas.showMapEditorTransformPanel();
+        enableEditorToolboxPanel(getGame() != null && getGame().getMap() != null);
+        enableEditorTransformPanel(getGame() != null && getGame().getMap() != null);
+        enableMapControls(getGame() != null && getGame().getMap() != null && getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        updateMenuBar();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void enableEditorToolboxPanel(boolean shouldDisplayPanel) {
+        final MapEditorToolboxPanel panel = this.canvas.getExistingFreeColPanel(MapEditorToolboxPanel.class);
+        if (shouldDisplayPanel && panel == null) {
+            this.canvas.showMapEditorToolboxPanel();
+        } else if (!shouldDisplayPanel && panel != null) {
+            this.canvas.removeFromCanvas(panel);
+        } // else: ignore.
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isShowingMapEditorToolboxPanel() {
+        return this.canvas.isAddedAsPanelFrameOrIcon(MapEditorToolboxPanel.class);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void enableEditorTransformPanel(boolean shouldDisplayPanel) {
+        final MapEditorTransformPanel panel = this.canvas.getExistingFreeColPanel(MapEditorTransformPanel.class);
+        if (shouldDisplayPanel && panel == null) {
+            this.canvas.showMapEditorTransformPanel();
+        } else if (!shouldDisplayPanel && panel != null) {
+            this.canvas.removeFromCanvas(panel);
+        } // else: ignore.
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isShowingMapEditorTransformPanel() {
+        return this.canvas.isAddedAsPanelFrameOrIcon(MapEditorTransformPanel.class);
     }
 
 
@@ -925,7 +985,6 @@ public class SwingGUI extends GUI {
                                          attacker, defender,
                                          attackerTile, defenderTile,
                                          success, getMapScale()));
-        refreshTilesForUnit(attacker, attackerTile, defenderTile);
     }
     
     /**
@@ -935,54 +994,26 @@ public class SwingGUI extends GUI {
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         animations(Animations.unitMove(getFreeColClient(),
                 unit, srcTile, dstTile, getMapScale()));
-        refreshTilesForUnit(unit, srcTile, dstTile);
     }
     
-    /**
-     * Refreshes and repaints the unit and tiles.
-     * 
-     * @param unit The {@code Unit} that may have moved, and which we should
-     *      use the line-of-sight for invalidating tiles.
-     * @param srcTile The source for the unit.
-     * @param dstTile The destination tile for the unit.
-     */
-    private void refreshTilesForUnit(Unit unit, Tile srcTile, Tile dstTile) {
-        if (unit != null && srcTile != null) {
-            final List<Tile> possibleDirtyTiles = srcTile.getSurroundingTiles(0, unit.getLineOfSight());
-            mapViewer.getMapViewerRepaintManager().markAsDirty(possibleDirtyTiles);
-        }
-        if (unit != null && dstTile != null) {
-            final List<Tile> possibleDirtyTiles = dstTile.getSurroundingTiles(0, unit.getLineOfSight());
-            mapViewer.getMapViewerRepaintManager().markAsDirty(possibleDirtyTiles);
-        }
-        
-        if (this.mapControls != null) {
-            this.mapControls.updateMinimap();
-        }
-        
-        repaint();
-    }
-
-
     // Dialog primitives
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
-                           String okKey, String cancelKey) {
-        return this.widgets.confirm(tmpl, icon, okKey, cancelKey,
-                                    getPopupPosition(tile));
+    public boolean modalConfirmDialog(Tile tile, StringTemplate tmpl, ImageIcon icon,
+                           String okKey, String cancelKey, boolean defaultOk) {
+        return this.widgets.modalConfirmDialog(tmpl, icon, okKey, cancelKey,getPopupPosition(tile), defaultOk);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
+    protected <T> T modalChoiceDialog(Tile tile, StringTemplate tmpl, ImageIcon icon,
                               String cancelKey, List<ChoiceItem<T>> choices) {
-        return this.widgets.getChoice(tmpl, icon, cancelKey, choices,
+        return this.widgets.modalChoiceDialog(tmpl, icon, cancelKey, choices,
                                       getPopupPosition(tile));
     }
 
@@ -990,9 +1021,9 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
+    public String modalInputDialog(Tile tile, StringTemplate tmpl, String defaultValue,
                            String okKey, String cancelKey) {
-        return this.widgets.getInput(tmpl, defaultValue, okKey, cancelKey,
+        return this.widgets.modalInputDialog(tmpl, defaultValue, okKey, cancelKey,
                                      getPopupPosition(tile));
     }
 
@@ -1221,8 +1252,8 @@ public class SwingGUI extends GUI {
                 updateGotoTile(tile);
                 traverseGotoPath();
             }
-            updateUnitPath();
         }
+        updateUnitPath();
         repaint();
     }
 
@@ -1240,7 +1271,11 @@ public class SwingGUI extends GUI {
     @Override
     public void traverseGotoPath() {
         final Unit unit = getActiveUnit();
-        if (unit == null || !isGotoStarted()) return;
+        if (unit == null || !isGotoStarted()) {
+            return;
+        }
+        
+        setUnitPath(null);
 
         final PathNode path = stopGoto();
         if (path == null) {
@@ -1249,8 +1284,7 @@ public class SwingGUI extends GUI {
             igc().goToTile(unit, path);
             refresh();
         }
-        // Only update the path if the unit is still active
-        if (unit == getActiveUnit()) updateUnitPath();
+        updateUnitPath();
         repaint();
     }
 
@@ -1285,6 +1319,7 @@ public class SwingGUI extends GUI {
         }
         
         this.mapViewer.getMapViewerState().setActiveUnit(dragUnit);
+        updateMapControls();
         
         setDragPoint(x, y);
         this.canvas.requestFocus();
@@ -1687,7 +1722,9 @@ public class SwingGUI extends GUI {
             setFocus((Tile)fco);
         } else if (fco instanceof Unit) {
             Location loc = ((Unit)fco).up();
-            if (loc instanceof Colony) {
+            if (loc.getRank() == Location.LOCATION_RANK_HIGHSEAS) {
+                // do nothing. Unit at LOCATION_RANK_HIGHSEAS can't be displayed
+            }else if (loc instanceof Colony) {
                 showColonyPanel((Colony)loc, (Unit)fco);
             } else {
                 displayObject((FreeColObject)loc);
@@ -1714,8 +1751,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean isClientOptionsDialogShowing() {
-        return this.canvas.getExistingFreeColDialog(ClientOptionsDialog.class) != null;
+    public boolean isDialogShowing() {
+        return this.canvas.getDisplayedModalDialogs() > 0 || this.canvas.getExistingFreeColDialog(ClientOptionsDialog.class) != null;
     }
 
     /**
@@ -1773,7 +1810,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void removeDialog(FreeColDialog<?> fcd) {
+    public void removeDialog(DeprecatedFreeColDialog<?> fcd) {
         this.canvas.dialogRemove(fcd);
     }
 
@@ -1933,6 +1970,7 @@ public class SwingGUI extends GUI {
         FontLibrary.setMainFontSize(fontSize);
         
         final Font font = FontLibrary.getMainFont();
+        FreeColLookAndFeel.setScaleFactor(scaleFactor);
         FreeColLookAndFeel.installFont(font);
         FreeColToolTipUI.setFontScaling(FontLibrary.getFontScaling());
         Utility.initStyleContext(font);
@@ -1948,6 +1986,8 @@ public class SwingGUI extends GUI {
             this.canvas.resetMenuBar();
             resetMapControls();
         }
+        
+        canvas.refreshAllFrames();
         
         refresh();
     }
@@ -1973,23 +2013,29 @@ public class SwingGUI extends GUI {
         }
         
         final int displayScaling = getClientOptions().getInteger(ClientOptions.DISPLAY_SCALING);
-        if (displayScaling == 0) {
-            int fontSize = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
-            
-            final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
-            if (screenHeight < 900) {
-                fontSize = Math.min(14, fontSize);
-            } else if (screenHeight < 1050) {
-                fontSize = Math.min(18, fontSize);
-            }
-                    
-            logger.info("Automatic font size: " + fontSize + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");        
-            return fontSize;
+        final float scaleFactor = determineScaleFactorUsingClientOptions(dpi);
+        final int fontSizeUsingScaling = (int) (FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * scaleFactor);
+        
+        if (displayScaling != 0) {
+            logger.info("Font size based on manual display scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ")");
+            return fontSizeUsingScaling;
         }
         
-        final int fontSize = (int) (FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * (displayScaling / 100f));
-        logger.info("Font size based on manual display scaling: " + fontSize + " (reported DPI: " + dpi + ")");        
-        return fontSize;
+        int fontSizeUsingDpi = (int) ((FontLibrary.DEFAULT_UNSCALED_MAIN_FONT_SIZE * dpi) / DEFAULT_DPI);
+        final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
+        if (screenHeight < 900) {
+            fontSizeUsingDpi = Math.min(14, fontSizeUsingDpi);
+        } else if (screenHeight < 1050) {
+            fontSizeUsingDpi = Math.min(18, fontSizeUsingDpi);
+        }
+        
+        if (fontSizeUsingDpi >= fontSizeUsingScaling * 0.25f) {
+            logger.info("Using font size from scaling: " + fontSizeUsingScaling + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
+            return fontSizeUsingScaling;
+        }
+                
+        logger.info("Automatic font size: " + fontSizeUsingDpi + " (reported DPI: " + dpi + ", screen height: " + screenHeight + ")");
+        return Math.max(10, fontSizeUsingDpi);        
     }
 
     private float determineScaleFactorUsingClientOptions(final int dpi) {
@@ -2009,8 +2055,15 @@ public class SwingGUI extends GUI {
                 scaleFactor = 2F;
             }
             
-            final int screenHeight = graphicsDevice.getDisplayMode().getHeight();
-            if (screenHeight < 900) {
+            final int screenHeight;
+            if (FreeColDebugger.isAutomaticRescalingOnWindowResize()) {
+                screenHeight = (canvas != null && canvas.getParentFrame() != null) ? canvas.getParentFrame().getHeight() : graphicsDevice.getDisplayMode().getHeight();
+            } else {
+                screenHeight = graphicsDevice.getDisplayMode().getHeight();
+            }
+            if (screenHeight < 720) {
+                scaleFactor = 0.75F;
+            } else if (screenHeight < 900) {
                 scaleFactor = 1F;
             } else if (screenHeight < 1050) {
                 scaleFactor = Math.min(1.25F, scaleFactor);
@@ -2053,6 +2106,18 @@ public class SwingGUI extends GUI {
         }
         if (unit != null) panel.setSelectedUnit(unit);
         return panel;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void showFreeColPanel(FreeColPanel panel, boolean toolBox, PopupPosition popupPosition, boolean resizable) {
+        if (canvas.isAddedAsPanelFrameOrIcon(panel)) {
+            panel.requestFocus();
+        } else {
+            canvas.showFreeColPanel(panel, toolBox, popupPosition, resizable);
+        }
     }
 
     /**
@@ -2100,7 +2165,17 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showDeclarationPanel(Runnable afterClosing) {
-        this.widgets.showDeclarationPanel(afterClosing);
+        mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(true);
+        try {
+            this.widgets.showDeclarationPanel(() -> {
+                mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
+                refresh();
+                afterClosing.run();
+            });
+        } catch (RuntimeException e) {
+            mapViewer.getMapViewerRepaintManager().setRepaintsBlocked(false);
+            throw e;
+        }
     }
 
     /**
@@ -2128,7 +2203,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean showEditOptionDialog(Option option) {
+    public boolean showEditOptionDialog(Option<?> option) {
         return this.widgets.showEditOptionDialog(option);
     }
 
@@ -2154,9 +2229,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showEndTurnDialog(final List<Unit> units,
-                                  DialogHandler<Boolean> handler) {
-        this.widgets.showEndTurnDialog(units, handler);
+    public void showEndTurnDialog(final List<Unit> units) {
+        this.widgets.showEndTurnDialog(units);
     }
 
     /**
@@ -2398,17 +2472,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
-                                                 FreeColGameObject other,
-                                                 DiplomaticTrade agreement,
-                                                 StringTemplate comment) {
+    public void showNegotiationDialog(FreeColGameObject our, FreeColGameObject other, DiplomaticTrade agreement,
+            StringTemplate comment, DialogHandler<DiplomaticTrade> handler) {
         if ((!(our instanceof Unit) && !(our instanceof Colony))
             || (!(other instanceof Unit) && !(other instanceof Colony))
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        return this.widgets.showNegotiationDialog(our, other, agreement,
-            comment, getPopupPosition(((Location)our).getTile()));
+        this.widgets.showNegotiationDialog(our, other, agreement, comment, getPopupPosition(((Location)our).getTile()), handler);
     }
 
     /**
@@ -2793,5 +2864,20 @@ public class SwingGUI extends GUI {
     @Override
     public boolean canGameChangingModsBeAdded() {
         return getFreeColClient().getGame() == null;
+    }
+    
+    @Override
+    public void refreshScaleFactorIfNecessary() {
+        if (!FreeColDebugger.isAutomaticRescalingOnWindowResize()) {
+            return;
+        }
+        
+        final int dpi = Utils.determineDpi(graphicsDevice);
+        final float scaleFactor = determineScaleFactorUsingClientOptions(dpi);
+        if (Math.abs(getFixedImageLibrary().getScaleFactor() - scaleFactor) <= 0.1) {
+            return;
+        }
+        
+        refreshGuiUsingClientOptions();
     }
 }

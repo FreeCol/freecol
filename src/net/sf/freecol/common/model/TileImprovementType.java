@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,6 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.all;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+import static net.sf.freecol.common.util.CollectionUtils.iterable;
+import static net.sf.freecol.common.util.CollectionUtils.mapEntriesByValue;
+import static net.sf.freecol.common.util.CollectionUtils.matchKey;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +39,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -281,7 +288,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     }
 
     public int getBonus(GoodsType goodsType) {
-        Modifier result = getProductionModifier(goodsType);
+        Modifier result = getProductionModifier(goodsType, magnitude);
         if (result == null) {
             return 0;
         } else {
@@ -289,8 +296,54 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         }
     }
 
-    public Modifier getProductionModifier(GoodsType goodsType) {
-        return first(getModifiers(goodsType.getId()));
+    public Modifier getProductionModifier(GoodsType goodsType, int magnitude) {
+        final Modifier modifier = first(getModifiers(goodsType.getId()));
+        if (modifier == null || modifier.getValue() == 0 || magnitude <= 0) {
+            return modifier;
+        }
+        
+        final Modifier modifierWithMagnitudeBonus = Modifier.makeModifier(modifier);
+        modifierWithMagnitudeBonus.setValue(modifierWithMagnitudeBonus.getValue() * magnitude);
+        return modifierWithMagnitudeBonus;
+    }
+    
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType, TileType tileType, int magnitude) {
+        if (goodsType == null) {
+            return Stream.<Modifier>empty();
+        }
+        
+        final Specification spec = getSpecification();
+        
+        if (unitType == null
+                && isNatural()
+                && goodsType.isFoodType()) {
+            return Stream.<Modifier>empty();
+        }
+        
+        if (unitType == null
+                && !isNatural()
+                && !goodsType.isFoodType()
+                && spec.getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)) {
+            return Stream.<Modifier>empty();
+        }
+        
+        Modifier m = getProductionModifier(goodsType, magnitude);
+        if (m == null) {
+            return Stream.<Modifier>empty();
+        }
+        
+        if (unitType != null
+                && unitType.getExpertProduction() != null
+                && unitType.getExpertProduction().equals(goodsType)) {
+            final Stream<Modifier> expertMultiplicativeModifier = unitType.getModifiers(goodsType.getId(), tileType, null)
+                .filter(mod -> mod.getType() == Modifier.ModifierType.MULTIPLICATIVE);
+            
+            final float expertBonus = FeatureContainer.applyModifiers(m.getValue(), null, expertMultiplicativeModifier);
+            m = Modifier.makeModifier(m);
+            m.setValue(expertBonus);
+        }
+        
+        return Stream.of(m);
     }
 
     /**
@@ -525,7 +578,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private static final String DISASTER_TAG = "disaster";
     private static final String EXPENDED_AMOUNT_TAG = "expended-amount";
     private static final String EXPOSE_RESOURCE_PERCENT_TAG = "expose-resource-percent";
-    private static final String FROM_TAG = "from";
     private static final String MAGNITUDE_TAG = "magnitude";
     private static final String MOVEMENT_COST_TAG = "movement-cost";
     private static final String NATURAL_TAG = "natural";
@@ -533,7 +585,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private static final String REQUIRED_IMPROVEMENT_TAG = "required-improvement";
     private static final String REQUIRED_ROLE_TAG = "required-role";
     private static final String TILE_TYPE_CHANGE_TAG = "tile-type-change";
-    private static final String TO_TAG = "to";
     private static final String WORKER_TAG = "worker";
     private static final String ZINDEX_TAG = "zIndex";
     // @compat 0.11.0

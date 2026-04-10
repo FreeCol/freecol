@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,25 +24,24 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
@@ -110,7 +109,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         // Default to ESCAPE removing the panel
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false),
                      ESCAPE);
     }
 
@@ -269,7 +268,55 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         return getImageLibrary().getSmallUnitTypeImage(au.getType(spec),
                                                        au.getRoleId(), false);
     }
-
+    
+    /**
+     * A border to be used around the frame containing this panel.
+     * @return The border, if any, or {@code null}.
+     */
+    public Border getFrameBorder() {
+        return null;
+    }
+    
+    /**
+     * Refreshes the layout after scaling and/or font changes.
+     * 
+     * Subclasses can extend this method to handle the change.
+     */
+    public void refreshLayout() {
+        
+    }
+    
+    /**
+     * Checks if this panel should be displayed in fullscreen mode.
+     * @return {@code false} unless overriden by a subclass.
+     */
+    public boolean isFullscreen() {
+        return false;
+    }
+    
+    /**
+     * Allows subclasses to define a frame title.
+     * @return The title, if defined by a subclass.
+     */
+    public String getFrameTitle() {
+       return null; 
+    }
+    
+    /**
+     * Allows subclasses to define a default frame popup position.
+     * @return The title, if defined by a subclass.
+     */
+    public PopupPosition getFramePopupPosition() {
+        return null;
+    }
+    
+    /**
+     * Allows subclasses to execute code when the frame is closed
+     * using the "X" button (in the map editor).
+     */
+    public void onFrameClosing() {
+        
+    }
 
     // Interface ActionListener
 
@@ -288,31 +335,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
 
     // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        // removeNotify gets called when a JPanel has no parent any
-        // more, that is the best opportunity available for JPanels
-        // to be given a chance to remove leak generating references.
-
-        if (okButton == null) return; // Been here before
-
-        // We need to make sure the layout is cleared because some
-        // versions of MigLayout are leaky.
-        setLayout(null);
-
-        okButton.removeActionListener(this);
-        okButton = null;
-
-        for (MouseListener listener : getMouseListeners()) {
-            removeMouseListener(listener);
-        }
-    }
 
     /**
      * {@inheritDoc}

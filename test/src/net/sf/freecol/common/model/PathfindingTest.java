@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,11 +30,9 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class PathfindingTest extends FreeColTestCase {
 
-    private final TileType plainsType
-        = spec().getTileType("model.tile.plains");
+    private final TileType plainsType = spec().getTileType("model.tile.plains");
 
-    private final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
+    private final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 
 
 
@@ -48,16 +46,14 @@ public class PathfindingTest extends FreeColTestCase {
         GoalDecider gd;
 
         Tile colonyTile = map.getTile(9, 2);
-        Colony colony = FreeColTestUtils.getColonyBuilder().player(dutch)
-            .colonyTile(colonyTile).build();
+        FreeColTestUtils.getColonyBuilder().player(dutch).colonyTile(colonyTile).build();
         assertTrue(colonyTile.isShore());
 
         Tile unitTile = map.getTile(9, 3);
         Unit unit = new ServerUnit(game, unitTile, dutch, colonistType);
 
         Tile nativeTile = map.getTile(9, 4);
-        IndianSettlement is = new FreeColTestCase.IndianSettlementBuilder(game)
-            .settlementTile(nativeTile).build();
+        new FreeColTestCase.IndianSettlementBuilder(game).settlementTile(nativeTile).build();
         assertTrue(nativeTile.isShore());
             
         GoalDecider settlementGD = new GoalDecider() {

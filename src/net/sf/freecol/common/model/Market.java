@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,18 +19,18 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -39,9 +39,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * determined solely by its availability in that market.
  */
 public final class Market extends FreeColGameObject implements Ownable {
-
-    private static final Logger logger = Logger.getLogger(Market.class.getName());
-
+    
     public static final String TAG = "market";
 
     /**
@@ -107,18 +105,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public Market(Game game, String id) {
         super(game, id);
     }
-
-
-    /**
-     * Get the market data.
-     *
-     * @return The map of goods type to market data.
-     */
-    private Map<GoodsType, MarketData> getMarketData() {
-        synchronized (this.marketData) {
-            return this.marketData;
-        }
-    }
+    
 
     /**
      * Get the market data values.
@@ -171,18 +158,6 @@ public final class Market extends FreeColGameObject implements Ownable {
             putMarketData(goodsType, data);
         }
         return data;
-    }
-
-    /**
-     * Set the market data.
-     *
-     * @param data The new market data.
-     */
-    private void setMarketData(Map<GoodsType, MarketData> data) {
-        synchronized (this.marketData) {
-            this.marketData.clear();
-            this.marketData.putAll(data);
-        }
     }
 
     /**

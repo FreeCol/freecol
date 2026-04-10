@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -758,8 +758,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
-                             int value) {
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class<?> type, int value) {
         if (type == DefendSettlementMission.class) {
             // Reduce value in proportion to the number of active defenders.
             Settlement settlement = (Settlement)DefendSettlementMission

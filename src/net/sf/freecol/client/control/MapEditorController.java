@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,7 +25,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -40,6 +42,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
@@ -48,6 +51,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
+import net.sf.freecol.common.resources.AudioResource;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerGame;
@@ -65,11 +70,18 @@ public final class MapEditorController extends FreeColClientHolder {
     /** Map height in MapGeneratorOptionsDialog. */
     private static final int MINI_MAP_THUMBNAIL_FINAL_HEIGHT = 64;
 
+    private MapEditorTool currentTool = MapEditorTool.PAINTBRUSH;
+    
     /**
      * The transform that should be applied to a {@code Tile}
      * that is clicked on the map.
      */
     private MapTransform currentMapTransform = null;
+    
+    private Area currentArea = null;
+    
+    private boolean displayAreas = false;
+    private java.util.Map<Area, Boolean> visibleAreas = new HashMap<>();
 
 
     /**
@@ -164,6 +176,11 @@ public final class MapEditorController extends FreeColClientHolder {
             //fcc.changeClientState(true);
             //gui.changeView((Tile)null);
             gui.startMapEditorGUI();
+            final AudioResource defaultPlaylist = ResourceManager.getAudioResource("sound.music.playlist.default", true);
+            if (defaultPlaylist != null) {
+                getFreeColClient().getSoundController().setDefaultPlaylist(defaultPlaylist.getAllAudio());
+            }
+            getFreeColClient().getSoundController().playMusic(null);
             
             if (specificationChanges) {
                 gui.showInformationPanel("mapEditor.loadedWithMods");
@@ -205,6 +222,44 @@ public final class MapEditorController extends FreeColClientHolder {
     public MapTransform getMapTransform() {
         return currentMapTransform;
     }
+    
+    public MapEditorTool getCurrentTool() {
+        return currentTool;
+    }
+    
+    public void setCurrentArea(Area currentArea) {
+        this.currentArea = currentArea;
+    }
+    
+    public Area getCurrentArea() {
+        return currentArea;
+    }
+    
+    public boolean isAreaVisible(Area area) {
+        final Boolean b = visibleAreas.get(area);
+        return (b == null || b);
+    }
+    
+    public void setAreaVisible(Area area, boolean visible) {
+        visibleAreas.put(area, visible);
+    }
+    
+    /**
+     * Checks if areas should be displayed while editing.
+     * @return {@code true} if the areas should be displayed.
+     */
+    public boolean isDisplayAreas() {
+        return displayAreas;
+    }
+    
+    /**
+     * Sets if areas should be displayed while editing.
+     * @param displayAreas {@code true} if the areas should be displayed.
+     */
+    public void setDisplayAreas(boolean displayAreas) {
+        this.displayAreas = displayAreas;
+        getGUI().refresh();
+    }
 
     /**
      * Transforms the given {@code Tile} using the
@@ -227,11 +282,14 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void newMap() {
         final FreeColServer freeColServer = getFreeColServer();
-        final ServerGame serverGame = freeColServer.getGame();
 
         getGUI().removeInGameComponents();
         getGUI().showMapGeneratorOptionsDialog(true, mgo -> {
             if (mgo != null) {
+                final ServerGame serverGame = new ServerGame(getDefaultSpecification(), new Random());
+                getFreeColClient().getFreeColServer().setGame(serverGame);
+                getFreeColClient().setGame(serverGame);
+                
                 serverGame.setMapGeneratorOptions(mgo);
                 freeColServer.generateMap(false);
                 requireNativeNations(serverGame);
@@ -311,6 +369,7 @@ public final class MapEditorController extends FreeColClientHolder {
         final GUI gui = getGUI();
 
         fcc.setMapEditor(true);
+        getGUI().removeInGameComponents();
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         final File theFile = file;
@@ -322,12 +381,13 @@ public final class MapEditorController extends FreeColClientHolder {
                     Specification spec = getDefaultSpecification();
                     Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
                                                        spec, freeColServer);
+                    game.generateDefaultAreas();
                     fcc.setGame(game);
                     requireNativeNations(game);
                     SwingUtilities.invokeLater(() -> {
                             gui.closeStatusPanel();
+                            getGUI().startMapEditorGUI();
                             gui.setFocus(game.getMap().getTile(1,1));
-                            gui.updateMenuBar();
                             gui.refresh();
                         });
                 } catch (FileNotFoundException fnfe) {

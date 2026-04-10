@@ -28,6 +28,12 @@
       <xs:pattern value="aiGoods:(|am)([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
+  
+  <xs:simpleType name="AreaId">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="model\.area\.(.)+" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:simpleType name="BuildingId">
     <xs:restriction base="xs:string">

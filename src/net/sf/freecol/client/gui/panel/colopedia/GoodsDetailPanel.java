@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -92,7 +92,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             List<Modifier> modifiers = new ArrayList<>();
             for (TileImprovementType improvementType :
                      getSpecification().getTileImprovementTypeList()) {
-                Modifier productionModifier = improvementType.getProductionModifier(type);
+                Modifier productionModifier = improvementType.getProductionModifier(type, 1);
                 if (productionModifier != null) {
                     improvements.add(improvementType);
                     modifiers.add(productionModifier);

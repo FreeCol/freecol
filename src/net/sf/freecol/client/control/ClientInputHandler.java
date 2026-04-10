@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
@@ -33,10 +31,7 @@ import net.sf.freecol.common.networking.MessageHandler;
 /**
  * Message handler implementation for the client side.
  */
-public final class ClientInputHandler extends FreeColClientHolder
-    implements MessageHandler {
-
-    private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
+public final class ClientInputHandler extends FreeColClientHolder implements MessageHandler {
 
     /**
      * The constructor to use.

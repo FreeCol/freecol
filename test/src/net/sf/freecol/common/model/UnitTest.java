@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.CollectionUtils.any;
+
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -27,68 +28,36 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class UnitTest extends FreeColTestCase {
 
-    private static final BuildingType carpenterHouseType
-        = spec().getBuildingType("model.building.carpenterHouse");
-    private static final BuildingType churchType
-        = spec().getBuildingType("model.building.chapel");
+    private static final BuildingType churchType = spec().getBuildingType("model.building.chapel");
 
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType foodType
-        = spec().getPrimaryFoodType();
+    private static final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType = spec().getPrimaryFoodType();
 
-    private static final Role dragoonRole
-        = spec().getRole("model.role.dragoon");
-    private static final Role missionaryRole
-        = spec().getRole("model.role.missionary");
-    private static final Role scoutRole
-        = spec().getRole("model.role.scout");
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
+    private static final Role dragoonRole = spec().getRole("model.role.dragoon");
+    private static final Role missionaryRole = spec().getRole("model.role.missionary");
+    private static final Role scoutRole = spec().getRole("model.role.scout");
+    private static final Role soldierRole = spec().getRole("model.role.soldier");
 
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final TileType ocean = spec().getTileType("model.tile.ocean");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
 
-    private static final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private static final UnitType braveType
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType caravelType
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType colonialRegularType
-        = spec().getUnitType("model.unit.colonialRegular");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType expertFarmerType
-        = spec().getUnitType("model.unit.expertFarmer");
-    private static final UnitType frigateType
-        = spec().getUnitType("model.unit.frigate");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private static final UnitType hardyPioneerType
-        = spec().getUnitType("model.unit.hardyPioneer");
-    private static final UnitType indianConvertType
-        = spec().getUnitType("model.unit.indianConvert");
-    private static final UnitType jesuitMissionaryType
-        = spec().getUnitType("model.unit.jesuitMissionary");
-    private static final UnitType kingsRegularType
-        = spec().getUnitType("model.unit.kingsRegular");
-    private static final UnitType merchantmanType
-        = spec().getUnitType("model.unit.merchantman");
-    private static final UnitType seasonedScoutType
-        = spec().getUnitType("model.unit.seasonedScout");
-    private static final UnitType treasureTrainType
-        = spec().getUnitType("model.unit.treasureTrain");
-    private static final UnitType revengerType
-        = spec().getUnitType("model.unit.revenger");
-    private static final UnitType undeadType
-        = spec().getUnitType("model.unit.undead");
-    private static final UnitType veteranSoldierType
-        = spec().getUnitType("model.unit.veteranSoldier");
-    private static final UnitType wagonType
-        = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+    private static final UnitType braveType = spec().getUnitType("model.unit.brave");
+    private static final UnitType caravelType = spec().getUnitType("model.unit.caravel");
+    private static final UnitType colonialRegularType = spec().getUnitType("model.unit.colonialRegular");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType frigateType = spec().getUnitType("model.unit.frigate");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private static final UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType jesuitMissionaryType = spec().getUnitType("model.unit.jesuitMissionary");
+    private static final UnitType kingsRegularType = spec().getUnitType("model.unit.kingsRegular");
+    private static final UnitType merchantmanType = spec().getUnitType("model.unit.merchantman");
+    private static final UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
+    private static final UnitType revengerType = spec().getUnitType("model.unit.revenger");
+    private static final UnitType undeadType = spec().getUnitType("model.unit.undead");
+    private static final UnitType veteranSoldierType = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
 
     /**
      * Test unit for colonist status
@@ -167,7 +136,7 @@ public class UnitTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = this.getStandardColony();
+        Colony colony = this.createStandardColony();
         int foodInColony = 300;
         colony.addGoods(foodType, foodInColony);
         assertEquals("Setup error, colony does goods quantity wrong",
@@ -201,7 +170,7 @@ public class UnitTest extends FreeColTestCase {
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
 
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
         Building church = colony.getBuilding(churchType);
         church.upgrade();
         Unit jesuit = new ServerUnit(game, tile, dutch, jesuitMissionaryType);
@@ -492,7 +461,7 @@ public class UnitTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         Unit unit = colony.getUnitList().get(0);
         String initial = "/" + Integer.toString(unit.getInitialMovesLeft()/3);
 
@@ -551,10 +520,9 @@ public class UnitTest extends FreeColTestCase {
 
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(6, 8);
-        Tile tile2 = map.getTile(6, 9);
 
         Unit merchantman = new ServerUnit(game, tile1, dutch, merchantmanType);
-        Unit soldier = new ServerUnit(game, merchantman, dutch, veteranSoldierType);
+        new ServerUnit(game, merchantman, dutch, veteranSoldierType);
         Goods goods = new Goods(game, merchantman, cottonType, 44);
         merchantman.add(goods);
         

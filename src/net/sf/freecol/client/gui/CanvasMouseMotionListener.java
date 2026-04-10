@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
@@ -31,8 +30,6 @@ import net.sf.freecol.client.control.FreeColClientHolder;
  * Listens to the mouse being moved at the level of the Canvas.
  */
 public final class CanvasMouseMotionListener extends FreeColClientHolder implements MouseMotionListener {
-
-    private static final Logger logger = Logger.getLogger(CanvasMouseMotionListener.class.getName());
     
     private final Scrolling scrolling;
 

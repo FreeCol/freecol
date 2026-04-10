@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 
 /**
@@ -39,6 +40,8 @@ import java.util.StringTokenizer;
  */
 public class FAFile {
 
+    private static final Logger logger = Logger.getLogger(FAFile.class.getName());
+    
     // FIXME: Use two hashes, to be safer?
     private final HashMap<Object, Object> letters = new HashMap<>();
     private int maxHeight = 0;
@@ -55,6 +58,24 @@ public class FAFile {
         load(new CREatingInputStream(is));
     }
 
+    /**
+     * Returns the input with invalid characters removed.
+     * @param text The input text.
+     * @return The input with invalid characters removed.
+     */
+    public String onlyValidCharacters(String text) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i=0; i<text.length(); i++) {
+            final char c = text.charAt(i);
+            FALetter fl = getLetter(c);
+            if (fl == null) {
+                logger.warning("Missing character in FAF: " + c);
+                continue;
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
     
     /**
      * Gets the {@code Dimension} of the given

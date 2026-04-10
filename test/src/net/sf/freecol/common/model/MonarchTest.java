@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -57,7 +57,7 @@ public class MonarchTest extends FreeColTestCase {
             = dutch.getMonarch().getActionChoices();
         assertTrue(choices.isEmpty());
 
-        Colony colony = getStandardColony();
+        createStandardColony();
         game.setTurn(new Turn(100));
         dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
         choices = dutch.getMonarch().getActionChoices();

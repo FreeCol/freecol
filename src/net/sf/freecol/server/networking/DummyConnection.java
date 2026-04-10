@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,7 +20,6 @@
 package net.sf.freecol.server.networking;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
@@ -31,8 +30,6 @@ import net.sf.freecol.common.networking.Message;
  * A dummy connection, used for AI players.
  */
 public final class DummyConnection extends Connection {
-
-    private static final Logger logger = Logger.getLogger(DummyConnection.class.getName());
 
     /** The other connection, to which outgoing requests are forwarded .*/
     private DummyConnection otherConnection;

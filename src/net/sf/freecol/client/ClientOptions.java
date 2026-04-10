@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FullscreenDisplayModeOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -122,6 +123,12 @@ public class ClientOptions extends OptionGroup {
 
     private static final String DISPLAY_GROUP
         = "clientOptions.display";
+    
+    /**
+     * Option to control the display mode in fullscreen
+     */
+    public static final String DISPLAY_MODE_FULLSCREEN
+        = "model.option.fullscreenDisplayMode";
 
     /**
      * Option to control the display scale factor.
@@ -876,6 +883,18 @@ public class ClientOptions extends OptionGroup {
         // end @compat 0.13.0
         // @compat 1.1.0
         remove("model.option.mapControls");
+        final RangeOption op = getOption(DISPLAY_SCALING, RangeOption.class);
+        if (!op.getItemValues().containsKey(75)) {
+            op.setItemValueAtIndex(1, 75, "model.option.displayScaling.75");
+        }
+        // end @compat 1.1.0
+        // @compat 1.1.0
+        if (!hasOption(DISPLAY_MODE_FULLSCREEN, FullscreenDisplayModeOption.class)) {
+            final FullscreenDisplayModeOption dmf = new FullscreenDisplayModeOption(null);
+            dmf.setGroup(DISPLAY_GROUP);
+            dmf.setValue(null);
+            add(op);
+        }
         // end @compat 1.1.0
     }
     
@@ -959,8 +978,10 @@ public class ClientOptions extends OptionGroup {
      * @param gr The identifier for the option group to move to.
      */
     private void regroup(String id, String gr) {
-        Option op = getOption(id);
-        if (op != null) op.setGroup(gr);
+        final Option<?> op = getOption(id);
+        if (op != null) {
+            op.setGroup(gr);
+        }
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * This panel is used to handle dumping cargo.
  */
-public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
+public final class DumpCargoDialog extends DeprecatedFreeColDialog<List<Goods>> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());

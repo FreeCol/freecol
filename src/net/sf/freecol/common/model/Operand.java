@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,16 +19,17 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
+
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.model.Constants.*;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -47,8 +48,6 @@ import net.sf.freecol.common.util.Utils;
  * OperandType is NONE.
  */
 public class Operand extends Scope {
-
-    private static final Logger logger = Logger.getLogger(Operand.class.getName());
 
     public static enum OperandType {
         UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, YEAR, OPTION, NONE

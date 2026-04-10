@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -45,28 +44,15 @@ import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class ServerPlayerTest extends FreeColTestCase {	
 
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType foodType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
-    private static final GoodsType silverType
-        = spec().getGoodsType("model.goods.silver");
-
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType = spec().getPrimaryFoodType();
+    private static final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType silverType = spec().getGoodsType("model.goods.silver");
     
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType wagonTrainType
-        = spec().getUnitType("model.unit.wagonTrain");
-    private static final UnitType caravelType
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType = spec().getUnitType("model.unit.privateer");
 
 
     @Override
@@ -82,7 +68,6 @@ public class ServerPlayerTest extends FreeColTestCase {
      */
     public void testMarketRecovery() {
         ServerGame game = ServerTestHelper.startServerGame(getTestMap());
-        InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer french = getServerPlayer(game, "model.nation.french");
         ServerPlayer english = getServerPlayer(game, "model.nation.english");
@@ -95,6 +80,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // is now considered "traded".
         Random random = new Random();
         int m = english.sellInEurope(random, null, silverType, 1);
+        assertEquals(1, m);
         assertTrue(englishMarket.hasBeenTraded(silverType));
         int englishAmount = englishMarket.getAmountInMarket(silverType);
 
@@ -178,7 +164,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.addGoods(cottonType, 200);
         ServerPlayer dutch
             = getServerPlayer(game, "model.nation.dutch");
@@ -418,7 +404,7 @@ public class ServerPlayerTest extends FreeColTestCase {
      */
     public int buyUntilPriceRise(Game game, ServerPlayer player,
                                  GoodsType type) {
-        Game g = ServerTestHelper.startServerGame(getTestMap());
+        ServerTestHelper.startServerGame(getTestMap());
         Random random = new Random();
         int result = 0;
         Market market = player.getMarket();

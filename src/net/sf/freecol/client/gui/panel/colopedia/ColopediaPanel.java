@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -96,7 +96,6 @@ public final class ColopediaPanel extends FreeColPanel
             }
         };
 
-        sl.getVerticalScrollBar().setUnitIncrement(16);
         sl.getViewport().setOpaque(false);
 
         detailPanel = new MigPanel("ColopediaPanelUI");
@@ -104,7 +103,6 @@ public final class ColopediaPanel extends FreeColPanel
         JScrollPane detail = new JScrollPane(detailPanel,
                                              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        detail.getVerticalScrollBar().setUnitIncrement(16);
         detail.getViewport().setOpaque(false);
         
         select(id);
@@ -167,7 +165,7 @@ public final class ColopediaPanel extends FreeColPanel
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
 
-        Enumeration allNodes = root.depthFirstEnumeration();
+        Enumeration<?> allNodes = root.depthFirstEnumeration();
         while (allNodes.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) allNodes.nextElement();
             ColopediaTreeItem item = (ColopediaTreeItem) node.getUserObject();

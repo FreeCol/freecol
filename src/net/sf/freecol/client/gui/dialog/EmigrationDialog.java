@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,19 +19,20 @@
 
 package net.sf.freecol.client.gui.dialog;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JButton;
 import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.DialogHandler;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
@@ -41,45 +42,45 @@ import net.sf.freecol.common.model.LostCityRumour;
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
  */
-public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
+public final class EmigrationDialog extends FreeColPanel {
 
     /**
      * The constructor to use.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param frame The owner frame.
      * @param europe The {@code Europe} where we can find the
      *     units that are prepared to emigrate.
      * @param foy Is this emigration due to a fountain of youth?
      */
-    public EmigrationDialog(FreeColClient freeColClient, JFrame frame,
-            Europe europe, boolean foy) {
-        super(freeColClient, frame);
-        final List<AbstractUnit> recruitables
-            = new ArrayList<>(europe.getExpandedRecruitables(false));
-
-        JTextArea header
-            = Utility.localizedTextArea("emigrationDialog.chooseImmigrant");
+    public EmigrationDialog(FreeColClient freeColClient,  Europe europe, boolean foy, DialogHandler<Integer> handler) {
+        super(freeColClient, null, new MigLayout("wrap 1", "[fill]", ""));
+        
+        final List<AbstractUnit> recruitables = new ArrayList<>(europe.getExpandedRecruitables(false));
+        final JTextArea header = Utility.localizedTextArea("emigrationDialog.chooseImmigrant");
         if (foy) {
-            header.insert(Messages.message(LostCityRumour.RumourType.FOUNTAIN_OF_YOUTH.getDescriptionKey())
-                          + "\n\n", 0);
+            header.insert(Messages.message(LostCityRumour.RumourType.FOUNTAIN_OF_YOUTH.getDescriptionKey()) + "\n\n", 0);
         }
 
-        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[fill]", ""));
-        panel.add(header, "wrap 20");
-        panel.setSize(panel.getPreferredSize());
-
-        List<ChoiceItem<Integer>> c = choices();
+        add(header, "wrap 20");
+        
         int i = Europe.MigrationType.getDefaultSlot();
-        AbstractUnit a0 = recruitables.remove(0);
-        c.add(new ChoiceItem<>(Messages.message(a0.getSingleLabel()), i++)
-            .defaultOption()
-            .setIcon(new ImageIcon(getSmallAbstractUnitImage(a0))));
         for (AbstractUnit au : recruitables) {
-            c.add(new ChoiceItem<>(Messages.message(au.getSingleLabel()), i++)
-                .setIcon(new ImageIcon(getSmallAbstractUnitImage(au))));
+            final JButton unitChoiceButton = new JButton(Messages.message(au.getSingleLabel()), new ImageIcon(getSmallAbstractUnitImage(au)));
+            final int index = i;
+            unitChoiceButton.addActionListener(ae -> {
+                getGUI().removeComponent(EmigrationDialog.this);
+                handler.handle(index);
+            });
+            add(unitChoiceButton);
+            okButton = unitChoiceButton;
+            i++;
         }
-
-        initializeChoiceDialog(frame, false, panel, null, null, c);
+        
+        setEscapeAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Ignore.
+            }
+        });
     }
 }

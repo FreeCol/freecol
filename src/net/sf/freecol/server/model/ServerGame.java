@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -701,6 +701,7 @@ public class ServerGame extends Game implements TurnTaker {
         final Specification spec = getSpecification();
         Event succession = spec.getEvent("model.event.spanishSuccession");
         if (succession != null && !getSpanishSuccession()) {
+            @SuppressWarnings("unused")
             ServerPlayer loser = csSpanishSuccession(cs, lb, succession);
             // TODO: send update to loser.  It will not see anything
             // because it is no longer a live player.

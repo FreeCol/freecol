@@ -917,6 +917,14 @@ div.warningbox {
     color: #9F6000;
 }
 
+div.infobox {
+    border: #9F6000 1px solid;
+    margin: .5em 0;
+    padding: .5em;
+    background-color: #EEEEFF;
+    color: #000044;
+}
+
 tr.trLine .leftcell {
     padding: 0 .25em;
     vertical-align: top;

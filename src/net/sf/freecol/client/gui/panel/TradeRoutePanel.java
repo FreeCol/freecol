@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -101,7 +101,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             });
         this.tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
                 @Override
-                public Component getListCellRendererComponent(JList list,
+                public Component getListCellRendererComponent(JList<?> list,
                     Object value, int index, boolean selected, boolean focus) {
                     Component ret = super.getListCellRendererComponent(list,
                         value, index, selected, focus);

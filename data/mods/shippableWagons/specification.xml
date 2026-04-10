@@ -23,6 +23,7 @@
     <unit-type id="model.unit.wagonTrain" extends="wagon"
                offence="0" defence="1" movement="6"
                score-value="1" spaceTaken="6" space="2">
+      <required-goods id="model.goods.hammers" value="40"/>
       <limit id="model.limit.wagonTrains" operator="lt">
         <left-hand-side operand-type="units" scope-level="player" />
         <right-hand-side operand-type="settlements" scope-level="player" />

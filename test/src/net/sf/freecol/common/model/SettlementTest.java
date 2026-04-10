@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -83,7 +83,7 @@ public class SettlementTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         assertEquals(1, colony.getOwner().getNationType().getSettlementType(false).getClaimableRadius());
         //assertEquals(1, colony.getOwner().getNationType().getCapitalType().getClaimableRadius());
         assertEquals(1, colony.getRadius());
@@ -117,7 +117,7 @@ public class SettlementTest extends FreeColTestCase {
         map.getTile(4, 8).setType(spec().getTileType("model.tile.ocean"));
         assertFalse(map.getTile(4, 8).isLand());
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         for (Tile tile : colony.getTile().getSurroundingTiles(1)) {
             assertEquals("Tile " + tile.toString()
                          + " should be owned by " + colony.getOwner().getId(),
@@ -133,7 +133,7 @@ public class SettlementTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
 
         assertEquals(2, colony.getLineOfSight());
 
@@ -152,7 +152,7 @@ public class SettlementTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         // Colony has no equipment for the unit
         Unit colonist = colony.getUnitList().get(0);

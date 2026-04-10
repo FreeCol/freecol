@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -28,7 +28,7 @@ import javax.swing.ImageIcon;
  */
 class ColopediaTreeItem {
 
-    private final ColopediaDetailPanel detailPanel;
+    private final ColopediaDetailPanel<?> detailPanel;
     private final String id;
     private final String text;
     private final ImageIcon icon;
@@ -43,7 +43,7 @@ class ColopediaTreeItem {
      * @param text a {@code String} value
      * @param icon an {@code ImageIcon} value
      */
-    ColopediaTreeItem(ColopediaDetailPanel detailPanel, String id, String text,
+    ColopediaTreeItem(ColopediaDetailPanel<?> detailPanel, String id, String text,
                       ImageIcon icon) {
         this.detailPanel = detailPanel;
         this.id = id;
@@ -56,7 +56,7 @@ class ColopediaTreeItem {
      *
      * @return the panel type this item belongs to.
      */
-    public ColopediaDetailPanel getPanelType() {
+    public ColopediaDetailPanel<?> getPanelType() {
         return detailPanel;
     }
 

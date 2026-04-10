@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -201,10 +201,10 @@ public final class EuropePanel extends PortPanel {
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
                         .getLocationLabelFor(unit.getOwner());
-                    if (!getGUI().confirm(null, StringTemplate
+                    if (!getGUI().modalConfirmDialog(null, StringTemplate
                             .template("europePanel.leaveColonists")
                             .addStringTemplate("%newWorld%", locName),
-                            unit, "ok", "cancel")) return null;
+                            unit, "ok", "cancel", true)) return null;
                 }
 
                 igc().moveTo(unit, dest);
@@ -381,8 +381,9 @@ public final class EuropePanel extends PortPanel {
             case ACTIVE: case FORTIFIED: case FORTIFYING:
             case SENTRY: case SKIPPED:
                 return true;
+            default:
+                return false;
             }
-            return false;
         }
     }
 
@@ -649,7 +650,7 @@ public final class EuropePanel extends PortPanel {
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
         inPortPanel = new EuropeInPortPanel();
-        cargoPanel = new CargoPanel(freeColClient, true);
+        cargoPanel = new CargoPanel(freeColClient, true, false);
         europeanDocksPanel = new EuropeanDocksPanel();
         marketPanel = new MarketPanel(this);
         log = new TransactionLog();
@@ -689,30 +690,24 @@ public final class EuropePanel extends PortPanel {
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        toAmericaScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        toEuropeScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane inPortScroll = new JScrollPane(inPortPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        cargoScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane docksScroll = new JScrollPane(europeanDocksPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        docksScroll.getVerticalScrollBar().setUnitIncrement(16);
         JScrollPane marketScroll = new JScrollPane(marketPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane logScroll = new JScrollPane(log,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
         toAmericaPanel.setBorder(Utility.localizedBorder("sailingToAmerica"));
         toEuropePanel.setBorder(Utility.localizedBorder("sailingToEurope"));
@@ -829,15 +824,11 @@ public final class EuropePanel extends PortPanel {
     @Override
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnitLabel != unitLabel) {
-            if (selectedUnitLabel != null) {
-                selectedUnitLabel.setSelected(false);
-            }
             selectedUnitLabel = unitLabel;
             if (unitLabel == null) {
                 cargoPanel.setCarrier(null);
             } else {
                 cargoPanel.setCarrier(unitLabel.getUnit());
-                unitLabel.setSelected(true);
             }
         }
         inPortPanel.revalidate();
@@ -918,5 +909,12 @@ public final class EuropePanel extends PortPanel {
         log = null;
         exitButton = trainButton = purchaseButton = recruitButton
             = unloadButton = sailButton = null;
+    }
+
+    /**
+     * Refresh marketPanel, called after pay arrears
+     */
+    public void refreshMarketPanel() {
+        marketPanel.initialize();
     }
 }

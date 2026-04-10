@@ -18,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.release_tag }}
         
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '11'
@@ -44,7 +44,7 @@ jobs:
         env:
           FREECOL_VERSION: ${{ github.event.inputs.release_version }}
       
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Linux-packages
           path: dist/
@@ -54,14 +54,14 @@ jobs:
     runs-on: windows-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.release_tag }}
         
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '19'
+          java-version: '21'
 
       - name: Build artifacts
         shell: cmd
@@ -70,7 +70,7 @@ jobs:
         env:
           FREECOL_VERSION: ${{ github.event.inputs.release_version }}
           
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Windows-packages
           path: dist/releases/
@@ -80,23 +80,51 @@ jobs:
     runs-on: macos-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.release_tag }}
         
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '19'
+          java-version: '21'
 
       - name: Build artifacts
         shell: bash
         run: |
           ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION -Dprint.manual.is.up.to.date=true -Dprint.devmanual.is.up.to.date=true mac-complete-installer
+          codesign --force -s - --deep dist/releases/FreeCol-$FREECOL_VERSION.dmg
         env:
           FREECOL_VERSION: ${{ github.event.inputs.release_version }}
       
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Mac-packages
+          path: dist/releases/
+          
+  build_mac_intel:
+    name: Mac Intel Build
+    runs-on: macos-13
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.release_tag }}
+        
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build artifacts
+        shell: bash
+        run: |
+          ant -noinput -buildfile build.xml -Dfreecol.version=$FREECOL_VERSION -Dprint.manual.is.up.to.date=true -Dprint.devmanual.is.up.to.date=true mac-complete-installer
+          codesign --force -s - --deep dist/releases/FreeCol-$FREECOL_VERSION.dmg
+        env:
+          FREECOL_VERSION: ${{ github.event.inputs.release_version }}
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Mac-intel-packages
           path: dist/releases/

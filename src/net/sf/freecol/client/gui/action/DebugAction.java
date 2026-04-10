@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -46,6 +46,8 @@ public class DebugAction extends FreeColAction {
 
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
                 KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK));
+        
+        setCanvasKeyBinding(true);
     }
 
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,10 +19,6 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
@@ -30,7 +26,7 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * An action to toggle the display of the map grid.
  */
-public class DisplayGridAction extends SelectableAction {
+public class DisplayGridAction extends SelectableOptionAction {
 
     public static final String id = "displayGridAction";
 
@@ -44,18 +40,5 @@ public class DisplayGridAction extends SelectableAction {
         super(freeColClient, id, ClientOptions.DISPLAY_GRID);
 
         setSelected(shouldBeSelected());
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());
-        setOption(isSelected());
-        getGUI().refresh();
     }
 }

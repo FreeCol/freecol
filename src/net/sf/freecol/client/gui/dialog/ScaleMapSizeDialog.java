@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.Map;
 /**
  * A dialog to allow resizing of the map.
  */
-public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
+public class ScaleMapSizeDialog extends DeprecatedFreeColDialog<Dimension> {
 
     private static final int COLUMNS = 5;
 
@@ -138,8 +138,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         Object value = getValue();
         if (options.get(0).equals(value)) {
             checkFields();
-            return new Dimension(Integer.parseInt(inputHeight.getText()),
-                                 Integer.parseInt(inputWidth.getText()));
+            return new Dimension(Integer.parseInt(inputWidth.getText()), Integer.parseInt(inputHeight.getText()));
         }
         return null;
     }

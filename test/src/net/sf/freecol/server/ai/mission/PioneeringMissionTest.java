@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -72,7 +72,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
             = getServerPlayer(game, "model.nation.dutch");
         final EuropeanAIPlayer aiPlayer
             = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
-        final Colony colony = getStandardColony();
+        final Colony colony = createStandardColony();
         final AIColony aiColony = aiMain.getAIColony(colony);
         final Unit colonist = new ServerUnit(game, colony.getTile(), player,
                                              colonistType);

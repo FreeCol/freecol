@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -159,7 +159,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * @param unit an {@code Unit} value
      * @return false
      */
-    public static boolean isValidFor(@SuppressWarnings("unusued") Unit unit) {
+    public static boolean isValidFor(@SuppressWarnings("unused") Unit unit) {
         return false;
     }
 

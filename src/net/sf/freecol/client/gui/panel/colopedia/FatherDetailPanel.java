@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel.colopedia;
 
-import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -40,10 +39,10 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
-import net.sf.freecol.common.util.ImageUtils;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
+import net.sf.freecol.common.util.ImageUtils;
 
 
 /**
@@ -147,16 +146,9 @@ public class FatherDetailPanel
                 .addStringTemplate(turn.getLabel());
         }
 
-        panel.add(header, "span, align center, wrap 40");
+        panel.add(header, "span, align center, wrap");
         panel.add(label, "top");
         JTextArea description = Utility.localizedTextArea(template, 20);
         panel.add(description, "top, growx, wmin 0");
-
-        Dimension hSize = header.getPreferredSize(),
-            lSize = label.getPreferredSize(),
-            dSize = description.getPreferredSize(), size = new Dimension();
-        size.setSize(lSize.getWidth() + dSize.getWidth() + 20,
-            hSize.getHeight() + lSize.getHeight() + 10);
-        panel.setPreferredSize(size);            
     }
 }

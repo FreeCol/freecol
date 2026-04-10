@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,7 +31,7 @@ public class HighSeasTest extends FreeColTestCase {
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
         HighSeas highSeas = dutch.getHighSeas();
         UnitType caravel = spec().getUnitType("model.unit.caravel");
-        Unit unit = new ServerUnit(game, highSeas, dutch, caravel);
+        new ServerUnit(game, highSeas, dutch, caravel);
 
         dutch.dumpObject();
     }

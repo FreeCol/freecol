@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -63,7 +63,6 @@ import javax.xml.stream.XMLStreamException;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -583,11 +582,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         if (hasSettlements()) return false;
 
         int naval = 0;
-        int land = 0, landOnMap = 0;
+        int land = 0;
         for (Unit u : getUnitSet()) {
             if (u.isNaval()) naval++; else {
                 land++;
-                if (u.isOnTile()) landOnMap++;
             }
         }
 
@@ -4259,7 +4257,7 @@ outer:  for (Effect effect : effects) {
             // accepts the tile offer, we can verify that the offer
             // was made.
             DiplomacySession ds = new DiplomacySession(tile.getFirstUnit(),
-                tile.getOwningSettlement(), FreeCol.getTimeout(false));
+                tile.getOwningSettlement(), FreeCol.getTimeout(true));  // TODO: Timeout in multiplayer
             ds.register();
             ds.setAgreement(DiplomaticTrade
                 .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT,
@@ -4295,7 +4293,7 @@ outer:  for (Effect effect : effects) {
         // Initial agreement goes first to this player
         DiplomaticTrade agreement = DiplomaticTrade
             .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT, this, other);
-        final long timeout = FreeCol.getTimeout(false);
+        final long timeout = FreeCol.getTimeout(true); // TODO: Timeout in multiplayer
         DiplomacySession session = (settlement == null)
             ? new DiplomacySession(unit, otherUnit, timeout)
             : new DiplomacySession(unit, settlement, timeout);

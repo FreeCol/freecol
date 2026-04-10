@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,18 +19,13 @@
 
 package net.sf.freecol.client.gui.menu;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
@@ -328,7 +323,7 @@ public class InGameMenuBar extends FreeColMenuBar {
             .addAmount("%tax%", player.getTax())
             .addAmount("%score%", player.getScore())
             .addStringTemplate("%year%", this.freeColClient.getGame()
-            .getTurn().getLabel())).replace("|", "✧");
+            .getTurn().getLabel())).replace("|", "\u2727"); // ✧
         
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -342,7 +337,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         final FontMetrics fm = g2d.getFontMetrics();
         final Rectangle2D d  = fm.getStringBounds(text, g2d);
         final int textWidth = (int) d.getWidth();
-        final int textHeight = (int) d.getHeight();;
+        final int textHeight = (int) d.getHeight();
         
         final int rightSidePaddingInPx = 10;
         final int centerHeight = getHeight() - getInsets().bottom;

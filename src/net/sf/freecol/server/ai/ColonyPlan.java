@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -1418,7 +1418,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 nonExperts.add(u);
             }
         }
-        int expert = 0;
+
         Iterator<Unit> expertIterator = experts.iterator();
         while (expertIterator.hasNext()) {
             Unit u1 = expertIterator.next();

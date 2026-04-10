@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu.Separator;
@@ -32,6 +31,7 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
+import net.sf.freecol.client.gui.label.AbstractGoodsLabel.AmountType;
 import net.sf.freecol.client.gui.label.GoodsTypeLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.model.Unit;
@@ -45,9 +45,7 @@ import net.sf.freecol.common.util.OSUtils;
  * be precise).
  */
 public final class DragListener extends MouseAdapter {
-
-    private static final Logger logger = Logger.getLogger(DragListener.class.getName());
-
+    
     /**
      * The maximum numbers of pixels of the user's screen height
      * before triggering the small flag.
@@ -146,17 +144,14 @@ public final class DragListener extends MouseAdapter {
                         }
                     }
                 }
-                label.setSuperFullChosen(true);
+                label.setAmountType(AmountType.SUPER_FULL);
                 label.setAmount(sum);
             } else if (e.isShiftDown()) {
-                label.setSuperFullChosen(false);
-                label.setPartialChosen(true);
+                label.setAmountType(AmountType.PARTIAL);
             } else if (e.isControlDown()) {
-                label.setSuperFullChosen(false);
-                label.setFullChosen(true);
+                label.setAmountType(AmountType.FULL);
             } else {
-                label.setSuperFullChosen(false);
-                label.setPartialChosen(false);
+                label.setAmountType(AmountType.DEFAULT);
                 label.setDefaultAmount();
             }
         } else if (comp instanceof UnitLabel) {

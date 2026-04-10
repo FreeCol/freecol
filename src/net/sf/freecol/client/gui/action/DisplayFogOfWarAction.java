@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,10 +19,6 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.option.GameOptions;
@@ -31,7 +27,7 @@ import net.sf.freecol.common.option.GameOptions;
 /**
  * An action to toggle the display of national borders.
  */
-public class DisplayFogOfWarAction extends SelectableAction {
+public class DisplayFogOfWarAction extends SelectableOptionAction {
 
     public static final String id = "displayFogOfWarAction";
 
@@ -47,18 +43,6 @@ public class DisplayFogOfWarAction extends SelectableAction {
         setSelected(shouldBeSelected());
     }
 
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());
-        setOption(isSelected());
-        getGUI().refresh();
-    }
     
     @Override
     protected boolean shouldBeEnabled() {

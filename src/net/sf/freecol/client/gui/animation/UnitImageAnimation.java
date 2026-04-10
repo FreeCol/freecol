@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,15 +19,20 @@
 
 package net.sf.freecol.client.gui.animation;
 
-import java.awt.Image;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.ImageUtils.createMirroredImage;
+import static net.sf.freecol.common.util.StringUtils.downCase;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.io.sza.AnimationEvent;
@@ -36,9 +41,6 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.ImageUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -47,8 +49,6 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class UnitImageAnimation extends Animation {
     
-    private static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
-
     /**
        Alternate directions to check when a directional animation is
        not found.
@@ -175,12 +175,18 @@ public final class UnitImageAnimation extends Animation {
             long time = System.nanoTime();
             if (event instanceof ImageAnimationEvent) {
                 final ImageAnimationEvent ievent = (ImageAnimationEvent)event;
-                Image image = ievent.getImage();
+                BufferedImage image = ievent.getImage();
                 if (mirror) {
                     // FIXME: Add mirroring functionality to SimpleZippedAnimation
                     image = createMirroredImage(image);
                 }
+                final Dimension origSize = unitLabel.getSize();
                 icon.setImage(image);
+                final Dimension newSize = new Dimension(image.getWidth(), image.getHeight());
+                unitLabel.setSize(newSize);
+                final Point newLoc = unitLabel.getLocation();
+                newLoc.translate((origSize.width - newSize.width) / 2, (origSize.height - newSize.height) / 2);
+                unitLabel.setLocation(newLoc);
                 paintCallback.execute(); // paint now
 
                 // Time accounting

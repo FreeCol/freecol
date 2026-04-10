@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
@@ -139,5 +138,6 @@ public class CanvasMapViewer extends JComponent {
         g.drawString("Full map (average): " + art + "ms ==> " + (1000 / (art+1)) + "fps", 50, 50);
         g.drawString("Full map (last): " +lastFullMapRenderTimeInMillis + "ms ==> " + (1000 / (lastFullMapRenderTimeInMillis+1)) + "fps", 50, 70);
         g.drawString("Last render: " + renderTime + "ms ==> " + (1000 / (renderTime+1)) + "fps", 50, 90);
+        g.drawString("Zoom factor: " + ((int) (freeColClient.getGUI().getScaledImageLibrary().getScaleFactor() * 100)) + "%", 50, 110);
     }
 }

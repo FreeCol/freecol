@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -47,55 +47,29 @@ public class MessagesTest extends FreeColTestCase {
 
     public static final String noSuchKey = "should.not.exist.and.thus.return.null";
 
-    private static final Role armedBraveRole
-        = spec().getRole("model.role.armedBrave");
-    private static final Role cavalryRole
-        = spec().getRole("model.role.cavalry");
-    private static final Role defaultRole
-        = spec().getDefaultRole();
-    private static final Role dragoonRole
-        = spec().getRole("model.role.dragoon");
-    private static final Role infantryRole
-        = spec().getRole("model.role.infantry");
-    private static final Role missionaryRole
-        = spec().getRole("model.role.missionary");
-    private static final Role mountedBraveRole
-        = spec().getRole("model.role.mountedBrave");
-    private static final Role nativeDragoonRole
-        = spec().getRole("model.role.nativeDragoon");
-    private static final Role pioneerRole
-        = spec().getRole("model.role.pioneer");
-    private static final Role scoutRole
-        = spec().getRole("model.role.scout");
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
+    private static final Role armedBraveRole = spec().getRole("model.role.armedBrave");
+    private static final Role cavalryRole = spec().getRole("model.role.cavalry");
+    private static final Role defaultRole = spec().getDefaultRole();
+    private static final Role dragoonRole = spec().getRole("model.role.dragoon");
+    private static final Role infantryRole = spec().getRole("model.role.infantry");
+    private static final Role missionaryRole = spec().getRole("model.role.missionary");
+    private static final Role mountedBraveRole = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoonRole = spec().getRole("model.role.nativeDragoon");
+    private static final Role pioneerRole = spec().getRole("model.role.pioneer");
+    private static final Role soldierRole = spec().getRole("model.role.soldier");
 
-    private static final UnitType artillery
-        = spec().getUnitType("model.unit.artillery");
-    private static final UnitType brave
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType caravel
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType colonialRegular
-        = spec().getUnitType("model.unit.colonialRegular");
-    private static final UnitType freeColonist
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType hardyPioneer
-        = spec().getUnitType("model.unit.hardyPioneer");
-    private static final UnitType jesuitMissionary
-        = spec().getUnitType("model.unit.jesuitMissionary");
-    private static final UnitType kingsRegular
-        = spec().getUnitType("model.unit.kingsRegular");
-    private static final UnitType manOWar
-        = spec().getUnitType("model.unit.manOWar");
-    private static final UnitType masterCarpenter
-        = spec().getUnitType("model.unit.masterCarpenter");
-    private static final UnitType seasonedScout
-        = spec().getUnitType("model.unit.seasonedScout");
-    private static final UnitType treasureTrain
-        = spec().getUnitType("model.unit.treasureTrain");
-    private static final UnitType veteranSoldier
-        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType artillery = spec().getUnitType("model.unit.artillery");
+    private static final UnitType brave = spec().getUnitType("model.unit.brave");
+    private static final UnitType caravel = spec().getUnitType("model.unit.caravel");
+    private static final UnitType colonialRegular = spec().getUnitType("model.unit.colonialRegular");
+    private static final UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType hardyPioneer = spec().getUnitType("model.unit.hardyPioneer");
+    private static final UnitType jesuitMissionary = spec().getUnitType("model.unit.jesuitMissionary");
+    private static final UnitType kingsRegular = spec().getUnitType("model.unit.kingsRegular");
+    private static final UnitType manOWar = spec().getUnitType("model.unit.manOWar");
+    private static final UnitType masterCarpenter = spec().getUnitType("model.unit.masterCarpenter");
+    private static final UnitType treasureTrain = spec().getUnitType("model.unit.treasureTrain");
+    private static final UnitType veteranSoldier = spec().getUnitType("model.unit.veteranSoldier");
 
 
     @Override
@@ -187,7 +161,7 @@ public class MessagesTest extends FreeColTestCase {
             .addName("xyz");
         assertEquals("Food / xyz", Messages.message(t2));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         assertEquals("New Amsterdam", colony.getName());
 
         StringTemplate t3 = StringTemplate.template("model.building.locationLabel")

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -226,8 +226,8 @@ public class MetaServerUtils {
         String host = FreeCol.getMetaServerAddress();
         int port = FreeCol.getMetaServerPort();
         try {
-            Connection c = new Connection(host, port, "MetaServer")
-                .setMessageHandler(new MetaInputHandler(consumer));
+            @SuppressWarnings("resource")
+            final Connection c = new Connection(host, port, "MetaServer").setMessageHandler(new MetaInputHandler(consumer));
             c.startReceiving();
             return c;
         } catch (IOException ioe) {

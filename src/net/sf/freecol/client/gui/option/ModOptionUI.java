@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -146,7 +146,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * {@inheritDoc}
      */
     @Override
-    public ListCellRenderer getListCellRenderer() {
+    public ListCellRenderer<ModOption> getListCellRenderer() {
         return new ModOptionRenderer(gui);
     }
 
@@ -162,7 +162,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * {@inheritDoc}
      */
     @Override
-    public JComboBox getComponent() {
+    public JComboBox<FreeColModFile> getComponent() {
         return this.box;
     }
 

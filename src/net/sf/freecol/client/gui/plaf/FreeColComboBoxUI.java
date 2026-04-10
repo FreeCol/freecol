@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,9 +42,8 @@ public class FreeColComboBoxUI extends MetalComboBoxUI {
         c.setOpaque(false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected ListCellRenderer createRenderer() {
-        return new FreeColComboBoxRenderer();
+    protected ListCellRenderer<Object> createRenderer() {
+        return new FreeColComboBoxRenderer<Object>();
     }
 }

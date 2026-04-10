@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,16 +25,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TradeRouteTest extends FreeColTestCase {
 
-    private static final GoodsType fursGoodsType
-        = spec().getGoodsType("model.goods.furs");
-
-    private static final TileType mixedForestType
-        = spec().getTileType("model.tile.mixedForest");
-
-    private static final UnitType caravel
-        = spec().getUnitType("model.unit.caravel");
-    private static final UnitType wagonTrainType
-        = spec().getUnitType("model.unit.wagonTrain");
+    private static final GoodsType fursGoodsType = spec().getGoodsType("model.goods.furs");
+    private static final TileType mixedForestType = spec().getTileType("model.tile.mixedForest");
+    private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
 
 
     public void testTradeRoute() {
@@ -42,9 +35,9 @@ public class TradeRouteTest extends FreeColTestCase {
         game.changeMap(getTestMap(mixedForestType, true));
 
         // Set up three colonies
-        Colony colony1 = getStandardColony(4, 1, 1);
-        Colony colony2 = getStandardColony(4, 3, 1);
-        Colony colony3 = getStandardColony(4, 5, 1);
+        Colony colony1 = createStandardColony(4, 1, 1);
+        Colony colony2 = createStandardColony(4, 3, 1);
+        Colony colony3 = createStandardColony(4, 5, 1);
         Tile tile1 = colony1.getTile();
         Tile tile2 = colony2.getTile();
         Tile tile3 = colony3.getTile();

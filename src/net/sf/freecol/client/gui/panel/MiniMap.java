@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -99,6 +99,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
         minimapPainterThread.start();
         minimapPainterThread.setPriority(Thread.NORM_PRIORITY - 1);
+        setOpaque(false);
     }
 
     /**
@@ -390,6 +391,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                     g.fill(settlementPath);
                 }
                 if (!freeColClient.isMapEditor()
+                    && freeColClient.getMyPlayer() != null
                     && !freeColClient.getMyPlayer().canSee(tile)
                     && clientOptions.getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
                     Color blackTransparent = new Color(0, 0, 0, 100);

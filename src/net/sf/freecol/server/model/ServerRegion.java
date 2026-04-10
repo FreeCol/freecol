@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,12 +19,11 @@
 
 package net.sf.freecol.server.model;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
-import java.awt.Rectangle;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
@@ -236,6 +235,86 @@ public class ServerRegion extends Region {
         h.setScore(score);
         cs.addGlobalHistory(getGame(), h);
     }
+    
+    /**
+     * Determines how to separate the given map into three
+     * parts (north, center and south) with equal amount of land tiles
+     * for each.
+     *  
+     * @param map The map.
+     * @return The indexes separating the three parts.
+     */
+    private static int[] findYForThirdsOfLand(Map map) {
+        final int[] landTiles = new int[map.getHeight() - 1];
+        long sum = 0;
+        for (Tile t : map) {
+            if (t.isLand() && !t.isPolar()) {
+                landTiles[t.getY()]++;
+                sum++;
+            }
+        }
+        
+        return findThirdsOfValues(landTiles, sum);
+    }
+    
+    /**
+     * Determines how to separate the given submap into three
+     * parts (west, center and east) with equal amount of land tiles
+     * for each.
+     *  
+     * @param map The map.
+     * @param startY The starting Y-coordinate for the submap (inclusive).
+     * @param endY The ending Y-coordinate for the submap (inclusive).
+     * @return The indexes separating the three parts.
+     */
+    private static int[] findXForThirdsOfLand(Map map, int startY, int endY) {
+        final List<Tile> subMap = map.subMap(0, startY, map.getWidth() - 1, endY - startY + 1);
+        
+        final int[] landTiles = new int[map.getWidth() - 1];
+        long sum = 0;
+        for (Tile t : subMap) {
+            if (t.isLand() && !t.isPolar()) {
+                landTiles[t.getX()]++;
+                sum++;
+            }
+        }
+        
+        return findThirdsOfValues(landTiles, sum);
+    }
+    
+    /**
+     * Finds the indexes  for separating the given array into three parts.
+     * @param timesTheValue An array containing the number of elements for
+     *      each number (as given by the index).
+     * @param sum The total sum.
+     * @return The indexes separating the three parts.
+     */
+    private static int[] findThirdsOfValues(int[] timesTheValue, long sum) {
+        final int[] result = new int[2];
+        int accumulatedSum = 0;
+        boolean needFirst = true;
+        for (int i=0; i<timesTheValue.length; i++) {
+            accumulatedSum += timesTheValue[i];
+            if (needFirst && accumulatedSum >= sum / 3) {
+                result[0] = i;
+                needFirst = false;
+            }
+            if (accumulatedSum >= (2 * sum) / 3) {
+                result[1] = i;
+                break;
+            }
+        }
+        return result;
+    }
+    
+    private static Rectangle ensureWithinMap(Map map, Rectangle bounds) {
+        final int capX = Math.max(0, bounds.x);
+        final int capY = Math.max(0, bounds.y);
+        final int capWidth = Math.min(map.getWidth() - 1, bounds.x + Math.min(map.getWidth() - 1, bounds.width)) - capX;
+        final int capHeight = Math.min(map.getHeight() - 1, bounds.y + Math.min(map.getHeight() - 1, bounds.height)) - capY;
+        
+        return new Rectangle(capX, capY, capWidth, capHeight);
+    }
 
     /**
      * Make the fixed regions if they do not exist in a given map.
@@ -292,91 +371,105 @@ public class ServerRegion extends Region {
         // used by the MapGenerator to place Indian Settlements.  Note
         // that these regions are "virtual", i.e. having a bounding
         // box, but contain no tiles directly.
-        final int thirdWidth = map.getWidth()/3;
-        final int twoThirdWidth = 2 * thirdWidth;
-        final int thirdHeight = map.getHeight()/3;
-        final int twoThirdHeight = 2 * thirdHeight;
+        final int[] yDelimiterThirds = findYForThirdsOfLand(map);
+        
+        int[] xDelimiterThirds = findXForThirdsOfLand(map, 0, yDelimiterThirds[0]);
+        
+        map.removeRegionsByKey("model.region.northWest");
+        final ServerRegion northWest = new ServerRegion(map, "model.region.northWest", RegionType.LAND, null);
+        northWest.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                0,
+                0,
+                xDelimiterThirds[0],
+                yDelimiterThirds[0]
+                )));
+        map.addRegion(northWest);
 
-        ServerRegion northWest = (ServerRegion)fixed.get("model.region.northWest");
-        if (northWest == null) {
-            northWest = new ServerRegion(map, "model.region.northWest",
-                                         RegionType.LAND, null);
-            northWest.bounds.setBounds(new Rectangle(0,0,thirdWidth,thirdHeight));
-            lb.add("+NW");
-        }
-        result.add(northWest);
+        map.removeRegionsByKey("model.region.north");
+        final ServerRegion north = new ServerRegion(map, "model.region.north",RegionType.LAND, null);
+        north.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                xDelimiterThirds[0],
+                0,
+                xDelimiterThirds[1] - xDelimiterThirds[0],
+                yDelimiterThirds[0]
+                )));
+        map.addRegion(north);
 
-        ServerRegion north = (ServerRegion)fixed.get("model.region.north");
-        if (north == null) {
-            north = new ServerRegion(map, "model.region.north",
-                                     RegionType.LAND, null);
-            north.bounds.setBounds(new Rectangle(thirdWidth,0,thirdWidth,thirdHeight));
-            lb.add("+N");
-        }
-        result.add(north);
+        map.removeRegionsByKey("model.region.northEast");
+        final ServerRegion northEast = new ServerRegion(map, "model.region.northEast", RegionType.LAND, null);
+        northEast.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                xDelimiterThirds[1],
+                0,
+                Integer.MAX_VALUE,
+                yDelimiterThirds[0]
+                )));
+        map.addRegion(northEast);
 
-        ServerRegion northEast = (ServerRegion)fixed.get("model.region.northEast");
-        if (northEast == null) {
-            northEast = new ServerRegion(map, "model.region.northEast",
-                                         RegionType.LAND, null);
-            northEast.bounds.setBounds(new Rectangle(twoThirdWidth,0,thirdWidth,thirdHeight));
-            lb.add("+NE");
-        }
-        result.add(northEast);
+        
+        xDelimiterThirds = findXForThirdsOfLand(map, yDelimiterThirds[0], yDelimiterThirds[1]);
+        
+        map.removeRegionsByKey("model.region.west");
+        final ServerRegion west = new ServerRegion(map, "model.region.west", RegionType.LAND, null);
+        west.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                0,
+                yDelimiterThirds[0],
+                xDelimiterThirds[0],
+                yDelimiterThirds[1] - yDelimiterThirds[0]
+                )));
+        map.addRegion(west);
 
-        ServerRegion west = (ServerRegion)fixed.get("model.region.west");
-        if (west == null) {
-            west = new ServerRegion(map, "model.region.west",
-                                    RegionType.LAND, null);
-            west.bounds.setBounds(new Rectangle(0,thirdHeight,thirdWidth,thirdHeight));
-            lb.add("+W");
-        }
-        result.add(west);
+        map.removeRegionsByKey("model.region.center");
+        final ServerRegion center = new ServerRegion(map, "model.region.center", RegionType.LAND, null);
+        center.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                xDelimiterThirds[0],
+                yDelimiterThirds[0],
+                xDelimiterThirds[1] - xDelimiterThirds[0],
+                yDelimiterThirds[1] - yDelimiterThirds[0]
+                )));
+        map.addRegion(center);
 
-        ServerRegion center = (ServerRegion)fixed.get("model.region.center");
-        if (center == null) {
-            center = new ServerRegion(map, "model.region.center",
-                                      RegionType.LAND, null);
-            center.bounds.setBounds(new Rectangle(thirdWidth,thirdHeight,thirdWidth,thirdHeight));
-            lb.add("+center");
-        }
-        result.add(center);
+        map.removeRegionsByKey("model.region.east");
+        final ServerRegion east = new ServerRegion(map, "model.region.east", RegionType.LAND, null);
+        east.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                xDelimiterThirds[1],
+                yDelimiterThirds[0],
+                Integer.MAX_VALUE,
+                yDelimiterThirds[1] - yDelimiterThirds[0]
+                )));
+        map.addRegion(east);
 
-        ServerRegion east = (ServerRegion)fixed.get("model.region.east");
-        if (east == null) {
-            east = new ServerRegion(map, "model.region.east",
-                                    RegionType.LAND, null);
-            east.bounds.setBounds(new Rectangle(twoThirdWidth,thirdHeight,thirdWidth,thirdHeight));
-            lb.add("+E");
-        }
-        result.add(east);
+        
+        xDelimiterThirds = findXForThirdsOfLand(map, yDelimiterThirds[1], map.getHeight() - 1);
+        
+        map.removeRegionsByKey("model.region.southWest");
+        final ServerRegion southWest = new ServerRegion(map, "model.region.southWest", RegionType.LAND, null);
+        southWest.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                0,
+                yDelimiterThirds[1],
+                xDelimiterThirds[0],
+                Integer.MAX_VALUE
+                )));
+        map.addRegion(southWest);
 
-        ServerRegion southWest = (ServerRegion)fixed.get("model.region.southWest");
-        if (southWest == null) {
-            southWest = new ServerRegion(map, "model.region.southWest",
-                                         RegionType.LAND, null);
-            southWest.bounds.setBounds(new Rectangle(0,twoThirdHeight,thirdWidth,thirdHeight));
-            lb.add("+SW");
-        }
-        result.add(southWest);
+        map.removeRegionsByKey("model.region.south");
+        final ServerRegion south = new ServerRegion(map, "model.region.south", RegionType.LAND, null);
+        south.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                xDelimiterThirds[0],
+                yDelimiterThirds[1],
+                xDelimiterThirds[1] - xDelimiterThirds[0],
+                Integer.MAX_VALUE
+                )));
+        map.addRegion(south);
 
-        ServerRegion south = (ServerRegion)fixed.get("model.region.south");
-        if (south == null) {
-            south = new ServerRegion(map, "model.region.south",
-                                     RegionType.LAND, null);
-            south.bounds.setBounds(new Rectangle(thirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
-            lb.add("+S");
-        }
-        result.add(south);
-
-        ServerRegion southEast = (ServerRegion)fixed.get("model.region.southEast");
-        if (southEast == null) {
-            southEast = new ServerRegion(map, "model.region.southEast",
-                                         RegionType.LAND, null);
-            southEast.bounds.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
-            lb.add("+SE");
-        }
-        result.add(southEast);
+        map.removeRegionsByKey("model.region.southEast");
+        final ServerRegion southEast = new ServerRegion(map, "model.region.southEast", RegionType.LAND, null);
+        southEast.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+                xDelimiterThirds[1],
+                yDelimiterThirds[1],
+                Integer.MAX_VALUE,
+                Integer.MAX_VALUE
+                )));
+        map.addRegion(southEast);
 
         boolean allOceans = true;
         ServerRegion pacific = (ServerRegion)fixed.get("model.region.pacific");

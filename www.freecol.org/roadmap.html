@@ -1,7 +1,7 @@
 ---
   title: Roadmap
   author: FreeCol Team
-  date: 2013-01-11
+  date: 2024-07-04
   layout: page-date-author
   folder:
     path: /about.html
@@ -9,66 +9,54 @@
 ---
                         <div align="left">
                             <div align="justify">
-                                <div class="warningbox">The roadmap below is long out of date and retained for historical interest.</div>
-                                <p>This is a good place though to answer the following FAQ:</p>
+                                <div class="warningbox">
+                                    Please keep in mind that the roadmap below is tentative. Development and other creative efforts are done based on what our voluteers think is fun <i>right now</i>. The only way to ensure that a certain feature is added swiftly is actually <a href="how-to-contribute.html">contributing by working on the project</a>. Everyone can help, for example by retesting functionality that has recently been modified. People that regularly contribute are listened to, even for work that's definitely not fun, if they want some specific functionality or graphics.
+                                </div>
                             </div>
                         </div>
                         <div align="left">
-                            Q. When is the next release coming out?<br /><br />
-                            A. This question is discussed on the freecol-developers mailing list.&nbsp; Anyone who wants a detailed understanding of the current issues in FreeCol is more than welcome to subscribe (see <a href="community.html" title="here">/community.html)</a>. The list is low volume, and nicely illustrates that the real answer to this question is almost always `No one knows&#39;.<br /><br />
-                            Q. No, really, surely you have some sort of plan/roadmap/release schedule?<br /><br />
-                            A. Not really.  FreeCol is developed for fun, by a small group of volunteer contributors, at least some of which find the idea of a formal release schedule in a small volunteer project laughably impractical and/or not fun.<br /><br />
-                            Q. Well, alright, can you at least tell us what will be in the next release?<br /><br />
-                            <ul>
-                                <li>A1. Bug fixes.</li>
-                                <li>A2. Read the mailing list and you will know what we have been discussing.</li>
-                                <li>A3. Follow freecol-commits and you will know what we have actually done.</li>
-                                <li>A4. `Whatever catches the various developer&#39;s interest&#39;<br /></li>
-                            </ul>
+                            <div align="justify" class="infobox">
+                                <strong>Q. When is the next release coming out?</strong><br /><br />
+                                A. New official releases are made approximately twice a year. You can try our <a href="https://github.com/FreeCol/freecol/releases/tag/latest">development builds</a> if you want more frequent updates. The development builds tend be better than the release builds, but you might get stuck and need to report a bug in order to continue your game.
+                            </div>
                         </div>
-                        <div align="left">
-                            <pre>0.8.0 -----  Objective: Make the game easier to modify </pre>
-                            <pre>Release:   Released, January 14th </pre>
-                            <pre> - Allow the game to be customized using XML-files.</pre>
-                            <pre> - Units now slide between tiles while moving.</pre>
-                            <pre> - New terrain graphics.</pre>
-                            <pre> - Menu music added.</pre>
-                            <pre> - Sound effects for dragoons, artillery capturing a colony, building complete,</pre>
-                            <pre>   church and blacksmith.</pre>
-                            <pre> - New sound effects for artillery and buying/selling goods.</pre>
-                            <pre> - Short music clips for Aztecs and fountain of Youth.</pre>
-                            <pre> - Named regions and nicer placement of native settlements.</pre>
-                            <pre> - New nations added: Portuguese, Swedish, Danish and Russian </pre>
-                            <pre> - Games with up to eight European players are now supported. More information:</pre>
-                                <ul>
-                                    <li><pre><a href="https://sourceforge.net/p/freecol/pending-features-for-freecol/search/?q=status%3Aclose*">Feature requests implemented for this version</a></pre></li>
-                                    <li><pre><a href="https://sourceforge.net/p/freecol/bugs/milestone/Fixed_0.8.0/">Bugs fixed for this version</a></pre></li>
-                                </ul>
-                            <pre>0.9.0 -----  Objective: Improve graphics and audio</pre>
-                            <pre> - New background images, borders and buttons.</pre>
-                            <pre> - Implement feature requests from our users.</pre>
-                            <pre> - Unit combat animations. </pre>
-                            <pre> - Add more sound effects and music.</pre>
-                            <pre> - Opening movie.</pre>
-                            <pre>0.10.0 ------  Objective: Improve the computer players  </pre>
-                            <pre> - Add personalities and better strategy to computer opponents. </pre>
-                            <pre> - Add features for admin (kick player, restart game etc.)   </pre>
-                            <pre>0.11.0 ------  Objective: Campaigns and scenarios </pre>
-                            <pre> - Support triggers and events for scenario development. </pre>
-                            <pre> - Extend the map editor to support scenarios. </pre>
-                            <pre> - Backward compatibility for savegames will be assured after this release.</pre>
-                            <pre> - Create a few scenarios.   </pre>
-                            <pre>0.12.0 ------  Objective: Improve gameplay  </pre>
-                            <pre> - Implement feature requests from our community. </pre>
-                            <pre> - Balance the advantages of the different nations.</pre>
-                            <pre> - Create some campaigns. </pre><pre>- Improve AI.  </pre>
-                            <pre>0.13.0 ------  Objective: Easier customization of the game. </pre>
-                            <pre> - Extend the map editor and create editors for units and terrain. </pre>
-                            <pre> - Add other features simplifying modding.  </pre>
-                            <pre>0.14.0 ------  Objective: Improve graphics and audio </pre>
-                            <pre> - Add more sound effects. </pre>
-                            <pre> - Add skins for the colony panel and the Europe panel.   </pre>
-                            <pre>1.0.0 -----  Objective: The final polish :-)  </pre>
-                            <pre> - Add the remaining sfx and music.</pre>
-                            <pre> - Use more illustrations and background images. </pre>
-                        </div>
+                        <h2>FreeCol 1.3.0</h2>
+                        <h3>Release planned Q4 2024</h3>
+                        <p>
+                            This is the next planned release of FreeCol. Please refer to the <a href="https://github.com/FreeCol/freecol/blob/sf-auto-merge/CHANGELOG.md">Changelog</a> for a list of features that have already been implemented.
+                        </p>
+                        
+                        <h2>Features we have started working on</h2>
+                        <ul>
+                            <li>Drag-and-drop to scroll the map (instead of just scrolling like it is now).</li>
+                            <li>Major improvements to the AI colony planning and organization.</li>
+                            <li>Improvements to the "Hitpoints and Combat"-mod (for example collateral damage for ranged attacks and unit rebalancing).</li>
+                            <li>Activate new military AI code for the REF.</li>
+                        </ul>
+                        <h2>Next on the TODO-list</h2>
+                        <ul>
+                            <li>Fixing bugs and make minor improvements.</li>
+                            <li>Any changes needed to allow new graphics, music or sfx to be added/used/improved.</li>
+                            <li>Campaign and scenario mode with a tutorial being the first campaign.</li>
+                            <li>Make all dialogs render in the main frame when running fullscreen (fixes existing display bugs and increases rendering performance).</li>
+                            <li>Extensive testing and rebalancing the colonial AI (possibly nerfing it in the endgame).</li>
+                            <li>Improve the game option dialog and allow both options and the list of rule-changing-mods to be saved and loaded.</li>
+                        </ul>
+                        <h2>Changes we have analyzed and know how to implement</h2>
+                        <ul>
+                            <li>Have high resolution graphics as a separate download (at least graphics intended for 8K screens).</li>
+                            <li>Fix the diplomatic dialog.</li>
+                            <li>Implement 2D and hex world map and rendering.</li>
+                            <li>A mod with pixelated graphics (including tile transitions etc).</li>
+                            <li>A World War 2 mod with modularized unit designs (select chassis like wheeled/tracked/half-track, weapon like turret/AA-gun/MG, engine and armour).</li>
+                            <li>Allow battles to be preplanned and performed in its own stage.</li>
+                            <li>New improved colonization ruleset. Most of the changes would be minor, but should improve balancing and game pacing (for example, scale training cost in Europe based on elapsed turns and/or number of units ... like what's currently done when recruiting units, increase food cost for making a new colonist to 500).</li>
+                            <li>Merge all reports into one tabbed and navigatable display.</li>
+                        </ul>
+                        <h2>Changes that's unlikely to be prioritized soon</h2>
+                        <ul>
+                            <li>Make a signed Mac download package.</li>
+                            <li>Add cool animated graphs and other visualizations to the reports.</li>
+                            <li>Separate rendering pipeline for really low performance computers.</li>
+                            <li>(Optional) 3D rendering.</li>
+                        </ul>

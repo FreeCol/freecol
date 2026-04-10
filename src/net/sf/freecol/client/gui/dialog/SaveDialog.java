@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.ChoiceItem;
 /**
  * A dialog for choosing a file to save.
  */
-public final class SaveDialog extends FreeColDialog<File> {
+public final class SaveDialog extends DeprecatedFreeColDialog<File> {
 
     /**
      * We need a magic cookie to use for the cancel response, as

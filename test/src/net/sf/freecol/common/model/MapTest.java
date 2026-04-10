@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -40,23 +40,14 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class MapTest extends FreeColTestCase {
 
-    private final TileType highSeasType
-        = spec().getTileType("model.tile.highSeas");
-    private final TileType lakeType
-        = spec().getTileType("model.tile.lake");
-    private final TileType oceanType
-        = spec().getTileType("model.tile.ocean");
-    private final TileType plainsType
-        = spec().getTileType("model.tile.plains");
+    private final TileType lakeType = spec().getTileType("model.tile.lake");
+    private final TileType oceanType = spec().getTileType("model.tile.ocean");
+    private final TileType plainsType = spec().getTileType("model.tile.plains");
 
-    private final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-    private final UnitType pioneerType
-        = spec().getUnitType("model.unit.hardyPioneer");
+    private final UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+    private final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private final UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private final UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
 
 
     private Map getSingleLandPathMap(Game game) {
@@ -654,7 +645,7 @@ public class MapTest extends FreeColTestCase {
         Map map = getTestMap();
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile();
 
         Map otherMap = map.copy(game);

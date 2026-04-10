@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,10 +22,8 @@ package net.sf.freecol.client.gui.dialog;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -59,8 +57,6 @@ import net.sf.freecol.common.option.GameOptions;
  * A dialog to display a colony warehouse.
  */
 public final class WarehouseDialog extends FreeColPanel {
-
-    private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 
 
     /**
@@ -113,7 +109,7 @@ public final class WarehouseDialog extends FreeColPanel {
     }
 
     private JPanel createWarehousePanel(FreeColClient freeColClient, Colony colony) {
-        final JPanel warehousePanel = new JPanel(new WrapLayout(FlowLayout.CENTER, 0, 0));
+        final JPanel warehousePanel = new JPanel(new WrapLayout());
         warehousePanel.setOpaque(false);
         final List<GoodsType> goodsTypes = freeColClient.getGame().getSpecification().getStorableGoodsTypeList();
         int preferredWidth = 0;
@@ -129,7 +125,6 @@ public final class WarehouseDialog extends FreeColPanel {
     
     private JScrollPane scrollPaneWithHiddenBorder(final JPanel warehousePanel) {
         final JScrollPane scrollPane = new JScrollPane(warehousePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         return scrollPane;
@@ -177,7 +172,6 @@ public final class WarehouseDialog extends FreeColPanel {
             add(goodsLabel, "span 1 2");
 
             // low level settings
-            String str;
             SpinnerNumberModel lowLevelModel
                 = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);

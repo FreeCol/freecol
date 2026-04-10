@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,7 +25,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -54,8 +53,6 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
  * shown.
  */
 public final class StartGamePanel extends FreeColPanel {
-
-    private static final Logger logger = Logger.getLogger(StartGamePanel.class.getName());
 
     private boolean singlePlayerGame;
 
@@ -186,9 +183,6 @@ public final class StartGamePanel extends FreeColPanel {
             }
         };
         tableScroll.getViewport().setOpaque(false);
-
-        final int tableWidth = getImageLibrary().scaleInt(600);
-        final int tableHeight =  getImageLibrary().scaleInt(300);
         add(tableScroll, "grow");
         tableScroll.setSize(getPreferredSize());
         if (!singlePlayerGame) {

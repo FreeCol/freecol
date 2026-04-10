@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.logging.Logger;
-
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
@@ -31,8 +29,6 @@ import net.sf.freecol.common.networking.ChangeSet.See;
  * A type of session to handle trading with a native settlement.
  */
 public class NativeTradeSession extends Session {
-
-    private static final Logger logger = Logger.getLogger(NativeTradeSession.class.getName());
 
     /** The moves the trading unit has left at start of session. */
     private final int movesLeft;

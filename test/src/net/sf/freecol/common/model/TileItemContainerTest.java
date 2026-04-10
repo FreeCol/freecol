@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,18 +25,10 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TileItemContainerTest extends FreeColTestCase {
 
-    private static final ResourceType oreRsc
-        = spec().getResourceType("model.resource.ore");
+    private static final ResourceType oreRsc = spec().getResourceType("model.resource.ore");
 
-    private static final TileImprovementType riverImprov
-        = spec().getTileImprovementType("model.improvement.river");
-    private static final TileImprovementType roadImprov
-        = spec().getTileImprovementType("model.improvement.road");
-
-    private static final TileType desert
-        = spec().getTileType("model.tile.desert");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final TileType desert = spec().getTileType("model.tile.desert");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
 
 
     private TileItemContainer getSample(Game game, Tile t, 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,6 +38,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
+import net.sf.freecol.common.option.FullscreenDisplayModeOption.FullscreenDisplayModeWrapper;
 import net.sf.freecol.common.option.LanguageOption.Language;
 
 
@@ -157,6 +158,9 @@ public class FreeColComboBoxRenderer<T>
         } else if (value instanceof MixerWrapper) {
             final MixerWrapper mw = (MixerWrapper) value;
             c.setText(mw.getKey());
+        } else if (value instanceof FullscreenDisplayModeWrapper) {
+            final FullscreenDisplayModeWrapper fdw = (FullscreenDisplayModeWrapper) value;
+            c.setText(fdw.getName());
         } else {
             logger.warning("What is this?: " + value
                 + " (" + value.getClass() + ")");

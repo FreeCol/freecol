@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -88,7 +88,6 @@ public class ReportPanel extends FreeColPanel {
         scrollPane = new JScrollPane(reportPanel,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
         add(scrollPane, SCROLL_PANE_SIZE);
         add(okButton, "cell 0 2, tag ok");
         

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -240,6 +240,7 @@ public final class DeclarationPanel extends FreeColPanel {
          * @param name The name to be used when making the signature.
          */
         public void initialize(String name) {
+            name = faFile.onlyValidCharacters(name);
             name = getAbbreviatedName(name);
 
             points = faFile.getPoints(name);

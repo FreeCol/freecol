@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -460,13 +460,11 @@ public final class UnitSeekAndDestroyMission extends Mission {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
             Colony colony;
-            Mission m;
             if (Mission.TARGETOWNERSHIP.equals(reason)
                 && getTarget() instanceof Colony
                 && (colony = (Colony)getTarget()) != null
                 && getPlayer().owns(colony)
-                && (m = getAIPlayer().getDefendSettlementMission(aiUnit,
-                        colony)) != null) {
+                && getAIPlayer().getDefendSettlementMission(aiUnit, colony) != null) {
                 return lbDone(lb, true, " capturing colony ", colony.getName());
             }            
             return retargetMission(reason, lb);

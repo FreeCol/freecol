@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -35,7 +35,7 @@ import net.sf.freecol.common.i18n.Messages;
 /**
  * A dialog for choosing a file to load.
  */
-public final class LoadDialog extends FreeColDialog<File> {
+public final class LoadDialog extends DeprecatedFreeColDialog<File> {
 
     /** Fake file for the cancel selection. */
     private static final File cancelFile = new File("");

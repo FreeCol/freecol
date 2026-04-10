@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -646,7 +646,6 @@ public final class InGameController extends Controller {
         if (!valid) return;
         String messageId = action.getTextKey();
         StringTemplate template;
-        MonarchActionMessage message;
         String monarchKey = serverPlayer.getNationId();
 
         switch (action) {
@@ -2041,7 +2040,23 @@ public final class InGameController extends Controller {
                     : current.getName()) + "'s!");
         }
 
-        ChangeSet cs = new ChangeSet();
+        final ChangeSet cs = new ChangeSet();
+        if (debugOnlyAITurns > 0 && !serverPlayer.isAI()) {
+            Session.completeAll(cs);
+        }
+        
+        /*
+         * XXX: A hack for ensuring that sessions are handled in the same turn. We
+         *      should look into a better solution.
+         */
+        try {
+            while (Session.waitingForSession()) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, "Waiting for end session interrupted.", e);
+        }
+
         for (;;) {
             current.csEndTurn(cs);
             logger.finest("Ending turn for " + current.getName());
@@ -3882,11 +3897,10 @@ public final class InGameController extends Controller {
     public ChangeSet updateTradeRoute(ServerPlayer serverPlayer,
                                       TradeRoute tradeRoute) {
         final Game game = getGame();
-        String name;
         StringTemplate fail;
         TradeRoute tr;
         if (tradeRoute == null || tradeRoute.getId() == null
-            || (name = tradeRoute.getName()) == null) {
+            || tradeRoute.getName() == null) {
             return serverPlayer.clientError("Bogus route");
         } else if ((fail = tradeRoute.verify()) != null) {
             return serverPlayer.clientError(Messages.message(fail));

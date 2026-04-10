@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -166,6 +166,12 @@ public class Game extends FreeColGameObject {
 
     /** The map of the New World. */
     protected Map map = null;
+    
+    /**
+     * Areas are collections of tiles that can be identified using the
+     * area's ID. Areas may overlap.
+     */
+    private java.util.Map<String, Area> areas = new HashMap<>();
 
     /**
      * The current nation options.  Mainly used to see if a player
@@ -776,18 +782,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Set the players in the game.
-     *
-     * @param players The new {@code Player}s to add.
-     */
-    private void setPlayers(List<Player> players) {
-        synchronized (this.players) {
-            this.players.clear();
-            if (players != null) this.players.addAll(players);
-        }
-    }
-
-    /**
      * Gets the live player after the given player.
      *
      * @param beforePlayer The {@code Player} before the
@@ -998,7 +992,6 @@ public class Game extends FreeColGameObject {
      * @param players The list of {@code players} to add.
      */
     public void addPlayers(List<Player> players) {
-        List<Player> valid = new ArrayList<>();
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {
@@ -1494,6 +1487,51 @@ public class Game extends FreeColGameObject {
             throw new XMLStreamException(ex);
         }
     }
+    
+    /**
+     * Generates empty areas that should be made available in the map editor.
+     */
+    public void generateDefaultAreas() {
+        for (Nation nation : getSpecification().getNations()) {
+            if (nation.isUnknownEnemy()) {
+                continue;
+            }
+            if (nation.getType().isREF()) {
+                continue;
+            }
+            final String nationAreaId = Area.PREFIX_PLAYER_STARTING_POSITION + nation.getId();
+            if (!areas.containsKey(nationAreaId)) {
+                addArea(new Area(this, nationAreaId, nation.getNameKey()));
+            }
+        }
+    }
+    
+    /**
+     * Gets the starting area for the given nation.
+     * 
+     * @param nation The nation to get the area for.
+     * @return The {@code Area}, if it has been defined on the map. It not,
+     *      then just {@code null}.
+     */
+    public Area getNationStartingArea(Nation nation) {
+        final String nationAreaId = Area.PREFIX_PLAYER_STARTING_POSITION + nation.getId();
+        return areas.get(nationAreaId);
+    }
+    
+    /**
+     * Gets a list of all areas in this game.
+     */
+    public List<Area> getAreas() {
+        return new ArrayList<>(areas.values());
+    }
+    
+    /**
+     * Adds a new {@code Area} to the game.
+     * @param area The {@code Area} to be added.
+     */
+    public void addArea(Area area) {
+        areas.put(area.getId(), area);
+    }
 
 
     // Override FreeColGameObject
@@ -1597,6 +1635,7 @@ public class Game extends FreeColGameObject {
     // must be written first if the intent is to use that spec in the
     // game when it is read again.  Similarly we try to fail fast
     // if required to read those fields if a spec has not shown up.
+    private static final String AREAS_TAG = "areas";
     private static final String CIBOLA_TAG = "cibola";
     private static final String CLIENT_USER_NAME_TAG = "clientUserName";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
@@ -1674,7 +1713,15 @@ public class Game extends FreeColGameObject {
         if (unknown != null) unknown.toXML(xw);
 
         Map map = getMap();
-        if (map != null) map.toXML(xw);
+        if (map != null) {
+            map.toXML(xw);
+        }
+        
+        xw.writeStartElement(AREAS_TAG);
+        for (Area a : areas.values()) {
+            a.toXML(xw);
+        }
+        xw.writeEndElement();
     }
 
     /**
@@ -1783,6 +1830,15 @@ public class Game extends FreeColGameObject {
         } else if (Specification.TAG.equals(tag)) {
             setSpecification(new Specification(xr));
 
+        } else if (AREAS_TAG.equals(tag)) {
+            try {
+                while (xr.moreTags()) {
+                    final Area area = xr.readFreeColObject(game, Area.class);
+                    areas.put(area.getId(), area);
+                }
+            } catch (XMLStreamException xse) {
+                logger.log(Level.SEVERE, "nextTag failed at " + tag, xse);
+            }
         } else {
             super.readChild(xr);
         }

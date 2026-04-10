@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,7 +26,6 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -45,8 +45,14 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
+import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalAlignment;
+import net.sf.freecol.client.gui.panel.WrapLayout.HorizontalGap;
+import net.sf.freecol.client.gui.panel.mapeditor.ChooseAreaModificationPanel;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -255,13 +261,45 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             t.removeLostCityRumour();
         }
     }
+    
+    public static final class AssignAreaTransform extends MapTransform {
+        private Area area;
+
+        private AssignAreaTransform(Area area) {
+            this.area = area;
+        }
+
+        public Area getArea() {
+            return area;
+        }
+        
+        public void setArea(Area area) {
+            this.area = area;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void transform(Tile t) {
+            if (area == null) {
+                return;
+            }
+            if (area.containsTile(t)) {
+                area.removeTile(t);
+            } else {
+                area.addTile(t);
+            }
+        }
+    }
 
     /** A native nation to use for native settlement type and skill. */
     private static Nation nativeNation;
 
     private final JPanel listPanel;
-    private JToggleButton settlementButton;
     private final ButtonGroup group;
+    
+    private final ChooseAreaModificationPanel chooseAreaModificationPanel;
 
 
     /**
@@ -272,7 +310,22 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, null, new BorderLayout());
 
-        listPanel = new JPanel(new GridLayout(2, 0));
+        final MapEditorController ctlr = getFreeColClient().getMapEditorController();
+        final DialogHandler<Area> areaModificationHandler = (area) -> {
+            ctlr.setCurrentArea(area);
+            final MapTransform currentMapTransform = ctlr.getMapTransform();
+            if (currentMapTransform instanceof AssignAreaTransform) {
+                final AssignAreaTransform assignAreaTransform = (AssignAreaTransform) currentMapTransform;
+                assignAreaTransform.setArea(area);
+            }
+        };
+        this.chooseAreaModificationPanel = new ChooseAreaModificationPanel(freeColClient, areaModificationHandler );
+        
+        final Dimension terrainSize = ImageLibrary.scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_OVERLAY_SIZE), ImageLibrary.SMALLER_SCALE);
+        listPanel = new JPanel(new WrapLayout()
+                .withForceComponentSize(terrainSize)
+                .withHorizontalAlignment(HorizontalAlignment.LEFT)
+                .withHorizontalGap(HorizontalGap.AUTO));
 
         group = new ButtonGroup();
         //Add an invisible, move button to de-select all others
@@ -281,12 +334,25 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
         JScrollPane sl = new JScrollPane(listPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         sl.getViewport().setOpaque(false);
-        add(sl);
+        listPanel.setSize(new Dimension(terrainSize.width * 3, 0));
+        add(sl, BorderLayout.CENTER);
+        setBorder(BorderFactory.createEmptyBorder());
+        revalidate();
+        repaint();
     }
 
-
+    @Override
+    public String getFrameTitle() {
+        return Messages.message("mapEditorTransformPanel.title");
+    }
+    
+    @Override
+    public PopupPosition getFramePopupPosition() {
+        return PopupPosition.RIGHT;
+    }
+    
     /**
      * Get the last used native nation.
      *
@@ -314,10 +380,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         final Specification spec = getSpecification();
         final Dimension terrainSize = ImageLibrary
-            .scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE,
+            .scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_OVERLAY_SIZE),
                             ImageLibrary.SMALLER_SCALE);
         final Dimension riverSize = ImageLibrary
-            .scaleDimension(ImageLibrary.TILE_SIZE,
+            .scaleDimension(getImageLibrary().scale(ImageLibrary.TILE_SIZE),
                             ImageLibrary.SMALLER_SCALE);
 
         for (TileType type : spec.getTileTypeList()) {
@@ -355,6 +421,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getImageLibrary().getSettlementTypeImage(settlementType, riverSize),
                 Messages.message("settlement"),
                 new SettlementTransform()));
+        
+        listPanel.add(buildButton(getImageLibrary().getScaledImage("image.icon.mapEditor.selectArea"),
+                Messages.message("mapEditorTransformPanel.selectArea"),
+                new AssignAreaTransform(null)));
     }
 
     /**
@@ -393,6 +463,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                 .getRiverStyleKeys(all));
                         if (style != null) rst.setStyle(style);
                     }
+                    if (mt instanceof AssignAreaTransform) {
+                        getGUI().showFreeColPanel(chooseAreaModificationPanel, true, null, true);
+                        newMapTransform = null;
+                        ctlr.setDisplayAreas(true);
+                    }
                     newMapTransform = mt;
                 }
                 ctlr.setMapTransform(newMapTransform);
@@ -420,7 +495,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             = rt -> new ChoiceItem<ResourceType>(Messages.getName(rt), rt);
         StringTemplate tmpl = StringTemplate
             .template("mapEditorTransformPanel.chooseResource");
-        return getGUI().getChoice(tmpl, "cancel",
+        return getGUI().modalChoiceDialog(tmpl, "cancel",
                                   transform(resources, alwaysTrue(), mapper));
     }
 }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -343,9 +343,9 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testUnitGetsExperienceThroughWork() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerTestHelper.startServerGame(getTestMap());
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Unit colonist = colony.getUnitList().get(0);
 
         assertEquals("Colonist should not have any experience",
@@ -370,9 +370,9 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testUnitPromotionWorkingInWorkTile() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        ServerTestHelper.startServerGame(getTestMap(plains));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         assertTrue("Colony should only have 1 colonist for test setup",
                    colony.getUnitCount() == 1);
 
@@ -471,7 +471,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testUnitLumberDelivery() {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
-        Colony colony = getStandardColony(3);
+        Colony colony = createStandardColony(3);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Tile tile = colony.getTile();
         

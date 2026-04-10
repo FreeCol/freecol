@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,19 +20,25 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.beans.PropertyChangeListener;
+import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
+import net.sf.freecol.common.option.FullscreenDisplayModeOption;
 
 
 /**
@@ -45,6 +51,9 @@ public class FreeColFrame extends JFrame {
     /** The FreeCol client controlling the frame. */
     protected final FreeColClient freeColClient;
 
+    private PropertyChangeListener displayModeChange = (event) -> {
+                updateDisplayMode(getGraphicsConfiguration().getDevice());
+            };
 
     /**
      * Create a new main frame.
@@ -66,7 +75,12 @@ public class FreeColFrame extends JFrame {
         } else {
             setUndecorated(true);
             gd.setFullScreenWindow(this);
+            
+            final FullscreenDisplayModeOption fdmo = getDisplayModeOption(freeColClient);
+            fdmo.addPropertyChangeListener(displayModeChange);
+            updateDisplayMode(gd);
         }
+        
         setJMenuBar(menuBar);
         addWindowListener(windowed
             ? new WindowedFrameListener(freeColClient)
@@ -109,10 +123,45 @@ public class FreeColFrame extends JFrame {
         */
     }
 
+    private FullscreenDisplayModeOption getDisplayModeOption(FreeColClient freeColClient) {
+        return freeColClient.getClientOptions().getOption(ClientOptions.DISPLAY_MODE_FULLSCREEN, FullscreenDisplayModeOption.class);
+    }
+
+    private void updateDisplayMode(GraphicsDevice gd) {
+        final FullscreenDisplayModeOption fdmo = getDisplayModeOption(freeColClient);
+        final DisplayMode displayMode = fdmo.getValue().getDisplayMode();
+        if (displayMode == null) {
+            final DisplayMode matchingDisplayMode = List.of(gd.getDisplayModes()).stream()
+                    .sorted(Comparator.comparingInt((DisplayMode dm) -> dm.getWidth() * dm.getHeight())
+                            .thenComparing(DisplayMode::getRefreshRate)
+                            .thenComparing(DisplayMode::getBitDepth)
+                            .reversed())
+                    .findFirst()
+                    .orElse(null);
+            if (matchingDisplayMode == null) {
+                return;
+            }
+            gd.setDisplayMode(matchingDisplayMode);
+            return;
+        }
+        
+        final DisplayMode matchingDisplayMode = List.of(gd.getDisplayModes()).stream()
+                .filter(dm -> dm.getWidth() == displayMode.getWidth() && dm.getHeight() == displayMode.getHeight())
+                .sorted(Comparator.comparingInt(DisplayMode::getRefreshRate).thenComparing(DisplayMode::getBitDepth).reversed())
+                .findFirst()
+                .orElse(null);
+        if (matchingDisplayMode == null) {
+            return;
+        }
+        
+        gd.setDisplayMode(matchingDisplayMode);
+    }
+
     public void exitFullScreen() {
         GraphicsConfiguration GraphicsConf = getGraphicsConfiguration();
         GraphicsDevice gd = GraphicsConf.getDevice();
         gd.setFullScreenWindow(null);
+        getDisplayModeOption(freeColClient).removePropertyChangeListener(displayModeChange);
     }
 
     public void setMenuBar(FreeColMenuBar bar) {

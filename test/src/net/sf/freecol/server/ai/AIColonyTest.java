@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerBuilding;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -49,13 +48,9 @@ public class AIColonyTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.carpenterHouse");
     private static final BuildingType lumberMillType
         = spec().getBuildingType("model.building.lumberMill");
-    private static final BuildingType warehouseType
-        = spec().getBuildingType("model.building.warehouse");
 
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammersType
         = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType lumberType
@@ -107,7 +102,7 @@ public class AIColonyTest extends FreeColTestCase {
         }
 
         // Needs a decent sized colony.
-        Colony colony = getStandardColony(6);
+        Colony colony = createStandardColony(6);
         game.setCurrentPlayer(colony.getOwner());
         return colony;
     }
@@ -139,10 +134,7 @@ public class AIColonyTest extends FreeColTestCase {
 
         final Building carpenterHouse
             = colony.getBuilding(carpentersHouseType);
-        final Building blacksmithHouse
-            = colony.getBuilding(blacksmithsHouseType);
         AIColony aiColony = aiMain.getAIColony(colony);
-        ServerPlayer player = (ServerPlayer) colony.getOwner();
 
         // Add food so that the starvation avoidance is not triggered
         colony.addGoods(foodType, GoodsContainer.CARGO_SIZE);
@@ -228,7 +220,6 @@ public class AIColonyTest extends FreeColTestCase {
         final Building blacksmithHouse
             = colony.getBuilding(blacksmithsHouseType);
         AIColony aiColony = aiMain.getAIColony(colony);
-        ServerPlayer player = (ServerPlayer) colony.getOwner();
 
         // Add food so that the starvation avoidance is not triggered
         colony.addGoods(foodType, GoodsContainer.CARGO_SIZE);
@@ -343,7 +334,6 @@ public class AIColonyTest extends FreeColTestCase {
         AIColony aiColony = aiMain.getAIColony(colony);
         game.setCurrentPlayer(colony.getOwner());
 
-        ServerPlayer player = (ServerPlayer) colony.getOwner();
         assertEquals("Wrong number of units in colony", 1,
             colony.getUnitCount());
         Unit lumberjack = colony.getUnitList().get(0);
@@ -364,10 +354,8 @@ public class AIColonyTest extends FreeColTestCase {
     }
 
     public void testBestDefender() {
-        Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));
-        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-
-        Colony colony = getStandardColony();
+        ServerTestHelper.startServerGame(getTestMap(savannahType));
+        final Colony colony = createStandardColony();
         assertEquals(artilleryType, colony.getBestDefenderType());
     }
 }

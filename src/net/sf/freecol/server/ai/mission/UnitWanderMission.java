@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -34,9 +32,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * Mission for wandering in random directions.
  */
 public class UnitWanderMission extends Mission {
-
-    private static final Logger logger = Logger.getLogger(UnitWanderMission.class.getName());
-
+    
     public static final String TAG = "unitWanderMission";
 
     /** The tag for this mission. */

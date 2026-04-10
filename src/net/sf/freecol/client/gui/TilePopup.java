@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -18,6 +18,10 @@
  */
 
 package net.sf.freecol.client.gui;
+
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.sort;
+import static net.sf.freecol.common.util.CollectionUtils.sum;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -41,7 +45,6 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -49,7 +52,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -343,7 +345,6 @@ public final class TilePopup extends JPopupMenu {
                     if (!freeColClient.currentPlayerIsMyPlayer()) return;
                     Tile currTile = activeUnit.getTile();
                     if (currTile == tile) return;
-                    final Map map = activeUnit.getGame().getMap();
                     LogBuilder lb = new LogBuilder(512);
                     PathNode path = activeUnit.findPath(activeUnit.getTile(),
                         tile, activeUnit.getCarrier(), null, lb);
@@ -366,7 +367,17 @@ public final class TilePopup extends JPopupMenu {
                 DebugUtils.dumpTile(freeColClient, tile);
             });
         add(dumpItem);
+        
+        if (freeColClient.getFreeColServer() != null) {
+            final JMenuItem debugCreateIdealColony = new JMenuItem("Create Ideal Colony");
+            debugCreateIdealColony.setOpaque(false);
+            debugCreateIdealColony.addActionListener((ActionEvent ae) -> {
+                DebugUtils.createColonyFromAiColonyPlan(freeColClient, tile);
+            });
+            add(debugCreateIdealColony);
+        }
     }
+
 
     /**
      * Adds a unit entry to this popup.

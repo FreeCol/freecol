@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalIconFactory;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -112,12 +113,13 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     private static final String transparentPanelUI
         = "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI";
 
-    private static final Class uiClasses[] = {
+    private static final Class<?> uiClasses[] = {
         FreeColButtonUI.class,
         FreeColCheckBoxMenuItemUI.class,
         FreeColCheckBoxUI.class,
         FreeColComboBoxUI.class,
         FreeColFileChooserUI.class,
+        FreeColInternalFrameUI.class,
         FreeColLabelUI.class,
         FreeColListUI.class,
         FreeColMenuBarUI.class,
@@ -138,6 +140,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         FreeColTransparentPanelUI.class,
         FreeColSpinnerUI.class
     };
+    
+    private static float scaleFactor = 1;
 
 
     /**
@@ -221,7 +225,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         
         // TODO: We might want to allow overriding font colors for the menu:
         //u.put("Menu.foreground", java.awt.Color.WHITE);
-        
+
         return u;
     }
 
@@ -256,6 +260,23 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 u.put(key, defaultFont);
             }
         }
+    }
+    
+    public static void setScaleFactor(float scaleFactor) {
+        FreeColLookAndFeel.scaleFactor = scaleFactor;
+        final UIDefaults u = UIManager.getLookAndFeelDefaults();
+        final int scrollbarWidth = (int) (17 * scaleFactor);
+        u.put("ScrollBar.width", scrollbarWidth);
+        
+        int internalFrameIconSize = (int) (16 * scaleFactor);
+        u.put("InternalFrame.closeIcon", (LazyValue) t -> MetalIconFactory.getInternalFrameCloseIcon(internalFrameIconSize));
+        u.put("InternalFrame.maximizeIcon", (LazyValue) t -> MetalIconFactory. getInternalFrameMaximizeIcon(internalFrameIconSize));
+        u.put("InternalFrame.iconifyIcon", (LazyValue) t -> MetalIconFactory.getInternalFrameMinimizeIcon(internalFrameIconSize));
+        u.put("InternalFrame.minimizeIcon", (LazyValue) t -> MetalIconFactory.getInternalFrameAltMaximizeIcon(internalFrameIconSize));
+    }
+    
+    public static float getScaleFactor() {
+        return scaleFactor;
     }
 
     /**

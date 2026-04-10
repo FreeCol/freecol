@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -45,6 +45,7 @@ public class SaveGameValidator {
     public static void main(String[] args) throws Exception {
 
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         File schemaLocation = new File("schema/data/data-savedGame.xsd");
         Schema schema = factory.newSchema(schemaLocation);
         Validator saveGameValidator = schema.newValidator();

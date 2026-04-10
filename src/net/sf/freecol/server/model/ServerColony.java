@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -106,7 +106,6 @@ public class ServerColony extends Colony implements TurnTaker {
             colonyTiles.add(new ServerColonyTile(game, this, t));
         }
 
-        Building building;
         List<BuildingType> buildingTypes = spec.getBuildingTypeList();
         for (BuildingType buildingType : transform(buildingTypes, bt ->
                 bt.isAutomaticBuild() || isAutomaticBuild(bt))) {
@@ -685,6 +684,8 @@ public class ServerColony extends Colony implements TurnTaker {
         boolean newUnitBorn = false;
         GoodsContainer container = getGoodsContainer();
         container.saveState();
+        
+        invalidateCache();
 
         // Check for learning by experience
         for (WorkLocation wl : getCurrentWorkLocationsList()) {

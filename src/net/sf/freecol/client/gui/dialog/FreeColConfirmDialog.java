@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * A simple modal ok/cancel dialog.
  */
-public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
+public class FreeColConfirmDialog extends DeprecatedFreeColDialog<Boolean> {
 
     /**
      * Internal constructor.

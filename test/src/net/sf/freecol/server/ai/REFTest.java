@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.List;
 import java.util.Random;
 
 import net.sf.freecol.common.model.AbstractUnit;
@@ -29,7 +28,6 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -37,12 +35,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class REFTest extends FreeColTestCase {
-
-    private static final UnitType artilleryType
-        = spec().getUnitType("model.unit.artillery");
-    private static final UnitType soldierType
-        = spec().getUnitType("model.unit.kingsRegular");
-
 
     @Override
     public void tearDown() throws Exception {
@@ -61,7 +53,6 @@ public class REFTest extends FreeColTestCase {
         final Force exf = player1.getMonarch().getExpeditionaryForce();
         // Update to have full naval capacity
         exf.prepareToBoard(null);
-        List<AbstractUnit> refBeforeIndependence = exf.getUnitList();
         
         ServerPlayer refPlayer = igc.createREFPlayer(player1);
 
@@ -82,7 +73,6 @@ public class REFTest extends FreeColTestCase {
     public void testAddToREF() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         final Specification spec = game.getSpecification();
-        InGameController igc = ServerTestHelper.getInGameController();
         Random random = ServerTestHelper.getServer().getServerRandom();
 
         // Create player
@@ -95,7 +85,6 @@ public class REFTest extends FreeColTestCase {
         // If the REF has too many land units, it should add more naval,
         // if it has enough naval it should add more land.
         // If this does not happen, this test will fail by looping forever.
-        final Force exf = monarch.getExpeditionaryForce();
         int done = 0;
         while (done != 3) {
             boolean naval = monarch.shouldAddNavalUnit();

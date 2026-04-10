@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.tooltip;
 import static net.sf.freecol.common.util.CollectionUtils.forEach;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.List;
 
 import javax.swing.JLabel;

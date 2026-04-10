@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -108,9 +108,10 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @SuppressWarnings("unchecked")
         @Override
         public Object getCellEditorValue() {
-            return ((JComboBox)getComponent()).getSelectedItem();
+            return ((JComboBox<EuropeanNationType>) getComponent()).getSelectedItem();
         }
     }
 
@@ -708,8 +709,7 @@ public final class PlayersTable extends JTable {
         TableColumn advantagesColumn = tcm.getColumn(ADVANTAGE_COLUMN);
         switch (nationOptions.getNationalAdvantages()) {
         case SELECTABLE:
-            advantagesColumn.setCellEditor(new AdvantageCellEditor(spec
-                    .getEuropeanNationTypes()));
+            advantagesColumn.setCellEditor(new AdvantageCellEditor(spec.getVisibleEuropeanNationTypes()));
             break;
         case FIXED:
             break; // Do nothing

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,10 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.util.CollectionUtils.first;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -35,13 +36,11 @@ import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
-import net.sf.freecol.client.gui.tooltip.*;
+import net.sf.freecol.client.gui.tooltip.BuildingToolTip;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -49,7 +48,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -67,6 +65,8 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     /** Labels for any units present. */
     private final List<UnitLabel> unitLabels = new ArrayList<>();
+    
+    private final Dimension unscaledMinimumWorkerAndProductionSize;
 
 
     /**
@@ -76,14 +76,28 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      * @param building The building to display information from.
      */
     public BuildingPanel(FreeColClient freeColClient, Building building) {
-        super(new MigLayout("", "[32!][32!][32!]", "[32!][44!]"));
-
+        super(new MigLayout("ins 0 0 0 0, gap 0 0", layoutConstraintString(building), "0:push[32!, bottom]0[58!, bottom]"));
         this.freeColClient = freeColClient;
         this.building = building;
+        this.unscaledMinimumWorkerAndProductionSize = new Dimension(Math.max(64, building.getUnitCapacity() * 32), 90);
 
         setToolTipText(" ");
     }
 
+    private static String layoutConstraintString(Building building) {
+        return "push" + layoutWorkerString(building) + "push";
+    }
+
+    private static String layoutWorkerString(Building building) {
+        if (building.getUnitCapacity() < 2) {
+            return "[64!]";
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (int i=0; i<building.getUnitCapacity(); i++) {
+            sb.append("[32!]");
+        }
+        return sb.toString();
+    }
 
     private ImageLibrary getImageLibrary() {
         return this.freeColClient.getGUI().getFixedImageLibrary();
@@ -176,15 +190,22 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             unitLabels.add(unitLabel);
             add(unitLabel);
         }
-
-        ImageLibrary lib = getImageLibrary();
-        Image buildingImage = lib.getScaledBuildingImage(building);
-        setPreferredSize(new Dimension(buildingImage.getWidth(null), 
-                                       buildingImage.getHeight(null)));
+        
+        final Dimension minimumWorkerAndProductionSize = getImageLibrary().scale(unscaledMinimumWorkerAndProductionSize);
+        
+        final BufferedImage image = getImageLibrary().getScaledBuildingImage(building);
+        final Dimension minimumSizeForImage = new Dimension(image.getWidth(), image.getHeight());
+        setMinimumSize(largestWidthAndHeight(minimumWorkerAndProductionSize, minimumSizeForImage));
+        
+        final Dimension preferredSizeForImage = getImageLibrary().determineMaxSizeUsingSizeFromAllLevels(building.getType(), building.getOwner());
+        setPreferredSize(largestWidthAndHeight(minimumWorkerAndProductionSize, preferredSizeForImage));
         revalidate();
         repaint();
     }
 
+    private Dimension largestWidthAndHeight(Dimension d1, Dimension d2) {
+        return new Dimension(Math.max(d1.width, d2.width), Math.max(d1.height, d2.height));
+    }
 
     /**
      * Get the building this panel displays.
@@ -239,8 +260,13 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-        ImageLibrary lib = getImageLibrary();
-        g.drawImage(lib.getScaledBuildingImage(building), 0, 0, this);
+        final ImageLibrary lib = getImageLibrary();
+        final BufferedImage image = lib.getScaledBuildingImage(building);
+        final Dimension size = getSize();
+        g.drawImage(image,
+                (size.width - image.getWidth()) / 2,
+                size.height - image.getHeight(),
+                this);
     }
 
 

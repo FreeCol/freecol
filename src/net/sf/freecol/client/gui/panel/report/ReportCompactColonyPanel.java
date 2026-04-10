@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -898,7 +898,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
      * @param summaries A list of {@code ColonySummary}s to update from.
      */
     private void updateCombinedColonies(List<ColonySummary> summaries) {
-        JLabel l;
         Color c;
         StringTemplate t;
 

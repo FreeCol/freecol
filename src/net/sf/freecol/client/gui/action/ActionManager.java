@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.util.logging.Logger;
-
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,6 +119,8 @@ public class ActionManager extends OptionGroup {
         add(new LoadAction(freeColClient));
         add(new MapControlsAction(freeColClient));
         add(new MapEditorAction(freeColClient));
+        add(new MapEditorToolboxPanelAction(freeColClient));
+        add(new MapEditorTransformPanelAction(freeColClient));
         add(new MiniMapToggleViewAction(freeColClient));
         add(new MiniMapToggleViewAction(freeColClient, true));
         add(new MiniMapToggleFogOfWarAction(freeColClient));
@@ -209,6 +211,17 @@ public class ActionManager extends OptionGroup {
         return (hasOption(id, FreeColAction.class))
             ? getOption(id, FreeColAction.class)
             : null;
+    }
+    
+    /***
+     * Gets all registered {@code FreeColAction}s.
+     * @return The list of all actions.
+     */
+    public List<FreeColAction> getFreeColActions() {
+        return getOptions().stream()
+                .filter(o -> o instanceof FreeColAction)
+                .map(o -> (FreeColAction) o)
+                .collect(Collectors.toList());
     }
 
     /**

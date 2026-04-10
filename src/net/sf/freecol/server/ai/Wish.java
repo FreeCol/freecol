@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,18 +19,16 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Unit;
-import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
@@ -39,8 +37,6 @@ import net.sf.freecol.common.util.Utils;
  * Represents a need for something at a given {@code Location}.
  */
 public abstract class Wish extends ValuedAIObject {
-
-    private static final Logger logger = Logger.getLogger(Wish.class.getName());
 
     /** The requesting location of this wish. */
     protected Location destination;

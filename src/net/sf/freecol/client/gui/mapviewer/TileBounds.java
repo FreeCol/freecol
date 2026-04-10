@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,9 +20,6 @@
 package net.sf.freecol.client.gui.mapviewer;
 
 import java.awt.Dimension;
-import java.awt.Point;
-
-import javax.swing.JLabel;
 
 /**
  * Bounds of the tiles to be rendered. These bounds are scaled according to the
@@ -41,14 +38,11 @@ public final class TileBounds {
     /** Tile width and height, and half values thereof. */
     private int tileHeight, tileWidth, halfHeight, halfWidth;
     
-    private float scaleFactor;
-    
     TileBounds(Dimension tileSize, float scaleFactor) {
         this.tileHeight = tileSize.height;
         this.tileWidth = tileSize.width;
         this.halfHeight = tileSize.height / 2;
         this.halfWidth = tileSize.width / 2;
-        this.scaleFactor = scaleFactor;
     }
     
     public int getWidth() {
@@ -65,20 +59,5 @@ public final class TileBounds {
     
     public int getHalfHeight() {
         return halfHeight;
-    }  
-    
-    /**
-     * Gets the position where a unitLabel located at tile should be drawn.
-     *
-     * @param unitLabel The unit label.
-     * @param tileP The position of the {@code Tile} on the screen.
-     * @return The position where to put the label, null if tileP is null.
-     */
-    Point calculateUnitLabelPositionInTile(JLabel unitLabel,
-                                                  Point tileP) {
-        if (tileP == null) return null;
-        int labelX = tileP.x + tileWidth / 2 - unitLabel.getWidth() / 2;
-        int labelY = tileP.y + tileHeight / 2 - unitLabel.getHeight() / 2;
-        return new Point(labelX, labelY);
     }
 }

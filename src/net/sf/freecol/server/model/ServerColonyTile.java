@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,7 +20,6 @@
 package net.sf.freecol.server.model;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -41,8 +40,6 @@ import net.sf.freecol.common.util.LogBuilder;
  * The server version of a colony tile.
  */
 public class ServerColonyTile extends ColonyTile implements TurnTaker {
-
-    private static final Logger logger = Logger.getLogger(ServerColonyTile.class.getName());
 
 
     /**

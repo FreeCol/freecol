@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -40,10 +40,6 @@ public class NativeTrade extends FreeColGameObject {
     private static final Logger logger = Logger.getLogger(NativeTrade.class.getName());
 
     public static final String TAG = "nativeTrade";
-
-    /** A template to use as a magic cookie for aborted trades. */
-    private static final StringTemplate abortTrade
-        = StringTemplate.template("");
 
     /** The type of native trade command. */
     public static enum NativeTradeAction {

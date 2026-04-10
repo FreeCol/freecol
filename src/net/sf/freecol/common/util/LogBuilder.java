@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -59,7 +59,7 @@ public class LogBuilder {
      */
     private static String o2s(Object o) {
         return (o == null) ? "null"
-            : (o instanceof Class) ? ((Class)o).getName()
+            : (o instanceof Class<?>) ? ((Class<?>) o).getName()
             : (o instanceof String) ? (String)o
             : (o instanceof Location) ? ((Location)o).toShortString()
             : o.toString();

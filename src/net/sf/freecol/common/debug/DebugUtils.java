@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -42,9 +42,11 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -54,10 +56,13 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
@@ -65,6 +70,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.GameOptions;
@@ -77,10 +84,16 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.colony.ColonyPlan;
+import net.sf.freecol.server.ai.colony.PlannedWorkLocation;
+import net.sf.freecol.server.ai.colony.StandardColonyPlanner;
+import net.sf.freecol.server.ai.colony.TileImprovementPlan;
+import net.sf.freecol.server.ai.colony.WorkerPlan;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -134,7 +147,7 @@ public class DebugUtils {
             new ChoiceItem<BuildingType>(Messages.getName(bt), bt);
 
         StringTemplate tmpl = StringTemplate.name(title);
-        BuildingType buildingType = gui.getChoice(tmpl, "cancel",
+        BuildingType buildingType = gui.modalChoiceDialog(tmpl, "cancel",
             transform(spec.getBuildingTypeList(), alwaysTrue(), mapper,
                       Comparator.naturalOrder()));
         if (buildingType == null) return;
@@ -195,7 +208,7 @@ public class DebugUtils {
             = f -> new ChoiceItem<FoundingFather>(Messages.getName(f), f);
 
         StringTemplate tmpl = StringTemplate.name(fatherTitle);
-        FoundingFather father = gui.getChoice(tmpl, "cancel",
+        FoundingFather father = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sSpec.getFoundingFathers(), noFatherPred, mapper,
                       Comparator.naturalOrder()));
         if (father != null) {
@@ -218,7 +231,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectGold"),
             Integer.toString(1000), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -230,6 +243,7 @@ public class DebugUtils {
         }
         player.modifyGold(gold);
         sPlayer.modifyGold(gold);
+        freeColClient.getGUI().updateMenuBar();
     }
 
     /**
@@ -265,7 +279,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectImmigration"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -293,7 +307,7 @@ public class DebugUtils {
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectLiberty"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -355,7 +369,7 @@ public class DebugUtils {
             new ChoiceItem<UnitType>(Messages.getName(ut), ut);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectUnitType");
-        UnitType unitChoice = gui.getChoice(tmpl, "cancel",
+        UnitType unitChoice = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sSpec.getUnitTypeList(), alwaysTrue(), mapper,
                       Comparator.naturalOrder()));
         if (unitChoice == null) return;
@@ -401,12 +415,12 @@ public class DebugUtils {
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
             
         StringTemplate tmpl = StringTemplate.template("prompt.selectGoodsType");
-        GoodsType goodsType = gui.getChoice(tmpl, "cancel",
+        GoodsType goodsType = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sSpec.getGoodsTypeList(), goodsPred, mapper,
                       Comparator.naturalOrder()));
         if (goodsType == null) return;
 
-        String amount = gui.getInput(null,
+        String amount = gui.modalInputDialog(null,
             StringTemplate.template("prompt.selectGoodsAmount"),
             "20", "ok", "cancel");
         if (amount == null) return;
@@ -451,7 +465,7 @@ public class DebugUtils {
             return;
         }
         StringTemplate tmpl = StringTemplate.template("prompt.selectDisaster");
-        Disaster disaster = gui.getChoice(tmpl, "cancel", disasters);
+        Disaster disaster = gui.modalChoiceDialog(tmpl, "cancel", disasters);
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -490,7 +504,7 @@ public class DebugUtils {
             new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectOwner");
-        Player player = gui.getChoice(tmpl, "cancel",
+        Player player = gui.modalChoiceDialog(tmpl, "cancel",
             transform(game.getLiveEuropeanPlayers(colony.getOwner()),
                       alwaysTrue(), mapper, Comparator.naturalOrder()));
         if (player == null) return;
@@ -523,7 +537,7 @@ public class DebugUtils {
             new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectOwner");
-        Player player = gui.getChoice(tmpl, "cancel",
+        Player player = gui.modalChoiceDialog(tmpl, "cancel",
             transform(game.getLivePlayers(),
                       p -> unit.getType().isAvailableTo(p), mapper,
                       Comparator.naturalOrder()));
@@ -558,7 +572,7 @@ public class DebugUtils {
             new ChoiceItem<Role>(r.getId(), r);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectRole");
-        Role roleChoice = gui.getChoice(tmpl, "cancel",
+        Role roleChoice = gui.modalChoiceDialog(tmpl, "cancel",
             transform(sGame.getSpecification().getRoles(), alwaysTrue(),
                       roleMapper, Comparator.naturalOrder()));
         if (roleChoice == null) return;
@@ -964,12 +978,12 @@ public class DebugUtils {
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
 
         StringTemplate tmpl = StringTemplate.template("prompt.selectGoodsType");
-        GoodsType goodsType = gui.getChoice(tmpl, "cancel",
+        GoodsType goodsType = gui.modalChoiceDialog(tmpl, "cancel",
             transform(spec.getGoodsTypeList(), goodsPred, mapper,
                       Comparator.naturalOrder()));
         if (goodsType == null) return;
 
-        String response = gui.getInput(null,
+        String response = gui.modalInputDialog(null,
                 StringTemplate.template("prompt.selectGoodsAmount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel");
@@ -1024,7 +1038,7 @@ public class DebugUtils {
             new ChoiceItem<MonarchAction>(a);
 
         StringTemplate tmpl = StringTemplate.name(monarchTitle);
-        MonarchAction action = gui.getChoice(tmpl, "cancel",
+        MonarchAction action = gui.modalChoiceDialog(tmpl, "cancel",
             transform(MonarchAction.values(), alwaysTrue(), mapper,
                       Comparator.naturalOrder()));
         if (action == null) return;
@@ -1053,7 +1067,7 @@ public class DebugUtils {
             
         StringTemplate tmpl = StringTemplate.template("prompt.selectLostCityRumour");
         RumourType rumourChoice = freeColClient.getGUI()
-            .getChoice(tmpl, "cancel",
+            .modalChoiceDialog(tmpl, "cancel",
                        transform(RumourType.values(), realRumourPred, mapper,
                                  Comparator.naturalOrder()));
         if (rumourChoice == null) return;
@@ -1098,7 +1112,7 @@ public class DebugUtils {
 
         freeColClient.skipTurns(0); // Clear existing skipping
 
-        String response = freeColClient.getGUI().getInput(null,
+        String response = freeColClient.getGUI().modalInputDialog(null,
             StringTemplate.key("prompt.selectTurnsToSkip"),
             Integer.toString(10), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -1145,7 +1159,7 @@ public class DebugUtils {
         boolean more = true;
         while (more) {
             int val = server.getInGameController().stepRandom();
-            more = gui.confirm(StringTemplate.template("prompt.stepRNG")
+            more = gui.modalConfirmDialog(StringTemplate.template("prompt.stepRNG")
                 .addAmount("%value%", val),
                 "more", "cancel");
         }
@@ -1239,5 +1253,94 @@ public class DebugUtils {
         lb.add("\nLast Tribute = ", sis.getLastTribute());
 
         freeColClient.getGUI().showInformationPanel(lb.toString());
+    }
+    
+    /**
+     * Creates a new colony from the ideal AI {@code ColonyPlan}.
+     * 
+     * @param freeColClient The client.
+     * @param tile The {@code Tile} to create the colony on.
+     */
+    public static void createColonyFromAiColonyPlan(FreeColClient freeColClient, Tile tile) {
+        final FreeColServer fcs = freeColClient.getFreeColServer();
+        final ServerGame serverGame = fcs.getGame();
+        final Tile serverTile = serverGame.getFreeColGameObject(tile.getId(), Tile.class);
+        final ColonyPlan colonyPlan = new StandardColonyPlanner().createPlan(serverTile);
+        final ServerPlayer serverPlayer = serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId(), ServerPlayer.class);
+        
+        for (TileImprovementPlan tip : colonyPlan.getTileImprovements()) {
+            final Tile tipTarget = tip.getTarget();
+            final TileImprovement ti = new TileImprovement(serverGame, tipTarget, tip.getType(), null);
+            ti.setTurnsToComplete(0);
+            tipTarget.add(ti);
+            final TileType changeType = ti.getChange(tipTarget.getType());
+            if (changeType != null) {
+                tipTarget.changeType(changeType);
+            }
+        }
+        
+        final ServerColony serverColony = new ServerColony(serverGame, serverPlayer, "Debug", serverTile);
+        serverTile.setSettlement(serverColony);
+
+        for (BuildableType buildableType : colonyPlan.getBuildables()) {
+            if (!(buildableType instanceof BuildingType)) {
+                continue;
+            }
+            final BuildingType bt = (BuildingType) buildableType;
+            final ServerBuilding serverBuilding = new ServerBuilding(serverGame, serverColony, bt);
+            serverColony.addBuilding(serverBuilding);
+        }
+        
+        serverColony.addLiberty(10000);
+        
+        final ChangeSet cs = new ChangeSet();
+        for (WorkerPlan wp : colonyPlan.getWorkers()) {
+            final PlannedWorkLocation plannedWorkLocation = wp.getPlannedWorkLocation();
+            final Location workLocation;
+            if (plannedWorkLocation.getBuildingType() != null) {
+                workLocation = serverColony.getBuilding(plannedWorkLocation.getBuildingType());
+            } else {
+                serverPlayer.csClaimLand(wp.getPlannedWorkLocation().getTile(), serverColony, 0, cs);
+                final ColonyTile colonyTile = serverColony.getColonyTile(plannedWorkLocation.getTile());
+                workLocation = colonyTile;
+            }
+            final ServerUnit serverUnit = new ServerUnit(serverGame, serverTile, serverPlayer, wp.getUnitType());
+            serverUnit.setRole(serverGame.getSpecification().getDefaultRole());
+            serverUnit.setLocation(workLocation);
+            if (!wp.getProductionTypes().isEmpty()) {
+                serverUnit.changeWorkType(wp.getProductionTypes().get(0));
+            }
+        }
+        
+        serverPlayer.addSettlement(serverColony);
+        serverColony.placeSettlement(true);
+        
+        final Set<Tile> visible = serverColony.getVisibleTileSet();
+        cs.add(See.only(serverPlayer), visible);
+        cs.add(See.perhaps(), serverColony.getOwnedTiles());
+        serverGame.sendToAll(cs);
+    }
+    
+    public static String locationDisplayString(Location target) {
+        if (target == null) {
+            return "No target";
+        }
+        if (target.getTile() == null) {
+            return target.toString();
+        }
+        
+        final String tileCoordinates = "(" + target.getTile().getX() + ", " + target.getTile().getY() + ")";
+        if (target instanceof Settlement) {
+            return ((Settlement) target).getName() + "\n " + tileCoordinates;
+        }
+        if (target instanceof Unit) {
+            final Unit unit = (Unit) target;
+            return Messages.message(unit.getLabel()) + "\n" + tileCoordinates;
+        }
+        if (target instanceof Tile) {
+            return tileCoordinates;
+        }
+        
+        return target.toString();
     }
 }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,6 +30,7 @@ import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.Session;
 
 
 /**
@@ -114,7 +115,8 @@ public class LogoutMessage extends AttributeMessage {
         LogoutReason reason = getReason();
         ChangeSet cs = null;
         switch (freeColServer.getServerState()) {
-        case PRE_GAME: case LOAD_GAME:
+        case PRE_GAME:
+        case LOAD_GAME:
             break;
         case IN_GAME:
             boolean endTurn = false;
@@ -123,6 +125,7 @@ public class LogoutMessage extends AttributeMessage {
                 endTurn = true;
                 break;
             case LOGIN: // FIXME: should go away
+            case LOGOUT:
                 break;
             case MAIN_TITLE: case NEW_GAME: case QUIT:
                 if (freeColServer.getSinglePlayer() || serverPlayer.isAdmin()) {
@@ -147,6 +150,10 @@ public class LogoutMessage extends AttributeMessage {
 
         // Confirm the logout with the given reason.
         if (cs == null) cs = new ChangeSet();
+        
+        // TODO: Do other players need to know about the results?
+        Session.completeAll(new ChangeSet());
+        
         cs.add(See.only(serverPlayer), new LogoutMessage(serverPlayer, reason));
 
         // Update the metaserver

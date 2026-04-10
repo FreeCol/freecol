@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,7 +25,6 @@ import static net.sf.freecol.common.util.CollectionUtils.find;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -37,8 +36,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  * A stop along a trade route.
  */
 public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
-
-    private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());
 
     public static final String TAG = "tradeRouteStop";
 

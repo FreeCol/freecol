@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,7 +32,7 @@ public class ModelMessageTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(MessageType.MISSING_GOODS,
@@ -58,7 +58,7 @@ public class ModelMessageTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,

@@ -1,5 +1,5 @@
  /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -28,7 +27,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -37,16 +35,10 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PrivateerMissionTest extends FreeColTestCase {
 
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
 
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
-
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType privateerType = spec().getUnitType("model.unit.privateer");
+    private static final UnitType galleonType = spec().getUnitType("model.unit.galleon");
 
 
     @Override
@@ -73,7 +65,7 @@ public class PrivateerMissionTest extends FreeColTestCase {
         assertFalse("Dutch galleon tile should be ocean",dutchGalleonTile.isLand());
 
         // setup colony and units
-        getStandardColony(1, colonyTile.getX(), colonyTile.getY());
+        createStandardColony(1, colonyTile.getX(), colonyTile.getY());
         new ServerUnit(game, privateerTile, dutch, privateerType);
         new ServerUnit(game, frenchGalleonTile, french, galleonType);
         new ServerUnit(game, dutchGalleonTile, dutch, galleonType);
@@ -101,7 +93,6 @@ public class PrivateerMissionTest extends FreeColTestCase {
         Unit dutchGalleon = dutchGalleonTile.getFirstUnit();
         assertNotNull("Setup error, could not get galleon", dutchGalleon);
 
-        AIPlayer aiPlayer = aiMain.getAIPlayer(privateer.getOwner());
         AIUnit privateerAI = aiMain.getAIUnit(privateer);
         assertNotNull("Setup error, could not get privateerAI", privateerAI);
 

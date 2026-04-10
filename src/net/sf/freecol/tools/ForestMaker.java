@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -52,14 +52,6 @@ public class ForestMaker {
 
     private static final int HALF_WIDTH = BASE_WIDTH / 2;
     private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
-
-    private static final int[] LIMIT = {
-            HALF_WIDTH, HALF_WIDTH, -HALF_WIDTH, -HALF_WIDTH
-    };
-
-    private static final double[] SLOPE = {
-            -0.5, 0.5, -0.5, 0.5
-    };
 
     private static final int[] POWERS_OF_TWO
             = { 1, 2, 4, 8 };

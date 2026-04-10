@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,18 +19,16 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -49,8 +47,6 @@ import net.sf.freecol.server.ai.AIUnit;
  * Mission for sending a missionary to a native settlement.
  */
 public final class MissionaryMission extends Mission {
-
-    private static final Logger logger = Logger.getLogger(MissionaryMission.class.getName());
 
     public static final String TAG = "missionaryMission";
 

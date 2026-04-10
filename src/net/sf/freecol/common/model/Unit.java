@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -446,7 +446,6 @@ public class Unit extends GoodsLocation
                     extra = StringTemplate.template("goldAmount")
                         .addAmount("%amount%", getTreasureAmount());
                 } else {
-                    boolean noEquipment = false;
                     // unequipped expert has no-equipment label
                     List<Role> expertRoles = type.getExpertRoles();
                     for (Role someRole : expertRoles) {
@@ -1466,8 +1465,21 @@ public class Unit extends GoodsLocation
         if (student != null) {
             result = getSpecification()
                 .getNeededTurnsOfTraining(getType(), student.getType());
+            
+            /*
+             * Allows mod to apply modifiers to the number of turns:
+             */
+            final Turn turn = getGame().getTurn();
+            result = (int) FeatureContainer.applyModifiers(result, turn, concat(
+                    getModifiers(Modifier.EDUCATION_TEACHING_TURNS, getType(), turn),
+                    (getColony() != null) ? getColony().getModifiers(Modifier.EDUCATION_TEACHING_TURNS, getType(), turn) : Stream.of()
+                    ));
+            
             if (getColony() != null) {
                 result -= getColony().getProductionBonus();
+            }
+            if (result <= 0) {
+                result = 1;
             }
         }
         return result;
@@ -2427,8 +2439,12 @@ public class Unit extends GoodsLocation
                     return (allowMoveFrom(from))
                         ? MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT
                         : MoveType.MOVE_NO_ACCESS_WATER;
-                } else if (settlement instanceof IndianSettlement
-                    && hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+                } else if (settlement instanceof IndianSettlement && hasAbility(Ability.SPEAK_WITH_CHIEF)) {
+                    final IndianSettlement is = (IndianSettlement) settlement;
+                    if (!from.isLand() && is.getContactLevel(owner) == IndianSettlement.ContactLevel.UNCONTACTED) {
+                        return MoveType.MOVE_NO_ACCESS_CONTACT;
+                    }
+                                    
                     return (allowMoveFrom(from))
                         ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
                         : MoveType.MOVE_NO_ACCESS_WATER;
@@ -4666,7 +4682,6 @@ public class Unit extends GoodsLocation
     // Serialization
 
     private static final String ATTRITION_TAG = "attrition";
-    private static final String COUNT_TAG = "count";
     private static final String CURRENT_STOP_TAG = "currentStop";
     private static final String DESTINATION_TAG = "destination";
     private static final String ENTRY_LOCATION_TAG = "entryLocation";

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,11 +21,8 @@ package net.sf.freecol.common.model;
 
 import static net.sf.freecol.common.model.Constants.INFINITY;
 import static net.sf.freecol.common.model.Constants.UNDEFINED;
-import static net.sf.freecol.common.util.CollectionUtils.concat;
 import static net.sf.freecol.common.util.CollectionUtils.first;
-import static net.sf.freecol.common.util.CollectionUtils.iterable;
 import static net.sf.freecol.common.util.CollectionUtils.map;
-import static net.sf.freecol.common.util.CollectionUtils.sum;
 import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.util.ArrayList;
@@ -42,7 +39,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.production.BuildingProductionCalculator;
-import net.sf.freecol.common.model.production.TileProductionCalculator;
 import net.sf.freecol.common.model.production.WorkerAssignment;
 
 

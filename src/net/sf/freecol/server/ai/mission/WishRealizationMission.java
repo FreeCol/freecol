@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -18,8 +18,6 @@
  */
 
 package net.sf.freecol.server.ai.mission;
-
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -43,8 +41,6 @@ import net.sf.freecol.server.ai.WorkerWish;
  * Mission for realizing a {@code Wish}.
  */
 public final class WishRealizationMission extends Mission {
-
-    private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
     public static final String TAG = "wishRealizationMission";
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -38,17 +38,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
  * FoundingFather class in general.
  */
 public class FoundingFatherTest extends FreeColTestCase {
-
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
-
-    private static final UnitType servantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType statesmanType
-        = spec().getUnitType("model.unit.elderStatesman");
-
 
     public void testFeatures() {
         Game game = getStandardGame();
@@ -99,7 +88,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
 
         // check that all fathers can be added

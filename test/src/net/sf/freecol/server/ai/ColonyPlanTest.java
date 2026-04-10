@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -44,116 +44,41 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyPlanTest extends FreeColTestCase {
 
-    private static final BuildingType blacksmithShopType
-        = spec().getBuildingType("model.building.blacksmithShop");
-    private static final BuildingType lumberMillType
-        = spec().getBuildingType("model.building.lumberMill");
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType blacksmithShopType = spec().getBuildingType("model.building.blacksmithShop");
+    private static final BuildingType lumberMillType = spec().getBuildingType("model.building.lumberMill");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
 
-    private static final GoodsType bellsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType clothType
-        = spec().getGoodsType("model.goods.cloth");
-    private static final GoodsType foodType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType sugarType
-        = spec().getGoodsType("model.goods.sugar");
-    private static final GoodsType tobaccoType
-        = spec().getGoodsType("model.goods.tobacco");
-    private static final GoodsType rumType
-        = spec().getGoodsType("model.goods.rum");
+    private static final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType grainType = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType sugarType = spec().getGoodsType("model.goods.sugar");
+    private static final GoodsType tobaccoType = spec().getGoodsType("model.goods.tobacco");
 
-    private static final GoodsType hammersType
-        = spec().getGoodsType("model.goods.hammers");
-    private static final GoodsType lumberType
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType oreType
-        = spec().getGoodsType("model.goods.ore");
-    private static final GoodsType toolsType
-        = spec().getGoodsType("model.goods.tools");
+    private static final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
+    private static final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+    private static final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
 
-    private static final TileType forestType
-        = spec().getTileType("model.tile.coniferForest");
-    private static final TileType mountainType
-        = spec().getTileType("model.tile.mountains");
-    private static final TileType prairieType
-        = spec().getTileType("model.tile.prairie");
-    private static final TileType savannahType
-        = spec().getTileType("model.tile.savannah");
+    private static final TileType forestType = spec().getTileType("model.tile.coniferForest");
+    private static final TileType mountainType = spec().getTileType("model.tile.mountains");
+    private static final TileType savannahType = spec().getTileType("model.tile.savannah");
 
-    private static final TileImprovementType clearForest
-        = spec().getTileImprovementType("model.improvement.clearForest");
-    private static final TileImprovementType fishBonusLand
-        = spec().getTileImprovementType("model.improvement.fishBonusLand");
-    private static final TileImprovementType fishBonusRiver
-        = spec().getTileImprovementType("model.improvement.fishBonusRiver");
-    private static final TileImprovementType plow
-        = spec().getTileImprovementType("model.improvement.plow");
-    private static final TileImprovementType river
-        = spec().getTileImprovementType("model.improvement.river");
-    private static final TileImprovementType road
-        = spec().getTileImprovementType("model.improvement.road");
+    private static final TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.clearForest");
+    private static final TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
+    private static final TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
 
-    private static final TileType arctic
-        = spec().getTileType("model.tile.arctic");
-    private static final TileType desert
-        = spec().getTileType("model.tile.desert");
-    private static final TileType desertForest
-        = spec().getTileType("model.tile.scrubForest");
-    private static final TileType grassland
-        = spec().getTileType("model.tile.grassland");
-    private static final TileType grasslandForest
-        = spec().getTileType("model.tile.coniferForest");
-    private static final TileType highSeas
-        = spec().getTileType("model.tile.highSeas");
-    private static final TileType hills
-        = spec().getTileType("model.tile.hills");
-    private static final TileType marsh
-        = spec().getTileType("model.tile.marsh");
-    private static final TileType marshForest
-        = spec().getTileType("model.tile.wetlandForest");
-    private static final TileType mountains
-        = spec().getTileType("model.tile.mountains");
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
-    private static final TileType plainsForest
-        = spec().getTileType("model.tile.mixedForest");
-    private static final TileType prairie
-        = spec().getTileType("model.tile.prairie");
-    private static final TileType prairieForest
-        = spec().getTileType("model.tile.broadleafForest");
-    private static final TileType savannah
-        = spec().getTileType("model.tile.savannah");
-    private static final TileType savannahForest
-        = spec().getTileType("model.tile.tropicalForest");
-    private static final TileType swamp
-        = spec().getTileType("model.tile.swamp");
-    private static final TileType swampForest
-        = spec().getTileType("model.tile.rainForest");
-    private static final TileType tundra
-        = spec().getTileType("model.tile.tundra");
-    private static final TileType tundraForest
-        = spec().getTileType("model.tile.borealForest");
+    private static final TileType arctic = spec().getTileType("model.tile.arctic");
+    private static final TileType hills = spec().getTileType("model.tile.hills");
+    private static final TileType marsh = spec().getTileType("model.tile.marsh");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
+    private static final TileType savannah = spec().getTileType("model.tile.savannah");
+    private static final TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
 
-    private static final UnitType farmerType
-        = spec().getUnitType("model.unit.expertFarmer");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType servantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType convertType
-        = spec().getUnitType("model.unit.indianConvert");
-    private static final UnitType criminalType
-        = spec().getUnitType("model.unit.pettyCriminal");
-    private static final UnitType sugarPlanterType
-        = spec().getUnitType("model.unit.masterSugarPlanter");
+    private static final UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType servantType = spec().getUnitType("model.unit.indenturedServant");
+    private static final UnitType convertType = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType criminalType = spec().getUnitType("model.unit.pettyCriminal");
+    private static final UnitType sugarPlanterType = spec().getUnitType("model.unit.masterSugarPlanter");
 
     private static final LogBuilder lb = new LogBuilder(0);
 
@@ -198,9 +123,9 @@ public class ColonyPlanTest extends FreeColTestCase {
     }
 
     public void testReqLumberAndHammersForBuild() {
-        Game game = ServerTestHelper.startServerGame(buildMap(true));
+        ServerTestHelper.startServerGame(buildMap(true));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         ColonyPlan plan = new ColonyPlan(aiMain,colony);
         plan.update();
@@ -214,9 +139,9 @@ public class ColonyPlanTest extends FreeColTestCase {
     }
 
     public void testReqOreAndToolsWithEnoughHammersForBuild() {
-        Game game = ServerTestHelper.startServerGame(buildMap(true));
+        ServerTestHelper.startServerGame(buildMap(true));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         // Set colony to have enough hammers.  Should still require tools.
         ColonyPlan plan = new ColonyPlan(aiMain, colony);
@@ -239,9 +164,9 @@ public class ColonyPlanTest extends FreeColTestCase {
      * provide the raw materials for the build, but has them in stock
      */
     public void testNoBuildRawMatTiles() {
-        Game game = ServerTestHelper.startServerGame(buildMap(false));
+        ServerTestHelper.startServerGame(buildMap(false));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
 
         // Add enough raw materials for build
         colony.addGoods(lumberType, GoodsContainer.CARGO_SIZE);
@@ -274,9 +199,8 @@ public class ColonyPlanTest extends FreeColTestCase {
 
     public void testGetBestWorker() {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));
-        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         game.setCurrentPlayer(colony.getOwner());
         Player dutch = getGame().getPlayerByNationId("model.nation.dutch");
         List<Unit> units = new ArrayList<>();

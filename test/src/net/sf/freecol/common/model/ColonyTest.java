@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,55 +19,34 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.first;
+
 import net.sf.freecol.common.model.Player.NoClaimReason;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class ColonyTest extends FreeColTestCase {
 
-    private static final BuildingType carpenterHouseType
-        = spec().getBuildingType("model.building.carpenterHouse");
-    private static final BuildingType churchType
-        = spec().getBuildingType("model.building.church");
-    private static final BuildingType depotType
-        = spec().getBuildingType("model.building.depot");
-    private static final BuildingType lumberMillType
-        = spec().getBuildingType("model.building.lumberMill");
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
-    private static final BuildingType warehouseType
-        = spec().getBuildingType("model.building.warehouse");
-    private static final BuildingType warehouseExpansionType
-        = spec().getBuildingType("model.building.warehouseExpansion");
-    private static final BuildingType weaversHouseType
-        = spec().getBuildingType("model.building.weaverHouse");
+    private static final BuildingType carpenterHouseType = spec().getBuildingType("model.building.carpenterHouse");
+    private static final BuildingType churchType = spec().getBuildingType("model.building.church");
+    private static final BuildingType lumberMillType = spec().getBuildingType("model.building.lumberMill");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType warehouseType = spec().getBuildingType("model.building.warehouse");
+    private static final BuildingType weaversHouseType = spec().getBuildingType("model.building.weaverHouse");
 
-    private static final GoodsType bellsGoodsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType clothGoodsType
-        = spec().getGoodsType("model.goods.cloth");
-    private static final GoodsType cottonGoodsType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType foodGoodsType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType grainGoodsType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType hammerGoodsType
-        = spec().getGoodsType("model.goods.hammers");
-    private static final GoodsType lumberGoodsType
-        = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType bellsGoodsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType clothGoodsType = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType cottonGoodsType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodGoodsType = spec().getPrimaryFoodType();
+    private static final GoodsType grainGoodsType = spec().getGoodsType("model.goods.grain");
     
-    private static final ResourceType cottonResourceType
-        = spec().getResourceType("model.resource.cotton");
+    private static final ResourceType cottonResourceType = spec().getResourceType("model.resource.cotton");
     
     private static final TileImprovementType plowTileImprovementType
         = spec().getTileImprovementType("model.improvement.plow");
-    
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
 
     private static final TileType arcticTileType
         = spec().getTileType("model.tile.arctic");
@@ -94,7 +73,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Colony should be building a warehouse",
                      warehouseType, colony.getCurrentlyBuilding());
@@ -108,7 +87,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
 
         colony.setCurrentlyBuilding(warehouseType);
         assertEquals("Building queue should have 1 entry",
@@ -131,7 +110,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         colony.setCurrentlyBuilding(wagonTrainType);
         // default item will be added to new colony's build queue
         assertEquals("Building queue should have 2 entry",
@@ -147,7 +126,7 @@ public class ColonyTest extends FreeColTestCase {
         game.changeMap(getTestMap(true));
 
         int population = 1;
-        Colony colony = getStandardColony(population);
+        Colony colony = createStandardColony(population);
 
         assertTrue("colony should produce enough food",
                    colony.getFoodProduction() > colony.getFoodConsumption()
@@ -197,7 +176,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(5);
+        Colony colony = createStandardColony(5);
         Player player = colony.getOwner();
 
         assertEquals(0, countParties(colony));
@@ -214,7 +193,7 @@ public class ColonyTest extends FreeColTestCase {
         game.changeMap(getTestMap(arcticTileType, true));
 
         int population = 1;
-        Colony colony = getStandardColony(population);
+        Colony colony = createStandardColony(population);
         assertTrue("colony should produce less food than it consumes",
             colony.getFoodProduction() < colony.getFoodConsumption()
             + freeColonistType.getConsumptionOf(foodGoodsType));
@@ -311,7 +290,7 @@ public class ColonyTest extends FreeColTestCase {
         Map map = getCoastTestMap(plainsTileType);
         game.changeMap(map);
 
-        Colony colony = getStandardColony(3, 1, 8);
+        Colony colony = createStandardColony(3, 1, 8);
         Player dutch = colony.getOwner();
         Tile colonyTile = colony.getTile();
         assertEquals(colonyTile.getType(), plainsTileType);
@@ -348,7 +327,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(nativeTile.getOwner(), indianPlayer);
 
         Player french = game.getPlayerByNationId("model.nation.french");
-        Colony frenchColony = getStandardColony(3, 9, 8);
+        Colony frenchColony = createStandardColony(3, 9, 8);
         frenchColony.changeOwner(french);
         assertEquals(frenchColony.getTile().getType(), plainsTileType);
         Tile frenchTile = null;
@@ -444,13 +423,13 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(5);
+        Colony colony = createStandardColony(5);
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
 
         assertFalse("No enemy units present.", colony.isUnderSiege());
 
-        Unit brave = new ServerUnit(game, tile, iroquois, braveType);
+        new ServerUnit(game, tile, iroquois, braveType);
         assertFalse("Not at war with the Iroquois.", colony.isUnderSiege());
 
         // declare war
@@ -460,12 +439,12 @@ public class ColonyTest extends FreeColTestCase {
         assertTrue("At war with the Iroquois.", colony.isUnderSiege());
 
         Role soldierRole = spec().getRole("model.role.soldier");
-        Unit soldier = new ServerUnit(game, colony.getTile(), colony.getOwner(),
+        new ServerUnit(game, colony.getTile(), colony.getOwner(),
                                       freeColonistType, soldierRole);
         assertFalse("Equal number of friendly and enemy combat units.",
                     colony.isUnderSiege());
 
-        Unit brave2 = new ServerUnit(game, tile, iroquois, braveType);
+        new ServerUnit(game, tile, iroquois, braveType);
         assertTrue("Enemy combat units outnumber friendly combat units.",
                    colony.isUnderSiege());
 
@@ -484,7 +463,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(5);
+        Colony colony = createStandardColony(5);
 
         assertEquals("New colonies should not require upkeep.",
                      0, colony.getUpkeep());
@@ -502,7 +481,7 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(2);
+        Colony colony = createStandardColony(2);
         Player player = colony.getOwner();
 
         Colony copied = colony.copyColony();

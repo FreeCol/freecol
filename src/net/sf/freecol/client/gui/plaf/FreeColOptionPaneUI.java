@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,29 +19,31 @@
 
 package net.sf.freecol.client.gui.plaf;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.miginfocom.swing.MigLayout;
-
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
+import net.sf.freecol.client.gui.dialog.FreeColDialog.DialogApi;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.util.ImageUtils;
@@ -61,6 +63,70 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     /** Trivial internal constructor. */
     private FreeColOptionPaneUI() {}
 
+    
+    @Override
+    protected void installComponents() {
+        if (!(optionPane.getMessage() instanceof FreeColDialog )) {
+            super.installComponents();
+            return;
+        }
+        
+        /*
+         * FreeColDialog overrides the normal UI and behaviour of the JOptionPane:
+         */
+        
+        @SuppressWarnings("unchecked")
+        final FreeColDialog<Object> dialog = (FreeColDialog<Object>) optionPane.getMessage();
+        final JPanel content = dialog.createContent(new DialogApi<Object>() {
+            @Override
+            public void setValue(Object value) {
+                optionPane.setInputValue(value);
+                optionPane.setValue(value);
+            }
+            
+            @Override
+            public void setInitialFocusComponent(Component component) {
+                FreeColOptionPaneUI.this.initialFocusComponent = component;
+            }
+        });
+        
+        if (initialFocusComponent != null) {
+            /*
+             * Workaround for bug JDK-5018574 (Unable to set focus to another component in JOptionPane).
+             * https://bugs.java.com/bugdatabase/view_bug?bug_id=5018574
+             * 
+             * This workaround only handles JInternalFrame as there's no need to use FreeColDialog
+             * for non-internal frames.
+             */
+            content.setFocusable(true);
+            initialFocusComponent.addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    final Component c = e.getComponent();
+                    if (c.isShowing() && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                content.setFocusable(false);
+                                c.requestFocus();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        optionPane.add(content);
+
+        /*
+         * We can change the behavior of window closed/ESC using:
+         *
+        optionPane.getActionMap().put("close", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionPane.setInputValue(null);
+                optionPane.setValue(null);
+            }
+        });
+        */
+    }    
 
     /**
      * Choose the number of columns for the OptionPane buttons.
@@ -94,7 +160,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         for (int i = 0; i < buttons.length; i++) {
             JButton b;
             if (buttons[i] instanceof ChoiceItem) {
-                ChoiceItem ci = (ChoiceItem)buttons[i];
+                ChoiceItem<?> ci = (ChoiceItem<?>) buttons[i];
                 String label = ci.toString();
                 Icon icon = ci.getIcon();
                 b = (label == null || label.isEmpty()) ? new JButton(icon)

@@ -32,7 +32,7 @@ public class MapViewerRepaintManager {
     private VolatileImage backBufferImage = null;
     private BufferedImage nonAnimationBufferImage = null;
 
-    private Rectangle dirtyRegion = new Rectangle(0, 0, 0, 0);
+    private Rectangle dirtyRegion = new Rectangle(0, 0, -1, -1);
     private Tile focus = null;
     private Point focusPoint = null;
     private boolean repaintsBlocked = false;
@@ -192,7 +192,7 @@ public class MapViewerRepaintManager {
     void markAsClean() {
         assert SwingUtilities.isEventDispatchThread();
         
-        this.dirtyRegion = new Rectangle(0, 0, 0 ,0);
+        this.dirtyRegion = new Rectangle(0, 0, -1, -1);
     }
 
     /**
@@ -274,7 +274,9 @@ public class MapViewerRepaintManager {
 
         final int dx = repositionedOldFocusPoint.x - oldFocusPoint.x;
         final int dy = repositionedOldFocusPoint.y - oldFocusPoint.y;
-        updateDirtyRegion(mapViewerBounds, dx, dy);
+        if (dx != 0 || dy != 0) {
+            updateDirtyRegion(mapViewerBounds, dx, dy);
+        }
 
         if (!isAllDirty()) {
             moveContents(backBufferImage, dx, dy);
@@ -301,6 +303,12 @@ public class MapViewerRepaintManager {
         final Area dirtyArea = new Area(new Rectangle(0, 0, size.width, size.height));
         dirtyArea.subtract(new Area(alreadyPaintedBounds));
         final Rectangle newDirtyBounds = dirtyArea.getBounds();
+        if (newDirtyBounds.width == 0) {
+            newDirtyBounds.width = -1;
+        }
+        if (newDirtyBounds.height == 0) {
+            newDirtyBounds.height = -1;
+        }
         if (dirtyRegion != null && !dirtyRegion.isEmpty()) {
             dirtyRegion = dirtyRegion.union(newDirtyBounds);
         } else {

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -81,7 +81,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      * {@inheritDoc}
      */
     @Override
-    public JComboBox getComponent() {
+    public JComboBox<UnitType> getComponent() {
         return this.box;
     }
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -78,21 +78,8 @@ public class SerializationTest extends FreeColTestCase {
         }
     }
 
-    private void logParseFailure(SAXParseException e, String serialized) {
-        int col = e.getColumnNumber();
-        String errMsg = e.getMessage()
-            + "\nAt line=" + e.getLineNumber()
-            + ", column=" + col + ":\n"
-            + serialized.substring(Math.max(0, col - 100),
-                                   Math.min(col + 100, serialized.length()));
-        fail(errMsg);
-    }
-
     public void testValidation() throws Exception {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
-
-        Colony colony = getStandardColony(6);
-        Player player = game.getPlayerByNationId("model.nation.dutch");
 
         ServerTestHelper.newTurn();
         ServerTestHelper.newTurn();
@@ -132,8 +119,7 @@ public class SerializationTest extends FreeColTestCase {
             .addAmount("%amount%", 50)
             .addStringTemplate("%goods%", t1);
 
-        Game game = getGame();
-        Player player = game.getPlayerByNationId("model.nation.dutch");
+        getGame();
 
         try {
             Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");

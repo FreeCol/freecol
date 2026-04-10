@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -74,7 +74,7 @@ import net.sf.freecol.common.util.LogBuilder;
  * In theory, a {@link Game} might contain several Map instances
  * connected by the HighSeas.
  */
-public class Map extends FreeColGameObject implements Location {
+public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
@@ -619,6 +619,17 @@ public class Map extends FreeColGameObject implements Location {
             this.regions.add(region);
         }
     }
+    
+    /**
+     * Remove a region from this map.
+     *
+     * @param region The {@code Region} to be removed.
+     */
+    public void removeRegion(final Region region) {
+        synchronized (this.regions) {
+            this.regions.remove(region);
+        }
+    }
 
     /**
      * Clear the regions list.
@@ -653,6 +664,16 @@ public class Map extends FreeColGameObject implements Location {
     public Region getRegionByKey(final String key) {
         return (key == null) ? null
             : find(getRegions(), matchKeyEquals(key, Region::getKey));
+    }
+    
+    public void removeRegionsByKey(final String key) {
+        synchronized (this.regions) {
+            for (Region region : new ArrayList<>(regions)) {
+                if (key.equals(region.getKey())) {
+                    removeRegion(region);
+                }
+            }
+        }
     }
 
     /**
@@ -834,6 +855,11 @@ public class Map extends FreeColGameObject implements Location {
         return ret;
     }
 
+    @Override
+    public Iterator<Tile> iterator() {
+        return Collections.unmodifiableList(tileList).iterator();
+    }
+
     /**
      * Get a list of all the tiles that match a predicate.
      *
@@ -1002,16 +1028,6 @@ public class Map extends FreeColGameObject implements Location {
                 y = step.y;
             }
             if (!isValid(x, y)) nextTile();
-        }
-
-        /**
-         * Gets the current radius of the circle.
-         *
-         * @return The distance from the center tile this
-         *     {@code CircleIterator} was initialized with.
-         */
-        public int getCurrentRadius() {
-            return currentRadius;
         }
 
         /**

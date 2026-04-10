@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -95,6 +95,8 @@ public class Connection implements Closeable {
 
     /** The subthread to read the input. */
     private ReceivingThread receivingThread;
+    
+    private final Object receivingThreadLock = new Object();
 
     /** The message handler to process incoming messages with. */
     private MessageHandler messageHandler = null;
@@ -132,6 +134,7 @@ public class Connection implements Closeable {
      * @param name The connection name.
      * @exception IOException if streams can not be derived from the socket.
      */
+    @SuppressWarnings("resource")
     public Connection(Socket socket, String name) throws IOException {
         this(name);
 
@@ -586,10 +589,12 @@ public class Connection implements Closeable {
      * Close this connection.
      */
     public void close() {
-        if (this.receivingThread != null) {
-            this.receivingThread.askToStop("connection closing");
-            this.receivingThread.interrupt();
-            this.receivingThread = null;
+        synchronized (receivingThreadLock) {
+            if (this.receivingThread != null) {
+                this.receivingThread.askToStop("connection closing");
+                this.receivingThread.interrupt();
+                this.receivingThread = null;
+            }
         }
 
         // Close the socket before the input stream.  Socket closure will

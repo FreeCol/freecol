@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -263,7 +263,7 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(apache));
         assertFalse(apache.hasContacted(dutch));
 
-        Colony colony = getStandardColony(1, 5, 8);
+        Colony colony = createStandardColony(1, 5, 8);
         assertNotNull(colony);
         ServerUnit brave = new ServerUnit(game, tile3, apache, braveType);
         igc.move(apache, brave, tile2);

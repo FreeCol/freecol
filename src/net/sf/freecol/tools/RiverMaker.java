@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -39,8 +39,6 @@ public class RiverMaker {
     private static final int BASE_HEIGHT = 64;
     private static final int HALF_WIDTH = BASE_WIDTH / 2;
     private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
-
-    private static final float EDGE_LENGTH = (float) Math.sqrt(HALF_WIDTH * HALF_WIDTH + HALF_HEIGHT * HALF_HEIGHT);
 
     private static final int DY = 4;
     private static final int DX = 2 * DY;

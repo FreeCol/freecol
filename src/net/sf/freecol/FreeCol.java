@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -75,7 +75,6 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColRules;
 import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -113,7 +112,7 @@ public final class FreeCol {
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     /** The FreeCol release version number. */
-    private static final String FREECOL_VERSION = "1.1.0+git";
+    private static final String FREECOL_VERSION = "1.2.0+git";
 
     /** The FreeCol protocol version number. */
     private static final String FREECOL_PROTOCOL_VERSION = "0.1.6";
@@ -135,7 +134,6 @@ public final class FreeCol {
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
-    private static final long MEGA = 1000000; // Metric
 
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";
@@ -161,7 +159,10 @@ public final class FreeCol {
     public static final float   GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "11";
-    private static final long   MEMORY_MIN = 2000000000; // a bit less than 2GB
+    private static final long   MEMORY_MIN = 536500000; // a bit less than 512MB
+    private static final long   MEMORY_MIN_IN_MB = 512; // a bit less than 512MB
+    private static final long   SOFT_MEMORY_MIN = 2000000000; // a bit less than 2GB
+    private static final long   SOFT_MEMORY_MIN_IN_GB = 2;
     private static final String META_SERVER_ADDRESS = "meta.freecol.org";
     private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
@@ -326,7 +327,15 @@ public final class FreeCol {
             // Memory message is in Mbytes, hence division by MEGA.
             fatal(StringTemplate.template("main.memory")
                 .addAmount("%memory%", MEMORY_MAX)
-                .addAmount("%minMemory%", MEMORY_MIN / MEGA));
+                .addAmount("%minMemory%", MEMORY_MIN_IN_MB));
+        }
+        if (memoryCheck && MEMORY_MAX < SOFT_MEMORY_MIN) {
+            System.err.println();
+            System.err.println();
+            System.err.println(Messages.message(StringTemplate.template("main.memoryLow")
+                .addAmount("%memory%", MEMORY_MAX)
+                .add("%minMemory%", SOFT_MEMORY_MIN_IN_GB + "G")));
+            System.err.println();
         }
 
         // Having parsed the command line args, we know where the user
@@ -485,11 +494,10 @@ public final class FreeCol {
      * @return The {@code JarURLConnection}.
      * @exception IOException if the connection fails to open.
      */
-    private static JarURLConnection getJarURLConnection(Class c)
-        throws IOException {
+    private static JarURLConnection getJarURLConnection(Class<?> c) throws IOException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
-        return (JarURLConnection)url.openConnection();
+        return (JarURLConnection) url.openConnection();
     }
         
     /**
@@ -1291,10 +1299,7 @@ public final class FreeCol {
      *
      * @return The host name.
      */
-    public static String getServerHost() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (Exception e) {}
+    public static String getDefaultServerHost() {
         return InetAddress.getLoopbackAddress().getHostAddress();
     }
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -58,12 +58,6 @@ public class FreeColProgressBar extends JPanel {
     /** The expected increase next turn. */
     private int step = 0;
 
-    /**
-     * The type of goods this progress bar is for.  The default value
-     * of null indicates no goods type.
-     */
-    private final GoodsType goodsType;
-
     /** An image for the goods type. */
     private final Image image;
 
@@ -116,11 +110,16 @@ public class FreeColProgressBar extends JPanel {
         this.max = max;
         this.value = value;
         this.step = step;
-        this.goodsType = goodsType;
         this.image = (goodsType == null) ? null
             : (lib.getGoodsTypeImage(goodsType,
                     new Dimension(-1, iconHeight)));
-        this.font = FontLibrary.getScaledFont("simple-plain-tiny");
+        
+        Font font = FontLibrary.getScaledFont("simple-plain-tiny");
+        final int maxFontSize = lib.scaleInt(17);
+        if (font.getSize() > maxFontSize) {
+            font = font.deriveFont((float) maxFontSize);
+        }
+        this.font = font;
 
         final int padding = (int) (5 * lib.getScaleFactor());
         final int width = (int) (200 * lib.getScaleFactor());

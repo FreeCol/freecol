@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2021  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,7 +24,6 @@ import static net.sf.freecol.common.util.CollectionUtils.first;
 import static net.sf.freecol.common.util.CollectionUtils.none;
 import static net.sf.freecol.common.util.CollectionUtils.toList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
@@ -41,54 +40,31 @@ import net.sf.freecol.util.test.FreeColTestCase;
  */
 public class IndividualFatherTest extends FreeColTestCase {
 
-    private static final BuildableType customHouseType
-        = spec().getBuildingType("model.building.customHouse");
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
+    private static final BuildableType customHouseType = spec().getBuildingType("model.building.customHouse");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
 
-    private static final FoundingFather bartolomeDeLasCasas
-        = spec().getFoundingFather("model.foundingFather.bartolomeDeLasCasas");
-    private static final FoundingFather hernanCortes
-        = spec().getFoundingFather("model.foundingFather.hernanCortes");
-    private static final FoundingFather janDeWitt
-        = spec().getFoundingFather("model.foundingFather.janDeWitt");
-    private static final FoundingFather jeanDeBrebeuf
-        = spec().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
-    private static final FoundingFather paulRevere
-        = spec().getFoundingFather("model.foundingFather.paulRevere");
-    private static final FoundingFather peterMinuit
-        = spec().getFoundingFather("model.foundingFather.peterMinuit");
-    private static final FoundingFather peterStuyvesant
-        = spec().getFoundingFather("model.foundingFather.peterStuyvesant");
-    private static final FoundingFather simonBolivar
-        = spec().getFoundingFather("model.foundingFather.simonBolivar");
-    private static final FoundingFather thomasJefferson
-        = spec().getFoundingFather("model.foundingFather.thomasJefferson");
-    private static final FoundingFather thomasPaine
-        = spec().getFoundingFather("model.foundingFather.thomasPaine");
-    private static final FoundingFather williamBrewster
-        = spec().getFoundingFather("model.foundingFather.williamBrewster");
+    private static final FoundingFather bartolomeDeLasCasas = spec().getFoundingFather("model.foundingFather.bartolomeDeLasCasas");
+    private static final FoundingFather hernanCortes = spec().getFoundingFather("model.foundingFather.hernanCortes");
+    private static final FoundingFather janDeWitt = spec().getFoundingFather("model.foundingFather.janDeWitt");
+    private static final FoundingFather jeanDeBrebeuf = spec().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
+    private static final FoundingFather paulRevere = spec().getFoundingFather("model.foundingFather.paulRevere");
+    private static final FoundingFather peterMinuit = spec().getFoundingFather("model.foundingFather.peterMinuit");
+    private static final FoundingFather peterStuyvesant = spec().getFoundingFather("model.foundingFather.peterStuyvesant");
+    private static final FoundingFather simonBolivar = spec().getFoundingFather("model.foundingFather.simonBolivar");
+    private static final FoundingFather thomasJefferson = spec().getFoundingFather("model.foundingFather.thomasJefferson");
+    private static final FoundingFather thomasPaine = spec().getFoundingFather("model.foundingFather.thomasPaine");
+    private static final FoundingFather williamBrewster = spec().getFoundingFather("model.foundingFather.williamBrewster");
 
-    private static final GoodsType bellsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType horsesType
-        = spec().getGoodsType("model.goods.horses");
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
 
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
-    private static final Role missionaryRole
-        = spec().getRole("model.role.missionary");
+    private static final Role soldierRole = spec().getRole("model.role.soldier");
+    private static final Role missionaryRole = spec().getRole("model.role.missionary");
 
-    private static final UnitType servantType
-        = spec().getUnitType("model.unit.indenturedServant");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType statesmanType
-        = spec().getUnitType("model.unit.elderStatesman");
-    private static final UnitType nativeConvertType
-        = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType statesmanType = spec().getUnitType("model.unit.elderStatesman");
+    private static final UnitType nativeConvertType = spec().getUnitType("model.unit.indianConvert");
 
 
     public void testBolivar() {
@@ -96,10 +72,8 @@ public class IndividualFatherTest extends FreeColTestCase {
         game.changeMap(getTestMap(true));
 
         final int pop = 5;
-        Colony colony = getStandardColony(pop);
+        Colony colony = createStandardColony(pop);
         Player player = colony.getOwner();
-        List<AbstractGoods> empty = new ArrayList<>();
-        Building townHall = colony.getBuilding(townHallType);
 
         // Zero to start
         assertEquals(0, colony.getLiberty());
@@ -185,7 +159,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
 
@@ -206,7 +180,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
         unit.setType(nativeConvertType);
@@ -248,7 +222,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertNotNull(jeffersonModifier);
         assertTrue(jeffersonModifier.appliesTo(townHallType));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
         Building townHall = colony.getBuilding(townHallType);
         clearWorkLocation(townHall);
@@ -272,7 +246,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Unit unit = colony.getUnitList().get(0);
         Player player = colony.getOwner();
         Player iroquois = getGame().getPlayerByNationId("model.nation.iroquois");
@@ -310,9 +284,8 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
-        List<AbstractGoods> empty = new ArrayList<>();
         Building townHall = colony.getBuilding(townHallType);
         clearWorkLocation(townHall);
 
@@ -360,7 +333,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap());
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Player player = colony.getOwner();
         Unit colonist = colony.getUnitList().get(0);
 
@@ -390,7 +363,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        Colony colony = createStandardColony(4);
         Player player = colony.getOwner();
 
         // The custom house is not buildable initially

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,22 +19,17 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.util.logging.Level;
+import javax.swing.Action;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.ClientOptions;
 
 
 /**
- * An action for selecting one of several options.
+ * An action for a boolean value.
  */
 public abstract class SelectableAction extends MapboardAction {
 
     public static final String id = "selectableAction";
-
-    private final String optionId;
-
-    protected boolean selected = false;
 
 
     /**
@@ -42,41 +37,9 @@ public abstract class SelectableAction extends MapboardAction {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param id The object identifier.
-     * @param optionId The identifier of a boolean client option.
      */
-    protected SelectableAction(FreeColClient freeColClient,
-                               String id, String optionId) {
+    protected SelectableAction(FreeColClient freeColClient, String id) {
         super(freeColClient, id);
-
-        this.optionId = optionId;
-    }
-
-
-    /**
-     * Get the value of the underlying option.
-     *
-     * @return The option value.
-     */
-    public final boolean getOption() {
-        ClientOptions co = freeColClient.getClientOptions();
-        if (co != null && optionId != null) {
-            try {
-                return co.getBoolean(optionId);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failure with option: " + optionId, e);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Set the option value.
-     *
-     * @param value The new boolean value.
-     */
-    public final void setOption(boolean value) {
-        ClientOptions co = freeColClient.getClientOptions();
-        if (co != null && optionId != null) co.setBoolean(optionId, value);
     }
 
     /**
@@ -85,7 +48,7 @@ public abstract class SelectableAction extends MapboardAction {
      * @return True if this action is selected.
      */
     public final boolean isSelected() {
-        return selected;
+        return Boolean.TRUE.equals(getValue(Action.SELECTED_KEY));
     }
 
     /**
@@ -94,7 +57,7 @@ public abstract class SelectableAction extends MapboardAction {
      * @param b The new selection value.
      */
     public final void setSelected(boolean b) {
-        this.selected = b;
+        putValue(Action.SELECTED_KEY, b);
     }
 
     /**
@@ -105,7 +68,7 @@ public abstract class SelectableAction extends MapboardAction {
      * @return True of this action should be selected.
      */
     protected boolean shouldBeSelected() {
-        return getOption();
+        return isSelected();
     }
 
 

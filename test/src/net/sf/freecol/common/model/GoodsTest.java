@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -29,44 +29,24 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class GoodsTest extends FreeColTestCase {
 
-    private static final GoodsType bellsType
-        = spec().getGoodsType("model.goods.bells");
-    private static final GoodsType clothType
-        = spec().getGoodsType("model.goods.cloth");
-    private static final GoodsType cottonType
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType crossesType
-        = spec().getGoodsType("model.goods.crosses");
-    private static final GoodsType fishType
-        = spec().getGoodsType("model.goods.fish");
-    private static final GoodsType foodType
-        = spec().getPrimaryFoodType();
-    private static final GoodsType grainType
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType hammersType
-        = spec().getGoodsType("model.goods.hammers");
-    private static final GoodsType horsesType
-        = spec().getGoodsType("model.goods.horses");
-    private static final GoodsType lumberType
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType musketsType
-        = spec().getGoodsType("model.goods.muskets");
-    private static final GoodsType oreType
-        = spec().getGoodsType("model.goods.ore");
-    private static final GoodsType toolsType
-        = spec().getGoodsType("model.goods.tools");
-    private static final GoodsType tradeGoodsType
-        = spec().getGoodsType("model.goods.tradeGoods");
+    private static final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType clothType = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType crossesType = spec().getGoodsType("model.goods.crosses");
+    private static final GoodsType fishType = spec().getGoodsType("model.goods.fish");
+    private static final GoodsType foodType = spec().getPrimaryFoodType();
+    private static final GoodsType grainType = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
+    private static final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+    private static final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+    private static final GoodsType tradeGoodsType = spec().getGoodsType("model.goods.tradeGoods");
 
-    private static final TileType plainsType
-        = spec().getTileType("model.tile.plains");
+    private static final TileType plainsType = spec().getTileType("model.tile.plains");
 
-    private static final UnitType privateerType
-        = spec().getUnitType("model.unit.privateer");
-    private static final UnitType veteranSoldierType
-        = spec().getUnitType("model.unit.veteranSoldier");
-    private static final UnitType wagonTrainType
-        = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
 
 
     public void testGoodsGameLocationIntInt() {

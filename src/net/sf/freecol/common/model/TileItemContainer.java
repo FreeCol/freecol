@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -402,6 +402,15 @@ public class TileItemContainer extends FreeColGameObject {
         synchronized (tileItems) {
             return flatten(tileItems,
                 ti -> ti.getProductionModifiers(goodsType, unitType));
+        }
+    }
+    
+    public Stream<Modifier> getProductionModifiersWithoutResource(GoodsType goodsType,
+            UnitType unitType) {
+        synchronized (tileItems) {
+            return tileItems.stream()
+                    .filter(ti -> !(ti instanceof Resource))
+                    .flatMap(ti -> ti.getProductionModifiers(goodsType, unitType));
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,10 +23,9 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
-
-import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 
 
 /**

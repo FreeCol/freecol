@@ -3,7 +3,7 @@
   <xs:annotation>
     <xs:documentation>
 
-      Copyright (C) 2002-2021  The FreeCol Team
+      Copyright (C) 2002-2024  The FreeCol Team
 
       This file is part of FreeCol.
 
@@ -29,6 +29,7 @@
   <xs:include schemaLocation="data-player.xsd" />
   <xs:include schemaLocation="data-map.xsd" />
   <xs:include schemaLocation="data-modelMessage.xsd" />
+  <xs:include schemaLocation="data-areas.xsd" />
 
   <xs:element name="game">
     <xs:annotation>
@@ -45,7 +46,8 @@
 	      <xs:element ref="modelMessage" />
         <xs:element ref="nationOptions" />
         <xs:element name="newWorld" />
-	      <xs:element ref="player" />
+        <xs:element ref="player" />
+        <xs:element ref="areas" />
       </xs:choice>
 
       <xs:attribute name="id" type="GameId" use="required"/>

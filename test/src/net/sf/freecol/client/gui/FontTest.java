@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,24 +19,16 @@
 
 package net.sf.freecol.client.gui;
 
+import static net.sf.freecol.common.util.CollectionUtils.forEachMapEntry;
+
 import java.awt.Font;
-import java.io.File;
-import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
 public class FontTest extends FreeColTestCase {
-
-    private static FileFilter ttfFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".ttf");
-            }
-        };
 
     private static final Map<Character, String> specialCharacters = new HashMap<>();
     static {

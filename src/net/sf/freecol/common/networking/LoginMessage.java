@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -203,7 +203,6 @@ public class LoginMessage extends ObjectMessage {
                                    Connection connection) {
         final String userName = getUserName();
         ServerGame serverGame;
-        Player present;
         Nation nation;
         ChangeSet ret;
 
@@ -217,7 +216,7 @@ public class LoginMessage extends ObjectMessage {
             ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.maximumPlayers"));
 
-        } else if ((present = getPlayer(serverGame)) != null) {
+        } else if (getPlayer(serverGame) != null) {
             // Can not use the same name as existing player
             ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameInUse")

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Area;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
@@ -400,7 +401,6 @@ public class TerrainGenerator {
 
         // Create ServerRegions for all land regions
         ServerRegion[] landregions = new ServerRegion[continents+1];
-        int landIndex = 1;
         for (int c = 1; c <= continents; c++) {
             // c starting at 1, c=0 is all water tiles
             landregions[c] = new ServerRegion(game, RegionType.LAND);
@@ -649,7 +649,6 @@ public class TerrainGenerator {
             .getTileType("model.tile.lake");
         List<Tile> todo = new ArrayList<>(lakes.size()/10);
         List<ServerRegion> result = new ArrayList<>(lakes.size()/10);
-        int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = first(lakes);
             if (tile.getRegion() != null) continue;
@@ -931,6 +930,13 @@ public class TerrainGenerator {
 
         // Probably only needed on import of old maps.
         map.fixupRegions();
+        
+        if (importMap != null) {
+            for (Area importMapArea : importMap.getGame().getAreas()) {
+                game.addArea(new Area(game, importMapArea));
+            }
+        }
+        game.generateDefaultAreas();
 
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they

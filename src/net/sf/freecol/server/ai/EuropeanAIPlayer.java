@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -1989,9 +1989,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
         if (unit.isNaval()) {
             ret = (old instanceof PrivateerMission) ? old
-                : ((m = getPrivateerMission(aiUnit, null)) != null) ? m
+                : (!unit.isInEurope() && (m = getPrivateerMission(aiUnit, null)) != null) ? m
                 : (old instanceof TransportMission) ? old
                 : ((m = getTransportMission(aiUnit)) != null) ? m
+                : ((m = getPrivateerMission(aiUnit, null)) != null) ? m
                 : (old instanceof UnitSeekAndDestroyMission) ? old
                 : ((m = getSeekAndDestroyMission(aiUnit, 8)) != null) ? m
                 : (old instanceof UnitWanderHostileMission) ? old
@@ -2504,7 +2505,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         
         getPlayer().modifyGold(-purchasePrice);
-        final List<Unit> createdUnit = ((ServerPlayer) getPlayer()).createUnits(List.of(au), getPlayer().getEurope(), getAIRandom());
+        final ServerPlayer serverPlayer = (ServerPlayer) getPlayer();
+        serverPlayer.createUnits(List.of(au), getPlayer().getEurope(), getAIRandom());
+        
         return true;
     }
 
@@ -2673,8 +2676,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
-                             int value) {
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class<?> type, int value) {
         if (value > 0) {
             if (type == DefendSettlementMission.class) {
                 // Reduce value in proportion to the number of defenders.

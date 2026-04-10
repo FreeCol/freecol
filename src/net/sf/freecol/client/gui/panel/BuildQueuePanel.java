@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -176,17 +176,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 this.indexedBuildables = indexedBuildables;
             }
 
-
-            /**
-             * Get the build queue from the {@code Transferable}.
-             *
-             * @return The build queue.
-             */
-            public List<IndexedBuildable> getBuildables() {
-                return this.indexedBuildables;
-            }
-
-
             // Interface Transferable
 
             /**
@@ -272,8 +261,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 if (target != bql) {
                     // Dragging out of build queue => just remove the item.
                     // updateAllLists takes care of the rest.
-                    DefaultListModel sourceModel
-                        = (DefaultListModel)source.getModel();
+                    DefaultListModel<?> sourceModel = (DefaultListModel<?>) source.getModel();
                     for (Object obj : queue) {
                         sourceModel.removeElement(obj);
                     }
@@ -454,7 +442,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private class DefaultBuildQueueCellRenderer
         implements ListCellRenderer<BuildableType> {
 
-        private final Dimension buildingDimension = new Dimension(-1, 48);
+        private final Dimension buildingDimension = new Dimension(100, 48);
 
 
         public DefaultBuildQueueCellRenderer() {}
@@ -475,9 +463,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (isSelected) {
                 panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
             }
-
-            JLabel imageLabel = new JLabel(new ImageIcon(getImageLibrary()
-                    .getBuildableTypeImage(value, buildingDimension)));
+            
+            JLabel imageLabel = new JLabel(new ImageIcon(getImageLibrary().getSmallBuildableTypeImageWithWithSize(value, colony.getOwner(), buildingDimension)));
+            
             JLabel nameLabel = new JLabel(Messages.getName(value));
             String reason = lockReasons.get(value);
             panel.add(imageLabel, "span 1 2");

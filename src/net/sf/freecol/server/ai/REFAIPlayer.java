@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -197,9 +197,6 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
 
     /** Map of target to count. */
     private final Map<Location, Integer> targetMap = new HashMap<>();
-
-    /** Has the army been landed? */
-    private boolean landed = false;
 
 
     /**
@@ -912,12 +909,8 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
                 if (aiu.hasMission(TransportMission.class)) {
                     transport.add(aiu.getMission(TransportMission.class));
                 }
-            } else {
-                if (u.isInEurope()) {
-                    land.add(aiu);
-                } else if (u.isOnTile()) {
-                    this.landed = true;
-                }
+            } else if (u.isInEurope()) {
+                land.add(aiu);
             }
         }
         if (!land.isEmpty() && !transport.isEmpty()) {
@@ -931,8 +924,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
-                             int value) {
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class<?> type, int value) {
         if (value > 0) {
             if (type == DefendSettlementMission.class) {
                 // REF garrisons thinly.

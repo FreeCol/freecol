@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -26,6 +26,10 @@ package net.sf.freecol.client.gui;
  */
 public interface DialogHandler<T> {
 
+    /**
+     * This method gets called when the response is ready.
+     * @param response The response, or {@code null} if the user cancelled.
+     */
     void handle(T response);
 
 };

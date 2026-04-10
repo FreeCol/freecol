@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -94,7 +94,6 @@ public class ChatMessage extends AttributeMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final Color color = getColor();
         final String sender = getSender();
         final String text = getMessage();

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -23,117 +23,65 @@ import static net.sf.freecol.common.util.CollectionUtils.any;
 import static net.sf.freecol.common.util.CollectionUtils.count;
 import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.sf.freecol.common.model.production.TileProductionCalculator;
-import net.sf.freecol.common.model.production.WorkerAssignment;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class TileTest extends FreeColTestCase {
 
-    private static final BuildingType townHallType
-        = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType townHallType = spec().getBuildingType("model.building.townHall");
 
-    private static final GoodsType cotton
-        = spec().getGoodsType("model.goods.cotton");
-    private static final GoodsType fish
-        = spec().getGoodsType("model.goods.fish");
-    private static final GoodsType food
-        = spec().getPrimaryFoodType();
-    private static final GoodsType furs
-        = spec().getGoodsType("model.goods.furs");
-    private static final GoodsType grain
-        = spec().getGoodsType("model.goods.grain");
-    private static final GoodsType lumber
-        = spec().getGoodsType("model.goods.lumber");
-    private static final GoodsType ore
-        = spec().getGoodsType("model.goods.ore");
-    private static final GoodsType silver
-        = spec().getGoodsType("model.goods.silver");
-    private static final GoodsType sugar
-        = spec().getGoodsType("model.goods.sugar");
-    private static final GoodsType tobacco
-        = spec().getGoodsType("model.goods.tobacco");
+    private static final GoodsType cotton = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType food = spec().getPrimaryFoodType();
+    private static final GoodsType furs = spec().getGoodsType("model.goods.furs");
+    private static final GoodsType grain = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType ore = spec().getGoodsType("model.goods.ore");
+    private static final GoodsType silver = spec().getGoodsType("model.goods.silver");
+    private static final GoodsType sugar = spec().getGoodsType("model.goods.sugar");
 
-    private static final ResourceType grainResource
-        = spec().getResourceType("model.resource.grain");
-    private static final ResourceType lumberResource
-        = spec().getResourceType("model.resource.lumber");
-    private static final ResourceType mineralsResource
-        = spec().getResourceType("model.resource.minerals");
-    private static final ResourceType silverResource
-        = spec().getResourceType("model.resource.silver");
-    private static final ResourceType sugarResource
-        = spec().getResourceType("model.resource.sugar");
+    private static final ResourceType grainResource = spec().getResourceType("model.resource.grain");
+    private static final ResourceType lumberResource = spec().getResourceType("model.resource.lumber");
+    private static final ResourceType mineralsResource = spec().getResourceType("model.resource.minerals");
+    private static final ResourceType silverResource = spec().getResourceType("model.resource.silver");
+    private static final ResourceType sugarResource = spec().getResourceType("model.resource.sugar");
 
-    private static final TileImprovementType clearForest
-        = spec().getTileImprovementType("model.improvement.clearForest");
-    private static final TileImprovementType fishBonusLand
-        = spec().getTileImprovementType("model.improvement.fishBonusLand");
-    private static final TileImprovementType fishBonusRiver
-        = spec().getTileImprovementType("model.improvement.fishBonusRiver");
-    private static final TileImprovementType plow
-        = spec().getTileImprovementType("model.improvement.plow");
-    private static final TileImprovementType river
-        = spec().getTileImprovementType("model.improvement.river");
-    private static final TileImprovementType road
-        = spec().getTileImprovementType("model.improvement.road");
+    private static final TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.clearForest");
+    private static final TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
+    private static final TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
+    private static final TileImprovementType plow = spec().getTileImprovementType("model.improvement.plow");
+    private static final TileImprovementType river = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType road = spec().getTileImprovementType("model.improvement.road");
 
-    private static final TileType arctic
-        = spec().getTileType("model.tile.arctic");
-    private static final TileType coniferForest
-        = spec().getTileType("model.tile.coniferForest");
-    private static final TileType desert
-        = spec().getTileType("model.tile.desert");
-    private static final TileType desertForest
-        = spec().getTileType("model.tile.scrubForest");
-    private static final TileType grassland
-        = spec().getTileType("model.tile.grassland");
-    private static final TileType highSeas
-        = spec().getTileType("model.tile.highSeas");
-    private static final TileType hills
-        = spec().getTileType("model.tile.hills");
-    private static final TileType marsh
-        = spec().getTileType("model.tile.marsh");
-    private static final TileType marshForest
-        = spec().getTileType("model.tile.wetlandForest");
-    private static final TileType mountains
-        = spec().getTileType("model.tile.mountains");
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
-    private static final TileType plainsForest
-        = spec().getTileType("model.tile.mixedForest");
-    private static final TileType prairie
-        = spec().getTileType("model.tile.prairie");
-    private static final TileType prairieForest
-        = spec().getTileType("model.tile.broadleafForest");
-    private static final TileType savannah
-        = spec().getTileType("model.tile.savannah");
-    private static final TileType savannahForest
-        = spec().getTileType("model.tile.tropicalForest");
-    private static final TileType swamp
-        = spec().getTileType("model.tile.swamp");
-    private static final TileType swampForest
-        = spec().getTileType("model.tile.rainForest");
-    private static final TileType tundra
-        = spec().getTileType("model.tile.tundra");
-    private static final TileType tundraForest
-        = spec().getTileType("model.tile.borealForest");
+    private static final TileType arctic = spec().getTileType("model.tile.arctic");
+    private static final TileType coniferForest = spec().getTileType("model.tile.coniferForest");
+    private static final TileType desert = spec().getTileType("model.tile.desert");
+    private static final TileType desertForest = spec().getTileType("model.tile.scrubForest");
+    private static final TileType grassland = spec().getTileType("model.tile.grassland");
+    private static final TileType highSeas = spec().getTileType("model.tile.highSeas");
+    private static final TileType hills = spec().getTileType("model.tile.hills");
+    private static final TileType marsh = spec().getTileType("model.tile.marsh");
+    private static final TileType marshForest = spec().getTileType("model.tile.wetlandForest");
+    private static final TileType mountains = spec().getTileType("model.tile.mountains");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
+    private static final TileType plainsForest = spec().getTileType("model.tile.mixedForest");
+    private static final TileType prairie = spec().getTileType("model.tile.prairie");
+    private static final TileType prairieForest = spec().getTileType("model.tile.broadleafForest");
+    private static final TileType savannah = spec().getTileType("model.tile.savannah");
+    private static final TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
+    private static final TileType swamp = spec().getTileType("model.tile.swamp");
+    private static final TileType swampForest = spec().getTileType("model.tile.rainForest");
+    private static final TileType tundra = spec().getTileType("model.tile.tundra");
+    private static final TileType tundraForest = spec().getTileType("model.tile.borealForest");
 
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType expertFarmerType
-        = spec().getUnitType("model.unit.expertFarmer");
-    private static final UnitType expertLumberJack
-        = spec().getUnitType("model.unit.expertLumberJack");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType expertLumberJack = spec().getUnitType("model.unit.expertLumberJack");
+    
+    private static final UnitType expertSilverMiner = spec().getUnitType("model.unit.expertSilverMiner");
 
 
     private class Work {
@@ -253,7 +201,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile();
         ColonyTile center = colony.getColonyTile(tile);
 
@@ -309,61 +257,39 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
 
         Tile tile1 = new Tile(game, mountains, 0, 0);
-        assertEquals("Mountain/food", 0,
-                     tile1.getPotentialProduction(food, colonistType));
-        assertEquals("Mountain/food max", 0,
-                     tile1.getMaximumPotential(food, colonistType));
-        assertEquals("Mountain/silver", 1,
-                     tile1.getPotentialProduction(silver, colonistType));
-        assertEquals("Mountain/silver max", 2,
-                     tile1.getMaximumPotential(silver, colonistType));
+        assertEquals("Mountain/food", 0, tile1.getPotentialProduction(food, colonistType));
+        assertEquals("Mountain/food max", 0, tile1.getMaximumPotential(food, colonistType));
+        assertEquals("Mountain/silver", 1, tile1.getPotentialProduction(silver, colonistType));
+        assertEquals("Mountain/silver max", 4, tile1.getMaximumPotential(silver, colonistType));
         tile1.addResource(new Resource(game, tile1, silverResource));
-        assertEquals("Mountain+Resource/food", 0,
-                     tile1.getPotentialProduction(food, colonistType));
-        assertEquals("Mountain+Resource/silver", 3,
-                     tile1.getPotentialProduction(silver, colonistType));
-        assertEquals("Mountain+Resource/silver max", 4,
-                     tile1.getMaximumPotential(silver, colonistType));
+        assertEquals("Mountain+Resource/food", 0, tile1.getPotentialProduction(food, colonistType));
+        assertEquals("Mountain+Resource/silver", 3, tile1.getPotentialProduction(silver, colonistType));
+        assertEquals("Mountain+Resource/silver max", 6, tile1.getMaximumPotential(silver, colonistType));
+        assertEquals("Mountain+Resource/silver+expert max", 12, tile1.getMaximumPotential(silver, expertSilverMiner));
 
         // grain-max should equal grain-potential + 1 (ploughing improvement)
         Tile tile2 = new Tile(game, plains, 0, 1);
-        assertEquals("Plains/grain", 3,
-                     tile2.getPotentialProduction(grain, null));
-        assertEquals("Plains/grain max", 4,
-                     tile2.getMaximumPotential(grain, null));
-        assertEquals("Plains/grain/colonist", 5,
-                     tile2.getPotentialProduction(grain, colonistType));
-        assertEquals("Plains/grain/colonist max", 6,
-                     tile2.getMaximumPotential(grain, colonistType));
-        assertEquals("Plains/grain/expertFarmer", 7,
-                     tile2.getPotentialProduction(grain, expertFarmerType));
+        assertEquals("Plains/grain", 3, tile2.getPotentialProduction(grain, null));
+        assertEquals("Plains/grain max", 6, tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains/grain/colonist", 5, tile2.getPotentialProduction(grain, colonistType));
+        assertEquals("Plains/grain/colonist max", 8, tile2.getMaximumPotential(grain, colonistType));
+        assertEquals("Plains/grain/expertFarmer", 7, tile2.getPotentialProduction(grain, expertFarmerType));
         tile2.addResource(new Resource(game, tile2, grainResource));
-        assertEquals("Plains+Resource/grain", 5,
-                     tile2.getPotentialProduction(grain, null));
-        assertEquals("Plains+Resource/grain max", 6,
-                     tile2.getMaximumPotential(grain, null));
-        assertEquals("Plains+Resource/grain/colonist", 7,
-                     tile2.getPotentialProduction(grain, colonistType));
-        assertEquals("Plains+Resource/grain/colonist max", 8,
-                     tile2.getMaximumPotential(grain, colonistType));
-        assertEquals("Plains+Resource/grain/expertFarmer", 11,
-                     tile2.getPotentialProduction(grain, expertFarmerType));
-        assertEquals("Plains+Resource/grain/expertFarmer max", 12,
-                     tile2.getMaximumPotential(grain, expertFarmerType));
+        assertEquals("Plains+Resource/grain", 5, tile2.getPotentialProduction(grain, null));
+        assertEquals("Plains+Resource/grain max", 8, tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains+Resource/grain/colonist", 7, tile2.getPotentialProduction(grain, colonistType));
+        assertEquals("Plains+Resource/grain/colonist max", 10, tile2.getMaximumPotential(grain, colonistType));
+        assertEquals("Plains+Resource/grain/expertFarmer", 11, tile2.getPotentialProduction(grain, expertFarmerType));
+        assertEquals("Plains+Resource/grain/expertFarmer max", 16, tile2.getMaximumPotential(grain, expertFarmerType));
 
         Tile tile3 = new Tile(game, plainsForest, 1, 1);
-        assertEquals("Forest/grain", 2,
-                     tile3.getPotentialProduction(grain, null));
-        assertEquals("Forest/grain max", 4,
-                     tile3.getMaximumPotential(grain, null));
-        assertEquals("Forest/lumber/colonist", 6,
-                tile3.getPotentialProduction(lumber, colonistType));
-        assertEquals("Forest/lumber/colonist max", 8,
-                tile3.getMaximumPotential(lumber, colonistType));
-        assertEquals("Forest/lumber/expertLumberJack", 12,
-                tile3.getPotentialProduction(lumber, expertLumberJack));
-        assertEquals("Forest/lumber/expertLumberJack max", 14,
-                tile3.getMaximumPotential(lumber, expertLumberJack));
+        assertEquals("Forest/grain", 2, tile3.getPotentialProduction(grain, null));
+        assertEquals("Forest/grain max", 6, tile3.getMaximumPotential(grain, null));
+        assertEquals("Forest/grain/colonist max", 8, tile3.getMaximumPotential(grain, colonistType));
+        assertEquals("Forest/lumber/colonist", 6, tile3.getPotentialProduction(lumber, colonistType));
+        assertEquals("Forest/lumber/colonist max", 10, tile3.getMaximumPotential(lumber, colonistType));
+        assertEquals("Forest/lumber/expertLumberJack", 12, tile3.getPotentialProduction(lumber, expertLumberJack));
+        assertEquals("Forest/lumber/expertLumberJack max", 20, tile3.getMaximumPotential(lumber, expertLumberJack));
     }
 
     public void testIsTileTypeAllowed() {
@@ -426,7 +352,7 @@ public class TileTest extends FreeColTestCase {
         TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
         assertTrue(road2.isComplete());
-        TileImprovement river2 = tile2.addRiver(1, "0101");
+        tile2.addRiver(1, "0101");
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
@@ -443,7 +369,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
         ColonyTile colonyTile1 = null;
         ColonyTile colonyTile2 = null;
@@ -473,7 +399,7 @@ public class TileTest extends FreeColTestCase {
         TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
         assertTrue(road2.isComplete());
-        TileImprovement river2 = tile2.addRiver(1, "0101");
+        tile2.addRiver(1, "0101");
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
@@ -629,7 +555,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getGame();
         game.changeMap(map);
 
-        Colony colony = getStandardColony(1);
+        Colony colony = createStandardColony(1);
         final Tile tile = colony.getTile();
         tile.addRiver(1, "1111"); // allow rivers to join
         final Iterable<Tile> tiles = tile.getSurroundingTiles(1);
@@ -704,7 +630,7 @@ public class TileTest extends FreeColTestCase {
         Map map = getTestMap(tundra);
         game.changeMap(map);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         ColonyTile colonyTile = colony.getColonyTile(tile);
         tile.addResource(new Resource(game, tile, mineralsResource));
@@ -782,7 +708,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         game.changeMap(getTestMap(plains));
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         Tile tile = colony.getTile();
 
         Tile otherTile = tile.copy(game);

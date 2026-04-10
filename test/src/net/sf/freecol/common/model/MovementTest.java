@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -25,42 +25,21 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MovementTest extends FreeColTestCase {
 
-    private static final TileImprovementType riverType
-        = spec().getTileImprovementType("model.improvement.river");
-    private static final TileImprovementType roadType
-        = spec().getTileImprovementType("model.improvement.road");
+    private static final TileType hills = spec().getTileType("model.tile.hills");
+    private static final TileType ocean = spec().getTileType("model.tile.ocean");
+    private static final TileType plains = spec().getTileType("model.tile.plains");
 
-    private static final TileType hills
-        = spec().getTileType("model.tile.hills");
-    private static final TileType ocean
-        = spec().getTileType("model.tile.ocean");
-    private static final TileType plains
-        = spec().getTileType("model.tile.plains");
+    private static final Role armedBraveRole = spec().getRole("model.role.armedBrave");
+    private static final Role dragoonRole = spec().getRole("model.role.dragoon");
+    private static final Role missionaryRole = spec().getRole("model.role.missionary");
+    private static final Role mountedBraveRole = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoonRole = spec().getRole("model.role.nativeDragoon");
+    private static final Role pioneerRole = spec().getRole("model.role.pioneer");
+    private static final Role scoutRole = spec().getRole("model.role.scout");
+    private static final Role soldierRole = spec().getRole("model.role.soldier");
 
-    private static final Role armedBraveRole
-        = spec().getRole("model.role.armedBrave");
-    private static final Role dragoonRole
-        = spec().getRole("model.role.dragoon");
-    private static final Role missionaryRole
-        = spec().getRole("model.role.missionary");
-    private static final Role mountedBraveRole
-        = spec().getRole("model.role.mountedBrave");
-    private static final Role nativeDragoonRole
-        = spec().getRole("model.role.nativeDragoon");
-    private static final Role pioneerRole
-        = spec().getRole("model.role.pioneer");
-    private static final Role scoutRole
-        = spec().getRole("model.role.scout");
-    private static final Role soldierRole
-        = spec().getRole("model.role.soldier");
-
-    private static final UnitType braveType
-        = spec().getUnitType("model.unit.brave");
-    private static final UnitType colonistType
-        = spec().getUnitType("model.unit.freeColonist");
-    private static final UnitType galleonType
-        = spec().getUnitType("model.unit.galleon");
-
+    private static final UnitType braveType = spec().getUnitType("model.unit.brave");
+    private static final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 
     public void testMoveFromPlainsToPlains() throws Exception {
         Game game = getStandardGame();
@@ -228,7 +207,7 @@ public class MovementTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         tile3.setExplored(dutch, true);
 
-        Colony colony = getStandardColony();
+        Colony colony = createStandardColony();
         assertEquals(tile1.getColony(), colony);
 
         Unit colonist = new ServerUnit(game, tile2, french, colonistType);

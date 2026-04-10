@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -525,11 +525,27 @@ public class ServerIndianSettlement extends IndianSettlement
         // Now check the food situation
         int storedFood = getGoodsCount(spec.getPrimaryFoodType());
         if (storedFood <= 0 && getUnitCount() > 0) {
+            /* 
+             * BR#3354 - No, do not starve out the settlements without
+             *           making a better solution.
+             *            
+             * 1. Make every tile type produce at least 2 food so that the land has to be
+             *    taken/blockaded for starving to occur. We do want to be able to place
+             *    settlements in desert areas and in the arctic.
+             * 2. Starving should not be enabled for the classic ruleset.
+             * 3. Make the natives attack en masse in order to break out of the besieged
+             *    settlement (now they just die without attacking).
+             * 4. Have an event telling that everyone starved to death (instead of just
+             *    having the settlement disappear).
+             * 5. Produce a settlement ruin that can be converted into a treasure train by
+             *    moving into the tile.
+
             Unit victim = getRandomMember(logger, "Choose starver",
                                           getUnits(), random);
             ((ServerUnit)victim).csRemove(See.only(owner),
                 this, cs);//-vis(owner)
             lb.add(" FAMINE");
+            */
         }
         if (getUnitCount() <= 0) {
             if (tile.isEmpty()) {

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.io.sza;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 /**
  * An event describing that the given image should
@@ -31,7 +31,7 @@ public interface ImageAnimationEvent extends AnimationEvent {
      * Returns the image this event contains.
      * @return The image to be displayed. 
      */
-    public Image getImage();
+    public BufferedImage getImage();
     
     /**
      * Returns the duration the image should be displayed.

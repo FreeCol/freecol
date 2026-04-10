@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -524,7 +524,7 @@ public final class ConnectController extends FreeColClientHolder {
             if (names.isEmpty()) return false;
             if (names.contains(name)) break; // Already there, use it
             StringTemplate tmpl = StringTemplate.template("client.choicePlayer");
-            nationId = getGUI().getChoice(tmpl, "cancel",
+            nationId = getGUI().modalChoiceDialog(tmpl, "cancel",
                     transform(names, alwaysTrue(), n ->
                         new ChoiceItem<>(Messages.message(StringTemplate
                                 .template("countryName")

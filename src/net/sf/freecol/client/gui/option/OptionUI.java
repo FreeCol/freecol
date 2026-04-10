@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -31,6 +31,7 @@ import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.FullscreenDisplayModeOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.ModListOption;
@@ -129,7 +130,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      *
      * @return A suitable ListCellRenderer.
      */
-    public ListCellRenderer getListCellRenderer() {
+    public ListCellRenderer<T> getListCellRenderer() {
         return null;
     }
 
@@ -163,7 +164,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      * @param editable Should the result be editable.
      * @return A suitable {@code OptionUI}, or null if none found.
      */
-    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
+    public static OptionUI<?> getOptionUI(GUI gui, Option<?> option, boolean editable) {
         if (option instanceof BooleanOption) {
             return new BooleanOptionUI((BooleanOption)option, editable);
         } else if (option instanceof FileOption) {
@@ -182,6 +183,8 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
             return new LanguageOptionUI((LanguageOption)option, editable);
         } else if (option instanceof AudioMixerOption) {
             return new AudioMixerOptionUI(gui, (AudioMixerOption)option, editable);
+        } else if (option instanceof FullscreenDisplayModeOption) {
+            return new FullscreenDisplayModeOptionUI(gui, (FullscreenDisplayModeOption)option, editable);
         } else if (option instanceof FreeColAction) {
             return new FreeColActionUI((FreeColAction)option, editable);
         } else if (option instanceof AbstractUnitOption) {

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.menu;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -40,7 +39,7 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.ColopediaAction;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.action.SelectableAction;
+import net.sf.freecol.client.gui.action.SelectableOptionAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.util.ImageUtils;
@@ -133,6 +132,9 @@ public abstract class FreeColMenuBar extends JMenuBar {
             if (action.getMnemonic() != null) {
                 rtn.addMenuKeyListener(action.getMenuKeyListener());
             }
+            
+            rtn.getInputMap().put(action.getAccelerator(), action.getId());
+            rtn.getActionMap().put(action.getId(), action);
         } else {
             logger.finest("Could not create menu item. [" + actionId
                 + "] not found.");
@@ -166,7 +168,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
      * @return The menu item.
      */
     protected JCheckBoxMenuItem getCheckBoxMenuItem(String actionId) {
-
         JCheckBoxMenuItem rtn = null;
         FreeColAction action = am.getFreeColAction(actionId);
 
@@ -175,11 +176,11 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setAction(action);
             rtn.setOpaque(false);
 
-            rtn.setSelected(((SelectableAction)am.getFreeColAction(actionId))
-                .isSelected());
-        } else
-            logger.finest("Could not create menu item. [" + actionId
-                + "] not found.");
+            rtn.getInputMap().put(action.getAccelerator(), action.getId());
+            rtn.getActionMap().put(action.getId(), action);
+        } else {
+            logger.finest("Could not create menu item. [" + actionId + "] not found.");
+        }
 
         return rtn;
     }
@@ -202,8 +203,11 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setAction(action);
             rtn.setOpaque(false);
 
-            rtn.setSelected(((SelectableAction) am.getFreeColAction(actionId)).isSelected());
+            rtn.setSelected(((SelectableOptionAction) am.getFreeColAction(actionId)).isSelected());
             group.add(rtn);
+            
+            rtn.getInputMap().put(action.getAccelerator(), action.getId());
+            rtn.getActionMap().put(action.getId(), action);
         } else {
             logger.finest("Could not create menu item. [" + actionId
                 + "] not found.");

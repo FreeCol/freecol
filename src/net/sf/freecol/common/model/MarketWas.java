@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**
@@ -32,8 +31,6 @@ import java.util.logging.Logger;
  * change, and fire off any consequent property changes.
  */
 public class MarketWas extends ObjectWas {
-
-    private static final Logger logger = Logger.getLogger(MarketWas.class.getName());
 
     private final Market market;
     private final int tax;

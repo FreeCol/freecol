@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,7 +22,6 @@ package net.sf.freecol.common.i18n;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,8 +35,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
  * Common Locale Data Repository</a>.
  */
 public class NumberRules {
-
-    private static final Logger logger = Logger.getLogger(NumberRules.class.getName());
 
     /**
      * A rule that always returns category "other".
@@ -64,19 +61,6 @@ public class NumberRules {
 
 
     private static final Map<String, Number> numberMap = new HashMap<>();
-
-
-    /**
-     * Creates a new {@code NumberRules} instance from the given
-     * input stream, which must contain an XML representation of the
-     * CLDR plural rules.
-     *
-     * @param in an {@code InputStream} value
-     * @exception XMLStreamException if there is a problem reading the stream.
-     */
-    public NumberRules(InputStream in) throws XMLStreamException {
-        load(in);
-    }
 
 
     /**

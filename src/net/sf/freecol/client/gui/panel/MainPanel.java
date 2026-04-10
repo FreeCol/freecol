@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -48,9 +47,6 @@ import net.sf.freecol.common.io.FreeColDirectories;
  * The initial panel where the user chooses from the main modes of operation.
  */
 public final class MainPanel extends FreeColPanel {
-
-    private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
-
 
     /**
      * The constructor that will add the items to this panel.

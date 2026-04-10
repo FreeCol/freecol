@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.dialog;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
@@ -36,11 +35,12 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
@@ -59,7 +59,7 @@ import net.sf.freecol.server.model.ServerUnit;
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
  */
-public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
+public final class EditSettlementDialog extends DeprecatedFreeColDialog<IndianSettlement>
     implements ItemListener {
 
     @SuppressWarnings("unused")
@@ -200,7 +200,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         final Specification spec = freeColClient.getGame().getSpecification();
         final GUI gui = getGUI();
         IndianSettlement ret = null;
-        Set<Tile> tiles = is.getOwnedTiles();
         Object value = getValue();
         if (options.get(0).equals(value)) { // OK
             is.setName(this.name.getText());
@@ -253,8 +252,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             ret = is;
 
         } else if (options.get(1).equals(value)) {
-            if (!gui.confirm("editSettlementDialog.removeSettlement.text", 
-                             "ok", "cancel")) {
+            if (!gui.modalConfirmDialog("editSettlementDialog.removeSettlement.text", 
+                             "ok", "cancel", true)) {
                 return is;
             }
             // Dispose of units and settlement on tile

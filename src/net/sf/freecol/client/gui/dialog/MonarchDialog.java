@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -49,7 +49,7 @@ import net.sf.freecol.common.model.StringTemplate;
  * there may not be a meaningful accept option in some cases.  This
  * prevents just extending FreeColConfirmDialog. 
  */
-public final class MonarchDialog extends FreeColDialog<Boolean> {
+public final class MonarchDialog extends DeprecatedFreeColDialog<Boolean> {
 
     /**
      * Creates a dialog to handle monarch interactions.
@@ -64,7 +64,6 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             MonarchAction action, StringTemplate template, String monarchKey) {
         super(freeColClient, frame);
 
-        final ImageLibrary lib = getImageLibrary();
         final String messageId = action.getTextKey();
         if (!Messages.containsKey(messageId)) {
             throw new IllegalStateException("Unrecognized monarch action: "

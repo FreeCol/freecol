@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022  The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -29,7 +29,7 @@ public class SoLTest extends FreeColTestCase {
         game.changeMap(getTestMap(true));
 
         final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-        Colony colony = getStandardColony(7);
+        Colony colony = createStandardColony(7);
         for (int i = 1; i <= 100; i++) {
             int requiredBells = (Colony.LIBERTY_PER_REBEL
                 * (colony.getSonsOfLiberty() + 1) * colony.getUnitCount()) / 100;

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -24,7 +24,6 @@ import static net.sf.freecol.common.util.Utils.delay;
 import static net.sf.freecol.common.util.Utils.now;
 
 import java.awt.Point;
-import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 
@@ -37,8 +36,6 @@ import net.sf.freecol.common.model.Unit;
  * Class for the animation of units movement.
  */
 final class UnitMoveAnimation extends Animation {
-
-    private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
 
     /**
      * Display delay between one frame and another, in milliseconds.

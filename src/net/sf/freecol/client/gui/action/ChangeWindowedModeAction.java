@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.GUI;
 /**
  * An action for toggling between full-screen and windowed mode.
  */
-public final class ChangeWindowedModeAction extends SelectableAction {
+public final class ChangeWindowedModeAction extends SelectableOptionAction {
 
     public static final String id = "changeWindowedModeAction";
 

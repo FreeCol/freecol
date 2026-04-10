@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -213,10 +213,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             this.stops = stops;
         }
 
-        public List<TradeRouteStop> getStops() {
-            return stops;
-        }
-
         // Interface Transferable
 
         /**
@@ -262,8 +258,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         protected Transferable createTransferable(JComponent c) {
-            final JList list = (JList) c;
-            final DefaultListModel model = (DefaultListModel)list.getModel();
+            final JList<?> list = (JList<?>) c;
+            final DefaultListModel<?> model = (DefaultListModel<?>) list.getModel();
             final int[] indicies = list.getSelectedIndices();
             final List<TradeRouteStop> stops = new ArrayList<>(indicies.length);
             for (int i : indicies) {

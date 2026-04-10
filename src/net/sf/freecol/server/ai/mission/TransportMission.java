@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -27,10 +27,7 @@ import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -90,8 +87,6 @@ public final class TransportMission extends Mission {
      * on the distinct destination locations to visit.
      */
     private static final int DESTINATION_UPPER_BOUND = 4;
-
-    private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
     /** A list of {@code Cargo}s to work on. */
     private final List<Cargo> cargoes = new ArrayList<>();
@@ -978,6 +973,9 @@ public final class TransportMission extends Mission {
      */
     private void doTransport(LogBuilder lb) {
         final Unit unit = getUnit();
+        if (tSize() == 0) {
+            queueMoreCargo(lb, unit);
+        }
         if (tSize() > 0) {
             // Arrived at a target.  Deliver what can be delivered.
             // Check other deliveries, we might be in port so this is
@@ -1069,15 +1067,21 @@ public final class TransportMission extends Mission {
         }
 
         queueEasilyTransportedCargo(unit);
-        
+        queueMoreCargo(lb, unit);
+    }
+
+    private void queueMoreCargo(LogBuilder lb, final Unit unit) {
         // Replenish cargoes up to available destination capacity
         // and 50% above maximum cargoes (FIXME: longer?)
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
-        while (destinationCapacity() > 0
-            && tSize() < unit.getCargoCapacity() * 3 / 2) {
-            Cargo cargo = getBestCargo(unit);
-            if (cargo == null) break;
-            if (!queueCargo(cargo, false, lb)) break;
+        while (destinationCapacity() > 0 && tSize() < unit.getCargoCapacity() * 3 / 2) {
+            final Cargo cargo = getBestCargo(unit);
+            if (cargo == null) {
+                break;
+            }
+            if (!queueCargo(cargo, false, lb)) {
+                break;
+            }
             euaip.claimTransportable(cargo.getTransportable());
         }
         

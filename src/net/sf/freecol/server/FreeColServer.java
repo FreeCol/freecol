@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -657,8 +657,8 @@ public final class FreeColServer {
     public void addNewUserConnection(Socket socket)
         throws FreeColException, IOException, XMLStreamException {
         final String name = socket.getInetAddress() + ":" + socket.getPort();
-        Connection c = new Connection(socket, FreeCol.SERVER_THREAD + name)
-            .setMessageHandler(this.userConnectionHandler);
+        @SuppressWarnings("resource")
+        final Connection c = new Connection(socket, FreeCol.SERVER_THREAD + name).setMessageHandler(this.userConnectionHandler);
         getServer().addConnection(c);
         // Short delay here improves reliability
         c.startReceiving();
