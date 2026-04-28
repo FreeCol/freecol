@@ -23,6 +23,7 @@ package net.sf.freecol.common.model;
 /**
  * An object that has a name.
  */
+@FunctionalInterface
 public interface Named {
 
     /**

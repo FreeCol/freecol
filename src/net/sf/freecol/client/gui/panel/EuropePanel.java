@@ -42,6 +42,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -122,7 +123,7 @@ public final class EuropePanel extends PortPanel {
                                 && unit.getDestination().getTile().getMap()
                                 == destination);
                     } else {
-                        logger.warning("Bogus DestinationPanel location: "
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus DestinationPanel location: "
                             + destination
                             + " for unit: " + unit);
                         belongs = false;
@@ -177,7 +178,7 @@ public final class EuropePanel extends PortPanel {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
-                    logger.warning("Invalid component: " + comp);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid component: " + comp);
                     return null;
                 }
                 final Unit unit = ((UnitLabel)comp).getUnit();
@@ -459,7 +460,7 @@ public final class EuropePanel extends PortPanel {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
-                    logger.warning("Invalid component: " + comp);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid component: " + comp);
                     return null;
                 }
 
@@ -478,7 +479,7 @@ public final class EuropePanel extends PortPanel {
                             igc().unloadCargo(goods, true);
                             break;
                         default:
-                            logger.warning("showBoycottedGoodsDialog fail: "
+                            if (logger.isLoggable(Level.WARNING)) logger.warning("showBoycottedGoodsDialog fail: "
                                 + act);
                             break;
                         }
@@ -541,10 +542,11 @@ public final class EuropePanel extends PortPanel {
         private void add(String text) {
             StyledDocument doc = getStyledDocument();
             try {
-                if (doc.getLength() > 0) text = "\n\n" + text;
+                String entry = text;
+                if (doc.getLength() > 0) entry = "\n\n" + entry;
                 
-                doc.insertString(doc.getLength(), text, null);
-            } catch (Exception e) {
+                doc.insertString(doc.getLength(), entry, null);
+            } catch (BadLocationException e) {
                 logger.log(Level.WARNING, "Transaction log update failure", e);
             }
         }
@@ -612,8 +614,12 @@ public final class EuropePanel extends PortPanel {
 
     private TransactionLog log;
 
-    private JButton exitButton, trainButton, purchaseButton,
-                    recruitButton, unloadButton, sailButton;
+    private JButton exitButton;
+    private JButton trainButton;
+    private JButton purchaseButton;
+    private JButton recruitButton;
+    private JButton unloadButton;
+    private JButton sailButton;
 
     private final Europe europe;
 

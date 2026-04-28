@@ -542,6 +542,41 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(merchantman.getUnitList().get(0).getId(),
             other.getUnitList().get(0).getId());
     }
+
+    public void testChangeRoleClearsExperienceOnIncompatibleRole() {
+        Game game = getStandardGame();
+        Map map = getTestMap(plains, true);
+        game.changeMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Tile tile = map.getTile(6, 8);
+        Unit colonist = new ServerUnit(game, tile, dutch, colonistType);
+        colonist.setRole(soldierRole);
+        colonist.setExperience(10);
+        assertTrue("Setup error, experience should be set",
+                   colonist.getExperience() > 0);
+
+        colonist.changeRole(scoutRole, 1);
+        assertEquals("Experience should reset when changing to incompatible role",
+                     0, colonist.getExperience());
+    }
+
+    public void testChangeRoleCountResetsToDefaultRole() {
+        Game game = getStandardGame();
+        Map map = getTestMap(plains, true);
+        game.changeMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Tile tile = map.getTile(6, 8);
+        Unit colonist = new ServerUnit(game, tile, dutch, colonistType);
+        colonist.changeRole(soldierRole, 1);
+        assertEquals(1, colonist.getRoleCount());
+
+        assertTrue("Role count should reach zero", colonist.changeRoleCount(-1));
+        assertEquals("Role count should be zero", 0, colonist.getRoleCount());
+        assertEquals("Role should reset to default",
+                     spec().getDefaultRole(), colonist.getRole());
+    }
     
     public void testDefaultRole() {
         for (UnitType type : spec().getUnitTypeList()) {

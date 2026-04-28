@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.Mission;
+import java.util.logging.Level;
 
 
 /**
@@ -121,7 +122,7 @@ public final class AIGoods extends TransportableAIObject {
      *
      * @return The {@code Goods}.
      */
-    public final Goods getGoods() {
+    public Goods getGoods() {
         return this.goods;
     }
 
@@ -130,7 +131,7 @@ public final class AIGoods extends TransportableAIObject {
      *
      * @param goods The new {@code Goods}.
      */
-    public final void setGoods(Goods goods) {
+    public void setGoods(Goods goods) {
         this.goods = goods;
     }
 
@@ -139,7 +140,7 @@ public final class AIGoods extends TransportableAIObject {
      *
      * @return The {@code GoodsType}.
      */
-    public final GoodsType getGoodsType() {
+    public GoodsType getGoodsType() {
         return goods.getType();
     }
 
@@ -148,7 +149,7 @@ public final class AIGoods extends TransportableAIObject {
      *
      * @return The amount of goods.
      */
-    public final int getGoodsAmount() {
+    public int getGoodsAmount() {
         return goods.getAmount();
     }
 
@@ -157,7 +158,7 @@ public final class AIGoods extends TransportableAIObject {
      *
      * @param amount The new amount of goods.
      */
-    public final void setGoodsAmount(int amount) {
+    public void setGoodsAmount(int amount) {
         goods.setAmount(amount);
     }
 
@@ -184,11 +185,11 @@ public final class AIGoods extends TransportableAIObject {
             if (oldAmount - newAmount != amount) {
                 // FIXME: sort this out.
                 // For now, do not tolerate partial unloads.
-                logger.warning("Partial goods unload, expected: " + amount
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Partial goods unload, expected: " + amount
                     + ", got: " + (oldAmount - newAmount));
                 result = false;
             }
-            logger.fine("Unloaded " + amount + " " + type
+            if (logger.isLoggable(Level.FINE)) logger.fine("Unloaded " + amount + " " + type
                 + " from " + oldAmount + " leaving " + newAmount
                 + " off of " + carrier + " at " + carrier.getLocation());
         }   
@@ -307,7 +308,7 @@ public final class AIGoods extends TransportableAIObject {
                 getAIMain().getAIColony(colony).removeExportGoods(this);
             }
         }
-        logger.fine("Loaded " + amount + " " + type.getSuffix()
+        if (logger.isLoggable(Level.FINE)) logger.fine("Loaded " + amount + " " + type.getSuffix()
             + " over " + oldAmount + " leaving " + (goodsAmount - amount)
             + " onto " + carrier + " at " + carrier.getLocation());
         return !failed;
@@ -344,9 +345,8 @@ public final class AIGoods extends TransportableAIObject {
             if (destination instanceof Colony) {
                 AIColony aic = getAIMain().getAIColony((Colony)destination);
                 if (aic != null) aic.removeExportGoods(this);
-            } else if (destination instanceof Europe) {
-                // Nothing to remove.
-            } else {
+            } else if (!(destination instanceof Europe)
+                && logger.isLoggable(Level.WARNING)) {
                 logger.warning("Unknown type of destination: " + destination);
             }
             destination = null;

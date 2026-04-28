@@ -24,10 +24,12 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
 import net.sf.freecol.common.util.ImageUtils;
+import java.util.logging.Level;
 
 
 /**
@@ -40,9 +42,10 @@ public class Texture2Tile {
     
     private static final int RESULT_WIDTH = 512;
     private static final int RESULT_HEIGHT = 256;
+    private static final Logger logger = Logger.getLogger(Texture2Tile.class.getName());
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 0 || args[0].equals("-h") || args[0].equals("--help")) {
+        if (args.length == 0 || "-h".equals(args[0]) || "--help".equals(args[0])) {
             printUsage();
             System.exit(0);
         }
@@ -59,15 +62,15 @@ public class Texture2Tile {
 
 
     private static void printUsage() {
-        System.out.println("Creates an isometric base tile image from a tiling texture.");
-        System.out.println();
-        System.out.println("Usage: java -cp FreeCol.jar net.sf.freecol.tools.Texture2Tile IMAGE_FILE");
-        System.out.println();
-        System.out.println("IMAGE_FILE  - A seamlessly tiling texture to be used for creating a seamlessly");
-        System.out.println("              tiling isometric base tile.");
-        System.out.println();
-        System.out.println("Two results are produced by this tool: \"generated.png\" and \"generated-rotated.png\"");
-        System.out.println("The best one to use depends on the texture.");
+        logger.info("Creates an isometric base tile image from a tiling texture.");
+        logger.info("");
+        logger.info("Usage: java -cp FreeCol.jar net.sf.freecol.tools.Texture2Tile IMAGE_FILE");
+        logger.info("");
+        logger.info("IMAGE_FILE  - A seamlessly tiling texture to be used for creating a seamlessly");
+        logger.info("              tiling isometric base tile.");
+        logger.info("");
+        logger.info("Two results are produced by this tool: \"generated.png\" and \"generated-rotated.png\"");
+        logger.info("The best one to use depends on the texture.");
     }
 
 
@@ -86,7 +89,7 @@ public class Texture2Tile {
         tempImage = ImageUtils.imageWithAlphaFromMask(tempImage, tileMaskImage);
         
         ImageIO.write(tempImage, "png", resultImagefile);
-        System.out.println("Image written to: " + resultImagefile.getAbsolutePath().toString());
+        if (logger.isLoggable(Level.INFO)) logger.info("Image written to: " + resultImagefile.getAbsolutePath().toString());
     }
 
 
@@ -103,7 +106,7 @@ public class Texture2Tile {
         final BufferedImage resultImage = combineQuarterTiles(imageA, imageB);
         
         ImageIO.write(resultImage, "png", resultImagefile);
-        System.out.println("Image written to: " + resultImagefile.getAbsolutePath().toString());
+        if (logger.isLoggable(Level.INFO)) logger.info("Image written to: " + resultImagefile.getAbsolutePath().toString());
     }
 
 

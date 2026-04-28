@@ -35,6 +35,7 @@ public abstract class Resource {
      * Implement the Cleanable interface if a Resource has a use for
      * calls to a clean method.
      */
+    @FunctionalInterface
     public interface Cleanable {
 
         /**

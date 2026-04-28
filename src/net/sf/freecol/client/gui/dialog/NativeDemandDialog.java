@@ -60,7 +60,8 @@ public final class NativeDemandDialog extends FreeColConfirmDialog {
 
         final String nation = Messages.message(unit.getOwner().getNationLabel());
         StringTemplate template;
-        String yes, no;
+        String yes;
+        String no;
         if (type == null) {
             template = StringTemplate.template("indianDemand.gold.text")
                 .addName("%nation%", nation)

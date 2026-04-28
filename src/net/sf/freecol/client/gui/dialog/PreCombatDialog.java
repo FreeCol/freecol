@@ -87,8 +87,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             = attacker.getDescription(Unit.UnitLabelType.NATIONAL);
         JLabel attackerLabel = new UnitLabel(freeColClient, attacker,
                                              false, true);
-        String defenderName = null;
-        JLabel defenderLabel = null;
+        String defenderName;
+        JLabel defenderLabel;
         if (combatModel.combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit)defender;
             defenderName
@@ -119,7 +119,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         Iterator<Modifier> offenceI = offence.iterator();
         Iterator<Modifier> defenceI = defence.iterator();
         while (offenceI.hasNext() || defenceI.hasNext()) {
-            int skip = 0;
+            int skip;
             boolean hasOffence = offenceI.hasNext();
             if (hasOffence) {
                 JLabel[] labels = ModifierFormat

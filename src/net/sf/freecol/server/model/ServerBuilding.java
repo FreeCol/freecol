@@ -40,6 +40,7 @@ import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -120,16 +121,14 @@ public class ServerBuilding extends Building implements TurnTaker {
         final Player owner = getColony().getOwner();
 
         Unit student = teacher.getStudent();
-        if (student != null
-            && teacher.getTurnsOfTraining()
-                >= teacher.getNeededTurnsOfTraining()) {
-            csTrainStudent(teacher, student, cs);
-            // Student will have changed, teacher already added in csTeach
-            cs.add(See.only(owner), student);
-            if (teacher.getStudent() == null) csAssignStudent(teacher, cs);
-            return true;
-        }
-        return false;
+        if (student == null
+            || teacher.getTurnsOfTraining()
+                < teacher.getNeededTurnsOfTraining()) return false;
+        csTrainStudent(teacher, student, cs);
+        // Student will have changed, teacher already added in csTeach
+        cs.add(See.only(owner), student);
+        if (teacher.getStudent() == null) csAssignStudent(teacher, cs);
+        return true;
     }
         
     /**
@@ -146,7 +145,7 @@ public class ServerBuilding extends Building implements TurnTaker {
         UnitType skill = student.getTeachingType(teacher);
         boolean ret = skill != null;
         if (skill == null) {
-            logger.warning("Student " + student.getId()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Student " + student.getId()
                            + " can not learn from " + teacher.getId());
         } else {
             student.changeType(skill);//-vis: safe within colony

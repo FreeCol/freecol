@@ -26,6 +26,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -53,6 +54,7 @@ public class FountainOfYouthMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public FountainOfYouthMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, MIGRANTS_TAG);
@@ -84,7 +86,7 @@ public class FountainOfYouthMessage extends AttributeMessage {
         final int n = getMigrants();
 
         if (n <= 0) {
-            logger.warning("Invalid migrants attribute: " + n);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid migrants attribute: " + n);
             return;
         }
 

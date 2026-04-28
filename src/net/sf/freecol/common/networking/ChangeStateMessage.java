@@ -91,7 +91,7 @@ public class ChangeStateMessage extends AttributeMessage {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         // Do not test if it is on the map, units in Europe can change state.
@@ -99,7 +99,7 @@ public class ChangeStateMessage extends AttributeMessage {
         UnitState state;
         try {
             state = Enum.valueOf(UnitState.class, stateString);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.checkSetState(state)) {

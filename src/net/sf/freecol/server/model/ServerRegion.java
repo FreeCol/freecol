@@ -549,13 +549,25 @@ public class ServerRegion extends Region {
             final int midy = maxy / 2;
             Tile tNP = null, tSP = null, tNA = null, tSA = null, t;
             for (int y = midy-1; y >= 0; y--) {
-                if (tNP == null && !(t = map.getTile(0, y)).isLand()) tNP = t;
-                if (tNA == null && !(t = map.getTile(maxx-1, y)).isLand()) tNA = t;
+                if (tNP == null) {
+                    t = map.getTile(0, y);
+                    if (!t.isLand()) tNP = t;
+                }
+                if (tNA == null) {
+                    t = map.getTile(maxx-1, y);
+                    if (!t.isLand()) tNA = t;
+                }
                 if (tNP != null && tNA != null) break;
             }
             for (int y = midy; y < maxy; y++) {
-                if (tSP == null && !(t = map.getTile(0, y)).isLand()) tSP = t;
-                if (tSA == null && !(t = map.getTile(maxx-1, y)).isLand()) tSA = t;
+                if (tSP == null) {
+                    t = map.getTile(0, y);
+                    if (!t.isLand()) tSP = t;
+                }
+                if (tSA == null) {
+                    t = map.getTile(maxx-1, y);
+                    if (!t.isLand()) tSA = t;
+                }
                 if (tSP != null && tSA != null) break;
             }
             int nNP = 0, nSP = 0, nNA = 0, nSA = 0;

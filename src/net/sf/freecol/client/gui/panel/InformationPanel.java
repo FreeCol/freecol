@@ -64,7 +64,7 @@ import net.sf.freecol.common.model.Unit;
 public class InformationPanel extends FreeColPanel {
     
     /** The skin for this panel. */
-    private BufferedImage skin = null;
+    private BufferedImage skin;
 
     
     /**
@@ -77,7 +77,7 @@ public class InformationPanel extends FreeColPanel {
      * @param images The images to be displayed in the panel.
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
-                            FreeColObject[] fcos, ImageIcon[] images) {
+                            FreeColObject[] fcos, ImageIcon... images) {
         super(freeColClient, null, new MigLayout());
         
         final ImageLibrary fixedImageLibrary = freeColClient.getGUI().getFixedImageLibrary();

@@ -26,14 +26,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.util.Utils;
+import java.util.logging.Level;
 
 
 /**
  * Generate a desktop entry file.
  */
 public class DesktopEntry {
+
+    private static final Logger logger = Logger.getLogger(DesktopEntry.class.getName());
 
     private static final File SOURCE_DIRECTORY =
         new File("data", "strings");
@@ -70,14 +74,13 @@ public class DesktopEntry {
                 }
             });
             if (sourceFiles == null) {
-                System.err.println("No messages files found in "
-                    + SOURCE_DIRECTORY);
+                if (logger.isLoggable(Level.SEVERE)) logger.severe("No messages files found in " + SOURCE_DIRECTORY);
                 System.exit(1);
             }
 
             for (String name : sourceFiles) {
                 
-                System.out.println("Processing source file: " + name);
+                if (logger.isLoggable(Level.INFO)) logger.info("Processing source file: " + name);
                 
                 String languageCode = null;
                 if (name.startsWith("FreeColMessages_")) {
@@ -128,4 +131,3 @@ public class DesktopEntry {
 
     }
 }
-

@@ -131,7 +131,6 @@ import net.sf.freecol.common.util.ImageUtils;
  * Beware that in debug mode, this might be a server-side version of
  * the colony which is why we need to call getColony().getSpecification()
  * to get the spec that corresponds to the good types in this colony.
- * <p>
  */
 public final class ColonyPanel extends PortPanel
     implements PropertyChangeListener {
@@ -391,6 +390,7 @@ public final class ColonyPanel extends PortPanel
          * with the layout manager) rather than relying on JScrollPane.
          */
         buildingsScroll.addComponentListener(new ComponentAdapter() {
+            @Override
             public void componentResized(ComponentEvent e) {
                 final Dimension preferredSize = buildingsPanel.getLayout().preferredLayoutSize(buildingsPanel);
                 final Dimension viewportSize = buildingsScroll.getViewport().getSize();
@@ -994,7 +994,8 @@ public final class ColonyPanel extends PortPanel
 
         // Check for non-producing locations that can now produce.
         for (WorkLocation wl : colony.getCurrentWorkLocationsList()) {
-            boolean change = false, check = wl.getProductionType() == null;
+            boolean change = false;
+            boolean check = wl.getProductionType() == null;
             for (Unit unit : transform(wl.getUnits(), u ->
                     (check || !wl.produces(u.getWorkType())))) {
                 GoodsType workType = wl.getWorkFor(unit);
@@ -1057,11 +1058,11 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         JPopupMenu colonyUnitsMenu
             = new JPopupMenu(Messages.message("colonyPanel.colonyUnits"));
-        ImageIcon unitIcon = null;
+        ImageIcon unitIcon;
         final QuickActionMenu unitMenu
             = new QuickActionMenu(freeColClient, this);
         Tile colonyTile = colony.getTile();
-        JMenuItem subMenu = null;
+        JMenuItem subMenu;
 
         for (final Unit unit : colony.getUnitList()) {
             WorkLocation wl = unit.getWorkLocation();
@@ -1316,15 +1317,18 @@ public final class ColonyPanel extends PortPanel
                 if (!getGUI().modalConfirmDialog(null, StringTemplate.key(key), colony,
                         "abandonColony.yes", "abandonColony.no")) return;
                 abandon = true;
-            } else if ((buildable = colony.getCurrentlyBuilding()) != null) {
-                int required = buildable.getRequiredPopulation();
-                if (required > colony.getUnitCount()
-                    && !getGUI().modalConfirmDialog(null, StringTemplate
-                        .template("colonyPanel.reducePopulation")
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%number%", required)
-                            .addNamed("%buildable%", buildable),
-                        colony, "ok", "cancel")) return;
+            } else {
+                buildable = colony.getCurrentlyBuilding();
+                if (buildable != null) {
+                    int required = buildable.getRequiredPopulation();
+                    if (required > colony.getUnitCount()
+                        && !getGUI().modalConfirmDialog(null, StringTemplate
+                            .template("colonyPanel.reducePopulation")
+                                .addName("%colony%", colony.getName())
+                                .addAmount("%number%", required)
+                                .addNamed("%buildable%", buildable),
+                            colony, "ok", "cancel")) return;
+                }
             }
         }
 
@@ -1374,7 +1378,7 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         if (!isShowing() || colony == null) return;
         String property = event.getPropertyName();
-        logger.finest(colony.getName() + " change " + property
+        if (logger.isLoggable(Level.FINEST)) logger.finest(colony.getName() + " change " + property
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
 
@@ -1424,7 +1428,7 @@ public final class ColonyPanel extends PortPanel
             // ColonyTiles and Buildings now have their own
             // propertyChangeListeners so {ColonyTile,Building}.UNIT_CHANGE
             // events should not arrive here.
-            logger.warning("Unknown property change event: "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Unknown property change event: "
                            + event.getPropertyName());
         }
     }
@@ -1612,8 +1616,8 @@ public final class ColonyPanel extends PortPanel
             try {
                 royalistShield.setIcon(new ImageIcon(lib.getSmallerNationImage(other)));
                 add(royalistShield, "bottom");
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);
+            } catch (IllegalArgumentException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);
             }
 
             revalidate();
@@ -1781,7 +1785,7 @@ public final class ColonyPanel extends PortPanel
                     initialize();
                     return comp;
                 } else {
-                    logger.warning("Invalid component: " + comp);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid component: " + comp);
                     return null;
                 }
             } else {
@@ -2014,7 +2018,7 @@ public final class ColonyPanel extends PortPanel
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
-                    logger.warning("Invalid component: " + comp);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid component: " + comp);
                     return null;
                 }
                 comp.getParent().remove(comp);
@@ -2043,7 +2047,7 @@ public final class ColonyPanel extends PortPanel
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
             if (colony != null && event != null) {
-                logger.finest(colony.getName() + "-warehouse change "
+                if (logger.isLoggable(Level.FINEST)) logger.finest(colony.getName() + "-warehouse change "
                     + event.getPropertyName()
                     + ": " + event.getOldValue()
                     + " -> " + event.getNewValue());
@@ -2338,6 +2342,7 @@ public final class ColonyPanel extends PortPanel
                 setOpaque(false);
             }
             
+            @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 final ImageLibrary lib = getImageLibrary();
@@ -2412,13 +2417,13 @@ public final class ColonyPanel extends PortPanel
             for (int x = 0; x < tiles.length; x++) {
                 for (int y = 0; y < tiles[x].length; y++) {
                     if (tiles[x][y] == null) {
-                        logger.warning("Null tile for " + getColony()
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Null tile for " + getColony()
                             + " at " + x + "," + y);
                         continue;
                     }
                     ColonyTile colonyTile = colony.getColonyTile(tiles[x][y]);
                     if (colonyTile == null) {
-                        logger.warning("Null colony tile for " + getColony()
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Null colony tile for " + getColony()
                             + " on " + tiles[x][y] + " at " + x + "," + y);
                         dump("TILES", colony.getColonyTiles());
                         continue;
@@ -2575,7 +2580,7 @@ public final class ColonyPanel extends PortPanel
             public void update() {
                 removeAll();
                 if (this.colonyTile == null) {
-                    logger.warning("Update of " + getColony()
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Update of " + getColony()
                         + " null colony tile.");
                     return;
                 }
@@ -2654,11 +2659,11 @@ public final class ColonyPanel extends PortPanel
                     case NONE: case NATIVES:
                         if (igc().claimTile(tile, colony)
                             && tile.getOwningSettlement() == colony) {
-                            logger.info("Colony " + colony.getName()
+                            if (logger.isLoggable(Level.INFO)) logger.info("Colony " + colony.getName()
                                 + " claims tile " + tile
                                 + " with unit " + unit.getId());
                         } else {
-                            logger.warning("Colony " + colony.getName()
+                            if (logger.isLoggable(Level.WARNING)) logger.warning("Colony " + colony.getName()
                                 + " did not claim " + tile
                                 + " with unit " + unit.getId());
                             return false;
@@ -2747,7 +2752,7 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                logger.finest(this.colonyTile.getId() + " change " + property
+                if (logger.isLoggable(Level.FINEST)) logger.finest(this.colonyTile.getId() + " change " + property
                               + ": " + event.getOldValue()
                               + " -> " + event.getNewValue());
                 ColonyPanel.this.updateProduction();

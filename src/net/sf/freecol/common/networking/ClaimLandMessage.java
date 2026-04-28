@@ -66,6 +66,7 @@ public class ClaimLandMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public ClaimLandMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, TILE_TAG, CLAIMANT_TAG, PRICE_TAG);
@@ -106,7 +107,7 @@ public class ClaimLandMessage extends AttributeMessage {
 
         Class<? extends FreeColObject> c = FreeColObject
             .getFreeColObjectClassByName(FreeColObject.getIdTypeByName(claimantId));
-        Unit unit = null;
+        Unit unit;
         Settlement settlement = null;
         if (Unit.class.isAssignableFrom(c)) {
             unit = serverPlayer.getOurFreeColGameObject(claimantId, Unit.class);

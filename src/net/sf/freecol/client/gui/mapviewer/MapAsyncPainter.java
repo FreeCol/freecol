@@ -64,16 +64,13 @@ public final class MapAsyncPainter {
     
     static {
         if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-            System.out.println();
-            System.out.println("Map Async Debug enabled:");
-            System.out.println("p\tPrerendering started");
-            System.out.println("123\tTime taken prerendering");
-            System.out.println("P\tPrerendered image delivered for consumption");
-            System.out.println("#\tPrerendered image invalidated and dropped");
-            System.out.println(".\tPrerendered image used");
-            System.out.println(".\tPrerendered image used");
-            System.out.println("!\tNew prerendered image needed immediately");
-            System.out.println();
+            debugLog("Map Async Debug enabled:");
+            debugLog("p\tPrerendering started");
+            debugLog("123\tTime taken prerendering");
+            debugLog("P\tPrerendered image delivered for consumption");
+            debugLog("#\tPrerendered image invalidated and dropped");
+            debugLog(".\tPrerendered image used");
+            debugLog("!\tNew prerendered image needed immediately");
         }
     }
     
@@ -113,7 +110,10 @@ public final class MapAsyncPainter {
                         }
                         consumptionLock.wait();
                     }
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.log(Level.FINE, "Interrupted while waiting for buffer.", e);
+                }
             }
             
             if (aborted) {
@@ -138,7 +138,7 @@ public final class MapAsyncPainter {
                 lastRenderTimestamp = now;
                 mapViewer.getMapViewerBounds().setFocusMapPoint(newFocus);
                 if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                    System.out.print(".");
+                    debugLog("Prerendered image used");
                 }
                 consumerIgnoresOldBuffer = false;
                 
@@ -146,13 +146,13 @@ public final class MapAsyncPainter {
             }
             
             if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                System.out.print("!");
+                debugLog("New prerendered image needed immediately");
             }
             if (!used) {
-                if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                    System.out.println("\n\nWARNING: PRERENDERED IMAGE COMPLETELY UNUSED\nCoordinates: x1="
-                            + x + ", y1=" + y + ", x2" + (x + origSize.width) + ", y2" + (y + origSize.height)
-                            + " \nOut-of-bounds in buffer: " + size + "\n");
+                if (DEBUG_ASYNC_EVENTS_TO_STDOUT && logger.isLoggable(Level.WARNING)) {
+                    logger.warning("PRERENDERED IMAGE COMPLETELY UNUSED\nCoordinates: x1="
+                        + x + ", y1=" + y + ", x2" + (x + origSize.width) + ", y2" + (y + origSize.height)
+                        + " \nOut-of-bounds in buffer: " + size);
                 }
                 consumerIgnoresOldBuffer = true;
             }
@@ -268,7 +268,7 @@ public final class MapAsyncPainter {
             while (!aborted) {
                 try {
                     paint();
-                } catch (Exception e) {
+                } catch (IllegalStateException e) {
                     if (reportedExceptions < MAX_EXCEPTIONS) { 
                         logger.log(Level.WARNING, "Unhandled exception while painting.", e);
                         reportedExceptions++;
@@ -278,7 +278,10 @@ public final class MapAsyncPainter {
                     }
                     try {
                         Thread.sleep(MAX_EXCEPTIONS);
-                    } catch (InterruptedException e1) {}
+                    } catch (InterruptedException e1) {
+                        Thread.currentThread().interrupt();
+                        logger.log(Level.FINE, "Interrupted while throttling exceptions.", e1);
+                    }
                 }
             }
         }
@@ -290,7 +293,7 @@ public final class MapAsyncPainter {
             }
             
             if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                System.out.print("p");
+                debugLog("Prerendering started");
             }
             
             final long now = System.currentTimeMillis();
@@ -301,14 +304,14 @@ public final class MapAsyncPainter {
             ignoreOldBuffer = false;
             
             if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                System.out.print(" " + (System.currentTimeMillis() - now) + " ");
+                debugLog("Prerendering time: " + (System.currentTimeMillis() - now) + "ms");
             }
             
             while (!consumed && !aborted) {
                 if (direction != scrollDirection) {
                     // TODO: Reuse parts of the image.
                     if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                        System.out.print("#");
+                        debugLog("Prerendered image invalidated and dropped");
                     }
                     ignoreOldBuffer = true;
                     return;
@@ -350,7 +353,7 @@ public final class MapAsyncPainter {
             mapFocusPointBackBuffer = nextMapFocusPointBackBuffer;
             
             if (DEBUG_ASYNC_EVENTS_TO_STDOUT) {
-                System.out.println("P");
+                debugLog("Prerendered image delivered for consumption");
             }
 
             synchronized (consumptionLock) {
@@ -359,6 +362,12 @@ public final class MapAsyncPainter {
                 consumed = false;
                 consumptionLock.notifyAll();
             }
+        }
+    }
+
+    private static void debugLog(String message) {
+        if (DEBUG_ASYNC_EVENTS_TO_STDOUT && logger.isLoggable(Level.FINER)) {
+            logger.finer(message);
         }
     }
 }

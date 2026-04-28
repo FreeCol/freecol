@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -126,15 +127,15 @@ public class Unit extends GoodsLocation
             if (t == null || t == this.exclude) return false;
             Settlement settlement = t.getSettlement();
             int value;
-            if (settlement != null
-                && u.getOwner().owns(settlement)
-                && (!this.coastal || settlement.isConnectedPort())
-                && (value = path.getTotalTurns()) < bestValue) {
-                bestValue = value;
-                best = path;
-                return true;
+            if (settlement == null
+                || !u.getOwner().owns(settlement)
+                || (this.coastal && !settlement.isConnectedPort())
+                || (value = path.getTotalTurns()) >= bestValue) {
+                return false;
             }
-            return false;
+            bestValue = value;
+            best = path;
+            return true;
         }
     };
 
@@ -744,7 +745,7 @@ public class Unit extends GoodsLocation
         case SKIPPED:
             return getState() == UnitState.ACTIVE;
         default:
-            logger.warning("Invalid unit state: " + s);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid unit state: " + s);
             return false;
         }
     }
@@ -857,7 +858,7 @@ public class Unit extends GoodsLocation
         if (oldOwner == owner) return;
 
         if (oldOwner == null) {
-            logger.warning("Unit " + getId()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Unit " + getId()
                 + " had no owner, when changing owner to " + owner.getId());
         }
 
@@ -1632,12 +1633,14 @@ public class Unit extends GoodsLocation
      * @return Whether this unit looks native or not.
      */
     public boolean hasNativeEthnicity() {
+        if (this.ethnicity == null) return false;
+        if (getGame() == null || getGame().getSpecification() == null) return false;
         try {
             // FIXME: getNation() could fail, but getNationType()
             // doesn't work as expected
             return getGame().getSpecification().getNation(ethnicity)
                 .getType().isIndian();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
@@ -2700,7 +2703,7 @@ public class Unit extends GoodsLocation
      */
     public Location resolveDestination() {
         if (!isAtSea()) throw new RuntimeException("Not at sea: " + this);
-        Tile ret = null;
+        Tile ret;
         // Is there a destination, either explicit or by trade route?
         TradeRouteStop stop = getStop();
         Location dst = (TradeRoute.isStopValid(this, stop))
@@ -2716,7 +2719,7 @@ public class Unit extends GoodsLocation
             : getFullEntryLocation();
         // Apparently this can still be null!?!  At least log such cases
         if (ret == null) {
-            logger.warning("resolveDestination(" + dst
+            if (logger.isLoggable(Level.WARNING)) logger.warning("resolveDestination(" + dst
                 + ") is null for: " + this);
         }
         return ret;
@@ -3423,11 +3426,11 @@ public class Unit extends GoodsLocation
                             && (p = u.findPath(start)) != null
                             && p.getTotalTurns() < range);
                     };
-                    if (any(transform(tile.getUnits(), attackerPred))) {
-                        found = path;
-                        return true;
+                    if (!any(transform(tile.getUnits(), attackerPred))) {
+                        return false;
                     }
-                    return false;
+                    found = path;
+                    return true;
                 }
             };
         // The range to search will depend on the speed of the other
@@ -4194,7 +4197,7 @@ public class Unit extends GoodsLocation
 
         if (newLocation == this.location) return true;
         if (newLocation != null && !newLocation.canAdd(this)) {
-            logger.warning("Can not add " + this + " to " + newLocation);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Can not add " + this + " to " + newLocation);
             return false;
         }
 
@@ -4339,7 +4342,7 @@ public class Unit extends GoodsLocation
                 return true;
             }
         } else {
-            logger.warning("Tried to remove from unit: "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Tried to remove from unit: "
                 + locatable);
         }
         return false;

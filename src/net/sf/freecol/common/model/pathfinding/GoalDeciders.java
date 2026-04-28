@@ -94,12 +94,10 @@ public final class GoalDeciders {
                         }
                     }
                 }
-                if (all) {
-                    this.winner = 0;
-                    this.goal = path;
-                    return true;
-                }
-                return false;
+                if (!all) return false;
+                this.winner = 0;
+                this.goal = path;
+                return true;
             }
         };
     }
@@ -186,12 +184,9 @@ public final class GoalDeciders {
             @Override
             public boolean check(Unit u, PathNode path) {
                 Tile tile = path.getTile();
-                if (tile != null
-                    && tile.isDirectlyHighSeasConnected()) {
-                    first = path;
-                    return true;
-                }
-                return false;
+                if (tile == null || !tile.isDirectlyHighSeasConnected()) return false;
+                first = path;
+                return true;
             }
         };
     }
@@ -214,15 +209,13 @@ public final class GoalDeciders {
             public boolean hasSubGoals() { return false; }
             @Override
             public boolean check(Unit u, PathNode path) {
-                int cost;
-                if (Map.isSameLocation(path.getLocation(), target)) {
-                    if ((cost = path.getCost()) < bestCost) {
-                        best = path;
-                        bestCost = cost;
-                    }
-                    return true;
+                if (!Map.isSameLocation(path.getLocation(), target)) return false;
+                int cost = path.getCost();
+                if (cost < bestCost) {
+                    best = path;
+                    bestCost = cost;
                 }
-                return false;
+                return true;
             }
         };
     }
@@ -248,11 +241,9 @@ public final class GoalDeciders {
             @Override
             public boolean check(Unit u, PathNode path) {
                 Tile t = path.getTile();
-                if (t != null && t.isAdjacent(tile)) {
-                    best = path;
-                    return true;
-                }
-                return false;
+                if (t == null || !t.isAdjacent(tile)) return false;
+                best = path;
+                return true;
             }
         };
     }
@@ -278,11 +269,9 @@ public final class GoalDeciders {
                 if (t == null || !t.isLand()) return false;
                 Settlement s = t.getSettlement();
                 if (s == null) return false;
-                if (enemies.contains(s.getOwner())) {
-                    best = path;
-                    return true;
-                }
-                return false;
+                if (!enemies.contains(s.getOwner())) return false;
+                best = path;
+                return true;
             }
         };
     }
@@ -336,14 +325,12 @@ public final class GoalDeciders {
                             ? NO_DANGER_BONUS : 0.0)));
                 Tile best = maximize(tile.getSurroundingTiles(1, 1), dockPred,
                                      Comparator.comparingDouble(tileScorer));
-                double score;
-                if (best != null
-                    && (score = tileScorer.applyAsDouble(best)) > bestScore) {
-                    bestScore = score;
-                    goal = pathNode;
-                    return true;
-                }
-                return false;
+                if (best == null) return false;
+                double score = tileScorer.applyAsDouble(best);
+                if (score <= bestScore) return false;
+                bestScore = score;
+                goal = pathNode;
+                return true;
             }
         };
     }
@@ -425,12 +412,12 @@ public final class GoalDeciders {
             @Override
             public boolean check(Unit u, PathNode pathNode) {
                 Tile tile = pathNode.getTile();
-                if (tile.getHighSeasCount() < score && tile.isRiverCorner()) {
-                    score = tile.getHighSeasCount();
-                    goal = pathNode;
-                    return true;
+                if (tile.getHighSeasCount() >= score || !tile.isRiverCorner()) {
+                    return false;
                 }
-                return false;
+                score = tile.getHighSeasCount();
+                goal = pathNode;
+                return true;
             }
         };
     }

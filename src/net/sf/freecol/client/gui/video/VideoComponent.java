@@ -189,7 +189,7 @@ public class VideoComponent extends JPanel {
         // all cases:
         try {
             super.removeNotify();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             logger.log(Level.WARNING, "Video removal crash", e);
         }
     }

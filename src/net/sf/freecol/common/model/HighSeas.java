@@ -29,6 +29,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -104,7 +105,7 @@ public class HighSeas extends UnitLocation {
                 this.destinations.add(destination);
             }
         } else {
-            logger.warning("Tried to add null destination to " + getId());
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Tried to add null destination to " + getId());
         }
     }
 

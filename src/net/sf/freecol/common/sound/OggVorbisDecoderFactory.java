@@ -81,7 +81,7 @@ public class OggVorbisDecoderFactory {
         private float[][][] pcmData;
 
         // The stream containing the data.
-        private InputStream inputStream = null;
+        private InputStream inputStream;
 
 
         public OggStream(InputStream inputStream) throws IOException {
@@ -241,7 +241,8 @@ public class OggVorbisDecoderFactory {
                     packet = 1;
                     break;
                 case 0:
-                    if ((input = getInput()) != null) return input;
+                    input = getInput();
+                    if (input != null) return input;
                     break;
                 default:
                     return "Error reading first page";
@@ -256,7 +257,8 @@ public class OggVorbisDecoderFactory {
                     packet++;
                     break;
                 case 0:
-                    if ((input = getPage()) != null) return input;
+                    input = getPage();
+                    if (input != null) return input;
                     break;
                 default:
                     return "Error in header packet " + packet;
@@ -273,7 +275,7 @@ public class OggVorbisDecoderFactory {
          * @return An error message if input is not available, null on success.
          */
         private String getInput() {
-            int count = -1;
+            int count;
             try {
                 int idx = oggSyncState.buffer(BUFSIZ);
                 count = inputStream.read(oggSyncState.data, idx, BUFSIZ);
@@ -294,7 +296,8 @@ public class OggVorbisDecoderFactory {
             for (;;) {
                 switch (oggSyncState.pageout(oggPage)) { 
                 case 0:
-                    if ((input = getInput()) != null) return input;
+                    input = getInput();
+                    if (input != null) return input;
                     break;
                 case 1:
                     oggStreamState.pagein(oggPage);
@@ -330,7 +333,8 @@ public class OggVorbisDecoderFactory {
                     }
                     break;
                 case 0:
-                    if ((err = getPage()) != null) {
+                    err = getPage();
+                    if (err != null) {
                         return (EOS.equals(err)) ? 0 : -1;
                     }
                     break;
@@ -375,7 +379,7 @@ public class OggVorbisDecoderFactory {
     private static class OggVorbisAudioInputStream extends AudioInputStream {
 
         // Core JOgg and JOrbis magic.
-        private OggStream os = null;
+        private OggStream os;
 
 
         /**

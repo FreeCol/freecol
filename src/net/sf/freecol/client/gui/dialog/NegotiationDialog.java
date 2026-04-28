@@ -82,6 +82,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTradeItem;
+import java.util.logging.Level;
 
 
 /**
@@ -134,34 +135,41 @@ public final class NegotiationDialog extends FreeColPanel {
 
     /** The panels for various negotiable data. */
     private StanceTradeItemPanel stancePanel;
-    private GoldTradeItemPanel goldOfferPanel, goldDemandPanel;
-    private ColonyTradeItemPanel colonyOfferPanel, colonyDemandPanel;
-    private GoodsTradeItemPanel goodsOfferPanel, goodsDemandPanel;
-    private InciteTradeItemPanel inciteOfferPanel, inciteDemandPanel;
-    private UnitTradeItemPanel unitOfferPanel, unitDemandPanel;
+    private GoldTradeItemPanel goldOfferPanel;
+    private GoldTradeItemPanel goldDemandPanel;
+    private ColonyTradeItemPanel colonyOfferPanel;
+    private ColonyTradeItemPanel colonyDemandPanel;
+    private GoodsTradeItemPanel goodsOfferPanel;
+    private GoodsTradeItemPanel goodsDemandPanel;
+    private InciteTradeItemPanel inciteOfferPanel;
+    private InciteTradeItemPanel inciteDemandPanel;
+    private UnitTradeItemPanel unitOfferPanel;
+    private UnitTradeItemPanel unitDemandPanel;
 
     /** A panel showing a summary of the current agreement. */
     private JPanel summary;
 
     /** Useful internal messages. */
-    private StringTemplate demand, offer;
+    private StringTemplate demand;
+    private StringTemplate offer;
     private String exchangeMessage;
 
     /** Responses. */
-    private FreeColButton send = null, accept = null;
+    private FreeColButton send = null;
+    private FreeColButton accept = null;
 
 
     /**
      * Creates a new {@code NegotiationDialog} instance.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param frame The owner frame.
      * @param our Our {@code FreeColGameObject} that is negotiating.
      * @param other The other {@code FreeColGameObject}.
      * @param agreement The {@code DiplomaticTrade} agreement that
      *     is being negotiated.
      * @param comment An optional {@code StringTemplate}
      *     commentary message.
+     * @param handler Callback executed when the dialog closes.
      */
     public NegotiationDialog(FreeColClient freeColClient,
                              FreeColGameObject our, FreeColGameObject other,
@@ -777,7 +785,7 @@ public final class NegotiationDialog extends FreeColPanel {
                             .removeTradeItems(ColonyTradeItem.class);
                     break;
                 default:
-                    logger.warning("Bad command: " + command);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bad command: " + command);
                     break;
             }
         }
@@ -858,7 +866,7 @@ public final class NegotiationDialog extends FreeColPanel {
                     NegotiationDialog.this.removeTradeItems(GoldTradeItem.class);
                     break;
                 default:
-                    logger.warning("Bad command: " + command);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bad command: " + command);
                     break;
             }
         }
@@ -986,7 +994,7 @@ public final class NegotiationDialog extends FreeColPanel {
                             .removeTradeItems(GoodsTradeItem.class);
                     break;
                 default:
-                    logger.warning("Bad command: " + command);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bad command: " + command);
                     break;
             }
         }
@@ -1106,7 +1114,7 @@ public final class NegotiationDialog extends FreeColPanel {
                             .removeTradeItems(InciteTradeItem.class);
                     break;
                 default:
-                    logger.warning("Bad command: " + command);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bad command: " + command);
                     break;
             }
         }
@@ -1227,7 +1235,7 @@ public final class NegotiationDialog extends FreeColPanel {
                             .removeTradeItems(StanceTradeItem.class);
                     break;
                 default:
-                    logger.warning("Bad command: " + command);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bad command: " + command);
                     break;
             }
         }
@@ -1348,7 +1356,7 @@ public final class NegotiationDialog extends FreeColPanel {
                             .removeTradeItems(UnitTradeItem.class);
                     break;
                 default:
-                    logger.warning("Bad command: " + command);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bad command: " + command);
                     break;
             }
         }

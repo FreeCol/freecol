@@ -27,6 +27,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.util.Utils;
 
@@ -35,6 +37,8 @@ import net.sf.freecol.common.util.Utils;
  * Handle translations for the installer.
  */
 public class InstallerTranslations {
+
+    private static final Logger logger = Logger.getLogger(InstallerTranslations.class.getName());
 
     private static final File SOURCE_DIRECTORY =
         new File("data/strings");
@@ -104,26 +108,24 @@ public class InstallerTranslations {
 
         /*
         if (!LANGUAGE_CODES.exists()) {
-            System.out.println("Language codes not found.");
+            logger.info("Language codes not found.");
             System.exit(1);
         }
         */
 
         if (!MAIN_FILE.exists()) {
-            System.err.println("Main input file not found.");
+            logger.severe("Main input file not found.");
             System.exit(1);
         }
 
         if (!DESTINATION_DIRECTORY.exists()) {
             try {
                 if (!DESTINATION_DIRECTORY.mkdirs()) {
-                    System.err.println("Could not create "
-                        + DESTINATION_DIRECTORY);
+                    if (logger.isLoggable(Level.SEVERE)) logger.severe("Could not create " + DESTINATION_DIRECTORY);
                     System.exit(1);
                 }
             } catch (SecurityException se) {
-                System.err.println("Could not create " + DESTINATION_DIRECTORY
-                    + ": " + se);
+                if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Could not create " + DESTINATION_DIRECTORY, se);
                 System.exit(1);
             }
         }
@@ -143,13 +145,13 @@ public class InstallerTranslations {
                 }
             });
         if (sourceFiles == null) {
-            System.err.println("No messages files found in " + SOURCE_DIRECTORY);
+            if (logger.isLoggable(Level.SEVERE)) logger.severe("No messages files found in " + SOURCE_DIRECTORY);
             System.exit(1);
         }
 
         for (String name : sourceFiles) {
 
-            String languageCode = null;
+            String languageCode;
             int index = name.indexOf('.', 16);
             if (index < 0) {
                 continue;
@@ -166,11 +168,11 @@ public class InstallerTranslations {
             }
 
             if (languageCode == null) {
-                System.out.println("Skipping source file: " + name);
+                if (logger.isLoggable(Level.INFO)) logger.info("Skipping source file: " + name);
                 continue;
             }
 
-            System.out.println("Processing source file: " + name);
+            if (logger.isLoggable(Level.INFO)) logger.info("Processing source file: " + name);
 
             File sourceFile = new File(SOURCE_DIRECTORY, name);
             Map<String, String> sourceProperties = readFile(sourceFile);
@@ -218,8 +220,7 @@ public class InstallerTranslations {
                 line = bufferedReader.readLine();
             }
         } catch (IOException ioe) {
-            System.err.println("Error reading file: " + file.getName()
-                + ": " + ioe);
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Error reading file: " + file.getName(), ioe);
         }
         return result;
     }
@@ -245,4 +246,3 @@ public class InstallerTranslations {
     }
     */
 }
-

@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -94,15 +95,15 @@ public final class ConnectController extends FreeColClientHolder {
             if (askServer().connect(FreeCol.CLIENT_THREAD + user,
                                     host, port) != null) {
                 getFreeColClient().changeClientState(false);
-                logger.info("Connected to " + host + ":" + port
+                if (logger.isLoggable(Level.INFO)) logger.info("Connected to " + host + ":" + port
                     + " as " + user);
             } else {
-                logger.warning("Failed to connect to "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to connect to "
                     + host + ":" + port + " as " + user);
                 err = StringTemplate.template("server.couldNotConnect");
             }
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Exception when connecting to "
+        } catch (IOException ex) {
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Exception when connecting to "
                 + host + ":" + port + " as " + user, ex);
             err = FreeCol.errorFromException(ex, "server.couldNotConnect");
         }
@@ -132,7 +133,7 @@ public final class ConnectController extends FreeColClientHolder {
             }
         }
             
-        logger.info("Logout begin for client " + player.getName()
+        if (logger.isLoggable(Level.INFO)) logger.info("Logout begin for client " + player.getName()
             + ": " + reason);
         return askServer().logout(player, reason);
     }
@@ -146,7 +147,7 @@ public final class ConnectController extends FreeColClientHolder {
     public boolean logout(LogoutReason reason) {
         final FreeColClient fcc = getFreeColClient();
         final Player player = fcc.getMyPlayer();
-        logger.info("Logout end for client " + player.getName()
+        if (logger.isLoggable(Level.INFO)) logger.info("Logout end for client " + player.getName()
             + ": " + reason);
 
         askServer().disconnect();
@@ -190,13 +191,13 @@ public final class ConnectController extends FreeColClientHolder {
                                              FreeCol.getVersion(),
                                              fcc.getSinglePlayer(),
                                              fcc.currentPlayerIsMyPlayer())) {
-                        logger.info("Reconnected for client " + name);
+                        if (logger.isLoggable(Level.INFO)) logger.info("Reconnected for client " + name);
                     } else {
-                        logger.severe("Reconnect failed for client " + name);
+                        if (logger.isLoggable(Level.SEVERE)) logger.severe("Reconnect failed for client " + name);
                         fcc.askToQuit();
                     }
                 } catch (IOException ioe) {
-                    logger.log(Level.SEVERE, "Reconnect exception for client "
+                    if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Reconnect exception for client "
                         + name, ioe);
                     fcc.quit();
                 }
@@ -232,7 +233,7 @@ public final class ConnectController extends FreeColClientHolder {
             // Ask the server to log in a player with the given user
             // name.  Control effectively transfers through the server
             // back to PGIH.login() and then to login() below.
-            logger.info("Login request for client " + FreeCol.getName());
+            if (logger.isLoggable(Level.INFO)) logger.info("Login request for client " + FreeCol.getName());
             if (askServer().login(user, nationId, FreeCol.getVersion(),
                                   fcc.getSinglePlayer(),
                                   fcc.currentPlayerIsMyPlayer())) {
@@ -281,14 +282,14 @@ public final class ConnectController extends FreeColClientHolder {
             StringTemplate err = StringTemplate.template("server.noSuchPlayer")
                 .addName("%player%", user);
             getGUI().showErrorPanel(err);
-            logger.warning(Messages.message(err));
+            if (logger.isLoggable(Level.WARNING)) logger.warning(Messages.message(err));
             return;
         }
 
         // Reattach to the game
         fcc.login(state == ServerState.IN_GAME, game, player, single);
         if (current) game.setCurrentPlayer(player);
-        logger.info("Login accepted for client " + player.getName()
+        if (logger.isLoggable(Level.INFO)) logger.info("Login accepted for client " + player.getName()
             + " to " + ((fcc.isInGame()) ? "running"
                 : (game.allPlayersReadyToLaunch()) ? "ready" : "new")
             + " " + ((single) ? "single" : "multi")
@@ -369,17 +370,17 @@ public final class ConnectController extends FreeColClientHolder {
         final ClientOptions options = getClientOptions();
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
-        FreeColSavegameFile fis = null;
+        FreeColSavegameFile fis;
         try {
             fis = new FreeColSavegameFile(file);
         } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "Can not find file: " + file.getName(),
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Can not find file: " + file.getName(),
                        fnfe);
             gui.showErrorPanel(fnfe,
                 FreeCol.badFile("error.couldNotFind", file));
             return false;
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not load file: " + file.getName(),
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Could not load file: " + file.getName(),
                        ioe);
             gui.showErrorPanel(ioe,
                 FreeCol.badFile("error.couldNotLoad", file));
@@ -388,11 +389,11 @@ public final class ConnectController extends FreeColClientHolder {
         options.merge(fis);
         options.fixClientOptions();       
         
-        List<String> values = null;
+        List<String> values;
         try {
             values = fis.peekAttributes(savedKeys);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Could not read from: " + file.getName(),
+        } catch (IOException | XMLStreamException ex) {
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Could not read from: " + file.getName(),
                        ex);
             gui.showErrorPanel(ex,
                 FreeCol.badFile("error.couldNotLoad", file));

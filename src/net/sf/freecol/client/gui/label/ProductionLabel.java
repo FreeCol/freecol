@@ -25,11 +25,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -96,11 +96,12 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         super(freeColClient, ag);
 
         final ImageLibrary lib = getImageLibrary();
-        if (getType() == null) {
-            FreeCol.trace(logger, "Bad production label (no type)");
-        } else if (stockNumber < 0 && getAmount() == 0) {
-            FreeCol.trace(logger, "Bad production label: " + ag
-                + " stock=" + stockNumber);
+        if (getType() == null && logger.isLoggable(Level.WARNING)) {
+            logger.log(Level.WARNING, "Bad production label (no type)", new Exception());
+        } else if (stockNumber < 0 && getAmount() == 0
+            && logger.isLoggable(Level.WARNING)) {
+            logger.log(Level.WARNING, "Bad production label: " + ag
+                + " stock=" + stockNumber, new Exception());
         }
 
         final ClientOptions options = freeColClient.getClientOptions();

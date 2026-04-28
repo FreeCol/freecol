@@ -124,12 +124,10 @@ public class UpdateMessage extends ObjectMessage {
      */
     @Override
     public boolean merge(Message message) {
-        if (message instanceof UpdateMessage) {
-            UpdateMessage other = (UpdateMessage)message;
-            appendChildren(other.getChildren());
-            return true;
-        }
-        return false;
+        if (!(message instanceof UpdateMessage)) return false;
+        UpdateMessage other = (UpdateMessage)message;
+        appendChildren(other.getChildren());
+        return true;
     }
               
     /**

@@ -50,6 +50,7 @@ public class MiniMapToggleViewAction extends MapboardAction {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param b a {@code boolean} value
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public MiniMapToggleViewAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");
  

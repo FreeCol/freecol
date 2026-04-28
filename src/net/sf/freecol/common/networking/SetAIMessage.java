@@ -56,6 +56,7 @@ public class SetAIMessage extends AttributeMessage {
      * @param xr A {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public SetAIMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, PLAYER_TAG, AI_TAG);
