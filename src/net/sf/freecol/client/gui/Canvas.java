@@ -1601,7 +1601,17 @@ public final class Canvas extends JDesktopPane {
             runnable.run();
             return;
         }
-        
+
+        // Check if Applet class is available (removed in Java 11+)
+        try {
+            Class.forName("java.applet.Applet");
+        } catch (ClassNotFoundException e) {
+            // Applet class not available (Java 11+), skip video playback
+            logger.info("Skipping video playback: java.applet.Applet not available in this JVM");
+            runnable.run();
+            return;
+        }
+
         final String originalVendor = System.getProperty("java.vendor");
         if (originalVendor.indexOf(" ") == -1) {
             /* Cortado crashes unless there is a space in "java.vendor". */
