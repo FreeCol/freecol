@@ -217,13 +217,15 @@ public class EuropeanNationType extends NationType {
         if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
             Map<String, AbstractUnit> map;
             // default map
-            if ((map = startingUnitMap.get(DEFAULT_MAP_KEY)) != null) {
+            map = startingUnitMap.get(DEFAULT_MAP_KEY);
+            if (map != null) {
                 for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
                     writeUnit(xw, entry.getKey(), entry.getValue(), false);
                 }
             }
             // expert map
-            if ((map = startingUnitMap.get(EXPERT_MAP_KEY)) != null) {
+            map = startingUnitMap.get(EXPERT_MAP_KEY);
+            if (map != null) {
                 for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
                     writeUnit(xw, entry.getKey(), entry.getValue(), true);
                 }

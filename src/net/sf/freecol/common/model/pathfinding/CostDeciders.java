@@ -257,6 +257,7 @@ public final class CostDeciders {
             @Override
             public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
+                int bestIndex = -1;
                 for (int i = 0; i < costDeciders.length; i++) {
                     int cost = costDeciders[i].getCost(unit, oldLocation,
                                                        newLocation, movesLeft);
@@ -265,10 +266,11 @@ public final class CostDeciders {
                         return ILLEGAL_MOVE;
                     }
                     if (cost > ret) {
-                        index = i;
+                        bestIndex = i;
                         ret = cost;
                     }
                 }
+                index = bestIndex;
                 return ret;
             }
 

@@ -146,7 +146,7 @@ public abstract class ServerAPI {
     private Connection check(String operation, String type) {
         final Connection c = getConnection();
         if (c == null) {
-            logger.log(Level.WARNING, "Not connected, did not " + operation
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Not connected, did not " + operation
                 + ": " + type);
         }
         return c;

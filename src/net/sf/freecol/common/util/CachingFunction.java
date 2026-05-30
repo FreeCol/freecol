@@ -53,6 +53,7 @@ public class CachingFunction<T, R> implements Function<T, R> {
      */
     @SuppressFBWarnings(value="MUI_CONTAINSKEY_BEFORE_GET",
                         justification="Deliberate to all null values")
+    @Override
     public R apply(T t) {
         R result;
         // Normally we would just use get(), but this is a general routine

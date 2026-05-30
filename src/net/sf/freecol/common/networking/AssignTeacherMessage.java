@@ -90,14 +90,14 @@ public class AssignTeacherMessage extends AttributeMessage {
         Unit student;
         try {
             student = serverPlayer.getOurFreeColGameObject(studentId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
         Unit teacher;
         try {
             teacher = serverPlayer.getOurFreeColGameObject(teacherId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

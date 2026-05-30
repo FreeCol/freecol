@@ -95,7 +95,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 AbstractOption<T> c = o.cloneOption();
                 this.model.addElement(c);
             } catch (CloneNotSupportedException e) {
-                logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
             }
         }
         this.list = new JList<>(this.model);
@@ -148,7 +148,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         this.list.repaint();
                     }
                 } catch (CloneNotSupportedException cnse) {
-                    logger.log(Level.WARNING, "Can not clone: "
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Can not clone: "
                         + option.getTemplate(), cnse);
                 }
             });

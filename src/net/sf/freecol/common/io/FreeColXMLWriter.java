@@ -113,6 +113,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
             return this.player;
         }
 
+        @Override
         public String toString() {
             String ret = this.scopeType.toString();
             if (this.scopeType == WriteScopeType.CLIENT) {
@@ -264,7 +265,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
                 try {
                     this.outputWriter.write(str);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Flush-write fail:" + str, ioe);
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Flush-write fail:" + str, ioe);
                 }
             } else {
                 StreamSource source = new StreamSource(new StringReader(str));
@@ -272,7 +273,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
                 try {
                     this.transformer.transform(source, result);
                 } catch (TransformerException te) {
-                    logger.log(Level.WARNING, "Transform fail:" + str, te);
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Transform fail:" + str, te);
                 }
             }
 
@@ -301,7 +302,9 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     public void close() {
         try {
             flush();
-        } catch (XMLStreamException xse) {} // Ignore flush fail on close
+        } catch (XMLStreamException xse) {
+            logger.log(Level.FINE, "Flush failed on close.", xse);
+        }
         
         if (this.xmlStreamWriter != null) {
             try {

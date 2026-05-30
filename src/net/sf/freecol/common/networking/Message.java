@@ -273,7 +273,9 @@ public abstract class Message {
         if (hasAttribute(key)) {
             try {
                 return Boolean.valueOf(getStringAttribute(key));
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+                if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid boolean attribute: " + key, nfe);
+            }
         }
         return defaultValue;
     }
@@ -289,7 +291,9 @@ public abstract class Message {
         if (hasAttribute(key)) {
             try {
                 return Integer.valueOf(getStringAttribute(key));
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+                if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid integer attribute: " + key, nfe);
+            }
         }
         return defaultValue;
     }
@@ -311,8 +315,8 @@ public abstract class Message {
             String kv = upCase(getStringAttribute(key));
             try {
                 result = Enum.valueOf(returnClass, kv);
-            } catch (Exception e) {
-                logger.warning("Not a " + defaultValue.getClass().getName()
+            } catch (IllegalArgumentException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Not a " + defaultValue.getClass().getName()
                     + ": " + kv);
             }
         }
@@ -377,7 +381,7 @@ public abstract class Message {
      *
      * @param attributes An array of alternating key,value pairs.
      */
-    protected void setStringAttributes(String[] attributes) {
+    protected void setStringAttributes(String... attributes) {
         for (int i = 0; i < attributes.length; i += 2) {
             if (attributes[i+1] != null) {
                 setStringAttribute(attributes[i], attributes[i+1]);
@@ -423,7 +427,7 @@ public abstract class Message {
      *
      * @param attributes The array of attributes.
      */
-    protected void setArrayAttributes(String[] attributes) {
+    protected void setArrayAttributes(String... attributes) {
         if (attributes != null) {
             for (int i = 0; i < attributes.length; i++) {
                 setStringAttribute(FreeColObject.arrayKey(i), attributes[i]);
@@ -464,7 +468,9 @@ public abstract class Message {
         for (FreeColObject fco : getChildren()) {
             try {
                 ret.add(returnClass.cast(fco));
-            } catch (ClassCastException cce) {}
+            } catch (ClassCastException cce) {
+                logger.log(Level.FINE, "Child cast failed.", cce);
+            }
         }
         return ret;
     }
@@ -629,7 +635,7 @@ public abstract class Message {
     public static Message read(Game game, FreeColXMLReader xr)
         throws FreeColException {
         final String tag = xr.getLocalName();
-        Message ret = null;
+        Message ret;
         Constructor<? extends Message> mb = builders.get(tag);
         if (mb == null) {
             final String className = "net.sf.freecol.common.networking."

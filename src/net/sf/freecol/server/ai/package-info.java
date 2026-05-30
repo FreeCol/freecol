@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Artifical Intelligence</h1>
+ * <h2>FreeCol Artifical Intelligence</h2>
  *
  * <p>The main package of the Artifical Intelligence (AI) package tree.</p>
  *

@@ -120,7 +120,7 @@ public class ImageResource extends Resource implements Cleanable {
      */
     public BufferedImage getImage() {
         if (this.image == null) {
-            logger.finest("Preload not ready for " + getResourceLocator());
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Preload not ready for " + getResourceLocator());
             preload();
         }
         return this.image;
@@ -324,7 +324,7 @@ public class ImageResource extends Resource implements Cleanable {
             BufferedImage image = ImageIO.read(url);
             
             if (image == null) {
-                logger.log(Level.WARNING, "Failed to read image from: " + uri);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to read image from: " + uri);
                 return null;
             }
 
@@ -341,7 +341,7 @@ public class ImageResource extends Resource implements Cleanable {
             }
 
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Exception to loading image from: "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Exception to loading image from: "
                 + uri, ioe);
         }
         return null;

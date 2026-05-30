@@ -24,6 +24,7 @@ package net.sf.freecol.common;
  * Any object that provides a string identifier that can be used to
  * identify it, and to provide a localized name for it.
  */
+@FunctionalInterface
 public interface ObjectWithId {
 
     /**

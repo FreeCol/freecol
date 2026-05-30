@@ -125,6 +125,7 @@ public class LabourData {
 
     public static class LocationData {
 
+        @FunctionalInterface
         public interface Getter {
             LocationData getLocationData(UnitData unitData);
         }

@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -40,6 +42,8 @@ import javax.imageio.ImageIO;
  * Generate forest tiles.
  */
 public class ForestMaker {
+
+    private static final Logger logger = Logger.getLogger(ForestMaker.class.getName());
 
     private static final String DESTDIR = "data/rules/classic/resources/images/forest";
 
@@ -120,9 +124,9 @@ public class ForestMaker {
     public static void main(String[] args) throws IOException {
 
         if (args.length == 0) {
-            System.out.println("Usage: ForestMaker <directory>...");
-            System.out.println("Directory name should match a directory in");
-            System.out.println("   " + DESTDIR);
+            logger.info("Usage: ForestMaker <directory>...");
+            logger.info("Directory name should match a directory in");
+            logger.info("   " + DESTDIR);
             System.exit(1);
         }
 
@@ -137,23 +141,23 @@ public class ForestMaker {
         for (String arg : args) {
             File sourceDirectory = new File(arg);
             if (!sourceDirectory.exists()) {
-                System.out.println("Source directory " + arg + " does not exist.");
+                if (logger.isLoggable(Level.INFO)) logger.info("Source directory " + arg + " does not exist.");
                 continue;
             }
             String baseName = sourceDirectory.getName();
             File destinationDirectory = new File(DESTDIR, baseName);
             if (!destinationDirectory.exists()) {
-                System.out.println("Destination directory "
+                if (logger.isLoggable(Level.INFO)) logger.info("Destination directory "
                     + destinationDirectory.getPath() + " does not exist.");
                 continue;
             }
             File[] imageFiles = sourceDirectory.listFiles();
             if (imageFiles == null) {
-                System.out.println("No images found in source directory "
+                if (logger.isLoggable(Level.INFO)) logger.info("No images found in source directory "
                     + arg + ".");
                 continue;
             } else {
-                System.out.println(imageFiles.length
+                if (logger.isLoggable(Level.INFO)) logger.info(imageFiles.length
                     + " images found in source directory " + arg + ".");
             }
             List<BufferedImage> images = new ArrayList<>(imageFiles.length);
@@ -165,8 +169,8 @@ public class ForestMaker {
                         images.add(image);
                         maximumHeight = Math.min(image.getHeight(), maximumHeight);
                     } catch(IOException e) {
-                        System.err.println("Unable to load image "
-                            + imageFile.getName() + ":\n" + e);
+                        if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Unable to load image "
+                            + imageFile.getName(), e);
                     }
                 }
             }
@@ -289,7 +293,7 @@ public class ForestMaker {
                                 && crown < -BASE_HEIGHT + RIVER_HEIGHT - (x - halfWidth) / 2) {
                             continue;
                         }
-                        //System.out.println("x=" + x + ", y=" + (y - height));
+                        //logger.info("x=" + x + ", y=" + (y - height));
                         trees.add(new ImageLocation(image, x - halfWidth, crown));
                         count++;
                     }
@@ -321,4 +325,3 @@ public class ForestMaker {
         return (height == 0) ? 0 : random.nextInt(2 * height) - height;
     }*/
 }
-

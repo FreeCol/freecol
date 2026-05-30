@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import javax.swing.DefaultBoundedRangeModel;
@@ -52,8 +53,7 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
         slider.setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0,
                 0, option.getItemValues().size()-1));
 
-        Hashtable<Integer, JComponent> labels
-            = new Hashtable<>();
+        Dictionary<Integer, JComponent> labels = new Hashtable<>();
         int index = 0;
         for (String string : option.getItemValues().values()) {
             if (option.localizeLabels()) {

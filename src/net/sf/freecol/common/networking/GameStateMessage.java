@@ -63,6 +63,7 @@ public class GameStateMessage extends AttributeMessage {
      *     exists at this point).
      * @param xr The {@code FreeColXMLReader} to read from.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public GameStateMessage(Game game, FreeColXMLReader xr) {
         this(xr.getAttribute(STATE_TAG, ServerState.class, (ServerState)null));
     }

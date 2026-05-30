@@ -54,7 +54,7 @@ final class ProduceRawAndManufactoredUnstorableBuildingMaterialsStep {
     private ProduceRawAndManufactoredUnstorableBuildingMaterialsStep() {}
     
     /**
-     * @ses {@link InitialSteps#produceRawAndManufactoredUnstorableBuildingMaterials(TentativeColonyPlan)}
+     * @see InitialSteps#produceRawAndManufactoredUnstorableBuildingMaterials(TentativeColonyPlan)
      */
     static void execute(TentativeColonyPlan tcp) {
         final Specification s = tcp.getSpecification();

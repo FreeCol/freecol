@@ -146,7 +146,7 @@ public class DeliverGiftMessage extends ObjectMessage {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
@@ -154,7 +154,7 @@ public class DeliverGiftMessage extends ObjectMessage {
         try {
             is = unit.getAdjacentSettlement(getStringAttribute(SETTLEMENT_TAG),
                                             IndianSettlement.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

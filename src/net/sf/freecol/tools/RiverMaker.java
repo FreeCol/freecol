@@ -148,7 +148,7 @@ public class RiverMaker {
     }
 
 
-    private static int[] nextBranch(int[] branches) {
+    private static int[] nextBranch(int... branches) {
         for (int index = 0; index < branches.length; index++) {
             if (branches[index] == 2) {
                 branches[index] = 0;
@@ -160,7 +160,7 @@ public class RiverMaker {
         return branches;
     }
 
-    private static int branchCount(int[] branches) {
+    private static int branchCount(int... branches) {
         int result = 0;
         for (int branche : branches) {
             if (branche > 0) {
@@ -170,7 +170,7 @@ public class RiverMaker {
         return result;
     }
 
-    private static String getName(int[] branches) {
+    private static String getName(int... branches) {
         StringBuilder sb = new StringBuilder(32);
         for (int branche : branches) {
             sb.append(branche);

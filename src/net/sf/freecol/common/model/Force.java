@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -77,7 +78,7 @@ public class Force extends FreeColSpecObject {
             if (ability == null || au.getType(spec).hasAbility(ability)) {
                 add(au);
             } else {
-                logger.warning("Found unit lacking required ability \""
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Found unit lacking required ability \""
                     + ability + "\": " + au);
             }
         }
@@ -324,7 +325,7 @@ public class Force extends FreeColSpecObject {
                     add(new AbstractUnit(xr));
                 }
             } else {
-                logger.warning("Bogus Force tag: " + tag);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus Force tag: " + tag);
             }
         }
     }

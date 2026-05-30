@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Common Logging package</h1>
+ * <h2>FreeCol Common Logging package</h2>
  *
  * <p>Contains classes for handling logging information within FreeCol.</p>
  *

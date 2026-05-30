@@ -104,7 +104,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
     public static final class Position {
         
         /** The coordinates of the position. */
-        public final int x, y;
+        public final int x;
+        public final int y;
 
 
         /**
@@ -257,7 +258,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
 
 
     /** The width and height of the map. */
-    private int width = -1, height = -1;
+    private int width = -1;
+    private int height = -1;
 
     /**
      * The tiles that this map contains, as a 2D array.  This starts
@@ -497,7 +499,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      */
     private boolean updateTile(Tile tile) {
         if (tile == null) return false;
-        final int x = tile.getX(), y = tile.getY();
+        final int x = tile.getX();
+        final int y = tile.getY();
         if (!isValid(x, y)) return false;
         Tile old = this.tileArray[x][y];
         if (old == null) return setTile(tile, x, y);
@@ -646,7 +649,7 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      * @return A map of the fixed regions.
      */
     public java.util.Map<String, Region> getFixedRegions() {
-        HashMap<String, Region> result = new HashMap<>();
+        java.util.Map<String, Region> result = new HashMap<>();
         for (Region r : getRegions()) {
             String n = r.getKey();
             if (n != null) result.put(n, r);
@@ -821,7 +824,10 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      */
     public Tile getRandomLandTile(Random random) {
         final int SLOSH = 10;
-        int x = 0, y = 0, width = getWidth(), height = getHeight();
+        int x = 0;
+        int y = 0;
+        int width = getWidth();
+        int height = getHeight();
         if (width >= SLOSH) {
             width -= SLOSH;
             x += SLOSH/2;
@@ -940,23 +946,27 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      * @return A list of {@code Tile}s found (empty on error).
      */
     public List<Tile> subMap(int x, int y, int w, int h) {
-        if (x < 0) {
-            w += x;
-            x = 0;
+        int startX = x;
+        int startY = y;
+        int width = w;
+        int height = h;
+        if (startX < 0) {
+            width += startX;
+            startX = 0;
         }
-        if (y < 0) {
-            h += y;
-            y = 0;
+        if (startY < 0) {
+            height += startY;
+            startY = 0;
         }
-        final int width = getWidth();
-        final int height = getHeight();
-        if (w <= 0 || h <= 0 || x > width || y > height)
+        final int mapWidth = getWidth();
+        final int mapHeight = getHeight();
+        if (width <= 0 || height <= 0 || startX > mapWidth || startY > mapHeight)
             return Collections.<Tile>emptyList();
-        if (x+w > width) w = width - x;
-        if (y+h > height) h = height - y;
+        if (startX + width > mapWidth) width = mapWidth - startX;
+        if (startY + height > mapHeight) height = mapHeight - startY;
         List<Tile> ret = new ArrayList<>();
-        for (int yi = y; yi < y+h; yi++) {
-            for (int xi = x; xi < x+w; xi++) {
+        for (int yi = startY; yi < startY + height; yi++) {
+            for (int xi = startX; xi < startX + width; xi++) {
                 ret.add(getTile(xi, yi));
             }
         }
@@ -989,7 +999,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
         /** The current index in the circle with the current radius: */
         private int n;
         /** The current position in the circle. */
-        private int x, y;
+        private int x;
+        private int y;
 
 
         /**
@@ -1150,6 +1161,7 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
     /**
      * Simple interface to supply a heuristic to the A* routine.
      */
+    @FunctionalInterface
     private interface SearchHeuristic {
         int getValue(Tile tile);
     }
@@ -1176,19 +1188,20 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      * @return The actual end location.
      */
     private Location findRealEnd(Unit unit, Location end) {
+        Location currentEnd = end;
         while (true) {
-            if (end == null) {
+            if (currentEnd == null) {
                 throw new RuntimeException("Null end for: " + unit);
-            } else if (end instanceof Europe) {
-                return end;
-            } else if (end instanceof Map) {
-                end = unit.getFullEntryLocation();
-            } else if (end.getTile() != null) {
-                return end.getTile();
+            } else if (currentEnd instanceof Europe) {
+                return currentEnd;
+            } else if (currentEnd instanceof Map) {
+                currentEnd = unit.getFullEntryLocation();
+            } else if (currentEnd.getTile() != null) {
+                return currentEnd.getTile();
             } else if (unit != null) {
                 return unit.resolveDestination();
             } else {
-                throw new RuntimeException("Invalid end: " + end);
+                throw new RuntimeException("Invalid end: " + currentEnd);
             }
         }
     }
@@ -1206,10 +1219,11 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      */
     private PathNode getBestEntryPath(Unit unit, Tile tile, Unit carrier,
                                       CostDecider costDecider) {
-        if (costDecider == null)
-            costDecider = CostDeciders.avoidSettlementsAndBlockingUnits();
+        CostDecider effectiveCostDecider = (costDecider == null)
+            ? CostDeciders.avoidSettlementsAndBlockingUnits()
+            : costDecider;
         return searchMap(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
-                         costDecider, INFINITY, carrier, null, null);
+                         effectiveCostDecider, INFINITY, carrier, null, null);
     }
 
     /**
@@ -1251,7 +1265,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
             : null;
         final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
         final SearchHeuristic sh = getManhattenHeuristic(end);
-        Unit embarkTo, endUnit;
+        Unit embarkTo;
+        Unit endUnit;
 
         PathNode path;
         if (start.getContiguity() == end.getContiguity()) {
@@ -1350,7 +1365,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
                              final Location start, final Location end,
                              final Unit carrier, CostDecider costDecider,
                              LogBuilder lb) {
-        if (traceSearch) lb = new LogBuilder(1024);
+        LogBuilder logBuilder = lb;
+        if (traceSearch) logBuilder = new LogBuilder(1024);
 
         // Validate the arguments, reducing to either Europe or a Tile.
         final Location realEnd;
@@ -1363,7 +1379,8 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
         // Get the unit that will be used for off-map travel.
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
 
-        PathNode p, path;
+        PathNode p;
+        PathNode path;
         Tile tile;
         if (realEnd instanceof Tile && !((Tile)realEnd).isExplored()) {
             // Do not allow finding a path into unexplored territory,
@@ -1378,7 +1395,7 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
                 : null;
             path = (closest == null) ? null
                 : this.findPath(unit, start, closest, carrier,
-                                costDecider, lb);
+                                costDecider, logBuilder);
             if (path != null) {
                 PathNode last = path.getLastNode();
                 last.next = new PathNode((Tile)realEnd, 0,
@@ -1396,44 +1413,46 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
             if (offMapUnit == null
                 || !offMapUnit.getType().canMoveToHighSeas()) {
                 path = null;
-
-                // Find the best place to enter the map from Europe
-            } else if ((p = getBestEntryPath(unit, (Tile)realEnd, carrier,
-                        costDecider)) == null) {
-                path = null;
-
-                // Now search forward from there to get a path in the
-                // right order (path costs are not symmetric).  There are
-                // "expected" failures when rivers block due to foreign
-                // ship movement.  There are also other failures which we
-                // would like to log.  Try to filter out the first case.
-            } else if ((path = findMapPath(unit,
-                        (tile = p.getLastNode().getTile()), (Tile)realEnd,
-                        carrier, costDecider, lb)) == null) {
-                if (!((Tile)realEnd).isOnRiver()) {
-                    LogBuilder l2 = new LogBuilder(512);
-                    l2.add("Fail in findPath(", unit, ", ", tile,
-                        ", ", realEnd, ", ", carrier, ")\n");
-                    l2.addStackTrace();
-                    l2.add(p.fullPathToString());
-                    findMapPath(unit, tile, (Tile)realEnd,
-                        carrier, costDecider, l2);
-                    l2.log(logger, Level.WARNING);
-                }
-                path = null;
-
-                // At the front of the path insert a node for the starting
-                // location in Europe, correcting for the turns to sail to
-                // the entry location.
             } else {
-                path.addTurns(offMapUnit.getSailTurns());
-                path.previous = new PathNode(start, unit.getMovesLeft(),
-                    0, carrier != null, null, path);
-                path = path.previous;
-                if (carrier != null && unit.getLocation() != carrier) {
-                    path.previous = new PathNode(start, unit.getMovesLeft(),
-                        0, false, null, path);
-                    path = path.previous;
+                // Find the best place to enter the map from Europe
+                p = getBestEntryPath(unit, (Tile)realEnd, carrier, costDecider);
+                if (p == null) {
+                    path = null;
+                } else {
+                    // Now search forward from there to get a path in the
+                    // right order (path costs are not symmetric).  There are
+                    // "expected" failures when rivers block due to foreign
+                    // ship movement.  There are also other failures which we
+                    // would like to log.  Try to filter out the first case.
+                    tile = p.getLastNode().getTile();
+                    path = findMapPath(unit, tile, (Tile)realEnd,
+                                       carrier, costDecider, logBuilder);
+                    if (path == null) {
+                        if (!((Tile)realEnd).isOnRiver()) {
+                            LogBuilder l2 = new LogBuilder(512);
+                            l2.add("Fail in findPath(", unit, ", ", tile,
+                                ", ", realEnd, ", ", carrier, ")\n");
+                            l2.addStackTrace();
+                            l2.add(p.fullPathToString());
+                            findMapPath(unit, tile, (Tile)realEnd,
+                                carrier, costDecider, l2);
+                            l2.log(logger, Level.WARNING);
+                        }
+                        path = null;
+                    } else {
+                        // At the front of the path insert a node for the starting
+                        // location in Europe, correcting for the turns to sail to
+                        // the entry location.
+                        path.addTurns(offMapUnit.getSailTurns());
+                        path.previous = new PathNode(start, unit.getMovesLeft(),
+                            0, carrier != null, null, path);
+                        path = path.previous;
+                        if (carrier != null && unit.getLocation() != carrier) {
+                            path.previous = new PathNode(start, unit.getMovesLeft(),
+                                0, false, null, path);
+                            path = path.previous;
+                        }
+                    }
                 }
             }
 
@@ -1443,19 +1462,20 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
             if (offMapUnit == null
                 || !offMapUnit.getType().canMoveToHighSeas()) {
                 path = null;
-                
-                // Search forwards to the high seas.
-            } else if ((p = searchMap(unit, (Tile)start,
-                        GoalDeciders.getHighSeasGoalDecider(),
-                        costDecider, INFINITY, carrier, null, lb)) == null) {
-                path = null;
-
             } else {
-                PathNode last = p.getLastNode();
-                last.next = new PathNode(realEnd, unit.getInitialMovesLeft(),
-                    last.getTurns() + offMapUnit.getSailTurns(),
-                    last.isOnCarrier(), last, null);
-                path = p;
+                // Search forwards to the high seas.
+                p = searchMap(unit, (Tile)start,
+                              GoalDeciders.getHighSeasGoalDecider(),
+                              costDecider, INFINITY, carrier, null, logBuilder);
+                if (p == null) {
+                    path = null;
+                } else {
+                    PathNode last = p.getLastNode();
+                    last.next = new PathNode(realEnd, unit.getInitialMovesLeft(),
+                        last.getTurns() + offMapUnit.getSailTurns(),
+                        last.isOnCarrier(), last, null);
+                    path = p;
+                }
             }
 
         } else if (start instanceof Tile && realEnd instanceof Tile) {
@@ -1475,14 +1495,14 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
                                          0, false, path, null);
             } else {
                 path = findMapPath(unit, (Tile)start, (Tile)realEnd,
-                                   carrier, costDecider, lb);
+                                   carrier, costDecider, logBuilder);
             }
         } else {
             throw new IllegalStateException("Can not happen: " + start
                 + ", " + realEnd);
         }
 
-        finishPath(path, unit, lb);
+        finishPath(path, unit, logBuilder);
         return path;
     }
 
@@ -1513,39 +1533,41 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
                            final CostDecider costDecider,
                            final int maxTurns, final Unit carrier,
                            LogBuilder lb) {
-        if (traceSearch) lb = new LogBuilder(1024);
+        LogBuilder logBuilder = lb;
+        if (traceSearch) logBuilder = new LogBuilder(1024);
 
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         
-        PathNode p, path;
+        PathNode p;
+        PathNode path;
         if (start instanceof Europe) {
             // Fail fast if Europe is unattainable.
             if (offMapUnit == null
                 || !offMapUnit.getType().canMoveToHighSeas()) {
                 path = null;
-
+            } else {
                 // This is suboptimal.  We do not know where to enter from
                 // Europe, so start with the standard entry location...
-            } else if ((p = searchMap(unit,
-                        offMapUnit.getFullEntryLocation(),
-                        goalDecider, costDecider, maxTurns, carrier,
-                        null, lb)) == null) {
-                path = null;
-
-                // ...then if we find a path, try to optimize it.  This
-                // will lose if the initial search fails due to a turn limit.
-                // FIXME: do something better.
-            } else {
-                path = this.findPath(unit, start, p.getLastNode().getTile(),
-                                     carrier, costDecider, lb);
+                p = searchMap(unit, offMapUnit.getFullEntryLocation(),
+                              goalDecider, costDecider, maxTurns, carrier,
+                              null, logBuilder);
+                if (p == null) {
+                    path = null;
+                } else {
+                    // ...then if we find a path, try to optimize it.  This
+                    // will lose if the initial search fails due to a turn limit.
+                    // FIXME: do something better.
+                    path = this.findPath(unit, start, p.getLastNode().getTile(),
+                                         carrier, costDecider, logBuilder);
+                }
             }
 
         } else {
             path = searchMap(unit, start.getTile(), goalDecider,
-                             costDecider, maxTurns, carrier, null, lb);
+                             costDecider, maxTurns, carrier, null, logBuilder);
         }
 
-        finishPath(path, unit, lb);
+        finishPath(path, unit, logBuilder);
         return path;
     }
 
@@ -1581,11 +1603,14 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
      * @return True if the path includes a previous on-carrier node.
      */
     private boolean usedCarrier(PathNode path) {
-        while (path != null) {
-            if (path.isOnCarrier()) return true;
-            path = path.previous;
+        boolean used = false;
+        for (PathNode current = path; current != null; current = current.previous) {
+            if (current.isOnCarrier()) {
+                used = true;
+                break;
+            }
         }
-        return false;
+        return used;
     }
 
     /**
@@ -1620,7 +1645,6 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
             this.unit = unit;
             this.current = current;
             this.dst = dst;
-            this.movesLeft = movesLeft;
             this.turns = turns;
             this.onCarrier = onCarrier;
             CostDecider cd = (decider != null) ? decider
@@ -1692,9 +1716,9 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
          * @param f The heuristic values for A*.
          * @param sh A {@code SearchHeuristic} to apply.
          */
-        public void improve(HashMap<String, PathNode> openMap,
-                            PriorityQueue<PathNode> openMapQueue,
-                            HashMap<String, Integer> f,
+        public void improve(java.util.Map<String, PathNode> openMap,
+                            Queue<PathNode> openMapQueue,
+                            java.util.Map<String, Integer> f,
                             SearchHeuristic sh) {
             PathNode best = openMap.get(dst.getId());
             if (best != null) {
@@ -1712,9 +1736,9 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
          * @param f The map of f-values.
          * @param sh A {@code SearchHeuristic} to apply.
          */
-        public void add(HashMap<String, PathNode> openMap,
-                        PriorityQueue<PathNode> openMapQueue,
-                        HashMap<String, Integer> f,
+        public void add(java.util.Map<String, PathNode> openMap,
+                        Queue<PathNode> openMapQueue,
+                        java.util.Map<String, Integer> f,
                         SearchHeuristic sh) {
             int fcost = this.cost;
             if (this.dst.getTile() != null) {
@@ -1787,10 +1811,10 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
                                final int maxTurns, final Unit carrier,
                                final SearchHeuristic searchHeuristic,
                                final LogBuilder lb) {
-        final HashMap<String, PathNode> openMap = new HashMap<>();
-        final HashMap<String, PathNode> closedMap = new HashMap<>();
-        final HashMap<String, Integer> f = new HashMap<>();
-        final PriorityQueue<PathNode> openMapQueue = new PriorityQueue<>(1024,
+        final java.util.Map<String, PathNode> openMap = new HashMap<>();
+        final java.util.Map<String, PathNode> closedMap = new HashMap<>();
+        final java.util.Map<String, Integer> f = new HashMap<>();
+        final Queue<PathNode> openMapQueue = new PriorityQueue<>(1024,
             Comparator.comparingInt(p -> f.get(p.getLocation().getId())));
         final SearchHeuristic sh = (searchHeuristic == null)
             ? trivialSearchHeuristic : searchHeuristic;
@@ -1815,7 +1839,7 @@ public class Map extends FreeColGameObject implements Location, Iterable<Tile> {
         openMap.put(start.getId(), firstNode);
         openMapQueue.offer(firstNode);
 
-        PathNode best = null;
+        PathNode best;
         int bestScore = INFINITY;
 ok:     while (!openMap.isEmpty()) {
             // Choose the node with the lowest f.
@@ -1897,8 +1921,8 @@ ok:     while (!openMap.isEmpty()) {
                     && carrier.getSimpleMoveType(carrier.getTile(), moveTile).isProgress();
                 if (lb != null) lb.add(" ", ((unitMove) ? "U"
                         : ((carrierMove) ? "C" : "")));
-                MoveCandidate move;
-                String stepLog;
+                MoveCandidate move = null;
+                String stepLog = "";
                 
                 // Is this move to the goal?  Use fake high cost so
                 // this does not become cached inside the goal decider
@@ -1944,13 +1968,11 @@ ok:     while (!openMap.isEmpty()) {
                             move = new MoveCandidate(unit, currentNode,
                                 moveTile, currentMovesLeft, currentTurns,
                                 false, CostDeciders.tileCost());
-                            unitMove = true;
                             break;
                         case EMBARK:
                             move = new MoveCandidate(unit, currentNode,
                                 moveTile, currentMovesLeft, currentTurns,
                                 true, CostDeciders.tileCost());
-                            unitMove = true;
                             break;
                         case MOVE_NO_ATTACK_CIVILIAN:
                             // There is a settlement in the way, this
@@ -1972,7 +1994,6 @@ ok:     while (!openMap.isEmpty()) {
                                 continue;
                             }
                             if (lb != null) lb.add(" blocked");
-                            unitMove = true;
                             move = new MoveCandidate(unit, currentNode,
                                 moveTile, currentMovesLeft, currentTurns,
                                 false, CostDeciders.tileCost());
@@ -2049,11 +2070,14 @@ ok:     while (!openMap.isEmpty()) {
                         move = new MoveCandidate(unit, currentNode, moveTile,
                             0, currentTurns, false, costDecider);
                         break;
-                    case FAIL: default: // Loop on failure.
+                    case FAIL: // Loop on failure.
                         if (lb != null) lb.add("!");
                         continue;
                     }
                     stepLog = " " + step + "_";
+                }
+                if (move == null) {
+                    continue;
                 }
                 if (move.cost >= INFINITY) {
                     continue;
@@ -2164,17 +2188,20 @@ ok:     while (!openMap.isEmpty()) {
      */
     public static boolean[][] floodFillBool(boolean[][] boolmap, int x, int y,
                                             int limit) {
-        final int xmax = boolmap.length, ymax = boolmap[0].length;
+        final int xmax = boolmap.length;
+        final int ymax = boolmap[0].length;
         boolean[][] visited = new boolean[xmax][ymax];
         Queue<Position> q = new LinkedList<>();
 
         visited[x][y] = true;
         Position p = new Position(x, y);
-        for (; p != null && --limit > 0; p = q.poll()) {
+        int remaining = limit;
+        for (; p != null && --remaining > 0; p = q.poll()) {
             for (Direction d : Direction.values()) {
                 final Position np = new Position(p, d);
                 if (!np.isValid(xmax, ymax)) continue;
-                int nx = np.getX(), ny = np.getY();
+                int nx = np.getX();
+                int ny = np.getY();
                 if (boolmap[nx][ny] && !visited[nx][ny]) {
                     visited[nx][ny] = true;
                     q.add(np);
@@ -2191,7 +2218,8 @@ ok:     while (!openMap.isEmpty()) {
     public void resetContiguity() {
         // Create the water map.  It is an error for any tile not to
         // have a region at this point.
-        final int xmax = getWidth(), ymax = getHeight();
+        final int xmax = getWidth();
+        final int ymax = getHeight();
         boolean[][] waterMap = new boolean[xmax][ymax];
         for (int y = 0; y < ymax; y++) {
             for (int x = 0; x < xmax; x++) {
@@ -2227,7 +2255,8 @@ ok:     while (!openMap.isEmpty()) {
      * @param xmax The X-value
      * @param waterMap The boolean array containing the x and y coordinates
      */
-    private void floodFill(int contig, int ymax, int xmax, boolean[][] waterMap) {
+    private void floodFill(int contig, int ymax, int xmax, boolean[]... waterMap) {
+        int contiguity = contig;
         for (int y = 0; y < ymax; y++) {
             for (int x = 0; x < xmax; x++) {
                 if (waterMap[x][y]) {
@@ -2240,12 +2269,12 @@ ok:     while (!openMap.isEmpty()) {
                             if (found[xx][yy]) {
                                 Tile t = getTile(xx, yy);
                                 if (t.getContiguity() < 0) {
-                                    t.setContiguity(contig);
+                                    t.setContiguity(contiguity);
                                 }
                             }
                         }
                     }
-                    contig++;
+                    contiguity++;
                 }
             }
         }
@@ -2323,9 +2352,15 @@ ok:     while (!openMap.isEmpty()) {
         // Reset all highSeas tiles to the default ocean type.
         forEachTile(t -> t.getType() == highSeas, t -> t.setType(ocean));
 
-        final int width = getWidth(), height = getHeight();
-        Tile t, seaL = null, seaR = null;
-        int totalL = 0, totalR = 0, distanceL = -1, distanceR = -1;
+        final int width = getWidth();
+        final int height = getHeight();
+        Tile t;
+        Tile seaL = null;
+        Tile seaR = null;
+        int totalL = 0;
+        int totalR = 0;
+        int distanceL = -1;
+        int distanceR = -1;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < maxDistanceToEdge && x < width
                      && isValid(x, y)
@@ -2369,7 +2404,7 @@ ok:     while (!openMap.isEmpty()) {
             totalR++;
         }
         if (totalL <= 0 || totalR <= 0) {
-            logger.warning("No high seas on "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("No high seas on "
                 + ((totalL <= 0 && totalR <= 0) ? "either"
                     : (totalL <= 0) ? "left"
                     : (totalR <= 0) ? "right"
@@ -2441,12 +2476,13 @@ ok:     while (!openMap.isEmpty()) {
      * Reset layer to reflect what is actually there.
      */
     public void resetLayers() {
-        boolean regions = false,
-            rivers = false,
-            lostCityRumours = false,
-            resources = false,
-            nativeSettlements = false;
-        final int hgt = getHeight(), wid = getWidth();
+        boolean regions = false;
+        boolean rivers = false;
+        boolean lostCityRumours = false;
+        boolean resources = false;
+        boolean nativeSettlements = false;
+        final int hgt = getHeight();
+        final int wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
                 Tile t = getTile(x, y);
@@ -2717,7 +2753,8 @@ ok:     while (!openMap.isEmpty()) {
     @Override
     public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
         IntegrityType result = super.checkIntegrity(fix, lb);
-        final int hgt = getHeight(), wid = getWidth();
+        final int hgt = getHeight();
+        final int wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
                 Tile t = getTile(x, y);
@@ -2791,7 +2828,8 @@ ok:     while (!openMap.isEmpty()) {
 
         for (Region region : sort(getRegions())) region.toXML(xw);
 
-        final int hgt = getHeight(), wid = getWidth();
+        final int hgt = getHeight();
+        final int wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
                 getTile(x, y).toXML(xw);
@@ -2855,7 +2893,7 @@ ok:     while (!openMap.isEmpty()) {
         } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColObject(game, Tile.class);
             if (!updateTile(t)) {
-                logger.warning("Tile update failure for: " + t);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Tile update failure for: " + t);
             }                    
 
         } else {

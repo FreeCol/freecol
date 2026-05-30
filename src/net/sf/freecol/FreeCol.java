@@ -166,6 +166,7 @@ public final class FreeCol {
     private static final String META_SERVER_ADDRESS = "meta.freecol.org";
     private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
+    private static final byte[] ANY_ADDR = new byte[] { 0, 0, 0, 0 };
     private static final String SPLASH_DEFAULT = "splash.jpg";
     private static final String TC_DEFAULT = "default";
     private static final String RULES_DEFAULT = "freecol";
@@ -276,12 +277,12 @@ public final class FreeCol {
             juc = getJarURLConnection(FreeCol.class);
         } catch (ClassCastException cce) {
             juc = null;
-            System.err.println("Unable to cast class properly: "
-                                       + cce.getMessage());
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unable to cast class properly: "
+                + cce.getMessage(), cce);
         } catch (IOException ioe) {
             juc = null;
-            System.err.println("Unable to open class jar: "
-                + ioe.getMessage());
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unable to open class jar: "
+                + ioe.getMessage(), ioe);
         }
         if (juc != null) {
             try {
@@ -289,15 +290,15 @@ public final class FreeCol {
                 if (revision != null) {
                     freeColRevision += " (Revision: " + revision + ")";
                 }
-            } catch (Exception e) {
-                System.err.println("Unable to load Manifest: "
-                    + e.getMessage());
+            } catch (IOException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unable to load Manifest: "
+                    + e.getMessage(), e);
             }
             try {
                 splashStream = getDefaultSplashStream(juc);
-            } catch (Exception e) {
-                System.err.println("Unable to open default splash: "
-                    + e.getMessage());
+            } catch (IOException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unable to open default splash: "
+                    + e.getMessage(), e);
             }
         }
 
@@ -330,12 +331,9 @@ public final class FreeCol {
                 .addAmount("%minMemory%", MEMORY_MIN_IN_MB));
         }
         if (memoryCheck && MEMORY_MAX < SOFT_MEMORY_MIN) {
-            System.err.println();
-            System.err.println();
-            System.err.println(Messages.message(StringTemplate.template("main.memoryLow")
+            if (logger.isLoggable(Level.WARNING)) logger.warning(Messages.message(StringTemplate.template("main.memoryLow")
                 .addAmount("%memory%", MEMORY_MAX)
                 .add("%minMemory%", SOFT_MEMORY_MIN_IN_GB + "G")));
-            System.err.println();
         }
 
         // Having parsed the command line args, we know where the user
@@ -354,14 +352,18 @@ public final class FreeCol {
             baseLogger.addHandler(new DefaultHandler(consoleLogging, writer));
             for (LogLevel ll : logLevels) ll.buildLogger();
         } catch (FreeColException e) {
-            System.err.println("Logging initialization failure: " + e);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Logging initialization failure: " + e, e);
         }
         
         // This is overridden by FreeColClient.
         Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
-                baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                if (baseLogger.isLoggable(Level.WARNING)) {
+                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                }
                 if (e instanceof Error) {
-                    e.printStackTrace();
+                    if (baseLogger.isLoggable(Level.SEVERE)) {
+                        baseLogger.log(Level.SEVERE, "Fatal error from thread: " + thread, e);
+                    }
                     System.exit(1);
                 }
             });
@@ -378,16 +380,16 @@ public final class FreeCol {
             specialOptions = ClientOptions.getSpecialOptions();
         } catch (FreeColException fce) {
             specialOptions = new HashMap<>();
-            logger.log(Level.WARNING, "Special options unavailable", fce);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Special options unavailable", fce);
         }
-        String cLang;
+        String cLang = specialOptions.get(ClientOptions.LANGUAGE);
         if (localeArg == null
-            && (cLang = specialOptions.get(ClientOptions.LANGUAGE)) != null
+            && cLang != null
             && !Messages.AUTOMATIC.equalsIgnoreCase(cLang)
             && setLocale(cLang)) {
             Locale loc = getLocale();
             Messages.loadMessageBundle(loc);
-            logger.info("Loaded messages for " + loc);
+            if (logger.isLoggable(Level.INFO)) logger.info("Loaded messages for " + loc);
         }
 
         // Now we have the user mods directory and the locale is now
@@ -404,7 +406,7 @@ public final class FreeCol {
         processSpecialOptions();
 
         // Report on where we are.
-        logger.info(getConfiguration().toString());
+        if (logger.isLoggable(Level.INFO)) logger.info(getConfiguration().toString());
 
         // Ready to specialize into client or server.
         if (standAloneServer) {
@@ -566,32 +568,29 @@ public final class FreeCol {
      * @param err The error message to print.
      */
     private static void fatal(String err) {
-        if (err == null || err.isEmpty()) {
-            err = "Bogus null fatal error message";
+        String message = err;
+        if (message == null || message.isEmpty()) {
+            message = "Bogus null fatal error message";
             Thread.dumpStack();
         }
-        System.err.println(err);
+        logger.severe(message);
         quit(1);
     }
 
     /**
-     * Just gripe to System.err.
+     * Just gripe to the logger.
      *
      * @param template A {@code StringTemplate} to print.
      */
     private static void gripe(StringTemplate template) {
-        System.err.println(Messages.message(template));
+        if (logger.isLoggable(Level.WARNING)) logger.warning(Messages.message(template));
     }
 
     /**
-     * Just gripe to System.err.
+     * Just gripe to the logger.
      *
      * @param key A message key.
      */
-    private static void gripe(String key) {
-        System.err.println(Messages.message(key));
-    }
-
     /**
      * Log a warning with a stack trace.
      *
@@ -610,7 +609,7 @@ public final class FreeCol {
      * @param args The  command-line arguments.
      * @return The option's parameter.
      */
-    private static String findArg(String option, String[] args) {
+    private static String findArg(String option, String... args) {
         for (int i = args.length - 2; i >= 0; i--) {
             if (option.equals(args[i])) {
                 return args[i+1];
@@ -676,7 +675,7 @@ public final class FreeCol {
      *
      * @param args The command-line arguments.
      */
-    private static void handleArgs(String[] args) {
+    private static void handleArgs(String... args) {
         Options options = new Options();
         for (String[] o : optionsTable) {
             String arg = o[3];
@@ -935,7 +934,7 @@ public final class FreeCol {
             }
 
             if (line.hasOption("version")) {
-                System.out.println("FreeCol " + getVersion());
+                if (logger.isLoggable(Level.INFO)) logger.info("FreeCol " + getVersion());
                 quit(0);
             }
 
@@ -945,7 +944,7 @@ public final class FreeCol {
             }
 
         } catch (ParseException e) {
-            System.err.println("\n" + e.getMessage() + "\n");
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, e.getMessage(), e);
             usageError = true;
         }
         if (usageError) printUsage(options, 1);
@@ -979,8 +978,8 @@ public final class FreeCol {
         try {
             if (rulesFile != null) spec = rulesFile.getSpecification();
         } catch (IOException|XMLStreamException ex) {
-            System.err.println("Spec read failed in " + rulesFile.getId()
-                + ": " + ex.getMessage() + "\n");
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Spec read failed in " + rulesFile.getId()
+                + ": " + ex.getMessage(), ex);
         }
         if (spec != null) spec.prepare(advantages, difficulty);
         return spec;
@@ -1185,7 +1184,9 @@ public final class FreeCol {
                 setEuropeanCount(n);
                 return n;
             }
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+            if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid European count: " + arg, nfe);
+        }
         return -1;
     }
 
@@ -1218,7 +1219,9 @@ public final class FreeCol {
         int port = -1;
         try {
             port = (s.length == 2) ? Integer.parseInt(s[1]) : -1;
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+            if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid meta-server port: " + arg, nfe);
+        }
         if (s.length != 2 || s[0] == null || "".equals(s[0])) return false;
 
         metaServerAddress = s[0];
@@ -1245,7 +1248,7 @@ public final class FreeCol {
      */
     public static void setName(String name) {
         FreeCol.name = name;
-        logger.info("Set FreeCol.name = " + name);
+        if (logger.isLoggable(Level.INFO)) logger.info("Set FreeCol.name = " + name);
     }
 
     /**
@@ -1269,20 +1272,21 @@ public final class FreeCol {
     @SuppressFBWarnings(value="MDM_SETDEFAULTLOCALE",
                         justification="Locale can be reset by user")
     public static boolean setLocale(String localeArg) {
-        Locale newLocale = null;
-        if (localeArg == null) {
+        String localeSpec = localeArg;
+        Locale newLocale;
+        if (localeSpec == null) {
             newLocale = Locale.getDefault();
         } else {
-            int index = localeArg.indexOf('.'); // Strip encoding if present
-            if (index > 0) localeArg = localeArg.substring(0, index);
-            newLocale = Messages.getLocale(localeArg);
+            int index = localeSpec.indexOf('.'); // Strip encoding if present
+            if (index > 0) localeSpec = localeSpec.substring(0, index);
+            newLocale = Messages.getLocale(localeSpec);
         }
-        if (newLocale != FreeCol.locale) {
+        boolean changed = newLocale != FreeCol.locale;
+        if (changed) {
             FreeCol.locale = newLocale;
             Locale.setDefault(newLocale);
-            return true;
         }
-        return false;
+        return changed;
     }
 
     /**
@@ -1319,7 +1323,7 @@ public final class FreeCol {
      */
     public static InetAddress getServerName() {
         try {
-            return (serverAddress == null) ? InetAddress.getByName("0.0.0.0") : serverAddress;
+            return (serverAddress == null) ? InetAddress.getByAddress(ANY_ADDR) : serverAddress;
         } catch (UnknownHostException e) {
             return Inet4Address.getLoopbackAddress();
         }
@@ -1469,7 +1473,9 @@ public final class FreeCol {
                 try {
                     windowSize = new Dimension(Integer.parseInt(xy[0]),
                                                Integer.parseInt(xy[1]));
-                } catch (NumberFormatException nfe) {}
+                } catch (NumberFormatException nfe) {
+                    if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid window size: " + arg, nfe);
+                }
             }
         }
     }
@@ -1514,12 +1520,10 @@ public final class FreeCol {
             return ((FreeColUserMessageException) ex).getStringTemplate();
         }
         
-        String msg;
-        return (ex == null || (msg = ex.getMessage()) == null)
-            ? fallback
-            : (Messages.containsKey(msg))
-            ? StringTemplate.template(msg)
-            : (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+        String msg = (ex == null) ? null : ex.getMessage();
+        if (msg == null) return fallback;
+        if (Messages.containsKey(msg)) return StringTemplate.template(msg);
+        return (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
             ? StringTemplate.name(msg)
             : fallback;
     }
@@ -1617,9 +1621,10 @@ public final class FreeCol {
         if (splashStream != null) {
             try {
                 final GraphicsDevice defaultScreenDevice = Utils.getGoodGraphicsDevice();
+                if (defaultScreenDevice == null) return null;
                 splashScreen = new SplashScreen(defaultScreenDevice, splashStream);
                 splashScreen.setVisible(true);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.log(Level.WARNING, "Splash screen failure", e);
             }
         }
@@ -1689,7 +1694,7 @@ public final class FreeCol {
                 if (!freeColServer.registerWithMetaServer()) {
                     fatal(Messages.message("server.noRouteToServer"));
                 }
-            } catch (Exception e) {
+            } catch (FreeColException | IOException | XMLStreamException e) {
                 logger.log(Level.SEVERE, "Load fail", e);
                 fatal(Messages.message(badFile("error.couldNotLoad", saveGame))
                     + ": " + e);
@@ -1705,13 +1710,13 @@ public final class FreeCol {
                 if (!freeColServer.registerWithMetaServer()) {
                     fatal(Messages.message("server.noRouteToServer"));
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 fatal(Messages.message("server.initialize")
                     + ": " + e.getMessage());
                 return;
             }
             if (publicServer && !freeColServer.getPublicServer()) {
-                gripe(Messages.message("server.noRouteToServer"));
+                gripe(StringTemplate.template("server.noRouteToServer"));
             }
         }
 

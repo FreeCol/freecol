@@ -27,6 +27,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.TreeSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 
 /**
@@ -34,6 +38,8 @@ import java.util.TreeSet;
  */
 public class TranslationReport {
     
+    private static final Logger logger = Logger.getLogger(TranslationReport.class.getName());
+
     private static class LanguageStatsRecord{
         String localFile = "";
         int missingKeys = 0;
@@ -49,7 +55,7 @@ public class TranslationReport {
     private static final boolean printSummary = true;
 
     public static void main(String[] args) throws Exception {
-        ArrayList<LanguageStatsRecord> statistics = new ArrayList<>();
+        List<LanguageStatsRecord> statistics = new ArrayList<>();
 
         //String dirName = "src/net/sf/freecol.common.i18n/";
         String dirName = args[0];
@@ -65,7 +71,7 @@ public class TranslationReport {
                 }
             });
         if (languageFiles == null) {
-            System.err.println("No language files found in " + directory);
+            if (logger.isLoggable(Level.SEVERE)) logger.severe("No language files found in " + directory);
             System.exit(1);
         }
 
@@ -73,7 +79,7 @@ public class TranslationReport {
             "FreeColMessages.properties");
         Properties master = new Properties();
         master.load(Files.newInputStream(filePath));
-        //System.out.println("*** Found master property file with " + master.size() + " properties.\n");
+        //logger.info("*** Found master property file with " + master.size() + " properties.\n");
 
         Properties properties = new Properties();
         for (String name : languageFiles) {
@@ -82,13 +88,13 @@ public class TranslationReport {
             Path propPath = FileSystems.getDefault().getPath(args[0], name);
             properties.clear();
             properties.load(Files.newInputStream(propPath));
-            System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
-            System.out.println("*** " + name + " ***");
-            System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
+            if (logger.isLoggable(Level.INFO)) logger.info(name.length() + 8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
+            if (logger.isLoggable(Level.INFO)) logger.info("*** " + name + " ***");
+            if (logger.isLoggable(Level.INFO)) logger.info(name.length() + 8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
 
-            ArrayList<String> missingKeys      = new ArrayList<>();
-            ArrayList<String> missingVariables = new ArrayList<>();
-            ArrayList<String> copiedFromMaster = new ArrayList<>();
+            List<String> missingKeys = new ArrayList<>();
+            List<String> missingVariables = new ArrayList<>();
+            List<String> copiedFromMaster = new ArrayList<>();
 
             for (Object o : master.keySet()) {
                 String key = (String)o;
@@ -114,42 +120,42 @@ public class TranslationReport {
             }
             
             if (!missingKeys.isEmpty()) {
-                System.out.println("** Total of " + missingKeys.size() + " properties missing:\n");
+                if (logger.isLoggable(Level.INFO)) logger.info("** Total of " + missingKeys.size() + " properties missing:\n");
                 for (String key : sort(missingKeys)) {
-                    System.out.println(key + "=" + master.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info(key + "=" + master.getProperty(key));
                 }
                 lstat.missingKeys = missingKeys.size();
-                System.out.println("");
+                logger.info("");
             } else {
-                System.out.println("** No properties missing.\n");
+                logger.info("** No properties missing.\n");
             }
             
             if (!copiedFromMaster.isEmpty()){
-                System.out.println("** Total of " + copiedFromMaster.size() + " properties copied from master properties:\n");
+                if (logger.isLoggable(Level.INFO)) logger.info("** Total of " + copiedFromMaster.size() + " properties copied from master properties:\n");
                 for (String key : sort(copiedFromMaster)) {
-                    System.out.println(key + "=" + master.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info(key + "=" + master.getProperty(key));
                 }
                 lstat.copiedKeys = copiedFromMaster.size();
-                System.out.println("");
+                logger.info("");
             } else {
-                System.out.println("** No properties copied.\n");
+                logger.info("** No properties copied.\n");
             }
 
             if (!missingVariables.isEmpty()) {
-                System.out.println("** Total of " + missingVariables.size() + " properties with missing variables:\n");
+                if (logger.isLoggable(Level.INFO)) logger.info("** Total of " + missingVariables.size() + " properties with missing variables:\n");
                 for (String key : sort(missingVariables)) {
-                    System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
-                    System.out.println("INCORRECT: " + key + "=" + properties.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info("* CORRECT: " + key + "=" + master.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info("INCORRECT: " + key + "=" + properties.getProperty(key));
                 }
                 lstat.missingVariables = missingVariables.size();
-                System.out.println("");
+                logger.info("");
             } else {
-                System.out.println("** No properties with missing variables.\n");
+                logger.info("** No properties with missing variables.\n");
             }
 
 
-            ArrayList<String> superfluousKeys = new ArrayList<>();
-            ArrayList<String> superfluousVariables = new ArrayList<>();
+            List<String> superfluousKeys = new ArrayList<>();
+            List<String> superfluousVariables = new ArrayList<>();
             for (Object o : properties.keySet()) {
                 String key = (String)o;
                 String value = master.getProperty(key, null);
@@ -165,36 +171,36 @@ public class TranslationReport {
             }
 
             if (!superfluousKeys.isEmpty()) {
-                System.out.println("** Total of " + superfluousKeys.size() + " superfluous properties:\n");
+                if (logger.isLoggable(Level.INFO)) logger.info("** Total of " + superfluousKeys.size() + " superfluous properties:\n");
                 for (String key : sort(superfluousKeys)) {
-                    System.out.println(key + "=" + properties.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info(key + "=" + properties.getProperty(key));
                 }
                 lstat.superfluousKeys = superfluousKeys.size();
-                System.out.println("");
+                logger.info("");
             } else {
-                System.out.println("** No superfluous properties.\n");
+                logger.info("** No superfluous properties.\n");
             }
             
             if (!superfluousVariables.isEmpty()) {
-                System.out.println("** Total of " + superfluousVariables.size() +
+                if (logger.isLoggable(Level.INFO)) logger.info("** Total of " + superfluousVariables.size() +
                                    " properties with superfluous variables:\n");
                 for (String key : sort(superfluousVariables)) {
-                    System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
-                    System.out.println("INCORRECT: " + key + "=" + properties.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info("* CORRECT: " + key + "=" + master.getProperty(key));
+                    if (logger.isLoggable(Level.INFO)) logger.info("INCORRECT: " + key + "=" + properties.getProperty(key));
                 }
                 lstat.superfluousVariables = superfluousVariables.size();
-                System.out.println("");
+                logger.info("");
             } else {
-                System.out.println("** No properties with superfluous variables.\n");
+                logger.info("** No properties with superfluous variables.\n");
             }
 
             statistics.add(lstat);
         }
         
         if (printSummary){
-            System.out.println(stars);
-            System.out.println("*** Summary of translation efforts (" + master.size() + " keys in master file) ***");
-            System.out.println(stars);
+            logger.info(stars);
+            if (logger.isLoggable(Level.INFO)) logger.info("*** Summary of translation efforts (" + master.size() + " keys in master file) ***");
+            logger.info(stars);
             for (LanguageStatsRecord stats : statistics){
                 StringBuilder output = new StringBuilder();
                 output.append(shortenName(stats.localFile));
@@ -214,7 +220,7 @@ public class TranslationReport {
                 percentageDone = Math.round(percentageDone*100)/100f;
                 output.append(percentageDone).append("% finished.");
                 
-                System.out.println(output.toString());
+                if (logger.isLoggable(Level.INFO)) logger.info(output.toString());
             }
         }
     }
@@ -223,22 +229,24 @@ public class TranslationReport {
     /**
      * Sets inVariable as needed
      */
-    private static void isInVariable(ArrayList<String> superfluousVariables, String key, String value, String propertiesValue, int lastIndex, boolean inVariable) {
+    private static void isInVariable(List<String> superfluousVariables, String key, String value, String propertiesValue, int lastIndex, boolean inVariable) {
+        int currentIndex = lastIndex;
+        boolean insideVariable = inVariable;
         for (int index = 0; index < propertiesValue.length() - 1; index++) {
             char current = propertiesValue.charAt(index);
             if (current == '%') {
-                if (inVariable) {
-                    String var = propertiesValue.substring(lastIndex, index + 1);
+                if (insideVariable) {
+                    String var = propertiesValue.substring(currentIndex, index + 1);
                     if (!value.contains(var)) {
                         superfluousVariables.add(key);
                     }
-                    inVariable = false;
+                    insideVariable = false;
                 } else {
-                    lastIndex = index;
-                    inVariable = true;
+                    currentIndex = index;
+                    insideVariable = true;
                 }
             } else if (!Character.isLetterOrDigit(current)) {
-                inVariable = false;
+                insideVariable = false;
             }
         }
     }
@@ -270,8 +278,8 @@ public class TranslationReport {
     }
 
 
-    private static TreeSet<String> sort(ArrayList<String> missingKeys) {
-        TreeSet<String> sorted = new TreeSet<>();
+    private static Set<String> sort(List<String> missingKeys) {
+        Set<String> sorted = new TreeSet<>();
         sorted.addAll(missingKeys);
         return sorted;
     }

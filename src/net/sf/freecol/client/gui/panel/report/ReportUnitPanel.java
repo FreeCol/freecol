@@ -64,6 +64,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     /** Simple comparator to order miscellaneous locations. */
     private static final Comparator<Location> locationComparator
         = new Comparator<Location>() {
+                @Override
                 public int compare(Location l1, Location l2) {
                     return l1.getId().compareTo(l2.getId());
                 }
@@ -89,7 +90,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     private final List<Location> orderedLocations = new ArrayList<>();
     
     /** Whether to show colonies even if no selected units are present. */
-    private boolean showColonies = false;
+    private boolean showColonies;
 
 
     /**

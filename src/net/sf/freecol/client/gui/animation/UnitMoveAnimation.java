@@ -89,7 +89,8 @@ final class UnitMoveAnimation extends Animation {
             * movementRatio);
 
         Point point = srcPoint;
-        long time = now(), dropFrames = 0;
+        long time = now();
+        long dropFrames = 0;
         while (!point.equals(dstPoint)) {
             point.x += stepX;
             point.y += stepY;

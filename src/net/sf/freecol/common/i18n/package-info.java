@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Internationalisation package</h1>
+ * <h2>FreeCol Internationalisation package</h2>
  *
  * <p>This package contains the FreeCol support for internationalisation
  *     (translation).

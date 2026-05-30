@@ -77,6 +77,7 @@ public class FreeColCheckBoxUI extends MetalCheckBoxUI {
             return FontLibrary.getMainFont().getSize() * 3 / 2;
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             final Graphics2D g2d = (Graphics2D) g;
             final int mainFontSize = FontLibrary.getMainFont().getSize();
@@ -128,10 +129,12 @@ public class FreeColCheckBoxUI extends MetalCheckBoxUI {
             }
         }
 
+        @Override
         public int getIconWidth() {
             return getWidgetSize();
         }
 
+        @Override
         public int getIconHeight() {
             return getWidgetSize();
         }

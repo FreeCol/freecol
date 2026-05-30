@@ -55,7 +55,7 @@ class BaseCostDecider implements CostDecider {
     @Override
     public int getCost(final Unit unit, final Location oldLocation,
                        final Location newLocation, int movesLeftBefore) {
-        int cost = 0;
+        int cost;
         this.newTurns = 0;
               
         Tile oldTile = oldLocation.getTile();

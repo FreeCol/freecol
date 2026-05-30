@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.video;
 /**
  * A listener for video playback events.
  */
+@FunctionalInterface
 public interface VideoListener {
     
     /**

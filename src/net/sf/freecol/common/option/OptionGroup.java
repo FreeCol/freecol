@@ -350,17 +350,17 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      */
     public boolean load(File file) {
         if (file == null) return false;
-        boolean ret = false;
+        boolean ret;
         try (
              FreeColXMLReader xr = new FreeColXMLReader(file);
              ) {
             ret = load(xr);
         } catch (IOException|XMLStreamException xse) {
-            logger.log(Level.WARNING, "Load OptionGroup(" + getId()
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Load OptionGroup(" + getId()
                 + ") from file " + file.getPath() + " crashed", xse);
             return false;
         }
-        logger.info("Load OptionGroup(" + getId() + ") from " + file.getPath()
+        if (logger.isLoggable(Level.INFO)) logger.info("Load OptionGroup(" + getId() + ") from " + file.getPath()
             + ((ret) ? " succeeded" : " failed"));
         return ret;
     }
@@ -408,14 +408,14 @@ public class OptionGroup extends AbstractOption<OptionGroup>
     public <T extends Option<?>> T getOption(String id,
                                           Class<T> returnClass) {
         if (id == null) {
-            throw new RuntimeException("Null id: " + this);
+            throw new IllegalArgumentException("Null id: " + this);
         } else if (!this.optionMap.containsKey(id)) {
-            throw new RuntimeException("Missing option: " + id);
+            throw new IllegalArgumentException("Missing option: " + id);
         } else {
             try {
                 return returnClass.cast(optionMap.get(id));
             } catch (ClassCastException cce) {
-                throw new RuntimeException("Not a " + returnClass.getName()
+                throw new IllegalArgumentException("Not a " + returnClass.getName()
                     + ": " + id, cce);
             }
         }
@@ -505,15 +505,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      */
     @Override
     public boolean save(File file) {
-        boolean ret = false;
-        try {
-            ret = this.save(file, null, true);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Save OptionGroup(" + getId()
-                + ") to " + file.getPath() + " crashed", e);
-            return false;
-        }
-        logger.info("Save OptionGroup(" + getId() + ") to " + file.getPath()
+        boolean ret = this.save(file, null, true);
+        if (logger.isLoggable(Level.INFO)) logger.info("Save OptionGroup(" + getId() + ") to " + file.getPath()
             + ((ret) ? " succeeded" : " failed"));
         return ret;
     }

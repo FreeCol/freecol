@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -65,6 +66,7 @@ public class FirstContactMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public FirstContactMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, PLAYER_TAG, OTHER_TAG, TILE_TAG, CAMPS_TAG, RESULT_TAG);
@@ -104,15 +106,15 @@ public class FirstContactMessage extends AttributeMessage {
         final int n = getSettlementCount();
 
         if (player == null || player != freeColClient.getMyPlayer()) {
-            logger.warning("firstContact with bad player: " + player);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("firstContact with bad player: " + player);
             return;
         }
         if (other == null || other == player || !other.isIndian()) {
-            logger.warning("firstContact with bad other player: " + other);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("firstContact with bad other player: " + other);
             return;
         }
         if (tile != null && tile.getOwner() != other) {
-            logger.warning("firstContact with bad tile: " + tile);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("firstContact with bad tile: " + tile);
             return;
         }
 
@@ -133,9 +135,7 @@ public class FirstContactMessage extends AttributeMessage {
         Player first = getPlayer(game);
         if (first == null) {
             return serverPlayer.clientError("Invalid player: " + playerId);
-        } else if (serverPlayer.getId().equals(playerId)) {
-            ; // OK
-        } else {
+        } else if (!serverPlayer.getId().equals(playerId)) {
             return serverPlayer.clientError("Not our player: " + playerId);
         }
 

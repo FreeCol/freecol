@@ -25,7 +25,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -150,7 +150,7 @@ public class ImageCache {
             final Dimension size,
             final boolean grayscale,
             final int variation,
-            Callable<BufferedImage> imageCreator) {
+            Supplier<BufferedImage> imageCreator) {
         
         final long cacheKey = imageHash(key, size, grayscale, variation);
         final BufferedImage cached = searchCaches(cacheKey);
@@ -159,10 +159,10 @@ public class ImageCache {
         }
         
         try {
-            final BufferedImage image = imageCreator.call();
+            final BufferedImage image = imageCreator.get();
             placeImageInLowPriorityCache(cacheKey, image);
             return image;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             logger.log(Level.WARNING, "Exception while producing image", e);
             return null;
         }
@@ -205,7 +205,11 @@ public class ImageCache {
 
     private void debugPrintCacheSizes() {
         if (DEBUG_PRINT_CACHE_SIZES_TO_STDOUT) {
-            System.out.format("Cache: %4sMB   Low priority cache: %4sMB\n", Math.round(cacheSize / (1024 * 1024)), Math.round(lowPriorityCacheSize / (1024 * 1024)));
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine(String.format("Cache: %4sMB   Low priority cache: %4sMB",
+                    Math.round(cacheSize / (1024 * 1024)),
+                    Math.round(lowPriorityCacheSize / (1024 * 1024))));
+            }
         }
     }
 
@@ -300,7 +304,10 @@ public class ImageCache {
                     lowPriorityCacheSize -= ref.getSize();
                     lowPriorityCache.remove(ref.getKey());
                 }
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.log(Level.FINE, "Cache cleanup thread interrupted.", e);
+            }
         }
     }
     

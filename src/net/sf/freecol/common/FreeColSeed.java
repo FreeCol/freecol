@@ -20,12 +20,16 @@
 package net.sf.freecol.common;
 
 import java.security.SecureRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
  * A wrapper for the pseudo-random number generator seed.
  */
 public class FreeColSeed {
+
+    private static final Logger logger = Logger.getLogger(FreeColSeed.class.getName());
 
     public static final long DEFAULT_SEED = 0L;
 
@@ -72,7 +76,9 @@ public class FreeColSeed {
             FreeColSeed.freeColSeed = Long.parseLong(arg);
             FreeColSeed.seeded = true;
             return true;
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+            if (logger.isLoggable(Level.FINE)) logger.log(Level.FINE, "Invalid seed: " + arg, nfe);
+        }
         return false;
     }
 }

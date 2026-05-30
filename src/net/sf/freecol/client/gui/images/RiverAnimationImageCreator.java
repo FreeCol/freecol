@@ -64,7 +64,7 @@ public final class RiverAnimationImageCreator {
             final BufferedImage maskImage = createRiverMaskImageWithTransitions(baseMaskImage, minorToMajorTransitions);
             final BufferedImage baseTileMask = lib.getTerrainMask(null);
             
-            return generateImage(riverPebblesImage, riverWaterImage, riverVariationNumber, maskImage, baseTileMask);
+            return generateImage(riverPebblesImage, riverWaterImage, maskImage, baseTileMask);
         });
         
         return result;
@@ -133,8 +133,6 @@ public final class RiverAnimationImageCreator {
      * 
      * @param pebblesImage The pebbles image. That is, the graphics the water is drawn upon.
      * @param waterImage The water to be drawn.
-     * @param riverImageVariationNumber The variation number of the
-     *      water image given above.
      * @param riverMaskImage A mask to be applied to the water image in
      *      order to make the pebbles visible below the water. In addition, an
      *      enlarged (and less transparent) version of this mask is used for
@@ -145,7 +143,6 @@ public final class RiverAnimationImageCreator {
      */
     private static BufferedImage generateImage(BufferedImage pebblesImage,
             BufferedImage waterImage,
-            int riverImageVariationNumber,
             BufferedImage riverMaskImage,
             BufferedImage tileMask) {
         final int width = waterImage.getWidth();

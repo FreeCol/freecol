@@ -84,7 +84,7 @@ public class SetCurrentStopMessage extends AttributeMessage {
         ServerUnit serverUnit;
         try {
             serverUnit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         TradeRoute tr = serverUnit.getTradeRoute();

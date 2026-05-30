@@ -188,7 +188,7 @@ public class FreeColProgressBar extends JPanel {
             g2d.setColor(new Color(0, 0, 0, 70));
             g2d.fillRect(getInsets().left, getInsets().top, dvalue, height);
         }
-        int dstep = 0;
+        int dstep;
         if (max > 0) {
             dstep = (width * step) / max;
             if (dstep > 0) {
@@ -228,7 +228,7 @@ public class FreeColProgressBar extends JPanel {
         int restWidth = getWidth() - stringWidth;
 
         int iconWidth = 0;
-        int iconHeight = 0;
+        int iconHeight;
         if (this.image != null) {
             iconWidth = this.image.getWidth(this);
             iconHeight = this.image.getHeight(this);

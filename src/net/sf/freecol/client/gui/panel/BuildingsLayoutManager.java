@@ -163,7 +163,7 @@ public class BuildingsLayoutManager implements LayoutManager {
     private boolean randomizedPlacement(Container parent, Dimension size, boolean dryRun) {
         final Random r = new Random(layoutSeed);
         
-        final List<Entry> entries = getAllEntries(parent, size);
+        final List<Entry> entries = getAllEntries(parent);
         if (isDefinitelyNotEnoughRoomForLayout(entries, size)) {
             return false;
         }
@@ -257,7 +257,7 @@ public class BuildingsLayoutManager implements LayoutManager {
      * 
      * @return The list of children (called entries).
      */
-    private List<Entry> getAllEntries(Container parent, Dimension size) {
+    private List<Entry> getAllEntries(Container parent) {
         final List<Entry> entries = new ArrayList<>(parent.getComponentCount());
         for (Component c : parent.getComponents()) {
             if (!c.isVisible()) {

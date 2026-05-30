@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.ImageUtils;
+import java.util.logging.Level;
 
 
 /**
@@ -84,7 +85,8 @@ public final class TileViewer extends FreeColClientHolder {
                         null);
 
     /** The offset to paint the occupation indicator (in pixels). */
-    public static final int STATE_OFFSET_X = 25, STATE_OFFSET_Y = 10;
+    public static final int STATE_OFFSET_X = 25;
+    public static final int STATE_OFFSET_Y = 10;
 
     /**
      * The image library derived from the parent map viewer.
@@ -97,13 +99,16 @@ public final class TileViewer extends FreeColClientHolder {
     private RoadPainter rp;
 
     /** Helper variables for displaying tiles. */
-    private int tileHeight, tileWidth, halfHeight;
+    private int tileHeight;
+    private int tileWidth;
+    private int halfHeight;
 
     /** Font for tile text. */
     private Font tinyFont;
 
     /** Fonts for the colony population chip. */
-    private Font emphFont, normFont;
+    private Font emphFont;
+    private Font normFont;
 
 
     /**
@@ -484,6 +489,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
     
     boolean hasRiverDelta(Tile tile) {
+        boolean found = false;
         for (Direction direction : Direction.longSides) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
             if (borderingTile == null || tile.isLand() || !borderingTile.isLand() || !tile.isExplored()) {
@@ -497,12 +503,11 @@ public final class TileViewer extends FreeColClientHolder {
             
             final Direction reverseDirection = direction.getReverseDirection();
             final int magnitude = river.getRiverConnection(reverseDirection);
-            if (magnitude <= 0) {
-                continue;
-            }
-            return true;
+            if (magnitude <= 0) continue;
+            found = true;
+            break;
         }
-        return false;
+        return found;
     }
     
     private void drawRiverMouth(Graphics2D g2d, Tile tile, long ticks) {
@@ -581,7 +586,7 @@ public final class TileViewer extends FreeColClientHolder {
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
         default:
-            logger.warning("displayTileText option " + op + " out of range");
+            if (logger.isLoggable(Level.WARNING)) logger.warning("displayTileText option " + op + " out of range");
             break;
         }
 
@@ -686,11 +691,12 @@ public final class TileViewer extends FreeColClientHolder {
             }
 
             // Draw the alarm chip if needed.
-            if ((chip = this.lib.getAlarmChip(g2d, is, player)) != null) {
+            chip = this.lib.getAlarmChip(g2d, is, player);
+            if (chip != null) {
                 g2d.drawImage(chip, rop, (int)xOffset, (int)yOffset);
             }
         } else {
-            logger.warning("Bogus settlement: " + settlement);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus settlement: " + settlement);
         }
     }
 

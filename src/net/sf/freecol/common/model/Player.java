@@ -73,6 +73,7 @@ import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
+import java.util.logging.Level;
 
 
 /**
@@ -648,7 +649,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param connection The {@code Connection}.
      */
     public void setConnection(Connection connection) {
-        throw new RuntimeException("setConnection called on Player: " + this);
+        throw new IllegalStateException("setConnection called on Player: " + this);
     }
 
     /**
@@ -658,7 +659,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the message was sent.
      */
     public boolean send(ChangeSet cs) {
-        throw new RuntimeException("send called on Player: " + this);
+        throw new IllegalStateException("send called on Player: " + this);
     }
 
 
@@ -672,7 +673,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A new {@code ChangeSet}.
      */
     public ChangeSet clientError(StringTemplate template) {
-        logger.warning(Messages.message(template));
+        if (logger.isLoggable(Level.WARNING)) logger.warning(Messages.message(template));
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             Thread.dumpStack();
         }
@@ -1162,7 +1163,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 // where the balance is unknown. Just keep going and
                 // do the best thing possible, we don't want to crash
                 // the game here.
-                logger.warning("Cannot add " + amount + " gold for "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Cannot add " + amount + " gold for "
                     + this + ": would be negative!");
                 gold = 0;
             }
@@ -1278,7 +1279,7 @@ public class Player extends FreeColGameObject implements Nameable {
             / apply(1f, turn, Modifier.RELIGIOUS_UNREST_BONUS));
         immigrationRequired = (int)apply(unreduced + base, turn,
             Modifier.RELIGIOUS_UNREST_BONUS);;
-        logger.finest("Immigration for " + getId() + " updated " + current
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Immigration for " + getId() + " updated " + current
             + " -> " + immigrationRequired);
     }
 
@@ -2260,8 +2261,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param tradeRoute The {@code TradeRoute} to add.
      */
     public final void addTradeRoute(TradeRoute tradeRoute) {
-        String name;
-        if (tradeRoute != null && (name = tradeRoute.getName()) != null
+        String name = (tradeRoute == null) ? null : tradeRoute.getName();
+        if (tradeRoute != null && name != null
             && getTradeRouteByName(name, tradeRoute) == null) {
             synchronized (this.tradeRoutes) {
                 this.tradeRoutes.add(tradeRoute);
@@ -3981,7 +3982,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param what A description of the cheating.
      */
     public void logCheat(String what) {
-        logger.finest("CHEAT: " + getGame().getTurn().getNumber()
+        if (logger.isLoggable(Level.FINEST)) logger.finest("CHEAT: " + getGame().getTurn().getNumber()
             + " " + lastPart(getNationId(), ".")
             + " " + what);
     }
@@ -4029,7 +4030,7 @@ public class Player extends FreeColGameObject implements Nameable {
         T t = getGame().getFreeColGameObject(id, returnClass);
         if (t == null) {
             FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
-            throw new RuntimeException("Not a " + returnClass.getName()
+            throw new IllegalArgumentException("Not a " + returnClass.getName()
                 + ": " + id + "/" + fcgo);
         } else if (t instanceof Ownable) {
             if (!owns((Ownable)t)) {
@@ -4037,7 +4038,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     + " not owned by " + getId() + ": " + id + "/" + t);
             }
         } else {
-            throw new RuntimeException("Not ownable: " + id + "/" + t);
+            throw new IllegalStateException("Not ownable: " + id + "/" + t);
         }
         return t;
     }

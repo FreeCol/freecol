@@ -69,6 +69,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * @param game a {@code Game} value
      * @param xr a {@code FreeColXMLReader} value
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     protected AbstractMission(Game game, FreeColXMLReader xr) {
         super(game, null);
     }

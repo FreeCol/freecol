@@ -138,14 +138,14 @@ public class SetBuildQueueMessage extends AttributeMessage {
         Colony colony;
         try {
             colony = getColony(serverPlayer);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
         List<BuildableType> buildQueue;
         try {
             buildQueue = getQueue(spec);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

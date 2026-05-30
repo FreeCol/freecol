@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol</h1>
+ * <h2>FreeCol</h2>
  *
  * <p>The base FreeCol package containing all subclasses.</p>
  *

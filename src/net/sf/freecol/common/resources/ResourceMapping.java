@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 
 /**
@@ -298,6 +299,7 @@ public final class ResourceMapping {
         imageResources.values().stream().forEach(r -> r.clean());
     }
     
+    @FunctionalInterface
     public interface PreloadController {
         boolean shouldContinue();
     }
@@ -323,7 +325,7 @@ public final class ResourceMapping {
         
         boolean put(String key, Object resource) {
             if (requiredKeyPrefix != null && !key.startsWith(requiredKeyPrefix)) {
-                logger.warning("Rejecting malformed resource key: \""
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Rejecting malformed resource key: \""
                         + key + "\". The key should have started with: \"" + requiredKeyPrefix + "\".");
                 return false;
             }

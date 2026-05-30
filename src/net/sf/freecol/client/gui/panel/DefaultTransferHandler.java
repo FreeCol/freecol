@@ -30,6 +30,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragGestureRecognizer;
@@ -39,9 +40,11 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -67,6 +70,7 @@ import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
+import java.util.logging.Level;
 
 
 /**
@@ -139,13 +143,14 @@ public final class DefaultTransferHandler extends TransferHandler {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dragGestureRecognized(DragGestureEvent dge) {
             JComponent c = (JComponent)dge.getComponent();
             DefaultTransferHandler th
                 = (DefaultTransferHandler)c.getTransferHandler();
             Transferable t = th.createTransferable(c);
             if (t == null) {
-                logger.warning("Unable to create transferable for: " + dge);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Unable to create transferable for: " + dge);
                 th.exportDone(c, null, NONE);
                 return;
             }
@@ -155,7 +160,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             try {
                 Cursor cursor = getCursor(c);
                 dge.startDrag(cursor, t, this);
-            } catch (RuntimeException re) {
+            } catch (InvalidDnDOperationException re) {
                 c.setAutoscrolls(this.scrolls);
             }
         }
@@ -166,21 +171,25 @@ public final class DefaultTransferHandler extends TransferHandler {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dragEnter(DragSourceDragEvent dsde) {}
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dragOver(DragSourceDragEvent dsde) {}
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dragExit(DragSourceEvent dsde) {}
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
@@ -200,6 +209,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dropActionChanged(DragSourceDragEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent comp = (JComponent)dsc.getComponent();
@@ -228,11 +238,13 @@ public final class DefaultTransferHandler extends TransferHandler {
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void registerListeners() {}
 
         /**
          * {@inheritDoc}
          */
+        @Override
         protected void unregisterListeners() {}
     }
 
@@ -332,7 +344,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @return Always false.
      */
     private boolean importFail(JComponent comp, String data) {
-        logger.warning("Transfer of " + data + " invalid at: " + comp);
+        if (logger.isLoggable(Level.WARNING)) logger.warning("Transfer of " + data + " invalid at: " + comp);
         return false;
     }
 
@@ -451,14 +463,15 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @return True if the import succeeds.
      */
     private boolean importMarket(JComponent comp, MarketLabel label) {
-        if (!(comp instanceof UnitLabel) && !(comp instanceof CargoPanel)) {
+        JComponent targetComp = comp;
+        if (!(targetComp instanceof UnitLabel) && !(targetComp instanceof CargoPanel)) {
             return false;
         }
         
         if (label.isPartialChosen()) {
-            if (comp instanceof CargoPanel) {
+            if (targetComp instanceof CargoPanel) {
                 // Verifies that goods can be imported before showing the dialog.
-                final CargoPanel cargoPanel = (CargoPanel) comp;
+                final CargoPanel cargoPanel = (CargoPanel) targetComp;
                 if (cargoPanel.getCarrier() == null) {
                     return false;
                 }
@@ -471,22 +484,22 @@ public final class DefaultTransferHandler extends TransferHandler {
             if (amount <= 0) return false;
             label.setAmount(amount);
         }
-        if (comp instanceof UnitLabel) {
-            if (equipUnitIfPossible((UnitLabel)comp,
+        if (targetComp instanceof UnitLabel) {
+            if (equipUnitIfPossible((UnitLabel)targetComp,
                                     label.getAbstractGoods())) return true;
             // Try again with parent
-            if (comp.getParent() instanceof JComponent) {
-                comp = (JComponent)comp.getParent();
+            if (targetComp.getParent() instanceof JComponent) {
+                targetComp = (JComponent)targetComp.getParent();
             } else {
-                return importFail(comp, "equipping market goods");
+                return importFail(targetComp, "equipping market goods");
             }
         }
-        if (comp instanceof CargoPanel) {
-            ((CargoPanel)comp).add(label, true);
-            comp.revalidate();
+        if (targetComp instanceof CargoPanel) {
+            ((CargoPanel)targetComp).add(label, true);
+            targetComp.revalidate();
             return true;
         }
-        return importFail(comp, "market goods");
+        return importFail(targetComp, "market goods");
     }
 
     /**
@@ -570,8 +583,9 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public boolean importData(JComponent comp, Transferable t) {
+        JComponent targetComp = comp;
         if (!t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
-            return importFail(comp, "data flavor");
+            return importFail(targetComp, "data flavor");
         }
 
         boolean ret;
@@ -582,15 +596,15 @@ public final class DefaultTransferHandler extends TransferHandler {
             // Get the data to transfer.
             JLabel data = (JLabel)t.getTransferData(DefaultTransferHandler.flavor);
             // Do not allow a transferable to be dropped upon itself:
-            if (comp == data) return false;
+            if (targetComp == data) return false;
 
             // Special cases when dropping onto other labels.
-            if (comp instanceof AbstractGoodsLabel
-                || comp instanceof GoodsTypeLabel) {
+            if (targetComp instanceof AbstractGoodsLabel
+                || targetComp instanceof GoodsTypeLabel) {
                 // We probably intended to drop on the enclosing parent panel
-                comp = getDropTarget(comp);
-            } else if (comp instanceof UnitLabel) {
-                UnitLabel unitLabel = (UnitLabel)comp;
+                targetComp = getDropTarget(targetComp);
+            } else if (targetComp instanceof UnitLabel) {
+                UnitLabel unitLabel = (UnitLabel)targetComp;
                 /**
                  * 1. If a unit or goods are dropped onto a carrier in port
                  *    then the unit/goods is added and the carrier selected.
@@ -609,28 +623,30 @@ public final class DefaultTransferHandler extends TransferHandler {
                         oldSelectedUnit = portPanel.getSelectedUnitLabel();
                     }
                     portPanel.setSelectedUnitLabel(unitLabel);
-                    comp = portPanel.getCargoPanel();
+                    targetComp = portPanel.getCargoPanel();
                 } else if (data instanceof AbstractGoodsLabel
                     && unitLabel.getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     // don't do anything before partial amount has been checked
                 } else {
-                    comp = getDropTarget(comp);
+                    targetComp = getDropTarget(targetComp);
                 }
             }
 
-            ret = (data.getParent() == comp)
-                ? importFail(comp, "data-already-present")
+            ret = (data.getParent() == targetComp)
+                ? importFail(targetComp, "data-already-present")
                 : (data instanceof GoodsTypeLabel)
-                ? importGoodsType(comp, (GoodsTypeLabel)data)
+                ? importGoodsType(targetComp, (GoodsTypeLabel)data)
                 : (data instanceof GoodsLabel)
-                ? importGoods(comp, (GoodsLabel)data, oldSelectedUnit)
+                ? importGoods(targetComp, (GoodsLabel)data, oldSelectedUnit)
                 : (data instanceof MarketLabel)
-                ? importMarket(comp, (MarketLabel)data)
+                ? importMarket(targetComp, (MarketLabel)data)
                 : (data instanceof UnitLabel)
-                ? importUnit(comp, (UnitLabel)data, oldSelectedUnit)
-                : importFail(comp, data.toString());
-        } catch (Exception e) { // FIXME: Suggest a reconnect?
-            ret = importFail(comp, "crash: " + e);
+                ? importUnit(targetComp, (UnitLabel)data, oldSelectedUnit)
+                : importFail(targetComp, data.toString());
+        } catch (UnsupportedFlavorException | IOException e) {
+            ret = importFail(targetComp, "data flavor");
+        } catch (IllegalArgumentException | IllegalStateException e) { // FIXME: Suggest a reconnect?
+            ret = importFail(targetComp, "crash: " + e);
         }
         return ret;
     }

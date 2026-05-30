@@ -664,7 +664,7 @@ public class GUI extends FreeColClientHolder {
                                                       boolean canSell,
                                                       boolean canGift) {
         String msg;
-        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
+        List<ChoiceItem<TradeAction>> choices = new ArrayList<>();
         if (canBuy) {
             msg = Messages.message("tradeProposition.toBuy");
             choices.add(new ChoiceItem<>(msg, TradeAction.BUY, canBuy));
@@ -1017,7 +1017,7 @@ public class GUI extends FreeColClientHolder {
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
-        if (sound != null && ResourceManager.getString(sound + ".type", "").equals("music")) {
+        if (sound != null && "music".equals(ResourceManager.getString(sound + ".type", ""))) {
             getFreeColClient().getSoundController().playMusic(sound);
         } else {
             getFreeColClient().getSoundController().playSound(sound);
@@ -2044,7 +2044,7 @@ public class GUI extends FreeColClientHolder {
      * @param spec The enclosing {@code Specification}.
      * @param group The {@code OptionGroup} to show.
      * @param editable If true, the option group can be edited.
-     * @return The (possibly modified) {@code OptionGroup}.
+     * @param dialogHandler Callback executed when the dialog gets closed.
      */
     public void showDifficultyDialog(Specification spec,
                                             OptionGroup group,

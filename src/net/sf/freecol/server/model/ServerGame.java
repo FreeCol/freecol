@@ -196,12 +196,12 @@ public class ServerGame extends Game implements TurnTaker {
     public boolean sendTo(Player player, ChangeSet cs) {
         try {
             return player.send(cs);
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             // Catch all manner of exceptions here to localize failure
             // to just one player.  Nothing is *expected*, but the
             // entire output side of serialization is potentially
             // exercised here, so it is a good place to find new fails.
-            logger.log(Level.WARNING, "sendTo(" + player.getId()
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "sendTo(" + player.getId()
                 + "," + cs + ") failed", e);
         }
         return false;
@@ -329,7 +329,7 @@ public class ServerGame extends Game implements TurnTaker {
 
         Session.completeAll(cs);
         setTurn(getTurn().next());
-        logger.finest("Turn is now " + getTurn() + "/" + duration);
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Turn is now " + getTurn() + "/" + duration);
         cs.add(See.all(), new NewTurnMessage(getTurn()));
     }
 
@@ -442,7 +442,7 @@ public class ServerGame extends Game implements TurnTaker {
                 ; // Allow carrier to handle
             } else if (!weakest.csChangeOwner(unit, strongAI, null, null,
                                               cs)) { //-vis(both)
-                logger.warning("Owner change failed for " + unit);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Owner change failed for " + unit);
             } else {
                 unit.setMovesLeft(0);
                 unit.setState(Unit.UnitState.ACTIVE);
@@ -520,18 +520,18 @@ public class ServerGame extends Game implements TurnTaker {
             final Player source = tradeItem.getSource();
             final Player dest = tradeItem.getDestination();
             if (!tradeItem.isValid()) {
-                logger.warning("Trade with invalid tradeItem: " + tradeItem);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid tradeItem: " + tradeItem);
                 fail = true;
                 continue;
             }
             if (source != srcPlayer && source != dstPlayer) {
-                logger.warning("Trade with invalid source: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid source: "
                                + ((source == null) ? "null" : source.getId()));
                 fail = true;
                 continue;
             }
             if (dest != srcPlayer && dest != dstPlayer) {
-                logger.warning("Trade with invalid destination: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid destination: "
                                + ((dest == null) ? "null" : dest.getId()));
                 fail = true;
                 continue;
@@ -539,13 +539,13 @@ public class ServerGame extends Game implements TurnTaker {
 
             Colony colony = tradeItem.getColony(getGame());
             if (colony != null && !source.owns(colony)) {
-                logger.warning("Trade with invalid source owner: " + colony);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid source owner: " + colony);
                 fail = true;
                 continue;
             }
             int gold = tradeItem.getGold();
             if (gold > 0 && !source.checkGold(gold)) {
-                logger.warning("Trade with invalid gold: " + gold);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid gold: " + gold);
                 fail = true;
                 continue;
             }
@@ -555,15 +555,15 @@ public class ServerGame extends Game implements TurnTaker {
                 Location loc = goods.getLocation();
                 if (loc instanceof Ownable
                     && !source.owns((Ownable)loc)) {
-                    logger.warning("Trade with invalid source owner: " + loc);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid source owner: " + loc);
                     fail = true;
                 } else if (!(loc instanceof GoodsLocation
                         && loc.contains(goods))) {
-                    logger.warning("Trade of unavailable goods " + goods
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Trade of unavailable goods " + goods
                         + " at " + loc);
                     fail = true;
                 } else if (dest.owns(unit) && !unit.couldCarry(goods)) {
-                    logger.warning("Trade unit can not carry traded goods: "
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Trade unit can not carry traded goods: "
                         + goods);
                     fail = true;
                 }
@@ -573,11 +573,11 @@ public class ServerGame extends Game implements TurnTaker {
             Unit u = tradeItem.getUnit();
             if (u != null) {
                 if (!source.owns(u)) {
-                    logger.warning("Trade with invalid source owner: " + u);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Trade with invalid source owner: " + u);
                     fail = true;
                     continue;
                 } else if (dest.owns(unit) && !unit.couldCarry(u)) {
-                    logger.warning("Trade unit can not carry traded unit: "
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Trade unit can not carry traded unit: "
                         + u);
                     fail = true;
                 }
@@ -596,7 +596,7 @@ public class ServerGame extends Game implements TurnTaker {
             if (stance != null
                 && source.getStance(dest) != stance
                 && !((ServerPlayer)source).csChangeStance(stance, dest, true, cs)) {
-                logger.warning("Stance trade failure: " + stance);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Stance trade failure: " + stance);
             }
             Colony colony = tradeItem.getColony(getGame());
             if (colony != null) {
@@ -645,7 +645,7 @@ public class ServerGame extends Game implements TurnTaker {
                             .addStringTemplate("%defender%",
                                 victim.getNationLabel()));
                 } else {
-                    logger.warning("Incite trade failure: " + victim);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Incite trade failure: " + victim);
                 }
             }                
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
@@ -656,7 +656,7 @@ public class ServerGame extends Game implements TurnTaker {
                 if (unit.isOnCarrier()) {
                     Unit carrier = unit.getCarrier();
                     if (!carrier.couldCarry(newUnit)) {
-                        logger.warning("Can not add " + newUnit
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Can not add " + newUnit
                             + " to " + carrier);
                         continue;
                     }

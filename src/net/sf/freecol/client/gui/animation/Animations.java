@@ -27,6 +27,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import java.util.logging.Level;
 
 
 /**
@@ -40,6 +41,7 @@ public class Animations {
      * Trivial wrapper for zero-argument-zero-return function, 
      * used as a callback for an animation to trigger painting.
      */
+    @FunctionalInterface
     public interface Procedure {
         public void execute();
     };
@@ -95,7 +97,7 @@ public class Animations {
         List<Animation> ret = new ArrayList<>();
         Direction dirn = attackerTile.getDirection(defenderTile);
         if (dirn == null) {
-            logger.warning("Attack animation null direction: " + attacker
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Attack animation null direction: " + attacker
                 + " v " + defender);
             return ret; // Fail fast
         }
@@ -105,7 +107,7 @@ public class Animations {
                 = UnitImageAnimation.build(attacker, attackerTile, dirn,
                     getAttackAnimationBase(attacker), scale);
             if (a == null) {
-                logger.warning("No attack animation for: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No attack animation for: "
                     + attacker + " (" + dirn + ")");
             } else {
                 ret.add(a);
@@ -119,7 +121,7 @@ public class Animations {
                 = UnitImageAnimation.build(defender, defenderTile, revd,
                     getAttackAnimationBase(defender), scale);
             if (a == null) {
-                logger.warning("No attack animation for: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("No attack animation for: "
                     + defender + " (" + revd + ")");
             } else {
                 ret.add(a);

@@ -59,6 +59,7 @@ import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.Cargo;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TransportableAIObject;
+import java.util.logging.Level;
 
 
 /**
@@ -129,7 +130,7 @@ public final class TransportMission extends Mission {
      */
     @Override
     public void dispose() {
-        logger.finest(tag + " disposing (" + clearCargoes() + "): " + this);
+        if (logger.isLoggable(Level.FINEST)) logger.finest(tag + " disposing (" + clearCargoes() + "): " + this);
         super.dispose();
     }
 
@@ -272,7 +273,7 @@ public final class TransportMission extends Mission {
     private boolean tAdd(Cargo cargo, int index) {
         if (!cargo.isValid()) return false;
         if (tFind(cargo.getTransportable()) != null) return true;
-        boolean change = false;
+        boolean change;
         synchronized (cargoes) {
             change = cargoes.isEmpty() || index == 0;
             if (index >= 0) {
@@ -444,13 +445,15 @@ public final class TransportMission extends Mission {
      * @return The unwrapped list of cargoes.
      */
     private List<Cargo> unwrapCargoes(List<Cargo> ts) {
-        for (int i = 0; i < ts.size(); i++) {
+        int i = 0;
+        while (i < ts.size()) {
             Cargo t = ts.get(i);
             if (t.hasWrapped()) {
                 List<Cargo> tl = t.unwrap();
                 ts.addAll(i+1, tl);
                 i += tl.size();
             }
+            i++;
         }
         return ts;
     }
@@ -722,32 +725,42 @@ public final class TransportMission extends Mission {
             dump = false;
             TransportableAIObject t = cargo.getTransportable();
             reason = invalidMissionReason(aiCarrier, cargo.getCarrierTarget());
-            if (reason != null || (reason = cargo.check(aiCarrier)) != null) {
+            if (reason != null) {
                 // Just remove, it is invalid
                 removeCargo(cargo);
                 lb.add(", INVALID(", reason, ") ", cargo.toShortString());
-            } else if (cargo.isDelivered()) {
-                removeCargo(cargo);
-                lb.add(", COMPLETED ", cargo.toShortString());
-            } else if (!cargo.hasPath() && !cargo.retry()) {
-                reason = " no-path";
-                dump = true;
-            } else if (carrier.hasTile() && (reason = cargo.update()) != null) {
-                if (reason.startsWith("invalid")) {
-                    removeCargo(cargo);
-                    lb.add(", FAIL(", reason, ") ", cargo.toShortString());
-                } else if (cargo.retry()) {
-                    lb.add(", retry-", cargo.getTries(), "(", reason, ")");
-                } else {
-                    dump = true;
-                }
-            } else if (cargo.isCollectable()) {
-                lb.add(", collect ", cargo.toShortString());
-            } else if (cargo.isDeliverable()) {
-                lb.add(", deliver ", cargo.toShortString());
             } else {
-                lb.add(", ok ", cargo.toShortString()); // Good
-                cargo.resetTries();
+                reason = cargo.check(aiCarrier);
+                if (reason != null) {
+                    // Just remove, it is invalid
+                    removeCargo(cargo);
+                    lb.add(", INVALID(", reason, ") ", cargo.toShortString());
+                } else if (cargo.isDelivered()) {
+                    removeCargo(cargo);
+                    lb.add(", COMPLETED ", cargo.toShortString());
+                } else if (!cargo.hasPath() && !cargo.retry()) {
+                    reason = " no-path";
+                    dump = true;
+                } else if (carrier.hasTile()) {
+                    reason = cargo.update();
+                    if (reason != null) {
+                        if (reason.startsWith("invalid")) {
+                            removeCargo(cargo);
+                            lb.add(", FAIL(", reason, ") ", cargo.toShortString());
+                        } else if (cargo.retry()) {
+                            lb.add(", retry-", cargo.getTries(), "(", reason, ")");
+                        } else {
+                            dump = true;
+                        }
+                    }
+                } else if (cargo.isCollectable()) {
+                    lb.add(", collect ", cargo.toShortString());
+                } else if (cargo.isDeliverable()) {
+                    lb.add(", deliver ", cargo.toShortString());
+                } else {
+                    lb.add(", ok ", cargo.toShortString()); // Good
+                    cargo.resetTries();
+                }
             }
             if (dump) {
                 if (cargo.isCarried()) {
@@ -840,7 +853,7 @@ public final class TransportMission extends Mission {
         final TransportableAIObject t = cargo.getTransportable();
         final Locatable l = t.getTransportLocatable();
         if (l == null) {
-            logger.warning("Null-locatable: " + cargo);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Null-locatable: " + cargo);
             return CargoResult.TDONE;
         }
         if (!Map.isSameLocation(here, cargo.getCarrierTarget())) {
@@ -856,8 +869,9 @@ public final class TransportMission extends Mission {
                 lb.add(", ", t, " out of moves");
                 return CargoResult.TCONTINUE;
             }
-            if ((d = cargo.getJoinDirection()) == null) {
-                logger.warning("Null pickup direction"
+            d = cargo.getJoinDirection();
+            if (d == null) {
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Null pickup direction"
                     + " for " + cargo.toShortString()
                     + " at " + t.getLocation()
                     + " to " + carrier);
@@ -913,7 +927,8 @@ public final class TransportMission extends Mission {
                 lb.add(", ", t, " about to leave");
                 return CargoResult.TCONTINUE;
             }
-            if ((d = cargo.getLeaveDirection()) == null) {
+            d = cargo.getLeaveDirection();
+            if (d == null) {
                 Unit.MoveType mt = ((AIUnit)t).getUnit()
                     .getSimpleMoveType(t.getLocation().getTile(),
                                        cargo.getTransportTarget().getTile());
@@ -923,7 +938,7 @@ public final class TransportMission extends Mission {
                 default:
                     PathNode path = t.getDeliveryPath(carrier,
                         cargo.getTransportTarget());
-                    logger.warning("Null direction"
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Null direction"
                         + " for " + cargo.toShortString()
                         + " at " + t.getLocation().toShortString()
                         + "/" + carrier.getLocation().toShortString()
@@ -956,11 +971,12 @@ public final class TransportMission extends Mission {
         // Check for goods completing a wish
         Colony colony;
         AIColony aiColony;
-        if ((colony = (t.getLocation() == null) ? null
-                : t.getLocation().getColony()) != null
-            && (aiColony = getAIMain().getAIColony(colony)) != null
-            && aiColony.completeWish(t, lb)) {
-            aiColony.requestRearrange();
+        colony = (t.getLocation() == null) ? null : t.getLocation().getColony();
+        if (colony != null) {
+            aiColony = getAIMain().getAIColony(colony);
+            if (aiColony != null && aiColony.completeWish(t, lb)) {
+                aiColony.requestRearrange();
+            }
         }
         return CargoResult.TDONE;
     }
@@ -1503,8 +1519,9 @@ public final class TransportMission extends Mission {
                     Mission m = euaip.getPrivateerMission(aiCarrier, null);
                     if (m != null) return lbDone(lb, false, "going pirate");
                 }                    
-                if ((reason = invalidReason()) != null) {
-                    logger.warning(tag + " post-stop failure(" + reason
+                reason = invalidReason();
+                if (reason != null) {
+                    if (logger.isLoggable(Level.WARNING)) logger.warning(tag + " post-stop failure(" + reason
                         + "): " + this.toFullString());
                     return lbFail(lb, false, reason);
                 }

@@ -49,7 +49,7 @@ public final class DeltaAnimationImageCreator {
             final BufferedImage riverPebblesMaskImage = this.imageCache.getSizedImage(riverPebblesMaskKey, lib.getTileSize(), false);
             final BufferedImage baseTileMask = lib.getTerrainMask(null);
             
-            return generateImage(riverPebblesImage, waterImage, waterVariationNumber, riverWaterMaskImage, riverPebblesMaskImage, baseTileMask);
+            return generateImage(riverPebblesImage, waterImage, riverWaterMaskImage, riverPebblesMaskImage, baseTileMask);
         });
         
         return result;
@@ -65,8 +65,6 @@ public final class DeltaAnimationImageCreator {
      * 
      * @param pebblesImage The pebbles image. That is, the graphics the water is drawn upon.
      * @param waterImage The water to be drawn.
-     * @param waterImageVariationNumber The variation number of the
-     *      water image given above.
      * @param riverWaterMaskImage A mask to be applied to the water image in
      *      order to make the pebbles visible below the water.
      * @param riverPebblesMaskImage A mask to be applied to the pebbles image in
@@ -77,7 +75,6 @@ public final class DeltaAnimationImageCreator {
      */
     private static BufferedImage generateImage(BufferedImage pebblesImage,
             BufferedImage waterImage,
-            int waterImageVariationNumber,
             BufferedImage riverWaterMaskImage,
             BufferedImage riverPebblesMaskImage,
             BufferedImage tileMask) {

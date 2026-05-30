@@ -50,6 +50,7 @@ public class MiniMapToggleFogOfWarAction extends MapboardAction {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param b a {@code boolean} value
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public MiniMapToggleFogOfWarAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");
 
@@ -82,4 +83,3 @@ public class MiniMapToggleFogOfWarAction extends MapboardAction {
         }
     }
 }
-

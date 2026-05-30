@@ -47,7 +47,7 @@ import net.sf.freecol.server.model.ServerRegion;
  */
 public class FreeColMapLoader implements MapLoader {
 
-    private Map importMap = null;
+    private Map importMap;
 
     /**
      * Constructor for the FreeColMapLoader class.

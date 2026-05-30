@@ -285,16 +285,15 @@ public final class UnitLabel extends FreeColLabel implements ActionListener, Car
                 if (args.length < 3) break;
                 ColonyTile colonyTile
                     = game.getFreeColGameObject(args[1], ColonyTile.class);
-                if (args.length >= 4 && "!".equals(args[3])) {
-                    // Claim tile if needed
-                    if (!igc.claimTile(colonyTile.getWorkTile(),
-                                       this.unit.getColony())) break;
-                }
+                // Claim tile if needed
+                if (args.length >= 4 && "!".equals(args[3])
+                    && !igc.claimTile(colonyTile.getWorkTile(),
+                                      this.unit.getColony())) break;
                 if (colonyTile != this.unit.getLocation()) {
                     igc.work(this.unit, colonyTile);
                 }
-                if ((gt = spec.getGoodsType(args[2])) != null
-                    && this.unit.getWorkType() != gt) {
+                gt = spec.getGoodsType(args[2]);
+                if (gt != null && this.unit.getWorkType() != gt) {
                     igc.changeWorkType(this.unit, gt);
                 }
                 break;
@@ -305,8 +304,8 @@ public final class UnitLabel extends FreeColLabel implements ActionListener, Car
                 if (building != this.unit.getLocation()) {
                     igc.work(this.unit, building);
                 }
-                if ((gt = spec.getGoodsType(args[2])) != null
-                    && this.unit.getWorkType() != gt) {
+                gt = spec.getGoodsType(args[2]);
+                if (gt != null && this.unit.getWorkType() != gt) {
                     igc.changeWorkType(this.unit, gt);
                 }
                 break;

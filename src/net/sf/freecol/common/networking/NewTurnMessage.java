@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -55,6 +56,7 @@ public class NewTurnMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public NewTurnMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, TURN_TAG);
@@ -85,7 +87,7 @@ public class NewTurnMessage extends AttributeMessage {
         final int turn = getTurnNumber();
 
         if (turn < 0) {
-            logger.warning("Invalid turn for newTurn: "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid turn for newTurn: "
                 + Integer.toString(turn) );
             return;
         }

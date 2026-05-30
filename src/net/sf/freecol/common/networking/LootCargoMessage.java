@@ -161,7 +161,7 @@ public class LootCargoMessage extends ObjectMessage {
         Unit winner;
         try {
             winner = getWinner(game);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         // Do not check the defender identifier, as it might have

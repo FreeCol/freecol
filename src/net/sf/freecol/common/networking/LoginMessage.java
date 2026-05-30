@@ -206,23 +206,23 @@ public class LoginMessage extends ObjectMessage {
         Nation nation;
         ChangeSet ret;
 
-        if ((serverGame = freeColServer.waitForGame()) == null) {
+        serverGame = freeColServer.waitForGame();
+        if (serverGame == null) {
             // No game found
             ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.timeOut"));
-
-        } else if ((nation = serverGame.getVacantNation()) == null) {
-            // No nation available
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.maximumPlayers"));
-
-        } else if (getPlayer(serverGame) != null) {
-            // Can not use the same name as existing player
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.userNameInUse")
-                    .addName("%name%", userName));
-
         } else {
+            nation = serverGame.getVacantNation();
+            if (nation == null) {
+                // No nation available
+                ret = ChangeSet.clientError((Player)null,
+                    StringTemplate.template("server.maximumPlayers"));
+            } else if (getPlayer(serverGame) != null) {
+                // Can not use the same name as existing player
+                ret = ChangeSet.clientError((Player)null,
+                    StringTemplate.template("server.userNameInUse")
+                        .addName("%name%", userName));
+            } else {
             // OK, make a new player and complete initialization...
             ServerPlayer serverPlayer = new ServerPlayer(serverGame, connection);
             serverPlayer.initialize(serverGame,
@@ -258,6 +258,7 @@ public class LoginMessage extends ObjectMessage {
                                  serverGame));
 
             serverGame.sendToOthers(serverPlayer, ret);
+            }
         }
         return ret;
     }
@@ -280,55 +281,56 @@ public class LoginMessage extends ObjectMessage {
             // Trying to start a map, see BR#2976 -> IR#217
             ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("error.mapEditorGame"));
-
-        } else if ((serverGame = freeColServer.getGame()) == null) {
-            // No game found
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.noSuchGame"));
-
-        } else if ((present = getPlayer(serverGame)) == null) {
-            // Player not present
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.userNameNotPresent")
-                    .addName("%name%", userName)
-                    .addName("%names%",
-                        transform(serverGame.getLiveEuropeanPlayers(),
-                            alwaysTrue(), Player::getName,
-                            Collectors.joining(", "))));
-
-        } else if (present.isConnected()) {
-            // Another player already connected on the name
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.userNameInUse")
-                    .addName("%name%", userName));
-
-        } else if (present.isAI()) {
-            // Should not connect to AI
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.userNameInUse")
-                    .addName("%name%", userName));
-
         } else {
-            // Found the player
-            present.setConnection(connection);
+            serverGame = freeColServer.getGame();
+            if (serverGame == null) {
+                // No game found
+                ret = ChangeSet.clientError((Player)null,
+                    StringTemplate.template("server.noSuchGame"));
+            } else {
+                present = getPlayer(serverGame);
+                if (present == null) {
+                    // Player not present
+                    ret = ChangeSet.clientError((Player)null,
+                        StringTemplate.template("server.userNameNotPresent")
+                            .addName("%name%", userName)
+                            .addName("%names%",
+                                transform(serverGame.getLiveEuropeanPlayers(),
+                                    alwaysTrue(), Player::getName,
+                                    Collectors.joining(", "))));
+                } else if (present.isConnected()) {
+                    // Another player already connected on the name
+                    ret = ChangeSet.clientError((Player)null,
+                        StringTemplate.template("server.userNameInUse")
+                            .addName("%name%", userName));
+                } else if (present.isAI()) {
+                    // Should not connect to AI
+                    ret = ChangeSet.clientError((Player)null,
+                        StringTemplate.template("server.userNameInUse")
+                            .addName("%name%", userName));
+                } else {
+                    // Found the player
+                    present.setConnection(connection);
 
-            // Ensure there is a current player.
-            if (serverGame.getCurrentPlayer() == null) {
-                serverGame.setCurrentPlayer(present);
+                    // Ensure there is a current player.
+                    if (serverGame.getCurrentPlayer() == null) {
+                        serverGame.setCurrentPlayer(present);
+                    }
+
+                    // Add the connection, send back the game.
+                    freeColServer.addPlayerConnection(connection);
+                    connection.setWriteScope(FreeColXMLWriter.WriteScope
+                        .toClient(present));
+                    ret = ChangeSet.simpleChange(present,
+                        new LoginMessage(present, userName,
+                            present.getNationId(),
+                            getVersion(),
+                            freeColServer.getServerState(),
+                            freeColServer.getSinglePlayer(),
+                            serverGame.getCurrentPlayer() == present,
+                            serverGame));
+                }
             }
-
-            // Add the connection, send back the game.
-            freeColServer.addPlayerConnection(connection);
-            connection.setWriteScope(FreeColXMLWriter.WriteScope
-                .toClient(present));
-            ret = ChangeSet.simpleChange(present,
-                new LoginMessage(present, userName,
-                    present.getNationId(),
-                    getVersion(),
-                    freeColServer.getServerState(),
-                    freeColServer.getSinglePlayer(),
-                    serverGame.getCurrentPlayer() == present,
-                    serverGame));
         }
         return ret;
     }
@@ -347,27 +349,27 @@ public class LoginMessage extends ObjectMessage {
         Player present;
         ChangeSet ret;
         
-        if ((serverGame = freeColServer.getGame()) == null) {
+        serverGame = freeColServer.getGame();
+        if (serverGame == null) {
             ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.noSuchGame"));
-
-        } else if ((present = getPlayer(serverGame)) == null) {
-            // Player not present
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.userNameNotPresent")
-                    .addName("%name%", userName)
-                    .addName("%names%",
-                        transform(serverGame.getLiveEuropeanPlayers(),
-                            alwaysTrue(), Player::getName,
-                            Collectors.joining(", "))));
-
-        } else if (!present.isAI() && present.isConnected()) {
-            // Another human player already connected on the name
-            ret = ChangeSet.clientError((Player)null,
-                StringTemplate.template("server.userNameInUse")
-                    .addName("%name%", userName));
-
         } else {
+            present = getPlayer(serverGame);
+            if (present == null) {
+                // Player not present
+                ret = ChangeSet.clientError((Player)null,
+                    StringTemplate.template("server.userNameNotPresent")
+                        .addName("%name%", userName)
+                        .addName("%names%",
+                            transform(serverGame.getLiveEuropeanPlayers(),
+                                alwaysTrue(), Player::getName,
+                                Collectors.joining(", "))));
+            } else if (!present.isAI() && present.isConnected()) {
+                // Another human player already connected on the name
+                ret = ChangeSet.clientError((Player)null,
+                    StringTemplate.template("server.userNameInUse")
+                        .addName("%name%", userName));
+            } else {
             // Join allowed, including over an AI
             if (present.isAI()) serverGame.changeAI(present, false);
 
@@ -385,6 +387,7 @@ public class LoginMessage extends ObjectMessage {
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == present,
                                  serverGame));
+            }
         }
         return ret;
     }

@@ -33,6 +33,7 @@ import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -350,7 +351,7 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public void removeIncompatibleImprovements() {
         TileType tileType = tile.getType();
-        boolean removed = false;
+        boolean removed;
         synchronized (tileItems) {
             TileImprovement river = getRiver();
             if(river != null && !river.isTileTypeAllowed(tileType)
@@ -489,7 +490,7 @@ public class TileItemContainer extends FreeColGameObject {
                     result.add(tileImprovement);
                 }
             } else {
-                logger.warning("Bogus tile item: " + item.getId());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus tile item: " + item.getId());
             }
         }
         setTileItems(result);
@@ -557,7 +558,7 @@ public class TileItemContainer extends FreeColGameObject {
                 }
 
                 if (!integ.safe()) {
-                    logger.warning("Removing broken TileImprovement: "
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Removing broken TileImprovement: "
                         + ti.getId());
                     removeTileItem(ti);
                     integ = integ.fix();

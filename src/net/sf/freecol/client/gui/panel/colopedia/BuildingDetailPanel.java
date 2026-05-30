@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -64,6 +66,8 @@ import net.sf.freecol.common.util.ImageUtils;
  */
 public class BuildingDetailPanel
     extends ColopediaGameObjectTypePanel<BuildingType> {
+
+    private static final Logger logger = Logger.getLogger(BuildingDetailPanel.class.getName());
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
@@ -172,7 +176,7 @@ public class BuildingDetailPanel
             panel.add(Utility.localizedLabel("colopedia.buildings.requires"), "top");
             panel.add(textPane, "span, growx");
         } catch (BadLocationException e) {
-            //logger.warning(e.toString());
+            logger.log(Level.FINE, "Failed to build building detail text.", e);
         }
 
         // Costs to build - Hammers & Tools

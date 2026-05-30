@@ -619,17 +619,17 @@ public class ClientOptions extends OptionGroup {
      */
     private boolean load(FreeColSavegameFile save) {
         if (save == null) return false;
-        boolean ret = false;
+        boolean ret;
         try (
             FreeColXMLReader xr = save.getClientOptionsFreeColXMLReader();
         ) {
             ret = load(xr);
         } catch (IOException|XMLStreamException ex) {
-            logger.log(Level.WARNING, "Load OptionGroup(" + getId()
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Load OptionGroup(" + getId()
                 + ") from file " + save.getPath() + " crashed", ex);
             return false;
         }
-        logger.info("Load OptionGroup(" + getId() + ") from " + save.getPath()
+        if (logger.isLoggable(Level.INFO)) logger.info("Load OptionGroup(" + getId() + ") from " + save.getPath()
             + ((ret) ? " succeeded" : " failed"));
         return ret;
     }
@@ -797,7 +797,7 @@ public class ClientOptions extends OptionGroup {
                 ro.addItemValue(6, "6");
                 ro.setValue(value); // Make sure the value is valid
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | ClassCastException e) {
             logger.log(Level.WARNING, "Failed to fix " + DEFAULT_ZOOM_LEVEL
                 + " option", e);
         }
@@ -997,8 +997,8 @@ public class ClientOptions extends OptionGroup {
             return (etc == null) ? null
                 : new Point(etc.getInteger(className + ".x"),
                     etc.getInteger(className + ".y"));
-        } catch (Exception ex) {
-            logger.finest("Missing position option for " + className);
+        } catch (IllegalArgumentException ex) {
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Missing position option for " + className);
             return null;
         }
     }
@@ -1016,8 +1016,8 @@ public class ClientOptions extends OptionGroup {
             return (etc == null) ? null
                 : new Dimension(etc.getInteger(className + ".w"),
                                 etc.getInteger(className + ".h"));
-        } catch (Exception ex) {
-            logger.finest("Missing size option for " + className);
+        } catch (IllegalArgumentException ex) {
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Missing size option for " + className);
             return null;
         }
     }

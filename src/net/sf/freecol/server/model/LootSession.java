@@ -24,8 +24,6 @@ import java.util.List;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
-
-
 /**
  * A type of session to handle looting of cargo.
  */
@@ -40,13 +38,15 @@ public class LootSession extends Session {
         this.capture = capture;
     }
 
+    public List<Goods> getCapture() {
+        return capture;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean complete(ChangeSet cs) {
         return super.complete(cs);
-    }
-
-    public List<Goods> getCapture() {
-        return capture;
     }
 }

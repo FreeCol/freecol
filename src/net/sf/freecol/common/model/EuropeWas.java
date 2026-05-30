@@ -66,10 +66,10 @@ public class EuropeWas extends ObjectWas {
      */
     public boolean fireChanges() {
         final int newCount = europe.getUnitCount();
-        if (newCount != this.unitCount) {
+        boolean changed = newCount != this.unitCount;
+        if (changed) {
             europe.firePropertyChange(Europe.UNIT_CHANGE, unitCount, newCount);
-            return true;
         }
-        return false;
+        return changed;
     }
 }

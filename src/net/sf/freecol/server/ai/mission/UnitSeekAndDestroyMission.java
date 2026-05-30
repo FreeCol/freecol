@@ -45,6 +45,7 @@ import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.MissionAIPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -241,12 +242,10 @@ public final class UnitSeekAndDestroyMission extends Mission {
                 @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path, onlySettlements, noNativeSettlements);
-                    if (bestValue < value) {
-                        bestValue = value;
-                        bestPath = path;
-                        return true;
-                    }
-                    return false;
+                    if (bestValue >= value) return false;
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
                 }
             };
     }
@@ -423,7 +422,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
                 if (settlement.isConnectedPort()) {
                     transportTarget = settlement.getTile()
                         .getBestDisembarkTile(unit.getOwner());
-                    logger.finest(tag + " chose dropoff " + transportTarget
+                    if (logger.isLoggable(Level.FINEST)) logger.finest(tag + " chose dropoff " + transportTarget
                         + " for attack on "
                         + ((settlement.canBombardEnemyShip()) ? "hazardous"
                             : "normal")
@@ -530,7 +529,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
             }
             Direction d = unitTile.getDirection(currentTarget.getTile());
             if (d == null) {
-                logger.warning("SDDM bogus " + mt + " with " + unit
+                if (logger.isLoggable(Level.WARNING)) logger.warning("SDDM bogus " + mt + " with " + unit
                     + " from " + unitTile + " to " + currentTarget
                     + " at " + currentTarget.getTile());
                 return lbWait(lb);

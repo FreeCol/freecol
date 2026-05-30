@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Client Package</h1>
+ * <h2>FreeCol Client Package</h2>
  * 
  * <p>This is the main client package.</p>
  *

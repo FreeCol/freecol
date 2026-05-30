@@ -23,6 +23,8 @@ import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu.Separator;
@@ -45,7 +47,9 @@ import net.sf.freecol.common.util.OSUtils;
  * be precise).
  */
 public final class DragListener extends MouseAdapter {
-    
+
+    private static final Logger logger = Logger.getLogger(DragListener.class.getName());
+
     /**
      * The maximum numbers of pixels of the user's screen height
      * before triggering the small flag.
@@ -136,9 +140,9 @@ public final class DragListener extends MouseAdapter {
             if (e.isShiftDown() && e.isAltDown()) {
                 Component[] cArr = comp.getParent().getComponents();
                 int sum = 0;
-                for (int i = 0; i < cArr.length; i++) {
-                    if (cArr[i] instanceof AbstractGoodsLabel) {
-                        AbstractGoodsLabel abGoods = (AbstractGoodsLabel) cArr[i];
+                for (Component component : cArr) {
+                    if (component instanceof AbstractGoodsLabel) {
+                        AbstractGoodsLabel abGoods = (AbstractGoodsLabel) component;
                         if (abGoods.getAbstractGoods().getType().equals(label.getAbstractGoods().getType())) {
                             sum += abGoods.getAmount();
                         }
@@ -163,9 +167,11 @@ public final class DragListener extends MouseAdapter {
                 ((PortPanel)this.parentPanel).setSelectedUnitLabel(label);
             }
         } else if (comp instanceof GoodsTypeLabel) {
-            ; // Do nothing, TradeRouteInputPanel handles this
+            if (logger.isLoggable(Level.FINER)) {
+                logger.finer("Ignoring GoodsTypeLabel drag.");
+            }
         } else {
-            System.err.println("DragListener did not recognize:" + comp);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("DragListener did not recognize:" + comp);
         }
 
         final TransferHandler handler = comp.getTransferHandler();

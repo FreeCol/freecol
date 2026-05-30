@@ -107,7 +107,7 @@ public final class PreGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet requestLaunch(ServerPlayer serverPlayer) {
-        logger.info("Launching for " + serverPlayer);
+        if (logger.isLoggable(Level.INFO)) logger.info("Launching for " + serverPlayer);
         if (setLaunching(true)) {
             logger.warning("Already launching");
             return null;

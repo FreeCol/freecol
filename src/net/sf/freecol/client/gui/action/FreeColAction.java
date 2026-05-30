@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.option.Option;
+import java.util.logging.Level;
 
 
 /**
@@ -274,7 +275,9 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     private void updateImageIcon(String key) {
-        final ImageLibrary lib = getGUI().getFixedImageLibrary();
+        final GUI gui = getGUI();
+        if (gui == null) return;
+        final ImageLibrary lib = gui.getFixedImageLibrary();
         List<BufferedImage> images = lib.getButtonImages(key);
         orderButtonImageCount = images.size();
         if (hasOrderButtons()) {
@@ -283,7 +286,7 @@ public abstract class FreeColAction extends AbstractAction
             putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
             putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
         } else {
-            logger.warning("Found only " + orderButtonImageCount
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Found only " + orderButtonImageCount
                 + " order button images for " + getId() + "/" + key);
         }
     }
@@ -478,7 +481,9 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the XML tag name for serialization.
+     *
+     * @return The XML tag name.
      */
     public String getXMLTagName() { return TAG; }
 

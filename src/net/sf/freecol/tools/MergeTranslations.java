@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -41,6 +43,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class MergeTranslations {
     
+    private static final Logger logger = Logger.getLogger(MergeTranslations.class.getName());
+
     public static void main(String[] args) throws Exception {
 
         File sourceDirectory = new File(args[0]);
@@ -61,14 +65,13 @@ public class MergeTranslations {
                 }
             });
         if (sourceFiles == null) {
-            System.err.println("No messages files found in "
-                + sourceDirectory);
+            if (logger.isLoggable(Level.SEVERE)) logger.severe("No messages files found in " + sourceDirectory);
             System.exit(1);
         }
         
         for (String name : sourceFiles) {
 
-            System.out.println("Processing source file: " + name);
+            if (logger.isLoggable(Level.INFO)) logger.info("Processing source file: " + name);
 
             File sourceFile = new File(sourceDirectory, name);
             Map<String, String> sourceProperties = readFile(sourceFile);
@@ -97,7 +100,7 @@ public class MergeTranslations {
                     }
                 }
             } else {
-                System.out.println("Copying " + name + " from trunk.");
+                if (logger.isLoggable(Level.INFO)) logger.info("Copying " + name + " from trunk.");
                 try (
                     Reader in = Utils.getFileUTF8Reader(sourceFile);
                     Writer out = Utils.getFileUTF8Writer(targetFile);
@@ -126,8 +129,7 @@ public class MergeTranslations {
                 line = bufferedReader.readLine();
             }
         } catch (IOException ioe) {
-            System.err.println("Error reading file " + file.getName()
-                + ": " + ioe);
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Error reading file " + file.getName(), ioe);
         }
         return result;
     }

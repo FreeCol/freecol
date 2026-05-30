@@ -75,7 +75,7 @@ public final class MapViewerBounds {
     /**
      * The size of the displayed {@link MapViewer}.
      */
-    private Dimension size = null;
+    private Dimension size;
 
     /**
      * The current focus Tile as determined by the {@link #mapFocusPoint}.
@@ -126,7 +126,7 @@ public final class MapViewerBounds {
 
     MapViewerBounds() {
         this.size = new Dimension(0, 0); // Start empty, update is coming
-        this.tileBounds = new TileBounds(new Dimension(0, 0), 1f);
+        this.tileBounds = new TileBounds(new Dimension(0, 0));
     }
 
     /**
@@ -167,10 +167,12 @@ public final class MapViewerBounds {
         setFocus(tile);
         positionMap();
 
-        int ret = 0, moveX = -1;
+        int ret;
+        int moveX = -1;
         final Map map = tile.getMap();
-        final int tx = tile.getX(), ty = tile.getY(),
-                width = bottomRightVisibleTile.getX() - topLeftVisibleTile.getX();
+        final int tx = tile.getX();
+        final int ty = tile.getY();
+        final int width = bottomRightVisibleTile.getX() - topLeftVisibleTile.getX();
         if (topLeftVisibleTile.getX() <= 0) { // At left edge already
             if (tx <= width / 4) {
                 ret = -1;
@@ -218,8 +220,10 @@ public final class MapViewerBounds {
             return false;
         }
 
-        final int fx = t.getX(), fy = t.getY();
-        if ((t = t.getNeighbourOrNull(direction)) == null) {
+        final int fx = t.getX();
+        final int fy = t.getY();
+        t = t.getNeighbourOrNull(direction);
+        if (t == null) {
             scrollSpeed = 1;
             return false;
         }
@@ -238,7 +242,8 @@ public final class MapViewerBounds {
             }
         }
 
-        final int tx = t.getX(), ty = t.getY();
+        final int tx = t.getX();
+        final int ty = t.getY();
 
         int scrollX = mapFocusPoint.x;
         int scrollY = mapFocusPoint.y;
@@ -440,7 +445,8 @@ public final class MapViewerBounds {
      * @return The new {@code Point}.
      */
     Point tileToPoint(Tile tile) {
-        final int tileX = tile.getX(), tileY = tile.getY();
+        final int tileX = tile.getX();
+        final int tileY = tile.getY();
         final int x = topLeftVisibleTilePoint.x
                 + tileBounds.getWidth() * (tileX - topLeftVisibleTile.getX())
                 + (tileY & 1) * tileBounds.getHalfWidth();
@@ -521,7 +527,8 @@ public final class MapViewerBounds {
         // Next, we can calculate the center pixel of the tile-sized
         // rectangle that was clicked. First, we calculate the
         // difference in units of rows and columns.
-        final int fx = this.focus.getX(), fy = this.focus.getY();
+        final int fx = this.focus.getX();
+        final int fy = this.focus.getY();
         int dcol = (x - leftOffset + (x > leftOffset ? tileBounds.getHalfWidth() : -tileBounds.getHalfWidth()))
                 / tileBounds.getWidth();
         int drow = (y - topOffset + (y > topOffset ? tileBounds.getHalfHeight() : -tileBounds.getHalfHeight()))

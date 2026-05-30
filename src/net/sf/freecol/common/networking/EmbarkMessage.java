@@ -98,14 +98,14 @@ public class EmbarkMessage extends AttributeMessage {
         ServerUnit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
         Unit carrier;
         try {
             carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
@@ -129,10 +129,10 @@ public class EmbarkMessage extends AttributeMessage {
                     + unitId);
             }
 
-            Tile destinationTile = null;
+            Tile destinationTile;
             try {
                 destinationTile = unit.getNeighbourTile(directionString);
-            } catch (Exception e) {
+            } catch (IllegalArgumentException | IllegalStateException e) {
                 return serverPlayer.clientError(e.getMessage());
             }
             if (carrier.getTile() != destinationTile) {

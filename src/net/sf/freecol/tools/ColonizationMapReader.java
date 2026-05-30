@@ -22,6 +22,8 @@ package net.sf.freecol.tools;
 import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -58,6 +60,9 @@ import java.util.Arrays;
  *
  */
 public class ColonizationMapReader {
+
+    private static final Logger logger
+        = Logger.getLogger(ColonizationMapReader.class.getName());
 
     public static final int WIDTH = 0;
     public static final int HEIGHT = 2;
@@ -139,25 +144,28 @@ public class ColonizationMapReader {
                 try {
                     reader.readFully(header);
                 } catch (EOFException ee) {
-                    System.err.println("Unable to read header of " + args[0]
-                        + ": " + ee);
+                    if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Unable to read header of "
+                        + args[0] + ": " + ee, ee);
                     System.exit(1);
                 }
-                System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
-                System.out.println(String.format("Map height: %02d", (int) header[HEIGHT]));
+                if (logger.isLoggable(Level.INFO)) logger.info(String.format("Map width:  %02d",
+                    (int) header[WIDTH]));
+                if (logger.isLoggable(Level.INFO)) logger.info(String.format("Map height: %02d",
+                    (int) header[HEIGHT]));
     
                 int size = header[WIDTH] * header[HEIGHT];
                 layer1 = new byte[size];
                 try {
                     reader.readFully(layer1);
                 } catch (EOFException ee) {
-                    System.err.println("Unable to read data of " + args[0]
-                        + ": " + ee);
+                    if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Unable to read data of "
+                        + args[0] + ": " + ee, ee);
                     System.exit(1);
                 }
     
                 int index = 0;
                 for (int y = 0; y < header[HEIGHT]; y++) {
+                    StringBuilder row = new StringBuilder();
                     for (int x = 0; x < header[WIDTH]; x++) {
                         int decimal = layer1[index] & 0xff;
                         char terrain = tiletypes[decimal & 31];
@@ -178,12 +186,12 @@ public class ColonizationMapReader {
                         default:
                             break;
                         };
-                        System.out.print(terrain);
+                        row.append(terrain);
                         index++;
                     }
-                    System.out.println('\n');
+                    if (logger.isLoggable(Level.INFO)) logger.info(row.toString());
                 }
-                System.out.println('\n');
+                logger.info("");
             }
         }
     }

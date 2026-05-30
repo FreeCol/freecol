@@ -31,6 +31,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.Session;
+import java.util.logging.Level;
 
 
 /**
@@ -63,6 +64,7 @@ public class LogoutMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public LogoutMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, PLAYER_TAG, REASON_TAG);
@@ -110,7 +112,7 @@ public class LogoutMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         if (serverPlayer == null) return null;
-        logger.info("Handling logout by " + serverPlayer.getName());
+        if (logger.isLoggable(Level.INFO)) logger.info("Handling logout by " + serverPlayer.getName());
 
         LogoutReason reason = getReason();
         ChangeSet cs = null;

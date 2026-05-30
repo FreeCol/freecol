@@ -40,7 +40,7 @@ public class Turn {
 
 
     /** The numerical value of the Turn, never less than one. */
-    private int turn = 1;
+    private int turn;
 
 
     /**

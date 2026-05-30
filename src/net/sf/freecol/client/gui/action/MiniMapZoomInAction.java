@@ -40,6 +40,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     public MiniMapZoomInAction(FreeColClient freeColClient) {
         super(freeColClient, id);
 
+        setCanvasKeyBinding(true);
         addImageIcons("zoom_in");
     }
 
@@ -49,9 +50,11 @@ public class MiniMapZoomInAction extends MapboardAction {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param b a {@code boolean} value
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public MiniMapZoomInAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");
  
+        setCanvasKeyBinding(true);
         addImageIcons("zoom_in");
     }
 

@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -128,9 +129,10 @@ public class AnimateAttackMessage extends ObjectMessage {
                 u.intern();
                 return u;
             }
-            if ((u = u.getCarriedUnitById(id)) != null) {
-                u.intern();
-                return u;
+            Unit carried = u.getCarriedUnitById(id);
+            if (carried != null) {
+                carried.intern();
+                return carried;
             }
         }  
         return null;
@@ -225,11 +227,11 @@ public class AnimateAttackMessage extends ObjectMessage {
             return;
         }
         if (attackerTile == null) {
-            logger.warning("Attack animation for: " + player.getId()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Attack animation for: " + player.getId()
                 + " omitted attacker tile.");
         }
         if (defenderTile == null) {
-            logger.warning("Attack animation for: " + player.getId()
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Attack animation for: " + player.getId()
                 + " omitted defender tile.");
         }
 

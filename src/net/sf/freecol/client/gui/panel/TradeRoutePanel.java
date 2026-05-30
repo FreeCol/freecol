@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import java.util.logging.Level;
 
 
 /**
@@ -53,7 +54,6 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class TradeRoutePanel extends FreeColPanel {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TradeRoutePanel.class.getName());
 
     /** Compare trade routes by name. */
@@ -135,15 +135,20 @@ public final class TradeRoutePanel extends FreeColPanel {
                 final String name = selected.getName();
                 getGUI().showTradeRouteInputPanel(selected)
                     .addClosingCallback(() -> {
-                            StringTemplate template = null;
+                            StringTemplate template;
                             if (selected.getName() == null) { // Cancelled
                                 selected.setName(name);
-                            } else if ((template = selected.verify()) == null
-                                && (template = selected.verifyUniqueName()) == null) {
-                                igc().updateTradeRoute(selected);
-                                updateList(selected);
                             } else {
-                                getGUI().showInformationPanel(template);
+                                template = selected.verify();
+                                if (template == null) {
+                                    template = selected.verifyUniqueName();
+                                }
+                                if (template == null) {
+                                    igc().updateTradeRoute(selected);
+                                    updateList(selected);
+                                } else {
+                                    getGUI().showInformationPanel(template);
+                                }
                             }
                         });
             });
@@ -228,19 +233,24 @@ public final class TradeRoutePanel extends FreeColPanel {
         final TradeRoute newRoute = igc().newTradeRoute(player);
         getGUI().showTradeRouteInputPanel(newRoute)
             .addClosingCallback(() -> {
-                    StringTemplate template = null;
+                    StringTemplate template;
                     String name = newRoute.getName();
                     if (name == null) { // Cancelled
                         igc().deleteTradeRoute(newRoute);
                         updateList(null);
-                    } else if ((template = newRoute.verify()) != null
-                        && (template = newRoute.verifyUniqueName()) != null) {
-                        updateList(null);
-                        getGUI().showInformationPanel(template);
                     } else {
-                        igc().updateTradeRoute(newRoute);
-                        if (u != null) igc().assignTradeRoute(u, newRoute);
-                        updateList(newRoute);
+                        template = newRoute.verify();
+                        if (template != null) {
+                            template = newRoute.verifyUniqueName();
+                        }
+                        if (template != null) {
+                            updateList(null);
+                            getGUI().showInformationPanel(template);
+                        } else {
+                            igc().updateTradeRoute(newRoute);
+                            if (u != null) igc().assignTradeRoute(u, newRoute);
+                            updateList(newRoute);
+                        }
                     }
                 });
     }
@@ -279,7 +289,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                 routes.add(tr);
             } else {
                 igc().deleteTradeRoute(tr);
-                logger.warning("Dropped trade route: " + Messages.message(st));
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Dropped trade route: " + Messages.message(st));
             }
         }
         routes.sort(tradeRouteComparator);

@@ -98,7 +98,7 @@ public class MetaServerUtils {
                 this.consumer.accept(slm.getServers());
                 break;
             default:
-                logger.warning("MetaInputHandler does not handle: " + tag);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("MetaInputHandler does not handle: " + tag);
                 break;
             }
             return null;
@@ -231,7 +231,7 @@ public class MetaServerUtils {
             c.startReceiving();
             return c;
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not connect to meta-server: "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Could not connect to meta-server: "
                 + host + ":" + port, ioe);
         }
         return null;
@@ -267,11 +267,11 @@ public class MetaServerUtils {
                 }
                 return true;
             default:
-                logger.log(Level.WARNING, "Wrong metaMessage type: " + type);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Wrong metaMessage type: " + type);
                 break;
             }
         } catch (FreeColException|IOException|XMLStreamException|TimeoutException ex) {
-            logger.log(Level.WARNING, "Meta message " + type + " failure.", ex);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Meta message " + type + " failure.", ex);
             // Do not fail: Try registering again later:
             return true;
         }

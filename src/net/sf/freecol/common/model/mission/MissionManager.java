@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model.mission;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -82,14 +83,15 @@ public class MissionManager {
         String tag = xr.getLocalName();
         Constructor<? extends Mission> c = missionMap.get(tag);
         if (c == null) {
-            logger.warning("Unknown type of mission: '" + tag + "'.");
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Unknown type of mission: '" + tag + "'.");
             xr.nextTag();
             return null;
         } else {
             try {
                 return c.newInstance(game, xr);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to instatiate mission with tag: "
+            } catch (InstantiationException | IllegalAccessException
+                     | InvocationTargetException | IllegalArgumentException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to instatiate mission with tag: "
                     + tag, e);
                 return null;
             }

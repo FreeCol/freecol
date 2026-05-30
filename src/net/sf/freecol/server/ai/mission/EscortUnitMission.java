@@ -34,6 +34,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
+import java.util.logging.Level;
 
 
 /**
@@ -236,7 +237,7 @@ public final class EscortUnitMission extends Mission {
             final Tile unitTile = getUnit().getTile();
             Direction d = unitTile.getDirection(currentTarget.getTile());
             if (d == null) {
-                logger.warning("SDDM bogus " + mt + " with " + getUnit()
+                if (logger.isLoggable(Level.WARNING)) logger.warning("SDDM bogus " + mt + " with " + getUnit()
                     + " from " + unitTile + " to " + currentTarget
                     + " at " + currentTarget.getTile());
                 return lbWait(lb);

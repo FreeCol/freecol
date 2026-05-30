@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Common package</h1>
+ * <h2>FreeCol Common package</h2>
  *
  * <p>Contains classes in use by both the server and the client.</p>
  *

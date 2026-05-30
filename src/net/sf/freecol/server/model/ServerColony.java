@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -173,7 +174,7 @@ public class ServerColony extends Colony implements TurnTaker {
                               .addStringTemplate("%unit%", unit.getLabel()));
         }
 
-        logger.info("New unit in " + getName() + ": " + type.getSuffix());
+        if (logger.isLoggable(Level.INFO)) logger.info("New unit in " + getName() + ": " + type.getSuffix());
         return unit;
     }
 
@@ -240,7 +241,7 @@ public class ServerColony extends Colony implements TurnTaker {
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_COLONY, true, false);
             }
-            logger.info("New building in " + getName()
+            if (logger.isLoggable(Level.INFO)) logger.info("New building in " + getName()
                 + ": " + type.getSuffix());
         }
         return success;
@@ -290,7 +291,7 @@ public class ServerColony extends Colony implements TurnTaker {
                         .addNamed("%building%", buildable));
                 break;
             default: // Are there other warnings to send?
-                logger.warning("Unexpected build failure at " + getName()
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Unexpected build failure at " + getName()
                     + " for " + buildable
                     + ": " + getNoBuildReason(buildable, null));
                 cs.addMessage(owner,
@@ -491,7 +492,7 @@ public class ServerColony extends Colony implements TurnTaker {
                     .addStringTemplate("%nation%", nation)
                     .addName("%colony%", getName()));
             newOwner.invalidateCanSeeTiles();//+vis(other)
-            logger.fine("Convert at " + getName() + " for " + getName());
+            if (logger.isLoggable(Level.FINE)) logger.fine("Convert at " + getName() + " for " + getName());
         }
     }
 

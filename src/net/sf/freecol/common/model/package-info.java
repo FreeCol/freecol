@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Game Model package</h1>
+ * <h2>FreeCol Game Model package</h2>
  *
  * <p>This package contains the game model, which describes how the
  * individual game objects, such as units, buildings, tiles and so on,

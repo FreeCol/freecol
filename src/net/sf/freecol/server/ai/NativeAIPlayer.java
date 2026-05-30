@@ -256,12 +256,14 @@ public final class NativeAIPlayer extends MissionAIPlayer {
             AIUnit aiu = aiMain.getAIUnit(u);
             if (aiu == null) {
                 units.remove(u);
-            } else if ((dm = aiu.getMission(DefendSettlementMission.class)) != null
-                && dm.getTarget() == is) {
-                defenders.add(u);
-                units.remove(u);
-            } else if (Mission.invalidNewMissionReason(aiu) != null) {
-                units.remove(u);
+            } else {
+                dm = aiu.getMission(DefendSettlementMission.class);
+                if (dm != null && dm.getTarget() == is) {
+                    defenders.add(u);
+                    units.remove(u);
+                } else if (Mission.invalidNewMissionReason(aiu) != null) {
+                    units.remove(u);
+                }
             }
         }
 
@@ -272,38 +274,46 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         for (Tile t : is.getTile().getSurroundingTiles(is.getRadius() + 1)) {
             if (!t.isLand() || t.getUnitCount() == 0) {
                 ; // Do nothing
-            } else if ((enemy = t.getFirstUnit().getOwner()) == player) {
-                // Its one of ours!
-                for (Unit u : t.getUnitList()) {
-                    AIUnit aiu;
-                    if (defenders.contains(u) || units.contains(u)
-                        || (aiu = aiMain.getAIUnit(u)) == null) {
-                        ; // Do nothing
-                    } else if ((dm = aiu.getMission(DefendSettlementMission.class)) != null
-                        && dm.getTarget() == is) {
-                        defenders.add(u);
-                    } else if (Mission.invalidNewMissionReason(aiu) == null) {
-                        units.add(u);
+            } else {
+                enemy = t.getFirstUnit().getOwner();
+                if (enemy == player) {
+                    // Its one of ours!
+                    for (Unit u : t.getUnitList()) {
+                        AIUnit aiu = aiMain.getAIUnit(u);
+                        if (defenders.contains(u) || units.contains(u)
+                            || aiu == null) {
+                            ; // Do nothing
+                        } else {
+                            dm = aiu.getMission(DefendSettlementMission.class);
+                            if (dm != null && dm.getTarget() == is) {
+                                defenders.add(u);
+                            } else if (Mission.invalidNewMissionReason(aiu) == null) {
+                                units.add(u);
+                            }
+                        }
+                    }
+                } else {
+                    tension = is.getAlarm(enemy);
+                    if (tension == null
+                        || tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
+                        ; // Not regarded as a threat
+                    } else {
+                        // Evaluate the threat
+                        double threshold, bonus, value = 0.0;
+                        if (tension.getLevel().compareTo(Tension.Level.DISPLEASED) <= 0) {
+                            threshold = 1.0;
+                            bonus = 0.0f;
+                        } else {
+                            threshold = 0.0;
+                            bonus = (float)tension.getLevel().ordinal()
+                                - Tension.Level.CONTENT.ordinal();
+                        }
+                        value += sumDouble(t.getUnits(),
+                                           u -> cm.getOffencePower(u, is) > threshold,
+                                           u -> cm.getOffencePower(u, is) + bonus);
+                        if (value > 0.0) threats.put(t, value);
                     }
                 }
-            } else if ((tension = is.getAlarm(enemy)) == null
-                || tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                ; // Not regarded as a threat
-            } else {
-                // Evaluate the threat
-                double threshold, bonus, value = 0.0;
-                if (tension.getLevel().compareTo(Tension.Level.DISPLEASED) <= 0) {
-                    threshold = 1.0;
-                    bonus = 0.0f;
-                } else {
-                    threshold = 0.0;
-                    bonus = (float)tension.getLevel().ordinal()
-                        - Tension.Level.CONTENT.ordinal();
-                }
-                value += sumDouble(t.getUnits(),
-                                   u -> cm.getOffencePower(u, is) > threshold,
-                                   u -> cm.getOffencePower(u, is) + bonus);
-                if (value > 0.0) threats.put(t, value);
             }
         }
 
@@ -699,10 +709,12 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         AIUnit aiu;
         IndianDemandMission mission;
         if (unit.getOwner() == player) { // Its one of ours
-            if ((aiu = getAIUnit(unit)) != null // and its valid and demanding
-                && (mission = aiu.getMission(IndianDemandMission.class)) != null
-                && accept != IndianDemandAction.INDIAN_DEMAND_DONE) {
-                mission.setSucceeded(accept == IndianDemandAction.INDIAN_DEMAND_ACCEPT);
+            aiu = getAIUnit(unit);
+            if (aiu != null && accept != IndianDemandAction.INDIAN_DEMAND_DONE) {
+                mission = aiu.getMission(IndianDemandMission.class);
+                if (mission != null) {
+                    mission.setSucceeded(accept == IndianDemandAction.INDIAN_DEMAND_ACCEPT);
+                }
             }
         }
         // Once we get here, the demand is settled

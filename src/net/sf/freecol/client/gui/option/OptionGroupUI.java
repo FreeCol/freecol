@@ -46,6 +46,7 @@ import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import java.util.logging.Level;
 
 
 /**
@@ -88,7 +89,7 @@ public final class OptionGroupUI extends MigPanel
             
     private final List<OptionUpdater> optionUpdaters = new ArrayList<>();
 
-    private final HashMap<String, OptionUI<?>> optionUIs = new HashMap<>();
+    private final Map<String, OptionUI<?>> optionUIs = new HashMap<>();
     private final Map<String, TreeNode[]> optionGroupSelectionPath = new HashMap<>(); 
 
     private final JPanel detailPanel;
@@ -233,7 +234,7 @@ public final class OptionGroupUI extends MigPanel
         if (ui == null) {
             ui = OptionUI.getOptionUI(gui, option, editable);
             if (ui == null) {
-                logger.warning("Unknown option type: " + option.toString());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Unknown option type: " + option.toString());
                 return;
             }
             if (option.getEnabledBy() != null) {

@@ -174,7 +174,7 @@ public final class FindSettlementPanel extends FreeColPanel
         Object selected = this.settlementList.getSelectedValue();
 
         for (Player player : getGame().getLivePlayerList()) {
-            boolean ok;
+            boolean ok = false;
             switch (displayListOption) {
             case ONLY_NATIVES:
                 ok = player.isIndian();
@@ -184,9 +184,6 @@ public final class FindSettlementPanel extends FreeColPanel
                 break;
             case ALL:
                 ok = true;
-                break;
-            default:
-                ok = false;
                 break;
             }
             if (ok) {
@@ -222,7 +219,6 @@ public final class FindSettlementPanel extends FreeColPanel
     public void itemStateChanged(ItemEvent event) {
         switch (this.displayOptionBox.getSelectedIndex()) {
         case 0:
-        default:
             updateSearch(DisplayListOption.valueOf("ALL"));
             break;
         case 1:
@@ -230,6 +226,9 @@ public final class FindSettlementPanel extends FreeColPanel
             break;
         case 2:
             updateSearch(DisplayListOption.valueOf("ONLY_EUROPEAN"));
+            break;
+        default:
+            updateSearch(DisplayListOption.valueOf("ALL"));
         }
     }
 

@@ -181,7 +181,8 @@ public class UnitWanderHostileMission extends Mission {
                 check = checkTurns;
             } else check--;
 
-            if ((d = moveRandomly(tag, d)) == null) break;
+            d = moveRandomly(tag, d);
+            if (d == null) break;
         }
         return lbAt(lb);
     }

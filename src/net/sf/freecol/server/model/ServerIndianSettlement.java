@@ -47,6 +47,7 @@ import net.sf.freecol.common.networking.ChangeSet.See;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import java.util.logging.Level;
 
 
 
@@ -164,7 +165,7 @@ public class ServerIndianSettlement extends IndianSettlement
         float cAlarm = missionary.apply(alarm, turn,
             Modifier.CONVERSION_ALARM_RATE);
         convert += cMiss + (cAlarm - alarm);
-        logger.finest("Conversion at " + getName() + " alarm=" + alarm
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Conversion at " + getName() + " alarm=" + alarm
             + " " + convert
             + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
         ServerColony colony = (ServerColony)tile.getNearestSettlement(other,
@@ -330,7 +331,7 @@ public class ServerIndianSettlement extends IndianSettlement
             ((ServerPlayer)getOwner()).csModifyTension(player,
                 ((isCapital()) ? add : add/2), this, cs);
         }
-        logger.finest("Alarm at " + getName()
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Alarm at " + getName()
             + " toward " + player.getName()
             + " modified by " + add
             + " now = " + getAlarm(player).getValue());

@@ -238,11 +238,11 @@ public class Europe extends UnitLocation implements Ownable, Named, TradeLocatio
      * @return True if the recruitable was added.
      */
     protected boolean addRecruitable(AbstractUnit au, boolean force) {
-        if (force || this.recruitables.size() < MigrationType.MIGRANT_COUNT) {
-            this.recruitables.add(au);
-            return true;
+        if (!force && this.recruitables.size() >= MigrationType.MIGRANT_COUNT) {
+            return false;
         }
-        return false;
+        this.recruitables.add(au);
+        return true;
     }
 
     /**

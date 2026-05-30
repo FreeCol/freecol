@@ -159,7 +159,7 @@ public class SpySettlementMessage extends ObjectMessage {
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
