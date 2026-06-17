@@ -97,7 +97,7 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
         ServerUnit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
@@ -108,7 +108,7 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

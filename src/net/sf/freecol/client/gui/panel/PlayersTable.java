@@ -290,7 +290,7 @@ public final class PlayersTable extends JTable {
         private final Component[] components;
 
         public HeaderRenderer(Component... components) {
-            this.components = components;
+            this.components = components.clone();
         }
 
 

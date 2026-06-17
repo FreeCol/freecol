@@ -23,6 +23,7 @@ import static net.sf.freecol.common.util.CollectionUtils.count;
 import static net.sf.freecol.common.util.CollectionUtils.first;
 
 import net.sf.freecol.common.model.Player.NoClaimReason;
+import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -119,6 +120,43 @@ public class ColonyTest extends FreeColTestCase {
         colony.setCurrentlyBuilding(wagonTrainType);
         assertEquals("Building queue should have 3 entries",
                      3, colony.getBuildQueue().size());
+    }
+
+    public void testClothProductionRequiresCotton() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+        Building weaversHouse = colony.getBuilding(weaversHouseType);
+        if (weaversHouse == null) {
+            weaversHouse = new ServerBuilding(game, colony, weaversHouseType);
+            colony.addBuilding(weaversHouse);
+        }
+        clearWorkLocation(weaversHouse);
+
+        Unit weaver = new ServerUnit(game, colony.getTile(),
+                                     colony.getOwner(), masterWeaverType);
+        weaver.setLocation(weaversHouse);
+
+        colony.addGoods(cottonGoodsType, 50);
+        colony.invalidateCache();
+        ProductionInfo withCottonInfo = colony.getProductionInfo(weaversHouse);
+        int withCottonDeficit = AbstractGoods.getCount(cottonGoodsType,
+            withCottonInfo.getConsumptionDeficit());
+        int withCotton = colony.getNetProductionOf(clothGoodsType);
+        assertEquals("Cotton deficit should be zero when cotton is available",
+                     0, withCottonDeficit);
+        assertTrue("Cloth production should resume with cotton",
+                   withCotton > 0);
+
+        colony.removeGoods(cottonGoodsType,
+                           colony.getGoodsCount(cottonGoodsType));
+        colony.invalidateCache();
+        ProductionInfo noCottonInfo = colony.getProductionInfo(weaversHouse);
+        int noCottonDeficit = AbstractGoods.getCount(cottonGoodsType,
+            noCottonInfo.getConsumptionDeficit());
+        assertTrue("Cotton deficit should be reported when input is missing",
+                   noCottonDeficit > 0);
     }
 
     public void testOccupationWithFood() {

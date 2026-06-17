@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Sound and Music package</h1>
+ * <h2>FreeCol Sound and Music package</h2>
  *
  * <p>This package contains the classes for handling sound effects and music in FreeCol.
  * {@link net.sf.freecol.client.FreeColClient} initializes {@link net.sf.freecol.client.control.SoundController} which

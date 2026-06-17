@@ -97,7 +97,7 @@ public class UnloadGoodsMessage extends AttributeMessage {
         Unit carrier;
         try {
             carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (!carrier.canCarryGoods()) {

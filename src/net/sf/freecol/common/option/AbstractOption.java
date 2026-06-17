@@ -27,6 +27,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColSpecObject;
 import net.sf.freecol.common.model.Specification;
+import java.util.logging.Level;
 
 
 /**
@@ -295,7 +296,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
             option = new TextOption(spec);
 
         } else {
-            logger.warning("Not an option type: " + tag);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Not an option type: " + tag);
             xr.nextTag();
         }
 

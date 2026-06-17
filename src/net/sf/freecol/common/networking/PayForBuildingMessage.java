@@ -87,7 +87,7 @@ public class PayForBuildingMessage extends AttributeMessage {
         Colony colony;
         try {
             colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

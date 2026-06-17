@@ -201,8 +201,8 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             try {
                 languages.add(new Language(languageId,
                         Messages.getLocale(languageId)));
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to add: " + languageId, e);
+            } catch (IllegalArgumentException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to add: " + languageId, e);
             }
         }
         languages.sort(Comparator.naturalOrder());

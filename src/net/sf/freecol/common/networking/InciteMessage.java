@@ -117,14 +117,14 @@ public class InciteMessage extends AttributeMessage {
         ServerUnit unit;
         try {
             unit = (ServerUnit)getUnit(serverPlayer);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
         IndianSettlement is;
         try {
             is = getSettlement(unit);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
@@ -137,8 +137,9 @@ public class InciteMessage extends AttributeMessage {
             return serverPlayer.clientError("Inciting against oneself!");
         } else if (!enemy.isEuropean()) {
             return serverPlayer.clientError("Inciting against non-European!");
-        } else if ((type = unit.getMoveType(is.getTile()))
-            != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
+        }
+        type = unit.getMoveType(is.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return serverPlayer.clientError("Unable to enter "
                 + is.getName() + ": " + type.whyIllegal());
         }

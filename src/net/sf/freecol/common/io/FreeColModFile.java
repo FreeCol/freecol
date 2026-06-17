@@ -115,8 +115,8 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
             return (si == null) ? null : new Specification(si);
         } catch (FreeColUserMessageException e) {
             throw e;
-        } catch (RuntimeException rte) {
-            logger.log(Level.WARNING, "Parse error while reading specification " + getId(), rte);
+        } catch (IllegalArgumentException | IllegalStateException rte) {
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Parse error while reading specification " + getId(), rte);
             throw new FreeColUserMessageException(
                 StringTemplate.template("error.mod").add("%id%", getId()).add("%name%", Messages.getName("mod." + getId())),
                 rte
@@ -173,7 +173,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
             try {
                 ret.add(new FreeColModFile(f));
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to load mod from: " + f, ioe);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to load mod from: " + f, ioe);
             }
         }
         return ret;

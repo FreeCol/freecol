@@ -292,7 +292,7 @@ public final class FreeColServer {
             for (int i = tryMax; i > 0; i--) {
                 try {
                     Server ret = new Server(this, host, port);
-                    logger.finest("Server started: " + ret.getHost()
+                    if (logger.isLoggable(Level.FINEST)) logger.finest("Server started: " + ret.getHost()
                         + ", " + ret.getPort());
                     return ret;
                 } catch (IOException ioe) {
@@ -667,7 +667,7 @@ public final class FreeColServer {
         if (this.serverState == ServerState.IN_GAME) {
             c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
         }
-        logger.info("Client connected from " + name);
+        if (logger.isLoggable(Level.INFO)) logger.info("Client connected from " + name);
     }
 
     /**
@@ -735,10 +735,11 @@ public final class FreeColServer {
     public ServerGame waitForGame() {        
         final int timeStep = 1000;
         int timeOut = 20000;
-        ServerGame serverGame = null;
+        ServerGame serverGame;
         while ((serverGame = getGame()) == null) {
             delay(timeStep, "waitForGame delay interrupt");
-            if ((timeOut -= timeStep) <= 0) break;
+            timeOut -= timeStep;
+            if (timeOut <= 0) break;
         }
         return serverGame;
     }
@@ -761,7 +762,7 @@ public final class FreeColServer {
      * @exception FreeColException if there is a problem creating the game.
      */
     public void startGame() throws FreeColException {
-        logger.info("Server starting game: " + this.serverState);
+        if (logger.isLoggable(Level.INFO)) logger.info("Server starting game: " + this.serverState);
 
         switch (this.serverState) {
         case PRE_GAME: // Send the updated game to the clients.
@@ -777,7 +778,7 @@ public final class FreeColServer {
         case LOAD_GAME: // Do nothing, game has been sent.
             break;
         default:
-            logger.warning("Invalid startGame when server state = "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid startGame when server state = "
                 + this.serverState);
             return;
         }
@@ -983,7 +984,7 @@ public final class FreeColServer {
         ServerGame serverGame
             = FreeColServer.readGame(new FreeColSavegameFile(file),
                                      spec, freeColServer);
-        logger.info("Read file " + file.getPath());
+        if (logger.isLoggable(Level.INFO)) logger.info("Read file " + file.getPath());
 
         // If importing as a result of "Start Game" in the map editor,
         // consume the file.
@@ -1012,7 +1013,7 @@ public final class FreeColServer {
                                       FreeColServer freeColServer)
         throws FreeColException, IOException, XMLStreamException {
         final int savegameVersion = fis.getSavegameVersion();
-        logger.info("Found savegame version " + savegameVersion);
+        if (logger.isLoggable(Level.INFO)) logger.info("Found savegame version " + savegameVersion);
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
             throw new FreeColException("server.incompatibleVersions: "
                 + savegameVersion + " < " + MINIMUM_SAVEGAME_VERSION);
@@ -1110,10 +1111,10 @@ public final class FreeColServer {
             logger.info("Game integrity test succeeded.");
             break;
         case INTEGRITY_FIXED:
-            logger.info("Game integrity test failed, but fixed." + lb);
+            if (logger.isLoggable(Level.INFO)) logger.info("Game integrity test failed, but fixed." + lb);
             break;
         default:
-            logger.warning("Game integrity test failed." + lb);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Game integrity test failed." + lb);
             break;
         }
 
@@ -1139,13 +1140,13 @@ public final class FreeColServer {
             logger.info("AI integrity test succeeded.");
             break;
         case INTEGRITY_FIXED:
-            logger.info("AI integrity test failed, but fixed." + lb);
+            if (logger.isLoggable(Level.INFO)) logger.info("AI integrity test failed, but fixed." + lb);
             break;
         default:
             aiMain = new AIMain(this);
             aiMain.findNewObjects(true);
             setAIMain(aiMain);
-            logger.warning("AI integrity test failed, replaced AIMain." + lb);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("AI integrity test failed, replaced AIMain." + lb);
             break;
         }
         serverGame.setFreeColGameObjectListener(aiMain);
@@ -1264,7 +1265,7 @@ public final class FreeColServer {
                 importMap = FreeColServer.readMap(importFile,
                     serverGame.getSpecification());
             } catch (FreeColException|IOException|XMLStreamException ex) {
-                logger.log(Level.WARNING, "Failed to import map: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to import map: "
                     + importFile.getName(), ex);
             }
         }

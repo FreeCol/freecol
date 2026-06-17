@@ -67,7 +67,8 @@ public class ServerInfoMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ServerInfoMessage(String tag, @SuppressWarnings("unused") Game game,
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    public ServerInfoMessage(String tag, Game game,
                              FreeColXMLReader xr) throws XMLStreamException {
         super(tag, xr, NAME_TAG, ADDRESS_TAG, PORT_TAG, SLOTS_AVAILABLE_TAG,
               CURRENTLY_PLAYING_TAG, IS_GAME_STARTED_TAG, VERSION_TAG,

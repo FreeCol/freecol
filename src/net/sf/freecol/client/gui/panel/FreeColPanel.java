@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import java.util.logging.Level;
 
 
 
@@ -329,7 +330,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         if (OK.equals(command)) {
             getGUI().removeComponent(this);
         } else {
-            logger.warning("Bad event: " + command);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bad event: " + command);
         }
     }
 

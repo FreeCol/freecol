@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import javax.swing.DefaultBoundedRangeModel;
@@ -50,8 +51,7 @@ public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  
         JSlider slider = getComponent();
 
         slider.setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
-        Hashtable<Integer, JComponent> labels
-            = new Hashtable<>();
+        Dictionary<Integer, JComponent> labels = new Hashtable<>();
         labels.put(0,   new JLabel("0 %"));
         labels.put(25,  new JLabel("25 %"));
         labels.put(50,  new JLabel("50 %"));

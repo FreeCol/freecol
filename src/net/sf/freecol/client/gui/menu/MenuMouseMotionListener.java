@@ -44,7 +44,7 @@ public class MenuMouseMotionListener implements MouseMotionListener {
     /**
      * Trivial constructor.
      *
-     * @param freeColClient The enclosing {@code FreeColClient}.
+     * @param scrolling The {@code Scrolling} helper to delegate to.
      */
     public MenuMouseMotionListener(Scrolling scrolling) {
         this.scrolling = scrolling;

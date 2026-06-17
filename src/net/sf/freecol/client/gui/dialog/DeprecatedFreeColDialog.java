@@ -131,7 +131,10 @@ public class DeprecatedFreeColDialog<T> extends JDialog implements PropertyChang
      * @return The option to select initially.
      */
     private int selectDefault(List<ChoiceItem<T>> options) {
-        int def = -1, can = -1, ok = -1, i = 0;
+        int def = -1;
+        int can = -1;
+        int ok = -1;
+        int i = 0;
         for (ChoiceItem<T> ci : options) {
             if (ci.isDefault()) def = i;
             else if (ci.isCancel()) can = i;
@@ -196,7 +199,7 @@ public class DeprecatedFreeColDialog<T> extends JDialog implements PropertyChang
         setSubcomponentsNotOpaque(this.pane);
         try { // Layout failures might not get logged.
             pack();
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             logger.log(Level.WARNING, "Packing failure", e);
         }
         setLocationRelativeTo(frame);

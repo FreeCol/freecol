@@ -227,7 +227,7 @@ public abstract class AIPlayer extends AIObject {
         List<AIUnit> aiUnits = new ArrayList<>();
         for (Unit u : getPlayer().getUnitSet()) {
             if (u.isDisposed()) {
-                logger.warning("getAIUnits ignoring: " + u.getId());
+                if (logger.isLoggable(Level.WARNING)) logger.warning("getAIUnits ignoring: " + u.getId());
                 continue;
             }
             AIUnit a = getAIUnit(u);
@@ -238,7 +238,7 @@ public abstract class AIPlayer extends AIObject {
                 }
                 aiUnits.add(a);
             } else {
-                logger.warning("Could not find the AIUnit for: "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Could not find the AIUnit for: "
                                + u + " (" + u.getId() + ")");
             }
         }
@@ -281,7 +281,7 @@ public abstract class AIPlayer extends AIObject {
         Thread thread = new Thread(runnable,
             FreeCol.SERVER_THREAD + "AIPlayer(" + getPlayer().getName() + ")");
         thread.start();
-        logger.finest("Started " + thread);
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Started " + thread);
     }
 
     // Message.aiHandler support
@@ -294,7 +294,7 @@ public abstract class AIPlayer extends AIObject {
     public void chooseFoundingFatherHandler(List<FoundingFather> fathers) {
         FoundingFather ff = selectFoundingFather(fathers);
         if (ff == null) return;
-        logger.finest(getId() + " chose founding father: " + ff);
+        if (logger.isLoggable(Level.FINEST)) logger.finest(getId() + " chose founding father: " + ff);
         invoke(() -> {
                 AIMessage.askChooseFoundingFather(this, fathers, ff);
             });
@@ -316,11 +316,11 @@ public abstract class AIPlayer extends AIObject {
         case PROPOSE_TRADE:
             agreement.setStatus(this.acceptDiplomaticTrade(agreement));
             sb.append(" -> ").append(agreement);
-            logger.fine(sb.toString());
+            if (logger.isLoggable(Level.FINE)) logger.fine(sb.toString());
             break;
         default: // Do not need to respond to others
             sb.append(" -> ignoring ").append(agreement.getStatus());
-            logger.fine(sb.toString());
+            if (logger.isLoggable(Level.FINE)) logger.fine(sb.toString());
             return;
         }
 
@@ -369,7 +369,7 @@ public abstract class AIPlayer extends AIObject {
                                     int amount, IndianDemandAction initial) {
         IndianDemandAction result
             = indianDemand(unit, colony, type, amount, initial);
-        logger.finest("AI handling native demand by " + unit
+        if (logger.isLoggable(Level.FINEST)) logger.finest("AI handling native demand by " + unit
             + " at " + colony + " result: " + initial + " -> " + result);
         if (result != IndianDemandAction.INDIAN_DEMAND_DONE) {
             invoke(() -> {
@@ -423,10 +423,10 @@ public abstract class AIPlayer extends AIObject {
             break;
 
         default:
-            logger.finest("AI player ignoring monarch action " + action);
+            if (logger.isLoggable(Level.FINEST)) logger.finest("AI player ignoring monarch action " + action);
             return;
         }
-        logger.finest("AI player monarch action " + action + " = " + accept);
+        if (logger.isLoggable(Level.FINEST)) logger.finest("AI player monarch action " + action + " = " + accept);
 
         invoke(() -> {
                 AIMessage.askMonarchAction(this, action, accept);
@@ -441,7 +441,7 @@ public abstract class AIPlayer extends AIObject {
      */
     public void nationSummaryHandler(Player other, NationSummary ns) {
         getPlayer().putNationSummary(other, ns);
-        logger.info("Updated nation summary of " + other.getSuffix()
+        if (logger.isLoggable(Level.INFO)) logger.info("Updated nation summary of " + other.getSuffix()
             + " for AI " + player.getSuffix());
     }
 
@@ -512,7 +512,7 @@ public abstract class AIPlayer extends AIObject {
             invoke(() -> {
                     try {
                         startWorking();
-                    } catch (Exception e) {
+                    } catch (IllegalArgumentException | IllegalStateException e) {
                         logger.log(Level.SEVERE, "Unhandled exception from the AI. The AI's turn has been ended prematurely.", e);
                         askServer().chat(currentPlayer, Messages.message("ai.chat.stoppedWorking"));
                     }

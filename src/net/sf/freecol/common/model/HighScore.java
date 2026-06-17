@@ -423,7 +423,7 @@ public class HighScore extends FreeColObject {
         if (!hsf.exists()) {
             try {
                 if (hsf.createNewFile()) {
-                    logger.info("Created empty high score file: "
+                    if (logger.isLoggable(Level.INFO)) logger.info("Created empty high score file: "
                         + hsf.getPath());
                     saveHighScores(scores);
                 } else {
@@ -431,7 +431,7 @@ public class HighScore extends FreeColObject {
                 }
             } catch (IOException ioe) {
                 scores = null;
-                logger.log(Level.WARNING, "Unable to create high score file: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Unable to create high score file: "
                            + hsf.getPath(), ioe);
             }
             return scores;
@@ -588,7 +588,7 @@ public class HighScore extends FreeColObject {
         try {
             long l = xr.getAttribute(DATE_TAG, -1L);
             if (l >= 0) date = new Date(l);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Bad long date", e);
         }
         // @compat 0.11.0
@@ -599,7 +599,7 @@ public class HighScore extends FreeColObject {
                 if (f >= 0.0 && f < Long.MAX_VALUE) {
                     date = new Date((long)f);
                 }
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 logger.log(Level.WARNING, "Bad float date", e);
             }
         }
@@ -619,7 +619,7 @@ public class HighScore extends FreeColObject {
         String str = xr.getAttribute(GAMEUUID_TAG, (String)null);
         try {
             gameUUID = UUID.fromString(str);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             gameUUID = nullUUID;
         }
         

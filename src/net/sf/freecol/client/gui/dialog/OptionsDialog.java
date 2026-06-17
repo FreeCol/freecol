@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.OptionGroup;
+import java.util.logging.Level;
 
 
 /**
@@ -156,7 +157,7 @@ public abstract class OptionsDialog extends FreeColPanel {
      * Initialize this dialog.
      * 
      * @param frame The owner frame.
-     * @param c Extra choices to add beyond the default ok and cancel.
+     * @param extraButtons Extra choices to add beyond the default ok and cancel.
      */
     protected void initialize(JFrame frame, List<JButton> extraButtons) {
         this.panel.add(this.optionPanel, "width 100%, height 100%, gap 0 0, pad 0");
@@ -302,7 +303,7 @@ public abstract class OptionsDialog extends FreeColPanel {
         } else if (CANCEL.equals(command)) {
             cancelOptionsDialog();
         } else {
-            logger.warning("Bad event: " + command);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bad event: " + command);
         }
     }
 }

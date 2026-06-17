@@ -253,6 +253,7 @@ public final class CompactLabourReport extends ReportPanel {
      */
     private int addLocationData(LabourData.LocationData data, Colony colony,
                                 int row) {
+        int currentRow = row;
         boolean allColonists = data.getUnitData().isSummary();
 
         LabourData.UnitData unit = data.getUnitData();
@@ -271,9 +272,9 @@ public final class CompactLabourReport extends ReportPanel {
                 }
             }
         }
-        addLocationSummary(data, row);
+        addLocationSummary(data, currentRow);
 
-        int buildingStartRow = row;
+        int buildingStartRow = currentRow;
 
         //details
         int otherAmateurs = data.getOtherWorkingAmateurs().getColonists();
@@ -283,75 +284,75 @@ public final class CompactLabourReport extends ReportPanel {
                    workingAs,
                    createNonCountedLabel(otherAmateurs),
                    data.getOtherWorkingAmateurs().getProduction(),
-                   row);
-            row++;
+                   currentRow);
+            currentRow++;
         }
 
-        row = addRow(data,
+        currentRow = addRow(data,
                      unitName,
                      allColonists ? Messages.message("report.labour.expertsWorking") : workingAs,
                      data.getWorkingProfessionals().getColonists(),
                      data.getWorkingProfessionals().getProduction(),
-                     row);
+                     currentRow);
 
-        int notProducingStartRow = row;
+        int notProducingStartRow = currentRow;
 
         if (showBuildings) {
-            if (productionWL != null && row > buildingStartRow) {
+            if (productionWL != null && currentRow > buildingStartRow) {
                 JLabel buildingLabel = Utility.localizedLabel(productionWL.getLabel());
                 buildingLabel.setBorder(Utility.getCellBorder());
-                reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
-                buildingStartRow = row;
+                reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (currentRow - buildingStartRow));
+                buildingStartRow = currentRow;
             } else {
-                reportPanel.add(createEmptyLabel(), "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
+                reportPanel.add(createEmptyLabel(), "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (currentRow - buildingStartRow));
             }
         }
 
-        row = addRow(data,
+        currentRow = addRow(data,
                      unitName,
                      Messages.message(allColonists ?
                          "report.labour.amateursWorking" :
                          "report.labour.workingAsOther"),
                      data.getWorkingAmateurs(),
-                     0, row);
+                     0, currentRow);
         if (data.getNotWorking() > 0) {
             addRow(data,
                    unitName,
                    Messages.message("report.labour.notWorking"),
                    createNumberLabel(data.getNotWorking(), "report.labour.notWorking.tooltip"),
-                   0, row);
-            row++;
+                   0, currentRow);
+            currentRow++;
         }
 
         WorkLocation school = (colony != null && data.isTraining())
             ? colony.getWorkLocationWithAbility(Ability.TEACH)
             : null;
 
-        if (showBuildings && school != null && row > buildingStartRow) {
+        if (showBuildings && school != null && currentRow > buildingStartRow) {
             reportPanel.add(createEmptyLabel(), "cell " + BUILDING_COLUMN
-                + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
-            buildingStartRow = row;
+                + " " + buildingStartRow + " 1 " + (currentRow - buildingStartRow));
+            buildingStartRow = currentRow;
         }
 
-        row = addRow(data,
+        currentRow = addRow(data,
                      unitName,
                      Messages.message("report.labour.teacher"),
                      data.getTeachers(),
-                     0, row);
+                     0, currentRow);
         if (!allColonists) {
-            row = addRow(data,
+            currentRow = addRow(data,
                          data.getOtherStudentsName(),
                          Messages.message(StringTemplate
                              .template("report.labour.learning")
                              .addName("%unit%", data.getUnitData().getUnitName())),
                          data.getOtherStudents(),
-                         0, row);
+                         0, currentRow);
         }
 
         int studentCount = data.getStudents();
         if (studentCount > 0) {
             if (allColonists) {
-                addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, row);
+                addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, currentRow);
             } else {
                 final Predicate<Unit> teachingPred = u -> {
                     final Unit student = u.getStudent();
@@ -372,27 +373,27 @@ public final class CompactLabourReport extends ReportPanel {
                        data.getUnitData().getUnitName(),
                        student,
                        createNumberLabel(-studentCount, "report.labour.subtracted.tooltip"),
-                       0, row);
+                       0, currentRow);
             }
-            row++;
+            currentRow++;
         }
 
-        if (showBuildings && row > buildingStartRow) {
+        if (showBuildings && currentRow > buildingStartRow) {
             JLabel buildingLabel = new JLabel((school == null) ? ""
                 : Messages.message(school.getLabel()));
             buildingLabel.setBorder(Utility.getCellBorder());
             reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN
                 + " " + buildingStartRow
-                + " 1 " + (row - buildingStartRow));
+                + " 1 " + (currentRow - buildingStartRow));
         }
 
-        if (row > notProducingStartRow && data.getUnitData().showProduction()) {
+        if (currentRow > notProducingStartRow && data.getUnitData().showProduction()) {
             reportPanel.add(createEmptyLabel(), "cell " + PRODUCTION_COLUMN
                 + " " + notProducingStartRow
-                + " 1 " + (row - notProducingStartRow));
+                + " 1 " + (currentRow - notProducingStartRow));
         }
 
-        return row;
+        return currentRow;
     }
 
     private void addLocations() {

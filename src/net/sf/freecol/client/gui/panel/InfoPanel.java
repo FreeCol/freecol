@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.PropertyList;
 import net.sf.freecol.common.resources.ResourceManager;
+import java.util.logging.Level;
 
 
 /**
@@ -69,7 +70,6 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class InfoPanel extends FreeColPanel
     implements PropertyChangeListener {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InfoPanel.class.getName());
 
 
@@ -487,7 +487,7 @@ public final class InfoPanel extends FreeColPanel
                 fillEndPanel();
                 updated = true;
             }
-            logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
+            if (logger.isLoggable(Level.INFO)) logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
                     + oldMode + " -> " + this.mode);
         }
     }
@@ -504,7 +504,7 @@ public final class InfoPanel extends FreeColPanel
             this.mapTransform = fillMapPanel(mapTransform);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
+        if (logger.isLoggable(Level.INFO)) logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with " + mapTransform);
     }
 
@@ -520,7 +520,7 @@ public final class InfoPanel extends FreeColPanel
             this.tile = fillTilePanel(tile);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
+        if (logger.isLoggable(Level.INFO)) logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with tile " + tile);
     }
 
@@ -536,7 +536,7 @@ public final class InfoPanel extends FreeColPanel
             return;
         }
         
-        boolean updated = false;
+        boolean updated;
         InfoPanelMode oldMode = changeMode(InfoPanelMode.UNIT);
         if (unit != this.unit) {
             // Only update the PCLs when the unit changes
@@ -553,7 +553,7 @@ public final class InfoPanel extends FreeColPanel
         // change, its annotations (such as moves left) might
         this.unit = fillUnitPanel(unit);
         updated = true;
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
+        if (logger.isLoggable(Level.INFO)) logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
             + oldMode + " -> " + this.mode + " with unit " + unit);
     }
 

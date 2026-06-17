@@ -164,8 +164,9 @@ public final class PrivateerMission extends Mission {
      * @param deferOK Enable colony fallback (not implemented).
      * @return A suitable {@code GoalDecider}.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-        @SuppressWarnings("unused") boolean deferOK) {
+                                              boolean deferOK) {
         return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
@@ -177,12 +178,10 @@ public final class PrivateerMission extends Mission {
                 @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path);
-                    if (bestValue < value) {
-                        bestValue = value;
-                        bestPath = path;
-                        return true;
-                    }
-                    return false;
+                    if (bestValue >= value) return false;
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
                 }
             };
     }

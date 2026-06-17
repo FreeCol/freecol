@@ -216,7 +216,7 @@ public class IntegerOption extends AbstractOption<Integer> {
         try {
             setValue(Integer.valueOf(str));
         } catch (NumberFormatException nfe) {
-            logger.log(Level.WARNING, "IntegerOption fail: " + str, nfe);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "IntegerOption fail: " + str, nfe);
         }
     }
 

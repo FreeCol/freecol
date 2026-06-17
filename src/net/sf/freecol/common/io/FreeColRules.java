@@ -47,7 +47,7 @@ public class FreeColRules {
             try {
                 ret.add(new FreeColModFile(f));
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to load TC from: " + f, ioe);
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to load TC from: " + f, ioe);
             }
         }
         return ret;

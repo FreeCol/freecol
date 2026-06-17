@@ -29,6 +29,7 @@ public class AllTests {
         //$JUnit-BEGIN$
         suite.addTest(net.sf.freecol.common.i18n.AllTests.suite());
         suite.addTest(net.sf.freecol.common.io.AllTests.suite());
+        suite.addTest(net.sf.freecol.common.networking.AllTests.suite());
         suite.addTest(net.sf.freecol.common.option.AllTests.suite());
         suite.addTest(net.sf.freecol.common.model.AllTests.suite());
         suite.addTest(net.sf.freecol.common.utils.AllTests.suite());

@@ -35,7 +35,7 @@ public final class FreeColUserMessageException extends RuntimeException {
     /**
      * Build a new FreeCol specific exception with the given message.
      *
-     * @param message The message for this exception.
+     * @param stringTemplate The message for this exception.
      */
     public FreeColUserMessageException(StringTemplate stringTemplate) {
         super(Messages.message(Objects.requireNonNull(stringTemplate)));

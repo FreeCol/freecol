@@ -132,12 +132,12 @@ public class ColonizationMapLoader implements MapLoader {
             layer1 = new byte[size];
             reader.readFully(layer1);
         } catch (EOFException ee) {
-            logger.log(Level.SEVERE, "File (" + file + ") is too short.", ee);
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "File (" + file + ") is too short.", ee);
         } catch (FileNotFoundException fe) {
             
-            logger.log(Level.SEVERE, "File (" + file + ") was not found.", fe);
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "File (" + file + ") was not found.", fe);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "File (" + file + ") is corrupt and cannot be read.", e);
+            if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "File (" + file + ") is corrupt and cannot be read.", e);
         }
 
     }
@@ -159,10 +159,6 @@ public class ColonizationMapLoader implements MapLoader {
             // import only the land / water distinction
             for (int y = 0; y < header[HEIGHT]; y++) {
                 for (int x = 0; x < header[WIDTH]; x++) {
-                    int decimal = layer1[index] & 0xff;
-                    int terrain = decimal & 0b11111;
-                    tileType = (terrain == OCEAN || terrain == HIGH_SEAS) ?
-                        TileType.WATER : TileType.LAND;
                     index++;
                 }
             }

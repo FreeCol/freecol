@@ -187,6 +187,7 @@ public final class EndTurnDialog extends FreeColPanel {
             
         }
 
+        @Override
         public Component getListCellRendererComponent(JList<? extends UnitWrapper> list,
                 UnitWrapper value, int index, boolean isSelected, boolean cellHasFocus) {
             final JLabel imageLabel = new JLabel();

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
+import java.util.logging.Level;
 
 
 /**
@@ -58,6 +59,7 @@ public class PartialMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public PartialMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr.getAllAttributes());
@@ -107,7 +109,7 @@ public class PartialMessage extends AttributeMessage {
         }
         FreeColGameObject fcgo = game.getFreeColGameObject(id);
         if (fcgo == null) {
-            logger.warning("Partial update of missing object: " + id);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Partial update of missing object: " + id);
             return;
         }
                 

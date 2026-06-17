@@ -20,7 +20,9 @@
 package net.sf.freecol.common.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.freecol.common.util.CollectionUtils;
 
@@ -75,5 +77,40 @@ public class UtilsTest extends FreeColTestCase {
         o3.add(1);o3.add(2);o3.add(3);
         o.sort(CollectionUtils.descendingListLengthComparator);
         assertEquals(o.get(0), o3);
+    }
+
+    public void testAsMapOddLength() {
+        Map<Integer, Integer> map = CollectionUtils.asMap(1, 2, 3);
+        assertEquals(1, map.size());
+        assertEquals(Integer.valueOf(2), map.get(1));
+        assertFalse(map.containsKey(3));
+    }
+
+    public void testAppendToMapListNoDuplicates() {
+        Map<String, List<Integer>> map = new java.util.HashMap<>();
+        CollectionUtils.appendToMapList(map, "a", 1);
+        CollectionUtils.appendToMapList(map, "a", 1);
+        CollectionUtils.appendToMapList(map, "a", 2);
+        assertEquals(Arrays.asList(1, 2), map.get("a"));
+    }
+
+    public void testAccumulateToMap() {
+        Map<String, Integer> map = new java.util.HashMap<>();
+        CollectionUtils.accumulateToMap(map, "a", 2, Integer::sum);
+        CollectionUtils.accumulateToMap(map, "a", 3, Integer::sum);
+        assertEquals(Integer.valueOf(5), map.get("a"));
+    }
+
+    public void testAllSame() {
+        assertTrue(CollectionUtils.allSame(Arrays.asList("x", "x", "x")));
+        assertFalse(CollectionUtils.allSame(Arrays.asList("x", "y")));
+    }
+
+    public void testRotateList() {
+        List<Integer> list = makeList(1, 2, 3, 4, 5);
+        CollectionUtils.rotate(list, 2);
+        assertEquals(makeList(3, 4, 5, 1, 2), list);
+        CollectionUtils.rotate(list, -2);
+        assertEquals(makeList(1, 2, 3, 4, 5), list);
     }
 }

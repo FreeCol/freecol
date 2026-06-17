@@ -76,6 +76,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -399,7 +400,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                     (int)Math.round(totalAttackPower - defencePower));
                 int moves = Math.min(9, 3 + diff / 3);
                 setMovesLeft(getMovesLeft() - moves);
-                logger.info(getId() + " slowed by " + attacker.getId()
+                if (logger.isLoggable(Level.INFO)) logger.info(getId() + " slowed by " + attacker.getId()
                     + " by " + Integer.toString(moves) + " moves.");
             } else {
                 attacker = null;
@@ -507,7 +508,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             }
         }
 
-        logger.info("Unit " + getId() + " is exploring rumour " + rumour);
+        if (logger.isLoggable(Level.INFO)) logger.info("Unit " + getId() + " is exploring rumour " + rumour);
         boolean result = true;
         String key = rumour.getDescriptionKey();
         switch (rumour) {
@@ -636,7 +637,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             break;
         case NO_SUCH_RUMOUR: case MOUNDS:
         default:
-            logger.warning("Bogus rumour type: " + rumour);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus rumour type: " + rumour);
             break;
         }
         tile.cacheUnseen();//+til
@@ -718,7 +719,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                             this, is)
                         .addStringTemplate("%nation%", nation)
                         .addName("%settlement%", is.getName()));
-                    logger.finest("First contact between "
+                    if (logger.isLoggable(Level.FINEST)) logger.finest("First contact between "
                         + contactPlayer.getId()
                         + " and " + is + " at " + newTile);
                 }                   
@@ -757,7 +758,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         if (oldLocation == null) {
             // This "can not happen", but if it did what follows would crash.
             // Probably best to log and return in the hope of not breaking it worse.
-            logger.warning("Unit with null location: " + this.toString());
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Unit with null location: " + this.toString());
             return;
         }
         Set<Tile> oldTiles = getVisibleTileSet();
@@ -772,7 +773,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             setMovesLeft(0); // Disembark always consumes all moves.
         } else {
             if (getMoveCost(newTile) <= 0) {
-                logger.warning("Move of unit: " + getId()
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Move of unit: " + getId()
                     + " from: " + oldLocation.getTile().getId()
                     + " to: " + newTile.getId()
                     + " has bogus cost: " + getMoveCost(newTile));
@@ -831,7 +832,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             }
 
             // Check for first landing
-            String newLand = null;
+            String newLand;
             boolean firstLanding = !owner.isNewLandNamed();
             if (firstLanding && owner.isEuropean()) {
                 newLand = owner.getNameForNewLand();
@@ -840,7 +841,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                 owner.setNewLandName(newLand);
                 cs.add(See.only(owner),
                        new NewLandNameMessage(this, newLand));
-                logger.finest("First landing for " + owner
+                if (logger.isLoggable(Level.FINEST)) logger.finest("First landing for " + owner
                     + " at " + newTile + " with " + this);
             }
 
@@ -1043,7 +1044,8 @@ public class ServerUnit extends Unit implements TurnTaker {
                     int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
                         ? 2 : 1;
                     int turns = ti.getTurnsToComplete();
-                    if ((turns -= amount) < 0) turns = 0;
+                    turns -= amount;
+                    if (turns < 0) turns = 0;
                     ti.setTurnsToComplete(turns);
                     setWorkLeft(turns);
                     if (ti.isRoad() && ti.isComplete()) {
@@ -1093,7 +1095,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                     locDirty = true;
                 } else {
                     if (!(result instanceof Tile)) {
-                        logger.warning("Unit has unsupported destination: "
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Unit has unsupported destination: "
                             + dst + " -> " + result);
                         result = getFullEntryLocation();
                     }

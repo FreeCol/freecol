@@ -28,6 +28,7 @@ import java.util.List;
  *      {@link #getBaseProduction(ProductionType, GoodsType, UnitType)}
  *      method originally was identical methods in seperate classes
  */
+@FunctionalInterface
 public interface BaseProduction {
 
     /**

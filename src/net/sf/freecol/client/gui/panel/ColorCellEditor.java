@@ -33,6 +33,7 @@ import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import java.util.logging.Level;
 
 
 /**
@@ -113,7 +114,7 @@ public final class ColorCellEditor extends AbstractCellEditor
                 fireEditingCanceled();
                 break;
             default:
-                logger.warning("Bad event: " + command);
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Bad event: " + command);
                 break;
         }
     }

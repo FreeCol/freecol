@@ -249,7 +249,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             if (colony.getCurrentlyBuilding() == null
                 && colonyPlan != null
                 && colonyPlan.getBestBuildableType() != null) {
-                logger.warning(colony.getName() + " could be building but"
+                if (logger.isLoggable(Level.WARNING)) logger.warning(colony.getName() + " could be building but"
                     + " is asleep until turn: " + rearrangeTurn.getNumber()
                     + "( > " + turn + ")");
             } else {
@@ -342,7 +342,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             sb.append("Autodestruct at ").append(colony.getName())
                 .append(" in ").append(turn).append(':');
             for (UnitWas uw : was) sb.append('\n').append(uw);
-            logger.warning(sb.toString());
+            if (logger.isLoggable(Level.WARNING)) logger.warning(sb.toString());
             if (!avertAutoDestruction()) return result;
         }
 

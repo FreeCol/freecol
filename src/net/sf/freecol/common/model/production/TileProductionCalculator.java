@@ -296,8 +296,11 @@ public class TileProductionCalculator {
      * Gets the production modifiers for the given type of goods on
      * the colony center tile.
      *
+     * @param turn The {@code Turn} in which production occurs.
+     * @param tile The center {@code Tile} to evaluate.
      * @param goodsType The {@code GoodsType} to produce.
-     * @param unitType The optional {@code UnitType} to produce them.
+     * @param additionalTileImprovements Additional {@code TileImprovementType}s
+     *     to apply in the calculation.
      * @return A stream of the applicable modifiers.
      */
     public Stream<Modifier> getCenterTileProductionModifiers(Turn turn, Tile tile, GoodsType goodsType, List<TileImprovementType> additionalTileImprovements) {        

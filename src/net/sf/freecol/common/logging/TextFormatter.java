@@ -21,6 +21,7 @@ package net.sf.freecol.common.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -51,7 +52,7 @@ final class TextFormatter extends Formatter {
             .append("\n\t").append(record.getLevel().getName())
             .append(": ").append(record.getMessage().replaceAll("\n", "\n\t"))
             .append("\n\t").append(new Date(record.getMillis()))
-            .append("\n\tThread: ").append(record.getThreadID())
+            .append("\n\tThread: ").append(getThreadId(record))
             .append('\n');
         if (record.getThrown() != null) {
             StringWriter sw = new StringWriter();
@@ -64,5 +65,23 @@ final class TextFormatter extends Formatter {
         }
 
         return result.toString();
+    }
+
+    private static long getThreadId(LogRecord record) {
+        try {
+            Method method = LogRecord.class.getMethod("getLongThreadID");
+            Object value = method.invoke(record);
+            if (value instanceof Long) return (Long) value;
+        } catch (ReflectiveOperationException | SecurityException e) {
+            // Fall back to older API.
+        }
+        try {
+            Method method = LogRecord.class.getMethod("getThreadID");
+            Object value = method.invoke(record);
+            if (value instanceof Integer) return ((Integer) value).longValue();
+        } catch (ReflectiveOperationException | SecurityException e) {
+            return -1L;
+        }
+        return -1L;
     }
 }

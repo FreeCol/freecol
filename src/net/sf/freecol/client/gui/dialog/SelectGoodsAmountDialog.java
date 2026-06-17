@@ -61,7 +61,7 @@ public final class SelectGoodsAmountDialog {
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
      * @param goodsType The {@code GoodsType} to select an amount of.
-     * @param available The amount of goods available.
+     * @param availableAmount The amount of goods available.
      * @param defaultAmount The amount to select to start with.
      * @param pay If true, check the player has sufficient funds.
      */

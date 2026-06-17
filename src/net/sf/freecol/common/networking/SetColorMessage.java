@@ -20,6 +20,8 @@
 package net.sf.freecol.common.networking;
 
 import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,6 +38,8 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message that changes the player color.
  */
 public class SetColorMessage extends AttributeMessage {
+
+    private static final Logger logger = Logger.getLogger(SetColorMessage.class.getName());
 
     public static final String TAG = "setColor";
     private static final String COLOR_TAG = "color";
@@ -60,6 +64,7 @@ public class SetColorMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public SetColorMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, NATION_TAG, COLOR_TAG);
@@ -85,11 +90,11 @@ public class SetColorMessage extends AttributeMessage {
         final Color color = getColor();
       
         if (nation == null) {
-            logger.warning("Invalid nation: " + toString());
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid nation: " + toString());
             return;
         }
         if (color == null) {
-            logger.warning("Invalid color: " + toString());
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Invalid color: " + toString());
             return;
         }
 
@@ -143,7 +148,9 @@ public class SetColorMessage extends AttributeMessage {
         try {
             int rgb = getIntegerAttribute(COLOR_TAG, 0);
             color = new Color(rgb);
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+            logger.log(Level.FINE, "Invalid set-color value.", nfe);
+        }
         return color;
     }
 }

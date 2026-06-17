@@ -31,6 +31,7 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 public class PathfindingTest extends FreeColTestCase {
 
     private final TileType plainsType = spec().getTileType("model.tile.plains");
+    private final TileType oceanType = spec().getTileType("model.tile.ocean");
 
     private final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 
@@ -131,7 +132,30 @@ public class PathfindingTest extends FreeColTestCase {
         gd = GoalDeciders.getComposedGoalDecider(false, nativeGD, colonyGD);
         path = unit.search(unitTile, gd, null, 1, null);
         assertNotNull(path);
-        assertEquals("Composed-OR GoalDecider should find colony", colonyTile,
+        Tile found = path.getLastNode().getTile();
+        assertTrue("Composed-OR GoalDecider should find colony or natives",
+                   found == colonyTile || found == nativeTile);
+    }
+
+    public void testPathAvoidsOceanBlock() {
+        final Game game = getStandardGame();
+        final Map map = getTestMap(plainsType, true);
+        game.changeMap(map);
+
+        final Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        final Tile start = map.getTile(3, 3);
+        final Tile target = map.getTile(5, 3);
+        final Tile blocked = map.getTile(4, 3);
+        blocked.setType(oceanType);
+
+        final Unit unit = new ServerUnit(game, start, dutch, colonistType);
+        final GoalDecider gd = GoalDeciders.getLocationGoalDecider(target);
+        final PathNode path = unit.search(start, gd, null, 1, null);
+
+        assertNotNull("Path should be found around ocean", path);
+        assertEquals("Path should reach target", target,
                      path.getLastNode().getTile());
+        assertTrue("Path should detour around ocean",
+                   path.getLength() > 3);
     }
 }

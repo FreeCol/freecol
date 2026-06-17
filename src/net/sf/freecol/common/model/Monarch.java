@@ -40,6 +40,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.RandomChoice;
+import java.util.logging.Level;
 
 
 /**
@@ -558,7 +559,7 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         Force ref = getExpeditionaryForce();
         ref.add(result);
-        logger.info("Add to " + player.getDebugName()
+        if (logger.isLoggable(Level.INFO)) logger.info("Add to " + player.getDebugName()
             + " REF: capacity=" + ref.getCapacity()
             + " spaceRequired=" + ref.getSpaceRequired()
             + " => " + result);
@@ -713,7 +714,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
             strength = AbstractUnit.calculateStrength(spec, result);
             ratio = Player.strengthRatio(baseStrength+strength, enemyStrength);
-            logger.finest("War support:"
+            if (logger.isLoggable(Level.FINEST)) logger.finest("War support:"
                 + " initially=" + supportStrength + "/" + fullRatio
                 + " finally=" + strength + "/" + ratio);
         }
@@ -741,7 +742,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // FIXME: magic numbers for 2-4 mercs
         int count = randomInt(logger, "Mercenary count", random, 2) + 2;
         int price = 0;
-        UnitType unitType = null;
+        UnitType unitType;
         List<UnitType> unitTypes = new ArrayList<>(mercenaryTypes);
         while (count > 0 && !unitTypes.isEmpty()) {
             unitType = getRandomMember(logger, "Merc unit",

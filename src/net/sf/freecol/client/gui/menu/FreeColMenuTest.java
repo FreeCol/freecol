@@ -27,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -46,12 +48,14 @@ import net.sf.freecol.client.gui.FreeColFrame;
  */
 public class FreeColMenuTest implements ActionListener, ItemListener {
 
+    private static final Logger logger = Logger.getLogger(FreeColMenuTest.class.getName());
+
     JTextArea output;
     JScrollPane scrollPane;
     final String newline = "\n";
 
     private JMenuBar createMenuBar() {
-        JMenuBar menuBar = null;
+        JMenuBar menuBar;
 
         FreeColClient client = FreeCol.startTestClient(null);
 
@@ -122,7 +126,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-            System.err.println("Couldn't find file: " + path);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Couldn't find file: " + path);
             return null;
         }
     }

@@ -522,8 +522,6 @@ public class Flag {
         case PER_SALTIRE:
             drawPerSaltire(g);
             break;
-        default:
-            break;
         }
 
         // draw decoration
@@ -554,8 +552,6 @@ public class Flag {
             decorationShape = getBend(true);
             decorationShape.append(getBend(false), false);
             decorationShape.append(getCross(Decoration.CROSS), false);
-            break;
-        default:
             break;
         }
         if (decorationShape != null) {
@@ -647,9 +643,9 @@ public class Flag {
                          || decoration == Decoration.BEND
                          || decoration == Decoration.BEND_SINISTER);
 
-        double x = 0;
-        double y = 0;
-        double r = 0;
+        double x;
+        double y;
+        double r;
         if (unionShape == UnionShape.CHEVRON) {
             x = CHEVRON_X;
             y = HEIGHT;

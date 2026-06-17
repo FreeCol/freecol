@@ -70,7 +70,7 @@ public class DisconnectMessage extends TrivialMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        ; // Do nothing on the client side
+        // Do nothing on the client side
     }
 
     /**

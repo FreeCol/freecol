@@ -436,7 +436,8 @@ public final class BuildColonyMission extends Mission {
 
                 // Find a real tile target?
                 Location newTarget;
-                if ((newTarget = findMissionTarget(aiUnit, 5, false)) != null) {
+                newTarget = findMissionTarget(aiUnit, 5, false);
+                if (newTarget != null) {
                     setTarget(newTarget);
                     return lbRetarget(lb);
                 }
@@ -474,7 +475,7 @@ public final class BuildColonyMission extends Mission {
             } else if (player.owns(tile)) { // Already ours, clear users
                 Colony colony = (Colony)tile.getOwningSettlement();
                 if (colony != null) {
-                    logger.warning("Building on colony tile: " + tile);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Building on colony tile: " + tile);
                     return lbFail(lb, false, "building on colony tile ", tile);
                 }
             } else {

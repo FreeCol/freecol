@@ -117,7 +117,7 @@ public class FreeColDataFile {
             }
             return name;
         } catch (IOException ioe) {
-            logger.warning("Failed to create jar file: " + file.getName());
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to create jar file: " + file.getName());
         }
         return null;
     }
@@ -134,7 +134,7 @@ public class FreeColDataFile {
                 try {
                     return new URI(name);
                 } catch (URISyntaxException e) {
-                    logger.log(Level.WARNING, "Resource creation failure with: "
+                    if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Resource creation failure with: "
                         + name, e);
                     return null;
                 }
@@ -145,7 +145,7 @@ public class FreeColDataFile {
                                null);
             }
         } catch (URISyntaxException e) {
-            logger.log(Level.WARNING, "Failed to lookup: " + file + "/" + name,
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to lookup: " + file + "/" + name,
                        e);
             return null;
         }
@@ -309,7 +309,7 @@ public class FreeColDataFile {
             } catch (FileNotFoundException e) { // Expected failure
                 lb.add(' ', file, '/', fileName, ":not-found");
             } catch (IOException e) {
-                logger.log(Level.WARNING, "ResourceMapping read exception: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "ResourceMapping read exception: "
                     + file + "/" + fileName, e);
                 return null;
             }
@@ -342,49 +342,47 @@ public class FreeColDataFile {
             return Map.of();
         }
 
-        FileSystem fileSystem = null;
         try {
-            final Path filePath;
             if (file.isDirectory()) {
-                filePath = new File(file, name).toPath();
-            } else {
-                /*
-                 * We can use JarEntry instead, if this solution causes problems. 
-                 */
-                fileSystem = FileSystems.newFileSystem(new URI("jar:file", file.getAbsolutePath(), null), Map.of());
-                filePath = fileSystem.getPath(jarDirectory + name);
+                return findVariationsWithAlternateSizes(new File(file, name).toPath());
             }
             
             /*
-             * Using LinkedHashMap to ensure we keep the variations in order.
+             * We can use JarEntry instead, if this solution causes problems. 
              */
-            final Map<URI, List<URI>> result = new LinkedHashMap<>();
-            if (MemoryManager.isHighQualityGraphicsEnabled()) {
-                result.put(null, findFilesWithVariationOrAlternativeSizeAsUri(filePath, false));
-            } else {
-                result.put(null, List.of());
+            try (FileSystem fileSystem = FileSystems.newFileSystem(
+                    new URI("jar:file", file.getAbsolutePath(), null), Map.of())) {
+                Path filePath = fileSystem.getPath(jarDirectory + name);
+                return findVariationsWithAlternateSizes(filePath);
             }
-            
-            final List<Path> variations = findFilesWithVariationOrAlternativeSize(filePath, true);
-            for (Path variationPath : variations) {
-                if (MemoryManager.isHighQualityGraphicsEnabled()) {
-                    result.put(variationPath.toUri(), findFilesWithVariationOrAlternativeSizeAsUri(variationPath, false));
-                } else {
-                    result.put(variationPath.toUri(), List.of());
-                }
-            } 
-            
-            return result;
         } catch (IOException | URISyntaxException e) {
-            logger.log(Level.WARNING, "Failed to read directory from jar/zip file: " + file + " jarDirectory" + jarDirectory, e);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Failed to read directory from jar/zip file: " + file + " jarDirectory" + jarDirectory, e);
             return Map.of();
-        } finally {
-            if (fileSystem != null) {
-                try {
-                    fileSystem.close();
-                } catch (IOException e) {}
+        }
+    }
+
+    private Map<URI, List<URI>> findVariationsWithAlternateSizes(Path filePath) throws IOException {
+        /*
+         * Using LinkedHashMap to ensure we keep the variations in order.
+         */
+        final Map<URI, List<URI>> result = new LinkedHashMap<>();
+        if (MemoryManager.isHighQualityGraphicsEnabled()) {
+            result.put(null, findFilesWithVariationOrAlternativeSizeAsUri(filePath, false));
+        } else {
+            result.put(null, List.of());
+        }
+
+        final List<Path> variations = findFilesWithVariationOrAlternativeSize(filePath, true);
+        for (Path variationPath : variations) {
+            if (MemoryManager.isHighQualityGraphicsEnabled()) {
+                result.put(variationPath.toUri(),
+                    findFilesWithVariationOrAlternativeSizeAsUri(variationPath, false));
+            } else {
+                result.put(variationPath.toUri(), List.of());
             }
         }
+
+        return result;
     }
 
     private List<URI> findFilesWithVariationOrAlternativeSizeAsUri(final Path filePath, boolean findVariation) throws IOException {
@@ -438,7 +436,7 @@ public class FreeColDataFile {
      */
     public static FileFilter getFileFilter(String extension) {
         String s = Messages.message("filter." + extension);
-        if (extension.equals("*")) {
+        if ("*".equals(extension)) {
             return new FileFilter() {
                 @Override
                 public boolean accept(File f) {

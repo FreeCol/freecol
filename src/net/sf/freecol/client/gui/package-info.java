@@ -1,5 +1,5 @@
 /**
- * <h1>FreeCol Client GUI package</h1>
+ * <h2>FreeCol Client GUI package</h2>
  *
  * <p>Contains the graphical user interface (GUI) classes.</p>
  *

@@ -32,6 +32,7 @@ import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.sound.SoundPlayer;
+import java.util.logging.Level;
 
 /**
  * Controls the SoundPlayer.
@@ -61,8 +62,8 @@ public class SoundController {
             try {
                 amo = opts.getOption(ClientOptions.AUDIO_MIXER,
                                      AudioMixerOption.class);
-            } catch (Exception ex) {
-                logger.warning(ex.getMessage());
+            } catch (IllegalArgumentException ex) {
+                if (logger.isLoggable(Level.WARNING)) logger.warning(ex.getMessage());
             }
             
             if (amo == null) {
@@ -72,7 +73,7 @@ public class SoundController {
             // created, but if it has a bad mixer sound output will be
             // suspended.  The hope is that the user will change the
             // mixer option to one that works.
-            logger.info("Create sound player with " + amo);
+            if (logger.isLoggable(Level.INFO)) logger.info("Create sound player with " + amo);
             this.soundPlayer = new SoundPlayer(amo, opts.getOption(ClientOptions.SOUND_EFFECTS_VOLUME, PercentageOption.class));
             this.musicPlayer = new SoundPlayer(amo, opts.getOption(ClientOptions.MUSIC_VOLUME, PercentageOption.class));
         }
@@ -122,7 +123,7 @@ public class SoundController {
         File file = ResourceManager.getAudio(sound);
         if (file == null) return;
         boolean playing = sp.playOnce(file);
-        logger.finest(((playing) ? "Queued" : "Fail on")
+        if (logger.isLoggable(Level.FINEST)) logger.finest(((playing) ? "Queued" : "Fail on")
             + " sound: " + sound);
     }
     

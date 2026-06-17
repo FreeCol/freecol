@@ -70,6 +70,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerIndianSettlement;
+import java.util.logging.Level;
 
 
 /**
@@ -83,7 +84,6 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
  */
 public final class MapEditorTransformPanel extends FreeColPanel {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
     private static final class RiverTransform extends MapTransform {
@@ -236,7 +236,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             nativePlayer.addSettlement(sis);
             sis.placeSettlement(true);
             sis.addUnits(null);
-            logger.info("Add settlement " + sis.getName() + " to tile " + t);
+            if (logger.isLoggable(Level.INFO)) logger.info("Add settlement " + sis.getName() + " to tile " + t);
         }
     }
 
@@ -465,7 +465,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     }
                     if (mt instanceof AssignAreaTransform) {
                         getGUI().showFreeColPanel(chooseAreaModificationPanel, true, null, true);
-                        newMapTransform = null;
                         ctlr.setDisplayAreas(true);
                     }
                     newMapTransform = mt;

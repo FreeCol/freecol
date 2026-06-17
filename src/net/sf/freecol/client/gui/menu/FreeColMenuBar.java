@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.action.SelectableOptionAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.util.ImageUtils;
+import java.util.logging.Level;
 
 
 /**
@@ -136,7 +137,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.getInputMap().put(action.getAccelerator(), action.getId());
             rtn.getActionMap().put(action.getId(), action);
         } else {
-            logger.finest("Could not create menu item. [" + actionId
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Could not create menu item. [" + actionId
                 + "] not found.");
         }
         return rtn;
@@ -179,7 +180,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.getInputMap().put(action.getAccelerator(), action.getId());
             rtn.getActionMap().put(action.getId(), action);
         } else {
-            logger.finest("Could not create menu item. [" + actionId + "] not found.");
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Could not create menu item. [" + actionId + "] not found.");
         }
 
         return rtn;
@@ -209,7 +210,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.getInputMap().put(action.getAccelerator(), action.getId());
             rtn.getActionMap().put(action.getId(), action);
         } else {
-            logger.finest("Could not create menu item. [" + actionId
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Could not create menu item. [" + actionId
                 + "] not found.");
         }
         return rtn;

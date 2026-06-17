@@ -145,12 +145,10 @@ public final class DefendSettlementMission extends Mission {
                 @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path);
-                    if (bestValue < value) {
-                        bestValue = value;
-                        bestPath = path;
-                        return true;
-                    }
-                    return false;
+                    if (bestValue >= value) return false;
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
                 }
             };
     }
@@ -163,8 +161,9 @@ public final class DefendSettlementMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static PathNode findTargetPath(AIUnit aiUnit, int range,
-        @SuppressWarnings("unused") boolean deferOK) {
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
@@ -343,7 +342,7 @@ public final class DefendSettlementMission extends Mission {
         // Change to supporting the settlement if the size is marginal.
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
-        Mission m = null;
+        Mission m;
         if (getTarget() instanceof Colony) {
             Colony colony = (Colony)getTarget();
             if (unit.isInColony()
@@ -410,12 +409,11 @@ public final class DefendSettlementMission extends Mission {
                 double weDefend = cm.getDefencePower(enemyUnit, unit);
                 double difference = weAttack / (weAttack + enemyDefend)
                     - enemyAttack / (enemyAttack + weDefend);
-                if (difference > bestDifference) {
-                    if (difference > 0 || weAttack > enemyDefend) {
-                        bestDifference = difference;
-                        bestTarget = enemyUnit;
-                        bestDirection = d;
-                    }
+                if (difference > bestDifference
+                    && (difference > 0 || weAttack > enemyDefend)) {
+                    bestDifference = difference;
+                    bestTarget = enemyUnit;
+                    bestDirection = d;
                 }
             }
         }

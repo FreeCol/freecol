@@ -95,7 +95,7 @@ public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
@@ -120,15 +120,18 @@ public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
         } else if (!type.isTileTypeAllowed(tile.getType())) {
             return serverPlayer.clientError("ImprovementType not allowed on tile: "
                 + improvementId);
-        } else if ((improvement = tile.getTileImprovement(type)) == null) {
-            if (!type.isWorkerAllowed(unit)) {
-                return serverPlayer.clientError("Unit can not create improvement: "
-                    + improvementId);
-            }
-        } else { // Has improvement, check if worker can contribute to it
-            if (!improvement.isWorkerAllowed(unit)) {
-                return serverPlayer.clientError("Unit can not work on improvement: "
-                    + improvementId);
+        } else {
+            improvement = tile.getTileImprovement(type);
+            if (improvement == null) {
+                if (!type.isWorkerAllowed(unit)) {
+                    return serverPlayer.clientError("Unit can not create improvement: "
+                        + improvementId);
+                }
+            } else { // Has improvement, check if worker can contribute to it
+                if (!improvement.isWorkerAllowed(unit)) {
+                    return serverPlayer.clientError("Unit can not work on improvement: "
+                        + improvementId);
+                }
             }
         }
 

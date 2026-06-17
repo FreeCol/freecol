@@ -74,6 +74,7 @@ public class FreeColRadioButtonUI extends BasicRadioButtonUI {
             return FontLibrary.getMainFont().getSize() * 3 / 2;
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             final Graphics2D g2d = (Graphics2D) g;
             final ButtonModel model = ((AbstractButton) c).getModel();
@@ -115,10 +116,12 @@ public class FreeColRadioButtonUI extends BasicRadioButtonUI {
             }
         }
 
+        @Override
         public int getIconWidth() {
             return getWidgetSize();
         }
 
+        @Override
         public int getIconHeight() {
             return getWidgetSize();
         }

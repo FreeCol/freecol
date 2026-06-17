@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
+import java.util.logging.Level;
 
 
 /**
@@ -248,7 +249,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         }
         if (this.rulesBox.getSelectedItem() == null) {
             this.rulesBox.setSelectedItem(this.rulesBox.getItemCount()-1);
-            logger.warning("No TC found for: " + selectRules
+            if (logger.isLoggable(Level.WARNING)) logger.warning("No TC found for: " + selectRules
                 + ", failling back to " + this.rulesBox.getSelectedItem());
         }
         this.rulesBox
@@ -364,7 +365,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         if (this.difficulty == null) {
             throw new RuntimeException("No difficulty found for: " + this);
         }
-        logger.info("NewPanel initialized with " + this.specification.getId()
+        if (logger.isLoggable(Level.INFO)) logger.info("NewPanel initialized with " + this.specification.getId()
             + "/" + this.difficulty.getId());
         enableComponents();
         setSize(getPreferredSize());
@@ -610,7 +611,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                 super.actionPerformed(ae);
                 break;
             }
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             gui.showErrorPanel(e, StringTemplate.key("error.unspecified"));
         }
     }

@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import static java.nio.file.StandardOpenOption.*;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -193,8 +194,8 @@ public class FreeColDebugger {
             try {
                 DebugMode mode = Enum.valueOf(DebugMode.class, upCase(s));
                 enableDebugMode(mode);
-            } catch (RuntimeException e) {
-                logger.warning("Unrecognized debug mode: " + optionValue);
+            } catch (IllegalArgumentException e) {
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Unrecognized debug mode: " + optionValue);
                 return false;
             }
         }
@@ -295,7 +296,9 @@ public class FreeColDebugger {
                 try {
                     fcs.saveGame(FreeColDirectories.getDebugRunSaveFile(),
                                  freeColClient.getClientOptions(), null);
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                    logger.log(Level.FINE, "Failed to save debug run.", e);
+                }
             }
             freeColClient.quit();
         }
@@ -497,9 +500,10 @@ public class FreeColDebugger {
         lb.add(warn, "\n");
         addStackTrace(lb);
         if (logger == null) {
-            System.err.println(lb.toString());
+            Logger fallbackLogger = Logger.getLogger(FreeColDebugger.class.getName());
+            if (fallbackLogger.isLoggable(Level.WARNING)) fallbackLogger.warning(lb.toString());
         } else {
-            logger.warning(lb.toString());
+            if (logger.isLoggable(Level.WARNING)) logger.warning(lb.toString());
         }
     }
 }

@@ -1090,7 +1090,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A suitable {@code StringTemplate}.
      */
     private StringTemplate getDetailedLocationLabel() {
-        Settlement nearSettlement = null;
+        Settlement nearSettlement;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
             if (nearSettlement != null && nearSettlement.getName() != null) {
@@ -1125,7 +1125,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A suitable {@code StringTemplate}.
      */
     private StringTemplate getDetailedLocationLabelFor(Player player) {
-        Settlement nearSettlement = null;
+        Settlement nearSettlement;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
             if (nearSettlement != null
@@ -1280,7 +1280,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * Used by the terrain generator.
      *
-     * @param mountains The mountain tile type.
      * @return True if this is a good potential elevated tile.
      */
     public boolean isGoodMountainTile() {
@@ -1610,14 +1609,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         java.util.Map<GoodsType, Integer> goodsMap
             = new HashMap<>(typeList.size());
         for (GoodsType goodsType : typeList) {
-            if (goodsType.isBuildingMaterial()) {
-                while (goodsType.isRefined()) {
-                    goodsType = goodsType.getInputType();
+            GoodsType actualType = goodsType;
+            if (actualType.isBuildingMaterial()) {
+                while (actualType.isRefined()) {
+                    actualType = actualType.getInputType();
                 }
-            } else if (!goodsType.isFoodType()) {
+            } else if (!actualType.isFoodType()) {
                 continue;
             }
-            goodsMap.put(goodsType, 0);
+            goodsMap.put(actualType, 0);
         }
         // Supercede with positive unattended production from this tile
         for (ProductionType productionType : getType()
@@ -2165,7 +2165,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 // to throw.
                 u = settlement.getDefendingUnit(attacker);
             } catch (IllegalStateException e) {
-                logger.log(Level.WARNING, "Empty settlement: "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Empty settlement: "
                     + settlement.getName(), e);
             }
             // This routine can be called on the client for the pre-combat
@@ -2262,11 +2262,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             return addTileItem((TileItem) locatable);//-til
 
         } else if (locatable instanceof Unit) {
-            if (super.add(locatable)) {
-                ((Unit)locatable).setState(Unit.UnitState.ACTIVE);
-                return true;
-            }
-            return false;
+            if (!super.add(locatable)) return false;
+            ((Unit)locatable).setState(Unit.UnitState.ACTIVE);
+            return true;
 
         } else {
             return super.add(locatable);
@@ -2544,22 +2542,25 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (player == null) { // 1. Not writing to a player, just write tile.
             this.internalToXML(xw, tag);
 
-        } else if ((tile = getCachedTile(player)) != null) { // 2. Cached tile.
-            tile.internalToXML(xw, tag);
+        } else {
+            tile = getCachedTile(player);
+            if (tile != null) { // 2. Cached tile.
+                tile.internalToXML(xw, tag);
 
-        } else if (isExploredBy(player)) { // 3. Tile is explored, write it
-            this.internalToXML(xw, tag);
+            } else if (isExploredBy(player)) { // 3. Tile is explored, write it
+                this.internalToXML(xw, tag);
 
-        } else { // 4. Tile is not explored.
-            xw.writeStartElement(tag);
+            } else { // 4. Tile is not explored.
+                xw.writeStartElement(tag);
 
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
-            xw.writeAttribute(X_TAG, this.x);
+                xw.writeAttribute(X_TAG, this.x);
 
-            xw.writeAttribute(Y_TAG, this.y);
+                xw.writeAttribute(Y_TAG, this.y);
 
-            xw.writeEndElement();
+                xw.writeEndElement();
+            }
         }
     }
 
@@ -2789,7 +2790,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     int apparent;
                     if (colony != null
                         && (apparent = colony.getApparentUnitCount()) <= 0) {
-                        logger.warning("Copied colony " + colony.getId()
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Copied colony " + colony.getId()
                             + " display unit count set to 1 from corrupt: "
                             + apparent);
                         colony.setDisplayUnitCount(1);

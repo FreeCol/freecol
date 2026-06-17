@@ -57,6 +57,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -468,7 +469,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         StringTemplate lab = null, tip = null;
         GoodsType gt;
         if (hasVisited(player)) {
-            if ((gt = getWantedGoods(index)) != null) {
+            gt = getWantedGoods(index);
+            if (gt != null) {
                 lab = StringTemplate.label("").add(Messages.nameKey(gt));
                 String sale = player.getLastSaleString(this, gt);
                 if (sale != null) {
@@ -581,12 +583,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *     and player.
      */
     public boolean setContacted(Player player) {
-        if (!hasContacted(player)) {
-            setContactLevel(player, ContactLevel.CONTACTED);
-            initializeAlarm(player);
-            return true;
-        }
-        return false;
+        if (hasContacted(player)) return false;
+        setContactLevel(player, ContactLevel.CONTACTED);
+        initializeAlarm(player);
+        return true;
     }
 
     /**
@@ -609,12 +609,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *     by the player.
      */
     public boolean setVisited(Player player) {
-        if (!hasVisited(player)) {
-            if (!hasContacted(player)) initializeAlarm(player);
-            setContactLevel(player, ContactLevel.VISITED);
-            return true;
-        }
-        return false;
+        if (hasVisited(player)) return false;
+        if (!hasContacted(player)) initializeAlarm(player);
+        setContactLevel(player, ContactLevel.VISITED);
+        return true;
     }
 
     /**
@@ -637,12 +635,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *     by the player.
      */
     public boolean setScouted(Player player) {
-        if (!hasScouted(player)) {
-            if (!hasContacted(player)) initializeAlarm(player);
-            setContactLevel(player, ContactLevel.SCOUTED);
-            return true;
-        }
-        return false;
+        if (hasScouted(player)) return false;
+        if (!hasContacted(player)) initializeAlarm(player);
+        setContactLevel(player, ContactLevel.SCOUTED);
+        return true;
     }
 
     /**
@@ -854,7 +850,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // Do not simplify with *=, we want the integer truncation.
         price = wantedBonus * price / wantedBase;
 
-        logger.finest("Full price(" + amount + " " + type + ")"
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Full price(" + amount + " " + type + ")"
                       + " -> " + price);
         return price;
     }
@@ -964,7 +960,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         int valued = Math.max(0, required - getGoodsCount(type));
         int price = (valued > amount / 2) ? full * amount
             : valued * full + getNormalGoodsPriceToBuy(type, amount - valued);
-        logger.finest("Military price(" + amount + " " + type + ")"
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Military price(" + amount + " " + type + ")"
                       + " valued=" + valued
                       + " -> " + price);
         return price;

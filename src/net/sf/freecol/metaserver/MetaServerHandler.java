@@ -34,6 +34,7 @@ import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
+import java.util.logging.Level;
 
 
 /**
@@ -100,7 +101,7 @@ public final class MetaServerHandler implements MessageHandler {
             update(usm);
             break;
         default:
-            logger.warning("Unknown request: " + tag);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Unknown request: " + tag);
             break;
         }
         return reply;

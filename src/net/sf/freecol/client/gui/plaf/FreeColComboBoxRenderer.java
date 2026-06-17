@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 import net.sf.freecol.common.option.FullscreenDisplayModeOption.FullscreenDisplayModeWrapper;
 import net.sf.freecol.common.option.LanguageOption.Language;
+import java.util.logging.Level;
 
 
 /**
@@ -162,7 +163,7 @@ public class FreeColComboBoxRenderer<T>
             final FullscreenDisplayModeWrapper fdw = (FullscreenDisplayModeWrapper) value;
             c.setText(fdw.getName());
         } else {
-            logger.warning("What is this?: " + value
+            if (logger.isLoggable(Level.WARNING)) logger.warning("What is this?: " + value
                 + " (" + value.getClass() + ")");
         }
     }

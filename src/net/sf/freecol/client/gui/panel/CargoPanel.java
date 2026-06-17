@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
+import java.util.logging.Level;
 
 /**
  * A panel that holds units and goods that represent Units and cargo
@@ -230,7 +231,7 @@ public class CargoPanel extends FreeColPanel
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        logger.finest("CargoPanel change " + event.getPropertyName()
+        if (logger.isLoggable(Level.FINEST)) logger.finest("CargoPanel change " + event.getPropertyName()
                 + ": " + event.getOldValue()
                 + " -> " + event.getNewValue());
         update();

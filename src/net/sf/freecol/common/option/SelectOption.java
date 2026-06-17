@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
+import java.util.logging.Level;
 
 
 /**
@@ -48,7 +49,6 @@ import net.sf.freecol.common.model.Specification;
  */
 public class SelectOption extends IntegerOption {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectOption.class.getName());
 
     public static final String TAG = "selectOption";
@@ -181,7 +181,7 @@ public class SelectOption extends IntegerOption {
             }
             if (fallback == null) fallback = i;
         }
-        logger.warning(TAG + ".setValue invalid value: "
+        if (logger.isLoggable(Level.WARNING)) logger.warning(TAG + ".setValue invalid value: "
             + value + ", using fallback: " + fallback);
         super.setValue(fallback);
     }

@@ -48,6 +48,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -332,7 +333,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         setCurrentFather(ff);
         clearOfferedFathers();
         if (ff != null) {
-            logger.finest(getId() + " is recruiting " + ff.getId()
+            if (logger.isLoggable(Level.FINEST)) logger.finest(getId() + " is recruiting " + ff.getId()
                 + " in " + getGame().getTurn());
         }
     }
@@ -421,7 +422,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             }
         }
         if (changed) {
-            logger.finest("randomizeGame(" + getId() + ") initial prices: "
+            if (logger.isLoggable(Level.FINEST)) logger.finest("randomizeGame(" + getId() + ") initial prices: "
                 + sb.toString().substring(2));
         }
     }
@@ -475,8 +476,10 @@ public class ServerPlayer extends Player implements TurnTaker {
 
         // Traverse player units, look for valid carriers, colonists,
         // carriers with units, carriers with goods.
-        boolean hasCarrier = false, hasColonist = false, hasEmbarked = false,
-            hasGoods = false;
+        boolean hasCarrier = false;
+        boolean hasColonist = false;
+        boolean hasEmbarked = false;
+        boolean hasGoods = false;
         for (Unit unit : getUnitSet()) {
             if (unit.isCarrier()) {
                 if (unit.hasGoodsCargo()) hasGoods = true;
@@ -489,17 +492,17 @@ public class ServerPlayer extends Player implements TurnTaker {
             hasColonist = true;
 
             // Verify if unit is in new world, or on a carrier in new world
-            Unit carrier;
-            if ((carrier = unit.getCarrier()) != null) {
+            Unit carrier = unit.getCarrier();
+            if (carrier != null) {
                 if (carrier.hasTile()) {
-                    logger.info(getName() + " alive, unit " + unit.getId()
+                    if (logger.isLoggable(Level.INFO)) logger.info(getName() + " alive, unit " + unit.getId()
                         + " (embarked) on map.");
                     return DeadCheck.IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
             if (unit.hasTile() && !unit.isInMission()) {
-                logger.info(getName() + " alive, unit " + unit.getId()
+                if (logger.isLoggable(Level.INFO)) logger.info(getName() + " alive, unit " + unit.getId()
                     + " on map.");
                 return DeadCheck.IS_ALIVE;
             }
@@ -510,17 +513,17 @@ public class ServerPlayer extends Player implements TurnTaker {
         if (getGame().getTurn().getYear() >= mandatory) {
             // After the season cutover year there must be a presence
             // in the New World.
-            logger.info(getName() + " dead, no presence >= " + mandatory);
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + " dead, no presence >= " + mandatory);
             return DeadCheck.IS_DEAD;
         }
 
         // No problems, unit available on carrier but off map, or goods
         // available to be sold.
         if (hasEmbarked) {
-            logger.info(getName() + " alive, has embarked unit.");
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + " alive, has embarked unit.");
             return DeadCheck.IS_ALIVE;
         } else if (hasGoods) {
-            logger.info(getName() + " alive, has cargo.");
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + " alive, has cargo.");
             return DeadCheck.IS_ALIVE;
         }
 
@@ -536,7 +539,7 @@ public class ServerPlayer extends Player implements TurnTaker {
                 : min(spec.getUnitTypesWithAbility(Ability.NAVAL_UNIT),
                       unitPricer);
             if (price == Integer.MAX_VALUE || !checkGold(price)) {
-                logger.info(getName() + " dead, can not buy carrier.");
+                if (logger.isLoggable(Level.INFO)) logger.info(getName() + " dead, can not buy carrier.");
                 return DeadCheck.IS_DEAD;
             }
             goldNeeded += price;
@@ -544,10 +547,10 @@ public class ServerPlayer extends Player implements TurnTaker {
 
         // A colonist is required.
         if (hasColonist) {
-            logger.info(getName() + " alive, has waiting colonist.");
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + " alive, has waiting colonist.");
             return DeadCheck.IS_ALIVE;
         } else if (europe == null) {
-            logger.info(getName() + " dead, can not recruit.");
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + " dead, can not recruit.");
             return DeadCheck.IS_DEAD;
         }
         int price = Math.min(europe.getCurrentRecruitPrice(),
@@ -555,13 +558,13 @@ public class ServerPlayer extends Player implements TurnTaker {
                                  unitPricer));
         goldNeeded += price;
         if (checkGold(goldNeeded)) {
-            logger.info(getName() + " alive, can buy colonist.");
+            if (logger.isLoggable(Level.INFO)) logger.info(getName() + " alive, can buy colonist.");
             return DeadCheck.IS_ALIVE;
         }
 
         // Col1 auto-recruits a unit in Europe if you run out before
         // the cutover year.
-        logger.info(getName() + " survives by autorecruit.");
+        if (logger.isLoggable(Level.INFO)) logger.info(getName() + " survives by autorecruit.");
         return DeadCheck.IS_AUTORECRUIT;
     }
 
@@ -595,7 +598,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         for (Player r : getRebels()) {
             double rebelLandPower = r.calculateStrength(false);
             if (rebelLandPower < refLandPower) return false;
-            logger.fine("REF in trouble wrt " + r.getName() + " ("
+            if (logger.isLoggable(Level.FINE)) logger.fine("REF in trouble wrt " + r.getName() + " ("
                 + refLandPower + " <= " + rebelLandPower + ")");
         }
 
@@ -603,17 +606,15 @@ public class ServerPlayer extends Player implements TurnTaker {
         // a minimal number of land and naval units
         final int landREFUnitsRequired = 7; // FIXME: magic number
         if (land < landREFUnitsRequired) {
-            logger.info("REF surrenders due to land army collapse ("
+            if (logger.isLoggable(Level.INFO)) logger.info("REF surrenders due to land army collapse ("
                 + land + " < " + landREFUnitsRequired + ")");
             return true;
         }
         final int navalREFUnitsRequired = 2; // FIXME: magic number
-        if (naval < navalREFUnitsRequired) {
-            logger.info("REF surrenders due to lack of naval support ("
-                + naval + " < " + navalREFUnitsRequired + ")");
-            return true;
-        }
-        return false;
+        if (naval >= navalREFUnitsRequired) return false;
+        if (logger.isLoggable(Level.INFO)) logger.info("REF surrenders due to lack of naval support ("
+            + naval + " < " + navalREFUnitsRequired + ")");
+        return true;
     }
 
     /**
@@ -721,19 +722,21 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public void csWithdraw(ChangeSet cs, ModelMessage mm, HistoryEvent he) {
         final Game game = getGame();
-        if (mm == null) {
+        ModelMessage message = mm;
+        if (message == null) {
             final String key = (isEuropean())
                 ? "model.player.dead.european"
                 : "model.player.dead.native";
-            mm = new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
+            message = new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
                 .addStringTemplate("%nation%", getNationLabel());
         }
-        if (he == null) {
-            he = new HistoryEvent(game.getTurn(), HistoryEvent.HistoryEventType.NATION_DESTROYED, null)
+        HistoryEvent historyEvent = he;
+        if (historyEvent == null) {
+            historyEvent = new HistoryEvent(game.getTurn(), HistoryEvent.HistoryEventType.NATION_DESTROYED, null)
                 .addStringTemplate("%nation%", getNationLabel());
         }
-        cs.addGlobalMessage(game, null, mm);
-        cs.addGlobalHistory(game, he);
+        cs.addGlobalMessage(game, null, message);
+        cs.addGlobalHistory(game, historyEvent);
         csKill(cs);//+vis,+til
     }
 
@@ -800,7 +803,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         final int age = game.getAge();
-        EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
+        Map<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
             = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFather father : transform(spec.getFoundingFathers(),
                 ff -> !hasFather(ff) && ff.isAvailableTo(this))) {
@@ -1027,8 +1030,8 @@ public class ServerPlayer extends Player implements TurnTaker {
      *     when making claims.
      */
     public void reassignTiles(Collection<Tile> tiles, Settlement avoid) {
-        HashMap<Settlement, Integer> votes = new HashMap<>();
-        HashMap<Tile, Settlement> claims = new HashMap<>();
+        Map<Settlement, Integer> votes = new HashMap<>();
+        Map<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
         for (Tile tile : tiles) {
             final Player occupier = (tile.getFirstUnit() == null) ? null
@@ -1199,7 +1202,9 @@ public class ServerPlayer extends Player implements TurnTaker {
             sb.append(' ').append(goodsType.getId());
             ret = true;
         }
-        if (ret) logger.finest(sb.toString());
+        if (ret) {
+            if (logger.isLoggable(Level.FINEST)) logger.finest(sb.toString());
+        }
         return ret;
     }
 
@@ -1238,11 +1243,12 @@ public class ServerPlayer extends Player implements TurnTaker {
                            GoodsType type, int amount) {
         final Market market = getMarket();
         int marketAmount = 0;
-        while (amount > 0) {
+        int remaining = amount;
+        while (remaining > 0) {
             // Always break up into chunks, so the price can adjust
             // dynamically during large transactions, avoiding
             // exploitable market manipulation.
-            int a = (amount <= GoodsContainer.CARGO_SIZE) ? amount
+            int a = (remaining <= GoodsContainer.CARGO_SIZE) ? remaining
                 : GoodsContainer.CARGO_SIZE;
             int price = market.getBidPrice(type, a);
             if (!checkGold(price)) {
@@ -1259,7 +1265,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             market.addGoodsToMarket(type, -ma);
             marketAmount += ma;
             propagateToEuropeanMarkets(type, -a, random);
-            amount -= a;
+            remaining -= a;
         }
         return marketAmount;
     }
@@ -1279,11 +1285,12 @@ public class ServerPlayer extends Player implements TurnTaker {
         final Market market = getMarket();
         final int tax = getTax();
         int marketAmount = 0;
-        while (amount > 0) {
+        int remaining = amount;
+        while (remaining > 0) {
             // Always break up into chunks, so the price can adjust
             // dynamically during large transactions, avoiding
             // exploitable market manipulation.
-            int a = (amount <= GoodsContainer.CARGO_SIZE) ? amount
+            int a = (remaining <= GoodsContainer.CARGO_SIZE) ? remaining
                 : GoodsContainer.CARGO_SIZE;
             int incomeBeforeTaxes = market.getSalePrice(type, a);
             int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
@@ -1325,7 +1332,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             market.addGoodsToMarket(type, ma);
             marketAmount += ma;
             propagateToEuropeanMarkets(type, a, random);
-            amount -= a;
+            remaining -= a;
         }
         return marketAmount;
     }
@@ -1362,7 +1369,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             cs.addHistory(this, new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.getEventTypeFromStance(stance), otherPlayer)
                 .addStringTemplate("%nation%", otherPlayer.getNationLabel()));
-            logger.info("Stance modification " + getName()
+            if (logger.isLoggable(Level.INFO)) logger.info("Stance modification " + getName()
                 + " " + old + " -> " + stance + " wrt " + otherPlayer.getName());
             this.addStanceChange(otherPlayer);
             if (old != Stance.UNCONTACTED) {
@@ -1375,29 +1382,32 @@ public class ServerPlayer extends Player implements TurnTaker {
             cs.addStance(See.only(otherPlayer), this, stance, otherPlayer);
             change = true;
         }
-        if (symmetric && (old = otherPlayer.getStance(this)) != stance) {
-            int modifier = old.getTensionModifier(stance);
-            otherPlayer.setStance(this, stance);
-            if (modifier != 0) {
-                ((ServerPlayer)otherPlayer).csModifyTension(this, modifier, cs);//+til
+        if (symmetric) {
+            old = otherPlayer.getStance(this);
+            if (old != stance) {
+                int modifier = old.getTensionModifier(stance);
+                otherPlayer.setStance(this, stance);
+                if (modifier != 0) {
+                    ((ServerPlayer)otherPlayer).csModifyTension(this, modifier, cs);//+til
+                }
+                cs.addHistory(otherPlayer, new HistoryEvent(getGame().getTurn(),
+                        HistoryEvent.getEventTypeFromStance(stance), this)
+                    .addStringTemplate("%nation%", this.getNationLabel()));
+                if (logger.isLoggable(Level.INFO)) logger.info("Stance modification " + otherPlayer.getName()
+                    + " " + old + " -> " + stance
+                    + " wrt " + getName() + " (symmetric)");
+                ((ServerPlayer)otherPlayer).addStanceChange(this);
+                if (old != Stance.UNCONTACTED) {
+                    cs.addMessage(this,
+                        new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                         stance.getStanceChangeKey(), otherPlayer)
+                            .addStringTemplate("%nation%",
+                                otherPlayer.getNationLabel()));
+                }
+                cs.addStance(See.only(this), otherPlayer, stance, this);
+                cs.addStance(See.only(otherPlayer), otherPlayer, stance, this);
+                change = true;
             }
-            cs.addHistory(otherPlayer, new HistoryEvent(getGame().getTurn(),
-                    HistoryEvent.getEventTypeFromStance(stance), this)
-                .addStringTemplate("%nation%", this.getNationLabel()));
-            logger.info("Stance modification " + otherPlayer.getName()
-                + " " + old + " -> " + stance
-                + " wrt " + getName() + " (symmetric)");
-            ((ServerPlayer)otherPlayer).addStanceChange(this);
-            if (old != Stance.UNCONTACTED) {
-                cs.addMessage(this,
-                    new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     stance.getStanceChangeKey(), otherPlayer)
-                        .addStringTemplate("%nation%",
-                            otherPlayer.getNationLabel()));
-            }
-            cs.addStance(See.only(this), otherPlayer, stance, this);
-            cs.addStance(See.only(otherPlayer), otherPlayer, stance, this);
-            change = true;
         }
 
         return change;
@@ -1577,9 +1587,12 @@ public class ServerPlayer extends Player implements TurnTaker {
                 effects.add(effect.getObject());
                 sb.append(' ').append(Messages.getName(effect.getObject()));
             }
+            break;
+        default:
+            break;
         }
         if (effects.isEmpty()) sb.append(" All avoided");
-        logger.fine(sb.toString());
+        if (logger.isLoggable(Level.FINE)) logger.fine(sb.toString());
 
         boolean colonyDirty = false;
         List<ModelMessage> messages = new ArrayList<>();
@@ -1742,15 +1755,16 @@ outer:  for (Effect effect : effects) {
         int r = (random == null) ? (lowerBound + upperBound)/2
             : randomInt(logger, "Propagate goods", random,
                         upperBound - lowerBound + 1) + lowerBound;
-        amount *= r;
-        amount /= 100;
-        if (amount == 0) return;
+        int adjustedAmount = amount;
+        adjustedAmount *= r;
+        adjustedAmount /= 100;
+        if (adjustedAmount == 0) return;
 
         // Do not need to update the clients here, these changes happen
         // while it is not their turn.
         for (Player p : getGame().getLiveEuropeanPlayerList(this)) {
             Market market = p.getMarket();
-            if (market != null) market.addGoodsToMarket(type, amount);
+            if (market != null) market.addGoodsToMarket(type, adjustedAmount);
         }
     }
 
@@ -1788,7 +1802,7 @@ outer:  for (Effect effect : effects) {
             amount = randomInt(logger, "Market adjust " + type, random, amount);
             if (!add) amount = -amount;
             market.addGoodsToMarket(type, amount);
-            logger.finest(getName() + " adjust of " + amount
+            if (logger.isLoggable(Level.FINEST)) logger.finest(getName() + " adjust of " + amount
                 + " " + type
                 + ", total: " + market.getAmountInMarket(type)
                 + ", initial: " + type.getInitialAmount());
@@ -1977,7 +1991,8 @@ outer:  for (Effect effect : effects) {
         final Specification spec = game.getSpecification();
         final ServerEurope europe = (ServerEurope)getEurope();
         final Turn turn = game.getTurn();
-        boolean europeDirty = false, visibilityChange = false;
+        boolean europeDirty = false;
+        boolean visibilityChange = false;
 
         addFather(father);
         addHistory(new HistoryEvent(turn,
@@ -2173,7 +2188,7 @@ outer:  for (Effect effect : effects) {
                                   true, cs);
             }
         }
-        logger.finest(this.getName() + " claimed " + tile
+        if (logger.isLoggable(Level.FINEST)) logger.finest(this.getName() + " claimed " + tile
             + " from " + ((owner == null) ? "no-one" : owner.getName())
             + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
                 : price));
@@ -2257,10 +2272,10 @@ outer:  for (Effect effect : effects) {
         boolean isBombard = combatModel.combatIsBombard(attacker, defender);
         Unit attackerUnit = null;
         Settlement attackerSettlement = null;
-        Tile attackerTile = null;
-        Unit defenderUnit = null;
-        Player defenderPlayer = null;
-        Tile defenderTile = null;
+        Tile attackerTile;
+        Unit defenderUnit;
+        Player defenderPlayer;
+        Tile defenderTile;
         if (isAttack) {
             attackerUnit = (Unit)attacker;
             //attackerPlayer = attackerUnit.getOwner();
@@ -2303,11 +2318,12 @@ outer:  for (Effect effect : effects) {
         // If the combat results were not specified (usually the case),
         // query the combat model.
         CombatResult combatResult = null;
-        if (crs == null) {
+        List<CombatEffectType> effects = crs;
+        if (effects == null) {
             combatResult = combatModel.generateAttackResult(random, attacker, defender);
-            crs = combatResult.getEffects();
+            effects = combatResult.getEffects();
         }
-        if (crs.isEmpty()) {
+        if (effects.isEmpty()) {
             throw new RuntimeException("empty attack result: " + this);
         }
         
@@ -2316,7 +2332,7 @@ outer:  for (Effect effect : effects) {
         // Set vis so that loser always sees things.
         // FIXME: Bombard animations
         See vis; // Visibility that insists on the loser seeing the result.
-        CombatEffectType result = crs.remove(0);
+        CombatEffectType result = effects.remove(0);
         switch (result) {
         case NO_RESULT:
             vis = See.perhaps();
@@ -2327,7 +2343,7 @@ outer:  for (Effect effect : effects) {
                 if (attackerTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
-                    logger.warning("Bogus attack from " + attackerTile
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus attack from " + attackerTile
                         + " to " + defenderTile);
                 } else {
                     cs.addAttack(vis, attackerUnit, defenderUnit, true);
@@ -2340,7 +2356,7 @@ outer:  for (Effect effect : effects) {
                 if (attackerTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
-                    logger.warning("Bogus attack from " + attackerTile
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus attack from " + attackerTile
                         + " to " + defenderTile);
                 } else {
                     cs.addAttack(vis, attackerUnit, defenderUnit, false);
@@ -2375,7 +2391,7 @@ outer:  for (Effect effect : effects) {
             defenderTileDirty = true;
         }
         
-        for (CombatEffectType cr : crs) {
+        for (CombatEffectType cr : effects) {
             boolean ok;
             switch (cr) {
             case AUTOEQUIP_UNIT:
@@ -3210,7 +3226,7 @@ outer:  for (Effect effect : effects) {
         
         UnitTypeChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
         if (uc == null || uc.to == loser.getType()) {
-            logger.warning("Demotion failed, type="
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Demotion failed, type="
                 + ((uc == null) ? "null" : "same type: " + uc.to));
             return;
         }
@@ -3380,7 +3396,7 @@ outer:  for (Effect effect : effects) {
         final Player owner = settlement.getOwner();
         final Set<Tile> owned = settlement.getOwnedTiles();
 
-        logger.finest("Disposing of " + settlement.getName());
+        if (logger.isLoggable(Level.FINEST)) logger.finest("Disposing of " + settlement.getName());
         for (Tile t : owned) t.cacheUnseen();//+til
         Tile centerTile = settlement.getTile();
         ServerPlayer missionaryOwner = null;
@@ -3756,7 +3772,7 @@ outer:  for (Effect effect : effects) {
     private void csDamageBuilding(Building building, ChangeSet cs) {
         ServerColony colony = (ServerColony)building.getColony();
         Tile copied = colony.getTile().getTileToCache();
-        boolean changed = false;
+        boolean changed;
         BuildingType type = building.getType();
         if (type.getUpgradesFrom() == null) {
             changed = colony.ejectUnits(building, building.getUnitList());//-til
@@ -3769,7 +3785,7 @@ outer:  for (Effect effect : effects) {
             for (WorkLocation wl : transform(colony.getAllWorkLocations(),
                                              w -> !w.isEmpty() && !w.canBeWorked())) {
                 changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
-                logger.info("Units ejected from workLocation "
+                if (logger.isLoggable(Level.INFO)) logger.info("Units ejected from workLocation "
                     + wl.getId() + " on loss of "
                     + building.getType().getSuffix());
             }
@@ -3798,7 +3814,7 @@ outer:  for (Effect effect : effects) {
 
         UnitTypeChange uc = winner.getUnitChange(UnitChangeType.PROMOTION);
         if (uc == null || uc.to == winner.getType()) {
-            logger.warning("Promotion failed, type="
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Promotion failed, type="
                 + ((uc == null) ? "null" : "same type: " + uc.to));
             return;
         }
@@ -4038,7 +4054,7 @@ outer:  for (Effect effect : effects) {
 
         if (accepted) {
             csSetTax(tax, cs);
-            logger.info("Accepted tax raise to: " + tax);
+            if (logger.isLoggable(Level.INFO)) logger.info("Accepted tax raise to: " + tax);
         } else if (colony.getGoodsCount(goodsType) < amount) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
@@ -4049,7 +4065,7 @@ outer:  for (Effect effect : effects) {
                        StringTemplate.template(Monarch.MonarchAction.FORCE_TAX.getTextKey())
                        .addAmount("%amount%", tax + extraTax),
                        getNationId()));
-            logger.info("Forced tax raise to: " + (tax + extraTax));
+            if (logger.isLoggable(Level.INFO)) logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
@@ -4079,7 +4095,7 @@ outer:  for (Effect effect : effects) {
                     .addAmount("%amount%", amount)
                     .addNamed("%goods%", goodsType));
             cs.addAttribute(See.only(this), "flush", Boolean.TRUE.toString());
-            logger.info("Goods party at " + colony.getName()
+            if (logger.isLoggable(Level.INFO)) logger.info("Goods party at " + colony.getName()
                 + " with: " + goods + " arrears: " + arrears);
             if (isAI()) { // Reset the goods wishes
                 colony.firePropertyChange(Colony.REARRANGE_COLONY,
@@ -4234,7 +4250,7 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%nation%", other.getNationLabel()));
         }
 
-        logger.finest("First contact between " + this.getId()
+        if (logger.isLoggable(Level.FINEST)) logger.finest("First contact between " + this.getId()
             + " and " + other.getId());
         return true;
     }
@@ -4303,7 +4319,7 @@ outer:  for (Effect effect : effects) {
         unit.setMovesLeft(0);
         cs.addPartial(See.only(this), unit,
             "movesLeft", String.valueOf(unit.getMovesLeft()));
-        logger.info("New European contact for " + unit
+        if (logger.isLoggable(Level.INFO)) logger.info("New European contact for " + unit
             + ", with session: " + session.getKey());
     }
 
@@ -4328,40 +4344,42 @@ outer:  for (Effect effect : effects) {
 
         final Tile oldTile = unit.getTile();
         // Undead can not avoid a change override!
-        if (newOwner.isUndead()) change = UnitChangeType.UNDEAD;
-        if (change != null) {
+        String changeType = newOwner.isUndead() ? UnitChangeType.UNDEAD : change;
+        if (changeType != null) {
             UnitType mainType = unit.getType();
             UnitTypeChange uc;
-            if ((uc = unit.getUnitChange(change, null, newOwner)) == null) {
+            uc = unit.getUnitChange(changeType, null, newOwner);
+            if (uc == null) {
                 ; // mainType is unchanged
             } else if (uc.isAvailableTo(newOwner)) {
                 mainType = uc.to;
             } else { // Can not have this unit.
-                logger.warning("Change type/owner failed for " + unit
-                    + " -> " + newOwner + "(" + change + "/" +  uc + ")");
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Change type/owner failed for " + unit
+                    + " -> " + newOwner + "(" + changeType + "/" +  uc + ")");
                 ((ServerUnit)unit).csRemove(See.perhaps().always(this),
                     oldTile, cs);
                 return false;
             }
 
             for (Unit u : unit.getUnitList()) {
-                if ((uc = u.getUnitChange(change, null, newOwner)) == null) {
+                uc = u.getUnitChange(changeType, null, newOwner);
+                if (uc == null) {
                     ; // no change for this passenger
                 } else if (uc.isAvailableTo(newOwner)) {
                     if (uc.to != u.getType() && !u.changeType(uc.to)) {
-                        logger.warning("Type change failure: " + u
+                        if (logger.isLoggable(Level.WARNING)) logger.warning("Type change failure: " + u
                             + " -> " + uc.to);
                     }
                 } else {
-                    logger.warning("Change type/owner failed for cargo " + u
-                        + " -> " + newOwner + "(" + change + "/" + uc + ")");
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Change type/owner failed for cargo " + u
+                        + " -> " + newOwner + "(" + changeType + "/" + uc + ")");
                     ((ServerUnit)u).csRemove(See.only(this), unit, cs);
                 }
             }
 
             unit.changeOwner(newOwner);
             if (mainType != unit.getType() && !unit.changeType(mainType)) {
-                logger.warning("Type change failure: " + unit
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Type change failure: " + unit
                     + " -> " + mainType);
                 return false;
             }
@@ -4497,8 +4515,11 @@ outer:  for (Effect effect : effects) {
         lb.add("PLAYER ", getName(), ": ");
         final Game game = getGame();
         final Specification spec = getSpecification();
-        int oldImmigration = getImmigration(), oldLiberty = getLiberty(),
-            newSoL = 0, newImmigration = 0, newLiberty = 0;
+        int oldImmigration = getImmigration();
+        int oldLiberty = getLiberty();
+        int newSoL = 0;
+        int newImmigration;
+        int newLiberty;
 
         // Settlements
         List<Settlement> settlements = getSettlementList();
@@ -4529,7 +4550,7 @@ outer:  for (Effect effect : effects) {
             try {
                 ((TurnTaker)unit).csNewTurn(random, lb, cs);
             } catch (ClassCastException cce) {
-                logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(),
+                if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(),
                            cce);
             }
         }
@@ -4591,7 +4612,7 @@ outer:  for (Effect effect : effects) {
                 List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
                 for (Unit unit : leftOver) {
                     // no use for left over units
-                    logger.warning("Disposing of left over unit " + unit);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("Disposing of left over unit " + unit);
                     unit.setLocationNoUpdate(null);//-vis: safe, off map
                     unit.dispose();//-vis: safe, never sighted
                 }
@@ -4603,7 +4624,7 @@ outer:  for (Effect effect : effects) {
                     new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "model.player.interventionForceArrives",
                                      this));
-                logger.info("Intervention force (" + naval.size() + " naval, "
+                if (logger.isLoggable(Level.INFO)) logger.info("Intervention force (" + naval.size() + " naval, "
                     + land.size() + " land, "
                     + leftOver.size() + " left over) arrives at " + entry
                     + "(for " + port.getName() + ")");

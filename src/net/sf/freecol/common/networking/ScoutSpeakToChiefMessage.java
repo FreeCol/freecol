@@ -124,7 +124,7 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         ServerUnit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
@@ -136,7 +136,7 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         try {
             is = unit.getAdjacentSettlement(settlementId,
                                             IndianSettlement.class);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return serverPlayer.clientError(e.getMessage());
         }
 

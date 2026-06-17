@@ -47,6 +47,7 @@ import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
+import java.util.logging.Level;
 
 
 /**
@@ -214,7 +215,7 @@ public final class ColopediaPanel extends FreeColPanel
     private void select(String id) {
         DefaultMutableTreeNode node = nodeMap.get(id);
         if (node == null) {
-            logger.warning("Unable to find node with id '" + id + "'.");
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Unable to find node with id '" + id + "'.");
         } else {
             TreePath oldPath = tree.getSelectionPath();
             if (oldPath != null && oldPath.getParentPath() != null) {

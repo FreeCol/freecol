@@ -29,6 +29,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.util.LogBuilder;
+import java.util.logging.Level;
 
 
 /**
@@ -166,12 +167,12 @@ public class Resource extends TileItem {
      */
     private int useQuantity(int usedQuantity) {
         if (quantity == UNLIMITED) {
-            ; // No change
+            return quantity;
         } else if (quantity >= usedQuantity) {
             quantity -= usedQuantity;
         } else {
             // Shouldn't generally happen.  Do something more drastic here?
-            logger.severe("Insufficient quantity in " + this);
+            if (logger.isLoggable(Level.SEVERE)) logger.severe("Insufficient quantity in " + this);
             quantity = 0;
         }
         return quantity;

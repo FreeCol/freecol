@@ -24,8 +24,9 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,11 +71,11 @@ public final class ReportTurnPanel extends ReportPanel {
     private static final Logger logger = Logger.getLogger(ReportTurnPanel.class.getName());
 
     /** Map message identifiers to label. */
-    private final Hashtable<String, List<JComponent>> labelsByMessage
-        = new Hashtable<>();
+    private final Map<String, List<JComponent>> labelsByMessage
+        = new HashMap<>();
     /** Map message identifiers to text pane. */
-    private final Hashtable<String, List<JComponent>> textPanesByMessage
-        = new Hashtable<>();
+    private final Map<String, List<JComponent>> textPanesByMessage
+        = new HashMap<>();
     /** The messages to display. */
     private final List<ModelMessage> messages = new ArrayList<>();
 
@@ -199,14 +200,18 @@ public final class ReportTurnPanel extends ReportPanel {
             // them by message identifier in the ActionListeners.
             String id = message.getId();
             List<JComponent> components;
-            if ((components = textPanesByMessage.get(id)) == null)
-                textPanesByMessage.put(id,
-                    components = new ArrayList<JComponent>());
+            components = textPanesByMessage.get(id);
+            if (components == null) {
+                components = new ArrayList<JComponent>();
+                textPanesByMessage.put(id, components);
+            }
             components.add(textPane);
 
-            if ((components = labelsByMessage.get(id)) == null)
-                labelsByMessage.put(id,
-                    components = new ArrayList<JComponent>());
+            components = labelsByMessage.get(id);
+            if (components == null) {
+                components = new ArrayList<JComponent>();
+                labelsByMessage.put(id, components);
+            }
             components.add(label);
             
             // Add filter button if option present.

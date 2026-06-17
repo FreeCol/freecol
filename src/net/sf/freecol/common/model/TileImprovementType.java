@@ -474,8 +474,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Gets the increase in production of the given GoodsType
      * this tile improvement type would yield at a specified tile.
      *
-     * @param tile The {@code Tile} to be considered.
+     * @param tileType The {@code TileType} to be considered.
      * @param goodsType An optional preferred {@code GoodsType}.
+     * @param unitType An optional {@code UnitType} to produce them.
      * @return The increase in production
      */
     public int getImprovementValue(TileType tileType, GoodsType goodsType, UnitType unitType) {

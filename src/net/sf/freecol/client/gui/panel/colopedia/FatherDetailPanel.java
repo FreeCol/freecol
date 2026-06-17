@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.util.ImageUtils;
+import java.util.logging.Level;
 
 
 /**
@@ -107,7 +108,7 @@ public class FatherDetailPanel
     public void buildDetail(String id, JPanel panel) {
         FoundingFather father = getSpecification().getFoundingFather(id);
         if (father == null) {
-            logger.warning("Bogus father detail requested for: " + id);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Bogus father detail requested for: " + id);
         } else {
             buildDetail(father, panel);
         }

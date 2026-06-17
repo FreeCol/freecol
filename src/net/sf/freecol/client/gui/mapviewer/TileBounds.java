@@ -28,17 +28,20 @@ import java.awt.Dimension;
 public final class TileBounds {
     
     /** The height offset to paint a Unit at (in pixels). */
-    public static final int UNIT_OFFSET = 20,
-        OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
-        OTHER_UNITS_OFFSET_Y = 1,
-        OTHER_UNITS_WIDTH = 3,
-        MAX_OTHER_UNITS = 10;
+    public static final int UNIT_OFFSET = 20;
+    public static final int OTHER_UNITS_OFFSET_X = -5; // Relative to the state indicator.
+    public static final int OTHER_UNITS_OFFSET_Y = 1;
+    public static final int OTHER_UNITS_WIDTH = 3;
+    public static final int MAX_OTHER_UNITS = 10;
     
 
     /** Tile width and height, and half values thereof. */
-    private int tileHeight, tileWidth, halfHeight, halfWidth;
+    private int tileHeight;
+    private int tileWidth;
+    private int halfHeight;
+    private int halfWidth;
     
-    TileBounds(Dimension tileSize, float scaleFactor) {
+    TileBounds(Dimension tileSize) {
         this.tileHeight = tileSize.height;
         this.tileWidth = tileSize.width;
         this.halfHeight = tileSize.height / 2;

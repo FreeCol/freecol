@@ -33,6 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -180,7 +181,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     private boolean addUnit(Unit u) {
         if (u == null) return false;
-        boolean ret = false;
+        boolean ret;
         u.setLocationNoUpdate(this);
         synchronized (this.units) {
             ret = this.units.add(u);
@@ -344,11 +345,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         } else if (locatable instanceof Goods) {
             // dumping goods is a valid action
             locatable.setLocation(null);
-            logger.finest("Dumped " + locatable + " in UnitLocation with id "
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Dumped " + locatable + " in UnitLocation with id "
                           + getId());
             return true;
         } else {
-            logger.warning("Tried to add Locatable " + locatable
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Tried to add Locatable " + locatable
                            + " to UnitLocation with id " + getId() + ".");
         }
         return false;
@@ -367,7 +368,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             unit.setLocationNoUpdate(null);
             return true;
         } else {
-            logger.warning("Tried to remove non-Unit " + locatable
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Tried to remove non-Unit " + locatable
                            + " from UnitLocation: " + getId());
             return false;
         }
@@ -590,7 +591,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             // Do *not* use getUnits/List here, because Colony lies!
             for (Unit unit : this.units) {
                 if (unit.getLocation() != this) {
-                    logger.warning("UnitLocation " + this
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("UnitLocation " + this
                         + " contains unit " + unit
                         + " with bogus location " + unit.getLocation()
                         + ", fixing.");

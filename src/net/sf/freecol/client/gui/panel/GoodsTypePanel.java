@@ -122,13 +122,11 @@ public class GoodsTypePanel extends MigPanel implements DropTarget {
      */
     public boolean removeGoodsType(GoodsType gt) {
         Component child = findLabel(gt);
-        if (child != null) {
-            super.remove(child);
-            revalidate();
-            repaint();
-            return true;
-        }
-        return false;
+        if (child == null) return false;
+        super.remove(child);
+        revalidate();
+        repaint();
+        return true;
     }
 
     // Implement DropTarget

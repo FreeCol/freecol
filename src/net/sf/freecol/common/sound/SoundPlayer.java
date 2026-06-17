@@ -130,10 +130,10 @@ public final class SoundPlayer {
         private boolean playSound(File sound) throws IOException {
             setVolume(volumeOption.getValue());
             
-            boolean ret = false;
+            boolean ret;
             PropertyChangeListener volumeListener = null;
-            try (AudioInputStream in = getAudioInputStream(sound)) {
-                final SourceDataLine line = openLine(in.getFormat(), getMixer(), data.length);
+            try (AudioInputStream in = getAudioInputStream(sound);
+                 SourceDataLine line = openLine(in.getFormat(), getMixer(), data.length)) {
                 if (line == null) {
                     return false;
                 }
@@ -156,10 +156,9 @@ public final class SoundPlayer {
                     this.playDone = true;
                     line.drain();
                     line.stop();
-                    line.close();
                 }
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Can not open "
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Can not open "
                     + sound + " as audio stream", ioe);
                 return false;
             } finally {
@@ -262,10 +261,10 @@ public final class SoundPlayer {
     private void setMixer(MixerWrapper mw) {
         try {
             this.mixer = AudioSystem.getMixer(mw.getMixerInfo());
-            logger.info("Mixer " + mw + " selected");
-        } catch (Exception e) {
+            if (logger.isLoggable(Level.INFO)) logger.info("Mixer " + mw + " selected");
+        } catch (IllegalArgumentException | SecurityException e) {
             this.mixer = null;
-            logger.log(Level.WARNING, "Bad mixer: " + mw
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Bad mixer: " + mw
                 + ", sound suspended", e);
         }
     }
@@ -303,7 +302,7 @@ public final class SoundPlayer {
     /**
      * Defines the default playlist.
      *
-     * @param file The {@code File}s to be played when
+     * @param files The {@code File}s to be played when
      *      nothing else is being played.
      */
     public void setDefaultPlaylist(File... files) {
@@ -401,11 +400,11 @@ public final class SoundPlayer {
             : min + 0.5f * (max - min) * (float)Math.log10(vol);
         try {
             control.setValue(gain);
-            logger.finest("Using volume " + vol + "%, "
+            if (logger.isLoggable(Level.FINEST)) logger.finest("Using volume " + vol + "%, "
                 + control.getUnits() + "=" + gain
                 + " control=" + type);
         } catch (IllegalArgumentException ie) {
-            logger.log(Level.WARNING, "Could not set volume "
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Could not set volume "
                 + " (control=" + type + " in [" + min + "," + max + "])"
                 + " to " + gain + control.getUnits(), ie);
         }
@@ -428,10 +427,10 @@ public final class SoundPlayer {
             return null;
         }
         if (!mixer.isLineSupported(info)) {
-            logger.log(Level.WARNING, "Mixer does not support " + info);
+            if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, "Mixer does not support " + info);
             return null;
         }
-        SourceDataLine line = null;
+        SourceDataLine line;
         try {
             line = (SourceDataLine)mixer.getLine(info);
             line.open(audioFormat, len);

@@ -33,6 +33,7 @@ import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.CloseMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import java.util.logging.Level;
 
 
 /**
@@ -273,7 +274,7 @@ public class DiplomacySession extends TimedSession {
      * @param cs A {@code ChangeSet} to update.
      */
     private void completeInternal(boolean result, ChangeSet cs) {
-        logger.info("Completing diplomacy session: " + this);
+        if (logger.isLoggable(Level.INFO)) logger.info("Completing diplomacy session: " + this);
         if (this.agreement != null) { // Agreement is null in first contact
             if (result) {
                 result = getGame().csAcceptTrade(this.agreement, this.unit,

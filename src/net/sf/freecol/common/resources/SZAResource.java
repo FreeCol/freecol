@@ -67,7 +67,7 @@ public class SZAResource extends Resource {
                     = new SimpleZippedAnimation(getResourceLocator().toURL());
                 this.cache.put(DEFAULT_SCALE, sza);
             } catch (IOException e) {
-                logger.log(Level.WARNING,
+                if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING,
                     "Could not load SimpleZippedAnimation: "
                     + getResourceLocator(), e);
             }

@@ -122,15 +122,7 @@ public class Introspector {
      */
     private Class<?> getMethodReturnType(Method method)
         throws IntrospectorException {
-        Class<?> ret;
-
-        try {
-            ret = method.getReturnType();
-        } catch (Exception e) {
-            throw new IntrospectorException(theClass.getName()
-                + "." + method.getName() + " return type.", e);
-        }
-        return ret;
+        return method.getReturnType();
     }
 
     /**
@@ -213,7 +205,7 @@ public class Introspector {
                     e);
             }
         } else {
-            Object result = null;
+            Object result;
             try {
                 result = getMethod.invoke(obj);
             } catch (IllegalAccessException | IllegalArgumentException
@@ -271,7 +263,7 @@ public class Introspector {
             }
         } else {
             Method convertMethod = getFromStringConverter(fieldType);
-            Object result = null;
+            Object result;
 
             if (fieldType.isEnum()) {
                 try {
@@ -323,7 +315,7 @@ public class Introspector {
      * @param types The types of the constructor arguments.
      * @return The constructor found, or null on error.
      */
-    public static <T> Constructor<T> getConstructor(Class<T> cl, Class<?>[] types) {
+    public static <T> Constructor<T> getConstructor(Class<T> cl, Class<?>... types) {
         Constructor<T> constructor;
         try {
             constructor = cl.getDeclaredConstructor(types);
@@ -342,7 +334,7 @@ public class Introspector {
      * @return The instance created, or null on error.
      * @exception IntrospectorException if there is a FreeCol failure.
      */
-    public static <T> T construct(Constructor<T> constructor, Object[] params)
+    public static <T> T construct(Constructor<T> constructor, Object... params)
         throws IntrospectorException {
         T instance;
         try {
@@ -365,7 +357,7 @@ public class Introspector {
      * @return The new object instance.
      * @exception IntrospectorException wraps all exceptional conditions.
      */
-    public static Object instantiate(String tag, Class<?>[] types, Object[] params)
+    public static Object instantiate(String tag, Class<?>[] types, Object... params)
         throws IntrospectorException {
         Class<?> messageClass;
         try {
@@ -387,7 +379,7 @@ public class Introspector {
      * @return The new instance.
      * @exception IntrospectorException wraps all exceptional conditions.
      */
-    public static <T> T instantiate(Class<T> messageClass, Class<?>[] types, Object[] params)
+    public static <T> T instantiate(Class<T> messageClass, Class<?>[] types, Object... params)
         throws IntrospectorException {
         final String tag = messageClass.getName();
         Constructor<T> constructor;

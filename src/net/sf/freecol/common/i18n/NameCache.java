@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.UnitType;
 
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -106,8 +107,8 @@ public class NameCache {
      * @param names A list to fill with the names found.
      */
     private static void collectNames(String prefix, List<String> names) {
-        String name;
-        if (Messages.containsKey(name = prefix + "0")) {
+        String name = prefix + "0";
+        if (Messages.containsKey(name)) {
             names.add(Messages.message(name));
         }
         int i = 1;
@@ -303,7 +304,7 @@ public class NameCache {
                     }
                 }
                 settlementNames.put(player, names);
-                logger.fine("Loaded " + names.size() + " settlement names for "
+                if (logger.isLoggable(Level.FINE)) logger.fine("Loaded " + names.size() + " settlement names for "
                     + player.getId());
             }
         }
@@ -536,7 +537,7 @@ public class NameCache {
         // Use the fallback name
         final String base = getFallbackSettlementName(player);
         int i = player.getSettlementCount() + 1;
-        String name = null;
+        String name;
         while (game.getSettlementByName(name = base + i++) != null);
         return name;
     }           

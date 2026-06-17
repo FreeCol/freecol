@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import java.util.logging.Level;
 
 
 /**
@@ -612,7 +613,7 @@ public class NativeTrade extends FreeColGameObject {
                 if (NativeTradeItem.TAG.equals(tag)) {
                     this.settlementToUnit.add(new NativeTradeItem(game, xr));
                 } else {
-                    logger.warning("SettlementToUnit-item expected, not: " + tag);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("SettlementToUnit-item expected, not: " + tag);
                 }
             }
 
@@ -622,7 +623,7 @@ public class NativeTrade extends FreeColGameObject {
                 if (NativeTradeItem.TAG.equals(tag)) {
                     this.unitToSettlement.add(new NativeTradeItem(game, xr));
                 } else {
-                    logger.warning("UnitToSettlement-item expected, not: " + tag);
+                    if (logger.isLoggable(Level.WARNING)) logger.warning("UnitToSettlement-item expected, not: " + tag);
                 }
             }
 

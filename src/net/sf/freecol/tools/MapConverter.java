@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.xml.stream.XMLStreamException;
@@ -41,6 +43,8 @@ import net.sf.freecol.server.FreeColServer;
  */
 public class MapConverter {
 
+    private static final Logger logger = Logger.getLogger(MapConverter.class.getName());
+
     public static void main(String[] args) throws Exception {
 
         FreeColRules.loadRules();
@@ -53,36 +57,34 @@ public class MapConverter {
                     String newName = filename + ".old";
                     File in = new File(newName);
                     if (!out.renameTo(in)) {
-                        System.err.println("Could not rename " + filename
-                            + " to " + newName);
+                        if (logger.isLoggable(Level.SEVERE)) logger.severe("Could not rename " + filename + " to " + newName);
                         continue;
                     }
-                    System.out.println("Renamed " + filename + " to " + newName + ".");
+                    if (logger.isLoggable(Level.INFO)) logger.info("Renamed " + filename + " to " + newName + ".");
                     FreeColSavegameFile savegame = new FreeColSavegameFile(in);
                     BufferedImage thumbnail = null;
                     try (InputStream thumbnailIn = savegame.getInputStream(FreeColSavegameFile.THUMBNAIL_FILE)) {
                         thumbnail = ImageIO.read(thumbnailIn);
-                        System.out.println("Loaded thumbnail.");
+                        logger.info("Loaded thumbnail.");
                     } catch (FileNotFoundException e) {
-                        System.err.println("No thumbnail present.");
+                        logger.warning("No thumbnail present.");
                     }
                     FreeColServer server
                         = new FreeColServer(savegame, specification,
                                             null,
                                             FreeCol.getServerPort(),
                                             "mapTransformer");
-                    System.out.println("Started server.");
+                    logger.info("Started server.");
                     server.saveMapEditorGame(out, thumbnail);
-                    System.out.println("Saved updated savegame.");
+                    logger.info("Saved updated savegame.");
                     server.shutdown();
-                    System.out.println("Shut down server.");
+                    logger.info("Shut down server.");
                 } catch (IOException | NullPointerException | SecurityException
                     | XMLStreamException | FreeColException e) {
-                    System.err.println(e);
+                    if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, "Map conversion failed for " + filename, e);
                 }
             }
         }
     }
 
 }
-

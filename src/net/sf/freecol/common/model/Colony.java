@@ -780,7 +780,9 @@ public class Colony extends Settlement implements TradeLocation {
         WorkLocation wl = getWorkLocationWithAbility(ability);
         try {
             if (wl != null) return returnClass.cast(wl);
-        } catch (ClassCastException cce) {};
+        } catch (ClassCastException cce) {
+            logger.log(Level.FINE, "Failed to cast work location.", cce);
+        }
         return null;
     }
 
@@ -807,7 +809,13 @@ public class Colony extends Settlement implements TradeLocation {
     public <T extends WorkLocation> T getWorkLocationWithModifier(String modifier,
                                                                   Class<T> returnClass) {
         WorkLocation wl = getWorkLocationWithModifier(modifier);
-        if (wl != null) try { return returnClass.cast(wl); } catch (ClassCastException cce) {}
+        if (wl != null) {
+            try {
+                return returnClass.cast(wl);
+            } catch (ClassCastException cce) {
+                logger.log(Level.FINE, "Failed to cast work location.", cce);
+            }
+        }
         return null;
     }
 
@@ -1358,12 +1366,12 @@ public class Colony extends Settlement implements TradeLocation {
      */
     protected boolean updateProductionBonus() {
         int newBonus = calculateProductionBonus(sonsOfLiberty);
-        if (productionBonus != newBonus) {
+        boolean changed = productionBonus != newBonus;
+        if (changed) {
             invalidateCache();
             setProductionBonus(newBonus);
-            return true;
         }
-        return false;
+        return changed;
     }
 
     /**
@@ -1467,7 +1475,7 @@ public class Colony extends Settlement implements TradeLocation {
         }
         if (!ret) {
             unit.setLocation(getTile()); // Fall back to safe value
-            logger.warning("Failed to join " + getName() + ": " + unit);
+            if (logger.isLoggable(Level.WARNING)) logger.warning("Failed to join " + getName() + ": " + unit);
         }
         return ret;
     }
@@ -3122,12 +3130,14 @@ public class Colony extends Settlement implements TradeLocation {
             if (uc > 0) { // Valid if above zero
                 xw.writeAttribute(UNIT_COUNT_TAG, uc);
             } else if (uc == 0) { // Zero is an error!  Find that bug
-                FreeCol.trace(logger, "Unit count fail: " + uc
-                    + " id=" + getId() + " name=" + getName()
-                    + " unitCount=" + getUnitCount()
-                    + " displayUnitCount=" + this.displayUnitCount
-                    + " scope=" + xw.getWriteScope()
-                    + "/" + xw.getClientPlayer());
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.log(Level.WARNING, "Unit count fail: " + uc
+                        + " id=" + getId() + " name=" + getName()
+                        + " unitCount=" + getUnitCount()
+                        + " displayUnitCount=" + this.displayUnitCount
+                        + " scope=" + xw.getWriteScope()
+                        + "/" + xw.getClientPlayer(), new Exception());
+                }
             } // else do nothing, negative means no value set
         }
     }

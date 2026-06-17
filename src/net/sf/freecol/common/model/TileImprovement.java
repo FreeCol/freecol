@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Constants.IntegrityType;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import java.util.logging.Level;
 
 
 /**
@@ -760,7 +761,7 @@ public class TileImprovement extends TileItem {
         List<Direction> dirns = getConnectionDirections();
         if (dirns == null) {
             if (str != null && !str.isEmpty())
-                logger.warning("At " + tile + " ignored nonempty style for "
+                if (logger.isLoggable(Level.WARNING)) logger.warning("At " + tile + " ignored nonempty style for "
                     + type + ": " + str);
         } else if (str == null) {
             // Null style OK for incomplete roads.  Virtual roads used
@@ -769,7 +770,7 @@ public class TileImprovement extends TileItem {
             // complaining about these as they will get fixed and
             // logged in checkIntegrity().
         } else if (str.length() != dirns.size()) {
-            logger.warning("At " + tile + " ignored bogus style for "
+            if (logger.isLoggable(Level.WARNING)) logger.warning("At " + tile + " ignored bogus style for "
                 + type + ": " + str);
         } else {
             style = TileImprovementStyle.getInstance(str);

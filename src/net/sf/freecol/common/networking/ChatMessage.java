@@ -20,6 +20,8 @@
 package net.sf.freecol.common.networking;
 
 import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,6 +38,8 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message that contains a chat string.
  */
 public class ChatMessage extends AttributeMessage {
+
+    private static final Logger logger = Logger.getLogger(ChatMessage.class.getName());
 
     public static final String TAG = "chat";
     private static final String COLOR_TAG = "color";
@@ -66,7 +70,8 @@ public class ChatMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      */
-    public ChatMessage(@SuppressWarnings("unused") Game game,
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    public ChatMessage(Game game,
                        FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, COLOR_TAG, MESSAGE_TAG, SENDER_TAG, PRIVATE_TAG);
@@ -134,7 +139,9 @@ public class ChatMessage extends AttributeMessage {
         try {
             int rgb = getIntegerAttribute(COLOR_TAG, 0);
             color = new Color(rgb);
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {
+            logger.log(Level.FINE, "Invalid chat color.", nfe);
+        }
         return color;
     }
 

@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import java.util.logging.Level;
 
 
 /**
@@ -94,7 +95,7 @@ public final class UnitButton extends FreeColButton {
                 setPreferredSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
                 setMinimumSize(new Dimension(bi.getIconWidth(), bi.getIconHeight()));
             } else {
-                logger.warning("Action " + a + " has no BUTTON_IMAGE");
+                if (logger.isLoggable(Level.WARNING)) logger.warning("Action " + a + " has no BUTTON_IMAGE");
             }
         }
     }
