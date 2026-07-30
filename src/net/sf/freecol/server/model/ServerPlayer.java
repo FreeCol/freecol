@@ -2027,6 +2027,7 @@ outer:  for (Effect effect : effects) {
                 for (Colony c : getColonyList()) {
                     c.addLiberty(0); // Kick the SoL and production bonus
                     c.invalidateCache();
+                    cs.add(See.only(this), c);
                 }
             }
         }
