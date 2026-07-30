@@ -27,6 +27,7 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 
 ### Rule Changes ###
 * Disabling "Experts have connections" for the classic ruleset.
+* Bugfix: Casas is now the only founding father that will upgrade native converts.
 
 ### AI/computer players ###
 * Bugfix: Fixed an issue that prevented diplomacy initiated during the AI players' turns.

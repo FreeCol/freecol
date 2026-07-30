@@ -2000,16 +2000,17 @@ outer:  for (Effect effect : effects) {
             europeDirty = true;
         }
 
-        UnitChangeType uct
-            = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
-        if (uct != null && uct.appliesTo(this)) {
-            for (Unit u : getUnitSet()) {
-                for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
-                    if (!uc.appliesTo(u)) continue;
-                    u.changeType(uc.to);//-vis(this)
-                    visibilityChange = true;
-                    cs.add(See.perhaps(), u);
-                    break;
+        if (father.hasAbility(Ability.UPGRADE_CONVERT)) {
+            UnitChangeType uct = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
+            if (uct != null && uct.appliesTo(this)) {
+                for (Unit u : getUnitSet()) {
+                    for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
+                        if (!uc.appliesTo(u)) continue;
+                        u.changeType(uc.to);//-vis(this)
+                        visibilityChange = true;
+                        cs.add(See.perhaps(), u);
+                        break;
+                    }
                 }
             }
         }
