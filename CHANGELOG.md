@@ -13,6 +13,7 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
 * The resolution of the screen in fullscreen mode can now be configured in the Preferences.
 * Left and right arrows can now again be used for switching the currently displayed colony
+* Bugfix: The buttons on the colony panel is now rendered properly for very large fonts.
 * Bugfix: Attack animations are now played in the correct position.
 * Bugfix: Fixes an issue where goods that has been sold is still displayed in the unit info panel.
 * Bugfix: Fixes a bug where the escape key closed multiple panels.
