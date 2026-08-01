@@ -63,6 +63,11 @@ public class MoveAction extends MapboardAction {
         super(freeColClient, id + direction + ".secondary");
 
         this.direction = direction;
+
+        // Canvas only installs input-map bindings for actions with
+        // isCanvasKeyBinding(); without this the secondary accelerators
+        // (the arrow keys) are never bound and do nothing.
+        setCanvasKeyBinding(true);
     }
 
 
