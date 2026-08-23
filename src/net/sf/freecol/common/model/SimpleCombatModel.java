@@ -393,7 +393,7 @@ public class SimpleCombatModel extends CombatModel {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.
                     if (isAmbush(attacker, defender)) {
-                        for (Modifier m : tile.getDefenceModifiers()) {
+                        for (Modifier m : tile.getType().getDefenceModifiers()) {
                             Modifier mod = Modifier.makeModifier(m);
                             mod.setId(Modifier.OFFENCE);
                             mod.setSource(Specification.AMBUSH_BONUS_SOURCE);
@@ -542,7 +542,8 @@ public class SimpleCombatModel extends CombatModel {
             if (settlement == null) {
                 // PF#73 demonstrated that tile modifiers do not apply
                 // for colonies
-                result.addAll(tile.getType().getDefenceModifiers());
+                if (!isAmbush(attacker, defender))
+                    result.addAll(tile.getType().getDefenceModifiers());
 
                 // Artillery in the Open penalty
                 if (defender.hasAbility(Ability.BOMBARD)
