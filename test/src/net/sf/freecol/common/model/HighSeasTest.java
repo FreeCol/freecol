@@ -19,15 +19,14 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
-
 
 public class HighSeasTest extends FreeColTestCase {
 
@@ -40,13 +39,20 @@ public class HighSeasTest extends FreeColTestCase {
 
         assertTrue(hs.getDestinations().isEmpty());
 
+        // Add once
         hs.addDestination(tile);
         assertEquals(1, hs.getDestinations().size());
-        assertTrue(hs.getDestinations().contains(tile));
+        assertSame(tile, hs.getDestinations().get(0));
 
+        // Add duplicate
         hs.addDestination(tile);
         assertEquals(1, hs.getDestinations().size());
 
+        // Remove once
+        hs.removeDestination(tile);
+        assertTrue(hs.getDestinations().isEmpty());
+
+        // Remove again (idempotent)
         hs.removeDestination(tile);
         assertTrue(hs.getDestinations().isEmpty());
     }
@@ -62,6 +68,17 @@ public class HighSeasTest extends FreeColTestCase {
         assertEquals(NoAddReason.NONE, hs.getNoAddReason(naval));
     }
 
+    public void testMultipleNavalTypesAllowed() {
+        Game game = getGame();
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        HighSeas hs = dutch.getHighSeas();
+
+        UnitType galleon = spec().getUnitType("model.unit.galleon");
+        Unit naval = new ServerUnit(game, null, dutch, galleon);
+
+        assertEquals(NoAddReason.NONE, hs.getNoAddReason(naval));
+    }
+
     public void testLandUnitRejected() {
         Game game = getGame();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
@@ -71,6 +88,13 @@ public class HighSeasTest extends FreeColTestCase {
         Unit land = new ServerUnit(game, null, dutch, colonist);
 
         assertEquals(NoAddReason.WRONG_TYPE, hs.getNoAddReason(land));
+    }
+
+    public void testNullLocatableRejected() {
+        Game game = getGame();
+        HighSeas hs = new HighSeas(game);
+
+        assertEquals(NoAddReason.WRONG_TYPE, hs.getNoAddReason(null));
     }
 
     public void testLinkTargetIsEurope() {
@@ -102,6 +126,10 @@ public class HighSeasTest extends FreeColTestCase {
         xw.writeEndElement();
         xw.close();
 
+        String xml = out.toString("UTF-8");
+        assertTrue(xml.contains("<destination"));
+        assertTrue(xml.contains("id="));
+
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         FreeColXMLReader xr = new FreeColXMLReader(in);
 
@@ -112,15 +140,91 @@ public class HighSeasTest extends FreeColTestCase {
         xr.close();
 
         assertEquals(2, hs2.getDestinations().size());
-        assertTrue(hs2.getDestinations().contains(t1));
-        assertTrue(hs2.getDestinations().contains(t2));
+        assertEquals(t1, hs2.getDestinations().get(0));
+        assertEquals(t2, hs2.getDestinations().get(1));
+    }
+
+    public void testReadChildrenClearsExistingDestinations() throws Exception {
+        Game game = getGame();
+        Map map = getTestMap();
+        Tile t1 = map.getTile(1, 1);
+        Tile t2 = map.getTile(2, 2);
+
+        HighSeas hs = new HighSeas(game);
+        hs.addDestination(t1);
+
+        HighSeas hsSrc = new HighSeas(game);
+        hsSrc.addDestination(t2);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        FreeColXMLWriter xw =
+            new FreeColXMLWriter(out, FreeColXMLWriter.WriteScope.toSave(), false);
+
+        xw.writeStartElement(hsSrc.getXMLTagName());
+        hsSrc.writeAttributes(xw);
+        hsSrc.writeChildren(xw);
+        xw.writeEndElement();
+        xw.close();
+
+        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        FreeColXMLReader xr = new FreeColXMLReader(in);
+        xr.nextTag();
+
+        hs.readFromXML(xr);
+        xr.close();
+
+        assertEquals(1, hs.getDestinations().size());
+        assertEquals(t2, hs.getDestinations().get(0));
     }
 
     public void testAddNullDestinationDoesNotCrash() {
         Game game = getGame();
         HighSeas hs = new HighSeas(game);
 
-        hs.addDestination(null); // should only log a warning
+        hs.addDestination(null);
         assertTrue(hs.getDestinations().isEmpty());
+    }
+
+    public void testDestinationsToString() {
+        Game game = getGame();
+        Map map = getTestMap();
+        Tile t1 = map.getTile(3, 3);
+        Tile t2 = map.getTile(4, 4);
+        HighSeas hs = new HighSeas(game);
+        hs.addDestination(t1);
+        hs.addDestination(t2);
+        String expected = t1.getId() + "," + t2.getId();
+        assertEquals(expected, hs.destinationsToString());
+    }
+
+    public void testEnsureMapDestinationAddsMapIfMissing() {
+        Game game = getGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        HighSeas hs = new HighSeas(game);
+        assertFalse(hs.hasMapDestination());
+        hs.ensureMapDestination();
+        assertTrue(hs.hasMapDestination());
+        assertSame(map, hs.getMapDestination());
+    }
+
+    public void testHasAndGetMapDestination() {
+        Game game = getGame();
+        Map map = getTestMap();
+        HighSeas hs = new HighSeas(game);
+        assertFalse(hs.hasMapDestination());
+        assertNull(hs.getMapDestination());
+        hs.addDestination(map);
+        assertTrue(hs.hasMapDestination());
+        assertSame(map, hs.getMapDestination());
+    }
+
+    public void testHasAndGetEuropeDestination() {
+        Game game = getGame();
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Europe europe = dutch.getEurope();
+        HighSeas hs = dutch.getHighSeas();
+        assertTrue(hs.hasEuropeDestination());
+        assertSame(europe, hs.getEuropeDestination());
     }
 }

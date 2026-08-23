@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2024   The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -164,8 +164,8 @@ public class HighScore extends FreeColObject {
         this.gameUUID = game.getUUID();
         this.score = player.getScore();
         this.level = find(ScoreLevel.values(),
-                          sl -> sl.getMinimumScore() <= this.score,
-                          ScoreLevel.PARASITIC_WORM);
+                    sl -> sl.getMinimumScore() <= this.score,
+                    ScoreLevel.PARASITIC_WORM);
         this.playerName = player.getName();
         this.nationId = player.getNationId();
         this.nationTypeId = player.getNationType().getId();
@@ -349,11 +349,14 @@ public class HighScore extends FreeColObject {
      *
      * @param scores The list of {@code HighScore}s to operate on.
      */
-    private static void tidyScores(List<HighScore> scores) {
+    static void tidyScores(List<HighScore> scores) {
+        // Always sort first
+        scores.sort(descendingScoreComparator);
+
+        // Trim to at most NUMBER_OF_HIGH_SCORES entries
         if (scores.size() > NUMBER_OF_HIGH_SCORES) {
             scores.subList(NUMBER_OF_HIGH_SCORES, scores.size()).clear();
         }
-        scores.sort(descendingScoreComparator);
     }
 
     /**
@@ -365,30 +368,31 @@ public class HighScore extends FreeColObject {
      */
     public static int checkHighScore(HighScore highScore,
                                      List<HighScore> scores) {
-        int score = hs.getScore();
-        UUID uuid = hs.getGameUUID();
-
-        // Reject negative scores
-        if (score < 0) return -1;
-
-        // Duplicate game logic
-        if (uuid != null && !uuid.equals(nullUUID)) {
-            for (int i = 0; i < scores.size(); i++) {
-                HighScore existing = scores.get(i);
-                if (uuid.equals(existing.getGameUUID())) {
-                    return score > existing.getScore() ? i : -1;
+        final int nScores = scores.size();
+        final int score = highScore.getScore();
+        final UUID uuid = highScore.getGameUUID();
+        if (uuid.compareTo(nullUUID) != 0) {
+            // UUID is valid, check for duplicate games
+            for (int i = nScores-1; i >= 0; i--) {
+                HighScore hs = scores.get(i);
+                if (uuid.compareTo(hs.getGameUUID()) == 0) {
+                    return (score > hs.getScore()) ? i : -1; // Replace if higher, reject if lower/equal
                 }
             }
         }
-
-        if (scores.isEmpty()) return 0;
-    
-        if (scores.size() >= NUMBER_OF_HIGH_SCORES) {
-            int lastIndex = scores.size() - 1;
-            return score > scores.get(lastIndex).getScore() ? lastIndex : -1;
+        if (score < 0) {
+            return -1;
         }
-
-        return scores.size();
+        if (nScores == 0) {
+            return 0;
+        }
+        if (nScores >= NUMBER_OF_HIGH_SCORES) {
+            if (score > scores.get(nScores-1).getScore()) {
+                return nScores - 1;
+            }
+            return -1;
+        }
+        return nScores;
     }
 
     /**
@@ -432,7 +436,7 @@ public class HighScore extends FreeColObject {
             } catch (IOException ioe) {
                 scores = null;
                 logger.log(Level.WARNING, "Unable to create high score file: "
-                           + hsf.getPath(), ioe);
+                            + hsf.getPath(), ioe);
             }
             return scores;
         }
@@ -449,7 +453,7 @@ public class HighScore extends FreeColObject {
                 }
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Stream error loading high scores.", xse);
-            }                
+            }            
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "I/O error loading high scores.", ioe);
         }
