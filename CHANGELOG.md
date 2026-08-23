@@ -44,6 +44,7 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * Fixes an issue where not capturing goods from a ship prevents ending the turn.
 * Includes the version number in the freecol application directory when making ZIP-files and other packages. This prevents having the application directory collide with the settings directory if the user extracts the ZIP file (or other installation file) to the Documents directory in Windows.
 * Bugfix: Bolivar's effect on colonies is now immediately applied for all colonies without having to force a change/reconnect.
+* Bugfix: Fallback on maps where European starting location placement previously failed.
 
 ## FreeCol 1.2.0 (4th of July, 2024) ##
 
