@@ -282,4 +282,76 @@ public class OccupationTest extends FreeColTestCase {
         assertEquals("WorkType should be set to Cloth", cloth, occupation.workType);
         assertEquals("WorkLocation should be set to Weaver's House", weaverHouse, occupation.workLocation);
     }
+
+    public void testImprove_WorkTypesContainsNull() {
+        Game game = getStandardGame();
+        game.setMap(getTestMap());
+
+        Colony colony = createStandardColony(1);
+        Unit unit = colony.getUnitList().get(0);
+
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
+        tile.setOwner(colony.getOwner());
+        WorkLocation wl = colony.getColonyTile(tile);
+
+        GoodsType grain = spec().getGoodsType("model.goods.grain");
+
+        List<GoodsType> workTypes = new ArrayList<>();
+        workTypes.add(null);
+        workTypes.add(grain);
+
+        Occupation occupation = new Occupation(null, null, null);
+        LogBuilder lb = new LogBuilder(256);
+
+        int amount = occupation.improve(unit, wl, 0, workTypes, lb);
+
+        assertTrue("Should still produce grain despite null entry in workTypes", amount > 0);
+        assertEquals("WorkType should be Grain", grain, occupation.workType);
+    }
+
+    public void testImprove_RespectsExistingWorkLocationBinding() {
+        Game game = getStandardGame();
+        game.setMap(getTestMap());
+
+        Colony colony = createStandardColony(1);
+        Unit unit = colony.getUnitList().get(0);
+
+        Tile tile1 = colony.getTile().getNeighbourOrNull(Direction.N);
+        tile1.setOwner(colony.getOwner());
+        WorkLocation wl1 = colony.getColonyTile(tile1);
+
+        GoodsType grain = spec().getGoodsType("model.goods.grain");
+        Occupation occupation = new Occupation(null, null, null);
+        LogBuilder lb = new LogBuilder(256);
+
+        // Run improvement and capture result
+        int amount = occupation.improve(unit, wl1, 0, List.of(grain), lb);
+
+        assertTrue("Should successfully assign location", amount > 0);
+        assertEquals(wl1, occupation.workLocation);
+
+        // Pass a lower best amount threshold with another check to ensure binding holds
+        int updatedAmount = occupation.improve(unit, wl1, amount + 5, List.of(grain), lb);
+        assertEquals("Should not overwrite with lower/equal amounts when threshold is high", amount + 5, updatedAmount);
+    }
+
+    public void testImprove_EmptyWorkTypesList() {
+        Game game = getStandardGame();
+        game.setMap(getTestMap());
+
+        Colony colony = createStandardColony(1);
+        Unit unit = colony.getUnitList().get(0);
+
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
+        tile.setOwner(colony.getOwner());
+        WorkLocation wl = colony.getColonyTile(tile);
+
+        Occupation occupation = new Occupation(null, null, null);
+        LogBuilder lb = new LogBuilder(256);
+
+        int amount = occupation.improve(unit, wl, 0, new ArrayList<>(), lb);
+
+        assertEquals("Should return original bestAmount when workTypes is empty", 0, amount);
+        assertNull("WorkLocation should remain unassigned", occupation.workLocation);
+    }
 }

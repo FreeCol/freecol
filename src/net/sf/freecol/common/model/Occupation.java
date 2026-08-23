@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2024   The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -71,19 +72,27 @@ public class Occupation {
     }
 
     /**
-     * Calculates the maximum possible input available for a production type.
+     * Determines the available input limit for a specific required goods type.
+     * Bounded by either the colony's net production flow or its current stockpile.
      *
-     * This method determines the production ceiling by checking the colony's 
-     * current net production and existing stock for all required input goods. 
+     * @param colony The {@code Colony} checking the stock/production.
+     * @param ag The {@code AbstractGoods} requirement.
+     * @return The maximum available amount for this input.
+     */
+    private int availableInput(Colony colony, AbstractGoods ag) {
+        return Math.max(colony.getNetProductionOf(ag.getType()),
+                        colony.getGoodsCount(ag.getType()));
+    }
+
+    /**
+     * Calculates the maximum possible input available for a production type.
      *
      * @param pt The {@code ProductionType} defining the required inputs.
      * @param colony The {@code Colony} where the production is occurring.
      * @return The limiting factor (minimum) among all required input goods.
      */
     private int computeMinInput(ProductionType pt, Colony colony) {
-        return min(pt.getInputs(),
-            ag -> Math.max(colony.getNetProductionOf(ag.getType()),
-                           colony.getGoodsCount(ag.getType())));
+        return min(pt.getInputs(), ag -> availableInput(colony, ag));
     }
 
     /**
@@ -105,8 +114,7 @@ public class Occupation {
 
         lb.add(" alone=", alone);
 
-        // Determine which production types we are allowed to use
-        var productionTypes = new ArrayList<ProductionType>();
+        List<ProductionType> productionTypes = new ArrayList<>();
         if (alone) {
             productionTypes.addAll(wl.getAvailableProductionTypes(false));
         } else {
@@ -115,14 +123,14 @@ public class Occupation {
 
         final Colony colony = wl.getColony();
 
-        // Stage best results
+        // Stage best results to avoid partial mutation during evaluation loops
         WorkLocation bestWL = this.workLocation;
         ProductionType bestPT = this.productionType;
         GoodsType bestGT = this.workType;
 
         for (ProductionType pt : transform(productionTypes, isNotNull())) {
             final int minInput = computeMinInput(pt, colony);
-            lb.add("\n      try=", pt);
+            lb.add("\n     try=", pt);
 
             for (GoodsType gt : transform(workTypes, isNotNull(g -> pt.getOutput(g)))) {
                 int potential = wl.getPotentialProduction(gt, unitType);
@@ -140,7 +148,7 @@ public class Occupation {
             }
         }
 
-        // Commit best results AFTER loops
+        // Commit best results after evaluation
         this.workLocation = bestWL;
         this.productionType = bestPT;
         this.workType = bestGT;
@@ -149,17 +157,16 @@ public class Occupation {
     }
 
     /**
-     * Determines if a unit has the authority to define the production type.
+     * Determines if a unit has the authority to define or change the production type.
      *
      * @param unit The {@code Unit} to check.
      * @param wl The {@code WorkLocation} to check.
-     * @return True if the location is empty or the unit is the sole occupant.
+     * @return True if the unit can set the production type.
      */
     private boolean isUnitAlone(Unit unit, WorkLocation wl) {
-        boolean present = unit.getLocation() == wl;
-        return wl.getProductionType() == null
-            || wl.isEmpty()
-            || (present && wl.getUnitCount() == 1);
+        return wl.isEmpty()
+            || wl.getProductionType() == null
+            || (unit.getLocation() == wl && wl.getUnitCount() == 1);
     }
 
     /**
@@ -176,16 +183,11 @@ public class Occupation {
      */
     public int improve(Unit unit, WorkLocation wl, int bestAmount,
                        Collection<GoodsType> workTypes, LogBuilder lb) {
-        // Can the unit work at the wl?
         boolean present = unit.getLocation() == wl;
         lb.add("\n    ", wl,
             ((!present && !wl.canAdd(unit)) ? " no-add" : ""));
         if (!present && !wl.canAdd(unit)) return bestAmount;
 
-        // Can the unit determine the production type at this WL?
-        // This will be true if the unit is going to be alone or if
-        // the production type is as yet unset.  Set the
-        // productionTypes list accordingly.
         boolean alone = isUnitAlone(unit, wl);
         return improve(unit.getType(), wl, bestAmount, workTypes, alone, lb);
     }
@@ -215,8 +217,12 @@ public class Occupation {
      */
     @Override
     public String toString() {
-        return String.format("[Occupation %s %s]",
-                workLocation != null ? workLocation : "null",
-                workType != null ? workType.getSuffix() : "");
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[Occupation ").append(workLocation != null ? workLocation : "null");
+        if (workType != null) {
+            sb.append(' ').append(workType.getSuffix());
+        }
+        sb.append(']');
+        return sb.toString();
     }
 }
