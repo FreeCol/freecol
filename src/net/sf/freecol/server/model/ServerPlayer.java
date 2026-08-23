@@ -3031,6 +3031,16 @@ outer:  for (Effect effect : effects) {
             loser.setMovesLeft(0);
             loser.setState(Unit.UnitState.ACTIVE);
             cs.add(See.perhaps().always(loserPlayer), oldTile);
+            // csChangeOwner() only notifies the new owner (see
+            // exploreForUnit() call therein).  The former owner is never
+            // told the unit is gone, so its client retains a stale copy
+            // that keeps demanding orders each turn even though the
+            // server has already reassigned the unit - the "ghost unit"
+            // bug.  Explicitly tell the former owner to drop it, mirroring
+            // the See.only()/See.perhaps() split csSlaughterUnit() uses.
+            cs.addRemove((oldTile.getSettlement() != null)
+                ? See.only(loserPlayer) : See.perhaps().always(loserPlayer),
+                oldTile, loser);//-vis(loserPlayer)
             // Winner message post-capture when it owns the loser
             key = "combat.unitCaptured.enemy." + loser.getType().getSuffix();
             cs.addMessage(winnerPlayer,
