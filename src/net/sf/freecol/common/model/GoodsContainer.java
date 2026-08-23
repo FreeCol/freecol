@@ -88,7 +88,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @param game The enclosing {@code Game}.
      * @param parent The {@code Location} this
-     *       {@code GoodsContainer} contains goods for.
+     *        {@code GoodsContainer} contains goods for.
      */
     public GoodsContainer(Game game, Location parent) {
         super(game);
@@ -177,7 +177,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param <T> The base type of the goods.
      * @param g The goods to test the presence of.
      * @return True if there is enough of the specified goods present that it
-     *       can be removed without error.
+     *        can be removed without error.
      */
     public <T extends AbstractGoods> boolean contains(T g) {
         return getGoodsCount(g.getType()) >= g.getAmount();
@@ -200,7 +200,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @param type The {@code GoodsType} being looked for.
      * @return The amount of this type of goods in this container at
-     *       the beginning of the turn
+     *        the beginning of the turn
      */
     public int getOldGoodsCount(GoodsType type) {
         synchronized (this.goodsLock) {
@@ -275,7 +275,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param type The {@code GoodsType} to remove.
      * @param amount The amount of goods to remove.
      * @return The {@code Goods} actually removed, which may have a
-     *       lower actual amount, or null if nothing removed.
+     *        lower actual amount, or null if nothing removed.
      */
     public Goods removeGoods(GoodsType type, int amount) {
         Goods removedGoods;
@@ -370,7 +370,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @param amount The amount to check.
      * @return True if any storable, capacity limited goods has reached the
-     *       given amount.
+     *        given amount.
      */
     public boolean hasReachedCapacity(int amount) {
         synchronized (this.goodsLock) {
@@ -410,7 +410,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                     int amount = e.getValue();
                     while (amount > 0) {
                         result.add(new Goods(game, parent, e.getKey(),
-                            ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
+                                ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
                         amount -= CARGO_SIZE;
                     }
                 });
@@ -547,10 +547,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public <T extends FreeColObject> boolean copyIn(T other) {
         if (!(other instanceof GoodsContainer)) return false;
         GoodsContainer o = (GoodsContainer) other;
-        
-        // Do not let super.copyIn(o) block the deep copy if IDs differ
-        super.copyIn(o); 
-        
+
         synchronized (this.goodsLock) {
             this.storedGoods.clear();
             synchronized (o.goodsLock) {
@@ -597,7 +594,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param tag The element tag.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem writing to
-     *       the stream.
+     *        the stream.
      */
     private void writeStorage(FreeColXMLWriter xw, String tag,
                             Map<GoodsType, Integer> storage) throws XMLStreamException {
@@ -660,7 +657,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem reading from
-     *       the stream.
+     *        the stream.
      */
     private void readStorage(FreeColXMLReader xr,
         Map<GoodsType, Integer> storage) throws XMLStreamException {

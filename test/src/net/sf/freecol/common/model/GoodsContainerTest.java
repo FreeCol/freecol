@@ -260,6 +260,7 @@ public class GoodsContainerTest extends FreeColTestCase {
         src.addGoods(sugar(), 100);
         src.saveState();
 
+        System.out.println("SRC GOODS BEFORE COPY: " + src.getGoodsCount(sugar()));
         dst.copyIn(src);
 
         assertEquals(100, dst.getGoodsCount(sugar()));
