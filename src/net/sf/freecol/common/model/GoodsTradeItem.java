@@ -19,12 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -114,17 +115,33 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int evaluateFor(Player player) {
+        // Guard Clause: If the item isn't valid, don't bother with math.
+        if (!isValid()) {
+            return INVALID_TRADE_ITEM;
+        }
+
         final Market market = player.getMarket();
         final Goods goods = getGoods();
-        return (!isValid()) ? INVALID_TRADE_ITEM
-            : (getSource() == player)
-            ? ((market == null) ? -2 * goods.getAmount()
-                : market.getBidPrice(goods.getType(), goods.getAmount()))
-            : ((market == null) ? 2 * goods.getAmount()
-                : (int)Math.round(market.getSalePrice(goods.getType(),
-                                                      goods.getAmount())
-                    * (1.0 - player.getTax() / 100.0)));
+
+        // Scenario: The player is the one giving the goods (Source).
+        if (getSource() == player) {
+            return (market == null) 
+                ? -2 * goods.getAmount() 
+                : market.getBidPrice(goods.getType(), goods.getAmount());
+        }
+
+        // Scenario: The player is receiving the goods (Destination).
+        if (market == null) {
+            return 2 * goods.getAmount();
+        }
+
+        // Apply tax logic for receiving goods.
+        double salePrice = market.getSalePrice(goods.getType(), goods.getAmount());
+        double taxFactor = 1.0 - player.getTax() / 100.0;
+        
+        return (int) Math.round(salePrice * taxFactor);
     }
 
     // Serialization
@@ -179,8 +196,9 @@ public class GoodsTradeItem extends TradeItem {
      */
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
-        ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
+        GoodsTradeItem o = copyInCast(other, GoodsTradeItem.class);
         if (o == null || !super.copyIn(o)) return false;
+        
         Goods g = o.getGoods();
         if (g == null) {
             this.goods = null;
@@ -199,12 +217,14 @@ public class GoodsTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof GoodsTradeItem) {
-            return Utils.equals(this.goods, ((GoodsTradeItem)other).goods)
-                && super.equals(other);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GoodsTradeItem other = (GoodsTradeItem) o;
+        return Objects.equals(this.goods, other.goods)
+            && super.equals(other);
     }
 
     /**
@@ -212,8 +232,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + Utils.hashCode(this.goods);
+        return Objects.hash(super.hashCode(), this.goods);
     }
 
     /**
@@ -221,10 +240,10 @@ public class GoodsTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(goods.getAmount()).append(' ')
-            .append(Messages.getName(goods)).append(']');
-        return sb.toString();
+        return getClass().getSimpleName()
+            + "[id=" + getId()
+            + ", goods=" + ((goods == null) ? "null" 
+                : (goods.getAmount() + " " + Messages.getName(goods)))
+            + "]";
     }
 }

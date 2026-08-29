@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -40,6 +41,21 @@ import static net.sf.freecol.common.util.StringUtils.*;
 public class DiplomaticTrade extends FreeColGameObject {
 
     public static final String TAG = "diplomaticTrade";
+
+    @FunctionalInterface
+    private interface TradeItemConstructor {
+        TradeItem create(Game game, FreeColXMLReader xr) throws XMLStreamException;
+    }
+
+    /** A map to find the correct constructor for each trade item tag. */
+    private static final Map<String, TradeItemConstructor> ITEM_FACTORY = Map.of(
+        ColonyTradeItem.TAG, ColonyTradeItem::new,
+        GoldTradeItem.TAG,   GoldTradeItem::new,
+        GoodsTradeItem.TAG,  GoodsTradeItem::new,
+        InciteTradeItem.TAG, InciteTradeItem::new,
+        StanceTradeItem.TAG, StanceTradeItem::new,
+        UnitTradeItem.TAG,   UnitTradeItem::new
+    );
 
     /** A context for the trade. */
     public static enum TradeContext {
@@ -194,7 +210,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
 
     /**
-     * Set the recieving player.
+     * Set the receiving player.
      *
      * @param newRecipient The new recipient {@code Player}.
      */
@@ -498,9 +514,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
         this.items.clear();
-
         super.readChildren(xr);
     }
 
@@ -510,25 +524,9 @@ public class DiplomaticTrade extends FreeColGameObject {
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
-
-        if (ColonyTradeItem.TAG.equals(tag)) {
-            add(new ColonyTradeItem(getGame(), xr));
-
-        } else if (GoldTradeItem.TAG.equals(tag)) {
-            add(new GoldTradeItem(getGame(), xr));
-
-        } else if (GoodsTradeItem.TAG.equals(tag)) {
-            add(new GoodsTradeItem(getGame(), xr));
-
-        } else if (InciteTradeItem.TAG.equals(tag)) {
-            add(new InciteTradeItem(getGame(), xr));
-
-        } else if (StanceTradeItem.TAG.equals(tag)) {
-            add(new StanceTradeItem(getGame(), xr));
-
-        } else if (UnitTradeItem.TAG.equals(tag)) {
-            add(new UnitTradeItem(getGame(), xr));
-
+        TradeItemConstructor constructor = ITEM_FACTORY.get(tag);
+        if (constructor != null) {
+            add(constructor.create(getGame(), xr));
         } else {
             super.readChild(xr);
         }
