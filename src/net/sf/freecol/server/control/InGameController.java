@@ -1721,19 +1721,14 @@ public final class InGameController extends Controller {
         RandomRange gifts = is.getType().getGifts();
         if (is.getLastTribute() + TURNS_PER_TRIBUTE < year
             && gifts != null) {
-            switch (indianPlayer.getTension(serverPlayer).getLevel()) {
-            case HAPPY: case CONTENT:
-                gold = Math.min(gifts.getAmount("Tribute", random, true) / 10,
-                                100);
-                break;
-            case DISPLEASED:
-                gold = Math.min(gifts.getAmount("Tribute", random, true) / 20,
-                                100);
-                break;
-            case ANGRY: case HATEFUL:
-            default:
+            Tension.Level level = indianPlayer.getTension(serverPlayer).getLevel();
+
+            if (level.isFriendly()) {
+                gold = Math.min(gifts.getAmount("Tribute", random, true) / 10, 100);
+            } else if (level == Tension.Level.DISPLEASED) {
+                gold = Math.min(gifts.getAmount("Tribute", random, true) / 20, 100);
+            } else { // Hostile or worse
                 gold = 0; // No tribute for you.
-                break;
             }
         }
 
@@ -2345,15 +2340,14 @@ public final class InGameController extends Controller {
         // Establish if at least not angry.
         final Tension tension = is.getAlarm(serverPlayer);
         Location loc = sUnit.getLocation();
-        switch (tension.getLevel()) {
-        case HATEFUL: case ANGRY:
+
+        if (tension.getLevel().isHostile()) {
             cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             sUnit.csRemove(See.perhaps().always(serverPlayer),
                            loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
-            break;
 
-        case HAPPY: case CONTENT: case DISPLEASED:
+        } else { // HAPPY, CONTENT, DISPLEASED
             ServerIndianSettlement sis = (ServerIndianSettlement)is;
             if (is.hasMissionary()) sis.csKillMissionary(Boolean.FALSE, cs);
 
@@ -2361,8 +2355,8 @@ public final class InGameController extends Controller {
             cs.add(See.perhaps().always(serverPlayer), sUnit.getTile());
 
             sis.csChangeMissionary(sUnit, cs);//+vis(serverPlayer)
-            break;
         }
+
 
         // Add the descriptive message.
         final StringTemplate nation = is.getOwner().getNationLabel();
