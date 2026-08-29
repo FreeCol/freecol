@@ -28,6 +28,7 @@ import static net.sf.freecol.common.util.RandomUtils.randomInt;
 import static net.sf.freecol.common.util.StringUtils.getEnumKey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -52,6 +53,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
     public static final String TAG = "monarch";
+
+    private static final int MIN_MERCENARIES = 2;
+
+    private static final int MERCENARY_RANGE = 3;
 
     /** Constants describing monarch actions. */
     public static enum MonarchAction {
@@ -514,15 +519,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     /**
      * Should we add a naval unit to the REF next?
-     * 
-     * Expand royal navy to +10% of required size to transport the land units.
      *
      * @return True if a naval unit should be added next.
      */
     public boolean shouldAddNavalUnit() {
-        Force ref = getExpeditionaryForce();
-        // FIXME: Magic number
-        return (double)ref.getCapacity() < ref.getSpaceRequired() * 1.1;
+        return getExpeditionaryForce().isUnderprovisioned();
     }
         
     /**
@@ -535,33 +536,49 @@ public final class Monarch extends FreeColGameObject implements Named {
         initializeCaches();
 
         final Specification spec = getSpecification();
+        Force ref = getExpeditionaryForce();
         AbstractUnit result;
-        if (shouldAddNavalUnit()) {
+
+        // --- Naval branch ---
+        if (ref.isUnderprovisioned()) {
             List<UnitType> types = navalREFUnitTypes;
             if (types.isEmpty()) return null;
-            result = new AbstractUnit(getRandomMember(logger, "Naval REF unit",
-                                                      types, random),
-                                      Specification.DEFAULT_ROLE_ID, 1);
+
+            result = new AbstractUnit(
+                getRandomMember(logger, "Naval REF unit", types, random),
+                Specification.DEFAULT_ROLE_ID,
+                1
+            );
+
+        // --- Land branch ---
         } else {
             List<UnitType> types = landREFUnitTypes;
             if (types.isEmpty()) return null;
-            UnitType unitType = getRandomMember(logger, "Land REF unit",
-                                                types, random);
+
+            UnitType unitType = getRandomMember(
+                logger, "Land REF unit", types, random
+            );
+
             Role role = (!unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
                 ? spec.getDefaultRole()
                 : (randomInt(logger, "Choose land role", random, 3) == 0)
-                ? refMountedRole
-                : refArmedRole;
+                    ? refMountedRole
+                    : refArmedRole;
+
             int number = randomInt(logger, "Choose land#", random, 3) + 1;
+
             result = new AbstractUnit(unitType, role.getId(), number);
         }
 
-        Force ref = getExpeditionaryForce();
+        // --- Add to REF ---
         ref.add(result);
+
+        // --- Logging (unchanged) ---
         logger.info("Add to " + player.getDebugName()
             + " REF: capacity=" + ref.getCapacity()
             + " spaceRequired=" + ref.getSpaceRequired()
             + " => " + result);
+
         return result;
     }
 
@@ -575,15 +592,14 @@ public final class Monarch extends FreeColGameObject implements Named {
     public void updateInterventionForce() {
         final Specification spec = getSpecification();
         final int interventionTurns = spec.getInteger(GameOptions.INTERVENTION_TURNS);
+        if (interventionTurns <= 0) return;
+
         final int updates = getGame().getTurn().getNumber() / interventionTurns;
         Force ivf = getInterventionForce();
-        if (interventionTurns > 0 && updates > 0) {
-            for (AbstractUnit au : ivf.getLandUnitsList()) {
-                // add units depending on current turn
-                ivf.add(new AbstractUnit(au.getType(spec), au.getRoleId(),
-                                         updates));
-            }
-            ivf.prepareToBoard(null);
+        
+        if (updates > 0) {
+            ivf.scaleLandUnits(updates); // Use the new scaling method
+            ivf.prepareToBoard(null);    // Ensure ships match the new size
         }
     }
 
@@ -665,57 +681,47 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of {@code AbstractUnit}s provided as support.
      */
     public List<AbstractUnit> getWarSupport(Player enemy, Random random) {
-        final Specification spec = getSpecification();
         final double baseStrength = player.calculateStrength(false);
         final double enemyStrength = enemy.calculateStrength(false);
-        final double strengthRatio
-            = Player.strengthRatio(baseStrength, enemyStrength);
-        List<AbstractUnit> result = new ArrayList<AbstractUnit>();
-        // We do not really know what Col1 did to decide whether to
-        // provide war support, so we have made something up.
-        //
-        // Strength ratios are in [0, 1].  Support is granted in negative
-        // proportion to the base strength ratio, such that we always
-        // support if the enemy is stronger (ratio < 0.5), and never
-        // support if the player is more than 50% stronger (ratio >
-        // 0.6).  However if war support force sufficiently large with
-        // respect to the current player and enemy forces it will be
-        // reduced.
-        // The principle at work is that the Crown is cautious/stingy.
+        final double strengthRatio = Player.strengthRatio(baseStrength, enemyStrength);
+        
+        // The Crown is cautious/stingy.
         final double NOSUPPORT = 0.6;
         double p = 10.0 * (NOSUPPORT - strengthRatio);
-        if (p >= 1.0 // Avoid calling randomDouble if unnecessary
-            || (p > 0.0 && p > randomDouble(logger, "War support?", random))) {
-            Force wsf = getWarSupportForce();
-            result.addAll(wsf.getUnitList());
-            double supportStrength, fullRatio, strength, ratio;
-            supportStrength = wsf.calculateStrength(false);
-            fullRatio = Player.strengthRatio(baseStrength + supportStrength,
-                                             enemyStrength);
-            if (fullRatio < NOSUPPORT) { // Full support, some randomization
-                for (AbstractUnit au : result) {
-                    au.addToNumber(randomInt(logger, "Vary war force " + au.getId(),
-                                             random, 3) - 1);
-                }
-            } else if (enemyStrength <= 0.0) { // Enemy is defenceless: 1 unit
-                while (result.size() > 1) result.remove(0);
-                result.get(0).setNumber(1);
-            } else { // Reduce force until below NOSUPPORT or single unit/s
-                outer: for (AbstractUnit au : result) {
-                    for (int n = au.getNumber() - 1; n >= 1; n--) {
-                        au.setNumber(n);
-                        strength = AbstractUnit.calculateStrength(spec, result);
-                        ratio = Player.strengthRatio(baseStrength + strength,
-                                                     enemyStrength);
-                        if (ratio < NOSUPPORT) break outer;
-                    }
+        
+        List<AbstractUnit> result = new ArrayList<>();
+        
+        if (p >= 1.0 || (p > 0.0 && p > randomDouble(logger, "War support?", random))) {
+            // Create a temporary Force object to handle the calculations
+            Force wsf = getWarSupportForce().copy();
+
+            // Randomize the initial force slightly
+            for (AbstractUnit au : wsf.getUnitList()) {
+                au.addToNumber(randomInt(logger, "Vary war force", random, 3) - 1);
+            }
+
+            double supportStrength = wsf.getLandStrength();
+            double fullRatio = Player.strengthRatio(baseStrength + supportStrength, enemyStrength);
+
+            if (fullRatio >= NOSUPPORT) {
+                if (enemyStrength <= 0.0) {
+                    // Enemy is defenseless: reduce to 1 single unit
+                    AbstractUnit first = wsf.getUnitList().get(0);
+                    wsf.clearLandUnits();
+                    first.setNumber(1);
+                    wsf.add(first);
+                } else {
+                    // Delegate the downsizing loop to the Force class
+                    // We need to find the strength 'limit' that results in NOSUPPORT ratio
+                    // StrengthRatio = (Player + Support) / (Player + Support + Enemy)
+                    // Solving for Support: Limit = (NOSUPPORT * Enemy) / (1 - NOSUPPORT) - Player
+                    double limit = (NOSUPPORT * enemyStrength) / (1.0 - NOSUPPORT) - baseStrength;
+                    wsf.downsizeToLimit(limit);
                 }
             }
-            strength = AbstractUnit.calculateStrength(spec, result);
-            ratio = Player.strengthRatio(baseStrength+strength, enemyStrength);
-            logger.finest("War support:"
-                + " initially=" + supportStrength + "/" + fullRatio
-                + " finally=" + strength + "/" + ratio);
+            
+            result.addAll(wsf.getUnitList());
+            logger.finest("War support provided: " + result);
         }
         return result;
     }
@@ -733,41 +739,50 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         final Specification spec = getSpecification();
         final Role defaultRole = spec.getDefaultRole();
-        final int mercPrice = spec.getInteger(GameOptions.MERCENARY_PRICE);
-        List<Role> landRoles = new ArrayList<>();
-        landRoles.add(armedRole);
-        landRoles.add(mountedRole);
+        final int priceMultiplier = spec.getInteger(GameOptions.MERCENARY_PRICE);
 
-        // FIXME: magic numbers for 2-4 mercs
-        int count = randomInt(logger, "Mercenary count", random, 2) + 2;
-        int price = 0;
-        UnitType unitType = null;
+        List<Role> landRoles = Arrays.asList(armedRole, mountedRole);
         List<UnitType> unitTypes = new ArrayList<>(mercenaryTypes);
+
+        Force tempForce = new Force(spec);
+        int count = MIN_MERCENARIES
+                + randomInt(logger, "Mercenary count", random, MERCENARY_RANGE);
+
         while (count > 0 && !unitTypes.isEmpty()) {
-            unitType = getRandomMember(logger, "Merc unit",
-                                       unitTypes, random);
+            UnitType unitType = getRandomMember(logger, "Merc unit", unitTypes, random);
             unitTypes.remove(unitType);
+
             Role role = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-                ? getRandomMember(logger, "Merc role",
-                                  landRoles, random)
+                ? getRandomMember(logger, "Merc role", landRoles, random)
                 : defaultRole;
-            int n = randomInt(logger, "Merc count " + unitType,
-                              random, Math.min(count, 2)) + 1;
-            AbstractUnit au = new AbstractUnit(unitType, role.getId(), 1);
-            int newPrice = player.getEuropeanPurchasePrice(au);
-            if (newPrice <= 0 || newPrice == INFINITY) break;
-            newPrice *= mercPrice / 100;
-            while (n > 0 && !player.checkGold(price + newPrice * n)) n--;
+
+            int n = randomInt(logger, "Merc count " + unitType, random, Math.min(count, 2)) + 1;
+
+            // Price of ONE unit
+            AbstractUnit single = new AbstractUnit(unitType, role.getId(), 1);
+            int unitPrice = player.getEuropeanPurchasePrice(single);
+            unitPrice = unitPrice * priceMultiplier / 100;
+
+            if (unitPrice <= 0 || unitPrice == INFINITY) {
+                continue; // original behavior: skip this type
+            }
+
+            int currentTotal = tempForce.getCustomPrice(player, priceMultiplier);
+            if (currentTotal < 0) break;
+
+            while (n > 0 && !player.checkGold(currentTotal + unitPrice * n)) {
+                n--;
+            }
+
             if (n > 0) {
-                au.setNumber(n);
-                mercs.add(au);
-                price += newPrice * n;
+                AbstractUnit au = new AbstractUnit(unitType, role.getId(), n);
+                tempForce.add(au);
                 count -= n;
-            } else {
-                unitTypes.remove(unitType);
             }
         }
-        return price;
+
+        mercs.addAll(tempForce.getUnitList());
+        return tempForce.getCustomPrice(player, priceMultiplier);
     }
 
     /**
@@ -782,36 +797,16 @@ public final class Monarch extends FreeColGameObject implements Named {
         initializeCaches();
         mercs.clear();
 
-        mercs.addAll(getMercenaryForce().getUnitList());
-        List<Integer> prices = new ArrayList<>(mercs.size());
-        for (AbstractUnit au : mercs) {
-            int price = player.getMercenaryHirePrice(au) / au.getNumber();
-            prices.add(price);
+        // Clone the template force so we do NOT mutate the spec
+        Force temp = getMercenaryForce().copy();
+
+        int finalPrice = temp.downsizeToPrice(player, random);
+
+        if (finalPrice >= 0) {
+            mercs.addAll(temp.getUnitList());
         }
-        int i = 0, mercPrice = 0;
-        while (i < mercs.size()) {
-            int price = prices.get(i);
-            if (price <= 0 || price == INFINITY) {
-                prices.remove(i);
-                mercs.remove(i);
-            } else {
-                mercPrice += price * mercs.get(i).getNumber();
-                i++;
-            }
-        }
-        while (!mercs.isEmpty()) {
-            if (player.checkGold(mercPrice)) return mercPrice;
-            int r = randomInt(logger, "merc downsize", random, mercs.size());
-            mercPrice -= prices.get(r);
-            AbstractUnit au = mercs.get(r);
-            if (au.getNumber() > 1) {
-                au.addToNumber(-1);
-            } else {
-                prices.remove(r);
-                mercs.remove(r);
-            }
-        }
-        return -1;
+
+        return finalPrice;
     }
 
 
