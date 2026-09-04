@@ -59,6 +59,8 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.logging.WideEvent;
+import static net.sf.freecol.common.logging.WideEventFields.*;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -1295,6 +1297,14 @@ public final class InGameController extends FreeColClientHolder {
         // Consider all the move types.
         final Unit.MoveType mt = unit.getMoveType(direction);
         boolean result = mt.isLegal();
+
+        WideEvent event = WideEvent.begin("client.moveUnit")
+            .with(UNIT, unit.getId())
+            .with(UNIT_TYPE, unit.getType().getSuffix())
+            .with(DIRECTION, direction)
+            .with(MOVE_TYPE, mt)
+            .with(INTERACTIVE, interactive);
+        try {
         switch (mt) {
         case MOVE_HIGH_SEAS:
             // If the destination is Europe (and valid) move there,
@@ -1483,6 +1493,9 @@ public final class InGameController extends FreeColClientHolder {
         }
 
         return result;
+        } finally {
+            event.with(RESULT, result).end(logger, Level.FINE);
+        }
     }
 
     /**
