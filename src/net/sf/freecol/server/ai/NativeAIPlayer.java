@@ -855,19 +855,16 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         int anger, haggle;
         Tension tension = is.getAlarm(other);
         if (tension == null) return NativeTradeAction.NAK_INVALID;
+        Tension.Level level = tension.getLevel();
 
         switch (action) {
         case OPEN:
-            switch (tension.getLevel()) {
-            case HAPPY: case CONTENT:
+            if (level.isFriendly()) {
                 anger = 1;
-                break;
-            case DISPLEASED:
+            } else if (level == Tension.Level.DISPLEASED) {
                 anger = 2;
-                break;
-            case ANGRY: default:
+            } else {
                 anger = -1;
-                break;
             }
             if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
             updateTrade(nt, anger);
@@ -875,16 +872,12 @@ public final class NativeAIPlayer extends MissionAIPlayer {
                 : NativeTradeAction.ACK_OPEN;
 
         case BUY:
-            switch (tension.getLevel()) {
-            case HAPPY: case CONTENT:
+            if (level.isFriendly()) {
                 anger = 1;
-                break;
-            case DISPLEASED:
+            } else if (level == Tension.Level.DISPLEASED) {
                 anger = 2;
-                break;
-            case ANGRY: default:
+            } else {
                 anger = -1;
-                break;
             }
             if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
             updateTrade(nt, anger);
@@ -905,21 +898,16 @@ public final class NativeAIPlayer extends MissionAIPlayer {
             return NativeTradeAction.ACK_BUY_HAGGLE;
 
         case SELL:
-            switch (tension.getLevel()) {
-            case HAPPY: case CONTENT:
+            if (level.isFriendly()) {
                 anger = 1;
-                break;
-            case DISPLEASED:
+            } else if (level == Tension.Level.DISPLEASED) {
                 anger = 2;
-                break;
-            case ANGRY:
+            } else if (level == Tension.Level.ANGRY) {
                 anger = (any(nt.getUnitToSettlement(),
                              nti -> nti.getGoods().getType().getMilitary()))
                     ? 3 : -1;
-                break;
-            default:
+            } else { // HATEFUL
                 anger = -1;
-                break;
             }
             if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
             updateTrade(nt, anger);

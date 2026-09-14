@@ -121,4 +121,140 @@ public class TensionTest extends FreeColTestCase {
         assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
         assertEquals(Stance.PEACE, stance);
     }
+
+    public void testTensionFromCombat() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        Tension tension = indian.getTension(european);
+
+        tension.modify(Tension.TENSION_ADD_UNIT_DESTROYED);
+        assertEquals(Tension.TENSION_ADD_UNIT_DESTROYED, tension.getValue());
+        assertTrue(tension.getValue() < Tension.Level.CONTENT.getLimit());
+
+        tension.setValue(0);
+        tension.modify(Tension.TENSION_ADD_LAND_TAKEN);
+        tension.modify(Tension.TENSION_ADD_UNIT_DESTROYED);
+        assertEquals(Tension.Level.CONTENT.getLimit(), tension.getValue());
+        assertEquals(Tension.Level.CONTENT, tension.getLevel());
+    }
+
+    public void testStanceTransitionWithDelta() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        Tension tension = indian.getTension(european);
+
+        tension.setValue(Tension.Level.HATEFUL.getLimit());
+        assertEquals(Stance.PEACE, Stance.PEACE.getStanceFromTension(tension));
+
+        tension.modify(Tension.DELTA + 1);
+        assertEquals(Stance.WAR, Stance.PEACE.getStanceFromTension(tension));
+    }
+
+    public void testDeescalationWithDelta() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        indian.setStance(european, Stance.WAR);
+        Tension tension = indian.getTension(european);
+
+        tension.setValue(800);
+        assertEquals(Stance.WAR, Stance.WAR.getStanceFromTension(tension));
+
+        tension.setValue(589); // Below CONTENT (600) - DELTA (10)
+        assertEquals(Stance.CEASE_FIRE, Stance.WAR.getStanceFromTension(tension));
+    }
+
+    public void testSurrenderTensionLevel() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        Tension tension = indian.getTension(european);
+
+        tension.setValue(Tension.SURRENDERED);
+        assertTrue(tension.getValue() > Tension.Level.HAPPY.getLimit());
+        assertEquals(Tension.Level.CONTENT, tension.getLevel());
+    }
+
+    public void testMultipleTensionSources() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        Tension tension = indian.getTension(european);
+
+        tension.setValue(0);
+        tension.modify(Tension.TENSION_ADD_LAND_TAKEN);    // 200
+        tension.modify(Tension.TENSION_ADD_UNIT_DESTROYED); // 400
+        tension.modify(Tension.TENSION_ADD_WAR_INCITER);    // 250
+        assertEquals(850, tension.getValue());
+        assertEquals(Tension.Level.HATEFUL, tension.getLevel());
+        assertEquals(Stance.PEACE, Stance.PEACE.getStanceFromTension(tension));
+    }
+
+    public void testAICalmingDownAfterPeaceTreaty() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        indian.setStance(european, Stance.WAR);
+        Tension tension = indian.getTension(european);
+        tension.setValue(900);
+
+        tension.modify(Tension.PEACE_TREATY_MODIFIER); // -250
+        tension.modify(Tension.CEASE_FIRE_MODIFIER);   // -250
+        assertEquals(Tension.Level.CONTENT, tension.getLevel());
+        assertEquals(Stance.CEASE_FIRE, Stance.WAR.getStanceFromTension(tension));
+    }
+
+    public void testAIDeclaresWarWhenCombatRaisesTension() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(indian, european);
+        Tension tension = indian.getTension(european);
+        tension.setValue(700);
+        tension.modify(Tension.TENSION_ADD_UNIT_DESTROYED); // +400 = 1100
+        assertEquals(Tension.Level.HATEFUL, tension.getLevel());
+        assertEquals(Stance.WAR, Stance.PEACE.getStanceFromTension(tension));
+    }
+
+    public void testAsymmetricTension() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer tupi = getServerPlayer(game, "model.nation.tupi");
+
+        Player.makeContact(dutch, tupi);
+        Tension tupiTension = tupi.getTension(dutch);
+        tupiTension.setValue(800); 
+
+        assertEquals(Tension.Level.ANGRY, tupiTension.getLevel());
+        assertEquals(Stance.PEACE, Stance.PEACE.getStanceFromTension(tupiTension));
+    }
+
+    public void testTensionClampingUnderExtremeEvents() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        ServerPlayer indian = getServerPlayer(game, "model.nation.tupi");
+        ServerPlayer european = getServerPlayer(game, "model.nation.dutch");
+
+        Player.makeContact(indian, european);
+        Tension tension = indian.getTension(european);
+
+        tension.modify(50000);
+        assertEquals(Tension.TENSION_MAX, tension.getValue());
+        tension.modify(-100000);
+        assertEquals(Tension.TENSION_MIN, tension.getValue());
+    }
 }
