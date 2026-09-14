@@ -44,6 +44,7 @@ import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Direction;
@@ -543,6 +544,65 @@ public final class TileViewer extends FreeColClientHolder {
                                                       tile.getX(), tile.getY()),
                               0, 0, null);
             }
+        }
+    }
+
+    /**
+     * Draw potential production for a regular colonist using current tile
+     * resources and improvements, without colony or player modifiers.
+     *
+     * @param g2d The graphics context for the tile.
+     * @param tile The tile whose potential production is displayed.
+     */
+    public void displayTileYields(Graphics2D g2d, Tile tile) {
+        if (!tile.isExplored() || this.tinyFont == null) return;
+
+        List<AbstractGoods> yields = tile.getSpecification()
+            .getFarmedGoodsTypeList().stream()
+            .map(type -> new AbstractGoods(type,
+                tile.getPotentialProduction(type,
+                    tile.getSpecification().getDefaultUnitType())))
+            .filter(goods -> goods.getAmount() > 0)
+            .collect(Collectors.toList());
+        if (yields.isEmpty()) return;
+
+        Graphics2D g = (Graphics2D) g2d.create();
+        try {
+            g.setFont(this.tinyFont);
+            FontMetrics metrics = g.getFontMetrics();
+            int iconSize = this.lib.scaleInt(14);
+            int padding = Math.max(1, this.lib.scaleInt(2));
+            int rowHeight = Math.max(iconSize, metrics.getHeight()) + padding;
+            int columns = Math.min(3, yields.size());
+            int rows = (yields.size() + columns - 1) / columns;
+            int top = (this.tileHeight - rows * rowHeight) / 2;
+            for (int row = 0; row < rows; row++) {
+                int start = row * columns;
+                int end = Math.min(start + columns, yields.size());
+                int width = padding + yields.subList(start, end).stream()
+                    .mapToInt(goods -> iconSize + 2 * padding
+                        + metrics.stringWidth(String.valueOf(goods.getAmount())))
+                    .sum();
+                int x = (this.tileWidth - width) / 2;
+                int y = top + row * rowHeight;
+                g.setColor(new Color(0, 0, 0, 175));
+                g.fillRoundRect(x, y, width, rowHeight, padding * 2, padding * 2);
+                x += padding;
+                for (int i = start; i < end; i++) {
+                    AbstractGoods goods = yields.get(i);
+                    BufferedImage icon = this.lib.getGoodsTypeImage(goods.getType(),
+                        new Dimension(iconSize, iconSize));
+                    g.drawImage(icon, x, y + (rowHeight - icon.getHeight()) / 2, null);
+                    x += iconSize + padding;
+                    String amount = String.valueOf(goods.getAmount());
+                    g.setColor(Color.WHITE);
+                    g.drawString(amount, x, y + (rowHeight - metrics.getHeight()) / 2
+                        + metrics.getAscent());
+                    x += metrics.stringWidth(amount) + padding;
+                }
+            }
+        } finally {
+            g.dispose();
         }
     }
 
