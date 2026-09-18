@@ -556,7 +556,10 @@ public class Europe extends UnitLocation implements Ownable, Named, TradeLocatio
         if (owner != null) {
             owner.setEurope(null);
             HighSeas highSeas = owner.getHighSeas();
-            if (highSeas != null) highSeas.removeDestination(this);
+            if (highSeas != null) {
+                highSeas.removeDestination(this);
+                highSeas.validateDestinations();
+            }
         }
         super.disposeResources();
     }

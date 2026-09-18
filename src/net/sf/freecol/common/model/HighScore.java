@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2024   The FreeCol Team
+ *  Copyright (C) 2002-2024  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -164,8 +164,8 @@ public class HighScore extends FreeColObject {
         this.gameUUID = game.getUUID();
         this.score = player.getScore();
         this.level = find(ScoreLevel.values(),
-                          sl -> sl.getMinimumScore() <= this.score,
-                          ScoreLevel.PARASITIC_WORM);
+                    sl -> sl.getMinimumScore() <= this.score,
+                    ScoreLevel.PARASITIC_WORM);
         this.playerName = player.getName();
         this.nationId = player.getNationId();
         this.nationTypeId = player.getNationType().getId();
@@ -349,11 +349,14 @@ public class HighScore extends FreeColObject {
      *
      * @param scores The list of {@code HighScore}s to operate on.
      */
-    private static void tidyScores(List<HighScore> scores) {
-        if (scores.size() > NUMBER_OF_HIGH_SCORES) {
-            scores = scores.subList(0, NUMBER_OF_HIGH_SCORES - 1);
-        }
+    static void tidyScores(List<HighScore> scores) {
+        // Always sort first
         scores.sort(descendingScoreComparator);
+
+        // Trim to at most NUMBER_OF_HIGH_SCORES entries
+        if (scores.size() > NUMBER_OF_HIGH_SCORES) {
+            scores.subList(NUMBER_OF_HIGH_SCORES, scores.size()).clear();
+        }
     }
 
     /**
@@ -372,8 +375,9 @@ public class HighScore extends FreeColObject {
             // UUID is valid, check for duplicate games
             for (int i = nScores-1; i >= 0; i--) {
                 HighScore hs = scores.get(i);
-                if (uuid.compareTo(hs.getGameUUID()) == 0
-                    && score > hs.getScore()) return i; // Replace score i
+                if (uuid.compareTo(hs.getGameUUID()) == 0) {
+                    return (score > hs.getScore()) ? i : -1; // Replace if higher, reject if lower/equal
+                }
             }
         }
         if (score < 0) {
@@ -432,7 +436,7 @@ public class HighScore extends FreeColObject {
             } catch (IOException ioe) {
                 scores = null;
                 logger.log(Level.WARNING, "Unable to create high score file: "
-                           + hsf.getPath(), ioe);
+                            + hsf.getPath(), ioe);
             }
             return scores;
         }
@@ -449,7 +453,7 @@ public class HighScore extends FreeColObject {
                 }
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Stream error loading high scores.", xse);
-            }                
+            }            
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "I/O error loading high scores.", ioe);
         }
