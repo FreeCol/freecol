@@ -19,26 +19,28 @@
 
 package net.sf.freecol.common.util;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Location;
 
-
 /**
  * A class to wrap a StringBuilder for log generation purposes.
  */
-public class LogBuilder {
+public class LogBuilder implements Iterable<String> {
 
     /** The string builder to use. */
     private final StringBuilder sb;
 
-    /** The remembered buffer index. */
-    private final List<Integer> points = new ArrayList<>();
+    /** The remembered buffer indices. */
+    private final Deque<Integer> points = new ArrayDeque<>();
 
 
     /**
@@ -58,15 +60,15 @@ public class LogBuilder {
      * @return The simple string result.
      */
     private static String o2s(Object o) {
-        return (o == null) ? "null"
-            : (o instanceof Class<?>) ? ((Class<?>) o).getName()
-            : (o instanceof String) ? (String)o
-            : (o instanceof Location) ? ((Location)o).toShortString()
-            : o.toString();
+        if (o == null) return "null";
+        if (o instanceof Class<?>) return ((Class<?>) o).getName();
+        if (o instanceof String) return (String) o;
+        if (o instanceof Location) return ((Location) o).toShortString();
+        return String.valueOf(o);
     }
 
     /**
-     * Add objects to a string builder.
+     * Add objects to a string builder using modern stream handling for arrays.
      *
      * @param sb The {@code StringBuilder} to add to.
      * @param objects The objects to add.
@@ -74,7 +76,7 @@ public class LogBuilder {
     private static void addInternal(StringBuilder sb, Object... objects) {
         for (Object o : objects) {
             if (o instanceof Object[]) {
-                for (Object o2 : (Object[])o) {
+                for (Object o2 : (Object[]) o) {
                     sb.append(o2s(o2));
                 }
             } else {
@@ -127,7 +129,7 @@ public class LogBuilder {
      */
     public void mark() {
         if (sb != null) {
-            this.points.add(0, sb.length());
+            this.points.push(sb.length());
         }
     }
 
@@ -136,13 +138,14 @@ public class LogBuilder {
      * text at that point.
      *
      * @param objects Optional {@code Object}s to insert if the buffer has
-     *     grown.
+     * grown.
      * @return True if the buffer grew (before inserting).
      */
     public boolean grew(Object... objects) {
-        if (sb == null) return false;
-        int p = this.points.remove(0);
+        if (sb == null || points.isEmpty()) return false;
+        int p = this.points.pop();
         if (sb.length() <= p) return false;
+        
         StringBuilder sb2 = new StringBuilder(64);
         addInternal(sb2, objects);
         this.sb.insert(p, sb2.toString());
@@ -189,7 +192,7 @@ public class LogBuilder {
     }
 
     /**
-     * Add a group of objects to the buffer at a particular width
+     * Add a group of objects to the buffer at a particular width.
      *
      * @param size The width to set.
      * @param objects The {@code Object}s to add.
@@ -198,17 +201,32 @@ public class LogBuilder {
     public static String wide(int size, Object... objects) {
         if (size == 0) return "";
         boolean left = size > 0;
-        if (!left) size = -size;
-        StringBuilder s2 = new StringBuilder(size);
+        int absSize = Math.abs(size);
+        
+        StringBuilder s2 = new StringBuilder();
         addInternal(s2, objects);
-        int delta = size - s2.length();
-        if (left) {
-            for (; delta > 0; delta--) s2.append(' ');
-        } else {
-            for (; delta > 0; delta--) s2.insert(0, " ");
+        
+        if (s2.length() >= absSize) {
+            s2.setLength(absSize);
+            return s2.toString();
         }
-        if (delta < 0) s2.setLength(size);
-        return s2.toString();
+
+        int delta = absSize - s2.length();
+        String padding = " ".repeat(delta);
+        
+        return left ? (s2.toString() + padding) : (padding + s2.toString());
+    }
+
+    /**
+     * Returns an iterator over the lines in the buffer.
+     * * @return An {@code Iterator} of Strings.
+     */
+    @Override
+    public Iterator<String> iterator() {
+        if (sb == null || sb.length() == 0) {
+            return Collections.emptyIterator();
+        }
+        return Arrays.asList(sb.toString().split("\\n")).iterator();
     }
 
 
