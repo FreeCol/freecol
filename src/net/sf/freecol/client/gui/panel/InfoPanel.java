@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import static net.sf.freecol.common.logging.WideEventFields.NOTE_INFO_PANEL;
 import static net.sf.freecol.common.util.CollectionUtils.sort;
 import static net.sf.freecol.common.util.StringUtils.splitText;
 
@@ -35,6 +36,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -50,6 +52,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI.PopupPosition;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.logging.WideEvent;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -487,8 +490,8 @@ public final class InfoPanel extends FreeColPanel
                 fillEndPanel();
                 updated = true;
             }
-            logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
-                    + oldMode + " -> " + this.mode);
+            WideEvent.noteOrLog(logger, Level.INFO, NOTE_INFO_PANEL, "InfoPanel "
+                + ((updated) ? "updated " : "maintained ") + oldMode + " -> " + this.mode);
         }
     }
         
@@ -504,8 +507,9 @@ public final class InfoPanel extends FreeColPanel
             this.mapTransform = fillMapPanel(mapTransform);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
-            + oldMode + " -> " + this.mode + " with " + mapTransform);
+        WideEvent.noteOrLog(logger, Level.INFO, NOTE_INFO_PANEL, "InfoPanel "
+            + ((updated) ? "updated " : "maintained ") + oldMode + " -> " + this.mode
+            + " with " + mapTransform);
     }
 
     /**
@@ -520,8 +524,9 @@ public final class InfoPanel extends FreeColPanel
             this.tile = fillTilePanel(tile);
             updated = true;
         }
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
-            + oldMode + " -> " + this.mode + " with tile " + tile);
+        WideEvent.noteOrLog(logger, Level.INFO, NOTE_INFO_PANEL, "InfoPanel "
+            + ((updated) ? "updated " : "maintained ") + oldMode + " -> " + this.mode
+            + " with tile " + tile);
     }
 
     /**
@@ -553,8 +558,9 @@ public final class InfoPanel extends FreeColPanel
         // change, its annotations (such as moves left) might
         this.unit = fillUnitPanel(unit);
         updated = true;
-        logger.info("InfoPanel " + ((updated) ? "updated " : "maintained ")
-            + oldMode + " -> " + this.mode + " with unit " + unit);
+        WideEvent.noteOrLog(logger, Level.INFO, NOTE_INFO_PANEL, "InfoPanel "
+            + ((updated) ? "updated " : "maintained ") + oldMode + " -> " + this.mode
+            + " with unit " + unit);
     }
 
     /**
