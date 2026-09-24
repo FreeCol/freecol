@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
@@ -125,7 +127,7 @@ public class GoldTradeItem extends TradeItem {
      */
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
-        ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
+        GoldTradeItem o = copyInCast(other, GoldTradeItem.class);
         if (o == null || !super.copyIn(o)) return false;
         this.gold = o.getGold();
         return true;
@@ -169,12 +171,14 @@ public class GoldTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof GoldTradeItem) {
-            return this.gold == ((GoldTradeItem)other).gold
-                && super.equals(other);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GoldTradeItem other = (GoldTradeItem) o;
+        return this.gold == other.gold
+            && super.equals(other);
     }
 
     /**
@@ -182,8 +186,7 @@ public class GoldTradeItem extends TradeItem {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + this.gold;
+        return Objects.hash(super.hashCode(), this.gold);
     }
 
     /**
@@ -191,8 +194,8 @@ public class GoldTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId()).append(' ').append(gold).append(']');
-        return sb.toString();
+        return getClass().getSimpleName()
+            + "[id=" + getId()
+            + ", gold=" + gold + "]";
     }
 }
