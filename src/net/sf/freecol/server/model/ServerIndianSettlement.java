@@ -302,10 +302,11 @@ public class ServerIndianSettlement extends IndianSettlement
             initializeAlarm(player);
             alarm = getAlarm(player);
         }
-        Tension.Level oldLevel = alarm.getLevel();
-        alarm.modify(amount);
-        boolean change = updateMostHated();
-        return change || oldLevel != alarm.getLevel();
+
+        boolean levelChanged = alarm.levelChangedAfterModify(amount);
+        boolean hatedChanged = updateMostHated();
+
+        return levelChanged || hatedChanged;
     }
 
     /**
@@ -475,6 +476,7 @@ public class ServerIndianSettlement extends IndianSettlement
         Tension newTension = getAlarm(enemy);
         Tension.Level newLevel = (newTension == null) ? null
             : newTension.getLevel();
+
         if (oldLevel == null || oldLevel == newLevel
             || !hasContacted(enemy) || !enemy.hasExplored(getTile())) return;
 
@@ -482,12 +484,12 @@ public class ServerIndianSettlement extends IndianSettlement
         cs.add(See.only(null).perhapsOnly(enemy), this);
 
         // No messages about improving tension
-        if (newLevel == null
-            || oldLevel.getLimit() > newLevel.getLimit()) return;
+        if (newLevel == null || !newLevel.isWorseThan(oldLevel)) return;
 
         // Send a message to the enemy that tension has increased.
         String key = "model.player.alarmIncrease." + getAlarm(enemy).getKey();
         if (!Messages.containsKey(key)) return;
+
         cs.addMessage(enemy,
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              key, this)
