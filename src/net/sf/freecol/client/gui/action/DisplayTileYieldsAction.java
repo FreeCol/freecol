@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2024  The FreeCol Team
+ *  Copyright (C) 2002-2024   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -17,21 +17,28 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.action;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 
 
-public class AllTests {
+/**
+ * An action to toggle the display of potential tile yields.
+ */
+public class DisplayTileYieldsAction extends SelectableOptionAction {
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui");
-        //$JUnit-BEGIN$
-        suite.addTestSuite(FontTest.class);
-        suite.addTestSuite(TileYieldsTest.class);
-        //$JUnit-END$
-        return suite;
+    public static final String id = "displayTileYieldsAction";
+
+
+    /**
+     * Creates this action.
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
+     */
+    public DisplayTileYieldsAction(FreeColClient freeColClient) {
+        super(freeColClient, id, ClientOptions.DISPLAY_TILE_YIELDS);
+
+        setSelected(shouldBeSelected());
     }
-
 }

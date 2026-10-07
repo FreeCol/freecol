@@ -226,6 +226,10 @@ public class ClientOptions extends OptionGroup {
     public static final String DISPLAY_GRID
         = "model.option.displayGrid";
 
+    /** Whether to display potential production on explored map tiles. */
+    public static final String DISPLAY_TILE_YIELDS
+        = "model.option.displayTileYields";
+
     /** Whether to display borders by default or not. */
     public static final String DISPLAY_BORDERS
         = "model.option.displayBorders";
@@ -896,6 +900,7 @@ public class ClientOptions extends OptionGroup {
             add(op);
         }
         // end @compat 1.1.0
+        addBooleanOption(DISPLAY_TILE_YIELDS, MAPVIEW_GROUP, false);
     }
     
     private void addPercentageOption(String id, String gr, int val) {

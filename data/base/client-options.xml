@@ -125,6 +125,8 @@
         <!-- Whether to display the grid by default or not. -->
         <booleanOption id="model.option.displayGrid"
                        defaultValue="false"/>
+        <booleanOption id="model.option.displayTileYields"
+                       defaultValue="false"/>
         <!-- Whether to display borders by default or not. -->
         <booleanOption id="model.option.displayBorders"
                        defaultValue="false"/>
