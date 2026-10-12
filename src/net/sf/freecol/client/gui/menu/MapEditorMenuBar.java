@@ -30,6 +30,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
+import net.sf.freecol.client.gui.action.DisplayTileYieldsAction;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.action.MapControlsAction;
@@ -135,6 +136,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(MapEditorToolboxPanelAction.id));
         menu.add(getCheckBoxMenuItem(MapEditorTransformPanelAction.id));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayTileYieldsAction.id));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
 
         menu.addSeparator();

@@ -704,6 +704,11 @@ public final class MapViewer extends FreeColClientHolder {
             }
         });
         
+        if (options.getBoolean(ClientOptions.DISPLAY_TILE_YIELDS)) {
+            paintEachTile(nonAnimationG2d, tcb,
+                (tileG2d, tile) -> this.tv.displayTileYields(tileG2d, tile));
+        }
+
         displayDebugAiDefensiveMap(nonAnimationG2d, tcb);
         
         displayAreasInMapEditor(nonAnimationG2d, tcb);
