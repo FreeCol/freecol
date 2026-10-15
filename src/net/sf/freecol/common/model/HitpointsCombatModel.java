@@ -73,18 +73,18 @@ public class HitpointsCombatModel extends SimpleCombatModel {
                                 // Rescaling to 0 <= r < 1
                                 // (rearrange: 0.8 * odds.win + 0.2 <= r < 1.0)
                                 (1.25 * r - 0.25 - odds.win)/(1.0 - odds.win), crs);
-                        return new CombatResult(crs, 1, newDefenderHitpoints);
+                        return new CombatResult(crs, 1, newDefenderHitpoints).withRoll(odds.win, r);
                     }
                 }
                 
                 crs.add(CombatEffectType.WIN);
-                return new CombatResult(crs, newAttackerHitpoints, newDefenderHitpoints);
+                return new CombatResult(crs, newAttackerHitpoints, newDefenderHitpoints).withRoll(odds.win, r);
             } else {
                 crs.add(CombatEffectType.WIN);
                 resolveAttack(attackerUnit, defenderUnit, true,
                         // Rescale to 0 <= r < 1
                         r / (0.1 * odds.win), crs);
-                return new CombatResult(crs, -1, 1);
+                return new CombatResult(crs, -1, 1).withRoll(odds.win, r);
             }
         } else if (combatIsBombard(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
@@ -99,16 +99,16 @@ public class HitpointsCombatModel extends SimpleCombatModel {
             if (defenderDamage == 0) {
                 crs.add(CombatEffectType.NO_RESULT);
                 crs.add(CombatEffectType.EVADE_BOMBARD);
-                return new CombatResult(crs, -1, -1);
+                return new CombatResult(crs, -1, -1).withRoll(odds.win, r);
             }
             final int newDefenderHitpoints = defenderUnit.getHitPoints() - defenderDamage;
             if (newDefenderHitpoints > 0) {
                 crs.add(CombatEffectType.WIN);
-                return new CombatResult(crs, -1, newDefenderHitpoints);
+                return new CombatResult(crs, -1, newDefenderHitpoints).withRoll(odds.win, r);
             } else {
                 crs.add(CombatEffectType.WIN);
                 crs.add(CombatEffectType.SINK_SHIP_BOMBARD);
-                return new CombatResult(crs, -1, -1);
+                return new CombatResult(crs, -1, -1).withRoll(odds.win, r);
             }
         } else {
             throw new RuntimeException("Bogus combat: " + attacker

@@ -692,7 +692,7 @@ public class SimpleCombatModel extends CombatModel {
         for (CombatEffectType cr : crs) lb.add(" ", cr);
         lb.log(logger, Level.INFO);
 
-        return new CombatResult(crs);
+        return new CombatResult(crs).withRoll(odds.win, r);
     }
 
     /**

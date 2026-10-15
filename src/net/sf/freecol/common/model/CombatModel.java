@@ -68,6 +68,9 @@ public abstract class CombatModel {
         private final List<CombatEffectType> effects;
         private final int attackerHitpointsAfter;
         private final int defenderHitpointsAfter;
+        /** Win probability and random roll that produced this result. */
+        private double odds = Double.NaN;
+        private double roll = Double.NaN;
         
         public CombatResult(List<CombatEffectType> effects) {
             this.effects = Objects.requireNonNull(effects);
@@ -99,6 +102,28 @@ public abstract class CombatModel {
         
         public int getDefenderHitpointsAfter() {
             return defenderHitpointsAfter;
+        }
+
+        /**
+         * Record the win probability and random roll behind this result,
+         * for the combat history.
+         *
+         * @param odds The win probability used.
+         * @param roll The random number drawn.
+         * @return This {@code CombatResult}.
+         */
+        public CombatResult withRoll(double odds, double roll) {
+            this.odds = odds;
+            this.roll = roll;
+            return this;
+        }
+
+        public double getOdds() {
+            return odds;
+        }
+
+        public double getRoll() {
+            return roll;
         }
     }
 

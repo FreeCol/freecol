@@ -2308,6 +2308,9 @@ outer:  for (Effect effect : effects) {
         if (crs == null) {
             combatResult = combatModel.generateAttackResult(random, attacker, defender);
             crs = combatResult.getEffects();
+            CombatHistory.record(combatModel.getClass().getSimpleName(),
+                                 getGame().getTurn().getNumber(),
+                                 attacker, defender, combatResult, crs);
         }
         if (crs.isEmpty()) {
             throw new RuntimeException("empty attack result: " + this);
