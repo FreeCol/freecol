@@ -74,6 +74,8 @@ public class ServerBuilding extends Building implements TurnTaker {
 
     /**
      * Teach all the units in this school.
+     * * Performs a sanitation check to ensure bidirectional consistency between 
+     * teacher and student before incrementing training progress.
      *
      * @param cs A {@code ChangeSet} to update.
      */
@@ -83,25 +85,23 @@ public class ServerBuilding extends Building implements TurnTaker {
         for (Unit teacher : getUnitList()) {
             Unit student = teacher.getStudent();
 
+            // Ensure bidirectional consistency
+            // If the relationship is broken, clean up both ends.
             if (student != null && student.getTeacher() != teacher) {
-                // Sanitation, make sure we have the proper
-                // teacher/student relation.
-                logger.warning("Bogus teacher/student assignment.");
+                logger.warning("Bogus teacher/student assignment. Cleaning up.");
                 teacher.setStudent(null);
+                student.setTeacher(null); 
                 student = null;
             }
 
-            // Student may have changed
+            // Assign a student if the teacher is idle
             if (student == null && csAssignStudent(teacher, cs)) {
                 student = teacher.getStudent();
             }
 
-            // Update teaching amount.
-            teacher.setTurnsOfTraining((student == null) ? 0
-                : teacher.getTurnsOfTraining() + 1);
+            // Update training progress: reset if no student, increment if there is one
+            teacher.setTurnsOfTraining((student == null) ? 0 : teacher.getTurnsOfTraining() + 1);
             cs.add(See.only(owner), teacher);
-
-            // Do not check for completed training, see csCheckTeach below.
         }
     }
 
@@ -118,14 +118,15 @@ public class ServerBuilding extends Building implements TurnTaker {
      */
     public boolean csCheckTeach(Unit teacher, ChangeSet cs) {
         final Player owner = getColony().getOwner();
-
         Unit student = teacher.getStudent();
-        if (student != null
-            && teacher.getTurnsOfTraining()
-                >= teacher.getNeededTurnsOfTraining()) {
+        
+        if (student != null && teacher.getTurnsOfTraining() >= teacher.getNeededTurnsOfTraining()) {
             csTrainStudent(teacher, student, cs);
-            // Student will have changed, teacher already added in csTeach
+            
+            // Student will have changed, inform owner
             cs.add(See.only(owner), student);
+            
+            // If the teacher became free, try to assign a new student immediately
             if (teacher.getStudent() == null) csAssignStudent(teacher, cs);
             return true;
         }
@@ -134,35 +135,40 @@ public class ServerBuilding extends Building implements TurnTaker {
         
     /**
      * Train a student.
+     * * Changes the student unit type based on the teacher's expertise.
+     * Resets training turns and exhausts moves for both units to signify 
+     * the effort spent on the graduation.
      *
      * @param teacher The teacher {@code Unit}.
      * @param student The student {@code Unit} to train.
      * @param cs A {@code ChangeSet} to update.
-     * @return True if teaching occurred.
+     * @return True if the skill transfer was successful.
      */
     private boolean csTrainStudent(Unit teacher, Unit student, ChangeSet cs) {
         final Player owner = getColony().getOwner();
         StringTemplate oldName = student.getLabel();
         UnitType skill = student.getTeachingType(teacher);
         boolean ret = skill != null;
+
         if (skill == null) {
-            logger.warning("Student " + student.getId()
-                           + " can not learn from " + teacher.getId());
+            logger.warning("Student " + student.getId() + " can not learn from " + teacher.getId());
         } else {
-            student.changeType(skill);//-vis: safe within colony
-            StringTemplate newName = student.getLabel();
+            student.changeType(skill);
             cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                 "model.building.unitEducated",
-                                 getColony(), this)
+                                 "model.building.unitEducated", getColony(), this)
                     .addStringTemplate("%oldName%", oldName)
-                    .addStringTemplate("%unit%", newName)
+                    .addStringTemplate("%unit%", student.getLabel())
                     .addName("%colony%", getColony().getName()));
         }
+
+        // Reset turn data and exhaust moves for both to signify the effort spent
         student.setTurnsOfTraining(0);
         student.setMovesLeft(0);
         teacher.setTurnsOfTraining(0);
         teacher.setMovesLeft(0);
+
+        // Check if the student can continue learning (e.g. going from indentured to free)
         if (!student.canBeStudent(teacher)) {
             student.setTeacher(null);
             teacher.setStudent(null);
@@ -181,6 +187,7 @@ public class ServerBuilding extends Building implements TurnTaker {
         final Colony colony = getColony();
         final Player owner = colony.getOwner();
         final Unit student = colony.findStudent(teacher);
+
         if (student == null) {
             cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -189,8 +196,16 @@ public class ServerBuilding extends Building implements TurnTaker {
                     .addName("%colony%", colony.getName()));
             return false;
         }
+
         teacher.setStudent(student);
-        teacher.changeWorkType(null);
+        
+        // Safety check to avoid redundant colony production updates.
+        // If the teacher was previously assigned to a production work type, 
+        // clear it now that they are dedicated to teaching.
+        if (teacher.getWorkType() != null) {
+            teacher.changeWorkType(null);
+        }
+
         student.setTeacher(teacher);
         cs.add(See.only(owner), student);
         return true;
@@ -198,15 +213,16 @@ public class ServerBuilding extends Building implements TurnTaker {
 
     /**
      * Repair the units in this building.
+     * * Scans all units on the tile and repairs those that are damaged 
+     * and compatible with this building's repair abilities.
      *
      * @param cs A {@code ChangeSet} to update.
      */
     private void csRepairUnits(ChangeSet cs) {
-        for (Unit unit : transform(getTile().getUnits(), u ->
-                (u.isDamaged()
-                    && getType().hasAbility(Ability.REPAIR_UNITS, u.getType())))) {
-            ((ServerUnit) unit).csRepairUnit(cs);
-        }
+        final BuildingType type = getType();
+        getTile().getUnitList().stream()
+            .filter(u -> u.isDamaged() && type.hasAbility(Ability.REPAIR_UNITS, u.getType()))
+            .forEach(u -> ((ServerUnit) u).csRepairUnit(cs));
     }
 
     /**
@@ -221,39 +237,35 @@ public class ServerBuilding extends Building implements TurnTaker {
     public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
         if (canAutoProduce()) return;
         List<AbstractGoods> production = pi.getProduction();
-        if (!production.isEmpty()) {
-            if (all(production, ag -> ag.getAmount() == 0)) {
-                for (GoodsType gt : transform(getInputs(),
-                                              ag -> ag.getAmount() > 0,
-                                              AbstractGoods::getType)) {
-                    cs.addMessage(getOwner(),
-                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                         "model.building.noInput",
-                                         this, gt)
-                            .addNamed("%inputGoods%", gt)
-                            .addNamed("%building%", this)
-                            .addName("%colony%", getColony().getName()));
-                }
-            } else {
-                for (AbstractGoods ag : pi.getConsumptionDeficit()) {
-                    cs.addMessage(getOwner(),
-                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                         "model.building.notEnoughInput",
-                                         this, ag.getType())
-                            .addNamed("%building%", this)
-                            .addName("%colony%", getColony().getName())
-                            .addAmount("%number%", ag.getAmount())
-                            .addNamed("%goodsType%", ag.getType()));
-                }
+        if (production.isEmpty()) return;
+
+        // Case 1: Production is completely stalled due to lack of any input.
+        if (all(production, ag -> ag.getAmount() == 0)) {
+            for (GoodsType gt : transform(getInputs(), ag -> ag.getAmount() > 0, AbstractGoods::getType)) {
+                cs.addMessage(getOwner(),
+                    new ModelMessage(ModelMessage.MessageType.MISSING_GOODS, "model.building.noInput", this, gt)
+                        .addNamed("%inputGoods%", gt)
+                        .addNamed("%building%", this)
+                        .addName("%colony%", getColony().getName()));
+            }
+        } else {
+            // Case 2: Production is occurring but is limited by a consumption deficit.
+            for (AbstractGoods ag : pi.getConsumptionDeficit()) {
+                cs.addMessage(getOwner(),
+                    new ModelMessage(ModelMessage.MessageType.MISSING_GOODS, "model.building.notEnoughInput", this, ag.getType())
+                        .addNamed("%building%", this)
+                        .addName("%colony%", getColony().getName())
+                        .addAmount("%number%", ag.getAmount())
+                        .addNamed("%goodsType%", ag.getType()));
             }
         }
     }
 
 
-    // Implement TurnTaker
-
     /**
      * New turn for this building.
+     * * Implementation of {@code TurnTaker}. Logs the building state and 
+     * triggers education and repair logic.
      *
      * @param random A {@code Random} number source.
      * @param lb A {@code LogBuilder} to log to.
@@ -261,11 +273,13 @@ public class ServerBuilding extends Building implements TurnTaker {
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        BuildingType type = getType();
-
-        if (canTeach()) csTeach(cs);
-
-        if (type.hasAbility(Ability.REPAIR_UNITS)) {
+        lb.add(this);
+        
+        if (canTeach()) {
+            csTeach(cs);
+        }
+        
+        if (getType().hasAbility(Ability.REPAIR_UNITS)) {
             csRepairUnits(cs);
         }
     }
