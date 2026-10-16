@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -866,5 +867,174 @@ public class ProductionTypeTest extends FreeColTestCase {
             testProduction(inputs, outputs,
                            b.getAvailableProductionTypes(false));
         }
+    }
+
+    public void testNeverNullLists() {
+        ProductionType pt = new ProductionType((Specification) null);
+        assertNotNull(pt.getInputList());
+        assertNotNull(pt.getOutputList());
+        assertTrue(pt.getInputList().isEmpty());
+        assertTrue(pt.getOutputList().isEmpty());
+    }
+
+    public void testCopyInDeepCopy() {
+        Specification spec = new Specification();
+        
+        ProductionType a = new ProductionType(spec);
+        a.setId("test");
+        a.addOutput(new AbstractGoods(tools, 5));
+
+        ProductionType b = new ProductionType(spec);
+        b.setId("test");
+
+        assertTrue(b.copyIn(a));
+
+        a.addOutput(new AbstractGoods(tools, 10));
+
+        assertEquals(1, b.getOutputList().size());
+        assertEquals(5, b.getOutputList().get(0).getAmount());
+    }
+    
+    public void testCopyInDeepCopiesInputs() {
+        Specification spec = new Specification();
+
+        ProductionType a = new ProductionType(spec);
+        a.setId("test");
+        a.setInputs(new ArrayList<>(
+            List.of(new AbstractGoods(ore, 5))));
+
+        ProductionType b = new ProductionType(spec);
+        b.setId("test");
+
+        assertTrue(b.copyIn(a));
+
+        a.getInputList().add(new AbstractGoods(ore, 10));
+
+        assertEquals(1, b.getInputList().size());
+        assertEquals(5, b.getInputList().get(0).getAmount());
+    }
+
+    public void testEqualsAndHashCode() {
+        ProductionType a = new ProductionType((Specification) null);
+        ProductionType b = new ProductionType((Specification) null);
+
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
+
+        a.addOutput(new AbstractGoods(tools, 3));
+        assertFalse("Objects should not be equal", a.equals(b));
+    }
+
+    public void testToStringEmptyLists() {
+        ProductionType pt = new ProductionType((Specification) null);
+        String s = pt.toString();
+        assertFalse(s.contains("inputs:"));
+        assertFalse(s.contains("outputs:"));
+    }
+
+    public void testGetOutputAbsent() {
+        ProductionType pt = new ProductionType((Specification) null);
+        assertNull(pt.getOutput(tools));
+    }
+
+    public void testBestOutputTypeEmpty() {
+        ProductionType pt = new ProductionType((Specification) null);
+        assertNull(pt.getBestOutputType());
+    }
+
+    public void testAddInputOutput() {
+        ProductionType pt = new ProductionType((Specification) null);
+
+        pt.getOutputList().add(new AbstractGoods(tools, 4));
+        pt.getInputList().add(new AbstractGoods(ore, 2));
+
+        assertEquals(1, pt.getOutputList().size());
+        assertEquals(1, pt.getInputList().size());
+    }
+
+    public void testSetInputsNull() {
+        ProductionType pt = new ProductionType((Specification)null);
+
+        pt.setInputs(null);
+
+        assertNotNull(pt.getInputList());
+        assertTrue(pt.getInputList().isEmpty());
+    }
+
+    public void testSetOutputsNull() {
+        ProductionType pt = new ProductionType((Specification)null);
+
+        pt.setOutputs(null);
+
+        assertNotNull(pt.getOutputList());
+        assertTrue(pt.getOutputList().isEmpty());
+    }
+
+    public void testCanProduceFalseForZeroOutput() {
+        ProductionType pt = new ProductionType((Specification)null);
+
+        pt.addOutput(new AbstractGoods(silver, 0));
+
+        assertFalse(ProductionType.canProduce(
+            silver, List.of(pt)));
+    }
+
+    public void testCanProduceTrue() {
+        ProductionType pt = new ProductionType((Specification)null);
+
+        pt.addOutput(new AbstractGoods(tools, 3));
+
+        assertTrue(ProductionType.canProduce(
+            tools, List.of(pt)));
+    }
+
+    public void testBestProductionType() {
+        ProductionType weak =
+            new ProductionType(null, tools, 3);
+
+        ProductionType strong =
+            new ProductionType(null, tools, 8);
+
+        ProductionType best =
+            ProductionType.getBestProductionType(
+                tools, List.of(weak, strong));
+
+        assertSame(strong, best);
+    }
+
+    public void testBestProductionTypeEmptyCollection() {
+        assertNull(
+            ProductionType.getBestProductionType(
+                tools, List.of()));
+    }
+
+    public void testGetOutputPresent() {
+        ProductionType pt = new ProductionType((Specification)null);
+
+        AbstractGoods ag = new AbstractGoods(tools, 7);
+        pt.addOutput(ag);
+
+        assertEquals(ag, pt.getOutput(tools));
+    }
+
+    public void testBestOutputType() {
+        ProductionType pt = new ProductionType((Specification)null);
+
+        pt.addOutput(new AbstractGoods(tools, 4));
+        pt.addOutput(new AbstractGoods(muskets, 8));
+
+        assertEquals(muskets, pt.getBestOutputType());
+    }
+
+    public void testSetInputsDefensiveCopy() {
+        List<AbstractGoods> list = new ArrayList<>();
+        list.add(new AbstractGoods(ore, 5));
+
+        ProductionType pt = new ProductionType((Specification)null);
+        pt.setInputs(list);
+
+        list.clear();
+
+        assertEquals(1, pt.getInputList().size());
     }
 }
