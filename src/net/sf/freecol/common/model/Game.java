@@ -1128,8 +1128,8 @@ public class Game extends FreeColGameObject {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
                                          Player::getHighSeas, toListNoNulls())) {
                 hs.removeDestination(oldMap);
-
                 hs.addDestination(newMap);
+                hs.validateDestinations();
             }
         }
     }
