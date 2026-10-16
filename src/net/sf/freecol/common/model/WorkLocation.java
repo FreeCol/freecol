@@ -139,6 +139,11 @@ public abstract class WorkLocation extends UnitLocation
     }
 
 
+    /**
+     * Set the colony containing this work location.
+     *
+     * @param colony The owning {@code Colony}.
+     */
     public void setColony(Colony colony) {
         this.colony = colony;
     }
@@ -153,7 +158,7 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
-     * Set the prodution type.
+     * Set the production type.
      *
      * @param newProductionType The new {@code ProductionType} value.
      */
@@ -187,8 +192,10 @@ public abstract class WorkLocation extends UnitLocation
      * work type of units present.
      */
     public void updateProductionType() {
-        setProductionType(getBestProductionType(isEmpty(),
-                getCurrentWorkType()));
+        final boolean unattended = isEmpty();
+        final GoodsType workType = getCurrentWorkType();
+
+        setProductionType(getBestProductionType(unattended, workType));
     }
 
     /**
@@ -336,7 +343,7 @@ public abstract class WorkLocation extends UnitLocation
                 || goodsType.isImmigrationType())) 
             return null;
         
-        final Boolean ok = goodSuggestionCheck(better,unit, goodsType);
+        final boolean ok = goodSuggestionCheck(better,unit, goodsType);
         return (!ok) ? null
             : new Suggestion(this, (unit == null) ? null : unit.getType(),
                              better, goodsType, delta);
@@ -364,7 +371,7 @@ public abstract class WorkLocation extends UnitLocation
      * @param goodsType The {@code GoodsType} to check.
      * @param workLocation The {@code WorkLocation} to check. This can
      *     be overloaded with a default parameter of "this" to call
-     *     the WorkLocation instance currently in in reference.
+     *     the WorkLocation instance currently in reference.
      * @return True or false, depending on whether the suggestion is valid.
      */
     protected boolean goodSuggestionCheck(UnitType unitType, Unit unit,
