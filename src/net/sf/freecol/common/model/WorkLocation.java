@@ -33,6 +33,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.logging.WideEvent;
+import static net.sf.freecol.common.logging.WideEventFields.NOTE_PRODUCTION_TYPE;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -161,8 +163,8 @@ public abstract class WorkLocation extends UnitLocation
         if (!Utils.equals(newProductionType, this.productionType)) {
             this.productionType = newProductionType;
             getColony().invalidateCache();
-            logger.fine("Production type at " + this
-                + " is now: " + newProductionType);
+            WideEvent.noteOrLog(logger, Level.FINE, NOTE_PRODUCTION_TYPE,
+                this + " -> " + newProductionType);
         }
     }
 
