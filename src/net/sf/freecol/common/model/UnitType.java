@@ -48,7 +48,7 @@ public final class UnitType extends BuildableType implements Consumer {
     /** The default offence value. */
     public static final int DEFAULT_OFFENCE = 0;
 
-    /** The default offence value. */
+    /** The default defence value. */
     public static final int DEFAULT_DEFENCE = 1;
 
     /**
@@ -102,7 +102,8 @@ public final class UnitType extends BuildableType implements Consumer {
 
     /** The maximum experience a unit of this type can accumulate. */
     private int maximumExperience = 0;
-    
+
+    /** The attack range of this UnitType. */
     private int attackRange = 0;
 
     /**
@@ -228,11 +229,11 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * Is this a defensive unit type?
      *
-     * Default defence is 1, same a for colonists, thus to be defensive, a
-     * colonist must have a military role. Artillery of all sorts has
-     * higher defense so they are automatically defensive.
+     * Default defence is 1, the same as for colonists. Thus, to be
+     * defensive, a colonist must have a military role. Artillery of all
+     * sorts has higher defence, so it is automatically defensive.
      *
-     * @return True if base defensive ability is greater than the default.
+     * @return True if the base defensive ability is greater than the default.
      */
     public boolean isDefensive() {
         return getBaseDefence() > UnitType.DEFAULT_DEFENCE;
@@ -537,8 +538,9 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * Can this unit type move to the High Seas?
      *
-     * ATM this is synonymous with being a naval unit, but we should use
-     * this routine instead of isNaval() in case this changes.
+     * Currently this is synonymous with being a naval unit. However, this
+     * method should be used instead of {@link #isNaval()} in case the
+     * behavior changes in the future.
      *
      * @return True if units of this type can move to the High Seas.
      */
@@ -633,28 +635,28 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     @Override
-    public int getMaximumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMaximumIndex(Colony colony,
+                               JList<BuildableType> buildQueueList,
+                               int UNABLE_TO_BUILD) {
         ListModel<BuildableType> buildQueue = buildQueueList.getModel();
         final int buildQueueLastPos = buildQueue.getSize();
 
-        boolean canBuild = false;
+        // Does not depend on anything, nothing depends on it.
+        // Can be built at any time.
         if (colony.canBuild(this)) {
-            canBuild = true;
+            return buildQueueLastPos;
         }
 
-        // does not depend on anything, nothing depends on it
-        // can be built at any time
-        if (canBuild)
-            return buildQueueLastPos;
-        // check for building in queue that allows builting this unit
+        // Check for a building in the queue that enables this unit.
         for (int index = 0; index < buildQueue.getSize(); index++) {
             BuildableType toBuild = buildQueue.getElementAt(index);
-            if (toBuild == this)
-                continue;
+            if (toBuild == this) continue;
+
             if (toBuild.hasAbility(Ability.BUILD, this)) {
                 return buildQueueLastPos;
             }
         }
+
         return UNABLE_TO_BUILD;
     }
 
@@ -665,7 +667,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
-        return (consumption == null) ? Collections.<AbstractGoods>emptyList()
+        return (consumption == null) ? Collections.emptyList()
                 : transform(consumption.keySet(),
                         gt -> consumption.getCount(gt) != 0,
                         gt -> new AbstractGoods(gt, consumption.getCount(gt)));
@@ -678,12 +680,16 @@ public final class UnitType extends BuildableType implements Consumer {
     public int getPriority() {
         return priority;
     }
-    
+
+    /**
+     * Get the attack range.
+     *
+     * @return The attack range.
+     */
     public int getAttackRange() {
         return attackRange;
     }
-    
-    
+
     /**
      * Sets attack range (used by Introspector).
      */
