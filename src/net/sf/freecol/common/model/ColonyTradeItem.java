@@ -19,12 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -195,10 +196,13 @@ public class ColonyTradeItem extends TradeItem {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ColonyTradeItem)) return false;
-        ColonyTradeItem other = (ColonyTradeItem)o;
-        return Utils.equals(this.colonyId, other.colonyId)
-            && Utils.equals(this.colonyName, other.colonyName)
+        if (this == o) return true;
+        
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        ColonyTradeItem other = (ColonyTradeItem) o;
+        return Objects.equals(this.colonyId, other.colonyId)
+            && Objects.equals(this.colonyName, other.colonyName)
             && super.equals(other);
     }
 
@@ -207,9 +211,7 @@ public class ColonyTradeItem extends TradeItem {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.colonyId);
-        return 37 * hash + Utils.hashCode(this.colonyName);
+        return Objects.hash(super.hashCode(), this.colonyId, this.colonyName);
     }
 
     /**
@@ -217,9 +219,8 @@ public class ColonyTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(colonyName).append(']');
-        return sb.toString();
+        return getClass().getSimpleName()
+            + "[id=" + getId()
+            + ", colonyName=" + colonyName + "]";
     }
 }
