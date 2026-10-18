@@ -50,6 +50,7 @@ public class AllTests {
         suite.addTestSuite(MonarchTest.class);
         suite.addTestSuite(MovementTest.class);
         suite.addTestSuite(NationTypeTest.class);
+        suite.addTestSuite(OccupationTest.class);
         suite.addTestSuite(PlayerTest.class);
         suite.addTestSuite(ProductionTypeTest.class);
         suite.addTestSuite(RandomRangeTest.class);
