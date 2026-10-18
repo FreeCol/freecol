@@ -22,10 +22,18 @@ package net.sf.freecol.server.model;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tension;
+
+import java.util.List;
+import java.util.Random;
+
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -75,7 +83,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertEquals("Unexpected value for remaining food, ", foodRemaining,camp.getGoodsCount(foodType));
     }
 
-    public void testHorseBreeding() {
+    public void testHorseBreedingWhenFoodAvailable() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
 
         FreeColTestCase.IndianSettlementBuilder builder
@@ -149,7 +157,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertEquals("No horses should be bred",expectedHorsesBreeded,horsesBreeded);
     }
 
-    public void testPricing() {
+    public void testSettlementPurchasePricing() {
         Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
 
         final int braveCount = 4;
@@ -239,5 +247,516 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         camp.setWantedGoods(0, toolsType);
         int p0 = camp.getPriceToBuy(toolsType, 50);
         assertTrue("Wanted 0: (" + p0 + " > " + p1 + ")",  p0 > p1);
+    }
+
+    public void testHorseBreedingAtThreshold() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp = new IndianSettlementBuilder(game).build();
+
+        int threshold = horsesType.getBreedingNumber();
+
+        camp.addGoods(horsesType, threshold);
+
+        int foodProduced = camp.getTotalProductionOf(grainType);
+        int foodConsumed = camp.getFoodConsumption();
+
+        assertTrue(foodProduced > foodConsumed);
+
+        int expected = Math.min(
+            ServerIndianSettlement.MAX_HORSES_PER_TURN,
+            foodProduced - foodConsumed);
+
+        ServerTestHelper.newTurn();
+
+        assertEquals(threshold + expected,
+                     camp.getGoodsCount(horsesType));
+    }
+
+    public void testHorseBreedingBelowThreshold() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp = new IndianSettlementBuilder(game).build();
+
+        int horses = horsesType.getBreedingNumber() - 1;
+        camp.addGoods(horsesType, horses);
+
+        ServerTestHelper.newTurn();
+
+        assertEquals(horses, camp.getGoodsCount(horsesType));
+    }
+
+    public void testHorseBreedingRespectsMaximumPerTurn() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlementBuilder builder
+            = new IndianSettlementBuilder(game);
+
+        IndianSettlement camp = builder.build();
+
+        camp.addGoods(horsesType, horsesType.getBreedingNumber());
+
+        int horseCountBefore = camp.getGoodsCount(horsesType);
+
+        ServerTestHelper.newTurn();
+
+        int bred = camp.getGoodsCount(horsesType) - horseCountBefore;
+
+        assertTrue(bred <= ServerIndianSettlement.MAX_HORSES_PER_TURN);
+        assertEquals(ServerIndianSettlement.MAX_HORSES_PER_TURN, bred);
+    }
+
+    public void testNoBirthAtMaximumSettlementSize() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlementBuilder builder
+            = new IndianSettlementBuilder(game);
+
+        IndianSettlement camp = builder.build();
+
+        int max = camp.getType().getMaximumSize();
+
+        while (camp.getUnitCount() < max + 1) {
+            ((ServerIndianSettlement) camp).addUnits(1);
+        }
+
+        int before = camp.getUnitCount();
+
+        camp.addGoods(foodType, 1000);
+        camp.addGoods(rumType, 1000);
+
+        ServerTestHelper.newTurn();
+
+        assertEquals(before, camp.getUnitCount());
+    }
+
+    public void testNewTurnConsumesFood() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp =
+            new IndianSettlementBuilder(game).build();
+
+        camp.addGoods(foodType, 50);
+
+        int before = camp.getGoodsCount(foodType);
+
+        ServerTestHelper.newTurn();
+
+        int after = camp.getGoodsCount(foodType);
+
+        assertTrue(after < before
+            + camp.getTotalProductionOf(grainType));
+    }
+
+    public void testWarehouseCapacityLimit() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp =
+            new IndianSettlementBuilder(game).build();
+
+        int capacity = camp.getWarehouseCapacity();
+
+        camp.addGoods(toolsType, capacity * 2);
+
+        ServerTestHelper.newTurn();
+
+        assertTrue(
+            camp.getGoodsCount(toolsType) <= capacity);
+    }
+
+    public void testAddUnitsIncreasesPopulation() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        int before = camp.getUnitCount();
+
+        camp.addUnits(4);
+
+        assertEquals(before + 4, camp.getUnitCount());
+    }
+
+    public void testAddUnitsSetsHomeSettlement() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+                new IndianSettlementBuilder(game).build();
+
+        camp.addUnits(3);
+
+        for (Unit unit : camp.getUnitList()) {
+            assertEquals(camp, unit.getHomeIndianSettlement());
+        }
+    }
+
+    public void testMostHatedUsesHighestAlarm() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp =
+            new IndianSettlementBuilder(game).build();
+
+        List<Player> players =
+            game.getLiveEuropeanPlayerList();
+
+        assertTrue(players.size() >= 2);
+
+        Player player1 = players.get(0);
+        Player player2 = players.get(1);
+
+        camp.setAlarm(player1, new Tension(100));
+        camp.setAlarm(player2, new Tension(200));
+
+        assertEquals(player2, camp.getMostHated());
+    }
+
+    public void testRemoveAlarmUpdatesMostHated() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        List<Player> players =
+            game.getLiveEuropeanPlayerList();
+
+        Player player1 = players.get(0);
+        Player player2 = players.get(1);
+
+        camp.setAlarm(player1, new Tension(300));
+        camp.setAlarm(player2, new Tension(400));
+
+        assertEquals(player2, camp.getMostHated());
+
+        camp.removeAlarm(player2);
+
+        assertEquals(player1, camp.getMostHated());
+    }
+
+    public void testSetAlarmForOwnerIgnored() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp =
+            new IndianSettlementBuilder(game).build();
+
+        Player owner = camp.getOwner();
+
+        camp.setAlarm(owner, new Tension(100));
+
+        assertNull(camp.getAlarm(owner));
+    }
+
+    public void testRandomAddUnitsRespectsSettlementSizeLimits() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        int before = camp.getUnitCount();
+
+        camp.addUnits(new Random(1));
+
+        int added = camp.getUnitCount() - before;
+
+        assertTrue(added > 0);
+
+        assertTrue(
+            added >= camp.getType().getMinimumSize());
+
+        assertTrue(
+            added <= camp.getType().getMaximumSize());
+    }
+
+    public void testWarehouseCapacityExactLimit() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        IndianSettlement camp =
+            new IndianSettlementBuilder(game).build();
+
+        int capacity = camp.getWarehouseCapacity();
+
+        camp.addGoods(toolsType, capacity);
+
+        ServerTestHelper.newTurn();
+
+        assertEquals(capacity,
+                     camp.getGoodsCount(toolsType));
+    }
+
+    public void testAddMissionary() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        assertNull(camp.getMissionary());
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        camp.csChangeMissionary(missionary, new ChangeSet());
+
+        assertEquals(missionary, camp.getMissionary());
+    }
+
+    public void testRemoveMissionary() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        ChangeSet cs = new ChangeSet();
+
+        camp.csChangeMissionary(missionary, cs);
+
+        assertNotNull(camp.getMissionary());
+
+        camp.csChangeMissionary(null, cs);
+
+        assertNull(camp.getMissionary());
+    }
+
+    public void testKillMissionaryRemovesMissionary() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        ChangeSet cs = new ChangeSet();
+
+        camp.csChangeMissionary(missionary, cs);
+
+        assertNotNull(camp.getMissionary());
+
+        camp.csKillMissionary(null, cs);
+
+        assertNull(camp.getMissionary());
+    }
+
+    public void testMissionaryIncreasesConvertProgress() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        ChangeSet cs = new ChangeSet();
+
+        camp.csChangeMissionary(missionary, cs);
+
+        int before = camp.getConvertProgress();
+
+        camp.csStartTurn(new Random(1), cs);
+
+        assertTrue(
+            camp.getConvertProgress() >= before);
+    }
+
+    public void testNewMissionaryResetsConvertProgress() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        camp.setConvertProgress(100);
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        camp.csChangeMissionary(missionary,
+                                new ChangeSet());
+
+        assertEquals(0, camp.getConvertProgress());
+    }
+
+    public void testReplaceMissionary() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game).build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        ChangeSet cs = new ChangeSet();
+
+        Unit missionary1 = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        Unit missionary2 = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        camp.csChangeMissionary(missionary1, cs);
+
+        assertEquals(missionary1, camp.getMissionary());
+
+        camp.setConvertProgress(50);
+
+        camp.csChangeMissionary(missionary2, cs);
+
+        assertEquals(missionary2, camp.getMissionary());
+
+        assertNotSame(missionary1, camp.getMissionary());
+
+        assertEquals(0, camp.getConvertProgress());
+    }
+
+    public void testConversionDoesNotOccurWithoutNearbyColony() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game)
+                .initialBravesInCamp(3)
+                .build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        ChangeSet cs = new ChangeSet();
+
+        camp.csChangeMissionary(missionary, cs);
+
+        int threshold =
+            camp.getType().getConvertThreshold();
+
+        camp.setConvertProgress(threshold);
+
+        camp.csStartTurn(new Random(1), cs);
+
+        assertTrue(
+            camp.getConvertProgress() >= threshold);
+    }
+
+    public void testConversionBlockedWithTooFewUnits() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game)
+                .initialBravesInCamp(1)
+                .build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        ChangeSet cs = new ChangeSet();
+
+        camp.csChangeMissionary(missionary, cs);
+
+        int threshold =
+            camp.getType().getConvertThreshold();
+
+        camp.setConvertProgress(threshold);
+
+        camp.csStartTurn(new Random(1), cs);
+
+        assertTrue(camp.getConvertProgress() >= threshold);
+    }
+
+    public void testSuccessfulConversion() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+
+        ServerIndianSettlement camp =
+            (ServerIndianSettlement)
+            new IndianSettlementBuilder(game)
+                .initialBravesInCamp(3)
+                .build();
+
+        Player european =
+            game.getLiveEuropeanPlayerList().get(0);
+
+        createStandardColony(1, 6, 8);
+
+        Unit missionary = new ServerUnit(
+            game,
+            camp.getTile(),
+            european,
+            spec().getDefaultUnitType(european));
+
+        ChangeSet cs = new ChangeSet();
+
+        camp.csChangeMissionary(missionary, cs);
+
+        camp.setConvertProgress(
+            camp.getType().getConvertThreshold());
+
+        int europeanUnitsBefore = european.getUnitCount();
+        int settlementUnitsBefore = camp.getAllUnitsList().size();
+
+        camp.csStartTurn(new Random(1), cs);
+
+        assertEquals(0, camp.getConvertProgress());
+
+        assertEquals(europeanUnitsBefore + 1,
+                     european.getUnitCount());
+
+        assertEquals(settlementUnitsBefore - 1,
+                     camp.getAllUnitsList().size());
     }
 }
