@@ -26,6 +26,7 @@ public class AllTests {
 
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.common.utils");
+        suite.addTestSuite(LogBuilderTest.class);
         suite.addTestSuite(UtilsTest.class);
         return suite;
     }
