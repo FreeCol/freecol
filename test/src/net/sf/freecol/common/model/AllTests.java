@@ -59,6 +59,9 @@ public class AllTests {
         suite.addTestSuite(SerializationTest.class);
         suite.addTestSuite(SettlementTest.class);
         suite.addTestSuite(SoLTest.class);
+        suite.addTestSuite(StanceTest.class);
+        suite.addTestSuite(StanceTradeItemTest.class);
+        suite.addTestSuite(TensionTest.class);
         suite.addTestSuite(ClassicTileProductionTest.class);
         suite.addTestSuite(TileImprovementTest.class);
         suite.addTestSuite(TileItemContainerTest.class);
