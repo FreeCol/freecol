@@ -2973,7 +2973,7 @@ public class Colony extends Settlement implements TradeLocation {
     }
 
     /**
-     * Check the integrity of the build queues.  Catches build fails
+     * Check the integrity of the build queues. Catches build fails
      * due to broken requirements.
      *
      * @param fix Fix problems if possible.
@@ -2981,39 +2981,19 @@ public class Colony extends Settlement implements TradeLocation {
      * @return The integrity found.
      */
     public IntegrityType checkBuildQueueIntegrity(boolean fix, LogBuilder lb) {
+
         IntegrityType result = IntegrityType.INTEGRITY_GOOD;
-        List<BuildableType> buildables = buildQueue.getValues();
-        List<BuildableType> assumeBuilt = new ArrayList<>();
-        for (int i = 0; i < buildables.size(); i++) {
-            BuildableType bt = buildables.get(i);
-            NoBuildReason reason = getNoBuildReason(bt, assumeBuilt);
-            if (reason == NoBuildReason.NONE) {
-                assumeBuilt.add(bt);
-            } else if (fix) {
-                if (lb != null) lb.add("\n  Invalid build queue item removed: ", bt.getId());
-                buildQueue.remove(i);
-                result = result.fix();
-            } else {
-                if (lb != null) lb.add("\n  Invalid build queue item: ", bt.getId());
-                result = result.fail();
-            }
-        }
-        List<UnitType> unitTypes = populationQueue.getValues();
-        assumeBuilt.clear();
-        for (int i = 0; i < unitTypes.size(); i++) {
-            UnitType ut = unitTypes.get(i);
-            NoBuildReason reason = getNoBuildReason(ut, assumeBuilt);
-            if (reason == NoBuildReason.NONE) {
-                assumeBuilt.add(ut);
-            } else if (fix) {
-                if (lb != null) lb.add("\n  Invalid population queue item removed: ", ut.getId());
-                populationQueue.remove(i);
-                result = result.fix();
-            } else {
-                if (lb != null) lb.add("\n  Invalid population queue item: ", ut.getId());
-                result = result.fail();
-            }
-        }
+
+        // Validate the main build queue
+        result = result.combine(
+            buildQueue.checkIntegrity(this, fix, lb)
+        );
+
+        // Validate the population queue
+        result = result.combine(
+            populationQueue.checkIntegrity(this, fix, lb)
+        );
+
         return result;
     }
 
