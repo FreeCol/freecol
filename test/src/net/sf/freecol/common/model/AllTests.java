@@ -67,6 +67,7 @@ public class AllTests {
         suite.addTestSuite(TradeRouteTest.class);
         suite.addTestSuite(UnitTest.class);
         suite.addTestSuite(UnitChangeTypeTest.class);
+        suite.addTestSuite(UnitTypeTest.class);
         //$JUnit-END$
         return suite;
     }
