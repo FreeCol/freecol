@@ -859,15 +859,15 @@ public final class ColonyPanel extends PortPanel
         add(inPortScroll, "span, grow, height 96!, gaptop push");
         add(outsideColonyScroll, "grow, height 96!");
         add(cargoScroll, "grow, height 100!");
-        add(warehouseScroll, "span, split, height 48!, growx");
+        add(warehouseScroll, "span, split, height 48:, grow, gap 0 0 0 0, sgy bottomRow");
         
-        add(wrapWithBorder(warehouseButton), "height 48!, gap 0 0 0 0");
+        add(wrapWithBorder(warehouseButton), "height 48:, growy, gap 0 0 0 0, sgy bottomRow");
         
         if (setGoodsButton != null) {
-            add(wrapWithBorder(setGoodsButton), "height 48!, gap 0 0 0 0");
+            add(wrapWithBorder(setGoodsButton), "height 48:, growy, gap 0 0 0 0, sgy bottomRow");
         }
         if (traceWorkButton != null) {
-            add(wrapWithBorder(traceWorkButton), "height 48!, gap 0 0 0 0");
+            add(wrapWithBorder(traceWorkButton), "height 48:, growy, gap 0 0 0 0, sgy bottomRow");
         }
 
         /*
@@ -880,7 +880,7 @@ public final class ColonyPanel extends PortPanel
         add(fillButton, "wmax 0, height 0, gap 0 0 0 0");
         add(nameBox, "wmax 0, height 0, gap 0 0 0 0");
         
-        add(okButton, "gapbefore push, height 48!"); // tag ok
+        add(okButton, "gapbefore push, height 48:, growy, sgy bottomRow"); // tag ok
         
         update();
     }

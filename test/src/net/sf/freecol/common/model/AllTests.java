@@ -35,6 +35,7 @@ public class AllTests {
         suite.addTestSuite(ColonyProductionTest.class);
         suite.addTestSuite(ColonyTradeItemTest.class);
         suite.addTestSuite(CombatTest.class);
+        suite.addTestSuite(CombatAmbushTest.class);
         suite.addTestSuite(DiplomaticTradeTest.class);
         suite.addTestSuite(DisasterTest.class);
         suite.addTestSuite(EuropeTest.class);

@@ -219,6 +219,10 @@ public final class Specification implements OptionContainer {
                     } else {
                         logger.warning("Delete " + id + " failed");
                     }
+                    // Consume the </delete> end tag, otherwise the reader
+                    // desyncs and every element after the first <delete>
+                    // in the section is silently dropped.
+                    xr.closeTag(FreeColSpecObjectType.DELETE_TAG);
 
                 } else {
                     T object = getAlreadyInitializedType(id, type);

@@ -310,10 +310,18 @@ class EuropeanStartingPositionsGenerator {
             switch (positionType) {
             case GameOptions.STARTING_POSITIONS_CLASSIC:
                 // Classic mode respects coast preference, the lists
-                // are pre-sampled and shuffled
-                start = ((startAtSea)
+                // are pre-sampled and shuffled.  On maps with sea on
+                // only one edge the preferred coast list can be empty;
+                // fall back to the other coast rather than crash.
+                List<Tile> preferred = (startAtSea)
                     ? ((startEast) ? eastSeaTiles : westSeaTiles)
-                    : ((startEast) ? eastLandTiles : westLandTiles)).remove(0);
+                    : ((startEast) ? eastLandTiles : westLandTiles);
+                if (preferred.isEmpty()) {
+                    preferred = (startAtSea)
+                        ? ((startEast) ? westSeaTiles : eastSeaTiles)
+                        : ((startEast) ? westLandTiles : eastLandTiles);
+                }
+                start = preferred.remove(0);
                 break;
             case GameOptions.STARTING_POSITIONS_RANDOM:
                 // Random mode is as classic but ignores coast

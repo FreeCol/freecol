@@ -53,6 +53,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -240,6 +241,10 @@ public final class Canvas extends JDesktopPane {
                 continue;
             }
             getInputMap().put(action.getAccelerator(), action.getId());
+            final KeyStroke extraKeyStroke = determineExtraKey(action.getAccelerator());
+            if (extraKeyStroke != null) {
+                getInputMap().put(extraKeyStroke, action.getId());
+            }
             getActionMap().put(action.getId(), action);
         }
 
@@ -259,7 +264,29 @@ public final class Canvas extends JDesktopPane {
         logger.info("Canvas created with bounds: " + windowBounds);
     }
 
+    private KeyStroke determineExtraKey(KeyStroke accelerator) {
+        final int alternativeKeyCode = determineAlternativeKeyCode(accelerator.getKeyCode());
+        if (alternativeKeyCode == 0) {
+            return null;
+        }
+        
+        return KeyStroke.getKeyStroke(alternativeKeyCode, accelerator.getModifiers());
+	}
     
+    private int determineAlternativeKeyCode(int keyCode) {
+        switch (keyCode) {
+        case KeyEvent.VK_KP_LEFT: return KeyEvent.VK_LEFT;
+        case KeyEvent.VK_KP_RIGHT: return KeyEvent.VK_RIGHT; 
+        case KeyEvent.VK_KP_UP: return KeyEvent.VK_UP; 
+        case KeyEvent.VK_KP_DOWN: return KeyEvent.VK_DOWN;
+        case KeyEvent.VK_LEFT: return KeyEvent.VK_KP_LEFT;
+        case KeyEvent.VK_RIGHT: return KeyEvent.VK_KP_RIGHT; 
+        case KeyEvent.VK_UP: return KeyEvent.VK_KP_UP; 
+        case KeyEvent.VK_DOWN: return KeyEvent.VK_KP_DOWN;
+        default: return 0;
+        }
+    }
+
     /**
      * Updates the timing for repaints.
      * 
@@ -1601,7 +1628,17 @@ public final class Canvas extends JDesktopPane {
             runnable.run();
             return;
         }
-        
+
+        // Check if Applet class is available (removed in Java 11+)
+        try {
+            Class.forName("java.applet.Applet");
+        } catch (ClassNotFoundException e) {
+            // Applet class not available (Java 11+), skip video playback
+            logger.info("Skipping video playback: java.applet.Applet not available in this JVM");
+            runnable.run();
+            return;
+        }
+
         final String originalVendor = System.getProperty("java.vendor");
         if (originalVendor.indexOf(" ") == -1) {
             /* Cortado crashes unless there is a space in "java.vendor". */

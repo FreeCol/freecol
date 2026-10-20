@@ -2000,16 +2000,17 @@ outer:  for (Effect effect : effects) {
             europeDirty = true;
         }
 
-        UnitChangeType uct
-            = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
-        if (uct != null && uct.appliesTo(this)) {
-            for (Unit u : getUnitSet()) {
-                for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
-                    if (!uc.appliesTo(u)) continue;
-                    u.changeType(uc.to);//-vis(this)
-                    visibilityChange = true;
-                    cs.add(See.perhaps(), u);
-                    break;
+        if (father.hasAbility(Ability.UPGRADE_CONVERT)) {
+            UnitChangeType uct = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
+            if (uct != null && uct.appliesTo(this)) {
+                for (Unit u : getUnitSet()) {
+                    for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
+                        if (!uc.appliesTo(u)) continue;
+                        u.changeType(uc.to);//-vis(this)
+                        visibilityChange = true;
+                        cs.add(See.perhaps(), u);
+                        break;
+                    }
                 }
             }
         }
@@ -2027,6 +2028,7 @@ outer:  for (Effect effect : effects) {
                 for (Colony c : getColonyList()) {
                     c.addLiberty(0); // Kick the SoL and production bonus
                     c.invalidateCache();
+                    cs.add(See.only(this), c);
                 }
             }
         }
@@ -3029,6 +3031,16 @@ outer:  for (Effect effect : effects) {
             loser.setMovesLeft(0);
             loser.setState(Unit.UnitState.ACTIVE);
             cs.add(See.perhaps().always(loserPlayer), oldTile);
+            // csChangeOwner() only notifies the new owner (see
+            // exploreForUnit() call therein).  The former owner is never
+            // told the unit is gone, so its client retains a stale copy
+            // that keeps demanding orders each turn even though the
+            // server has already reassigned the unit - the "ghost unit"
+            // bug.  Explicitly tell the former owner to drop it, mirroring
+            // the See.only()/See.perhaps() split csSlaughterUnit() uses.
+            cs.addRemove((oldTile.getSettlement() != null)
+                ? See.only(loserPlayer) : See.perhaps().always(loserPlayer),
+                oldTile, loser);//-vis(loserPlayer)
             // Winner message post-capture when it owns the loser
             key = "combat.unitCaptured.enemy." + loser.getType().getSuffix();
             cs.addMessage(winnerPlayer,

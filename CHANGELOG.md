@@ -13,6 +13,8 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * Scroll bar speed is now adjusted according to the current font size. This applies when scrolling with the mouse wheel or the scroll bar buttons.
 * The resolution of the screen in fullscreen mode can now be configured in the Preferences.
 * Left and right arrows can now again be used for switching the currently displayed colony
+* It's no longer necessary to activate numlock for keypad navigation.
+* Bugfix: The buttons on the colony panel is now rendered properly for very large fonts.
 * Bugfix: Attack animations are now played in the correct position.
 * Bugfix: Fixes an issue where goods that has been sold is still displayed in the unit info panel.
 * Bugfix: Fixes a bug where the escape key closed multiple panels.
@@ -21,12 +23,14 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 * Bugfix: Fixes rendering issues in the diplomacy dialog.
 * Buxfix: In the labor report, clicking on a unit carried by a ship no longer forces a reconnect.
 * Bugfix: Paying arrears in Europe now immediately refreshes the display so that goods are no longer greyed out.
+* Bugfix: Secondary accelerator keys for moving on the mapbaord now works again.
 
 ### Performance ###
 * Unit movements are now faster (area redrawn when moving is reduced).
 
 ### Rule Changes ###
 * Disabling "Experts have connections" for the classic ruleset.
+* Bugfix: Casas is now the only founding father that will upgrade native converts.
 
 ### AI/computer players ###
 * Bugfix: Fixed an issue that prevented diplomacy initiated during the AI players' turns.
@@ -34,10 +38,13 @@ All savegames (without mods) from 0.12.0 and up should continue working with 1.2
 
 ### Mod development ###
 * Allow mods to add modifiers ("model.modifier.education.teaching.turns") for the education teaching time. Scope checks are applied to the teacher.
+* Bugfix: Types can now be deleted from the specification.
 
 ### Other ###
 * Fixes an issue where not capturing goods from a ship prevents ending the turn.
 * Includes the version number in the freecol application directory when making ZIP-files and other packages. This prevents having the application directory collide with the settings directory if the user extracts the ZIP file (or other installation file) to the Documents directory in Windows.
+* Bugfix: Bolivar's effect on colonies is now immediately applied for all colonies without having to force a change/reconnect.
+* Bugfix: Fallback on maps where European starting location placement previously failed.
 
 ## FreeCol 1.2.0 (4th of July, 2024) ##
 
