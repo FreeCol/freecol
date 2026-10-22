@@ -328,6 +328,29 @@ public class ServerRegion extends Region {
         List<ServerRegion> result = new ArrayList<>(16);
 
         lb.add("Add regions ");
+        createPolarRegions(map, fixed, result, lb);
+        createGeographicRegions(map);
+        boolean allOceans = createOceanRegions(map, fixed, result, lb);
+        if (!allOceans) {
+            fillOceanRegions(map, lb);
+        }
+        return result;
+    }
+
+    /**
+     * Creates and adds arctic and antarctic regions to the map and result list 
+     * if they do not already exist.
+     *
+     * @param map The {@code Map} to check.
+     * @param fixed The map of fixed regions.
+     * @param result The list of server regions to append to.
+     * @param lb A {@code LogBuilder} to log to.
+     */
+    private static void createPolarRegions(
+            Map map,
+            java.util.Map<String, Region> fixed,
+            List<ServerRegion> result,
+            LogBuilder lb) {
         // Create arctic/antarctic regions first, but only if they do
         // not exist in on the map already.  This allows for example
         // the imported Caribbean map to have arctic/antarctic regions
@@ -350,6 +373,7 @@ public class ServerRegion extends Region {
             lb.add("+arctic");
         }
         result.add(arctic);
+
         final int antarcticHeight = map.getHeight() - Map.POLAR_HEIGHT - 1;
         ServerRegion antarctic = (ServerRegion)fixed.get("model.region.antarctic");
         if (antarctic == null) {
@@ -366,7 +390,15 @@ public class ServerRegion extends Region {
             lb.add("+antarctic");
         }
         result.add(antarctic);
+    }
 
+    /**
+     * Creates and adds virtual geographic land regions used by the 
+     * MapGenerator to place Indian Settlements.
+     *
+     * @param map The {@code Map} to add regions to.
+     */
+    private static void createGeographicRegions(Map map) {
         // Then, create "geographic" land regions.  These regions are
         // used by the MapGenerator to place Indian Settlements.  Note
         // that these regions are "virtual", i.e. having a bounding
@@ -375,104 +407,121 @@ public class ServerRegion extends Region {
         
         int[] xDelimiterThirds = findXForThirdsOfLand(map, 0, yDelimiterThirds[0]);
         
-        map.removeRegionsByKey("model.region.northWest");
-        final ServerRegion northWest = new ServerRegion(map, "model.region.northWest", RegionType.LAND, null);
-        northWest.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.northWest", new Rectangle(
                 0,
                 0,
                 xDelimiterThirds[0],
                 yDelimiterThirds[0]
-                )));
-        map.addRegion(northWest);
+                ));
 
-        map.removeRegionsByKey("model.region.north");
-        final ServerRegion north = new ServerRegion(map, "model.region.north",RegionType.LAND, null);
-        north.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.north", new Rectangle(
                 xDelimiterThirds[0],
                 0,
                 xDelimiterThirds[1] - xDelimiterThirds[0],
                 yDelimiterThirds[0]
-                )));
-        map.addRegion(north);
+                ));
 
-        map.removeRegionsByKey("model.region.northEast");
-        final ServerRegion northEast = new ServerRegion(map, "model.region.northEast", RegionType.LAND, null);
-        northEast.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.northEast", new Rectangle(
                 xDelimiterThirds[1],
                 0,
                 Integer.MAX_VALUE,
                 yDelimiterThirds[0]
-                )));
-        map.addRegion(northEast);
-
+                ));
         
         xDelimiterThirds = findXForThirdsOfLand(map, yDelimiterThirds[0], yDelimiterThirds[1]);
         
-        map.removeRegionsByKey("model.region.west");
-        final ServerRegion west = new ServerRegion(map, "model.region.west", RegionType.LAND, null);
-        west.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.west", new Rectangle(
                 0,
                 yDelimiterThirds[0],
                 xDelimiterThirds[0],
                 yDelimiterThirds[1] - yDelimiterThirds[0]
-                )));
-        map.addRegion(west);
+                ));
 
-        map.removeRegionsByKey("model.region.center");
-        final ServerRegion center = new ServerRegion(map, "model.region.center", RegionType.LAND, null);
-        center.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.center", new Rectangle(
                 xDelimiterThirds[0],
                 yDelimiterThirds[0],
                 xDelimiterThirds[1] - xDelimiterThirds[0],
                 yDelimiterThirds[1] - yDelimiterThirds[0]
-                )));
-        map.addRegion(center);
+                ));
 
-        map.removeRegionsByKey("model.region.east");
-        final ServerRegion east = new ServerRegion(map, "model.region.east", RegionType.LAND, null);
-        east.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.east", new Rectangle(
                 xDelimiterThirds[1],
                 yDelimiterThirds[0],
                 Integer.MAX_VALUE,
                 yDelimiterThirds[1] - yDelimiterThirds[0]
-                )));
-        map.addRegion(east);
-
+                ));
         
         xDelimiterThirds = findXForThirdsOfLand(map, yDelimiterThirds[1], map.getHeight() - 1);
         
-        map.removeRegionsByKey("model.region.southWest");
-        final ServerRegion southWest = new ServerRegion(map, "model.region.southWest", RegionType.LAND, null);
-        southWest.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.southWest", new Rectangle(
                 0,
                 yDelimiterThirds[1],
                 xDelimiterThirds[0],
                 Integer.MAX_VALUE
-                )));
-        map.addRegion(southWest);
+                ));
 
-        map.removeRegionsByKey("model.region.south");
-        final ServerRegion south = new ServerRegion(map, "model.region.south", RegionType.LAND, null);
-        south.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.south", new Rectangle(
                 xDelimiterThirds[0],
                 yDelimiterThirds[1],
                 xDelimiterThirds[1] - xDelimiterThirds[0],
                 Integer.MAX_VALUE
-                )));
-        map.addRegion(south);
+                ));
 
-        map.removeRegionsByKey("model.region.southEast");
-        final ServerRegion southEast = new ServerRegion(map, "model.region.southEast", RegionType.LAND, null);
-        southEast.bounds.setBounds(ensureWithinMap(map, new Rectangle(
+        createGeographicRegion(map, "model.region.southEast", new Rectangle(
                 xDelimiterThirds[1],
                 yDelimiterThirds[1],
                 Integer.MAX_VALUE,
                 Integer.MAX_VALUE
-                )));
-        map.addRegion(southEast);
+                ));
+    }
 
+    /**
+     * Helper to remove old regions by key, create a new land region, set its bounds, 
+     * and automatically register it to the map via its constructor.
+     *
+     * @param map The {@code Map} to update.
+     * @param key The region key.
+     * @param bounds The bounding rectangle.
+     */
+    private static void createGeographicRegion(
+            Map map,
+            String key,
+            Rectangle bounds) {
+        map.removeRegionsByKey(key);
+        ServerRegion region = new ServerRegion(map, key, RegionType.LAND, null);
+        region.bounds.setBounds(ensureWithinMap(map, bounds));
+    }
+
+    /**
+     * Helper to cast and retrieve a server region from the fixed regions map.
+     *
+     * @param fixed The map of fixed regions.
+     * @param key The region key.
+     * @return The cast {@code ServerRegion}, or null if not found.
+     */
+    private static ServerRegion getServerRegion(
+            java.util.Map<String, Region> fixed,
+            String key) {
+        return (ServerRegion) fixed.get(key);
+    }
+
+    /**
+     * Creates and adds ocean regions (Pacific, Atlantic, and their subdivisions)
+     * if they do not already exist.
+     *
+     * @param map The {@code Map} to check.
+     * @param fixed The map of fixed regions.
+     * @param result The list of server regions to append to.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return True if all checked regions are oceans, false otherwise.
+     */
+    private static boolean createOceanRegions(
+            Map map,
+            java.util.Map<String, Region> fixed,
+            List<ServerRegion> result,
+            LogBuilder lb) {
         boolean allOceans = true;
-        ServerRegion pacific = (ServerRegion)fixed.get("model.region.pacific");
+        ServerRegion pacific = getServerRegion(fixed, "model.region.pacific");
         if (pacific == null) {
             pacific = new ServerRegion(map, "model.region.pacific",
                                        RegionType.OCEAN, null);
@@ -482,7 +531,7 @@ public class ServerRegion extends Region {
             lb.add("+pacific");
         }
         result.add(pacific);
-        ServerRegion northPacific = (ServerRegion)fixed.get("model.region.northPacific");
+        ServerRegion northPacific = getServerRegion(fixed, "model.region.northPacific");
         if (northPacific == null) {
             northPacific = new ServerRegion(map, "model.region.northPacific",
                                             RegionType.OCEAN, pacific);
@@ -491,7 +540,7 @@ public class ServerRegion extends Region {
             lb.add("+northPacific");
         }
         result.add(northPacific);
-        ServerRegion southPacific = (ServerRegion)fixed.get("model.region.southPacific");
+        ServerRegion southPacific = getServerRegion(fixed, "model.region.southPacific");
         if (southPacific == null) {
             southPacific = new ServerRegion(map, "model.region.southPacific",
                                             RegionType.OCEAN, pacific);
@@ -501,7 +550,7 @@ public class ServerRegion extends Region {
         }
         result.add(southPacific);
 
-        ServerRegion atlantic = (ServerRegion)fixed.get("model.region.atlantic");
+        ServerRegion atlantic = getServerRegion(fixed, "model.region.atlantic");
         if (atlantic == null) {
             atlantic = new ServerRegion(map, "model.region.atlantic",
                                         RegionType.OCEAN, null);
@@ -510,7 +559,7 @@ public class ServerRegion extends Region {
             lb.add("+atlantic");
         }
         result.add(atlantic);
-        ServerRegion northAtlantic = (ServerRegion)fixed.get("model.region.northAtlantic");
+        ServerRegion northAtlantic = getServerRegion(fixed, "model.region.northAtlantic");
         if (northAtlantic == null) {
             northAtlantic = new ServerRegion(map, "model.region.northAtlantic",
                                              RegionType.OCEAN, atlantic);
@@ -519,7 +568,7 @@ public class ServerRegion extends Region {
             lb.add("+northAtlantic");
         }
         result.add(northAtlantic);
-        ServerRegion southAtlantic = (ServerRegion)fixed.get("model.region.southAtlantic");
+        ServerRegion southAtlantic = getServerRegion(fixed, "model.region.southAtlantic");
         if (southAtlantic == null) {
             southAtlantic = new ServerRegion(map, "model.region.southAtlantic",
                                              RegionType.OCEAN, atlantic);
@@ -528,6 +577,24 @@ public class ServerRegion extends Region {
             lb.add("+southAtlantic");
         }
         result.add(southAtlantic);
+        return allOceans;
+    }
+
+    /**
+     * Fills the ocean regions by filling quadrants, allowing horizontal overflow,
+     * and finally expanding across the entire map.
+     *
+     * @param map The {@code Map} being processed.
+     * @param lb A {@code LogBuilder} to log to.
+     */
+    private static void fillOceanRegions(
+            Map map,
+            LogBuilder lb) {
+        ServerRegion northPacific = (ServerRegion) map.getRegionByKey("model.region.northPacific");
+        ServerRegion southPacific = (ServerRegion) map.getRegionByKey("model.region.southPacific");
+        ServerRegion northAtlantic = (ServerRegion) map.getRegionByKey("model.region.northAtlantic");
+        ServerRegion southAtlantic = (ServerRegion) map.getRegionByKey("model.region.southAtlantic");
+
         // Fill the ocean regions by first filling the quadrants individually,
         // then allow the quadrants to overflow into their horizontally
         // opposite quadrant, then finally into the whole map.
@@ -542,52 +609,49 @@ public class ServerRegion extends Region {
         //
         // or multiple such incursions across the nominal quadrant divisions.
         //
-        if (!allOceans) {
-            final int maxx = map.getWidth();
-            final int midx = maxx / 2;
-            final int maxy = map.getHeight();
-            final int midy = maxy / 2;
-            Tile tNP = null, tSP = null, tNA = null, tSA = null, t;
-            for (int y = midy-1; y >= 0; y--) {
-                if (tNP == null && !(t = map.getTile(0, y)).isLand()) tNP = t;
-                if (tNA == null && !(t = map.getTile(maxx-1, y)).isLand()) tNA = t;
-                if (tNP != null && tNA != null) break;
-            }
-            for (int y = midy; y < maxy; y++) {
-                if (tSP == null && !(t = map.getTile(0, y)).isLand()) tSP = t;
-                if (tSA == null && !(t = map.getTile(maxx-1, y)).isLand()) tSA = t;
-                if (tSP != null && tSA != null) break;
-            }
-            int nNP = 0, nSP = 0, nNA = 0, nSA = 0;
-            
-            Rectangle rNP = new Rectangle(0,0,       midx,midy);
-            Rectangle rSP = new Rectangle(0,midy,    midx,maxy-midy);
-            Rectangle rNA = new Rectangle(midx,0,    maxx-midx,midy);
-            Rectangle rSA = new Rectangle(midx,midy, maxx-midx,maxy-midy);
-            if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rNP);
-            if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rSP);
-            if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rNA);
-            if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rSA);
+        final int maxx = map.getWidth();
+        final int midx = maxx / 2;
+        final int maxy = map.getHeight();
+        final int midy = maxy / 2;
+        Tile tNP = null, tSP = null, tNA = null, tSA = null, t;
+        for (int y = midy-1; y >= 0; y--) {
+            if (tNP == null && !(t = map.getTile(0, y)).isLand()) tNP = t;
+            if (tNA == null && !(t = map.getTile(maxx-1, y)).isLand()) tNA = t;
+            if (tNP != null && tNA != null) break;
+        }
+        for (int y = midy; y < maxy; y++) {
+            if (tSP == null && !(t = map.getTile(0, y)).isLand()) tSP = t;
+            if (tSA == null && !(t = map.getTile(maxx-1, y)).isLand()) tSA = t;
+            if (tSP != null && tSA != null) break;
+        }
+        int nNP = 0, nSP = 0, nNA = 0, nSA = 0;
+        
+        Rectangle rNP = new Rectangle(0,0,       midx,midy);
+        Rectangle rSP = new Rectangle(0,midy,    midx,maxy-midy);
+        Rectangle rNA = new Rectangle(midx,0,    maxx-midx,midy);
+        Rectangle rSA = new Rectangle(midx,midy, maxx-midx,maxy-midy);
+        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rNP);
+        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rSP);
+        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rNA);
+        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rSA);
 
-            Rectangle rN = new Rectangle(0,0,    maxx,midy);
-            Rectangle rS = new Rectangle(0,midy, maxx,maxy-midy);
-            if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rN);
-            if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rS);
-            if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rN);
-            if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rS);
+        Rectangle rN = new Rectangle(0,0,    maxx,midy);
+        Rectangle rS = new Rectangle(0,midy, maxx,maxy-midy);
+        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rN);
+        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rS);
+        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rN);
+        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rS);
 
-            Rectangle rAll = new Rectangle(0,0, maxx,maxy);
-            if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rAll);
-            if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rAll);
-            if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rAll);
-            if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rAll);
-            lb.add(" filled ocean regions ",
+        Rectangle rAll = new Rectangle(0,0, maxx,maxy);
+        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rAll);
+        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rAll);
+        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rAll);
+        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rAll);
+        lb.add(" filled ocean regions ",
                 nNP, " North Pacific, ",
                 nSP, " South Pacific, ",
                 nNA, " North Atlantic, ",
                 nSA, " South Atlantic.\n");
-        }
-        return result;
     }
 
     /**
