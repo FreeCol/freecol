@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,8 +42,26 @@ public class DiplomaticTrade extends FreeColGameObject {
 
     public static final String TAG = "diplomaticTrade";
 
+    @FunctionalInterface
+    private interface TradeItemConstructor {
+        TradeItem create(Game game, FreeColXMLReader xr) throws XMLStreamException;
+    }
+
+    /** Sentinel value indicating that no gold is offered in the trade. */
+    private static final int NO_GOLD_OFFERED = -1;
+
+    /** A map to find the correct constructor for each trade item tag. */
+    private static final Map<String, TradeItemConstructor> ITEM_FACTORY = Map.of(
+        ColonyTradeItem.TAG, ColonyTradeItem::new,
+        GoldTradeItem.TAG,   GoldTradeItem::new,
+        GoodsTradeItem.TAG,  GoodsTradeItem::new,
+        InciteTradeItem.TAG, InciteTradeItem::new,
+        StanceTradeItem.TAG, StanceTradeItem::new,
+        UnitTradeItem.TAG,   UnitTradeItem::new
+    );
+
     /** A context for the trade. */
-    public static enum TradeContext {
+    public enum TradeContext {
         CONTACT,    /** First contact between Europeans */
         DIPLOMATIC, /** Scout negotiating */
         TRADE,      /** Carrier trading */
@@ -59,7 +78,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
 
     /** A type for the trade status. */
-    public static enum TradeStatus {
+    public enum TradeStatus {
         PROPOSE_TRADE,
         ACCEPT_TRADE,
         REJECT_TRADE
@@ -113,7 +132,6 @@ public class DiplomaticTrade extends FreeColGameObject {
         this.sender = sender;
         this.recipient = recipient;
         this.status = TradeStatus.PROPOSE_TRADE;
-        this.items.clear();
         if (items != null) this.items.addAll(items);
         this.version = version;
     }
@@ -194,7 +212,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
 
     /**
-     * Set the recieving player.
+     * Set the receiving player.
      *
      * @param newRecipient The new recipient {@code Player}.
      */
@@ -347,7 +365,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     public int getGoldGivenBy(Player player) {
         TradeItem ti = find(this.items, i -> i instanceof GoldTradeItem
             && player == i.getSource());
-        return (ti == null) ? -1 : ti.getGold();
+        return (ti == null) ? NO_GOLD_OFFERED : ti.getGold();
     }
 
     /**
@@ -498,9 +516,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
         this.items.clear();
-
         super.readChildren(xr);
     }
 
@@ -510,28 +526,14 @@ public class DiplomaticTrade extends FreeColGameObject {
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
+        TradeItemConstructor constructor = ITEM_FACTORY.get(tag);
 
-        if (ColonyTradeItem.TAG.equals(tag)) {
-            add(new ColonyTradeItem(getGame(), xr));
-
-        } else if (GoldTradeItem.TAG.equals(tag)) {
-            add(new GoldTradeItem(getGame(), xr));
-
-        } else if (GoodsTradeItem.TAG.equals(tag)) {
-            add(new GoodsTradeItem(getGame(), xr));
-
-        } else if (InciteTradeItem.TAG.equals(tag)) {
-            add(new InciteTradeItem(getGame(), xr));
-
-        } else if (StanceTradeItem.TAG.equals(tag)) {
-            add(new StanceTradeItem(getGame(), xr));
-
-        } else if (UnitTradeItem.TAG.equals(tag)) {
-            add(new UnitTradeItem(getGame(), xr));
-
-        } else {
+        if (constructor == null) {
             super.readChild(xr);
+            return;
         }
+
+        add(constructor.create(getGame(), xr));
     }
 
 
@@ -552,8 +554,10 @@ public class DiplomaticTrade extends FreeColGameObject {
         sb.append('[').append(getId())
             .append(' ').append(getContext())
             .append(' ').append(getStatus())
-            .append(" from=").append(getSender().getId())
-            .append(" to=").append(getRecipient().getId())
+            .append(" from=")
+            .append(sender == null ? "null" : sender.getId())
+            .append(" to=")
+            .append(recipient == null ? "null" : recipient.getId())
             .append(" version=").append(getVersion())
             .append(" [");
         for (TradeItem item : getItems()) sb.append(' ').append(item);
