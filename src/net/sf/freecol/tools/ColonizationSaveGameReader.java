@@ -22,10 +22,17 @@ package net.sf.freecol.tools;
 import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
 
 public class ColonizationSaveGameReader {
+
+    private static class Utilities {
+
+        public static String getString ( byte[] data, int start, int length) {
+            String value = new String(data, start, length, StandardCharsets.UTF_8);
+            int index = value.indexOf(0);
+            return (index < 0) ? value : value.substring(0, index);
+        }
+    }
 
     private final static int PLAYER_DATA = 0x9e;
     private final static int COLONY_DATA = 0x186;
@@ -62,19 +69,13 @@ public class ColonizationSaveGameReader {
 
         public static final int LENGTH = 52;
 
-        private final String newLandName;
-        private final String playerName;
-        private final boolean humanPlayer;
+        public static void print(byte[] data, int offset) {
+            String playerName = Utilities.getString(data, offset, 23);
+            String newLandName = Utilities.getString(data, offset + 24, 23);
+            boolean isHuman = data[offset + 49] == 0;
 
-        public PlayerData(byte[] data, int offset) {
-            playerName = getString(data, offset, 23);
-            newLandName = getString(data, offset + 24, 23);
-            humanPlayer = (data[offset + 49] == 0);
-        }
-
-        public void print() {
             System.out.println("Player name is " + playerName
-                               + (humanPlayer ? " [human]" : " [AI]"));
+                               + (isHuman ? " [human]" : " [AI]"));
             System.out.println("New land name is " + newLandName);
         }
 
@@ -87,18 +88,14 @@ public class ColonizationSaveGameReader {
         public static final int COLONIST_SPECIALITY = 0x40;
         public static final int TILES = 0x70;
 
-        private final int x;
-        private final int y;
-        private final int numberOfColonists;
-        private final String name;
-        private final Colonist[] colonists;
+        public static void print(byte[] data, int offset) {
+            int x = data[offset];
+            int y = data[offset + 1];
+            String name = Utilities.getString(data, offset + 2, offset + 25);
+            int numberOfColonists = data[offset + 0x1f];
+            System.out.println(name + " [" + x + ", " + y + "], "
+                    + numberOfColonists + " colonists");
 
-        public ColonyData(byte[] data, int offset) {
-            x = data[offset];
-            y = data[offset + 1];
-            name = getString(data, offset + 2, offset + 25);
-            numberOfColonists = data[offset + 0x1f];
-            colonists = new Colonist[numberOfColonists];
             for (int index = 0; index < numberOfColonists; index++) {
                 int tile = -1;
                 for (int tileIndex = 0; tileIndex < 8; tileIndex++) {
@@ -107,26 +104,16 @@ public class ColonizationSaveGameReader {
                         break;
                     }
                 }
-                colonists[index] = new Colonist(data[offset + COLONIST_OCCUPATION + index],
-                        data[offset + COLONIST_SPECIALITY + index],
-                        tile);
-            }
-
-
-        }
-
-        public void print() {
-            System.out.println(name + " [" + x + ", " + y + "], "
-                               + numberOfColonists + " colonists");
-            for (Colonist colonist : colonists) {
-                colonist.print();
+                int occupation = data[offset + COLONIST_OCCUPATION];
+                int speciality = data[offset + COLONIST_SPECIALITY];
+                Colonist.print(occupation, speciality, tile);
             }
         }
     }
 
-    public static class Colonist {
+    private static class Colonist {
 
-        public final String[] OCCUPATION = {
+        public static final String[] OCCUPATION = {
             "Farmer",
             "Sugar planter",
             "Tobacco planter",
@@ -160,21 +147,11 @@ public class ColonizationSaveGameReader {
             "Mounted brave"
         };
 
-        public final String[] TILES = {
+        public static final String[] TILES = {
             "N", "E", "S", "W", "NW", "NE", "SE", "SW"
         };
 
-        final int occupation;
-        final int speciality;
-        final int tile;
-
-        public Colonist(int occupation, int speciality, int tile) {
-            this.occupation = occupation;
-            this.speciality = speciality;
-            this.tile = tile;
-        }
-
-        public void print() {
+        public static void print(int occupation, int speciality, int tile) {
             String tileString = (tile >= 0)
                 ? " [tile " + TILES[tile] + "]" : "";
             System.out.println(OCCUPATION[speciality] + " working as "
@@ -183,20 +160,13 @@ public class ColonizationSaveGameReader {
 
     }
 
-
-    private final byte[] data;
-
-    private ColonizationSaveGameReader(byte[] data) {
-        this.data = Arrays.copyOf(data, data.length);
-    }
-
     public static void main(String[] args) throws Exception {
 
         byte[] data;
         try (RandomAccessFile reader = new RandomAccessFile(args[0], "r")) {
             data = new byte[(int) reader.length()];
             reader.readFully(data);
-            new ColonizationSaveGameReader(data).run();
+            run(data);
         } catch (EOFException ee) {
             System.err.println("Could not read from " + args[0] + ": " + ee);
             System.exit(1);
@@ -204,30 +174,20 @@ public class ColonizationSaveGameReader {
     }
 
 
-    private void run() {
+    private static void run(byte[] data) {
 
         GameData gameData = new GameData(data);
         gameData.print();
         for (int index = 0; index < 4; index++) {
             System.out.println("Nation is " + NATIONS[index]);
-            PlayerData playerData = new PlayerData(data, PLAYER_DATA +
-                    index * PlayerData.LENGTH);
-            playerData.print();
+            PlayerData.print(data, PLAYER_DATA + index * PlayerData.LENGTH);
         }
         int count = gameData.getNumberOfColonies();
         for (int index = 0; index < count; index++) {
-            ColonyData colonyData = new ColonyData(data, COLONY_DATA +
-                                                   index * ColonyData.LENGTH);
-            colonyData.print();
+            ColonyData.print(data, COLONY_DATA + index * ColonyData.LENGTH);
         }
 
 
     }
 
-    public static String getString(byte[] data, int start, int length) {
-        byte[] bytes = Arrays.copyOfRange(data, start, start + length);
-        String value = new String(bytes, StandardCharsets.UTF_8);
-        int index = value.indexOf(0);
-        return (index < 0) ? value : value.substring(0, index);
-    }
 }
