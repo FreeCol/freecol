@@ -309,7 +309,6 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(3 * 6 + 1, townHall.getTotalProductionOf(bellsType));
 
         player.addFather(thomasPaine);
-        player.recalculateBellsBonus();
 
         assertTrue(player.hasAbility(Ability.ADD_TAX_TO_BELLS));
         List<Modifier> modifiers = toList(player.getModifiers("model.goods.bells"));
