@@ -74,7 +74,21 @@ public class MarketWas extends ObjectWas {
     public void addAll(List<AbstractGoods> ag) {
         this.transactions.addAll(ag);
     }
-    
+
+    /**
+     * Fire a market price change notification if the price has changed.
+     *
+     * @param type The affected goods type.
+     * @param oldPrice The previous price.
+     * @param newPrice The current price.
+     */
+    private void firePriceChange(GoodsType type, int oldPrice, int newPrice) {
+        if (oldPrice != newPrice) {
+            this.market.getMarketData(type)
+                .firePropertyChange(Market.PRICE_CHANGE, oldPrice, newPrice);
+        }
+    }
+
     /**
      * Fire any property changes resulting from actions in Market.
      *
@@ -86,19 +100,16 @@ public class MarketWas extends ObjectWas {
             if (amount < 0) {
                 int buy = this.costToBuy.get(type);
                 l.logPurchase(type, -amount, buy);
-                int buyNow = this.market.getCostToBuy(type);
-                if (buy != buyNow) {
-                    this.market.getMarketData(type)
-                        .firePropertyChange(Market.PRICE_CHANGE, buy, buyNow);
-                }
+
+                firePriceChange(type, buy,
+                    this.market.getCostToBuy(type));
+
             } else if (amount > 0) {
                 int sell = this.paidForSale.get(type);
                 l.logSale(type, amount, sell, this.tax);
-                int sellNow = this.market.getPaidForSale(type);
-                if (sell != sellNow) {
-                    this.market.getMarketData(type)
-                        .firePropertyChange(Market.PRICE_CHANGE, sell, sellNow);
-                }
+
+                firePriceChange(type, sell,
+                    this.market.getPaidForSale(type));
             }
         }
     }

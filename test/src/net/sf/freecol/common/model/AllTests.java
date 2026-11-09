@@ -45,7 +45,9 @@ public class AllTests {
         suite.addTestSuite(IndividualFatherTest.class);
         suite.addTestSuite(LimitTest.class);
         suite.addTestSuite(MapTest.class);
+        suite.addTestSuite(MarketDataTest.class);
         suite.addTestSuite(MarketTest.class);
+        suite.addTestSuite(MarketWasTest.class);
         suite.addTestSuite(ModelMessageTest.class);
         suite.addTestSuite(ModifierTest.class);
         suite.addTestSuite(MonarchTest.class);
