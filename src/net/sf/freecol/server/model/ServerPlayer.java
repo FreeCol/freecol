@@ -1429,9 +1429,11 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public void csModifyTension(Player player, int add, Settlement origin,
                                 ChangeSet cs) {
-        Tension.Level oldLevel = getTension(player).getLevel();
-        getTension(player).modify(add);
-        if (oldLevel != getTension(player).getLevel()) {
+
+        Tension tension = getTension(player);
+        boolean levelChanged = tension.levelChangedAfterModify(add);
+
+        if (levelChanged) {
             cs.add(See.only(player), this);
         }
 
@@ -1441,7 +1443,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             for (IndianSettlement is : transform(getIndianSettlements(),
                     i -> i != origin && i.hasContacted(player))) {
                 ((ServerIndianSettlement)is).csModifyAlarm(player, add,
-                                                           false, cs);//+til
+                                                           false, cs);
             }
         }
     }

@@ -73,7 +73,10 @@ public class StanceTradeItem extends TradeItem {
      */
     @Override
     public boolean isValid() {
-        return stance != null;
+        if (stance == null) return false;
+        final Player src = getSource();
+        final Player dst = getDestination();
+        return src.getStance(dst).isValidTransition(stance);
     }
 
     /**
@@ -111,25 +114,21 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int evaluateFor(Player player) {
-        final Stance stance = getStance();
         final double ratio = player.getStrengthRatio(getOther(player), false);
-        int value = (int)Math.round(100 * ratio);
-        switch (stance) {
-        case WAR:
-            if (ratio < 0.33) value = INVALID_TRADE_ITEM;
-            else if (ratio < 0.5) value = -value;
-            break;
-        case PEACE: case CEASE_FIRE: case ALLIANCE:
-            if (ratio > 0.66) value = INVALID_TRADE_ITEM;
-            else if (ratio > 0.5) value = -value;
-            else if (ratio < 0.33) value = 1000;
-            break;
-        case UNCONTACTED: default:
-            value = INVALID_TRADE_ITEM;
-            break;
-        }
-        return value;
+        return getStance().getTradeValue(ratio);
+    }
+
+    /**
+     * Get the tension impact of this trade item.
+     *
+     * @return The tension modifier for this stance change.
+     */
+    public int getTensionImpact() {
+        final Player src = getSource();
+        final Player dst = getDestination();
+        return src.getStance(dst).getTensionModifier(stance);
     }
 
 
