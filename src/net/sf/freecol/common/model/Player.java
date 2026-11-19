@@ -1469,6 +1469,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public void addFather(FoundingFather father) {
         foundingFathers.add(father);
         addFeatures(father);
+        recalculateBellsBonus(); // Paine's bells bonus depends on tax
         for (Colony c : getColonyList()) c.invalidateCache();
     }
 
