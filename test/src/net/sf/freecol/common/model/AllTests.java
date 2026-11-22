@@ -30,7 +30,10 @@ public class AllTests {
         suite.addTestSuite(SpecificationTest.class);
         //$JUnit-BEGIN$
         suite.addTestSuite(BaseCostDeciderTest.class);
+        suite.addTestSuite(BuildableTypeTest.class);
         suite.addTestSuite(BuildingTest.class);
+        suite.addTestSuite(BuildingTypeTest.class);
+        suite.addTestSuite(BuildQueueTest.class);
         suite.addTestSuite(ColonyTest.class);
         suite.addTestSuite(ColonyProductionTest.class);
         suite.addTestSuite(CombatTest.class);
