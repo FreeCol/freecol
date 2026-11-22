@@ -63,6 +63,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.logging.WideEvent;
+import static net.sf.freecol.common.logging.WideEventFields.*;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -365,7 +367,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             PioneeringMission pm = aiu.getMission(PioneeringMission.class);
             if (pm != null) {
                 if (tips.contains(pm.getTileImprovementPlan())) {
-                    logger.info(pm + " collapses with loss of " + colony);
+                    note(Level.INFO, NOTE_MISSION_COLLAPSE, pm + " collapses with loss of " + colony);
                     aiu.changeMission(null);
                 }
                 continue;
@@ -374,7 +376,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 wm = aiu.getMission(WishRealizationMission.class);
             if (wm != null) {
                 if (wishes.contains(wm.getWish())) {
-                    logger.info(wm + " collapses with loss of " + colony);
+                    note(Level.INFO, NOTE_MISSION_COLLAPSE, wm + " collapses with loss of " + colony);
                     aiu.changeMission(null);
                 }
                 continue;
@@ -886,7 +888,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     aic.removeTileImprovementPlan(tip);
                     tip.dispose();
                 } else if (tip.getTarget() == null) {
-                    logger.warning("No target for tip: " + tip);
+                    note(Level.WARNING, NOTE_NO_TIP_TARGET, tip);
                 } else {
                     TileImprovementPlan other = tipMap.get(tip.getTarget());
                     if (other == null || other.getValue() < tip.getValue()) {
@@ -1723,8 +1725,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 if (!(m instanceof WorkInsideColonyMission)
                     && (m = getWorkInsideColonyMission(aiUnit,
                             aiMain.getAIColony(colony))) != null) {
-                    logger.warning(aiUnit + " should WorkInsideColony at "
-                        + colony.getName());
+                    note(Level.WARNING, NOTE_SHOULD_WORK_INSIDE_COLONY,
+                        aiUnit + " should WorkInsideColony at " + colony.getName());
                     lb.add(", ", m);
                     updateTransport(aiUnit, oldTarget, lb);
                 }
@@ -1920,9 +1922,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             m = aiUnit.getMission();
             final Location oldTarget = (m == null) ? null : m.getTarget();
             if (m != null && m.isValid() && !m.isOneTime()) {
-                logger.warning("Trying fallback mission for unit " + unit
-                    + " with valid mission " + m
-                    + " reason " + reasons.get(unit));
+                note(Level.WARNING, NOTE_FALLBACK_MISSION_SKIPPED,
+                    "unit " + unit + " with valid mission " + m
+                        + " reason " + reasons.get(unit));
                 continue;
             }
 
@@ -2285,6 +2287,19 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
+     * Record a noteworthy occurrence.  If a turn is in progress it is
+     * folded into that turn's wide event, otherwise it falls back to
+     * an ordinary independent log line.
+     *
+     * @param level The level to fall back to logging at.
+     * @param category The category to group the note under.
+     * @param detail The detail to record.
+     */
+    private void note(Level level, String category, Object detail) {
+        WideEvent.noteOrLog(logger, level, category, detail);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -2309,15 +2324,17 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         // happen.
         LogBuilder lb = new LogBuilder(1024);
         int colonyCount = getAIColonies().size();
-        lb.add(player.getDebugName(),
-               " in ", turn, "/", turn.getNumber(),
-               " units=", getAIUnits().size(),
-               " colonies=", colonyCount,
-               " declare=", (player.checkDeclareIndependence() == null),
-               " v-land-REF=", player.getRebelStrengthRatio(false),
-               " v-naval-REF=", player.getRebelStrengthRatio(true));
+        WideEvent event = WideEvent.begin("ai.european.turn")
+            .with(PLAYER, player.getDebugName())
+            .with(TURN, turn.getNumber())
+            .with(UNITS, getAIUnits().size())
+            .with(COLONIES, colonyCount)
+            .with(DECLARE_INDEPENDENCE, player.checkDeclareIndependence() == null)
+            .with(LAND_REF_RATIO, player.getRebelStrengthRatio(false))
+            .with(NAVAL_REF_RATIO, player.getRebelStrengthRatio(true));
+        try {
         if (turn.isFirstTurn()) initializeMissions(lb);
-        
+
         if (isLikesAttackingNatives() && getGame().getTurn().getNumber() > 100) {
             for (Player p : getGame().getLivePlayerList(player)) {
                 if (!p.isIndian()) {
@@ -2326,7 +2343,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 player.getTension(p).setValue(Tension.TENSION_MAX);
             }
         }
-        
+
         determineStances(lb);
 
         if (colonyCount > 0) {
@@ -2337,6 +2354,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     lb.add(" ", aic.getColony());
                 }
             }
+            event.with(BADLY_DEFENDED_COLONIES, badlyDefended.size());
 
             lb.add("\n  Update colonies:");
             for (AIColony aic : getAIColonies()) aic.update(lb);
@@ -2354,12 +2372,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         final Set<AIUnit> militaryUnits = getAIUnits().stream()
                 .filter(MilitaryCoordinator.isUnitHandledByMilitaryCoordinator())
                 .collect(Collectors.toSet());
-        
+
         final MilitaryCoordinator militaryCoordinator = new MilitaryCoordinator(this, militaryUnits);
         militaryCoordinator.determineMissions();
-        
+
         buildTransportMaps(lb);
-        
+
         final List<AIUnit> normalAiUnits = getAIUnits().stream()
                 .filter(MilitaryCoordinator.isUnitHandledByMilitaryCoordinator().negate())
                 .collect(Collectors.toList());
@@ -2371,9 +2389,13 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             if (aiUnits.isEmpty()) break;
             aiUnits = doMissions(aiUnits, lb);
         }
-        
-        
-        lb.log(logger, Level.FINE);
+        } catch (RuntimeException ex) {
+            event.fail(ex);
+            throw ex;
+        } finally {
+            event.with(DETAIL, lb.toString());
+            event.end(logger, Level.FINE);
+        }
 
         clearAIUnits();
         tipMap.clear();
