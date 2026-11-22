@@ -19,12 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Objects;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -34,12 +35,27 @@ public class InciteTradeItem extends TradeItem {
     
     public static final String TAG = "inciteTradeItem";
 
+    private static final double BASE_INCITE_COST = 50.0;
+
+    /**
+     * Fallback ratio used when military strength information is unavailable
+     * or invalid. This keeps the trade evaluable while making incitement
+     * more expensive than a normal equal-strength scenario.
+     */
+    private static final double UNKNOWN_STRENGTH_RATIO = 0.5;
+
+    /**
+     * Minimum ratio used to avoid division by zero when a player has
+     * effectively no measurable military strength.
+     */
+    private static final double MIN_STRENGTH_RATIO = 0.1;
+
     /** The victim player. */
     private Player victim;
 
     
     /**
-     * Creates a new {@code InciteTradeItem} inincite.
+     * Creates a new {@code InciteTradeItem} incite.
      *
      * @param game The enclosing {@code Game}.
      * @param source The source {@code Player}.
@@ -55,7 +71,7 @@ public class InciteTradeItem extends TradeItem {
     }
 
     /**
-     * Creates a new {@code InciteTradeItem} inincite.
+     * Creates a new {@code InciteTradeItem} incite.
      *
      * @param game The enclosing {@code Game}.
      * @param xr A {@code FreeColXMLReader} to read from.
@@ -105,18 +121,36 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int evaluateFor(Player player) {
+        if (!isValid()) {
+            return INVALID_TRADE_ITEM;
+        }
+
         final Player victim = getVictim();
+
         switch (player.getStance(victim)) {
         case ALLIANCE:
             return INVALID_TRADE_ITEM;
-        case WAR: // Not invalid, other player may not know our stance
+        case WAR:
             return 0;
         default:
             break;
         }
-        // FIXME: magic#, needs rebalancing
-        return -(int)Math.round(50.0 / player.getStrengthRatio(victim, false));
+
+        double ratio = player.getStrengthRatio(victim, false);
+
+        // Strength information is unavailable or invalid.
+        // Use a conservative fallback value so the trade can still be evaluated.
+        if (Double.isNaN(ratio) || ratio < 0.0) {
+            ratio = UNKNOWN_STRENGTH_RATIO;
+
+        // Prevent division by zero when the player has no measurable strength.
+        } else if (ratio == 0.0) {
+            ratio = MIN_STRENGTH_RATIO;
+        }
+
+        return -(int) Math.round(BASE_INCITE_COST / ratio);
     }
     
 
@@ -173,9 +207,12 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof InciteTradeItem)) return false;
-        InciteTradeItem other = (InciteTradeItem)o;
-        return Utils.equals(this.victim, other.victim)
+        if (this == o) return true;
+        
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        InciteTradeItem other = (InciteTradeItem) o;
+        return Objects.equals(this.victim, other.victim)
             && super.equals(other);
     }
 
@@ -184,8 +221,7 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + Utils.hashCode(this.victim);
+        return Objects.hash(super.hashCode(), this.victim);
     }
 
     /**
@@ -193,9 +229,9 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(this.victim.getId()).append(']');
-        return sb.toString();
+        return getClass().getSimpleName()
+            + "[id=" + getId()
+            + ", victim=" + ((victim == null) ? "null" : victim.getId())
+            + "]";
     }
 }

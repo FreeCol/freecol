@@ -33,14 +33,19 @@ public class AllTests {
         suite.addTestSuite(BuildingTest.class);
         suite.addTestSuite(ColonyTest.class);
         suite.addTestSuite(ColonyProductionTest.class);
+        suite.addTestSuite(ColonyTradeItemTest.class);
         suite.addTestSuite(CombatTest.class);
         suite.addTestSuite(CombatAmbushTest.class);
+        suite.addTestSuite(DiplomaticTradeTest.class);
         suite.addTestSuite(DisasterTest.class);
         suite.addTestSuite(EuropeTest.class);
         suite.addTestSuite(FoundingFatherTest.class);
         suite.addTestSuite(GameTest.class);
+        suite.addTestSuite(GoldTradeItemTest.class);
         suite.addTestSuite(GoodsTest.class);
         suite.addTestSuite(GoodsContainerTest.class);
+        suite.addTestSuite(GoodsTradeItemTest.class);
+        suite.addTestSuite(InciteTradeItemTest.class);
         suite.addTestSuite(IndianSettlementTest.class);
         suite.addTestSuite(IndividualFatherTest.class);
         suite.addTestSuite(LimitTest.class);
@@ -64,6 +69,7 @@ public class AllTests {
         suite.addTestSuite(TileImprovementTest.class);
         suite.addTestSuite(TileItemContainerTest.class);
         suite.addTestSuite(TileTest.class);
+        suite.addTestSuite(TradeItemTest.class);
         suite.addTestSuite(TradeRouteTest.class);
         suite.addTestSuite(UnitTest.class);
         suite.addTestSuite(UnitChangeTypeTest.class);
