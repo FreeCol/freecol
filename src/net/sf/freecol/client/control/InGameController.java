@@ -1300,7 +1300,7 @@ public final class InGameController extends FreeColClientHolder {
             // If the destination is Europe (and valid) move there,
             // if the destination is null, ask what to do,
             // otherwise just move on the map.
-            result = (destination instanceof Europe
+            result = (unit.isSailingToEurope()
                       && getMyPlayer().getEurope() != null)
                 ? moveTowardEurope(unit, (Europe)destination)
                 : (destination == null)
@@ -3987,7 +3987,7 @@ public final class InGameController extends FreeColClientHolder {
             || !requireOurTurn()) return false;
 
         // Consider the distinct types of destinations.
-        if (destination instanceof Europe) {
+        if (unit.isSailingToEurope()) {
             if (unit.isInEurope()) {
                 sound("sound.event.illegalMove");
                 return false;
@@ -4865,7 +4865,7 @@ public final class InGameController extends FreeColClientHolder {
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askSetDestination(unit, destination);
         if (ret) {
-            if (destination instanceof Europe) {
+            if (unit.isSailingToEurope()) {
                 if (unit.hasTile()
                     && unit.getTile().isDirectlyHighSeasConnected()) {
                     moveTowardEurope(unit, (Europe)destination);

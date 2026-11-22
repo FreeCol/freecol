@@ -557,5 +557,95 @@ public class UnitTest extends FreeColTestCase {
                 assertFalse(type.hasMaximumAttrition());
             }
         }
-    }        
+    }
+
+    public void testSailingToEurope() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        HighSeas hs = dutch.getHighSeas();
+        Europe europe = dutch.getEurope();
+        Unit u = new ServerUnit(game, hs, dutch, caravelType);
+        u.setDestination(europe);
+        assertTrue("Unit should be at sea", u.isAtSea());
+        assertTrue("Unit should be sailing to Europe", u.isSailingToEurope());
+        assertFalse("Unit should not be sailing to New World", u.isSailingToNewWorld());
+    }
+
+    public void testSailingToNewWorld() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        HighSeas hs = dutch.getHighSeas();
+        Unit u = new ServerUnit(game, hs, dutch, caravelType);
+        u.setDestination(map);
+        assertTrue("Unit should be at sea", u.isAtSea());
+        assertTrue("Unit should be sailing to New World", u.isSailingToNewWorld());
+        assertFalse("Unit should not be sailing to Europe", u.isSailingToEurope());
+    }
+
+    public void testPassengerDirection() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        HighSeas hs = dutch.getHighSeas();
+        Europe europe = dutch.getEurope();
+        Unit carrier = new ServerUnit(game, hs, dutch, galleonType);
+        carrier.setDestination(europe);
+        Unit passenger = new ServerUnit(game, carrier, dutch, colonistType);
+        assertTrue("Passenger should be at sea via carrier", passenger.isAtSea());
+        assertFalse("Passengers do not have their own destination", passenger.isSailingToEurope());
+        assertFalse("Passenger should not be sailing to New World", passenger.isSailingToNewWorld());
+    }
+
+    public void testEuropeDestinationNotAtSea() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Europe europe = dutch.getEurope();
+
+        Tile tile = map.getTile(6, 8);
+        Unit unit = new ServerUnit(game, tile, dutch, caravelType);
+
+        unit.setDestination(europe);
+
+        assertFalse("Unit should not be at sea", unit.isAtSea());
+        assertFalse("Unit should not be sailing to Europe until it reaches High Seas",
+                    unit.isSailingToEurope());
+    }
+
+    public void testAtSeaWithoutDestination() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        HighSeas hs = dutch.getHighSeas();
+
+        Unit unit = new ServerUnit(game, hs, dutch, caravelType);
+
+        assertTrue(unit.isAtSea());
+        assertFalse(unit.isSailingToEurope());
+        assertFalse(unit.isSailingToNewWorld());
+    }
+
+    public void testNewWorldDestinationNotAtSea() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.changeMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+
+        Unit unit = new ServerUnit(game, map.getTile(6, 8), dutch, caravelType);
+        unit.setDestination(map);
+
+        assertFalse(unit.isAtSea());
+        assertFalse(unit.isSailingToEurope());
+        assertFalse(unit.isSailingToNewWorld());
+    }
 }

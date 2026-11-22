@@ -1094,6 +1094,27 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Check whether this unit is currently sailing toward Europe.
+     *
+     * @return True if the unit is at sea and its destination is Europe.
+     */
+    public boolean isSailingToEurope() {
+        return getLocation() instanceof HighSeas
+            && getDestination() instanceof Europe;
+    }
+
+    /**
+     * Check whether this unit is currently sailing toward the New World.
+     *
+     * @return True if the unit is at sea and its destination is the game map.
+     */
+    public boolean isSailingToNewWorld() {
+        return isAtSea()
+            && getDestination() != null
+            && !(getDestination() instanceof Europe);
+    }
+
+    /**
      * Checks if this unit is running a mission.
      *
      * @return True if this unit is running a mission.
