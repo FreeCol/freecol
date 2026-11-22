@@ -1172,4 +1172,242 @@ public class BuildingTest extends FreeColTestCase {
         // did that differed from magazine
         assertEquals(18, armory.getTotalProductionOf(musketsType));
     }
+
+    public void testGetOwner() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+        Building hall = colony.getBuilding(townHallType);
+
+        assertSame(colony.getOwner(), hall.getOwner());
+    }
+
+    public void testSetOwnerThrows() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+        Building building = colony.getBuilding(townHallType);
+
+        try {
+            building.setOwner(colony.getOwner());
+            fail("Expected UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            // Expected.
+        }
+    }
+
+    public void testCurrentWorkTypeEmpty() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building building = colony.getBuilding(townHallType);
+        clearWorkLocation(building);
+
+        assertNull(building.getCurrentWorkType());
+    }
+
+    public void testHasOutputs() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building townHall = colony.getBuilding(townHallType);
+
+        assertTrue(townHall.hasOutputs());
+    }
+
+    public void testGetProductionOfNullUnit() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+        Building building = colony.getBuilding(townHallType);
+
+        try {
+            building.getProductionOf(null, bellsType);
+            fail("Expected RuntimeException");
+        } catch (RuntimeException e) {
+            assertTrue(e.getMessage().contains("Null unit"));
+        }
+    }
+
+    public void testGenericPotential() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertEquals(
+            hall.getPotentialProduction(
+                bellsType,
+                spec().getDefaultUnitType(colony.getOwner())),
+            hall.getGenericPotential(bellsType));
+    }
+
+    public void testExpertUnitTypeTownHall() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertEquals(elderStatesmanType,
+                     hall.getExpertUnitType());
+    }
+
+    public void testBuildingCopyInNull() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building building = colony.getBuilding(townHallType);
+
+        assertFalse(building.copyIn(null));
+    }
+
+
+    public void testGetConsumedGoods() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building smithy = colony.getBuilding(blacksmithHouseType);
+
+        assertEquals(
+            toList(smithy.getInputs()).size(),
+            smithy.getConsumedGoods().size());
+    }
+
+    public void testGetLevel() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building church = colony.getBuilding(chapelType);
+
+        assertEquals(
+            church.getType().getLevel(),
+            church.getLevel());
+    }
+
+    public void testGetNameKey() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building smithy = colony.getBuilding(blacksmithHouseType);
+
+        assertEquals(
+            smithy.getType().getNameKey(),
+            smithy.getNameKey());
+    }
+
+    public void testDowngrade() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony(10);
+
+        Building church = colony.getBuilding(chapelType);
+
+        church.upgrade();
+        assertEquals(churchType, church.getType());
+
+        church.downgrade();
+        assertEquals(chapelType, church.getType());
+    }
+
+    public void testLocationLabel() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertNotNull(hall.getLocationLabel());
+    }
+
+    public void testUp() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertSame(colony, hall.up());
+    }
+
+    public void testToShortString() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertNotNull(hall.toShortString());
+        assertTrue(hall.toShortString().contains(colony.getName()));
+    }
+
+    public void testGetUnitCapacity() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertEquals(
+            hall.getType().getWorkPlaces(),
+            hall.getUnitCapacity());
+    }
+
+    public void testGetNoWorkReason() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertEquals(NoAddReason.NONE,
+                     hall.getNoWorkReason());
+    }
+
+    public void testGetLabel() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertNotNull(hall.getLabel());
+    }
+
+    public void testGetDisplayObject() {
+        Game game = getGame();
+        game.changeMap(getTestMap(true));
+
+        Colony colony = createStandardColony();
+
+        Building hall = colony.getBuilding(townHallType);
+
+        assertSame(hall.getType(),
+                   hall.getDisplayObject());
+    }
 }
