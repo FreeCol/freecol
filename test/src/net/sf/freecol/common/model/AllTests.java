@@ -37,6 +37,7 @@ public class AllTests {
         suite.addTestSuite(CombatAmbushTest.class);
         suite.addTestSuite(DisasterTest.class);
         suite.addTestSuite(EuropeTest.class);
+        suite.addTestSuite(ForceTest.class);
         suite.addTestSuite(FoundingFatherTest.class);
         suite.addTestSuite(GameTest.class);
         suite.addTestSuite(GoodsTest.class);
