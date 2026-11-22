@@ -105,6 +105,7 @@ public class ActionManager extends OptionGroup {
         add(new DisbandUnitAction(freeColClient));
         add(new DisplayBordersAction(freeColClient));
         add(new DisplayGridAction(freeColClient));
+        add(new DisplayTileYieldsAction(freeColClient));
         add(new DisplayFogOfWarAction(freeColClient));
         for (DisplayText type : DisplayText.values()) {
             add(new DisplayTileTextAction(freeColClient, type));

@@ -29,6 +29,7 @@ public class AllTests {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui");
         //$JUnit-BEGIN$
         suite.addTestSuite(FontTest.class);
+        suite.addTestSuite(TileYieldsTest.class);
         //$JUnit-END$
         return suite;
     }
