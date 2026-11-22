@@ -1227,4 +1227,117 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         FreeColTestUtils.setStudentSelection(selection);
     }
+
+    public void testStudentAlreadySkilledCannotLearn() {
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
+        ServerTestHelper.startServerGame(getTestMap(true));
+
+        Colony colony = getSchoolColony(2, SchoolLevel.UNIVERSITY);
+        Building university = colony.getBuilding(universityType);
+
+        Iterator<Unit> units = colony.getUnitList().iterator();
+        Unit student = units.next();
+        student.setType(expertOreMinerType); // Already skilled
+        student.setLocation(colony.getBuilding(townHallType));
+
+        Unit teacher = units.next();
+        teacher.setType(expertOreMinerType);
+        teacher.setLocation(university);
+
+        assertNull("Student should not be assigned", teacher.getStudent());
+
+        FreeColTestUtils.setStudentSelection(selection);
+    }
+
+    public void testNoEligibleStudents() {
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
+        ServerTestHelper.startServerGame(getTestMap(true));
+
+        Colony colony = getSchoolColony(2, SchoolLevel.UNIVERSITY);
+        Building university = colony.getBuilding(universityType);
+
+        // Make all units experts → no one can learn
+        for (Unit u : colony.getUnitList()) {
+            u.setType(expertOreMinerType);
+            u.setLocation(colony.getBuilding(townHallType));
+        }
+
+        Unit teacher = colony.getUnitList().get(0);
+        teacher.setLocation(university);
+
+        assertNull(teacher.getStudent());
+
+        FreeColTestUtils.setStudentSelection(selection);
+    }
+
+    public void testBrokenTeacherStudentRelationshipCleanup() {
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
+        ServerTestHelper.startServerGame(getTestMap(true));
+
+        Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
+        Building university = colony.getBuilding(universityType);
+
+        Iterator<Unit> units = colony.getUnitList().iterator();
+
+        Unit student = units.next();
+        student.setType(freeColonistType);
+        student.setLocation(colony.getBuilding(townHallType));
+
+        Unit teacher = units.next();
+        teacher.setType(expertOreMinerType);
+        teacher.setLocation(university);
+
+        // sanity
+        assertEquals(student, teacher.getStudent());
+        assertEquals(teacher, student.getTeacher());
+
+        // corrupt the relationship manually
+        student.setTeacher(null);
+
+        ServerTestHelper.newTurn();
+
+        assertNotNull("Teacher should recover and get a student",
+            teacher.getStudent());
+
+        assertEquals("Bidirectional relationship must be restored",
+            teacher, teacher.getStudent().getTeacher());
+
+        FreeColTestUtils.setStudentSelection(selection);
+    }
+
+    public void testTeacherCanRecoverFromInvalidStudent() {
+        boolean selection = FreeColTestUtils.setStudentSelection(false);
+        ServerTestHelper.startServerGame(getTestMap(true));
+
+        Colony colony = getSchoolColony(5, SchoolLevel.UNIVERSITY);
+        Building university = colony.getBuilding(universityType);
+        Building townHall = colony.getBuilding(townHallType);
+
+        Iterator<Unit> units = colony.getUnitList().iterator();
+
+        Unit student1 = units.next();
+        student1.setType(freeColonistType);
+        student1.setLocation(townHall);
+
+        Unit student2 = units.next();
+        student2.setType(freeColonistType);
+        student2.setLocation(townHall);
+
+        Unit teacher = units.next();
+        teacher.setType(expertOreMinerType);
+        teacher.setLocation(university);
+
+        // corrupt relationship
+        student1.setTeacher(null);
+
+        ServerTestHelper.newTurn();
+
+        assertNotNull(teacher.getStudent());
+
+        Unit assigned = teacher.getStudent();
+
+        assertEquals(teacher, assigned.getTeacher());
+
+        FreeColTestUtils.setStudentSelection(selection);
+    }
 }
