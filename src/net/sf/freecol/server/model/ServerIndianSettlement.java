@@ -585,11 +585,9 @@ public class ServerIndianSettlement extends IndianSettlement
         }
 
         // Try to breed horses
-        // FIXME: Make this generic.
         GoodsType horsesType = spec.getGoodsType("model.goods.horses");
-        // FIXME: remove this
-        GoodsType grainType = spec.getGoodsType("model.goods.grain");
-        int foodProdAvail = getTotalProductionOf(grainType) - getFoodConsumption();
+        GoodsType horseFoodType = horsesType.getInputType();
+        int foodProdAvail = getTotalProductionOf(horseFoodType) - getFoodConsumption();
         if (foodProdAvail > 0
             && getGoodsCount(horsesType) >= horsesType.getBreedingNumber()) {
             int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);
