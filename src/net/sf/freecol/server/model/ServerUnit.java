@@ -463,7 +463,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             }
             break;
         case LEARN:
-            if (getUnitChange(UnitChangeType.LOST_CITY) != null) {
+            if (getUnitChange(UnitChangeType.LOST_CITY) == null) {
                 rumour = RumourType.NOTHING;
             }
             break;
